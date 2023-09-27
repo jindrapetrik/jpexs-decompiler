@@ -2254,10 +2254,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
-    public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata) {
+    public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata, ABC abc) {
         int[] ret = new int[metadata.size()];
         for (int i = 0; i < metadata.size(); i++) {
             Map.Entry<String, Map<String, String>> en = metadata.get(i);
+            if ("API".equals(en.getKey()) && abc.isApiVersioned()) {
+                continue;
+            }                
             int[] keys = new int[en.getValue().size()];
             int[] values = new int[en.getValue().size()];
             int j = 0;
@@ -2433,7 +2436,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tc.slot_id = 0; //?
                 ts.traits.add(tc);
                 traits[k] = tc;
-                traits[k].metadata = generateMetadata(((InterfaceAVM2Item) item).metadata);
+                traits[k].metadata = generateMetadata(((InterfaceAVM2Item) item).metadata, abcIndex.getSelectedAbc());
                 if (traits[k].metadata.length > 0) {
                     traits[k].kindFlags |= Trait.ATTR_Metadata;
                 }
@@ -2454,7 +2457,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 tc.slot_id = slot_id++;
                 ts.traits.add(tc);
                 traits[k] = tc;
-                traits[k].metadata = generateMetadata(((ClassAVM2Item) item).metadata);
+                traits[k].metadata = generateMetadata(((ClassAVM2Item) item).metadata, abcIndex.getSelectedAbc());
                 if (traits[k].metadata.length > 0) {
                     traits[k].kindFlags |= Trait.ATTR_Metadata;
                 }
@@ -2482,7 +2485,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         sai.pkg.resolveCustomNs(abcIndex, importedClasses, localData.pkg, openedNamespaces, localData);
                     }
                     namespace = sai.pkg == null ? 0 : sai.pkg.getCpoolIndex(abcIndex);
-                    metadata = generateMetadata(((SlotAVM2Item) item).metadata);
+                    metadata = generateMetadata(((SlotAVM2Item) item).metadata, abcIndex.getSelectedAbc());
                 }
                 boolean generatedNs = false;
                 if (item instanceof ConstAVM2Item) {
@@ -2500,7 +2503,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     namespace = cai.pkg == null ? 0 : cai.pkg.getCpoolIndex(abcIndex);
                     isNamespace = type.toString().equals("Namespace");
                     isStatic = cai.isStatic();
-                    metadata = generateMetadata(((ConstAVM2Item) item).metadata);
+                    metadata = generateMetadata(((ConstAVM2Item) item).metadata, abcIndex.getSelectedAbc());
                 }
                 if (isNamespace) {
                     tsc.name_index = traitName(namespace, var);
@@ -2540,7 +2543,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ts.traits.add(tmgs);
 
                 traits[k] = tmgs;
-                traits[k].metadata = generateMetadata(((MethodAVM2Item) item).metadata);
+                traits[k].metadata = generateMetadata(((MethodAVM2Item) item).metadata, abcIndex.getSelectedAbc());
                 if (traits[k].metadata.length > 0) {
                     traits[k].kindFlags |= Trait.ATTR_Metadata;
                 }

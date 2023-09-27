@@ -501,6 +501,16 @@ public class Multiname {
         }
         return new ArrayList<>();
     }
+    
+    public boolean isApiVersioned(AVM2ConstantPool constants) {
+        if (hasOwnNamespace()) {
+            return false;
+        }
+        if (hasOwnNamespaceSet()) {
+            return getNamespaceSet(constants).isApiVersioned(constants);
+        }
+        return false;
+    }
 
     public NamespaceSet getNamespaceSet(AVM2ConstantPool constants) {
         if (namespace_set_index == 0) {

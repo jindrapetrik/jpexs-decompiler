@@ -2450,4 +2450,13 @@ public class ABC implements Openable {
         }
     }
 
+    public boolean isApiVersioned() {
+        //assuming all traits are versioned
+        for (ScriptInfo si: script_info) {
+            for (Trait trait : si.traits.traits) {
+                return trait.isApiVersioned(this);
+            }
+        }
+        return false;
+    }
 }
