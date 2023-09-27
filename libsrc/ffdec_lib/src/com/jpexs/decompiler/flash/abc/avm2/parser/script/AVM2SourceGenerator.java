@@ -2255,7 +2255,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata, ABC abc) {
-        int[] ret = new int[metadata.size()];
+        List<Integer> retList = new ArrayList<>();
         for (int i = 0; i < metadata.size(); i++) {
             Map.Entry<String, Map<String, String>> en = metadata.get(i);
             if ("API".equals(en.getKey()) && abc.isApiVersioned()) {
@@ -2270,8 +2270,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 j++;
             }
             MetadataInfo mi = new MetadataInfo(abcIndex.getSelectedAbc().constants.getStringId(en.getKey(), true), keys, values);
-            ret[i] = abcIndex.getSelectedAbc().metadata_info.size();
+            retList.add(abcIndex.getSelectedAbc().metadata_info.size());
             abcIndex.getSelectedAbc().metadata_info.add(mi);
+        }
+        int[] ret = new int[retList.size()];
+        for (int i = 0; i < retList.size(); i++) {
+            ret[i] = retList.get(i);
         }
         return ret;
     }
