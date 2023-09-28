@@ -20,8 +20,9 @@ package com.jpexs.helpers;
  *
  * @author JPEXS
  */
-@FunctionalInterface
 public interface ProgressListener {
 
     public void progress(int p);
+    
+    public void status(String status);
 }

@@ -1547,6 +1547,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         if (allowRenameIdentifiers && Configuration.autoRenameIdentifiers.get()) {
+            if (listener != null) {
+                listener.status("renaming.identifiers");
+            }
             deobfuscateIdentifiers(RenameType.TYPENUMBER);
             AbcMultiNameCollisionFixer collisionFixer = new AbcMultiNameCollisionFixer();
             collisionFixer.fixCollisions(this);

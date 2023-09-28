@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2066] AS3 Support for api-versioned SWFs
 - AS3 compound scripts (scripts containing multiple external definitions like compiled C code, etc.)
  have special node per script (script_0, script_1, ...) which contains included classes and script initializer
+- Show "Renaming identifiers" status on file opening with auto rename identifiers on
 
 ### Fixed
 - [#2043] StartSound2 tag handling

@@ -463,7 +463,7 @@ public class Main {
                     //Read again, because line file offsets changed with adding debug tags
                     //TODO: handle somehow without rereading?
                     instrSWF = null;
-                    try ( FileInputStream fis = new FileInputStream(fTempFile)) {
+                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
                         instrSWF = new SWF(fis, false, false);
                     } catch (InterruptedException ex) {
                         logger.log(Level.SEVERE, null, ex);
@@ -509,7 +509,7 @@ public class Main {
 
     private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException, InterruptedException {
         SWF instrSWF = null;
-        try ( FileInputStream fis = new FileInputStream(toPrepareFile)) {
+        try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -535,7 +535,7 @@ public class Main {
             if (prep != null) {
                 instrSWF = prep.prepare(instrSWF);
             }
-            try ( FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
+            try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
             }
         }
@@ -583,7 +583,7 @@ public class Main {
             if (swf.gfx) {
                 swfToSave = new GfxConvertor().convertSwf(swf);
             }
-            try ( FileOutputStream fos = new FileOutputStream(tempFile)) {
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 swfToSave.saveTo(fos, false, swf.gfx);
             }
 
@@ -634,7 +634,7 @@ public class Main {
                     if (swf.gfx) {
                         swfToSave = new GfxConvertor().convertSwf(swf);
                     }
-                    try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swfToSave.saveTo(fos, false, swf.gfx);
                     }
                     prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
@@ -822,37 +822,35 @@ public class Main {
         startWork(name, percent, mainFrame.getPanel().getCurrentWorker());
     }
 
-    
     private static long lastTimeStartWork = 0L;
-    
-    
+
     private static final Timer statusTimer = new Timer("status", true);
-    
+
     static {
-        statusTimer.schedule(new TimerTask(){
+        statusTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (mainFrame != null && mainFrame.getPanel().getStatusPanel().isStatusHidden()) {
-                    long nowTime = System.currentTimeMillis();                
-                    if(nowTime > lastTimeStartWork + 5000) {
-                        mainFrame.getPanel().showOldStatus();                         
+                    long nowTime = System.currentTimeMillis();
+                    if (nowTime > lastTimeStartWork + 5000) {
+                        mainFrame.getPanel().showOldStatus();
                     }
                 }
-            }            
+            }
         }, 5000, 5000);
     }
-    
+
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
         long nowTime = System.currentTimeMillis();
-        if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {            
+        if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {
             mainFrame.getPanel().setWorkStatusHidden(name, worker);
             return;
         }
         lastTimeStartWork = nowTime;
         View.execInEventDispatch(() -> {
             if (mainFrame != null) {
-                 mainFrame.getPanel().setWorkStatus(name, worker);
+                mainFrame.getPanel().setWorkStatus(name, worker);
                 if (percent == -1) {
                     mainFrame.getPanel().hidePercent();
                 } else {
@@ -975,6 +973,13 @@ public class Main {
                                 public void progress(int p) {
                                     startWork(AppStrings.translate("work.reading.swf"), p, worker);
                                 }
+
+                                @Override
+                                public void status(String status) {
+                                    if ("renaming.identifiers".equals(status)) {
+                                        startWork(AppStrings.translate("work.renaming.identifiers"), null);
+                                    }
+                                }
                             }, Configuration.parallelSpeedUp.get(), charset);
                             return swf;
                         }
@@ -1063,6 +1068,13 @@ public class Main {
                             @Override
                             public void progress(int p) {
                                 startWork(AppStrings.translate("work.reading.swf"), p, worker);
+                            }
+
+                            @Override
+                            public void status(String status) {
+                                if ("renaming.identifiers".equals(status)) {
+                                    startWork(AppStrings.translate("work.renaming.identifiers"), null);
+                                }
                             }
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
                             @Override
@@ -1206,7 +1218,7 @@ public class Main {
                                                     ret.setVal(open(new FileInputStream(selFile), selFile.getAbsolutePath(), selFile.getName()));
                                                     loadedStatus.add("CUSTOM:" + selFile.getAbsolutePath());
                                                     return;
-                                                } catch (Exception ex) {                                                    
+                                                } catch (Exception ex) {
                                                     //ignore;
                                                 }
                                             } else {
@@ -1293,7 +1305,7 @@ public class Main {
                 if (swf.encrypted) {
                     hasEncrypted = true;
                 }
-                
+
                 swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -1349,7 +1361,7 @@ public class Main {
 
             });
         }
-        
+
         if (hasEncrypted) {
             View.execInEventDispatchLater(new Runnable() {
                 @Override
@@ -1357,7 +1369,7 @@ public class Main {
                     ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("warning.cannotencrypt").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningCannotEncrypt);
                 }
 
-            });            
+            });
         }
 
         return result;
@@ -1368,7 +1380,7 @@ public class Main {
     }
 
     public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
-        try ( FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+        try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {
                 case WRAPPER:
                     InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
@@ -1442,7 +1454,7 @@ public class Main {
             if (mode == SaveFileMode.EXE) {
                 saveFileToExe((SWF) openable, exeExportMode, tmpFile);
             } else {
-                try ( FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
                     openable.saveTo(bos);
                 }
             }
@@ -1551,7 +1563,7 @@ public class Main {
                     continue;
                 }
 
-                openableLists.add(openables);                
+                openableLists.add(openables);
                 final OpenableList openables1 = openables;
                 final boolean first1 = first;
                 first = false;
@@ -1581,10 +1593,9 @@ public class Main {
                 }
             }
 
-            
             if (mainFrame != null) {
-                for (OpenableList openableList:openableLists) {
-                    for (Openable openable:openableList) {
+                for (OpenableList openableList : openableLists) {
+                    for (Openable openable : openableList) {
                         if (openable instanceof SWF) {
                             SWF swf = (SWF) openable;
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
@@ -1605,7 +1616,7 @@ public class Main {
                     }
                 }
             }
-            
+
             loadingDialog.setVisible(false);
             shouldCloseWhenClosingLoadingDialog = false;
 
@@ -1889,7 +1900,7 @@ public class Main {
             if (cc != null) {
                 cc.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
             }
-        }        
+        }
 
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
@@ -2669,9 +2680,10 @@ public class Main {
     }
 
     /**
-     * To bypass wrong encoded unicode characters coming from EXE,
-     * it Launch5j encodes characters using URLEncoder.
-     * @param args 
+     * To bypass wrong encoded unicode characters coming from EXE, it Launch5j
+     * encodes characters using URLEncoder.
+     *
+     * @param args
      */
     private static void decodeLaunch5jArgs(String[] args) {
         String encargs = System.getProperty("l5j.encargs");
@@ -2679,11 +2691,12 @@ public class Main {
             for (int i = 0; i < args.length; ++i) {
                 try {
                     args[i] = URLDecoder.decode(args[i], "UTF-8");
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                }
             }
         }
     }
-    
+
     /**
      * @param args the command line arguments
      * @throws IOException On error
@@ -2722,12 +2735,12 @@ public class Main {
                     reloadLastSession();
                 }
             });
-        } else {                       
+        } else {
             checkLibraryVersion();
             setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
-                initGui();                    
+                initGui();
                 View.execInEventDispatch(() -> {
                     shouldCloseWhenClosingLoadingDialog = true;
                     if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
@@ -2907,7 +2920,7 @@ public class Main {
             }
         }
     }
-    
+
     private static void populateSwf(Map<String, SWF> ret, SWF swf, String name) {
         int pos = 1;
         String baseName = name;
@@ -2925,10 +2938,10 @@ public class Main {
             }
         }
     }
-    
+
     public static void exit() {
         if (mainFrame != null && mainFrame.getPanel() != null) {
-            mainFrame.getPanel().scrollPosStorage.saveScrollPos(mainFrame.getPanel().getCurrentTree().getCurrentTreeItem());                    
+            mainFrame.getPanel().scrollPosStorage.saveScrollPos(mainFrame.getPanel().getCurrentTree().getCurrentTreeItem());
             mainFrame.getPanel().savePins();
         }
         try {

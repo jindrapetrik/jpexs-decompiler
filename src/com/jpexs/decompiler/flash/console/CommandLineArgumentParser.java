@@ -4362,6 +4362,10 @@ public class CommandLineArgumentParser {
                                             public void progress(int p) {
                                                 //...
                                             }
+
+                                            @Override
+                                            public void status(String status) {
+                                            }                                                                                        
                                         }, Configuration.parallelSpeedUp.get(), charset);
                                         return swf;
                                     }
@@ -4395,6 +4399,10 @@ public class CommandLineArgumentParser {
                                         public void progress(int p) {
                                             //startWork(AppStrings.translate("work.reading.swf"), p, worker);
                                         }
+
+                                        @Override
+                                        public void status(String status) {
+                                        }                                                                                
                                     }, Configuration.parallelSpeedUp.get(), charset);
                                     return swf;
                                 }
