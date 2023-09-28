@@ -179,8 +179,6 @@ public class Main {
 
     private static LoadFromMemoryFrame loadFromMemoryFrame;
 
-    private static LoadFromCacheFrame loadFromCacheFrame;
-
     private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static DebugLogDialog debugDialog;
@@ -752,13 +750,6 @@ public class Main {
             return mainFrame.getWindow();
         }
         return null;
-    }
-
-    public static void loadFromCache() {
-        if (loadFromCacheFrame == null) {
-            loadFromCacheFrame = new LoadFromCacheFrame();
-        }
-        loadFromCacheFrame.setVisible(true);
     }
 
     public static void loadFromMemory() {
@@ -1709,11 +1700,6 @@ public class Main {
             loadFromMemoryFrame.setVisible(false);
             loadFromMemoryFrame.dispose();
             loadFromMemoryFrame = null;
-        }
-        if (loadFromCacheFrame != null) {
-            loadFromCacheFrame.setVisible(false);
-            loadFromCacheFrame.dispose();
-            loadFromCacheFrame = null;
         }
         if (mainFrame != null) {
             mainFrame.setVisible(false);

@@ -792,10 +792,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Main.loadFromMemory();
     }
 
-    protected void searchCacheActionPerformed(ActionEvent evt) {
-        Main.loadFromCache();
-    }
-
     protected void gotoDucumentClassOnStartupActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
