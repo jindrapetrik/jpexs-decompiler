@@ -203,6 +203,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final DebugPanel debugPanel;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    
+    private final JLabel infoNotEditableLabel;
 
     private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
 
@@ -1065,14 +1067,20 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         brokenHintPanel.setVisible(false);
 
+        infoNotEditableLabel = new JLabel(View.getIcon("information16"));
+        infoNotEditableLabel.setToolTipText(AppStrings.translate("info.noteditable.compound"));        
+        
         iconDecPanel.add(panelWithHint, BorderLayout.CENTER);
         final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
         decButtonsPan.add(experimentalLabel);
+        decButtonsPan.add(infoNotEditableLabel);
         decButtonsPan.add(saveDecompiledButton);
         decButtonsPan.add(cancelDecompiledButton);
 
+        infoNotEditableLabel.setVisible(false);
+        
         editDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
@@ -1992,5 +2000,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public DebugPanel getDebugPanel() {
         return debugPanel;
+    }
+    
+    public void setCompound(boolean value) {
+        infoNotEditableLabel.setVisible(value);
+        experimentalLabel.setVisible(!value);
+        editDecompiledButton.setEnabled(!value);
     }
 }

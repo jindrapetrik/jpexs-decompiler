@@ -5140,6 +5140,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 abcPanel.setAbc(scriptLeaf.abc);
                 abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
                 abcPanel.decompiledTextArea.setNoTrait();
+                abcPanel.setCompound(true);
             }
 
             if (Configuration.displayAs3TraitsListAndConstantsPanel.get()) {
@@ -5156,6 +5157,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 abcPanel.setAbc(scriptLeaf.abc);
                 abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
                 abcPanel.decompiledTextArea.setNoTrait();
+                abcPanel.setCompound(!scriptLeaf.isSimple);
             }
 
             if (Configuration.displayAs3TraitsListAndConstantsPanel.get()) {
