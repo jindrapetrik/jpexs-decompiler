@@ -225,7 +225,9 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, true);
         AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(fullClassName), abc, scriptIndex);
-        getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);        
+        if (ci != null) {
+            getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);        
+        }
     }
 
     public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
