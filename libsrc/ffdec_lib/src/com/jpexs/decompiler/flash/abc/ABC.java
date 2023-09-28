@@ -1898,7 +1898,28 @@ public class ABC implements Openable {
         }
     }
 
+    private void packTraits(Traits traits) {
+        for (int i = traits.traits.size() - 1; i >= 0; i--) {
+            Trait t = traits.traits.get(i);
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass)t;
+                packTraits(instance_info.get(tc.class_info).instance_traits);
+                packTraits(class_info.get(tc.class_info).static_traits);
+            }
+            if (t.deleted) {
+                traits.traits.remove(i);
+            }
+        }
+    }
+    
     public void pack() {
+        for (ScriptInfo script:script_info) {
+            packTraits(script.traits);
+        }
+        for (MethodBody body: bodies) {
+            packTraits(body.traits);
+        }
+        
         packMethods();
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).deleted) {

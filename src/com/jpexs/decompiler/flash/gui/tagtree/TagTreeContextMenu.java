@@ -707,8 +707,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
                 if (item instanceof AS3Package) {
-                    AS3Package p = (AS3Package) item;
-                    if (!p.isPartOfCompoundScript()) {
+                    AS3Package pkg = (AS3Package) item;
+                    if (pkg.isCompoundScript() || !pkg.isPartOfCompoundScript()) {
                         continue;
                     }
                 }
@@ -2651,6 +2651,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                         for (int i = 0; i < itemsToRemove.size(); i++) {
                             Object item = itemsToRemove.get(i);
                             if (item instanceof AS3Package) {
+                                AS3Package pkg = (AS3Package) item;
+                                if (pkg.isCompoundScript()) {
+                                    continue;
+                                }
                                 List<ScriptPack> subScriptPacks = new ArrayList<>();
                                 getAllAS3PackageScriptPacks((AS3Package) item, subScriptPacks);
                                 for (ScriptPack pack : subScriptPacks) {
@@ -2733,6 +2737,25 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                 }
                             }
+                            
+                            if (item instanceof AS3Package) {
+                                AS3Package pkg = (AS3Package)item;
+                                if (pkg.isCompoundScript()) {
+                                    ScriptPack sp = pkg.getCompoundInitializerPack();
+                                    sp.abc.script_info.get(sp.scriptIndex).delete(sp.abc, true);
+                                    abcsToPack.add(sp.abc);
+                                    Openable openable = sp.getOpenable();
+                                    SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
+                                    swfsToClearCache.add(swf);
+                                    for (ABCContainerTag ct : swf.getAbcList()) {
+                                        if (ct.getABC() == sp.abc) {
+                                            ((Tag) ct).setModified(true);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
                             if (item instanceof TreeItem) {
                                 mainPanel.unpinItem((TreeItem) item);
                             }
