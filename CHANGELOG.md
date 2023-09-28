@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - AS3 compound scripts (scripts containing multiple external definitions like compiled C code, etc.)
  have special node per script (script_0, script_1, ...) which contains included classes and script initializer
 - Show "Renaming identifiers" status on file opening with auto rename identifiers on
+- [#2010] word wrapping in the translation tool
 
 ### Fixed
 - [#2043] StartSound2 tag handling
@@ -3110,6 +3111,7 @@ Major version of SWF to XML export changed to 2.
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
 [#2057]: https://www.free-decompiler.com/flash/issues/2057
 [#2066]: https://www.free-decompiler.com/flash/issues/2066
+[#2010]: https://www.free-decompiler.com/flash/issues/2010
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#2017]: https://www.free-decompiler.com/flash/issues/2017
 [#2052]: https://www.free-decompiler.com/flash/issues/2052
