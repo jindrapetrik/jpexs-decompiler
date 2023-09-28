@@ -476,8 +476,8 @@ public class ABC implements Openable {
             for (int ip = 0; ip < body.getCode().code.size(); ip++) {
                 if (body.getCode().code.get(ip).definition instanceof CallPropertyIns) {
                     int mIndex = body.getCode().code.get(ip).operands[0];
-                    if (mIndex > 0) {
-                        Multiname m = constants.getMultiname(mIndex);
+                    if (mIndex > 0 && mIndex < constants.getMultinameCount()) {
+                        Multiname m = constants.getMultiname(mIndex);                        
                         if (m.getNameWithNamespace(constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
