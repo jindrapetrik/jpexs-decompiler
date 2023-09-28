@@ -1179,6 +1179,12 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testImportedConst() {
+        decompileMethod("classic", "testImportedConst", "trace(myconst);\r\n",
+                 false);
+    }
+
+    @Test
     public void testImportedVar() {
         decompileMethod("classic", "testImportedVar", "trace(myvar);\r\n"
                 + "myvar = 5;\r\n",

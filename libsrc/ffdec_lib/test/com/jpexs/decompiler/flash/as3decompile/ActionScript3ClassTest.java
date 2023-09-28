@@ -558,4 +558,28 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}");
     }
+
+    @Test
+    public void testInitializedVar() {
+        decompileScriptPack("standard", "tests_classes.initializedvar", "package tests_classes\n"
+                + "{\n"
+                + "   public var initializedvar:Object = {\n"
+                + "      \"a\":1,\n"
+                + "      \"b\":2,\n"
+                + "      \"c\":3\n"
+                + "   };\n"
+                + "}");
+    }
+    
+    @Test
+    public void testInitializedConst() {
+        decompileScriptPack("standard", "tests_classes.initializedconst", "package tests_classes\n"
+                + "{\n"
+                + "   public const initializedconst:Object = {\n"
+                + "      \"a\":1,\n"
+                + "      \"b\":2,\n"
+                + "      \"c\":3\n"
+                + "   };\n"
+                + "}");
+    }
 }

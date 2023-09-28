@@ -1183,6 +1183,12 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testImportedConst() {
+        decompileMethod("classic_air", "testImportedConst", "trace(29);\r\n",
+                 false);
+    }
+
+    @Test
     public void testImportedVar() {
         decompileMethod("classic_air", "testImportedVar", "trace(myvar);\r\n"
                 + "myvar = 5;\r\n",

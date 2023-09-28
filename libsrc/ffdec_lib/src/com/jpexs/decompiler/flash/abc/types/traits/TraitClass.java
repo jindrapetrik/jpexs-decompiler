@@ -280,8 +280,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
             writer.mark();
-            List<Traits> ts = new ArrayList<>();
-            ts.add(classInfo.static_traits);
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
 
@@ -298,7 +296,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 }
             }
 
-            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, classInfo.static_traits, true, new HashSet<>());
 
             newScopeStack.push(new ClassAVM2Item(abc.instance_info.get(class_info).getName(abc.constants)));
             classInitializerIsEmpty = !writer.getMark();
@@ -308,12 +306,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (!instanceInfo.isInterface()) {
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
             if (bodyIndex != -1) {
-                List<Traits> ts = new ArrayList<>();
-                ts.add(instanceInfo.instance_traits);
                 MethodBody constructorBody = abc.bodies.get(bodyIndex);
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+                constructorBody.convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, instanceInfo.instance_traits, true, new HashSet<>());
 
                 if (convertData.ignoreFrameScripts) {
                     //find all addFrameScript(xx,this.method) in constructor

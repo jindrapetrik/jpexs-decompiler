@@ -104,14 +104,11 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer;
         try {
-            List<Traits> ts = new ArrayList<>();
-            ts.add(abc.instance_info.get(clsIndex).instance_traits);
-
             Configuration.autoDeobfuscate.set(methodName.toLowerCase().contains("obfus"));
 
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).convert(callStack, swf.getAbcIndex(), new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(callStack, swf.getAbcIndex(), new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(clsIndex).instance_traits, true, new HashSet<>());
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             abc.bodies.get(bodyIndex).toString(callStack, swf.getAbcIndex(), "run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), new HashSet<>());
         } catch (InterruptedException ex) {
