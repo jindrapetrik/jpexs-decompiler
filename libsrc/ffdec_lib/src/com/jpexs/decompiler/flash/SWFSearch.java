@@ -73,6 +73,10 @@ public class SWFSearch {
             public void progress(int p) {
                 setProgress(p);
             }
+
+            @Override
+            public void status(String status) {
+            }            
         },
                 "FWS".getBytes(), // Uncompressed Flash
                 "CWS".getBytes(), // ZLib compressed Flash

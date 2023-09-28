@@ -4872,6 +4872,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
                                 }
+
+                                @Override
+                                public void status(String status) {
+                                }                                
                             }, Configuration.parallelSpeedUp.get(), charset);
                             binaryDataTag.innerSwf = bswf;
                             bswf.binaryData = binaryDataTag;
