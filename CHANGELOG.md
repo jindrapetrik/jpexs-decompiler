@@ -61,6 +61,7 @@ new format wrong and corrupt SWFs.
 Major version of SWF to XML export changed to 2.
 - AS3 Compound scripts (scripts containing multiple external definitions like compiled C code, etc.)
  cannot be directly edited or imported (due to problems with script initializers)
+- [#2022] - AS3 - Make script initializer always visible and available instead of config
 
 ## [18.5.0] - 2023-06-25
 ### Added
@@ -3114,6 +3115,7 @@ Major version of SWF to XML export changed to 2.
 [#2076]: https://www.free-decompiler.com/flash/issues/2076
 [#2086]: https://www.free-decompiler.com/flash/issues/2086
 [#2009]: https://www.free-decompiler.com/flash/issues/2009
+[#2022]: https://www.free-decompiler.com/flash/issues/2022
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028

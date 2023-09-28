@@ -556,7 +556,7 @@ public final class Configuration {
     public static ConfigurationItem<Boolean> smartNumberFormatting = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("script")
+    //@ConfigurationCategory("script")    
     public static ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
 
     @ConfigurationDefaultBoolean(false)

@@ -220,7 +220,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.newLine();
         }
         
-        if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) { // && Configuration.enableScriptInitializerDisplay.get()) {
+        if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
@@ -233,15 +233,15 @@ public class ScriptPack extends AS3ClassTreeItem {
                     abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
                     writer.endBlock();
                 } else {
-                    writer.append(" ");
+                    writer.append("");
                 }
             }
             writer.endMethod();
             writer.endTrait();
             if (!scriptInitializerIsEmpty) {
                 writer.newLine();
-            }
-            first = false;
+                first = false;
+            }            
         }
 
         for (int t : traitIndices) {
