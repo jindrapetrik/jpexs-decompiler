@@ -263,9 +263,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return success;
     }
 
-    public void displayClass(int classIndex, int scriptIndex) {
+    public void displayClass(int classIndex, int scriptIndex, boolean hasScriptInitializer) {
         if (abcPanel.navigator.getClassIndex() != classIndex) {
-            abcPanel.navigator.setClassIndex(classIndex, scriptIndex);
+            abcPanel.navigator.setClassIndex(classIndex, scriptIndex, hasScriptInitializer);
         }
     }
 
@@ -636,7 +636,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             if (cm != null) {
                 classIndex = (int) cm.getProperties().index;
             }
-            displayClass(classIndex, script.scriptIndex);
+            displayClass(classIndex, script.scriptIndex, script.isSimple || script.traitIndices.isEmpty());
             Highlighting tm = Highlighting.searchPos(highlightedText.getMethodHighlights(), pos);
             if (tm != null) {
                 String name = "";
@@ -666,7 +666,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
 
             if (classIndex == -1) {
-                abcPanel.navigator.setClassIndex(-1, script.scriptIndex);
+                abcPanel.navigator.setClassIndex(-1, script.scriptIndex, script.isSimple || script.traitIndices.isEmpty());
                 //setNoTrait();
                 //return;
             }

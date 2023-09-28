@@ -40,6 +40,8 @@ public final class TraitsListModel implements ListModel<Object> {
     private final int classIndex;
 
     private final int scriptIndex;
+    
+    private final boolean hasScriptInitializer;
 
     public void setSorted(boolean sorted) {
         if (sorted) {
@@ -77,15 +79,16 @@ public final class TraitsListModel implements ListModel<Object> {
             items.add(new TraitsListItem(TraitType.INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
 
-        if (Configuration.enableScriptInitializerDisplay.get()) {
+        if (hasScriptInitializer) {
             items.add(new TraitsListItem(TraitType.SCRIPT_INITIALIZER, 0, true, abc, classIndex, scriptIndex));
         }
     }
 
-    public TraitsListModel(ABC abc, int classIndex, int scriptIndex, boolean sorted) {
+    public TraitsListModel(ABC abc, int classIndex, int scriptIndex, boolean sorted, boolean hasScriptInitializer) {
         this.abc = abc;
         this.classIndex = classIndex;
         this.scriptIndex = scriptIndex;
+        this.hasScriptInitializer = hasScriptInitializer;
         reset();
         if (sorted) {
             setSorted(true);
