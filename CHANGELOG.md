@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
 - AS3 - Checkbox for exporting assets embedded using `Embed` (-exportembed in commandline)
 - FLA export - AS3 - Using `Embed` tag for DefineBinaryData, images not extending BitmapData
 - [#2066] AS3 Support for api-versioned SWFs
+- AS3 compound scripts (scripts containing multiple external definitions like compiled C code, etc.)
+ have special node per script (script_0, script_1, ...) which contains included classes and script initializer
 
 ### Fixed
 - [#2043] StartSound2 tag handling
@@ -57,6 +59,8 @@ All notable changes to this project will be documented in this file.
 to properly handle newlines and tabs. Older versions of FFDec can read this
 new format wrong and corrupt SWFs.
 Major version of SWF to XML export changed to 2.
+- AS3 Compound scripts (scripts containing multiple external definitions like compiled C code, etc.)
+ cannot be directly edited or imported (due to problems with script initializers)
 
 ## [18.5.0] - 2023-06-25
 ### Added
