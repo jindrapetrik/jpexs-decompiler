@@ -1015,11 +1015,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
-        setMenuEnabled("/file/import", openableSelected);
-        setMenuEnabled("/file/import/importText", allSameSwf && swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importScript", allSameOpenable && openableSelected && !isWorking);
-        setMenuEnabled("/file/import/importOther", allSameSwf && swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importXml", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab", openableSelected);
+        setMenuEnabled("/import/importtab/importText", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importScript", allSameOpenable && openableSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importImages", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importShapes", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importShapesNoFill", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importMovies", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importSounds", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importSymbolClass", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importXml", allSameSwf && swfSelected && !isWorking);
 
         setMenuEnabled("/tools/deobfuscation", openableSelected);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);
@@ -1138,19 +1143,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/export/exportSelected", translate("menu.file.export.selection"), "exportsel16", this::exportSelectedActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/export");
 
-        addMenuItem("/file/import", translate("menu.import"), null, null, 0, null, false, null, false);
-        addMenuItem("/file/import/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_TOP, null, true, null, false);
-        addMenuItem("/file/import/importText", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther", translate("menu.file.import.other"), "importother32", null, PRIORITY_MEDIUM, null, false, null, false);
-        addMenuItem("/file/import/importOther/importImages", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther/importShapes", translate("menu.file.import.shape"), "importshape32", this::importShapesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther/importMovies", translate("menu.file.import.movie"), "importmovie32", this::importMoviesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
-        addMenuItem("/file/import/importOther/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        finishMenu("/file/import/importOther");
-        finishMenu("/file/import");
+        addMenuItem("/import", translate("menu.import"), null, null, 0, null, false, null, false);
+        addMenuItem("/import/importtab", translate("menu.import"), null, null, 0, null, false, null, false);
+        addMenuItem("/import/importtab/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/import/importtab/importText", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importImages", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importShapes", translate("menu.file.import.shape"), "importshape32", this::importShapesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importMovies", translate("menu.file.import.movie"), "importmovie32", this::importMoviesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
+        addMenuItem("/import/importtab/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        finishMenu("/import/importtab");
+        finishMenu("/import");
 
         addMenuItem("/file/start", translate("menu.file.start"), null, null, 0, null, false, null, false);
         addMenuItem("/file/start/run", translate("menu.file.start.run"), "play32", this::runActionPerformed, PRIORITY_TOP, null, true, new HotKey("F6"), false);
