@@ -73,6 +73,7 @@ package
         TestIfTry;
         TestIgnoreAndOr;
         TestImplicitCoerce;
+        TestImportedConst;
         TestImportedVar;
         TestInc2;
         TestIncDec;
@@ -143,6 +144,9 @@ package
         TestModifiers;
         
         TestOtherClass;
+        
+        initializedvar;
+        initializedconst;
         
         public function Main()
         {

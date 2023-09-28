@@ -8,7 +8,7 @@ package tests
 		{
 			trace(myvar);
 			//myvar++;
-			myvar = 5;
+			myvar = 5;            
 		}
 	}
 }
