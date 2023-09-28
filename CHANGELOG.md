@@ -53,6 +53,7 @@ All notable changes to this project will be documented in this file.
 - [#2086] AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements
 - [#2086] AS3 direct editation - not deleting old nested methods when they have multiple usages
 - [#2009] Missing images in MacOs icon
+- AS3 Initialization of var in script initializer
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
@@ -2685,7 +2686,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                constructorBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
 
                 Map<Integer, Multiname> frameToTraitMultiname = new HashMap<>();
 
@@ -2753,7 +2754,7 @@ public class XFLConverter {
                         StringBuilder scriptBuilder = new StringBuilder();
                         callStack = new ArrayList<>();
                         callStack.add(frameBody);
-                        frameBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                        frameBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
                         frameBody.toString(callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 

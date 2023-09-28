@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -4345,7 +4346,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 try {
                                     List<MethodBody> callStack = new ArrayList<>();
                                     callStack.add(documentPack.abc.findBody(mi));
-                                    documentPack.abc.findBody(mi).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                    documentPack.abc.findBody(mi).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
                                     List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
                                     if (!infos.isEmpty()) {
                                         if (infos.get(0) instanceof IfItem) {
@@ -4423,7 +4424,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                                                             int cinit = p.abc.class_info.get(ci).cinit_index;
                                                                             callStack = new ArrayList<>();
                                                                             callStack.add(p.abc.findBody(cinit));
-                                                                            p.abc.findBody(cinit).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                                                            p.abc.findBody(cinit).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
                                                                             List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
                                                                             for (GraphTargetItem cit : cinitBody) {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {

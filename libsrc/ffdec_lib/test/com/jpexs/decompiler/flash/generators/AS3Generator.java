@@ -156,14 +156,11 @@ public class AS3Generator {
                             s.append("\", ");
                             HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
                             MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
-                            List<Traits> ts = new ArrayList<>();
-                            ts.add(abc.instance_info.get(classId).instance_traits);
-
                             Configuration.autoDeobfuscate.set(clsName.toLowerCase().contains("obfus"));
 
                             List<MethodBody> callStack = new ArrayList<>();
                             callStack.add(b);
-                            b.convert(callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+                            b.convert(callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>());
                             b.toString(callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {

@@ -174,18 +174,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
         int sinit_bodyIndex = abc.findBodyIndex(sinit_index);
         if (sinit_bodyIndex != -1) {
-            List<Traits> ts = new ArrayList<>();
             //initialize all classes traits
-            for (Trait t : traits) {
+            /*for (Trait t : traits) {
                 if (t instanceof TraitClass) {
                     ts.add(abc.class_info.get(((TraitClass) t).class_info).static_traits);
                 }
-            }
-            ts.add(abc.script_info.get(scriptIndex).traits);
+            }*/
             writer.mark();
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(sinit_bodyIndex));            
-            abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true, new HashSet<>());
+            abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>());
             scriptInitializerIsEmpty = !writer.getMark();            
             
         }
