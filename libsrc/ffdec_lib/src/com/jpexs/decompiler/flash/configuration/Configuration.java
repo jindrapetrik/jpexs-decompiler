@@ -34,8 +34,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -44,6 +42,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -923,23 +922,15 @@ public final class Configuration {
         WINDOWS, OSX, UNIX
     }
 
-    private static OSId getOSId() {
-        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return System.getProperty("os.name");
-            }
-        };
-        OSId id = OSId.UNIX;
-        String osName = AccessController.doPrivileged(doGetOSName);
-        if (osName != null) {
-            if (osName.toLowerCase().startsWith("mac os x")) {
-                id = OSId.OSX;
-            } else if (osName.contains("Windows")) {
-                id = OSId.WINDOWS;
-            }
+    private static OSId getOSId() {        
+        String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        if ((OS.indexOf("mac") >= 0) || (OS.indexOf("darwin") >= 0)) {
+            return OSId.OSX;
+        } else if (OS.indexOf("win") >= 0) {
+            return OSId.WINDOWS;
+        } else {
+            return OSId.UNIX;
         }
-        return id;
     }
 
     public static String getFFDecHome() {
