@@ -51,6 +51,9 @@ public class AS3ScriptImporter {
             if (Thread.currentThread().isInterrupted()) {
                 return importCount;
             }
+            if (!pack.isSimple) {
+                continue;
+            }
             try {
                 File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false, false, false));
                 if (file.exists()) {
