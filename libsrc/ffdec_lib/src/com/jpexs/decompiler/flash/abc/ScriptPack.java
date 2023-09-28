@@ -137,7 +137,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     public String getPathScriptName() {
-        String scriptName = "";
+        String scriptName = "script_" + scriptIndex;
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
