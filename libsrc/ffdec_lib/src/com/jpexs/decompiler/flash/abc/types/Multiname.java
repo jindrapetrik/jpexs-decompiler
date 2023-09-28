@@ -366,9 +366,9 @@ public class Multiname {
         } else {
             String name = abc.constants.getString(name_index);
 
-            int nskind = namespace_index <= 0 ? -1 : getNamespace(abc.constants).kind;
+            int nskind = getSimpleNamespaceKind(abc.constants);
             if (nskind == Namespace.KIND_NAMESPACE || nskind == Namespace.KIND_PACKAGE_INTERNAL) {
-                DottedChain dc = abc.findCustomNs(namespace_index);
+                DottedChain dc = abc.findCustomNsOfMultiname(this);
                 String nsname = dc != null ? dc.getLast() : null;
                 
                 if (nsname != null && !"AS3".equals(nsname)) {
