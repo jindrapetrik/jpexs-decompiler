@@ -69,6 +69,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public void delete(ABC abc, boolean d) {
+        super.delete(abc, d);
         abc.deleteClass(class_info, d);
         abc.constants.getMultiname(name_index).deleted = d;
     }

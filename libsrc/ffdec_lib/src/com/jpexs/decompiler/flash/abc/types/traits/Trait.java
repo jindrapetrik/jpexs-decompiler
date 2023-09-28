@@ -98,8 +98,12 @@ public abstract class Trait implements Cloneable, Serializable {
     public static final int TRAIT_FUNCTION = 5;
 
     public static final int TRAIT_CONST = 6;
+    
+    public boolean deleted = false;
 
-    public abstract void delete(ABC abc, boolean d);
+    public void delete(ABC abc, boolean d) {
+        deleted = d;
+    }
 
     public final List<Entry<String, Map<String, String>>> getMetaDataTable(Trait parent, ConvertData convertData, ABC abc) {
         List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
