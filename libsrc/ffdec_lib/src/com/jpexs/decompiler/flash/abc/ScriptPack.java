@@ -91,6 +91,10 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     private final ClassPath path;
 
+    /**
+     * Is the scriptpack simple? ScriptPack can be either simple or compound.
+     * Compound = Contains more than one externally visible definitions.
+     */
     public boolean isSimple = false;
 
     public boolean scriptInitializerIsEmpty = false;
