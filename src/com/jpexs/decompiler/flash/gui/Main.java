@@ -968,7 +968,7 @@ public class Main {
                                 @Override
                                 public void status(String status) {
                                     if ("renaming.identifiers".equals(status)) {
-                                        startWork(AppStrings.translate("work.renaming.identifiers"), null);
+                                        startWork(AppStrings.translate("work.renaming.identifiers"), worker);
                                     }
                                 }
                             }, Configuration.parallelSpeedUp.get(), charset);
@@ -1064,7 +1064,7 @@ public class Main {
                             @Override
                             public void status(String status) {
                                 if ("renaming.identifiers".equals(status)) {
-                                    startWork(AppStrings.translate("work.renaming.identifiers"), null);
+                                    startWork(AppStrings.translate("work.renaming.identifiers"), worker);
                                 }
                             }
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
