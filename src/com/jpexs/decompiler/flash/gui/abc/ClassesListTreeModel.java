@@ -59,7 +59,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public ClassesListTreeModel(SWF swf, boolean flat) {
         super(null, null, null);
         this.flat = flat;
-        root = new AS3Package(null, swf, flat, false, null, null);
+        root = new AS3Package(null, swf, flat, false, null, false, null);
         this.targetItem = swf;
         this.list = swf.getAS3Packs();
         setFilter(null);
@@ -68,7 +68,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public ClassesListTreeModel(ABC abc, boolean flat) {
         super(null, null, null);
         this.flat = flat;
-        root = new AS3Package(null, abc.getOpenable(), flat, false, null, null);
+        root = new AS3Package(null, abc.getOpenable(), flat, false, null, false, null);
         this.targetItem = abc;
         List<ABC> allAbcs = new ArrayList<>();
         allAbcs.add(abc);
@@ -145,7 +145,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             String pathElement = "script_" + scriptIndex;
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, getOpenable(), false, false, abc, scriptIndex);
+                pkg = new AS3Package(pathElement, getOpenable(), false, false, abc, true, scriptIndex);
                 parent.addSubPackage(pkg);
             }
             if (pack.traitIndices.isEmpty()) {
@@ -164,7 +164,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             }
             AS3Package pkg = parent.getSubPackage(fullName);
             if (pkg == null) {
-                pkg = new AS3Package(fullName, getOpenable(), true, defaultPackage, null, null);
+                pkg = new AS3Package(fullName, getOpenable(), true, defaultPackage, null, scriptIndex != null, null);
                 parent.addSubPackage(pkg);
             }
             return pkg;
@@ -174,7 +174,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, getOpenable(), false, false, null, null);
+                pkg = new AS3Package(pathElement, getOpenable(), false, false, null, scriptIndex != null, null);
                 parent.addSubPackage(pkg);
             }
 

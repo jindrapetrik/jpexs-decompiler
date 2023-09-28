@@ -46,7 +46,6 @@ import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -118,8 +117,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
@@ -704,10 +701,16 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 if (item instanceof ScriptPack) {
-                    continue;
+                    ScriptPack pack = (ScriptPack) item;
+                    if (pack.isSimple) {
+                        continue;
+                    }
                 }
                 if (item instanceof AS3Package) {
-                    continue;
+                    AS3Package p = (AS3Package) item;
+                    if (!p.isPartOfCompoundScript()) {
+                        continue;
+                    }
                 }
 
                 if (item instanceof FrameScript) {
@@ -1052,8 +1055,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof ClassesListTreeModel) {
                 addAs3ClassMenuItem.setVisible(true);
             }
-            if (firstItem instanceof AS3Package) {
-                addAs3ClassMenuItem.setVisible(true);
+            if (firstItem instanceof AS3Package) {                
+                AS3Package pkg = (AS3Package) firstItem;
+                if (!pkg.isPartOfCompoundScript()) {
+                    addAs3ClassMenuItem.setVisible(true);
+                }
             }
             if (firstItem instanceof ABC) {
                 addAs3ClassMenuItem.setVisible(true);
