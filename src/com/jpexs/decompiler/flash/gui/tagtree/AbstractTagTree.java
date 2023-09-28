@@ -651,6 +651,12 @@ public abstract class AbstractTagTree extends JTree {
             if (d instanceof ScriptPack) {
                 ret.add(d);
             }
+            if (d instanceof AS3Package) {
+                AS3Package p = (AS3Package)d;
+                if (p.isCompoundScript()) {
+                    ret.add(d);
+                }
+            }
         }
         return ret;
     }

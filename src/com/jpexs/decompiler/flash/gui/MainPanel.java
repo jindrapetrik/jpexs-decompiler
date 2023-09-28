@@ -1960,6 +1960,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 if (d instanceof ScriptPack) {
                     as3scripts.add((ScriptPack) d);
                 }
+                
+                if (d instanceof AS3Package) {
+                    AS3Package p = (AS3Package) d;
+                    if (p.isCompoundScript()) {
+                        as3scripts.add(p.getCompoundInitializerPack());
+                    }
+                }
             }
 
             for (Tag sprite : sprites) {
