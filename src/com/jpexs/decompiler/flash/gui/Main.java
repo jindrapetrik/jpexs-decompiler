@@ -1567,6 +1567,9 @@ public class Main {
                     View.execInEventDispatch(() -> {
                         Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                         ensureMainFrame();
+                        if (openables1.isEmpty()) {
+                            return;
+                        }
                         if (reloadIndices[findex] > -1) {
                             mainFrame.getPanel().loadSwfAtPos(openables1, reloadIndices[findex]);
                         } else {
