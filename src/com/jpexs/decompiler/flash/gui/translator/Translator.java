@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -35,6 +36,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -361,6 +364,7 @@ public class Translator extends JFrame implements ItemListener {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setVerticalAlignment(JLabel.TOP);                
                 String key = (String) value;
                 String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
                 String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
@@ -394,15 +398,17 @@ public class Translator extends JFrame implements ItemListener {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String valueStr = "" + value;
                 label.setText("<html>" + valueStr.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\r\n", "<br/>") + "</html>");
-
+                label.setVerticalAlignment(JLabel.TOP);
+                
                 return label;
             }
 
-        });
+        });        
         table.getColumn("translated").setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setVerticalAlignment(JLabel.TOP);                
                 String key = (String) table.getValueAt(row, 0);
                 String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
                 String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
@@ -736,12 +742,17 @@ public class Translator extends JFrame implements ItemListener {
         setSize(800, 600);
         setTitle("JPEXS Free Flash Decompiler Translator");
         itemStateChanged(null);
-        table.setRowHeight(table.getFont().getSize() + 10);
-        updateRowHeights(table);
+        table.setRowHeight(table.getFont().getSize() + 10);        
+        table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                updateRowHeights(table);
+            }            
+        });
         View.centerScreen(this);
 
         load();
-        loadWindow();                       
+        loadWindow();                          
     }
 
     private void updateCounts() {
@@ -819,10 +830,32 @@ public class Translator extends JFrame implements ItemListener {
                 for (int column = 0; column < table.getColumnCount(); column++) {
                     Component comp = table.prepareRenderer(
                             table.getCellRenderer(row, column), row, column);
-                    rowHeight = Math.max(rowHeight,
-                            comp.getPreferredSize().height);
+                    int maxHeight = 0;
+                    int columnWidth = table.getColumn(table.getColumnName(column)).getWidth();
+                            
+                    if (comp instanceof JLabel) {
+                        JLabel lab = (JLabel) comp;
+                        javax.swing.text.View view = (javax.swing.text.View) lab.getClientProperty("html");
+                        if (view != null) {
+                            String text = lab.getText();
+                            float textWidth = view.getPreferredSpan(javax.swing.text.View.X_AXIS);
+                            float charHeight = view.getPreferredSpan(javax.swing.text.View.Y_AXIS);
+                            double lines = Math.ceil(textWidth / (double)columnWidth);
+                            double height = lines * charHeight;
+                            int heightInt = (int) Math.ceil(height);
+                            if (heightInt > maxHeight) {
+                                maxHeight = heightInt;
+                            }
+                        }
+                    }
+                    if (maxHeight == 0) {
+                        maxHeight = comp.getPreferredSize().height;
+                    }
+                    
+                    comp.setPreferredSize(new Dimension(columnWidth, maxHeight));
+                    
+                    rowHeight = Math.max(rowHeight, maxHeight);
                 }
-
                 table.setRowHeight(row, rowHeight);
             }
         } catch (ClassCastException e) {
@@ -1182,7 +1215,9 @@ public class Translator extends JFrame implements ItemListener {
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
         }
         try {
-            new Translator().setVisible(true);
+            Translator t = new Translator();
+            t.setVisible(true);
+            t.updateRowHeights(t.table); 
         } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1316,6 +1351,17 @@ class JTextAreaColumn extends AbstractCellEditor implements TableCellEditor {
         }
 
         String valueStr = value == null ? "" : value.toString();
+        
+        areaMode = true;
+        textArea.setFont(new JLabel().getFont());
+        textArea.setText(valueStr);
+        textArea.setEditable(column == 2);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        return pane;
+        
+        /*
+        String valueStr = value == null ? "" : value.toString();
         if (enValue.contains("\n") || valueStr.contains("\n")) {
             textArea.setText(valueStr);
             textArea.setEditable(column == 2);
@@ -1324,7 +1370,7 @@ class JTextAreaColumn extends AbstractCellEditor implements TableCellEditor {
         }
         areaMode = false;
         textField.setText(valueStr);
-        textField.setEditable(column == 2);
-        return textField;
+        textField.setEditable(column == 2);        
+        return textField;*/
     }
 }
