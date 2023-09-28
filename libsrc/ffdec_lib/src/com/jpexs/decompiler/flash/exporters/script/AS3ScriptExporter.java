@@ -475,6 +475,11 @@ public class AS3ScriptExporter {
         }
 
         if (exportSettings.exportEmbedFlaMode || exportSettings.exportEmbed) {
+            
+            if (Thread.currentThread().isInterrupted()) {
+                return ret;
+            }
+            
             final String ASSETS_DIR = outdir + "/_assets/";
             List<Tag> exportTagList = new ArrayList<>();
             List<DefineSpriteTag> spriteTagList = new ArrayList<>();
@@ -517,15 +522,29 @@ public class AS3ScriptExporter {
             try {
                 BinaryDataExporter bde = new BinaryDataExporter();
                 bde.exportBinaryData(handler, ASSETS_DIR, rttl, new BinaryDataExportSettings(BinaryDataExportMode.RAW), evl);
+                if (Thread.currentThread().isInterrupted()) {
+                    return ret;
+                }
                 ImageExporter ie = new ImageExporter();
                 ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
+                if (Thread.currentThread().isInterrupted()) {
+                    return ret;
+                }                
                 SoundExporter se = new SoundExporter();
                 se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
+                if (Thread.currentThread().isInterrupted()) {
+                    return ret;
+                }                
                 FontExporter fe = new FontExporter();
                 fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
+                if (Thread.currentThread().isInterrupted()) {
+                    return ret;
+                }                
                 Font4Exporter f4e = new Font4Exporter();
                 f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
-
+                if (Thread.currentThread().isInterrupted()) {
+                    return ret;
+                }                
                 if (!spriteTagList.isEmpty()) {
                     new RetryTask(() -> {
                         try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
@@ -593,7 +612,7 @@ public class AS3ScriptExporter {
             } catch (IOException ex) {
                 Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InterruptedException ex) {
-                Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+                return ret;
             }
         }
 
