@@ -2318,11 +2318,7 @@ public class ABC implements Openable {
         return newTrait;
     }
 
-    public DottedChain findCustomNs(int link_ns_index) {
-        String nsname;
-        if (link_ns_index <= 0) {
-            return null;
-        }
+    public DottedChain findCustomNsOfNamespace(int link_ns_index) {
         Namespace ns = constants.getNamespace(link_ns_index);
         if (ns.kind != Namespace.KIND_NAMESPACE && ns.kind != Namespace.KIND_PACKAGE_INTERNAL) {
             return null;
@@ -2332,20 +2328,20 @@ public class ABC implements Openable {
             return DottedChain.parseNoSuffix("AS3");
         }
 
-        return getSwf().getAbcIndex().nsValueToName(name);
-        /*
-        for (ABCContainerTag abcTag : getAbcTags()) {
-            DottedChain dc = abcTag.getABC().nsValueToName(name);
-            nsname = dc.getLast();
+        return getSwf().getAbcIndex().nsValueToName(name);        
+    }
+    
+    public DottedChain findCustomNsOfMultiname(Multiname m) {
+        int nskind = m.getSimpleNamespaceKind(constants);
+        if (nskind != Namespace.KIND_NAMESPACE && nskind != Namespace.KIND_PACKAGE_INTERNAL) {
+            return null;
+        }
+        String name = m.getSimpleNamespaceName(constants).toRawString();
+        if (name.equals("http://adobe.com/AS3/2006/builtin")) { //TODO: This should really be resolved using ABC indexing, not hardcoded constant
+            return DottedChain.parseNoSuffix("AS3");
+        }
 
-            if (nsname == null) {
-                continue;
-            }
-            if (!nsname.isEmpty()) {
-                return dc;
-            }
-        }*/
-        //return null;
+        return getSwf().getAbcIndex().nsValueToName(name);        
     }
 
     public void clearPacksCache() {
