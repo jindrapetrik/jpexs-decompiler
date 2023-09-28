@@ -1171,7 +1171,7 @@ public class ABC implements Openable {
             }
             for (AVM2Instruction ins : body.getCode().code) {
                 for (int o = 0; o < ins.definition.operands.length; o++) {
-                    if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
+                    if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX && ins.operands[o] < constants.getMultinameCount()) {
                         if (isSameName(multinameIndex, ins.operands[o], exactMatch)) {
                             ret.add(new MethodBodyMultinameUsage(this, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
                             return;
