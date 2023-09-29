@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
@@ -250,6 +251,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem unpinAllMenuItem;
 
     private JMenuItem unpinOthersMenuItem;
+    
+    private JMenuItem abcExplorerMenuItem;
 
     private List<TreeItem> items = new ArrayList<>();
 
@@ -358,11 +361,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
 
+        abcExplorerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.abcexplorer"));
+        abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
+        abcExplorerMenuItem.setIcon(View.getIcon("abc16"));
+        add(abcExplorerMenuItem);
+        
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
         rawEditMenuItem.setIcon(View.getIcon("rawedit16"));
-        add(rawEditMenuItem);
-
+        add(rawEditMenuItem);       
+        
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
@@ -931,6 +939,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceNoFillMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
         replaceRefsWithTagMenuItem.setVisible(false);
+        abcExplorerMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
@@ -1141,6 +1150,21 @@ public class TagTreeContextMenu extends JPopupMenu {
                 jumpToCharacterMenuItem.setVisible(true);
             }
 
+            if (firstItem instanceof ScriptPack) {
+                abcExplorerMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof AS3Package) {
+                AS3Package pkg = (AS3Package) firstItem;
+                if (pkg.isCompoundScript()) {
+                    abcExplorerMenuItem.setVisible(true);
+                }
+            }
+            
+            if (firstItem instanceof ABCContainerTag) {
+                abcExplorerMenuItem.setVisible(true);
+            }
+            
             if (firstItem instanceof Tag) {
                 rawEditMenuItem.setVisible(true);
             }
@@ -1799,6 +1823,33 @@ public class TagTreeContextMenu extends JPopupMenu {
         tag.replaceCharacter(characterId, newCharacterId);
     }
 
+    private void abcExplorerActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        if (item == null) {
+            return;
+        }
+        if (item instanceof ABCContainerTag) {
+            ABCContainerTag cnt = (ABCContainerTag)item;
+            mainPanel.showAbcExplorer(cnt.getSwf(), cnt.getABC());
+            return;
+        }
+        
+        if (item instanceof ScriptPack) {
+            ScriptPack pack = (ScriptPack)item;
+            ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.abc.getSwf(), pack.abc);
+            dialog.selectScriptInfo(pack.scriptIndex);
+        }
+            
+        if (item instanceof AS3Package) {
+            AS3Package pkg = (AS3Package) item;
+            if (pkg.isCompoundScript()) {
+                ScriptPack pack = pkg.getCompoundInitializerPack();
+                ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.abc.getSwf(), pack.abc);
+                dialog.selectScriptInfo(pack.scriptIndex);
+            }
+        }
+    }
+    
     private void rawEditActionPerformed(ActionEvent evt) {
         TreeItem itemr = getCurrentItem();
         if (itemr == null) {
