@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -185,7 +186,7 @@ public class ABCExplorerDialog extends AppDialog {
                 + (abc.hasFloatSupport() ? abc.constants.getFloatCount() - 1 + abc.constants.getFloat4Count() - 1 : 0);
         mainTabbedPane.addTab("cp (" + cpCount + ")", cpPanel);
         mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", makeTreePanel(abc, TreeType.METHOD_INFO));
-        mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", makeTreePanel(abc, TreeType.METADATA));
+        mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", makeTreePanel(abc, TreeType.METADATA_INFO));
         mainTabbedPane.addTab("ii (" + abc.instance_info.size() + ")", makeTreePanel(abc, TreeType.INSTANCE_INFO));
         mainTabbedPane.addTab("ci (" + abc.class_info.size() + ")", makeTreePanel(abc, TreeType.CLASS_INFO));
         mainTabbedPane.addTab("si (" + abc.script_info.size() + ")", makeTreePanel(abc, TreeType.SCRIPT_INFO));
@@ -223,7 +224,7 @@ public class ABCExplorerDialog extends AppDialog {
         CONSTANT_NAMESPACE_SET("NamespaceSets", "nss"),
         CONSTANT_MULTINAME("Multinames", "mn"),
         METHOD_INFO("MethodInfos", "mi"),
-        METADATA("MetadataInfos", "md"),
+        METADATA_INFO("MetadataInfos", "md"),
         INSTANCE_INFO("InstanceInfos", "ii"),
         CLASS_INFO("ClassInfos", "ci"),
         SCRIPT_INFO("ScriptInfos", "si"),
@@ -568,6 +569,17 @@ public class ABCExplorerDialog extends AppDialog {
                         siName = " (\"" + Helper.escapePCodeString(simplePackName.toRawString()) + "\")";
                     }
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName, prefix);
+
+                case METADATA_INFO:
+                    MetadataInfo md = abc.metadata_info.get(index);
+                    String mdName = abc.constants.getString(md.name_index);
+                    if (mdName == null) {
+                        mdName = "";
+                    } else {
+                        mdName = "\"" + Helper.escapePCodeString(mdName) + "\"";
+                    }
+                    mdName += " (" + md.values.length + " items)";
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.METADATA_INFO, md, mdName);
                 default:
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "", prefix);
             }
@@ -576,23 +588,27 @@ public class ABCExplorerDialog extends AppDialog {
         private int handleGetChildCountTrait(SubValue sv, Traits traits) {
             if (sv.getIndex() > -1) {
                 Trait t = traits.traits.get(sv.getIndex());
+                int count = 3;
+                if ((t.kindFlags & Trait.ATTR_Metadata) > 0) {
+                    count++;
+                }
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst) t;
                     if (tsc.value_index == 0) {
-                        return 3 + 3;
+                        return count + 3;
                     }
-                    return 3 + 4;
+                    return count + 4;
                 }
                 if (t instanceof TraitMethodGetterSetter) {
-                    return 3 + 2;
+                    return count + 2;
                 }
 
                 if (t instanceof TraitClass) {
-                    return 3 + 3;
+                    return count + 3;
                 }
 
                 if (t instanceof TraitFunction) {
-                    return 3 + 2;
+                    return count + 2;
                 }
             }
             return traits.traits.size();
@@ -602,6 +618,7 @@ public class ABCExplorerDialog extends AppDialog {
             if (sv.getIndex() > -1) {
                 Trait t = traits.traits.get(sv.getIndex());
 
+                int currentIndex = 0;
                 switch (index) {
                     case 0:
                         return createValueWithIndex(parent, index, t.name_index, TreeType.CONSTANT_MULTINAME, "name: ");
@@ -692,6 +709,7 @@ public class ABCExplorerDialog extends AppDialog {
                                     return new SimpleValue(parent, index, "value_kind: PrivateNamespace");
                             }
                     }
+                    currentIndex = 7;
                 }
                 if (t instanceof TraitMethodGetterSetter) {
                     TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
@@ -701,6 +719,7 @@ public class ABCExplorerDialog extends AppDialog {
                         case 4:
                             return createValueWithIndex(parent, index, tmgs.method_info, TreeType.METHOD_INFO, "method_info: ");
                     }
+                    currentIndex = 5;
                 }
                 if (t instanceof TraitClass) {
                     TraitClass tc = (TraitClass) t;
@@ -712,6 +731,7 @@ public class ABCExplorerDialog extends AppDialog {
                         case 5:
                             return createValueWithIndex(parent, index, tc.class_info, TreeType.CLASS_INFO, "class_info: ");
                     }
+                    currentIndex = 6;
                 }
 
                 if (t instanceof TraitFunction) {
@@ -721,6 +741,13 @@ public class ABCExplorerDialog extends AppDialog {
                             return new SimpleValue(parent, index, "slot_id: " + tf.slot_id);
                         case 4:
                             return createValueWithIndex(parent, index, tf.method_info, TreeType.METHOD_INFO, "method_index: ");
+                    }
+                    currentIndex = 5;
+                }
+                
+                if (index == currentIndex) {
+                    if ((t.kindFlags & Trait.ATTR_Metadata) > 0) {
+                        return new SubValue(parent, currentIndex, t, "metadata", "metadata");
                     }
                 }
             }
@@ -873,7 +900,7 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                 }
                 if (vwi.value instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo)vwi.value;
+                    InstanceInfo ii = (InstanceInfo) vwi.value;
                     switch (index) {
                         case 0:
                             return createValueWithIndex(parent, index, ii.name_index, TreeType.CONSTANT_MULTINAME, "name: ");
@@ -918,8 +945,8 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                 }
                 if (vwi.value instanceof ClassInfo) {
-                    ClassInfo ci = (ClassInfo)vwi.value;
-                    switch(index) {
+                    ClassInfo ci = (ClassInfo) vwi.value;
+                    switch (index) {
                         case 0:
                             return createValueWithIndex(parent, index, ci.cinit_index, TreeType.METHOD_INFO, "cinit: ");
                         case 1:
@@ -927,12 +954,22 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                 }
                 if (vwi.value instanceof ScriptInfo) {
-                    ScriptInfo si = (ScriptInfo)vwi.value;
-                    switch(index) {
+                    ScriptInfo si = (ScriptInfo) vwi.value;
+                    switch (index) {
                         case 0:
                             return createValueWithIndex(parent, index, si.init_index, TreeType.METHOD_INFO, "init: ");
                         case 1:
                             return new SubValue(parent, index, si, "traits", "traits");
+                    }
+                }
+
+                if (vwi.value instanceof MetadataInfo) {
+                    MetadataInfo md = (MetadataInfo) vwi.value;
+                    switch (index) {
+                        case 0:
+                            return createValueWithIndex(parent, index, md.name_index, TreeType.CONSTANT_STRING, "name: ");
+                        case 1:
+                            return new SubValue(parent, index, md, "pairs", "pairs");
                     }
                 }
             }
@@ -1042,7 +1079,7 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                 }
                 if (sv.getParentValue() instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo)sv.getParentValue();
+                    InstanceInfo ii = (InstanceInfo) sv.getParentValue();
                     switch (sv.getProperty()) {
                         case "interfaces":
                             return createValueWithIndex(parent, index, ii.interfaces[index], TreeType.CONSTANT_MULTINAME, "in" + index + ": ");
@@ -1051,20 +1088,47 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                 }
                 if (sv.getParentValue() instanceof ClassInfo) {
-                    ClassInfo ci = (ClassInfo)sv.getParentValue();
+                    ClassInfo ci = (ClassInfo) sv.getParentValue();
                     switch (sv.getProperty()) {
                         case "traits":
                             return handleGetChildTrait(parent, index, ci, sv, ci.static_traits);
                     }
                 }
                 if (sv.getParentValue() instanceof ScriptInfo) {
-                    ScriptInfo ci = (ScriptInfo)sv.getParentValue();
+                    ScriptInfo ci = (ScriptInfo) sv.getParentValue();
                     switch (sv.getProperty()) {
                         case "traits":
                             return handleGetChildTrait(parent, index, ci, sv, ci.traits);
                     }
                 }
+
+                if (sv.getParentValue() instanceof MetadataInfo) {
+                    MetadataInfo md = (MetadataInfo) sv.getParentValue();
+                    switch (sv.getProperty()) {
+                        case "pairs":
+                            if (sv.getIndex() > -1) {
+                                switch (index) {
+                                    case 0:
+                                        return createValueWithIndex(parent, index, md.keys[sv.getIndex()], TreeType.CONSTANT_STRING, "key: ");
+                                    case 1:
+                                        return createValueWithIndex(parent, index, md.values[sv.getIndex()], TreeType.CONSTANT_STRING, "value: ");
+                                }
+                                return null;
+                            }
+                            String pairTitle = "\"" + Helper.escapePCodeString(abc.constants.getString(md.keys[index])) + "\"" + " : "
+                                    + "\"" + Helper.escapePCodeString(abc.constants.getString(md.values[index])) + "\"";
+                            return new SubValue(parent, index, index, md, "pairs", "p" + index + ": " + pairTitle);
+                    }
+                }
                 
+                if (sv.getParentValue() instanceof Trait) {
+                    Trait t = (Trait) sv.getParentValue();
+                    switch (sv.getProperty()) {
+                        case "metadata":
+                            return createValueWithIndex(parent, index, t.metadata[index], TreeType.METADATA_INFO, "");
+                    }
+                }
+
             }
             return null;
         }
@@ -1095,7 +1159,7 @@ public class ABCExplorerDialog extends AppDialog {
                         return abc.constants.getMultinameCount();
                     case METHOD_INFO:
                         return abc.method_info.size();
-                    case METADATA:
+                    case METADATA_INFO:
                         return abc.metadata_info.size();
                     case INSTANCE_INFO:
                         return abc.instance_info.size();
@@ -1155,18 +1219,23 @@ public class ABCExplorerDialog extends AppDialog {
                     return 8;
                 }
                 if (vwi.value instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo)vwi.value;
+                    InstanceInfo ii = (InstanceInfo) vwi.value;
                     if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
                         return 7;
                     }
                     return 6;
                 }
-                
+
                 if (vwi.value instanceof ClassInfo) {
                     return 2;
                 }
-                
+
                 if (vwi.value instanceof ScriptInfo) {
+                    return 2;
+                }
+
+                if (vwi.value instanceof MetadataInfo) {
+                    MetadataInfo md = (MetadataInfo) vwi.value;
                     return 2;
                 }
             }
@@ -1218,11 +1287,11 @@ public class ABCExplorerDialog extends AppDialog {
                         case "traits":
                             return handleGetChildCountTrait(sv, body.traits);
                     }
-                }                
+                }
                 if (sv.getParentValue() instanceof InstanceInfo) {
                     InstanceInfo ii = (InstanceInfo) sv.getParentValue();
-                    switch(sv.getProperty()) {
-                        case "interfaces":                            
+                    switch (sv.getProperty()) {
+                        case "interfaces":
                             return ii.interfaces.length;
                         case "traits":
                             return handleGetChildCountTrait(sv, ii.instance_traits);
@@ -1230,16 +1299,35 @@ public class ABCExplorerDialog extends AppDialog {
                 }
                 if (sv.getParentValue() instanceof ClassInfo) {
                     ClassInfo ci = (ClassInfo) sv.getParentValue();
-                    switch(sv.getProperty()) {
+                    switch (sv.getProperty()) {
                         case "traits":
                             return handleGetChildCountTrait(sv, ci.static_traits);
                     }
                 }
                 if (sv.getParentValue() instanceof ScriptInfo) {
                     ScriptInfo ci = (ScriptInfo) sv.getParentValue();
-                    switch(sv.getProperty()) {
+                    switch (sv.getProperty()) {
                         case "traits":
                             return handleGetChildCountTrait(sv, ci.traits);
+                    }
+                }
+
+                if (sv.getParentValue() instanceof MetadataInfo) {
+                    MetadataInfo md = (MetadataInfo) sv.getParentValue();
+                    switch (sv.getProperty()) {
+                        case "pairs":
+                            if (sv.getIndex() > -1) {
+                                return 2;
+                            }
+                            return md.keys.length;
+                    }
+                }
+                
+                if (sv.getParentValue() instanceof Trait) {
+                    Trait t = (Trait) sv.getParentValue();
+                    switch (sv.getProperty()) {
+                        case "metadata":
+                            return t.metadata.length;
                     }
                 }
             }
