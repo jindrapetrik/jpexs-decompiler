@@ -142,6 +142,19 @@ public class ABCExplorerDialog extends AppDialog {
         View.setWindowIcon(this);
         View.centerScreen(this);
     }
+    
+    public void selectAbc(ABC abc) {
+        if (abc == null && !abcContainers.isEmpty()) {
+            abcComboBox.setSelectedIndex(0);
+            return;
+        }
+        for (int i = 0; i < abcContainers.size(); i++) {
+            if (abcContainers.get(i).getABC() == abc) {
+                abcComboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
 
     private ABC getSelectedAbc() {
         return abcContainers.get(abcComboBox.getSelectedIndex()).getABC();
@@ -201,6 +214,26 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("ci (" + abc.class_info.size() + ")", makeTreePanel(abc, TreeType.CLASS_INFO));
         mainTabbedPane.addTab("si (" + abc.script_info.size() + ")", makeTreePanel(abc, TreeType.SCRIPT_INFO));
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", makeTreePanel(abc, TreeType.METHOD_BODY));
+    }
+    
+    public void selectScriptInfo(int scriptIndex) {
+        if (mainTabbedPane.getTabCount() > 0) {
+            mainTabbedPane.setSelectedIndex(5);
+            JPanel pan = (JPanel) mainTabbedPane.getComponentAt(5);
+            FasterScrollPane fasterScrollPane = (FasterScrollPane) pan.getComponent(0);
+            JTree tree = (JTree)fasterScrollPane.getViewport().getView();
+            TreeModel model = tree.getModel();
+            if (scriptIndex >= model.getChildCount(model.getRoot())) {
+                return;
+            }
+            Object scriptInfoNode = model.getChild(model.getRoot(), scriptIndex);
+            TreePath path = new TreePath(new Object[]{
+                model.getRoot(),
+                scriptInfoNode
+            });
+            tree.setSelectionPath(path);
+            tree.scrollPathToVisible(path);
+        }
     }
 
     private JPanel makeTreePanel(ABC abc, TreeType type) {

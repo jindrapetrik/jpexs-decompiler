@@ -94,6 +94,7 @@ import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.flv.FLVInputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
+import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DecompiledEditorPane;
@@ -452,6 +453,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private List<List<String>> unfilteredTagListExpandedNodes = new ArrayList<>();
     
     public ScrollPosStorage scrollPosStorage;
+    
+    private Map<SWF, ABCExplorerDialog> abcExplorerDialogs = new WeakHashMap<>();
 
     public void savePins() {
         pinsPanel.save();
@@ -5920,4 +5923,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return statusPanel;
     }    
     
+    public ABCExplorerDialog showAbcExplorer(SWF swf, ABC abc) {
+        ABCExplorerDialog dialog = abcExplorerDialogs.get(swf);
+        if (dialog != null) {
+            dialog.selectAbc(abc);
+            if (!dialog.isVisible()) {
+                dialog.setVisible(true);
+            } else {
+                dialog.toFront();
+            }
+        } else {
+            dialog = new ABCExplorerDialog(mainFrame.getWindow(), swf, abc);
+            abcExplorerDialogs.put(swf, dialog);
+            dialog.setVisible(true);
+        }
+        return dialog;
+    }   
 }

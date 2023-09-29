@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
+import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.LinkDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
@@ -130,6 +131,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -217,7 +219,7 @@ public class Main {
 
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
-    public static CancellableWorker swfPrepareWorker = null;
+    public static CancellableWorker swfPrepareWorker = null;        
 
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
@@ -3192,5 +3194,5 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }
-    }
+    }                
 }

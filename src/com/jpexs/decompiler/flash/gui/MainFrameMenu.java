@@ -1688,8 +1688,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
         
-        ABCExplorerDialog aed = new ABCExplorerDialog(Main.getMainFrame().getWindow(), swf, null);
-        aed.setVisible(true);
+        mainFrame.getPanel().showAbcExplorer(swf, null);
     }
     
     public boolean stackActionPerformed(ActionEvent evt) {
