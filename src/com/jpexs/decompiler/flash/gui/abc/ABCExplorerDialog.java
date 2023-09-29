@@ -556,10 +556,10 @@ public class ABCExplorerDialog extends AppDialog {
                 case INSTANCE_INFO:
                     InstanceInfo ii = abc.instance_info.get(index);
                     String iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"));
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), prefix);
                 case CLASS_INFO:
                     ClassInfo ci = abc.class_info.get(index);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.CLASS_INFO, ci, "mi" + ci.cinit_index + (ci.static_traits.traits.isEmpty() ? "" : ", " + ci.static_traits.traits.size() + " traits"));
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.CLASS_INFO, ci, "mi" + ci.cinit_index + (ci.static_traits.traits.isEmpty() ? "" : ", " + ci.static_traits.traits.size() + " traits"), prefix);
                 case SCRIPT_INFO:
                     ScriptInfo si = abc.script_info.get(index);
                     DottedChain simplePackName = si.getSimplePackName(abc);
@@ -567,7 +567,7 @@ public class ABCExplorerDialog extends AppDialog {
                     if (simplePackName != null) {
                         siName = " (\"" + Helper.escapePCodeString(simplePackName.toRawString()) + "\")";
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName, prefix);
                 default:
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "", prefix);
             }
@@ -579,20 +579,20 @@ public class ABCExplorerDialog extends AppDialog {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst) t;
                     if (tsc.value_index == 0) {
-                        return 6;
+                        return 3 + 3;
                     }
-                    return 7;
+                    return 3 + 4;
                 }
                 if (t instanceof TraitMethodGetterSetter) {
-                    return 2;
+                    return 3 + 2;
                 }
 
                 if (t instanceof TraitClass) {
-                    return 3;
+                    return 3 + 3;
                 }
 
                 if (t instanceof TraitFunction) {
-                    return 2;
+                    return 3 + 2;
                 }
             }
             return traits.traits.size();
