@@ -457,8 +457,12 @@ public class ABCExplorerDialog extends AppDialog {
                     case CONSTANT_INT:
                     case CONSTANT_UINT:
                     case CONSTANT_DOUBLE:
-                    case CONSTANT_STRING:
+                    case CONSTANT_DECIMAL:
+                    case CONSTANT_FLOAT:
+                    case CONSTANT_FLOAT_4:
+                    case CONSTANT_STRING:                        
                     case CONSTANT_NAMESPACE:
+                    case CONSTANT_NAMESPACE_SET:
                     case CONSTANT_MULTINAME:
                         implicit = true;
                 }
@@ -516,8 +520,12 @@ public class ABCExplorerDialog extends AppDialog {
                     case CONSTANT_INT:
                     case CONSTANT_UINT:
                     case CONSTANT_DOUBLE:
+                    case CONSTANT_DECIMAL:
+                    case CONSTANT_FLOAT:
+                    case CONSTANT_FLOAT_4:
                     case CONSTANT_STRING:
                     case CONSTANT_NAMESPACE:
+                    case CONSTANT_NAMESPACE_SET:
                     case CONSTANT_MULTINAME:
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "null", prefix);
                 }
@@ -1148,25 +1156,25 @@ public class ABCExplorerDialog extends AppDialog {
             if (parent == type) {
                 switch (type) {
                     case CONSTANT_INT:
-                        return abc.constants.getIntCount();
+                        return Math.max(1, abc.constants.getIntCount());
                     case CONSTANT_UINT:
-                        return abc.constants.getUIntCount();
+                        return Math.max(1, abc.constants.getUIntCount());
                     case CONSTANT_DOUBLE:
-                        return abc.constants.getDoubleCount();
+                        return Math.max(1, abc.constants.getDoubleCount());
                     case CONSTANT_DECIMAL:
-                        return abc.constants.getDecimalCount();
+                        return Math.max(1, abc.constants.getDecimalCount());
                     case CONSTANT_FLOAT:
-                        return abc.constants.getFloatCount();
+                        return Math.max(1, abc.constants.getFloatCount());
                     case CONSTANT_FLOAT_4:
-                        return abc.constants.getFloat4Count();
+                        return Math.max(1, abc.constants.getFloat4Count());
                     case CONSTANT_STRING:
-                        return abc.constants.getStringCount();
+                        return Math.max(1, abc.constants.getStringCount());
                     case CONSTANT_NAMESPACE:
-                        return abc.constants.getNamespaceCount();
+                        return Math.max(1, abc.constants.getNamespaceCount());
                     case CONSTANT_NAMESPACE_SET:
                         return abc.constants.getNamespaceSetCount();
                     case CONSTANT_MULTINAME:
-                        return abc.constants.getMultinameCount();
+                        return Math.max(1, abc.constants.getMultinameCount());
                     case METHOD_INFO:
                         return abc.method_info.size();
                     case METADATA_INFO:
