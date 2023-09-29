@@ -597,4 +597,32 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public abstract void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos);
+    
+    public String getKindToStr() {
+        String traitKindStr = "";
+        switch(kindType) {
+            case Trait.TRAIT_CLASS:
+                traitKindStr = "class";
+                break;
+            case Trait.TRAIT_CONST:
+                traitKindStr = "const";
+                break;
+            case Trait.TRAIT_FUNCTION:
+                traitKindStr = "function";
+                break;
+            case Trait.TRAIT_GETTER:
+                traitKindStr = "getter";
+                break;
+            case Trait.TRAIT_METHOD:
+                traitKindStr = "method";
+                break;
+            case Trait.TRAIT_SETTER:
+                traitKindStr = "setter";
+                break;
+            case Trait.TRAIT_SLOT:
+                traitKindStr = "slot";
+                break;
+        }
+        return traitKindStr;
+    }
 }
