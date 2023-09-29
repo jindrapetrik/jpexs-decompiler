@@ -138,7 +138,7 @@ public class ABCExplorerDialog extends AppDialog {
             abcComboBox.setSelectedIndex(selectedIndex);
         }
         setSize(800, 600);
-        setTitle(translate("title"));
+        setTitle(translate("title") + " - " + swf.getTitleOrShortFileName());
         View.setWindowIcon(this);
         View.centerScreen(this);
     }
