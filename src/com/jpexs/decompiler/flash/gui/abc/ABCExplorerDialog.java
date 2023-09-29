@@ -165,35 +165,35 @@ public class ABCExplorerDialog extends AppDialog {
 
         cpTabbedPane.removeAll();
 
-        cpTabbedPane.addTab("int (" + abc.constants.getIntCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_INT));
-        cpTabbedPane.addTab("uint (" + abc.constants.getUIntCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_UINT));
-        cpTabbedPane.addTab("dbl (" + abc.constants.getDoubleCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_DOUBLE));
+        cpTabbedPane.addTab("int (" + Math.max(0, abc.constants.getIntCount() - 1 ) + ")", makeTreePanel(abc, TreeType.CONSTANT_INT));
+        cpTabbedPane.addTab("uint (" + Math.max(0, abc.constants.getUIntCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_UINT));
+        cpTabbedPane.addTab("dbl (" + Math.max(0, abc.constants.getDoubleCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_DOUBLE));
         if (abc.hasDecimalSupport()) {
-            cpTabbedPane.addTab("dc (" + abc.constants.getDecimalCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_DECIMAL));
+            cpTabbedPane.addTab("dc (" + Math.max(0, abc.constants.getDecimalCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_DECIMAL));
         }
         if (abc.hasFloatSupport()) {
-            cpTabbedPane.addTab("fl (" + abc.constants.getFloatCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT));
-            cpTabbedPane.addTab("fl4 (" + abc.constants.getFloat4Count() + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT_4));
+            cpTabbedPane.addTab("fl (" + Math.max(0, abc.constants.getFloatCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT));
+            cpTabbedPane.addTab("fl4 (" + Math.max(0, abc.constants.getFloat4Count() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT_4));
         }
-        cpTabbedPane.addTab("str (" + abc.constants.getStringCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_STRING));
-        cpTabbedPane.addTab("ns (" + abc.constants.getNamespaceCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE));
-        cpTabbedPane.addTab("nss (" + abc.constants.getNamespaceSetCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE_SET));
-        cpTabbedPane.addTab("mn (" + abc.constants.getMultinameCount() + ")", makeTreePanel(abc, TreeType.CONSTANT_MULTINAME));
+        cpTabbedPane.addTab("str (" + Math.max(0, abc.constants.getStringCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_STRING));
+        cpTabbedPane.addTab("ns (" + Math.max(0, abc.constants.getNamespaceCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE));
+        cpTabbedPane.addTab("nss (" + Math.max(0, abc.constants.getNamespaceSetCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE_SET));
+        cpTabbedPane.addTab("mn (" + Math.max(0, abc.constants.getMultinameCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_MULTINAME));
 
         mainTabbedPane.removeAll();
 
         JPanel cpPanel = new JPanel(new BorderLayout());
         cpPanel.add(cpTabbedPane, BorderLayout.CENTER);
 
-        int cpCount = abc.constants.getIntCount() - 1
-                + abc.constants.getUIntCount() - 1
-                + abc.constants.getDoubleCount() - 1
-                + abc.constants.getStringCount() - 1
-                + abc.constants.getNamespaceCount() - 1
-                + abc.constants.getNamespaceSetCount() - 1
-                + abc.constants.getMultinameCount() - 1
-                + (abc.hasDecimalSupport() ? abc.constants.getDecimalCount() - 1 : 0)
-                + (abc.hasFloatSupport() ? abc.constants.getFloatCount() - 1 + abc.constants.getFloat4Count() - 1 : 0);
+        int cpCount = Math.max(0, abc.constants.getIntCount() - 1)
+                + Math.max(0, abc.constants.getUIntCount() - 1)
+                + Math.max(0, abc.constants.getDoubleCount() - 1)
+                + Math.max(0, abc.constants.getStringCount() - 1)
+                + Math.max(0, abc.constants.getNamespaceCount() - 1)
+                + Math.max(0, abc.constants.getNamespaceSetCount() - 1)
+                + Math.max(0, abc.constants.getMultinameCount() - 1)
+                + (abc.hasDecimalSupport() ? Math.max(0, abc.constants.getDecimalCount() - 1) : 0)
+                + (abc.hasFloatSupport() ? (Math.max(0, abc.constants.getFloatCount() - 1) + Math.max(0, abc.constants.getFloat4Count() - 1)) : 0);
         mainTabbedPane.addTab("cp (" + cpCount + ")", cpPanel);
         mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", makeTreePanel(abc, TreeType.METHOD_INFO));
         mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", makeTreePanel(abc, TreeType.METADATA_INFO));
