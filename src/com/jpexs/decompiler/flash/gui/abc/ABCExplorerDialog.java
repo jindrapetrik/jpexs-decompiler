@@ -218,20 +218,20 @@ public class ABCExplorerDialog extends AppDialog {
 
         cpTabbedPane.removeAll();
 
-        cpTabbedPane.addTab("int (" + Math.max(0, abc.constants.getIntCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_INT));
-        cpTabbedPane.addTab("uint (" + Math.max(0, abc.constants.getUIntCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_UINT));
-        cpTabbedPane.addTab("dbl (" + Math.max(0, abc.constants.getDoubleCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_DOUBLE));
+        cpTabbedPane.addTab("int (" + Math.max(0, abc.constants.getIntCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_INT.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_INT));
+        cpTabbedPane.addTab("uint (" + Math.max(0, abc.constants.getUIntCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_UINT.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_UINT));
+        cpTabbedPane.addTab("dbl (" + Math.max(0, abc.constants.getDoubleCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_DOUBLE.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_DOUBLE));
         if (abc.hasDecimalSupport()) {
-            cpTabbedPane.addTab("dc (" + Math.max(0, abc.constants.getDecimalCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_DECIMAL));
+            cpTabbedPane.addTab("dc (" + Math.max(0, abc.constants.getDecimalCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_DECIMAL.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_DECIMAL));
         }
         if (abc.hasFloatSupport()) {
-            cpTabbedPane.addTab("fl (" + Math.max(0, abc.constants.getFloatCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT));
-            cpTabbedPane.addTab("fl4 (" + Math.max(0, abc.constants.getFloat4Count() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_FLOAT_4));
+            cpTabbedPane.addTab("fl (" + Math.max(0, abc.constants.getFloatCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_FLOAT.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_FLOAT));
+            cpTabbedPane.addTab("fl4 (" + Math.max(0, abc.constants.getFloat4Count() - 1) + ")", View.getIcon(TreeType.CONSTANT_FLOAT_4.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_FLOAT_4));
         }
-        cpTabbedPane.addTab("str (" + Math.max(0, abc.constants.getStringCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_STRING));
-        cpTabbedPane.addTab("ns (" + Math.max(0, abc.constants.getNamespaceCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE));
-        cpTabbedPane.addTab("nss (" + Math.max(0, abc.constants.getNamespaceSetCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE_SET));
-        cpTabbedPane.addTab("mn (" + Math.max(0, abc.constants.getMultinameCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_MULTINAME));
+        cpTabbedPane.addTab("str (" + Math.max(0, abc.constants.getStringCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_STRING.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_STRING));
+        cpTabbedPane.addTab("ns (" + Math.max(0, abc.constants.getNamespaceCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_NAMESPACE.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE));
+        cpTabbedPane.addTab("nss (" + Math.max(0, abc.constants.getNamespaceSetCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_NAMESPACE_SET.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_NAMESPACE_SET));
+        cpTabbedPane.addTab("mn (" + Math.max(0, abc.constants.getMultinameCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_MULTINAME.getIcon()), makeTreePanel(abc, TreeType.CONSTANT_MULTINAME));
 
         mainTabbedPane.removeAll();
 
@@ -248,12 +248,12 @@ public class ABCExplorerDialog extends AppDialog {
                 + (abc.hasDecimalSupport() ? Math.max(0, abc.constants.getDecimalCount() - 1) : 0)
                 + (abc.hasFloatSupport() ? (Math.max(0, abc.constants.getFloatCount() - 1) + Math.max(0, abc.constants.getFloat4Count() - 1)) : 0);
         mainTabbedPane.addTab("cp (" + cpCount + ")", cpPanel);
-        mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", makeTreePanel(abc, TreeType.METHOD_INFO));
-        mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", makeTreePanel(abc, TreeType.METADATA_INFO));
-        mainTabbedPane.addTab("ii (" + abc.instance_info.size() + ")", makeTreePanel(abc, TreeType.INSTANCE_INFO));
-        mainTabbedPane.addTab("ci (" + abc.class_info.size() + ")", makeTreePanel(abc, TreeType.CLASS_INFO));
-        mainTabbedPane.addTab("si (" + abc.script_info.size() + ")", makeTreePanel(abc, TreeType.SCRIPT_INFO));
-        mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", makeTreePanel(abc, TreeType.METHOD_BODY));
+        mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", View.getIcon(TreeType.METHOD_INFO.getIcon()), makeTreePanel(abc, TreeType.METHOD_INFO));
+        mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")",View.getIcon(TreeType.METADATA_INFO.getIcon()),  makeTreePanel(abc, TreeType.METADATA_INFO));
+        mainTabbedPane.addTab("ii (" + abc.instance_info.size() + ")", View.getIcon(TreeType.INSTANCE_INFO.getIcon()),  makeTreePanel(abc, TreeType.INSTANCE_INFO));
+        mainTabbedPane.addTab("ci (" + abc.class_info.size() + ")",View.getIcon(TreeType.CLASS_INFO.getIcon()),  makeTreePanel(abc, TreeType.CLASS_INFO));
+        mainTabbedPane.addTab("si (" + abc.script_info.size() + ")",View.getIcon(TreeType.SCRIPT_INFO.getIcon()),  makeTreePanel(abc, TreeType.SCRIPT_INFO));
+        mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")",View.getIcon(TreeType.METHOD_BODY.getIcon()), makeTreePanel(abc, TreeType.METHOD_BODY));
     }
 
     public void selectScriptInfo(int scriptIndex) {
@@ -296,29 +296,31 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private enum TreeType {
-        CONSTANT_INT("Integers", "int"),
-        CONSTANT_UINT("UnsignedIntegers", "uint"),
-        CONSTANT_DOUBLE("Doubles", "dbl"),
-        CONSTANT_DECIMAL("Decimals", "dc"), //needs ABC decimal support
-        CONSTANT_FLOAT("Floats", "fl"), //needs ABC float support
-        CONSTANT_FLOAT_4("Floats4", "fl4"), //needs ABC float support
-        CONSTANT_STRING("Strings", "str"),
-        CONSTANT_NAMESPACE("Namespaces", "ns"),
-        CONSTANT_NAMESPACE_SET("NamespaceSets", "nss"),
-        CONSTANT_MULTINAME("Multinames", "mn"),
-        METHOD_INFO("MethodInfos", "mi"),
-        METADATA_INFO("MetadataInfos", "md"),
-        INSTANCE_INFO("InstanceInfos", "ii"),
-        CLASS_INFO("ClassInfos", "ci"),
-        SCRIPT_INFO("ScriptInfos", "si"),
-        METHOD_BODY("MethodBodys", "mb");
+        CONSTANT_INT("Integers", "int", "abcint16"),
+        CONSTANT_UINT("UnsignedIntegers", "uint", "abcuint16"),
+        CONSTANT_DOUBLE("Doubles", "dbl", "abcdouble16"),
+        CONSTANT_DECIMAL("Decimals", "dc", "abcdecimal16"), //needs ABC decimal support
+        CONSTANT_FLOAT("Floats", "fl", "abcfloat16"), //needs ABC float support
+        CONSTANT_FLOAT_4("Floats4", "fl4", "abcfloat416"), //needs ABC float support
+        CONSTANT_STRING("Strings", "str", "abcstring16"),
+        CONSTANT_NAMESPACE("Namespaces", "ns", "abcnamespace16"),
+        CONSTANT_NAMESPACE_SET("NamespaceSets", "nss", "abcnamespaceset16"),
+        CONSTANT_MULTINAME("Multinames", "mn", "abcmultiname16"),
+        METHOD_INFO("MethodInfos", "mi", "abcmethodinfo16"),
+        METADATA_INFO("MetadataInfos", "md", "abcmethodbody16"),
+        INSTANCE_INFO("InstanceInfos", "ii", "abcinstanceinfo16"),
+        CLASS_INFO("ClassInfos", "ci", "abcclassinfo16"),
+        SCRIPT_INFO("ScriptInfos", "si", "abcscriptinfo16"),
+        METHOD_BODY("MethodBodys", "mb", "abcmethodbody16");
 
         private final String name;
         private final String abbreviation;
+        private final String icon;
 
-        TreeType(String name, String abbreviation) {
+        TreeType(String name, String abbreviation, String icon) {
             this.name = name;
             this.abbreviation = abbreviation;
+            this.icon = icon;
         }
 
         public String getName() {
@@ -327,6 +329,10 @@ public class ABCExplorerDialog extends AppDialog {
 
         public String getAbbreviation() {
             return abbreviation;
+        }
+
+        public String getIcon() {
+            return icon;
         }
 
         @Override
@@ -1564,6 +1570,14 @@ public class ABCExplorerDialog extends AppDialog {
                 setForeground(Color.BLACK);
             }
             setToolTipText(null);
+
+            if (value instanceof ValueWithIndex) {
+                
+                ValueWithIndex vwi = (ValueWithIndex) value;
+                setIcon(View.getIcon(vwi.type.getIcon()));
+            } else {
+                setIcon(null);
+            }
 
             //semitransparent = true;
             return this;
