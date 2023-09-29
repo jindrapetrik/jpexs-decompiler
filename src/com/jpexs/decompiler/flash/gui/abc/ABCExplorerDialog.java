@@ -92,13 +92,18 @@ public class ABCExplorerDialog extends AppDialog {
         cnt.setLayout(new BorderLayout());
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(new JLabel(translate("abc")));
+        int selectedIndex = 0;
         int frame = 1;
         for (Tag t : swf.getTags()) {
             if (t instanceof ShowFrameTag) {
                 frame++;
             }
             if (t instanceof ABCContainerTag) {
-                abcContainers.add((ABCContainerTag) t);
+                ABCContainerTag abcCnt = (ABCContainerTag)t;
+                if (abcCnt.getABC() == abc) {
+                    selectedIndex = abcContainers.size();
+                }
+                abcContainers.add(abcCnt);
                 abcFrames.add(frame);
             }
         }
@@ -129,7 +134,9 @@ public class ABCExplorerDialog extends AppDialog {
         cnt.add(topPanel, BorderLayout.NORTH);
         cnt.add(mainTabbedPane, BorderLayout.CENTER);
 
-        abcComboBoxActionPerformed(null);
+        if (!abcContainers.isEmpty()) {
+            abcComboBox.setSelectedIndex(selectedIndex);
+        }
         setSize(800, 600);
         setTitle(translate("title"));
         View.setWindowIcon(this);
