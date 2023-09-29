@@ -1426,7 +1426,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (abcPanel == null) {
             abcPanel = new ABCPanel(this);
             displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
-            detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
+            detailPanel.add(abcPanel.navigatorPanel, DETAILCARDAS3NAVIGATOR);
         }
 
         return abcPanel;
