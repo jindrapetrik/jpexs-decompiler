@@ -40,12 +40,14 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.View;
+import static com.jpexs.decompiler.flash.gui.View.loadImage;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -55,6 +57,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -79,14 +82,14 @@ import javax.swing.tree.TreePath;
  */
 public class ABCExplorerDialog extends AppDialog {
 
-    private final List<ABCContainerTag> abcContainers = new ArrayList<>();
-    private final JComboBox<String> abcComboBox;
+    private final List<ABC> abcs = new ArrayList<>();
+    private JComboBox<String> abcComboBox = null;
     private final JLabel tagInfoLabel;
     private final List<Integer> abcFrames = new ArrayList<>();
     private final JTabbedPane mainTabbedPane;
     private final JTabbedPane cpTabbedPane;
 
-    public ABCExplorerDialog(Window owner, SWF swf, ABC abc) {
+    public ABCExplorerDialog(Window owner, Openable openable, ABC abc) {
         super(owner);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
@@ -94,39 +97,49 @@ public class ABCExplorerDialog extends AppDialog {
         topPanel.add(new JLabel(translate("abc")));
         int selectedIndex = 0;
         int frame = 1;
-        for (Tag t : swf.getTags()) {
-            if (t instanceof ShowFrameTag) {
-                frame++;
-            }
-            if (t instanceof ABCContainerTag) {
-                ABCContainerTag abcCnt = (ABCContainerTag) t;
-                if (abcCnt.getABC() == abc) {
-                    selectedIndex = abcContainers.size();
+        if (openable instanceof SWF) {
+            SWF swf = (SWF) openable;
+            List<ABCContainerTag> abcContainers = new ArrayList<>();
+            for (Tag t : swf.getTags()) {
+                if (t instanceof ShowFrameTag) {
+                    frame++;
                 }
-                abcContainers.add(abcCnt);
-                abcFrames.add(frame);
-            }
-        }
-        String[] abcComboBoxData = new String[abcContainers.size()];
-        for (int i = 0; i < abcContainers.size(); i++) {
-            abcComboBoxData[i] = "tag" + (i + 1);
-            if (abcContainers.get(i) instanceof DoABC2Tag) {
-                DoABC2Tag doa2 = (DoABC2Tag) abcContainers.get(i);
-                if (doa2.name != null && !doa2.name.isEmpty()) {
-                    abcComboBoxData[i] += " (\"" + Helper.escapePCodeString(doa2.name) + "\")";
+                if (t instanceof ABCContainerTag) {
+                    ABCContainerTag abcCnt = (ABCContainerTag) t;
+                    if (abcCnt.getABC() == abc) {
+                        selectedIndex = abcs.size();
+                    }
+                    abcContainers.add(abcCnt);
+                    abcs.add(abcCnt.getABC());
+                    abcFrames.add(frame);
                 }
             }
+            String[] abcComboBoxData = new String[abcs.size()];
+
+            for (int i = 0; i < abcContainers.size(); i++) {
+                abcComboBoxData[i] = "tag" + (i + 1);
+                if (abcContainers.get(i) instanceof DoABC2Tag) {
+                    DoABC2Tag doa2 = (DoABC2Tag) abcContainers.get(i);
+                    if (doa2.name != null && !doa2.name.isEmpty()) {
+                        abcComboBoxData[i] += " (\"" + Helper.escapePCodeString(doa2.name) + "\")";
+                    }
+                }
+            }
+            abcComboBox = new JComboBox<>(abcComboBoxData);
+
+            Dimension abcComboBoxSize = new Dimension(500, abcComboBox.getPreferredSize().height);
+            abcComboBox.setMinimumSize(abcComboBoxSize);
+            abcComboBox.setPreferredSize(abcComboBoxSize);
+            topPanel.add(abcComboBox);
+            abcComboBox.addActionListener(this::abcComboBoxActionPerformed);
+
+        } else if (openable instanceof ABC) {
+            abcs.add((ABC) openable);
+            abcFrames.add(-1);
         }
-        abcComboBox = new JComboBox<>(abcComboBoxData);
-        Dimension abcComboBoxSize = new Dimension(500, abcComboBox.getPreferredSize().height);
-        abcComboBox.setMinimumSize(abcComboBoxSize);
-        abcComboBox.setPreferredSize(abcComboBoxSize);
-        topPanel.add(abcComboBox);
 
         tagInfoLabel = new JLabel();
         topPanel.add(tagInfoLabel);
-
-        abcComboBox.addActionListener(this::abcComboBoxActionPerformed);
 
         mainTabbedPane = new JTabbedPane();
         cpTabbedPane = new JTabbedPane();
@@ -134,22 +147,32 @@ public class ABCExplorerDialog extends AppDialog {
         cnt.add(topPanel, BorderLayout.NORTH);
         cnt.add(mainTabbedPane, BorderLayout.CENTER);
 
-        if (!abcContainers.isEmpty()) {
-            abcComboBox.setSelectedIndex(selectedIndex);
+        if (!abcs.isEmpty()) {
+            if (abcComboBox != null) {
+                abcComboBox.setSelectedIndex(selectedIndex);
+            } else {
+                abcComboBoxActionPerformed(null);
+            }
         }
         setSize(800, 600);
-        setTitle(translate("title") + " - " + swf.getTitleOrShortFileName());
-        View.setWindowIcon(this);
+        setTitle(translate("title") + " - " + openable.getTitleOrShortFileName());
+        List<Image> images = new ArrayList<>();
+        images.add(View.loadImage("abcexplorer16"));
+        images.add(View.loadImage("abcexplorer32"));
+        setIconImages(images);
         View.centerScreen(this);
     }
-    
+
     public void selectAbc(ABC abc) {
-        if (abc == null && !abcContainers.isEmpty()) {
+        if (abcComboBox == null) {
+            return;
+        }
+        if (abc == null && !abcs.isEmpty()) {
             abcComboBox.setSelectedIndex(0);
             return;
         }
-        for (int i = 0; i < abcContainers.size(); i++) {
-            if (abcContainers.get(i).getABC() == abc) {
+        for (int i = 0; i < abcs.size(); i++) {
+            if (abcs.get(i) == abc) {
                 abcComboBox.setSelectedIndex(i);
                 break;
             }
@@ -157,24 +180,41 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private ABC getSelectedAbc() {
-        return abcContainers.get(abcComboBox.getSelectedIndex()).getABC();
+        if (abcs.isEmpty()) {
+            return null;
+        }
+        if (abcComboBox == null) {
+            return abcs.get(0);
+        }
+        return abcs.get(abcComboBox.getSelectedIndex());
     }
 
     private void abcComboBoxActionPerformed(ActionEvent e) {
-        int index = abcComboBox.getSelectedIndex();
+        int index = abcComboBox == null ? 0 : abcComboBox.getSelectedIndex();
         if (index == -1) {
             return;
         }
-        ABC abc = abcContainers.get(index).getABC();
-        tagInfoLabel.setText(
-                translate("abc.info")
-                        .replace("%index%", "" + (index + 1))
-                        .replace("%count%", "" + abcComboBox.getItemCount())
-                        .replace("%major%", "" + abc.version.major)
-                        .replace("%minor%", "" + abc.version.minor)
-                        .replace("%size%", Helper.formatFileSize(abc.getDataSize()))
-                        .replace("%frame%", "" + abcFrames.get(index))
-        );
+        if (abcs.isEmpty()) {
+            return;
+        }
+        ABC abc = abcs.get(index);
+        if (abcComboBox == null) {
+            tagInfoLabel.setText(translate("abc.info.standalone")
+                    .replace("%major%", "" + abc.version.major)
+                    .replace("%minor%", "" + abc.version.minor)
+                    .replace("%size%", Helper.formatFileSize(abc.getDataSize()))
+            );
+        } else {
+            tagInfoLabel.setText(
+                    translate("abc.info")
+                            .replace("%index%", "" + (index + 1))
+                            .replace("%count%", "" + abcComboBox.getItemCount())
+                            .replace("%major%", "" + abc.version.major)
+                            .replace("%minor%", "" + abc.version.minor)
+                            .replace("%size%", Helper.formatFileSize(abc.getDataSize()))
+                            .replace("%frame%", "" + abcFrames.get(index))
+            );
+        }
 
         cpTabbedPane.removeAll();
 
@@ -215,13 +255,13 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("si (" + abc.script_info.size() + ")", makeTreePanel(abc, TreeType.SCRIPT_INFO));
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", makeTreePanel(abc, TreeType.METHOD_BODY));
     }
-    
+
     public void selectScriptInfo(int scriptIndex) {
         if (mainTabbedPane.getTabCount() > 0) {
             mainTabbedPane.setSelectedIndex(5);
             JPanel pan = (JPanel) mainTabbedPane.getComponentAt(5);
             FasterScrollPane fasterScrollPane = (FasterScrollPane) pan.getComponent(0);
-            JTree tree = (JTree)fasterScrollPane.getViewport().getView();
+            JTree tree = (JTree) fasterScrollPane.getViewport().getView();
             TreeModel model = tree.getModel();
             if (scriptIndex >= model.getChildCount(model.getRoot())) {
                 return;
@@ -567,22 +607,22 @@ public class ABCExplorerDialog extends AppDialog {
                 case CONSTANT_INT:
                     if (index >= abc.constants.getIntCount()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
-                    }                    
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getInt(index), "" + abc.constants.getInt(index), prefix);
                 case CONSTANT_UINT:
                     if (index >= abc.constants.getUIntCount()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
-                    }                    
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getUInt(index), "" + abc.constants.getUInt(index), prefix);
                 case CONSTANT_DOUBLE:
                     if (index >= abc.constants.getDoubleCount()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
-                    }                    
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDouble(index), EcmaScript.toString(abc.constants.getDouble(index)), prefix);
                 case CONSTANT_DECIMAL:
                     if (index >= abc.constants.getDecimalCount()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
-                    }                    
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDecimal(index), "" + abc.constants.getDecimal(index), prefix);
                 case CONSTANT_FLOAT:
                     if (index >= abc.constants.getFloatCount()) {
@@ -593,7 +633,7 @@ public class ABCExplorerDialog extends AppDialog {
                     if (index >= abc.constants.getFloat4Count()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
                     }
-                    
+
                     Float4 f4 = abc.constants.getFloat4(index);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, f4,
                             EcmaScript.toString(f4.values[0]) + " "
