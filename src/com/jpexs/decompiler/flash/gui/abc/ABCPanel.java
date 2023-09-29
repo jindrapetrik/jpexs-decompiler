@@ -133,7 +133,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -178,8 +177,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     private final JPersistentSplitPane splitPane;
 
-    private final JTable constantTable;
-
     public JComboBox<String> constantTypeList;
 
     public JLabel asmLabel = new HeaderLabel(AppStrings.translate("panel.disassembled"));
@@ -188,11 +185,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public final DetailPanel detailPanel;
 
-    private final JPanel navPanel;
+    public final JPanel navigatorPanel;
 
     public final JPanel brokenHintPanel;
-
-    public final JTabbedPane tabbedPane;
 
     public final SearchPanel<ScriptSearchResult> searchPanel;
 
@@ -263,41 +258,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
-        updateConstList();
         updateLinksLabel();
-    }
-
-    public void updateConstList() {
-        View.checkAccess();
-
-        switch (constantTypeList.getSelectedIndex()) {
-            case 0:
-                View.autoResizeColWidth(constantTable, new UIntTableModel(abc));
-                break;
-            case 1:
-                View.autoResizeColWidth(constantTable, new IntTableModel(abc));
-                break;
-            case 2:
-                View.autoResizeColWidth(constantTable, new DoubleTableModel(abc));
-                break;
-            case 3:
-                View.autoResizeColWidth(constantTable, new DecimalTableModel(abc));
-                break;
-            case 4:
-                View.autoResizeColWidth(constantTable, new StringTableModel(abc));
-                break;
-            case 5:
-                View.autoResizeColWidth(constantTable, new NamespaceTableModel(abc));
-                break;
-            case 6:
-                View.autoResizeColWidth(constantTable, new NamespaceSetTableModel(abc));
-                break;
-            case 7:
-                View.autoResizeColWidth(constantTable, new MultinameTableModel(abc));
-                break;
-        }
-        //DefaultTableColumnModel colModel  = (DefaultTableColumnModel) constantTable.getColumnModel();
-        //colModel.getColumn(0).setMaxWidth(50);
     }
 
     public SWF getSwf() {
@@ -317,7 +278,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         View.checkAccess();
 
         this.abc = null;
-        constantTable.setModel(new DefaultTableModel());
         navigator.clearAbc();
         decompiledTextArea.clearScript();
     }
@@ -1165,14 +1125,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         navigator = new TraitsList(this);
 
-        navPanel = new JPanel(new BorderLayout());
+        navigatorPanel = new JPanel(new BorderLayout());
         JPanel navIconsPanel = new JPanel();
         navIconsPanel.setLayout(new BoxLayout(navIconsPanel, BoxLayout.X_AXIS));
         final JToggleButton sortButton = new JToggleButton(View.getIcon("sort16"));
         sortButton.setMargin(new Insets(3, 3, 3, 3));
         navIconsPanel.add(sortButton);
-        navPanel.add(navIconsPanel, BorderLayout.SOUTH);
-        navPanel.add(new FasterScrollPane(navigator), BorderLayout.CENTER);
+        JLabel navigatorLabel = new JLabel(AppStrings.translate("traits"), JLabel.CENTER);
+        navigatorPanel.add(navigatorLabel, BorderLayout.NORTH);
+        navigatorPanel.add(navIconsPanel, BorderLayout.SOUTH);
+        navigatorPanel.add(new FasterScrollPane(navigator), BorderLayout.CENTER);
         sortButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1181,43 +1143,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         });
 
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(AppStrings.translate("traits"), navPanel);
-        add(splitPane, BorderLayout.CENTER);
-
-        JPanel panConstants = new JPanel();
-        panConstants.setLayout(new BorderLayout());
-
-        constantTypeList = new JComboBox<>(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
-        constantTable = new JTable();
-        if (abc != null) {
-            View.autoResizeColWidth(constantTable, new UIntTableModel(abc));
-        }
-        constantTable.setAutoCreateRowSorter(true);
-
-        final ABCPanel t = this;
-        constantTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (constantTypeList.getSelectedIndex() == 7) { //MULTINAME
-                        int rowIndex = constantTable.getSelectedRow();
-                        if (rowIndex == -1) {
-                            return;
-                        }
-                        int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
-                        if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(abc, multinameIndex, true, t, false);
-                            usageFrame.setVisible(true);
-                        }
-                    }
-                }
-            }
-        });
-        constantTypeList.addItemListener(this);
-        panConstants.add(constantTypeList, BorderLayout.NORTH);
-        panConstants.add(new FasterScrollPane(constantTable), BorderLayout.CENTER);
-        tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
+        add(splitPane, BorderLayout.CENTER);       
     }
 
     private void decompiledTextAreaTextChanged() {
@@ -1451,8 +1377,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {
                 return;
-            }
-            updateConstList();
+            }            
         }
     }
 
