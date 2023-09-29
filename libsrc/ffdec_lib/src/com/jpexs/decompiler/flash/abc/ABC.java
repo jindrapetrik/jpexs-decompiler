@@ -134,6 +134,8 @@ public class ABC implements Openable {
     private OpenableList openableList;
 
     private boolean isOpenable = false;
+    
+    private long dataSize = 0L;
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
@@ -570,11 +572,14 @@ public class ABC implements Openable {
             isOpenable = true;
         }
 
+        long posBefore = ais.getPosition();
         try {
             read(ais, swf);
         } catch (IOException ie) {
             throw new ABCOpenException(AppResources.translate("error.abc.invalid"), ie);
         }
+        long posAfter = ais.getPosition();
+        dataSize = posAfter - posBefore;
         //this will read all method body codes. TODO: make this ondemand
         refreshMultinameNamespaceSuffixes();
         getMethodIndexing();
@@ -808,7 +813,7 @@ public class ABC implements Openable {
     }
 
     public void saveToStream(OutputStream os) throws IOException {
-        ABCOutputStream aos = new ABCOutputStream(os);
+        ABCOutputStream aos = new ABCOutputStream(os);        
         aos.writeU16(version.minor);
         aos.writeU16(version.major);
 
@@ -918,6 +923,7 @@ public class ABC implements Openable {
             }
             aos.writeTraits(mb.traits);
         }
+        dataSize = aos.getPosition();
     }
 
     public MethodBody findBody(MethodInfo methodInfo) {
@@ -2476,4 +2482,8 @@ public class ABC implements Openable {
         }
         return false;
     }
+
+    public long getDataSize() {
+        return dataSize;
+    }       
 }

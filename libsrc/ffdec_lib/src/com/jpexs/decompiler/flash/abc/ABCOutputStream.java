@@ -39,16 +39,34 @@ import java.io.OutputStream;
 public class ABCOutputStream extends OutputStream {
 
     private final OutputStream os;
+    private long position = 0L;
 
     public ABCOutputStream(OutputStream os) {
         this.os = os;
     }
 
+    public long getPosition() {
+        return position;
+    }   
+    
     @Override
     public void write(int b) throws IOException {
         os.write(b);
+        position++;
+    }
+    
+    @Override
+    public void write(byte[] data) throws IOException {
+        super.write(data);
+        position += data.length;
     }
 
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        super.write(b, off, len);
+        position += len;
+    }
+        
     public void writeU30(long value) throws IOException {
         writeS32(value);
         /*boolean loop = true;

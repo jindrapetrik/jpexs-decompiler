@@ -269,7 +269,7 @@ public class Multiname {
         return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapePCodeString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
-    private static String namespaceSetToString(AVM2ConstantPool constants, int index) {
+    public static String namespaceSetToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
             return "null";
         }
