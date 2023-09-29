@@ -142,6 +142,9 @@ public class ABCExplorerDialog extends AppDialog {
 
     private void abcComboBoxActionPerformed(ActionEvent e) {
         int index = abcComboBox.getSelectedIndex();
+        if (index == -1) {
+            return;
+        }
         ABC abc = abcContainers.get(index).getABC();
         tagInfoLabel.setText(
                 translate("abc.info")
