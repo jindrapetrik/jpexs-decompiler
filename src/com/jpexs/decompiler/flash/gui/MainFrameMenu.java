@@ -21,9 +21,11 @@ import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -1031,8 +1033,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
         setMenuEnabled("/tools/timeline", swfSelected);
+        setMenuEnabled("/tools/abcExplorer", openableSelected);
         setMenuEnabled("/tools/showProxy", !isWorking);
-
+                
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
         /*setMenuEnabled("/tools/debugger/debuggerSwitch", hasAbc);
          setMenuChecked("/tools/debugger/debuggerSwitch", hasDebugger);
@@ -1219,6 +1222,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/tools/replace", translate("menu.tools.replace"), "replace32", this::replaceActionPerformed, PRIORITY_TOP, null, true, null, false);
         addToggleMenuItem("/tools/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
 
+        addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abc32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);        
         addMenuItem("/tools/showProxy", translate("menu.tools.proxy"), "proxy16", this::showProxyActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
@@ -1673,6 +1677,21 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return true;
     }
 
+    protected void abcExplorerActionPerformed(ActionEvent evt) {
+        
+        SWF swf;
+        if (openable instanceof SWF) {
+            swf = (SWF) openable;
+        } else if (openable instanceof ABC) {
+            swf = ((ABC)openable).getSwf();
+        } else {
+            return;
+        }
+        
+        ABCExplorerDialog aed = new ABCExplorerDialog(Main.getMainFrame().getWindow(), swf, null);
+        aed.setVisible(true);
+    }
+    
     public boolean stackActionPerformed(ActionEvent evt) {
         //TODO
         return true;
