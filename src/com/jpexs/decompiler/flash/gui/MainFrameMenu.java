@@ -944,6 +944,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         SWF swf = (openable instanceof SWF) ? (SWF) openable : null;
         boolean openableSelected = openable != null;
         boolean swfSelected = openable instanceof SWF;
+        boolean abcSelected = openable instanceof ABC;
+        boolean isAs3 = false;
+        if (swf != null) {
+           isAs3 = swf.isAS3();
+        }
+        if (abcSelected) {
+            isAs3 = true;
+        }
         boolean isWorking = Main.isWorking();
         List<ABCContainerTag> abcList = swf != null ? swf.getAbcList() : null;
         boolean hasAbc = openableSelected && abcList != null && !abcList.isEmpty();
@@ -1033,7 +1041,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
         setMenuEnabled("/tools/timeline", swfSelected);
-        setMenuEnabled("/tools/abcExplorer", openableSelected);
+        setMenuEnabled("/tools/abcExplorer", isAs3);
         setMenuEnabled("/tools/showProxy", !isWorking);
                 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
