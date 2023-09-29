@@ -99,7 +99,7 @@ public class ABCExplorerDialog extends AppDialog {
                 frame++;
             }
             if (t instanceof ABCContainerTag) {
-                ABCContainerTag abcCnt = (ABCContainerTag)t;
+                ABCContainerTag abcCnt = (ABCContainerTag) t;
                 if (abcCnt.getABC() == abc) {
                     selectedIndex = abcContainers.size();
                 }
@@ -165,7 +165,7 @@ public class ABCExplorerDialog extends AppDialog {
 
         cpTabbedPane.removeAll();
 
-        cpTabbedPane.addTab("int (" + Math.max(0, abc.constants.getIntCount() - 1 ) + ")", makeTreePanel(abc, TreeType.CONSTANT_INT));
+        cpTabbedPane.addTab("int (" + Math.max(0, abc.constants.getIntCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_INT));
         cpTabbedPane.addTab("uint (" + Math.max(0, abc.constants.getUIntCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_UINT));
         cpTabbedPane.addTab("dbl (" + Math.max(0, abc.constants.getDoubleCount() - 1) + ")", makeTreePanel(abc, TreeType.CONSTANT_DOUBLE));
         if (abc.hasDecimalSupport()) {
@@ -460,7 +460,7 @@ public class ABCExplorerDialog extends AppDialog {
                     case CONSTANT_DECIMAL:
                     case CONSTANT_FLOAT:
                     case CONSTANT_FLOAT_4:
-                    case CONSTANT_STRING:                        
+                    case CONSTANT_STRING:
                     case CONSTANT_NAMESPACE:
                     case CONSTANT_NAMESPACE_SET:
                     case CONSTANT_MULTINAME:
@@ -532,16 +532,35 @@ public class ABCExplorerDialog extends AppDialog {
             }
             switch (valueType) {
                 case CONSTANT_INT:
+                    if (index >= abc.constants.getIntCount()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }                    
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getInt(index), "" + abc.constants.getInt(index), prefix);
                 case CONSTANT_UINT:
+                    if (index >= abc.constants.getUIntCount()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }                    
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getUInt(index), "" + abc.constants.getUInt(index), prefix);
                 case CONSTANT_DOUBLE:
+                    if (index >= abc.constants.getDoubleCount()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }                    
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDouble(index), EcmaScript.toString(abc.constants.getDouble(index)), prefix);
                 case CONSTANT_DECIMAL:
+                    if (index >= abc.constants.getDecimalCount()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }                    
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDecimal(index), "" + abc.constants.getDecimal(index), prefix);
                 case CONSTANT_FLOAT:
+                    if (index >= abc.constants.getFloatCount()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getFloat(index), EcmaScript.toString(abc.constants.getFloat(index)), prefix);
                 case CONSTANT_FLOAT_4:
+                    if (index >= abc.constants.getFloat4Count()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
+                    
                     Float4 f4 = abc.constants.getFloat4(index);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, f4,
                             EcmaScript.toString(f4.values[0]) + " "
@@ -551,15 +570,21 @@ public class ABCExplorerDialog extends AppDialog {
                             prefix
                     );
                 case CONSTANT_STRING:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getString(index), "\"" + Helper.escapePCodeString(abc.constants.getString(index)) + "\"", prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getStringCount() ? abc.constants.getString(index) : null, formatString(index), prefix);
                 case CONSTANT_NAMESPACE:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getNamespace(index), Multiname.namespaceToString(abc.constants, index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getNamespaceCount() ? abc.constants.getNamespace(index) : null, Multiname.namespaceToString(abc.constants, index), prefix);
                 case CONSTANT_NAMESPACE_SET:
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getNamespaceSet(index), Multiname.namespaceSetToString(abc.constants, index), prefix);
                 case CONSTANT_MULTINAME:
-                    Multiname multiname = abc.constants.getMultiname(index);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, multiname, multiname.toString(abc.constants, new ArrayList<DottedChain>()), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getMultinameCount() ? abc.constants.getMultiname(index) : null,
+                            index < abc.constants.getMultinameCount()
+                            ? abc.constants.getMultiname(index).toString(abc.constants, new ArrayList<DottedChain>())
+                            : "Unknown(" + index + ")",
+                            prefix);
                 case METHOD_INFO:
+                    if (index >= abc.method_info.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     MethodInfo mi = abc.method_info.get(index);
                     StringBuilder miStrSb = new StringBuilder();
                     miStrSb.append("(");
@@ -570,32 +595,51 @@ public class ABCExplorerDialog extends AppDialog {
                     miStrSb.append(miReturnType);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, mi, miStrSb.toString(), prefix);
                 case METHOD_BODY:
+                    if (index >= abc.bodies.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     MethodBody b = abc.bodies.get(index);
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, b, "mi" + b.method_info + ", " + b.getCodeBytes().length + " bytes code", prefix);
                 case INSTANCE_INFO:
+                    if (index >= abc.instance_info.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     InstanceInfo ii = abc.instance_info.get(index);
-                    String iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
+                    String iiName;
+                    if (ii.name_index >= abc.constants.getMultinameCount() || ii.getName(abc.constants).namespace_index >= abc.constants.getNamespaceCount()) {
+                        iiName = "";
+                    } else {
+                        iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
+                    }
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), prefix);
                 case CLASS_INFO:
+                    if (index >= abc.class_info.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     ClassInfo ci = abc.class_info.get(index);
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.CLASS_INFO, ci, "mi" + ci.cinit_index + (ci.static_traits.traits.isEmpty() ? "" : ", " + ci.static_traits.traits.size() + " traits"), prefix);
                 case SCRIPT_INFO:
+                    if (index >= abc.script_info.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                    }
                     ScriptInfo si = abc.script_info.get(index);
-                    DottedChain simplePackName = si.getSimplePackName(abc);
                     String siName = "";
-                    if (simplePackName != null) {
-                        siName = " (\"" + Helper.escapePCodeString(simplePackName.toRawString()) + "\")";
+                    try {
+                        DottedChain simplePackName = si.getSimplePackName(abc);
+                        if (simplePackName != null) {
+                            siName = " (\"" + Helper.escapePCodeString(simplePackName.toRawString()) + "\")";
+                        }
+                    } catch (IndexOutOfBoundsException iob) {
+                        //ignore
                     }
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName, prefix);
 
                 case METADATA_INFO:
-                    MetadataInfo md = abc.metadata_info.get(index);
-                    String mdName = abc.constants.getString(md.name_index);
-                    if (mdName == null) {
-                        mdName = "";
-                    } else {
-                        mdName = "\"" + Helper.escapePCodeString(mdName) + "\"";
+                    if (index >= abc.metadata_info.size()) {
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
                     }
+                    MetadataInfo md = abc.metadata_info.get(index);
+                    String mdName = formatString(md.name_index);
                     mdName += " (" + md.values.length + " items)";
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.METADATA_INFO, md, mdName);
                 default:
@@ -762,7 +806,7 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                     currentIndex = 5;
                 }
-                
+
                 if (index == currentIndex) {
                     if ((t.kindFlags & Trait.ATTR_Metadata) > 0) {
                         return new SubValue(parent, currentIndex, t, "metadata", "metadata");
@@ -770,8 +814,18 @@ public class ABCExplorerDialog extends AppDialog {
                 }
             }
             Trait t = traits.traits.get(index);
-            String traitName = "\"" + Helper.escapePCodeString(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false)) + "\"";
+            String traitName = formatString(t.getName(abc).name_index);
             return new SubValue(parent, index, index, parentValue, "traits", "t" + index + ": " + t.getKindToStr() + ": " + traitName);
+        }
+
+        private String formatString(int index) {
+            if (index == 0) {
+                return "null";
+            }
+            if (index >= abc.constants.getStringCount()) {
+                return "Unknown(" + index + ")";
+            }
+            return "\"" + Helper.escapePCodeString(abc.constants.getString(index)) + "\"";
         }
 
         @Override
@@ -1133,12 +1187,11 @@ public class ABCExplorerDialog extends AppDialog {
                                 }
                                 return null;
                             }
-                            String pairTitle = "\"" + Helper.escapePCodeString(abc.constants.getString(md.keys[index])) + "\"" + " : "
-                                    + "\"" + Helper.escapePCodeString(abc.constants.getString(md.values[index])) + "\"";
+                            String pairTitle = formatString(md.keys[index]) + " : " + formatString(md.values[index]);
                             return new SubValue(parent, index, index, md, "pairs", "p" + index + ": " + pairTitle);
                     }
                 }
-                
+
                 if (sv.getParentValue() instanceof Trait) {
                     Trait t = (Trait) sv.getParentValue();
                     switch (sv.getProperty()) {
@@ -1340,7 +1393,7 @@ public class ABCExplorerDialog extends AppDialog {
                             return md.keys.length;
                     }
                 }
-                
+
                 if (sv.getParentValue() instanceof Trait) {
                     Trait t = (Trait) sv.getParentValue();
                     switch (sv.getProperty()) {
