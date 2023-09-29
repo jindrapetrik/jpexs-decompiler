@@ -1679,16 +1679,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected void abcExplorerActionPerformed(ActionEvent evt) {
         
-        SWF swf;
-        if (openable instanceof SWF) {
-            swf = (SWF) openable;
-        } else if (openable instanceof ABC) {
-            swf = ((ABC)openable).getSwf();
-        } else {
+        if (openable == null) {
             return;
         }
         
-        mainFrame.getPanel().showAbcExplorer(swf, null);
+        mainFrame.getPanel().showAbcExplorer(openable, null);
     }
     
     public boolean stackActionPerformed(ActionEvent evt) {

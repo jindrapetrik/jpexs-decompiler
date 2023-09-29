@@ -1165,6 +1165,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 abcExplorerMenuItem.setVisible(true);
             }
             
+            if (firstItem instanceof ABC) {
+                abcExplorerMenuItem.setVisible(true);
+            }
+            
             if (firstItem instanceof Tag) {
                 rawEditMenuItem.setVisible(true);
             }
@@ -1834,9 +1838,15 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         
+        if (item instanceof ABC) {
+            ABC abc = (ABC) item;
+            mainPanel.showAbcExplorer(abc, abc);
+            return;
+        }
+        
         if (item instanceof ScriptPack) {
             ScriptPack pack = (ScriptPack)item;
-            ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.abc.getSwf(), pack.abc);
+            ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.getOpenable(), pack.abc);
             dialog.selectScriptInfo(pack.scriptIndex);
         }
             
@@ -1844,7 +1854,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             AS3Package pkg = (AS3Package) item;
             if (pkg.isCompoundScript()) {
                 ScriptPack pack = pkg.getCompoundInitializerPack();
-                ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.abc.getSwf(), pack.abc);
+                ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.getOpenable(), pack.abc);
                 dialog.selectScriptInfo(pack.scriptIndex);
             }
         }

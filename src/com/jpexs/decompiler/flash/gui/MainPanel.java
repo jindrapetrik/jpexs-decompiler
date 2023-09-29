@@ -454,7 +454,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     
     public ScrollPosStorage scrollPosStorage;
     
-    private Map<SWF, ABCExplorerDialog> abcExplorerDialogs = new WeakHashMap<>();
+    private Map<Openable, ABCExplorerDialog> abcExplorerDialogs = new WeakHashMap<>();
 
     public void savePins() {
         pinsPanel.save();
@@ -5923,8 +5923,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return statusPanel;
     }    
     
-    public ABCExplorerDialog showAbcExplorer(SWF swf, ABC abc) {
-        ABCExplorerDialog dialog = abcExplorerDialogs.get(swf);
+    public ABCExplorerDialog showAbcExplorer(Openable openable, ABC abc) {
+        ABCExplorerDialog dialog = abcExplorerDialogs.get(openable);
         if (dialog != null) {
             dialog.selectAbc(abc);
             if (!dialog.isVisible()) {
@@ -5933,8 +5933,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 dialog.toFront();
             }
         } else {
-            dialog = new ABCExplorerDialog(mainFrame.getWindow(), swf, abc);
-            abcExplorerDialogs.put(swf, dialog);
+            dialog = new ABCExplorerDialog(mainFrame.getWindow(), openable, abc);
+            abcExplorerDialogs.put(openable, dialog);
             dialog.setVisible(true);
         }
         return dialog;
