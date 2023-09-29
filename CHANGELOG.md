@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
  have special node per script (script_0, script_1, ...) which contains included classes and script initializer
 - Show "Renaming identifiers" status on file opening with auto rename identifiers on
 - [#2010] word wrapping in the translation tool
+- ABC Explorer tool
 
 ### Fixed
 - [#2043] StartSound2 tag handling
@@ -68,6 +69,9 @@ Major version of SWF to XML export changed to 2.
  cannot be directly edited or imported (due to problems with script initializers)
 - [#2022] - AS3 - Make script initializer always visible and available instead of config
 - [#1355] Import panel moved to separate tab
+
+### Removed
+- Removed AS3 Constants list (tab on navigator) in favor of new ABC Explorer
 
 ## [18.5.0] - 2023-06-25
 ### Added
