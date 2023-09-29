@@ -1169,6 +1169,17 @@ public class TagTreeContextMenu extends JPopupMenu {
                 abcExplorerMenuItem.setVisible(true);
             }
             
+            if (firstItem instanceof ClassesListTreeModel) {
+                abcExplorerMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof SWF) {
+                SWF swf = (SWF) firstItem;
+                if (swf.isAS3()) {
+                    abcExplorerMenuItem.setVisible(true);
+                }
+            }
+            
             if (firstItem instanceof Tag) {
                 rawEditMenuItem.setVisible(true);
             }
@@ -1832,9 +1843,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (item == null) {
             return;
         }
+        if (item instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clsTreeModel = (ClassesListTreeModel) item;
+            item = clsTreeModel.getOpenable();
+        }
+        
         if (item instanceof ABCContainerTag) {
             ABCContainerTag cnt = (ABCContainerTag)item;
             mainPanel.showAbcExplorer(cnt.getSwf(), cnt.getABC());
+            return;
+        }
+        
+        if (item instanceof SWF) {            
+            mainPanel.showAbcExplorer((SWF) item, null);
             return;
         }
         
