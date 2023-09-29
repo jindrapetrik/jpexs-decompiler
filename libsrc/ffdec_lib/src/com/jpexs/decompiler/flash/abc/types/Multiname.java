@@ -254,6 +254,9 @@ public class Multiname {
         if (index == 0) {
             return "null";
         }
+        if (index >= constants.getNamespaceCount()) {
+            return "Unknown(" + index + ")";
+        }
         int type = constants.getNamespace(index).kind;
         int name_index = constants.getNamespace(index).name_index;
         String name = name_index == 0 ? null : constants.getNamespace(index).getName(constants).toRawString();
@@ -272,6 +275,9 @@ public class Multiname {
     public static String namespaceSetToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
             return "null";
+        }
+        if (index >= constants.getNamespaceSetCount()) {
+            return "Unknown(" + index + ")";
         }
         StringBuilder ret = new StringBuilder();
         ret.append("[");
