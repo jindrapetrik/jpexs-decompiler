@@ -363,7 +363,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         abcExplorerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.abcexplorer"));
         abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
-        abcExplorerMenuItem.setIcon(View.getIcon("abc16"));
+        abcExplorerMenuItem.setIcon(View.getIcon("abcexplorer16"));
         add(abcExplorerMenuItem);
         
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
