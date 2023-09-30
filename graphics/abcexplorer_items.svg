@@ -9,7 +9,7 @@
    id="svg5"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    sodipodi:docname="abcexplorer_items.svg"
-   inkscape:export-filename="abcint16.png"
+   inkscape:export-filename="abcnamespace16.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -29,8 +29,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="32.413584"
-     inkscape:cx="11.029326"
-     inkscape:cy="10.87507"
+     inkscape:cx="8.0676052"
+     inkscape:cy="7.3888775"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -39,6 +39,18 @@
      inkscape:current-layer="layer1" />
   <defs
      id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1868">
+      <stop
+         style="stop-color:#800000;stop-opacity:1"
+         offset="0"
+         id="stop1864" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="1"
+         id="stop1866" />
+    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient1344">
@@ -171,6 +183,16 @@
        y1="3.5785913"
        x2="0.48484141"
        y2="0.47329757" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1868"
+       id="linearGradient1713"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111166,0.14111117)"
+       x1="3.5555036"
+       y1="3.5785913"
+       x2="0.48484141"
+       y2="0.47329757" />
   </defs>
   <g
      inkscape:label="Vrstva 1"
@@ -269,25 +291,26 @@
          x="1.1625471"
          y="3.1399252">S</tspan></text>
     <rect
-       style="display:none;fill:url(#linearGradient1164);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:inline;fill:url(#linearGradient1164);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
        id="rect238-1"
        width="3.4572225"
        height="3.4572222"
        x="0.38805583"
        y="0.38805583"
-       inkscape:label="lightblue_rect" />
+       inkscape:label="lightblue_rect"
+       sodipodi:insensitive="true" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
+       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:inline;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
+       x="0.64128619"
+       y="2.9134934"
        id="text1487"
        inkscape:label="text_ns"><tspan
          sodipodi:role="line"
          id="tspan1485"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">NS</tspan></text>
+         x="0.64128619"
+         y="2.9134934">NS</tspan></text>
     <text
        xml:space="preserve"
        style="font-weight:bold;font-size:2.06812px;line-height:0.8;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.172343;stroke-dasharray:none"
@@ -359,7 +382,7 @@
          x="0.60863525"
          y="2.8155406">MI</tspan></text>
     <rect
-       style="display:inline;fill:url(#linearGradient1293);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:url(#linearGradient1293);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
        id="rect238-1-8-9-9"
        width="3.4572225"
        height="3.4572222"
@@ -379,7 +402,7 @@
          x="0.60863525"
          y="2.8155406">MD</tspan></text>
     <rect
-       style="display:inline;fill:url(#linearGradient1336);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:url(#linearGradient1336);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
        id="rect238-1-8-9-9-0"
        width="3.4572225"
        height="3.4572222"
@@ -398,5 +421,26 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
          x="0.60863525"
          y="2.8155406">MB</tspan></text>
+    <rect
+       style="display:none;fill:url(#linearGradient1713);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       id="rect238-1-8-9-9-0-5"
+       width="3.4572225"
+       height="3.4572222"
+       x="0.38805583"
+       y="0.38805583"
+       inkscape:label="red_roundrect"
+       ry="1.0611548" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:3.69349px;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';display:none;fill:#ffffff;stroke:none;stroke-width:0.307791;stroke-dasharray:none"
+       x="0.95465571"
+       y="2.971226"
+       id="text1976"
+       inkscape:label="text_e"><tspan
+         sodipodi:role="line"
+         id="tspan1974"
+         style="fill:#ffffff;stroke:none;stroke-width:0.307791"
+         x="0.95465571"
+         y="2.971226">e</tspan></text>
   </g>
 </svg>
