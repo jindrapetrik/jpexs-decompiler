@@ -330,8 +330,8 @@ public class ABCExplorerDialog extends AppDialog {
         Object root = model.getRoot();
         Object parent = root;
 
-        Object treePath[] = new Object[parts.length + 1];
-        treePath[0] = root;
+        Object treePathObjects[] = new Object[parts.length + 1];
+        treePathObjects[0] = root;
         
         loopp:for (int p = 0; p < parts.length; p++) {
             String part = parts[p];
@@ -353,14 +353,16 @@ public class ABCExplorerDialog extends AppDialog {
                     key = sv.getTitle();
                 }
                 if (key.equals(part)) {
-                    treePath[1 + p] = child;
+                    treePathObjects[1 + p] = child;
                     parent = child;
                     continue loopp;
                 }
             }
             return;
         }
-        tree.setSelectionPath(new TreePath(treePath));
+        TreePath treePath = new TreePath(treePathObjects);
+        tree.setSelectionPath(treePath);
+        tree.scrollPathToVisible(treePath);
     }
 
     public void selectScriptInfo(int scriptIndex) {
