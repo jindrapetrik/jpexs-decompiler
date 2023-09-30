@@ -546,7 +546,7 @@ public class ABCExplorerDialog extends AppDialog {
         }
         if (found) {
             DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
             mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
         }
         return found;
@@ -616,7 +616,7 @@ public class ABCExplorerDialog extends AppDialog {
                 case SCRIPT_INFO:
                     scriptIndex = vwi.getIndex();
                     DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
                     mainPanel.gotoScriptName(abc.getSwf(), scriptName);
                     break;
                 case METHOD_BODY:
@@ -646,7 +646,7 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toRawString());
+                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName2, classIndex, GraphTextWriter.TRAIT_CLASS_INITIALIZER);
                     }
                     break;
@@ -693,7 +693,7 @@ public class ABCExplorerDialog extends AppDialog {
 
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
                     }
 

@@ -44,6 +44,14 @@ public abstract class AS3ClassTreeItem implements TreeItem {
         }
         return ret;
     }
+    
+    public String getPrintableNameWithNamespaceSuffix() {
+        String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
+        if (namespaceSuffix != null) {
+            ret += namespaceSuffix;
+        }
+        return ret;
+    }
 
     public String getPath() {
         return path.toString();
@@ -51,10 +59,6 @@ public abstract class AS3ClassTreeItem implements TreeItem {
 
     @Override
     public String toString() {
-        String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
-        if (namespaceSuffix != null) {
-            ret += namespaceSuffix;
-        }
-        return ret;
+        return getPrintableNameWithNamespaceSuffix();
     }
 }
