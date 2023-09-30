@@ -2784,9 +2784,9 @@ public class Main {
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
-                        mainFrame.getPanel().reload(true);
-                        mainFrame.getPanel().updateUiWithCurrentOpenable();
                         setSessionLoaded(true);
+                        mainFrame.getPanel().reload(true);
+                        mainFrame.getPanel().updateUiWithCurrentOpenable();                        
                     });
                 }
             }
