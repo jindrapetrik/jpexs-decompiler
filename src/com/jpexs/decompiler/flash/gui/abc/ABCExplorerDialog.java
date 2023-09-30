@@ -1260,7 +1260,11 @@ public class ABCExplorerDialog extends AppDialog {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     MethodBody b = abc.bodies.get(index);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, b, "mi" + b.method_info + ", " + b.getCodeBytes().length + " bytes code", title);
+                    String exceptionsAdd = "";
+                    if (b.exceptions.length > 0) {
+                        exceptionsAdd = ", " + b.exceptions.length + " exceptions";
+                    }
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, b, "mi" + b.method_info + ", " + b.getCodeBytes().length + " bytes code" + exceptionsAdd, title);
                 case INSTANCE_INFO:
                     if (index >= abc.instance_info.size()) {
                         return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
