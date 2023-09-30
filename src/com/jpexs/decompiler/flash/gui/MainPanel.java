@@ -1441,7 +1441,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return actionPanel;
     }
 
-    private void updateUiWithCurrentOpenable() {
+    public void updateUiWithCurrentOpenable() {
         switch (currentView) {
             case VIEW_RESOURCES:
                 TreeItem resourcesTi = (TreeItem) tagTree.getLastSelectedPathComponent();

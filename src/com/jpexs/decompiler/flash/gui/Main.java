@@ -2784,16 +2784,7 @@ public class Main {
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
-                        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_RESOURCES) {
-                            mainFrame.getPanel().valueChanged(new TreeSelectionEvent(
-                                    mainFrame.getPanel().tagTree, mainFrame.getPanel().tagTree.getSelectionPath(), false, null, null
-                            ));
-                        }
-                        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_TAGLIST) {
-                            mainFrame.getPanel().valueChanged(new TreeSelectionEvent(
-                                    mainFrame.getPanel().tagListTree, mainFrame.getPanel().tagListTree.getSelectionPath(), false, null, null
-                            ));
-                        }
+                        mainFrame.getPanel().updateUiWithCurrentOpenable();
                         setSessionLoaded(true);
                     });
                 }
