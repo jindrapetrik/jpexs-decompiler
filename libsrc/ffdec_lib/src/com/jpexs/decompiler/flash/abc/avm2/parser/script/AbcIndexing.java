@@ -160,11 +160,14 @@ public final class AbcIndexing {
 
             int builtInIndex = -1;
             if (abc != null) {
-                if (!builtInNsPerAbc.containsKey(abc)) {
-                    int index = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
-                    builtInNsPerAbc.put(abc, index);
+                Integer builtInNs = builtInNsPerAbc.get(abc);
+                
+                if (builtInNs == null) {
+                    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
+                    builtInNsPerAbc.put(abc, builtInIndex);
+                } else {
+                    builtInIndex = builtInNs;
                 }
-                builtInIndex = builtInNsPerAbc.get(abc);
             }
 
             this.propName = propName;
