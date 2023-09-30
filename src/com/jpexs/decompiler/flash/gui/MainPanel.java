@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2023 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -2442,6 +2442,26 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void gotoScriptTrait(SWF swf, String scriptName, int classIndex, int traitIndex) {
+        abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
+            @Override
+            public void run() {
+                if (abcPanel != null) {
+                    abcPanel.decompiledTextArea.removeScriptListener(this);
+                    boolean classChanged = false;
+                    if (abcPanel.decompiledTextArea.getClassIndex() != classIndex) {
+                        abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                        classChanged = true;
+                    }
+                    if (traitIndex != -10) {
+                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+                    }            
+                }
+            }            
+        });
+        gotoScriptName(swf, scriptName);        
+    }
+
     public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
         View.checkAccess();
 
@@ -2641,7 +2661,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         for (TreeItem t : allItems) {
             if (t instanceof ScriptPack) {
                 ScriptPack sp = (ScriptPack) t;
-                Openable s = sp.getOpenable(); //Fixme for ABCs                
+                Openable s = sp.getOpenable(); //Fixme for ABCs
                 if (!scopeAs3.containsKey(s)) {
                     scopeAs3.put(s, new ArrayList<>());
                 }
@@ -3848,7 +3868,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (openable instanceof SWF) {
             swf = (SWF) openable;
         }
-        //FIXME for ABCs        
+        //FIXME for ABCs
 
         if (swf == null) {
             return;
@@ -4992,7 +5012,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 previewPanel.showFlashViewerPanel();
                 previewPanel.showSwf(swf);
 
-                //}                
+                //}
             }
         } else if ((treeItem instanceof PlaceObjectTypeTag)) {// && (previewPanel != dumpPreviewPanel)) {
             previewPanel.showDisplayEditTagPanel((PlaceObjectTypeTag) treeItem, frame);
@@ -5304,7 +5324,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             System.out.println("seekSamples = "+seekSamples);
             System.out.println("============");
             }catch(Exception ex){
-                
+
             }
         }*/
         if (treeItem instanceof HeaderItem) {
@@ -5987,7 +6007,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 dialog.toFront();
             }
         } else {
-            dialog = new ABCExplorerDialog(mainFrame.getWindow(), openable, abc);
+            dialog = new ABCExplorerDialog(mainFrame.getWindow(), this, openable, abc);
             abcExplorerDialogs.put(openable, dialog);
             dialog.setVisible(true);
         }
