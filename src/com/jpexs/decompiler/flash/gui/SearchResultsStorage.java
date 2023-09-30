@@ -342,7 +342,7 @@ public class SearchResultsStorage {
     public void destroySwf(SWF swf) {
         String swfId = getOpenableId(swf);
         for (int i = 0; i < openableIds.size(); i++) {
-            if (openableIds.get(i).equals(swfId)) {
+            if (openableIds.get(i).equals(swfId) && unpackedData.size() > i) {
                 unpackedData.set(i, null);
             }
         }

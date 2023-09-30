@@ -693,6 +693,10 @@ public class ABCExplorerDialog extends AppDialog {
 
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        if (scriptNameDc == null && (sv.getParentValue() instanceof ScriptInfo)) {
+                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(traitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                        }
+                        
                         String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
                     }
