@@ -350,6 +350,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), (ex.text + " on line " + ex.line), Main.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
+        abc.fireChanged();
         return true;
     }
 

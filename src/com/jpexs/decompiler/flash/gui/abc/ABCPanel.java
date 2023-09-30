@@ -1874,12 +1874,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                             abc.pack();
                         }
                         ((Tag) abc.parentTag).setModified(true);
+                        abc.fireChanged();
                     }
                 });
             } else {
                 traits.traits.remove(traitIndex);
                 ((Tag) abc.parentTag).setModified(true);
                 reload();
+                abc.fireChanged();
             }
 
         }
@@ -1992,8 +1994,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     decompiledTextArea.gotoTrait(traitId);
                     decompiledTextArea.removeScriptListener(this);
                 }
-            });
+            });            
             reload();
+            abc.fireChanged();
         }
     }
 
