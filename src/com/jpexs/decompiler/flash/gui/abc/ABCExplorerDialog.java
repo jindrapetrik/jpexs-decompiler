@@ -333,6 +333,11 @@ public class ABCExplorerDialog extends AppDialog {
             return null;
         }
         Object selection = tree.getLastSelectedPathComponent();
+        if (selection != null) {
+            JMenuItem copyRowMenuItem = new JMenuItem(translate("copy.row"), View.getIcon("copy16"));
+            copyRowMenuItem.addActionListener(this::copyRowActionPerformed);
+            menu.add(copyRowMenuItem);
+        }
         if (selection instanceof ValueWithIndex) {
             ValueWithIndex vwi = (ValueWithIndex) selection;
 
@@ -382,6 +387,13 @@ public class ABCExplorerDialog extends AppDialog {
         }
 
         return menu;
+    }
+
+    private void copyRowActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        if (selection != null) {
+            copyToClipboard(selection.toString());
+        }
     }
 
     private void copyTitleActionPerformed(ActionEvent e) {
@@ -589,7 +601,7 @@ public class ABCExplorerDialog extends AppDialog {
         }
 
         @Override
-        public String toString() {            
+        public String toString() {
             return title + (!value.isEmpty() ? ": " + value : "");
         }
 
