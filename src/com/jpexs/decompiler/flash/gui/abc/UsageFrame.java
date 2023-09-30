@@ -151,9 +151,9 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 decompiledTextArea.addScriptListener(setTrait);
                 String scriptName;                
                 if (icu.getClassIndex() > -1) {
-                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString();
+                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toPrintableString(true);
                 } else if (icu.getScriptIndex() > -1) {
-                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toRawString();
+                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toPrintableString(true);
                 } else {
                     scriptName = "";
                 }
