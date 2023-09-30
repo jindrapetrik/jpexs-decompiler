@@ -1137,7 +1137,7 @@ public class ABC implements Openable {
         output = new Utf8PrintWriter(os);
         constants.dump(output);
         for (int i = 0; i < method_info.size(); i++) {
-            output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(constants, new ArrayList<>()));
+            output.println("MethodInfo[" + i + "]:" + method_info.get(i).toString(this, new ArrayList<>()));
         }
         for (int i = 0; i < metadata_info.size(); i++) {
             output.println("MetadataInfo[" + i + "]:" + metadata_info.get(i).toString(constants));

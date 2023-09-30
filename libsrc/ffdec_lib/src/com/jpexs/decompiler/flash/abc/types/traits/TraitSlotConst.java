@@ -77,7 +77,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (type_index > 0) {
             typeStr = abc.constants.getMultiname(type_index).toString(abc.constants, fullyQualifiedNames);
         }
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc) + " metadata=" + Helper.intArrToString(metadata);
     }
 
     public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
@@ -150,7 +150,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
         if (value_kind != 0) {            
             ValueKind val = new ValueKind(value_index, value_kind);
-            writer.hilightSpecial(val.toString(abc.constants), HighlightSpecialType.TRAIT_VALUE);
+            writer.hilightSpecial(val.toString(abc), HighlightSpecialType.TRAIT_VALUE);
         }
     }
 
@@ -265,7 +265,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         writer.newLine();
         if (value_kind != ValueKind.CONSTANT_Undefined) {
             writer.appendNoHilight("value ");
-            writer.hilightSpecial((new ValueKind(value_index, value_kind).toASMString(abc.constants)), HighlightSpecialType.TRAIT_VALUE);
+            writer.hilightSpecial((new ValueKind(value_index, value_kind).toASMString(abc)), HighlightSpecialType.TRAIT_VALUE);
             writer.newLine();
         }
         return writer;

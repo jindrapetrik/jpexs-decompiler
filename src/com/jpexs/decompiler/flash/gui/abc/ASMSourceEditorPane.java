@@ -138,7 +138,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
             writer.newLine();
             
-            abc.method_info.get(methodIndex).toASMSource(abc.constants, writer);
+            abc.method_info.get(methodIndex).toASMSource(abc, writer);
             
             if (Configuration.indentAs3PCode.get()) {
                 writer.unindent();
