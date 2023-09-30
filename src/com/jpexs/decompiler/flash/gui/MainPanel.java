@@ -1441,6 +1441,40 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return actionPanel;
     }
 
+    private void updateUiWithCurrentOpenable() {
+        switch (currentView) {
+            case VIEW_RESOURCES:
+                TreeItem resourcesTi = (TreeItem) tagTree.getLastSelectedPathComponent();
+                if (resourcesTi != null) {
+                    Openable resourcesOpenable = resourcesTi.getOpenable();
+                    if (resourcesOpenable != null) {
+                        updateUi(resourcesOpenable);
+                    }
+                }
+                break;
+            case VIEW_TAGLIST:
+                TreeItem tagListTi = (TreeItem) tagListTree.getLastSelectedPathComponent();
+                if (tagListTi != null) {
+                    Openable tagListOpenable = tagListTi.getOpenable();
+                    if (tagListOpenable != null) {
+                        updateUi(tagListOpenable);
+                    }
+                }
+                break;
+            case VIEW_DUMP:
+                DumpInfo di = (DumpInfo) dumpTree.getLastSelectedPathComponent();
+                if (di != null) {
+                    Openable dumpOpenable = di.getOpenable();
+                    if (dumpOpenable != null) {
+                        updateUi(dumpOpenable);
+                    }
+                }
+                break;
+            case VIEW_TIMELINE:
+                break;
+        }
+    }
+
     private void updateUi(final Openable openable) {
         View.checkAccess();
 
@@ -4797,6 +4831,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 treePanelMode = TreePanelMode.DUMP_TREE;
                 showDetail(DETAILCARDEMPTYPANEL);
                 reload(true);
+                updateUiWithCurrentOpenable();
                 return true;
             case VIEW_RESOURCES:
                 pinsPanel.setVisible(true);
@@ -4818,6 +4853,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 refreshPins();
                 reload(true);
+                updateUiWithCurrentOpenable();
                 return true;
             case VIEW_TIMELINE:
                 pinsPanel.setVisible(false);
@@ -4853,6 +4889,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 treePanelMode = TreePanelMode.TAGLIST_TREE;
                 refreshPins();
                 reload(true);
+                updateUiWithCurrentOpenable();
                 return true;
         }
 
