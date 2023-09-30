@@ -933,6 +933,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         removeTraitButton.setToolTipText(AppStrings.translate("button.removetrait"));
         iconsPanel.add(removeTraitButton);
         
+        JButton abcExplorerButton = new JButton(View.getIcon("abcexplorer16"));
+        abcExplorerButton.setMargin(new Insets(5, 5, 5, 5));
+        abcExplorerButton.addActionListener(this::abcExplorerTraitButtonActionPerformed);
+        abcExplorerButton.setToolTipText(AppStrings.translate("button.abcexploretrait"));
+        iconsPanel.add(abcExplorerButton);
+        
         JToggleButton deobfuscateButton = new JToggleButton(View.getIcon("deobfuscate16"));
         deobfuscateButton.setMargin(new Insets(5, 5, 5, 5));
         deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
@@ -1117,7 +1123,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 gotoDeclaration(decompiledTextArea.getCaretPosition());
             }
         }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
-
+                
         CtrlClickHandler cch = new CtrlClickHandler();
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
@@ -1712,6 +1718,55 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         mainPanel.autoDeobfuscateChanged();
     }*/
     
+    
+    private void abcExplorerTraitButtonActionPerformed(ActionEvent evt) {
+        int classIndex = decompiledTextArea.getClassIndex();
+        int globalTraitIndex = decompiledTextArea.lastTraitIndex;
+
+        if ((globalTraitIndex == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)
+                || (globalTraitIndex == GraphTextWriter.TRAIT_CLASS_INITIALIZER)
+                || (globalTraitIndex == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+            ABCExplorerDialog dialog = mainPanel.showAbcExplorer(abc.getOpenable(), abc);
+            dialog.selectTrait(decompiledTextArea.getScriptLeaf().scriptIndex, classIndex, globalTraitIndex, globalTraitIndex);    
+            return;
+        }
+
+        int traitType;
+        int traitIndex = -1;
+        if (globalTraitIndex == GraphTextWriter.TRAIT_UNKNOWN && classIndex >= 0) {
+            Traits traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
+            for (int i = 0; i < traits.traits.size(); i++) {
+                if (traits.traits.get(i) instanceof TraitClass) {
+                    TraitClass tc = (TraitClass) traits.traits.get(i);
+                    if (tc.class_info == classIndex) {
+                        traitIndex = i;
+                        break;
+                    }
+                }
+            }
+            traitType = GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
+        } else if (classIndex < 0) {
+            traitIndex = globalTraitIndex;
+            traitType = GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
+        } else {
+            Traits staticTraits = abc.class_info.get(classIndex).static_traits;
+            Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
+            if (globalTraitIndex >= 0 && globalTraitIndex < abc.class_info.get(classIndex).static_traits.traits.size()) {
+                traitIndex = globalTraitIndex;
+                traitType = GraphTextWriter.TRAIT_CLASS_INITIALIZER;
+            } else {
+                if (globalTraitIndex >= 0 && globalTraitIndex < staticTraits.traits.size() + instanceTraits.traits.size()) {
+                    traitIndex = globalTraitIndex - staticTraits.traits.size();    
+                    traitType = GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
+                } else {
+                    return;
+                }
+            }
+        }       
+        
+        ABCExplorerDialog dialog = mainPanel.showAbcExplorer(abc.getOpenable(), abc);
+        dialog.selectTrait(decompiledTextArea.getScriptLeaf().scriptIndex, classIndex, traitIndex, traitType);
+    }
         
     private void removeTraitButtonActionPerformed(ActionEvent evt) {
         int classIndex = decompiledTextArea.getClassIndex();
