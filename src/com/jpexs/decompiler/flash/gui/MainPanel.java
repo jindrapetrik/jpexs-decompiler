@@ -1606,6 +1606,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     ABCExplorerDialog abcExportDialog = abcExplorerDialogs.get(openable);
                     if (abcExportDialog != null) {
                         abcExportDialog.setVisible(false);
+                        abcExplorerDialogs.remove(openable);
                     }
                 }
             }
@@ -1621,6 +1622,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ABCExplorerDialog abcExportDialog = abcExplorerDialogs.get(swf);
             if (abcExportDialog != null) {
                 abcExportDialog.setVisible(false);
+                abcExplorerDialogs.remove(swf);
             }
             if (!onExit) {
                 SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
@@ -5997,6 +5999,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return statusPanel;
     }
 
+    public void closeAbcExplorer(Openable openable) {
+        ABCExplorerDialog dialog = abcExplorerDialogs.get(openable);
+        if (dialog != null) {
+            dialog.setVisible(false);
+            abcExplorerDialogs.remove(dialog);
+        }
+    }
+    
     public ABCExplorerDialog showAbcExplorer(Openable openable, ABC abc) {
         ABCExplorerDialog dialog = abcExplorerDialogs.get(openable);
         if (dialog != null) {
