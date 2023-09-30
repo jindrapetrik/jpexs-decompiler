@@ -358,7 +358,6 @@ public class ABCExplorerDialog extends AppDialog {
                     continue loopp;
                 }
             }
-            System.err.println("not found");
             return;
         }
         tree.setSelectionPath(new TreePath(treePath));
