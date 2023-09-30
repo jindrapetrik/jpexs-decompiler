@@ -215,6 +215,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1852,7 +1853,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     updateClassesList();
                     reload(true);
                     ABCPanel abcPanel = getABCPanel();
-                    abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toRawString());
+                    abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString());
                 });
             }
         }
@@ -2555,15 +2556,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        String documentClass = swf.getDocumentClass();
+        String documentClass = swf.getDocumentClass();        
         if (documentClass != null && currentView != VIEW_DUMP) {
+            String documentClassPrintable = DottedChain.parseNoSuffix(documentClass).toPrintableString(true);
             List<ABCContainerTag> abcList = swf.getAbcList();
             if (!abcList.isEmpty()) {
                 ABCPanel abcPanel = getABCPanel();
                 for (ABCContainerTag c : abcList) {
-                    if (c.getABC().findClassByName(documentClass) > -1) {
+                    if (c.getABC().findClassByName(documentClassPrintable) > -1) {
                         abcPanel.setAbc(c.getABC());
-                        abcPanel.hilightScript(swf, documentClass);
+                        abcPanel.hilightScript(swf, documentClassPrintable);
                         break;
                     }
                 }

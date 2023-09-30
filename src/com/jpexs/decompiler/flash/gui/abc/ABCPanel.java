@@ -1393,6 +1393,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         setVisible(true);
     }
 
+    /**
+     * Hilights specific script.
+     * @param openable
+     * @param name Full name of the script. It must be printable - deobfuscated, not raw!
+     */
     public void hilightScript(Openable openable, String name) {
         
         TreeItem scriptNode = null;
