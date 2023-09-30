@@ -61,6 +61,7 @@ All notable changes to this project will be documented in this file.
 - Exceptions on cancelling file loading
 - Switching between openables on session load and on view type change
 - Float/Float4 ABC format support
+- AS3 Hilighting (go to) scripts when script has obfuscated name
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

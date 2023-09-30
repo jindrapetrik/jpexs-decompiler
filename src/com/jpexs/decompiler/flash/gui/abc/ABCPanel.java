@@ -1458,7 +1458,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 if (ti instanceof AS3ClassTreeItem) {
                     AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
 
-                    if (parts[i].equals(cti.getNameWithNamespaceSuffix())) {
+                    if (parts[i].equals(cti.getPrintableNameWithNamespaceSuffix())) {
                         item = ti;
                         break;
                     }
