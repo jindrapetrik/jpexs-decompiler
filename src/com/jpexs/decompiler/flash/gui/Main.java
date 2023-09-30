@@ -220,7 +220,7 @@ public class Main {
 
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
-    public static CancellableWorker swfPrepareWorker = null;        
+    public static CancellableWorker swfPrepareWorker = null;
 
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
@@ -1891,6 +1891,12 @@ public class Main {
             }
         }
 
+        if (mainFrame != null) {
+            for (Openable o : swf.items) {
+                mainFrame.getPanel().closeAbcExplorer(o);
+            }
+        }
+
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
@@ -2786,7 +2792,7 @@ public class Main {
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
                         setSessionLoaded(true);
                         mainFrame.getPanel().reload(true);
-                        mainFrame.getPanel().updateUiWithCurrentOpenable();                        
+                        mainFrame.getPanel().updateUiWithCurrentOpenable();
                     });
                 }
             }
@@ -3197,5 +3203,5 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }
-    }                
+    }
 }
