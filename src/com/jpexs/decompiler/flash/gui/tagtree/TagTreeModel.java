@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -399,6 +400,16 @@ public class TagTreeModel extends AbstractTagTreeModel {
             newPath.addAll(path);
             newPath.add(n);
 
+            if (n instanceof AS3Package) {
+                AS3Package pkg = (AS3Package)n;
+                if (obj instanceof AS3Package) {
+                    AS3Package opkg = (AS3Package)obj;
+                    if (Objects.equals(pkg.packageName, opkg.packageName) && pkg.getAbc() == opkg.getAbc()) {                        
+                        return newPath;
+                    }
+                }
+            }
+            
             if (n instanceof AS3ClassTreeItem) {
                 AS3ClassTreeItem te = (AS3ClassTreeItem) n;
                 if (obj == te) {

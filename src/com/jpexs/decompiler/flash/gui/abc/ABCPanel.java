@@ -1448,27 +1448,49 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         String pkg = name.contains(".") ? name.substring(0, name.lastIndexOf(".")) : "";
         String parts[] = name.split("\\.");
 
-        loopparts:
-        for (int i = 0; i < parts.length; i++) {
-            for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
-                if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
-                    AS3Package pti = (AS3Package) ti;
-                    if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
-                        item = pti;
-                        i = parts.length - 1 - 1;
-                        break;
+        List<Object> rootNodes = new ArrayList<>();
+        rootNodes.add(item);
+        List<? extends TreeItem> firstLevelNodes = tree.getFullModel().getAllChildren(item);
+        for (TreeItem ti :firstLevelNodes) {
+            if ((ti instanceof AS3Package)&&(((AS3Package)ti).isCompoundScript())) {
+                rootNodes.add(ti);
+            }
+        }
+        
+        looproot:for (Object root : rootNodes) {
+            item = root;
+            loopparts:
+            for (int i = 0; i < parts.length; i++) {
+                boolean found = false;
+                for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
+                    if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
+                        AS3Package pti = (AS3Package) ti;
+                        if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
+                            item = pti;
+                            i = parts.length - 1 - 1;
+                            found = true;
+                            break;
+                        }
+                        continue;
+                    }     
+                    if ((ti instanceof AS3Package)&&(((AS3Package)ti).isCompoundScript())) {
+                        continue;
                     }
-                    continue;
-                }
-                if (ti instanceof AS3ClassTreeItem) {
-                    AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
+                    if (ti instanceof AS3ClassTreeItem) {
+                        AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
 
-                    if (parts[i].equals(cti.getPrintableNameWithNamespaceSuffix())) {
-                        item = ti;
-                        break;
+                        if (parts[i].equals(cti.getPrintableNameWithNamespaceSuffix())) {
+                            item = ti;
+                            found = true;
+                            break;
+                        }
                     }
+                }
+                if (!found) {
+                    continue looproot;
                 }
             }
+            break; //found
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
         mainPanel.reload(true);
