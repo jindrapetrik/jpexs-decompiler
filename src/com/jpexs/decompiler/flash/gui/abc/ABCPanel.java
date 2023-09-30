@@ -198,7 +198,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final DebugPanel debugPanel;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
-    
+
     private final JLabel infoNotEditableLabel;
 
     private final JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
@@ -208,7 +208,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     private String lastDecompiled = null;
-    
+
     private JLabel linksLabel = new JLabel("");
 
     public MainPanel getMainPanel() {
@@ -219,7 +219,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public ScriptPack getPack() {
         return decompiledTextArea.getScriptLeaf();
-    }        
+    }
 
     public List<ABCSearchResult> search(final Openable openable, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker, List<ScriptPack> scope) {
         if (txt != null && !txt.isEmpty()) {
@@ -932,34 +932,34 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         removeTraitButton.addActionListener(this::removeTraitButtonActionPerformed);
         removeTraitButton.setToolTipText(AppStrings.translate("button.removetrait"));
         iconsPanel.add(removeTraitButton);
-        
+
         JButton abcExplorerButton = new JButton(View.getIcon("abcexplorer16"));
         abcExplorerButton.setMargin(new Insets(5, 5, 5, 5));
         abcExplorerButton.addActionListener(this::abcExplorerTraitButtonActionPerformed);
         abcExplorerButton.setToolTipText(AppStrings.translate("button.abcexploretrait"));
         iconsPanel.add(abcExplorerButton);
-        
+
         JToggleButton deobfuscateButton = new JToggleButton(View.getIcon("deobfuscate16"));
         deobfuscateButton.setMargin(new Insets(5, 5, 5, 5));
         deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
         deobfuscateButton.setToolTipText(AppStrings.translate("button.deobfuscate"));
         deobfuscateButton.setSelected(Configuration.autoDeobfuscate.get());
-        Configuration.autoDeobfuscate.addListener(new ConfigurationItemChangeListener<Boolean>(){
+        Configuration.autoDeobfuscate.addListener(new ConfigurationItemChangeListener<Boolean>() {
             @Override
             public void configurationItemChanged(Boolean newValue) {
                 deobfuscateButton.setSelected(newValue);
             }
         });
-        
+
         JButton deobfuscateOptionsButton = new JButton(View.getIcon("deobfuscateoptions16"));
         deobfuscateOptionsButton.addActionListener(this::deobfuscateOptionsButtonActionPerformed);
         deobfuscateOptionsButton.setToolTipText(AppStrings.translate("button.deobfuscate_options"));
-        deobfuscateOptionsButton.setMargin(new Insets(0,0,0,0));        
+        deobfuscateOptionsButton.setMargin(new Insets(0, 0, 0, 0));
         deobfuscateOptionsButton.setPreferredSize(new Dimension(30, deobfuscateButton.getPreferredSize().height));
-        
+
         iconsPanel.add(deobfuscateButton);
-        iconsPanel.add(deobfuscateOptionsButton);                
-        
+        iconsPanel.add(deobfuscateOptionsButton);
+
         scriptNameLabel = new JLabel("-");
 
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -970,9 +970,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         toolbarPanel.add(iconsPanel, BorderLayout.WEST);
 
         JPanel libraryAndLinkPanel = new JPanel(new FlowLayout());
-        
+
         LinkDialog linkDialog = new LinkDialog(mainPanel);
-        
+
         libraryComboBox = new JComboBox<>();
         libraryComboBox.addItem("AIR (airglobal.swc)");
         libraryComboBox.addItem("Flash (playerglobal.swc)");
@@ -993,33 +993,32 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         libraryAndLinkPanel.add(new JLabel(AppStrings.translate("library")));
         libraryAndLinkPanel.add(libraryComboBox);
-        
-        
+
         libraryAndLinkPanel.add(linksLabel);
-        
-        JButton linkButton = new JButton(View.getIcon("link16"));                
+
+        JButton linkButton = new JButton(View.getIcon("link16"));
         linkButton.setToolTipText(AppStrings.translate("button.abc.linkedSwfs.hint"));
-                       
+
         linkDialog.addSaveListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 reload();
-            }            
+            }
         });
-        
-        linkButton.addActionListener(new ActionListener(){
+
+        linkButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 linkDialog.setLocationRelativeTo(linkButton);
                 Point loc = new Point(0, linkButton.getHeight());
                 SwingUtilities.convertPointToScreen(loc, linkButton);
                 linkDialog.setLocation(loc);
-           
-                linkDialog.show(getSwf());                
-            }            
+
+                linkDialog.show(getSwf());
+            }
         });
         libraryAndLinkPanel.add(linkButton);
-        
+
         toolbarPanel.add(libraryAndLinkPanel, BorderLayout.EAST);
 
         topPanel.add(toolbarPanel, BorderLayout.CENTER);
@@ -1034,8 +1033,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         brokenHintPanel.setVisible(false);
 
         infoNotEditableLabel = new JLabel(View.getIcon("information16"));
-        infoNotEditableLabel.setToolTipText(AppStrings.translate("info.noteditable.compound"));        
-        
+        infoNotEditableLabel.setToolTipText(AppStrings.translate("info.noteditable.compound"));
+
         iconDecPanel.add(panelWithHint, BorderLayout.CENTER);
         final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -1046,7 +1045,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decButtonsPan.add(cancelDecompiledButton);
 
         infoNotEditableLabel.setVisible(false);
-        
+
         editDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
         cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
@@ -1060,7 +1059,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             saveDecompiledButton.setEnabled(false);
             cancelDecompiledButton.setEnabled(false);
         } else 
-        */
+         */
         {
             saveDecompiledButton.setVisible(false);
             cancelDecompiledButton.setVisible(false);
@@ -1123,7 +1122,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 gotoDeclaration(decompiledTextArea.getCaretPosition());
             }
         }, "find-declaration", AppStrings.translate("abc.action.find-declaration"), "control B");
-                
+
         CtrlClickHandler cch = new CtrlClickHandler();
         decompiledTextArea.addKeyListener(cch);
         decompiledTextArea.addMouseListener(cch);
@@ -1149,7 +1148,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         });
 
-        add(splitPane, BorderLayout.CENTER);       
+        add(splitPane, BorderLayout.CENTER);
     }
 
     private void decompiledTextAreaTextChanged() {
@@ -1357,16 +1356,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         decompiledTextArea.reloadClass();
-        detailPanel.methodTraitPanel.methodCodePanel.clear();                
+        detailPanel.methodTraitPanel.methodCodePanel.clear();
         updateLinksLabel();
     }
-    
+
     private void updateLinksLabel() {
         SWF swf = getSwf();
         if (swf == null) {
             linksLabel.setText("");
         } else {
-            int num = swf.getNumAbcIndexDependencies();      
+            int num = swf.getNumAbcIndexDependencies();
             if (num == 0) {
                 linksLabel.setText("");
             } else {
@@ -1383,7 +1382,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             int index = ((JComboBox) e.getSource()).getSelectedIndex();
             if (index == -1) {
                 return;
-            }            
+            }
         }
     }
 
@@ -1395,11 +1394,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     /**
      * Hilights specific script.
+     *
      * @param openable
-     * @param name Full name of the script. It must be printable - deobfuscated, not raw!
+     * @param name Full name of the script. It must be printable - deobfuscated,
+     * not raw!
      */
     public void hilightScript(Openable openable, String name) {
-        
+
         TreeItem scriptNode = null;
         if (openable instanceof SWF) {
             SWF swf = (SWF) openable;
@@ -1410,12 +1411,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 for (ABCContainerTag container : swf.getAbcList()) {
                     allAbcs.add(container.getABC());
                 }
-                loopcontainer: for (ABCContainerTag container : swf.getAbcList()) {
+                loopcontainer:
+                for (ABCContainerTag container : swf.getAbcList()) {
                     List<ScriptPack> packs = container.getABC().getScriptPacks(null, allAbcs);
-                    for (ScriptPack pack : packs) {   
+                    for (ScriptPack pack : packs) {
                         ClassPath classPath = pack.getClassPath();
                         if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
-                            scriptNode  = (Tag) container;
+                            scriptNode = (Tag) container;
                             break loopcontainer;
                         }
                     }
@@ -1424,12 +1426,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         } else if (openable instanceof ABC) {
             scriptNode = (ABC) openable;
         }
-        
+
         if (scriptNode != null) {
             hilightScript(openable, name, scriptNode);
         }
     }
-    
+
     public void hilightScript(Openable openable, String name, TreeItem scriptNode) {
         View.checkAccess();
 
@@ -1450,47 +1452,61 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         List<Object> rootNodes = new ArrayList<>();
         rootNodes.add(item);
+
+        boolean found = false;
+
         List<? extends TreeItem> firstLevelNodes = tree.getFullModel().getAllChildren(item);
-        for (TreeItem ti :firstLevelNodes) {
-            if ((ti instanceof AS3Package)&&(((AS3Package)ti).isCompoundScript())) {
+        for (TreeItem ti : firstLevelNodes) {
+            if ((ti instanceof AS3Package) && (((AS3Package) ti).isCompoundScript())) {
                 rootNodes.add(ti);
+                if (parts.length == 1 && parts[0].equals("script_" + ((AS3Package) ti).getCompoundScriptIndex())) {
+                    found = true;
+                    item = ti;
+                    break;
+                }
             }
         }
-        
-        looproot:for (Object root : rootNodes) {
-            item = root;
-            loopparts:
-            for (int i = 0; i < parts.length; i++) {
-                boolean found = false;
-                for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
-                    if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
-                        AS3Package pti = (AS3Package) ti;
-                        if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
-                            item = pti;
-                            i = parts.length - 1 - 1;
-                            found = true;
-                            break;
-                        }
-                        continue;
-                    }     
-                    if ((ti instanceof AS3Package)&&(((AS3Package)ti).isCompoundScript())) {
-                        continue;
-                    }
-                    if (ti instanceof AS3ClassTreeItem) {
-                        AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
 
-                        if (parts[i].equals(cti.getPrintableNameWithNamespaceSuffix())) {
-                            item = ti;
-                            found = true;
-                            break;
+        if (!found) {
+            looproot:
+            for (Object root : rootNodes) {
+                item = root;
+                loopparts:
+                for (int i = 0; i < parts.length; i++) {
+                    found = false;
+                    for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
+                        if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
+                            AS3Package pti = (AS3Package) ti;
+                            if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
+                                item = pti;
+                                i = parts.length - 1 - 1;
+                                found = true;
+                                break;
+                            }
+                            continue;
+                        }
+                        if ((ti instanceof AS3Package) && (((AS3Package) ti).isCompoundScript())) {
+                            continue;
+                        }
+                        if (ti instanceof AS3ClassTreeItem) {
+                            AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
+
+                            if (parts[i].equals(cti.getPrintableNameWithNamespaceSuffix())) {
+                                item = ti;
+                                found = true;
+                                break;
+                            }
                         }
                     }
+                    if (!found) {
+                        continue looproot;
+                    }
                 }
-                if (!found) {
-                    continue looproot;
-                }
+                break; //found
             }
-            break; //found
+        }
+        if (!found) {
+            return;
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
         mainPanel.reload(true);
@@ -1582,10 +1598,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             saveDecompiledButton.setVisible(val);
             saveDecompiledButton.setEnabled(false);
             editDecompiledButton.setVisible(!val);
-            experimentalLabel.setVisible(!val);                
+            experimentalLabel.setVisible(!val);
             cancelDecompiledButton.setVisible(val);
         }
-        
+
         decompiledTextArea.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
         detailPanel.setVisible(!val);
@@ -1643,8 +1659,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         try {
             String oldSp = pack.getClassPath().toRawString();
 
-            TreeItem scriptNode = getScriptNodeForPack(pack);                    
-            
+            TreeItem scriptNode = getScriptNodeForPack(pack);
+
             String as = decompiledTextArea.getText();
             localAbc.replaceScriptPack(scriptReplacer, pack, as);
             scriptReplacer.deinitReplacement(pack);
@@ -1658,7 +1674,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             reload();
             mainPanel.clearEditingStatus();
             if (refreshTree) {
-                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);       
+                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             }
         } catch (As3ScriptReplaceException asre) {
             StringBuilder sb = new StringBuilder();
@@ -1693,20 +1709,20 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 ViewMessages.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            }            
+            }
             decompiledTextArea.requestFocus();
 
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
         saveDecompiled(true);
     }
 
     private void deobfuscateButtonActionPerformed(ActionEvent evt) {
-        JToggleButton toggleButton = (JToggleButton)evt.getSource();
+        JToggleButton toggleButton = (JToggleButton) evt.getSource();
         boolean selected = toggleButton.isSelected();
 
         if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? AppStrings.translate("message.confirm.on") : AppStrings.translate("message.confirm.off")), AppStrings.translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningDeobfuscation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
@@ -1716,7 +1732,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             toggleButton.setSelected(Configuration.autoDeobfuscate.get());
         }
     }
-    
+
     private void deobfuscateOptionsButtonActionPerformed(ActionEvent evt) {
         JPopupMenu popupMenu = new JPopupMenu();
         JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
@@ -1725,27 +1741,25 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         /*JCheckBoxMenuItem removeObfuscatedDeclarationsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
         removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
         removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
-        */
+         */
         popupMenu.add(simplifyExpressionsMenuItem);
         //popupMenu.add(removeObfuscatedDeclarationsMenuItem);
-        
+
         JButton sourceButton = (JButton) evt.getSource();
         popupMenu.show(sourceButton, 0, sourceButton.getHeight());
     }
-    
+
     private void simplifyExpressionsMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.simplifyExpressions.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
-    
+
     /*private void removeObfuscatedDeclarationsMenuItemActionPerformed(ActionEvent evt) {
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }*/
-    
-    
     private void abcExplorerTraitButtonActionPerformed(ActionEvent evt) {
         int classIndex = decompiledTextArea.getClassIndex();
         int globalTraitIndex = decompiledTextArea.lastTraitIndex;
@@ -1754,7 +1768,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 || (globalTraitIndex == GraphTextWriter.TRAIT_CLASS_INITIALIZER)
                 || (globalTraitIndex == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
             ABCExplorerDialog dialog = mainPanel.showAbcExplorer(abc.getOpenable(), abc);
-            dialog.selectTrait(decompiledTextArea.getScriptLeaf().scriptIndex, classIndex, globalTraitIndex, globalTraitIndex);    
+            dialog.selectTrait(decompiledTextArea.getScriptLeaf().scriptIndex, classIndex, globalTraitIndex, globalTraitIndex);
             return;
         }
 
@@ -1783,18 +1797,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 traitType = GraphTextWriter.TRAIT_CLASS_INITIALIZER;
             } else {
                 if (globalTraitIndex >= 0 && globalTraitIndex < staticTraits.traits.size() + instanceTraits.traits.size()) {
-                    traitIndex = globalTraitIndex - staticTraits.traits.size();    
+                    traitIndex = globalTraitIndex - staticTraits.traits.size();
                     traitType = GraphTextWriter.TRAIT_INSTANCE_INITIALIZER;
                 } else {
                     return;
                 }
             }
-        }       
-        
+        }
+
         ABCExplorerDialog dialog = mainPanel.showAbcExplorer(abc.getOpenable(), abc);
         dialog.selectTrait(decompiledTextArea.getScriptLeaf().scriptIndex, classIndex, traitIndex, traitType);
     }
-        
+
     private void removeTraitButtonActionPerformed(ActionEvent evt) {
         int classIndex = decompiledTextArea.getClassIndex();
         //int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
@@ -1867,7 +1881,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 ((Tag) abc.parentTag).setModified(true);
                 reload();
             }
-            
+
         }
     }
 
@@ -1922,7 +1936,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
             }
         } while (again);
-        navigator.setModel(new DefaultListModel<>());            
+        navigator.setModel(new DefaultListModel<>());
         switch (kind) {
             case Trait.TRAIT_GETTER:
             case Trait.TRAIT_SETTER:
@@ -1979,7 +1993,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     decompiledTextArea.removeScriptListener(this);
                 }
             });
-            reload();            
+            reload();
         }
     }
 
@@ -1992,9 +2006,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             saveDecompiled(false);
             ok = ok && !(saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
         }
-        
+
         ok = ok && detailPanel.tryAutoSave();
-        
+
         return ok;
     }
 
@@ -2002,14 +2016,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public boolean isEditing() {
         View.checkAccess();
 
-        return (detailPanel.saveButton.isVisible() && detailPanel.saveButton.isEnabled()) 
+        return (detailPanel.saveButton.isVisible() && detailPanel.saveButton.isEnabled())
                 || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }
 
     public DebugPanel getDebugPanel() {
         return debugPanel;
     }
-    
+
     public void setCompound(boolean value) {
         infoNotEditableLabel.setVisible(value);
         experimentalLabel.setVisible(!value);
