@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
@@ -60,9 +61,9 @@ public class ValueKind {
 
     public static final int CONSTANT_Float4 = 0x1E;// float4
 
-    private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05};
+    private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05, 0x1E};
 
-    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNamespace"};
+    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal/Float", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNamespace", "Float4"};
 
     public int value_index;
 
@@ -128,23 +129,34 @@ public class ValueKind {
         }
     }
 
-    public String toString(AVM2ConstantPool constants) {
+    public String toString(ABC abc) {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
-                ret = EcmaScript.toString(constants.getInt(value_index));
+                ret = EcmaScript.toString(abc.constants.getInt(value_index));
                 break;
             case CONSTANT_UInt:
-                ret = EcmaScript.toString(constants.getUInt(value_index));
+                ret = EcmaScript.toString(abc.constants.getUInt(value_index));
                 break;
             case CONSTANT_Double:
-                ret = EcmaScript.toString(constants.getDouble(value_index));
+                ret = EcmaScript.toString(abc.constants.getDouble(value_index));
                 break;
             case CONSTANT_DecimalOrFloat:
-                ret = "" + constants.getDecimal(value_index);
+                if (abc.hasDecimalSupport()) {
+                    ret = "" + abc.constants.getDecimal(value_index);
+                } else {
+                    ret = "" + EcmaScript.toString(abc.constants.getFloat(value_index));
+                }
+                break;
+            case CONSTANT_Float4:
+                Float4 f4 = abc.constants.getFloat4(value_index);
+                ret = "[" + EcmaScript.toString(f4.values[0]) + ", "
+                        + EcmaScript.toString(f4.values[1]) + ", "
+                        + EcmaScript.toString(f4.values[2]) + ", "
+                        + EcmaScript.toString(f4.values[3]) + "]";
                 break;
             case CONSTANT_Utf8:
-                ret = "\"" + Helper.escapeActionScriptString(constants.getString(value_index)) + "\"";
+                ret = "\"" + Helper.escapeActionScriptString(abc.constants.getString(value_index)) + "\"";
                 break;
             case CONSTANT_True:
                 ret = "true";
@@ -158,35 +170,46 @@ public class ValueKind {
             case CONSTANT_Undefined:
                 ret = "undefined";
                 break;
-            case CONSTANT_Namespace:                
+            case CONSTANT_Namespace:
             case CONSTANT_PackageInternalNs:
             case CONSTANT_ProtectedNamespace:
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
             case CONSTANT_PrivateNs:
-                ret = "\"" + constants.getNamespace(value_index).getName(constants).toRawString() + "\"";  //assume not null name
+                ret = "\"" + abc.constants.getNamespace(value_index).getName(abc.constants).toRawString() + "\"";  //assume not null name
                 break;
         }
         return ret;
     }
 
-    public String toASMString(AVM2ConstantPool constants) {
+    public String toASMString(ABC abc) {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
-                ret = "Integer(" + constants.getInt(value_index) + ")";
+                ret = "Integer(" + abc.constants.getInt(value_index) + ")";
                 break;
             case CONSTANT_UInt:
-                ret = "UInteger(" + constants.getUInt(value_index) + ")";
+                ret = "UInteger(" + abc.constants.getUInt(value_index) + ")";
                 break;
             case CONSTANT_Double:
-                ret = "Double(" + EcmaScript.toString(constants.getDouble(value_index)) + ")";
+                ret = "Double(" + EcmaScript.toString(abc.constants.getDouble(value_index)) + ")";
                 break;
-            case CONSTANT_DecimalOrFloat:
-                ret = "Decimal(" + constants.getDecimal(value_index) + ")";
+            case CONSTANT_DecimalOrFloat:     
+                if (abc.hasDecimalSupport()) {
+                    ret = "Decimal(" + abc.constants.getDecimal(value_index) + ")";
+                } else {
+                    ret = "Float(" + EcmaScript.toString(abc.constants.getFloat(value_index)) + ")";
+                }
+                break;
+            case CONSTANT_Float4:
+                Float4 f4 = abc.constants.getFloat4(value_index);
+                ret = "Float4(" + EcmaScript.toString(f4.values[0]) + ", "
+                        + EcmaScript.toString(f4.values[1]) + ", "
+                        + EcmaScript.toString(f4.values[2]) + ", "
+                        + EcmaScript.toString(f4.values[3]) + ")";
                 break;
             case CONSTANT_Utf8:
-                ret = "Utf8(\"" + Helper.escapePCodeString(constants.getString(value_index)) + "\")";
+                ret = "Utf8(\"" + Helper.escapePCodeString(abc.constants.getString(value_index)) + "\")";
                 break;
             case CONSTANT_True:
                 ret = "True()";
@@ -200,16 +223,16 @@ public class ValueKind {
             case CONSTANT_Undefined:
                 ret = "Undefined()"; //"Void()" is also synonym
                 break;
-            case CONSTANT_Namespace:               
+            case CONSTANT_Namespace:
             case CONSTANT_PackageInternalNs:
             case CONSTANT_ProtectedNamespace:
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
-            case CONSTANT_PrivateNs:                
-                String nsVal = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants).toRawString() + "\")"; //assume not null name
-                
+            case CONSTANT_PrivateNs:
+                String nsVal = abc.constants.getNamespace(value_index).getKindStr() + "(\"" + abc.constants.getNamespace(value_index).getName(abc.constants).toRawString() + "\")"; //assume not null name
+
                 switch (value_kind) {
-                    case CONSTANT_Namespace:   
+                    case CONSTANT_Namespace:
                         ret = "Namespace(" + nsVal + ")";
                         break;
                     case CONSTANT_PackageInternalNs:

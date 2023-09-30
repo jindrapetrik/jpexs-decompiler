@@ -253,7 +253,7 @@ public class MethodInfo {
         return ret.toString();
     }
 
-    public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         StringBuilder optionalStr = new StringBuilder();
         optionalStr.append("[");
         if (optional != null) {
@@ -261,7 +261,7 @@ public class MethodInfo {
                 if (i > 0) {
                     optionalStr.append(",");
                 }
-                optionalStr.append(optional[i].toString(constants));
+                optionalStr.append(optional[i].toString(abc));
             }
         }
         optionalStr.append("]");
@@ -274,7 +274,7 @@ public class MethodInfo {
             if (param_types[i] == 0) {
                 param_typesStr.append("*");
             } else {
-                param_typesStr.append(constants.getMultiname(param_types[i]).toString(constants, fullyQualifiedNames));
+                param_typesStr.append(abc.constants.getMultiname(param_types[i]).toString(abc.constants, fullyQualifiedNames));
             }
         }
 
@@ -283,17 +283,17 @@ public class MethodInfo {
             if (i > 0) {
                 paramNamesStr.append(",");
             }
-            paramNamesStr.append(constants.getString(paramNames[i]));
+            paramNamesStr.append(abc.constants.getString(paramNames[i]));
         }
 
         String ret_typeStr;
         if (ret_type == 0) {
             ret_typeStr = "*";
         } else {
-            ret_typeStr = constants.getMultiname(ret_type).toString(constants, fullyQualifiedNames);
+            ret_typeStr = abc.constants.getMultiname(ret_type).toString(abc.constants, fullyQualifiedNames);
         }
 
-        return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.getString(name_index) + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
+        return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + abc.constants.getString(name_index) + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
     }
 
     public String getName(AVM2ConstantPool constants) {
@@ -346,7 +346,7 @@ public class MethodInfo {
                 if (i >= param_types.length - optional.length) {
                     int optionalIndex = i - (param_types.length - optional.length);
                     writer.appendNoHilight(" = ");
-                    writer.hilightSpecial(optional[optionalIndex].toString(constants), HighlightSpecialType.OPTIONAL, optionalIndex);
+                    writer.hilightSpecial(optional[optionalIndex].toString(abc), HighlightSpecialType.OPTIONAL, optionalIndex);
                 }
             }
         }
@@ -400,9 +400,9 @@ public class MethodInfo {
         return rname;
     }
     
-    public void toASMSource(AVM2ConstantPool constants, GraphTextWriter writer) {
+    public void toASMSource(ABC abc, GraphTextWriter writer) {
         writer.appendNoHilight("name ");
-        writer.hilightSpecial(name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
+        writer.hilightSpecial(name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(getName(abc.constants)) + "\"", HighlightSpecialType.METHOD_NAME);
         writer.newLine();
         if (flagNative()) {
             writer.appendNoHilight("flag ");
@@ -446,7 +446,7 @@ public class MethodInfo {
         }
         for (int p = 0; p < param_types.length; p++) {
             writer.appendNoHilight("param ");
-            writer.hilightSpecial(constants.multinameToString(param_types[p]), HighlightSpecialType.PARAM, p);
+            writer.hilightSpecial(abc.constants.multinameToString(param_types[p]), HighlightSpecialType.PARAM, p);
             writer.newLine();
         }
         if (flagHas_paramnames()) {
@@ -456,7 +456,7 @@ public class MethodInfo {
                     writer.appendNoHilight("null");
                 } else {
                     writer.appendNoHilight("\"");
-                    writer.appendNoHilight(constants.getString(n));
+                    writer.appendNoHilight(abc.constants.getString(n));
                     writer.appendNoHilight("\"");
                 }
                 writer.newLine();
@@ -466,12 +466,12 @@ public class MethodInfo {
             for (int i = 0; i < optional.length; i++) {
                 ValueKind vk = optional[i];
                 writer.appendNoHilight("optional ");
-                writer.hilightSpecial(vk.toASMString(constants), HighlightSpecialType.OPTIONAL, i);
+                writer.hilightSpecial(vk.toASMString(abc), HighlightSpecialType.OPTIONAL, i);
                 writer.newLine();
             }
         }
         writer.appendNoHilight("returns ");
-        writer.hilightSpecial(constants.multinameToString(ret_type), HighlightSpecialType.RETURNS);
+        writer.hilightSpecial(abc.constants.multinameToString(ret_type), HighlightSpecialType.RETURNS);
         writer.newLine();
     }
 }

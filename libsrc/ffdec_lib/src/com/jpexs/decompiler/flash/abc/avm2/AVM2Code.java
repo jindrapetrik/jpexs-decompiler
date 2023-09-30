@@ -1204,7 +1204,7 @@ public class AVM2Code implements Cloneable {
             }
             writer.newLine();
 
-            info.toASMSource(constants, writer);
+            info.toASMSource(abc, writer);
         }
         writer.newLine();
 

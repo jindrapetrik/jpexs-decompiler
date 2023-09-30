@@ -60,6 +60,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Nullpointer on getting multiname which is out of bounds
 - Exceptions on cancelling file loading
 - Switching between openables on session load and on view type change
+- Float/Float4 ABC format support
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

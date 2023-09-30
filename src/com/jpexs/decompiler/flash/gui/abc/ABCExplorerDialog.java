@@ -1385,8 +1385,13 @@ public class ABCExplorerDialog extends AppDialog {
                                     return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_UINT, "value_index");
                                 case ValueKind.CONSTANT_Double:
                                     return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_DOUBLE, "value_index");
-                                case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                    return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_DECIMAL, "value_index");
+                                case ValueKind.CONSTANT_DecimalOrFloat:
+                                    if (abc.hasDecimalSupport()) {
+                                        return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_DECIMAL, "value_index");
+                                    }
+                                    return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_FLOAT, "value_index");
+                                case ValueKind.CONSTANT_Float4:
+                                    return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_FLOAT_4, "value_index");
                                 case ValueKind.CONSTANT_Utf8:
                                     return createValueWithIndex(parent, index, tsc.value_index, TreeType.CONSTANT_STRING, "value_index");
                                 case ValueKind.CONSTANT_True:
@@ -1410,8 +1415,13 @@ public class ABCExplorerDialog extends AppDialog {
                                     return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Double:
                                     return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
-                                case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                    return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
+                                case ValueKind.CONSTANT_DecimalOrFloat:
+                                    if (abc.hasDecimalSupport()) {
+                                        return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
+                                    }
+                                    return new SimpleValue(parent, index, "value_kind", "Float", TreeIcon.VALUE_KIND);
+                                case ValueKind.CONSTANT_Float4:
+                                    return new SimpleValue(parent, index, "value_kind", "Float4", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Utf8:
                                     return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_True:
@@ -1751,8 +1761,13 @@ public class ABCExplorerDialog extends AppDialog {
                                             return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Double:
                                             return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                            return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
+                                        case ValueKind.CONSTANT_DecimalOrFloat:
+                                            if (abc.hasDecimalSupport()) {
+                                                return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
+                                            }
+                                            return new SimpleValue(parent, index, "value_kind", "Float", TreeIcon.VALUE_KIND);
+                                        case ValueKind.CONSTANT_Float4:
+                                            return new SimpleValue(parent, index, "value_kind", "Float4", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Utf8:
                                             return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_True:
@@ -1786,8 +1801,13 @@ public class ABCExplorerDialog extends AppDialog {
                                             return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_UINT, "value_index");
                                         case ValueKind.CONSTANT_Double:
                                             return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DOUBLE, "value_index");
-                                        case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DECIMAL, "value_index");
+                                        case ValueKind.CONSTANT_DecimalOrFloat:
+                                            if (abc.hasDecimalSupport()) {
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DECIMAL, "value_index");
+                                            }
+                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT, "value_index");
+                                        case ValueKind.CONSTANT_Float4:
+                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT_4, "value_index");
                                         case ValueKind.CONSTANT_Utf8:
                                             return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_STRING, "value_index");
                                         case ValueKind.CONSTANT_True:
@@ -1808,7 +1828,7 @@ public class ABCExplorerDialog extends AppDialog {
                                     }
                                 }
                             } else {
-                                return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc.constants), TreeIcon.OPTIONAL_SUB);
+                                return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc), TreeIcon.OPTIONAL_SUB);
                             }
                         case "param_names":
                             return createValueWithIndex(parent, index, mi.paramNames[index], TreeType.CONSTANT_STRING, "pn" + index);
@@ -2019,7 +2039,8 @@ public class ABCExplorerDialog extends AppDialog {
                                     case ValueKind.CONSTANT_Int:
                                     case ValueKind.CONSTANT_UInt:
                                     case ValueKind.CONSTANT_Double:
-                                    case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
+                                    case ValueKind.CONSTANT_DecimalOrFloat:
+                                    case ValueKind.CONSTANT_Float4:
                                     case ValueKind.CONSTANT_Utf8:
                                     case ValueKind.CONSTANT_Namespace:
                                     case ValueKind.CONSTANT_PackageInternalNs:
