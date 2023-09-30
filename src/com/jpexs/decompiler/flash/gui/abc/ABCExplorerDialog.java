@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.Float4;
@@ -39,8 +41,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -94,9 +98,11 @@ public class ABCExplorerDialog extends AppDialog {
     private final List<Integer> abcFrames = new ArrayList<>();
     private final JTabbedPane mainTabbedPane;
     private final JTabbedPane cpTabbedPane;
+    private MainPanel mainPanel;
 
-    public ABCExplorerDialog(Window owner, Openable openable, ABC abc) {
+    public ABCExplorerDialog(Window owner, MainPanel mainPanel, Openable openable, ABC abc) {
         super(owner);
+        this.mainPanel = mainPanel;
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -333,6 +339,46 @@ public class ABCExplorerDialog extends AppDialog {
             return null;
         }
         Object selection = tree.getLastSelectedPathComponent();
+
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            if (vwi.getType() == TreeType.SCRIPT_INFO) {
+                JMenuItem showInMainWindowMenuItem = new JMenuItem(translate("show.script"), View.getIcon("show16"));
+                showInMainWindowMenuItem.addActionListener(this::showInMainWindowActionPerformed);
+                menu.add(showInMainWindowMenuItem);
+            }
+
+            if (vwi.getType() == TreeType.METHOD_INFO || vwi.getType() == TreeType.METHOD_BODY) {
+                JMenuItem showInMainWindowMenuItem = new JMenuItem(translate("show.method"), View.getIcon("show16"));
+                showInMainWindowMenuItem.addActionListener(this::showInMainWindowActionPerformed);
+                menu.add(showInMainWindowMenuItem);
+            }
+            
+            if (vwi.getType() == TreeType.INSTANCE_INFO || vwi.getType() == TreeType.CLASS_INFO) {
+                JMenuItem showInMainWindowMenuItem = new JMenuItem(translate("show.class"), View.getIcon("show16"));
+                showInMainWindowMenuItem.addActionListener(this::showInMainWindowActionPerformed);
+                menu.add(showInMainWindowMenuItem);
+            }
+        }
+        if (selection instanceof SubValue) {
+            SubValue sv = (SubValue) selection;
+
+            switch (sv.getIcon()) {
+                case TRAIT_CLASS:
+                case TRAIT_CONST:
+                case TRAIT_FUNCTION:
+                case TRAIT_GETTER:
+                case TRAIT_METHOD:
+                case TRAIT_SETTER:
+                case TRAIT_SLOT:
+                    if (!(sv.parentValue instanceof MethodBody)) {
+                        JMenuItem showInMainWindowMenuItem = new JMenuItem(translate("show.trait"), View.getIcon("show16"));
+                        showInMainWindowMenuItem.addActionListener(this::showInMainWindowActionPerformed);
+                        menu.add(showInMainWindowMenuItem);
+                    }
+                    break;
+            }
+        }
         if (selection != null) {
             JMenuItem copyRowMenuItem = new JMenuItem(translate("copy.row"), View.getIcon("copy16"));
             copyRowMenuItem.addActionListener(this::copyRowActionPerformed);
@@ -361,7 +407,7 @@ public class ABCExplorerDialog extends AppDialog {
                 menu.add(copyRawStringValueMenuItem);
             }
         } else if (selection instanceof SubValue) {
-            SubValue sv = (SubValue) selection;
+            SubValue sv = (SubValue) selection;          
             JMenuItem copyTitleMenuItem = new JMenuItem(translate("copy.title"), View.getIcon("copy16"));
             copyTitleMenuItem.addActionListener(this::copyTitleActionPerformed);
             menu.add(copyTitleMenuItem);
@@ -393,6 +439,180 @@ public class ABCExplorerDialog extends AppDialog {
         Object selection = getCurrentTree().getLastSelectedPathComponent();
         if (selection != null) {
             copyToClipboard(selection.toString());
+        }
+    }
+
+    private boolean showMethodInfo(int round, ABC abc, int methodInfo, int searchMethodInfo, int scriptIndex, int classIndex, int globalTraitIndex) {
+        boolean found = false;
+        if (methodInfo == searchMethodInfo) {
+            found = true;
+        } else if (round == 2) {
+            MethodBody body = abc.findBody(methodInfo);
+            if (body != null) {
+                for (AVM2Instruction ins : body.getCode().code) {
+                    if (ins.definition instanceof NewFunctionIns) {
+                        if (ins.operands[0] == methodInfo) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (found) {
+            DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+            mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
+        }
+        return found;
+    }
+
+    private boolean showMethodInfoTraits(int round, int scriptIndex, int classIndex, int methodInfo, ABC abc, Traits traits, int traitsType) {
+        for (int j = 0; j < traits.traits.size(); j++) {
+            Trait t = (Trait) traits.traits.get(j);
+            int globalTraitIndex = j;
+            if (traitsType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
+                globalTraitIndex += abc.class_info.get(classIndex).static_traits.traits.size();
+            }
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                if (showMethodInfo(round, abc, abc.class_info.get(tc.class_info).cinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_CLASS_INITIALIZER)) {
+                    return true;
+                }
+
+                if (showMethodInfo(round, abc, abc.instance_info.get(tc.class_info).iinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+                    return true;
+                }
+
+                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.class_info.get(tc.class_info).static_traits, GraphTextWriter.TRAIT_CLASS_INITIALIZER)) {
+                    return true;
+                }
+                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.instance_info.get(tc.class_info).instance_traits, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+                    return true;
+                }
+            }
+            if (t instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
+                if (showMethodInfo(round, abc, tmgs.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex)) {
+                    return true;
+                }
+            }
+            if (t instanceof TraitFunction) {
+                TraitFunction tf = (TraitFunction) t;
+                if (showMethodInfo(round, abc, tf.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void showMethodInfo(int methodInfo) {
+        ABC abc = getSelectedAbc();
+        for (int round = 1; round <= 2; round++) {
+            for (int i = 0; i < abc.script_info.size(); i++) {
+                if (showMethodInfo(round, abc, abc.script_info.get(i).init_index, methodInfo, i, -1, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
+                    return;
+                }
+                if (showMethodInfoTraits(round, i, -1, methodInfo, abc, abc.script_info.get(i).traits, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private void showInMainWindowActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        ABC abc = getSelectedAbc();
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            int scriptIndex = -1;
+            switch (vwi.type) {
+                case SCRIPT_INFO:
+                    scriptIndex = vwi.getIndex();
+                    DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                    String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+                    mainPanel.gotoScriptName(abc.getSwf(), scriptName);
+                    break;
+                case METHOD_BODY:
+                    MethodBody body = (MethodBody) vwi.getRawValue();
+                    if (body != null) {
+                        showMethodInfo(body.method_info);
+                    }
+                    break;
+                case METHOD_INFO:
+                    showMethodInfo(vwi.getIndex());
+                    break;
+                case INSTANCE_INFO:
+                case CLASS_INFO:
+                    int classIndex = vwi.getIndex();
+                    loopc: for (int i = 0; i < abc.script_info.size(); i++) {
+                        for (int j = 0; j < abc.script_info.get(i).traits.traits.size(); j++) {
+                            Trait t = (Trait) abc.script_info.get(i).traits.traits.get(j);
+                            if (t instanceof TraitClass) {
+                                TraitClass tc = (TraitClass) t;
+                                if (tc.class_info == classIndex) {
+                                    scriptIndex = i;
+                                    break loopc;
+                                }
+                            }
+                        }
+                    }
+                    if (scriptIndex != -1) {
+                        DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toRawString());
+                        mainPanel.gotoScriptTrait(abc.getSwf(), scriptName2, classIndex, GraphTextWriter.TRAIT_CLASS_INITIALIZER);
+                    }
+                    break;
+            }
+        }
+        if (selection instanceof SubValue) {
+            SubValue sv = (SubValue) selection;
+            switch (sv.getIcon()) {
+                case TRAIT_CLASS:
+                case TRAIT_CONST:
+                case TRAIT_FUNCTION:
+                case TRAIT_GETTER:
+                case TRAIT_METHOD:
+                case TRAIT_SETTER:
+                case TRAIT_SLOT:
+                    int traitIndex = sv.getIndex();
+                    int globalTraitIndex = traitIndex;
+                    SubValue sv1 = (SubValue) sv.getParent();
+                    ValueWithIndex wvi = (ValueWithIndex) sv1.getParent();
+                    int scriptIndex = -1;
+                    int classIndex = -1;
+                    if (sv.getParentValue() instanceof ScriptInfo) {
+                        scriptIndex = wvi.getIndex();
+                    } else {
+                        classIndex = wvi.getIndex();                        
+                        if (sv.getParentValue() instanceof InstanceInfo) {
+                            globalTraitIndex += abc.class_info.get(classIndex).static_traits.traits.size();
+                        }
+
+                        loopi:
+                        for (int i = 0; i < abc.script_info.size(); i++) {
+                            for (int j = 0; j < abc.script_info.get(i).traits.traits.size(); j++) {
+                                Trait t = (Trait) abc.script_info.get(i).traits.traits.get(j);
+                                if (t instanceof TraitClass) {
+                                    TraitClass tc = (TraitClass) t;
+                                    if (tc.class_info == classIndex) {
+                                        scriptIndex = i;
+                                        break loopi;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (scriptIndex != -1) {
+                        DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toRawString());
+                        mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
+                    }
+
+                    break;
+            }
         }
     }
 

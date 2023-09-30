@@ -1460,6 +1460,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
+        mainPanel.reload(true);
     }
 
     public void hilightScript(ScriptPack pack) {
