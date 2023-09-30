@@ -40,7 +40,6 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.View;
-import static com.jpexs.decompiler.flash.gui.View.loadImage;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -58,17 +57,24 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -256,6 +262,18 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", View.getIcon(TreeType.METHOD_BODY.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_BODY));
     }
 
+    private JTree getCurrentTree() {
+        JPanel pan;
+        if (mainTabbedPane.getSelectedIndex() == 0) { //cp
+            pan = (JPanel) cpTabbedPane.getSelectedComponent();
+        } else {
+            pan = (JPanel) mainTabbedPane.getSelectedComponent();
+        }
+        FasterScrollPane fasterScrollPane = (FasterScrollPane) pan.getComponent(0);
+        JTree tree = (JTree) fasterScrollPane.getViewport().getView();
+        return tree;
+    }
+
     public void selectScriptInfo(int scriptIndex) {
         if (mainTabbedPane.getTabCount() > 0) {
             mainTabbedPane.setSelectedIndex(5);
@@ -289,10 +307,135 @@ public class ABCExplorerDialog extends AppDialog {
                 }
             }
         });
+        tree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int row = tree.getClosestRowForLocation(e.getX(), e.getY());
+                    tree.setSelectionRow(row);
+                    JPopupMenu popupMenu = createTreePopup(tree);
+                    if (popupMenu == null) {
+                        return;
+                    }
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
 
         JPanel treePanel = new JPanel(new BorderLayout());
         treePanel.add(new FasterScrollPane(tree), BorderLayout.CENTER);
         return treePanel;
+    }
+
+    private JPopupMenu createTreePopup(JTree tree) {
+        JPopupMenu menu = new JPopupMenu();
+        if (tree.getSelectionCount() != 1) {
+            return null;
+        }
+        Object selection = tree.getLastSelectedPathComponent();
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+
+            if (!vwi.getTitle().isEmpty()) {
+                JMenuItem copyTitleMenuItem = new JMenuItem(translate("copy.title"), View.getIcon("copy16"));
+                copyTitleMenuItem.addActionListener(this::copyTitleActionPerformed);
+                menu.add(copyTitleMenuItem);
+            }
+            JMenuItem copyTypeIdMenuItem = new JMenuItem(translate("copy.typeid"), View.getIcon("copy16"));
+            copyTypeIdMenuItem.addActionListener(this::copyTypeIdActionPerformed);
+            menu.add(copyTypeIdMenuItem);
+
+            if (!vwi.getDescription().isEmpty()) {
+                JMenuItem copyValueMenuItem = new JMenuItem(translate("copy.value"), View.getIcon("copy16"));
+                copyValueMenuItem.addActionListener(this::copyValueActionPerformed);
+                menu.add(copyValueMenuItem);
+            }
+            if (vwi.getType() == TreeType.CONSTANT_STRING && vwi.getIndex() > 0) {
+                JMenuItem copyRawStringValueMenuItem = new JMenuItem(translate("copy.rawstring"), View.getIcon("copy16"));
+                copyRawStringValueMenuItem.addActionListener(this::copyRawStringValueActionPerformed);
+                menu.add(copyRawStringValueMenuItem);
+            }
+        } else if (selection instanceof SubValue) {
+            SubValue sv = (SubValue) selection;
+            JMenuItem copyTitleMenuItem = new JMenuItem(translate("copy.title"), View.getIcon("copy16"));
+            copyTitleMenuItem.addActionListener(this::copyTitleActionPerformed);
+            menu.add(copyTitleMenuItem);
+            if (!sv.getDescription().isEmpty()) {
+                JMenuItem copyValueMenuItem = new JMenuItem(translate("copy.value"), View.getIcon("copy16"));
+                copyValueMenuItem.addActionListener(this::copyValueActionPerformed);
+                menu.add(copyValueMenuItem);
+            }
+        } else if (selection instanceof SimpleValue) {
+            SimpleValue sv = (SimpleValue) selection;
+
+            JMenuItem copyTitleMenuItem = new JMenuItem(translate("copy.title"), View.getIcon("copy16"));
+            copyTitleMenuItem.addActionListener(this::copyTitleActionPerformed);
+            menu.add(copyTitleMenuItem);
+
+            if (!sv.getValue().isEmpty()) {
+                JMenuItem copyValueMenuItem = new JMenuItem(translate("copy.value"), View.getIcon("copy16"));
+                copyValueMenuItem.addActionListener(this::copyValueActionPerformed);
+                menu.add(copyValueMenuItem);
+            }
+        } else {
+            return null;
+        }
+
+        return menu;
+    }
+
+    private void copyTitleActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        if (selection instanceof SimpleValue) {
+            SimpleValue sv = (SimpleValue) selection;
+            copyToClipboard(sv.getTitle());
+        }
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            copyToClipboard(vwi.getTitle());
+        }
+        if (selection instanceof SubValue) {
+            SubValue sv = (SubValue) selection;
+            copyToClipboard(sv.getTitle());
+        }
+    }
+
+    private void copyValueActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        if (selection instanceof SimpleValue) {
+            SimpleValue sv = (SimpleValue) selection;
+            copyToClipboard(sv.getValue());
+        }
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            copyToClipboard(vwi.getDescription());
+        }
+        if (selection instanceof SubValue) {
+            SubValue sv = (SubValue) selection;
+            copyToClipboard(sv.getDescription());
+        }
+    }
+
+    private void copyRawStringValueActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            copyToClipboard((String) vwi.getRawValue());
+        }
+    }
+
+    private void copyTypeIdActionPerformed(ActionEvent e) {
+        Object selection = getCurrentTree().getLastSelectedPathComponent();
+        if (selection instanceof ValueWithIndex) {
+            ValueWithIndex vwi = (ValueWithIndex) selection;
+            copyToClipboard(vwi.getType().getAbbreviation() + vwi.getIndex());
+        }
+    }
+
+    private void copyToClipboard(String text) {
+        StringSelection stringSelection = new StringSelection(text);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
     }
 
     private enum TreeIcon {
@@ -345,8 +488,7 @@ public class ABCExplorerDialog extends AppDialog {
         EXCEPTION_START(""),
         EXCEPTION_END(""),
         EXCEPTION_TARGET("");
-        
-        
+
         private final String DEFAULT_FILE = "abcbulletgray16";
 
         private String file;
@@ -415,12 +557,22 @@ public class ABCExplorerDialog extends AppDialog {
         private final Object parent;
         private final String title;
         private final TreeIcon icon;
+        private final String value;
 
-        public SimpleValue(Object parent, int currentLevelIndex, String title, TreeIcon icon) {
+        public SimpleValue(Object parent, int currentLevelIndex, String title, String value, TreeIcon icon) {
             this.currentLevelIndex = currentLevelIndex;
             this.parent = parent;
             this.title = title;
             this.icon = icon;
+            this.value = value;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getValue() {
+            return value;
         }
 
         @Override
@@ -437,8 +589,8 @@ public class ABCExplorerDialog extends AppDialog {
         }
 
         @Override
-        public String toString() {
-            return title;
+        public String toString() {            
+            return title + (!value.isEmpty() ? ": " + value : "");
         }
 
         @Override
@@ -483,8 +635,9 @@ public class ABCExplorerDialog extends AppDialog {
         private final String title;
         private final int index;
         private final TreeIcon icon;
+        private final String description;
 
-        public SubValue(Object parent, int currentLevelIndex, Object parentValue, String property, String title, TreeIcon icon) {
+        public SubValue(Object parent, int currentLevelIndex, Object parentValue, String property, String title, String description, TreeIcon icon) {
             this.currentLevelIndex = currentLevelIndex;
             this.parent = parent;
             this.parentValue = parentValue;
@@ -492,9 +645,10 @@ public class ABCExplorerDialog extends AppDialog {
             this.title = title;
             this.index = -1;
             this.icon = icon;
+            this.description = description;
         }
 
-        public SubValue(Object parent, int currentLevelIndex, int index, Object parentValue, String property, String title, TreeIcon icon) {
+        public SubValue(Object parent, int currentLevelIndex, int index, Object parentValue, String property, String title, String description, TreeIcon icon) {
             this.currentLevelIndex = currentLevelIndex;
             this.index = index;
             this.parent = parent;
@@ -502,6 +656,7 @@ public class ABCExplorerDialog extends AppDialog {
             this.property = property;
             this.title = title;
             this.icon = icon;
+            this.description = description;
         }
 
         public int getIndex() {
@@ -514,7 +669,7 @@ public class ABCExplorerDialog extends AppDialog {
 
         @Override
         public String toString() {
-            return title;
+            return title + (!description.isEmpty() ? ": " + description : "");
         }
 
         public Object getParent() {
@@ -527,6 +682,14 @@ public class ABCExplorerDialog extends AppDialog {
 
         public String getProperty() {
             return property;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getDescription() {
+            return description;
         }
 
         @Override
@@ -563,6 +726,7 @@ public class ABCExplorerDialog extends AppDialog {
             return Objects.equals(this.parent, other.parent);
         }
 
+        @Override
         public TreeIcon getIcon() {
             return icon;
         }
@@ -575,27 +739,31 @@ public class ABCExplorerDialog extends AppDialog {
         private final int currentLevelIndex;
         private final TreeType type;
         private final Object value;
+        private final String description;
         private final String title;
-        private final String prefix;
 
-        public ValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType type, Object value, String title) {
+        public ValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType type, Object value, String description) {
             this.parent = parent;
             this.currentLevelIndex = currentLevelIndex;
             this.index = index;
             this.type = type;
             this.value = value;
-            this.title = title;
-            this.prefix = "";
+            this.description = description;
+            this.title = "";
         }
 
-        public ValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType type, Object value, String title, String prefix) {
+        public ValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType type, Object value, String description, String title) {
             this.parent = parent;
             this.currentLevelIndex = currentLevelIndex;
             this.index = index;
             this.type = type;
             this.value = value;
+            this.description = description;
             this.title = title;
-            this.prefix = prefix;
+        }
+
+        public Object getRawValue() {
+            return value;
         }
 
         public int getCurrentLevelIndex() {
@@ -612,6 +780,14 @@ public class ABCExplorerDialog extends AppDialog {
 
         public TreeType getType() {
             return type;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getDescription() {
+            return description;
         }
 
         @Override
@@ -633,7 +809,7 @@ public class ABCExplorerDialog extends AppDialog {
                 }
             }
 
-            return prefix + (implicit ? "[" : "") + type.getAbbreviation() + index + (implicit ? "]" : "") + ": " + title;
+            return (!title.isEmpty() ? title + ": " : "") + (implicit ? "[" : "") + type.getAbbreviation() + index + (implicit ? "]" : "") + ": " + description;
         }
 
         @Override
@@ -683,7 +859,7 @@ public class ABCExplorerDialog extends AppDialog {
             return type;
         }
 
-        private ValueWithIndex createValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType valueType, String prefix) {
+        private ValueWithIndex createValueWithIndex(Object parent, int currentLevelIndex, int index, TreeType valueType, String title) {
             if (index == 0) {
                 switch (valueType) {
                     case CONSTANT_INT:
@@ -696,38 +872,38 @@ public class ABCExplorerDialog extends AppDialog {
                     case CONSTANT_NAMESPACE:
                     case CONSTANT_NAMESPACE_SET:
                     case CONSTANT_MULTINAME:
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "null", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "null", title);
                 }
             }
             switch (valueType) {
                 case CONSTANT_INT:
                     if (index >= abc.constants.getIntCount()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getInt(index), "" + abc.constants.getInt(index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getInt(index), "" + abc.constants.getInt(index), title);
                 case CONSTANT_UINT:
                     if (index >= abc.constants.getUIntCount()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getUInt(index), "" + abc.constants.getUInt(index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getUInt(index), "" + abc.constants.getUInt(index), title);
                 case CONSTANT_DOUBLE:
                     if (index >= abc.constants.getDoubleCount()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDouble(index), EcmaScript.toString(abc.constants.getDouble(index)), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDouble(index), EcmaScript.toString(abc.constants.getDouble(index)), title);
                 case CONSTANT_DECIMAL:
                     if (index >= abc.constants.getDecimalCount()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDecimal(index), "" + abc.constants.getDecimal(index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getDecimal(index), "" + abc.constants.getDecimal(index), title);
                 case CONSTANT_FLOAT:
                     if (index >= abc.constants.getFloatCount()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getFloat(index), EcmaScript.toString(abc.constants.getFloat(index)), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getFloat(index), EcmaScript.toString(abc.constants.getFloat(index)), title);
                 case CONSTANT_FLOAT_4:
                     if (index >= abc.constants.getFloat4Count()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
 
                     Float4 f4 = abc.constants.getFloat4(index);
@@ -736,23 +912,23 @@ public class ABCExplorerDialog extends AppDialog {
                             + EcmaScript.toString(f4.values[1]) + " "
                             + EcmaScript.toString(f4.values[2]) + " "
                             + EcmaScript.toString(f4.values[3]),
-                            prefix
+                            title
                     );
                 case CONSTANT_STRING:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getStringCount() ? abc.constants.getString(index) : null, formatString(index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getStringCount() ? abc.constants.getString(index) : null, formatString(index), title);
                 case CONSTANT_NAMESPACE:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getNamespaceCount() ? abc.constants.getNamespace(index) : null, Multiname.namespaceToString(abc.constants, index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getNamespaceCount() ? abc.constants.getNamespace(index) : null, Multiname.namespaceToString(abc.constants, index), title);
                 case CONSTANT_NAMESPACE_SET:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getNamespaceSet(index), Multiname.namespaceSetToString(abc.constants, index), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, abc.constants.getNamespaceSet(index), Multiname.namespaceSetToString(abc.constants, index), title);
                 case CONSTANT_MULTINAME:
                     return new ValueWithIndex(parent, currentLevelIndex, index, valueType, index < abc.constants.getMultinameCount() ? abc.constants.getMultiname(index) : null,
                             index < abc.constants.getMultinameCount()
                             ? abc.constants.getMultiname(index).toString(abc.constants, new ArrayList<DottedChain>())
                             : "Unknown(" + index + ")",
-                            prefix);
+                            title);
                 case METHOD_INFO:
                     if (index >= abc.method_info.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     MethodInfo mi = abc.method_info.get(index);
                     StringBuilder miStrSb = new StringBuilder();
@@ -762,16 +938,16 @@ public class ABCExplorerDialog extends AppDialog {
                     miStrSb.append("): ");
                     String miReturnType = mi.getReturnTypeRaw(abc.constants, new ArrayList<>());
                     miStrSb.append(miReturnType);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, mi, miStrSb.toString(), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, mi, miStrSb.toString(), title);
                 case METHOD_BODY:
                     if (index >= abc.bodies.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     MethodBody b = abc.bodies.get(index);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, b, "mi" + b.method_info + ", " + b.getCodeBytes().length + " bytes code", prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, b, "mi" + b.method_info + ", " + b.getCodeBytes().length + " bytes code", title);
                 case INSTANCE_INFO:
                     if (index >= abc.instance_info.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     InstanceInfo ii = abc.instance_info.get(index);
                     String iiName;
@@ -780,16 +956,16 @@ public class ABCExplorerDialog extends AppDialog {
                     } else {
                         iiName = "\"" + Helper.escapePCodeString(ii.getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString()) + "\"";
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.INSTANCE_INFO, ii, iiName + (ii.instance_traits.traits.isEmpty() ? "" : ", " + ii.instance_traits.traits.size() + " traits"), title);
                 case CLASS_INFO:
                     if (index >= abc.class_info.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     ClassInfo ci = abc.class_info.get(index);
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.CLASS_INFO, ci, "mi" + ci.cinit_index + (ci.static_traits.traits.isEmpty() ? "" : ", " + ci.static_traits.traits.size() + " traits"), prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.CLASS_INFO, ci, "mi" + ci.cinit_index + (ci.static_traits.traits.isEmpty() ? "" : ", " + ci.static_traits.traits.size() + " traits"), title);
                 case SCRIPT_INFO:
                     if (index >= abc.script_info.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     ScriptInfo si = abc.script_info.get(index);
                     String siName = "";
@@ -801,18 +977,18 @@ public class ABCExplorerDialog extends AppDialog {
                     } catch (IndexOutOfBoundsException iob) {
                         //ignore
                     }
-                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName, prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.SCRIPT_INFO, si, "mi" + si.init_index + (si.traits.traits.isEmpty() ? "" : ", " + si.traits.traits.size() + " traits") + siName, title);
 
                 case METADATA_INFO:
                     if (index >= abc.metadata_info.size()) {
-                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", prefix);
+                        return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "Unknown(" + index + ")", title);
                     }
                     MetadataInfo md = abc.metadata_info.get(index);
                     String mdName = formatString(md.name_index);
                     mdName += " (" + md.values.length + " items)";
                     return new ValueWithIndex(parent, currentLevelIndex, index, TreeType.METADATA_INFO, md, mdName);
                 default:
-                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "", prefix);
+                    return new ValueWithIndex(parent, currentLevelIndex, index, valueType, null, "", title);
             }
         }
 
@@ -854,7 +1030,7 @@ public class ABCExplorerDialog extends AppDialog {
                     case 0:
                         return createValueWithIndex(parent, index, t.name_index, TreeType.CONSTANT_MULTINAME, "name: ");
                     case 1:
-                        return new SimpleValue(parent, index, "kind: " + String.format("0x%02X", t.kindType) + " (" + t.getKindToStr() + ")", TreeIcon.KIND);
+                        return new SimpleValue(parent, index, "kind", String.format("0x%02X", t.kindType) + " (" + t.getKindToStr() + ")", TreeIcon.KIND);
                     case 2:
                         List<String> flagList = new ArrayList<>();
                         if ((t.kindFlags & Trait.ATTR_Final) > 0) {
@@ -869,18 +1045,18 @@ public class ABCExplorerDialog extends AppDialog {
                         if ((t.kindFlags & Trait.ATTR_0x8) > 0) {
                             flagList.add("0x8");
                         }
-                        return new SimpleValue(parent, index, "kind_flags: " + String.format("0x%02X", t.kindFlags) + (flagList.isEmpty() ? "" : " (" + String.join(", ", flagList) + ")"), TreeIcon.FLAGS);
+                        return new SimpleValue(parent, index, "kind_flags", String.format("0x%02X", t.kindFlags) + (flagList.isEmpty() ? "" : " (" + String.join(", ", flagList) + ")"), TreeIcon.FLAGS);
                 }
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst) t;
                     switch (index) {
                         case 3:
-                            return new SimpleValue(parent, index, "slot_id: " + tsc.slot_id, TreeIcon.SLOT_ID);
+                            return new SimpleValue(parent, index, "slot_id", "" + tsc.slot_id, TreeIcon.SLOT_ID);
                         case 4:
                             return createValueWithIndex(parent, index, tsc.type_index, TreeType.CONSTANT_MULTINAME, "type: ");
                         case 5:
                             if (tsc.value_index == 0) {
-                                return new SimpleValue(parent, index, "value_index: null", TreeIcon.VALUE_INDEX);
+                                return new SimpleValue(parent, index, "value_index", "null", TreeIcon.VALUE_INDEX);
                             }
                             switch (tsc.value_kind) {
                                 case ValueKind.CONSTANT_Int:
@@ -897,7 +1073,7 @@ public class ABCExplorerDialog extends AppDialog {
                                 case ValueKind.CONSTANT_False:
                                 case ValueKind.CONSTANT_Null:
                                 case ValueKind.CONSTANT_Undefined:
-                                    return new SimpleValue(parent, index, "value_index: " + tsc.value_index, TreeIcon.VALUE_INDEX);
+                                    return new SimpleValue(parent, index, "value_index", "" + tsc.value_index, TreeIcon.VALUE_INDEX);
                                 case ValueKind.CONSTANT_Namespace:
                                 case ValueKind.CONSTANT_PackageInternalNs:
                                 case ValueKind.CONSTANT_ProtectedNamespace:
@@ -909,35 +1085,35 @@ public class ABCExplorerDialog extends AppDialog {
                         case 6:
                             switch (tsc.value_kind) {
                                 case ValueKind.CONSTANT_Int:
-                                    return new SimpleValue(parent, index, "value_kind: Integer", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Integer", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_UInt:
-                                    return new SimpleValue(parent, index, "value_kind: UInteger", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Double:
-                                    return new SimpleValue(parent, index, "value_kind: Double", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                    return new SimpleValue(parent, index, "value_kind: Decimal", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Utf8:
-                                    return new SimpleValue(parent, index, "value_kind: String", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_True:
-                                    return new SimpleValue(parent, index, "value_kind: True", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "True", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_False:
-                                    return new SimpleValue(parent, index, "value_kind: False", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "False", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Null:
-                                    return new SimpleValue(parent, index, "value_kind: Null", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Null", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Undefined:
-                                    return new SimpleValue(parent, index, "value_kind: Undefined", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Undefined", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_Namespace:
-                                    return new SimpleValue(parent, index, "value_kind: Namespace", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "Namespace", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_PackageInternalNs:
-                                    return new SimpleValue(parent, index, "value_kind: PackageInternalNs", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "PackageInternalNs", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_ProtectedNamespace:
-                                    return new SimpleValue(parent, index, "value_kind: ProtectedNamespace", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "ProtectedNamespace", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_ExplicitNamespace:
-                                    return new SimpleValue(parent, index, "value_kind: ExplicitNamespace", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "ExplicitNamespace", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_StaticProtectedNs:
-                                    return new SimpleValue(parent, index, "value_kind: StaticProtectedNs", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "StaticProtectedNs", TreeIcon.VALUE_KIND);
                                 case ValueKind.CONSTANT_PrivateNs:
-                                    return new SimpleValue(parent, index, "value_kind: PrivateNamespace", TreeIcon.VALUE_KIND);
+                                    return new SimpleValue(parent, index, "value_kind", "PrivateNamespace", TreeIcon.VALUE_KIND);
                             }
                     }
                     currentIndex = 7;
@@ -946,7 +1122,7 @@ public class ABCExplorerDialog extends AppDialog {
                     TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
                     switch (index) {
                         case 3:
-                            return new SimpleValue(parent, index, "disp_id: " + tmgs.disp_id, TreeIcon.DISP_ID);
+                            return new SimpleValue(parent, index, "disp_id", "" + tmgs.disp_id, TreeIcon.DISP_ID);
                         case 4:
                             return createValueWithIndex(parent, index, tmgs.method_info, TreeType.METHOD_INFO, "method_info: ");
                     }
@@ -956,7 +1132,7 @@ public class ABCExplorerDialog extends AppDialog {
                     TraitClass tc = (TraitClass) t;
                     switch (index) {
                         case 3:
-                            return new SimpleValue(parent, index, "slot_id: " + tc.slot_id, TreeIcon.SLOT_ID);
+                            return new SimpleValue(parent, index, "slot_id", "" + tc.slot_id, TreeIcon.SLOT_ID);
                         case 4:
                             return createValueWithIndex(parent, index, tc.class_info, TreeType.INSTANCE_INFO, "instance_info: ");
                         case 5:
@@ -969,7 +1145,7 @@ public class ABCExplorerDialog extends AppDialog {
                     TraitFunction tf = (TraitFunction) t;
                     switch (index) {
                         case 3:
-                            return new SimpleValue(parent, index, "slot_id: " + tf.slot_id, TreeIcon.SLOT_ID);
+                            return new SimpleValue(parent, index, "slot_id", "" + tf.slot_id, TreeIcon.SLOT_ID);
                         case 4:
                             return createValueWithIndex(parent, index, tf.method_info, TreeType.METHOD_INFO, "method_index: ");
                     }
@@ -978,7 +1154,7 @@ public class ABCExplorerDialog extends AppDialog {
 
                 if (index == currentIndex) {
                     if ((t.kindFlags & Trait.ATTR_Metadata) > 0) {
-                        return new SubValue(parent, currentIndex, t, "metadata", "metadata", TreeIcon.TRAIT_METADATA);
+                        return new SubValue(parent, currentIndex, t, "metadata", "metadata", "", TreeIcon.TRAIT_METADATA);
                     }
                 }
             }
@@ -1008,7 +1184,7 @@ public class ABCExplorerDialog extends AppDialog {
                     icon = TreeIcon.TRAIT_SLOT;
                     break;
             }
-            return new SubValue(parent, index, index, parentValue, "traits", "t" + index + ": " + t.getKindToStr() + ": " + traitName, icon);
+            return new SubValue(parent, index, index, parentValue, "traits", "t" + index, t.getKindToStr() + ": " + traitName, icon);
         }
 
         private String formatString(int index) {
@@ -1037,7 +1213,7 @@ public class ABCExplorerDialog extends AppDialog {
                     Namespace ns = (Namespace) vwi.value;
                     switch (index) {
                         case 0:
-                            return new SimpleValue(parent, index, "kind: " + Namespace.kindToStr(ns.kind), TreeIcon.KIND);
+                            return new SimpleValue(parent, index, "kind", Namespace.kindToStr(ns.kind), TreeIcon.KIND);
                         case 1:
                             return createValueWithIndex(parent, index, ns.name_index, TreeType.CONSTANT_STRING, "name: ");
                     }
@@ -1045,7 +1221,7 @@ public class ABCExplorerDialog extends AppDialog {
                 if (vwi.value instanceof Multiname) {
                     Multiname m = (Multiname) vwi.value;
                     if (index == 0) {
-                        return new SimpleValue(parent, index, "kind: " + m.getKindStr(), TreeIcon.KIND);
+                        return new SimpleValue(parent, index, "kind", m.getKindStr(), TreeIcon.KIND);
                     }
                     int kind = m.kind;
                     if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
@@ -1085,7 +1261,7 @@ public class ABCExplorerDialog extends AppDialog {
                     MethodInfo mi = (MethodInfo) vwi.value;
                     switch (index) {
                         case 0:
-                            return new SubValue(parent, index, mi, "param_types", "param_types", TreeIcon.PARAM_TYPES);
+                            return new SubValue(parent, index, mi, "param_types", "param_types", "", TreeIcon.PARAM_TYPES);
                         case 1:
                             return createValueWithIndex(parent, index, mi.ret_type, TreeType.CONSTANT_MULTINAME, "return_type: ");
                         case 2:
@@ -1117,21 +1293,21 @@ public class ABCExplorerDialog extends AppDialog {
                                 flagList.add("SET_DXNS");
                             }
 
-                            return new SimpleValue(parent, index, "flags: " + String.format("0x%02X", mi.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
+                            return new SimpleValue(parent, index, "flags", String.format("0x%02X", mi.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
                     }
 
                     int currentIndex = 4;
 
                     if (mi.flagHas_optional()) {
                         if (index == currentIndex) {
-                            return new SubValue(parent, index, mi, "optional", "optional", TreeIcon.OPTIONAL);
+                            return new SubValue(parent, index, mi, "optional", "optional", "", TreeIcon.OPTIONAL);
                         }
                         currentIndex++;
                     }
 
                     if (mi.flagHas_paramnames()) {
                         if (index == currentIndex) {
-                            return new SubValue(parent, index, mi, "param_names", "param_names", TreeIcon.PARAM_NAMES);
+                            return new SubValue(parent, index, mi, "param_names", "param_names", "", TreeIcon.PARAM_NAMES);
                         }
                         currentIndex++;
                     }
@@ -1149,19 +1325,19 @@ public class ABCExplorerDialog extends AppDialog {
                         case 0:
                             return createValueWithIndex(parent, index, body.method_info, TreeType.METHOD_INFO, "method_info: ");
                         case 1:
-                            return new SimpleValue(parent, index, "max_stack: " + body.max_stack, TreeIcon.MAX_STACK);
+                            return new SimpleValue(parent, index, "max_stack", "" + body.max_stack, TreeIcon.MAX_STACK);
                         case 2:
-                            return new SimpleValue(parent, index, "max_regs: " + body.max_regs, TreeIcon.MAX_REGS);
+                            return new SimpleValue(parent, index, "max_regs", "" + body.max_regs, TreeIcon.MAX_REGS);
                         case 3:
-                            return new SimpleValue(parent, index, "init_scope_depth: " + body.init_scope_depth, TreeIcon.INIT_SCOPE_DEPTH);
+                            return new SimpleValue(parent, index, "init_scope_depth", "" + body.init_scope_depth, TreeIcon.INIT_SCOPE_DEPTH);
                         case 4:
-                            return new SimpleValue(parent, index, "max_scope_depth: " + body.max_scope_depth, TreeIcon.MAX_SCOPE_DEPTH);
+                            return new SimpleValue(parent, index, "max_scope_depth", "" + body.max_scope_depth, TreeIcon.MAX_SCOPE_DEPTH);
                         case 5:
-                            return new SimpleValue(parent, index, "code: " + body.getCodeBytes().length + " bytes", TreeIcon.CODE);
+                            return new SimpleValue(parent, index, "code", "" + body.getCodeBytes().length + " bytes", TreeIcon.CODE);
                         case 6:
-                            return new SubValue(parent, index, body, "exceptions", "exceptions", TreeIcon.EXCEPTIONS);
+                            return new SubValue(parent, index, body, "exceptions", "exceptions", "", TreeIcon.EXCEPTIONS);
                         case 7:
-                            return new SubValue(parent, index, body, "traits", "traits", TreeIcon.TRAITS);
+                            return new SubValue(parent, index, body, "traits", "traits", "", TreeIcon.TRAITS);
                     }
                 }
                 if (vwi.value instanceof InstanceInfo) {
@@ -1188,7 +1364,7 @@ public class ABCExplorerDialog extends AppDialog {
                             if ((ii.flags & InstanceInfo.CLASS_NON_NULLABLE) == InstanceInfo.CLASS_NON_NULLABLE) {
                                 flagList.add("NON_NULLABLE");
                             }
-                            return new SimpleValue(parent, index, "flags: " + String.format("0x%02X", ii.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
+                            return new SimpleValue(parent, index, "flags", String.format("0x%02X", ii.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
                     }
                     int currentIndex = 3;
                     if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
@@ -1198,7 +1374,7 @@ public class ABCExplorerDialog extends AppDialog {
                         currentIndex++;
                     }
                     if (index == currentIndex) {
-                        return new SubValue(parent, index, ii, "interfaces", "interfaces", TreeIcon.INTERFACES);
+                        return new SubValue(parent, index, ii, "interfaces", "interfaces", "", TreeIcon.INTERFACES);
                     }
                     currentIndex++;
                     if (index == currentIndex) {
@@ -1206,7 +1382,7 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                     currentIndex++;
                     if (index == currentIndex) {
-                        return new SubValue(parent, index, ii, "traits", "traits", TreeIcon.TRAITS);
+                        return new SubValue(parent, index, ii, "traits", "traits", "", TreeIcon.TRAITS);
                     }
                 }
                 if (vwi.value instanceof ClassInfo) {
@@ -1215,7 +1391,7 @@ public class ABCExplorerDialog extends AppDialog {
                         case 0:
                             return createValueWithIndex(parent, index, ci.cinit_index, TreeType.METHOD_INFO, "cinit: ");
                         case 1:
-                            return new SubValue(parent, index, ci, "traits", "traits", TreeIcon.TRAITS);
+                            return new SubValue(parent, index, ci, "traits", "traits", "", TreeIcon.TRAITS);
                     }
                 }
                 if (vwi.value instanceof ScriptInfo) {
@@ -1224,7 +1400,7 @@ public class ABCExplorerDialog extends AppDialog {
                         case 0:
                             return createValueWithIndex(parent, index, si.init_index, TreeType.METHOD_INFO, "init: ");
                         case 1:
-                            return new SubValue(parent, index, si, "traits", "traits", TreeIcon.TRAITS);
+                            return new SubValue(parent, index, si, "traits", "traits", "", TreeIcon.TRAITS);
                     }
                 }
 
@@ -1234,7 +1410,7 @@ public class ABCExplorerDialog extends AppDialog {
                         case 0:
                             return createValueWithIndex(parent, index, md.name_index, TreeType.CONSTANT_STRING, "name: ");
                         case 1:
-                            return new SubValue(parent, index, md, "pairs", "pairs", TreeIcon.METADATA_PAIRS);
+                            return new SubValue(parent, index, md, "pairs", "pairs", "", TreeIcon.METADATA_PAIRS);
                     }
                 }
             }
@@ -1250,35 +1426,35 @@ public class ABCExplorerDialog extends AppDialog {
                                 if (index == 0) {
                                     switch (mi.optional[sv.getIndex()].value_kind) {
                                         case ValueKind.CONSTANT_Int:
-                                            return new SimpleValue(parent, index, "value_kind: Integer", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Integer", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_UInt:
-                                            return new SimpleValue(parent, index, "value_kind: UInteger", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Double:
-                                            return new SimpleValue(parent, index, "value_kind: Double", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_DecimalOrFloat: //?? or float ??
-                                            return new SimpleValue(parent, index, "value_kind: Decimal", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Utf8:
-                                            return new SimpleValue(parent, index, "value_kind: String", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_True:
-                                            return new SimpleValue(parent, index, "value_kind: True", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "True", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_False:
-                                            return new SimpleValue(parent, index, "value_kind: False", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "False", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Null:
-                                            return new SimpleValue(parent, index, "value_kind: Null", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Null", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Undefined:
-                                            return new SimpleValue(parent, index, "value_kind: Undefined", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Undefined", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_Namespace:
-                                            return new SimpleValue(parent, index, "value_kind: Namespace", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "Namespace", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_PackageInternalNs:
-                                            return new SimpleValue(parent, index, "value_kind: PackageInternalNs", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "PackageInternalNs", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_ProtectedNamespace:
-                                            return new SimpleValue(parent, index, "value_kind: ProtectedNamespace", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "ProtectedNamespace", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_ExplicitNamespace:
-                                            return new SimpleValue(parent, index, "value_kind: ExplicitNamespace", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "ExplicitNamespace", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_StaticProtectedNs:
-                                            return new SimpleValue(parent, index, "value_kind: StaticProtectedNs", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "StaticProtectedNs", TreeIcon.VALUE_KIND);
                                         case ValueKind.CONSTANT_PrivateNs:
-                                            return new SimpleValue(parent, index, "value_kind: PrivateNamespace", TreeIcon.VALUE_KIND);
+                                            return new SimpleValue(parent, index, "value_kind", "PrivateNamespace", TreeIcon.VALUE_KIND);
                                     }
                                 }
                                 if (index == 1) {
@@ -1312,7 +1488,7 @@ public class ABCExplorerDialog extends AppDialog {
                                     }
                                 }
                             } else {
-                                return new SubValue(parent, index, index, mi, "optional", "op" + index + ": " + mi.optional[index].toASMString(abc.constants), TreeIcon.OPTIONAL_SUB);
+                                return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc.constants), TreeIcon.OPTIONAL_SUB);
                             }
                         case "param_names":
                             return createValueWithIndex(parent, index, mi.paramNames[index], TreeType.CONSTANT_STRING, "pn" + index + ": ");
@@ -1326,18 +1502,18 @@ public class ABCExplorerDialog extends AppDialog {
                                 ABCException ex = body.exceptions[sv.getIndex()];
                                 switch (index) {
                                     case 0:
-                                        return new SimpleValue(parent, index, "start: " + ex.start, TreeIcon.EXCEPTION_START);
+                                        return new SimpleValue(parent, index, "start", "" + ex.start, TreeIcon.EXCEPTION_START);
                                     case 1:
-                                        return new SimpleValue(parent, index, "end: " + ex.end, TreeIcon.EXCEPTION_END);
+                                        return new SimpleValue(parent, index, "end", "" + ex.end, TreeIcon.EXCEPTION_END);
                                     case 2:
-                                        return new SimpleValue(parent, index, "target: " + ex.target, TreeIcon.EXCEPTION_TARGET);
+                                        return new SimpleValue(parent, index, "target", "" + ex.target, TreeIcon.EXCEPTION_TARGET);
                                     case 3:
                                         return createValueWithIndex(parent, index, ex.name_index, TreeType.CONSTANT_MULTINAME, "name: ");
                                     case 4:
                                         return createValueWithIndex(parent, index, ex.type_index, TreeType.CONSTANT_MULTINAME, "type: ");
                                 }
                             } else {
-                                return new SubValue(parent, index, index, body, "exceptions", "ex" + index, TreeIcon.EXCEPTIONS_SUB);
+                                return new SubValue(parent, index, index, body, "exceptions", "ex" + index, "", TreeIcon.EXCEPTIONS_SUB);
                             }
                         case "traits":
                             return handleGetChildTrait(parent, index, body, sv, body.traits);
@@ -1381,7 +1557,7 @@ public class ABCExplorerDialog extends AppDialog {
                                 return null;
                             }
                             String pairTitle = formatString(md.keys[index]) + " : " + formatString(md.values[index]);
-                            return new SubValue(parent, index, index, md, "pairs", "p" + index + ": " + pairTitle, TreeIcon.METADATA_PAIRS_SUB);
+                            return new SubValue(parent, index, index, md, "pairs", "p" + index, pairTitle, TreeIcon.METADATA_PAIRS_SUB);
                     }
                 }
 
