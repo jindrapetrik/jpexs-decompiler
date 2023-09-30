@@ -127,6 +127,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
         abc.refreshMultinameNamespaceSuffixes();
         ((Tag) abc.parentTag).setModified(true);
+        abc.fireChanged();
         return true;
     }
 

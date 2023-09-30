@@ -134,12 +134,28 @@ public class ABC implements Openable {
     private OpenableList openableList;
 
     private boolean isOpenable = false;
-    
+
     private long dataSize = 0L;
+
+    private List<Runnable> changeListeners = new ArrayList<>();
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
         this.deobfuscation = null;
+    }
+
+    public void addChangeListener(Runnable listener) {
+        changeListeners.add(listener);
+    }
+
+    public void removeChangeListener(Runnable listener) {
+        changeListeners.remove(listener);
+    }
+
+    public void fireChanged() {
+        for (Runnable r : changeListeners) {
+            r.run();
+        }
     }
 
     @Override
@@ -479,7 +495,7 @@ public class ABC implements Openable {
                 if (body.getCode().code.get(ip).definition instanceof CallPropertyIns) {
                     int mIndex = body.getCode().code.get(ip).operands[0];
                     if (mIndex > 0 && mIndex < constants.getMultinameCount()) {
-                        Multiname m = constants.getMultiname(mIndex);                        
+                        Multiname m = constants.getMultiname(mIndex);
                         if (m.getNameWithNamespace(constants, true).toRawString().equals("flash.utils.getDefinitionByName")) {
                             if (ip > 0) {
                                 if (body.getCode().code.get(ip - 1).definition instanceof PushStringIns) {
@@ -813,7 +829,7 @@ public class ABC implements Openable {
     }
 
     public void saveToStream(OutputStream os) throws IOException {
-        ABCOutputStream aos = new ABCOutputStream(os);        
+        ABCOutputStream aos = new ABCOutputStream(os);
         aos.writeU16(version.minor);
         aos.writeU16(version.major);
 
@@ -1869,9 +1885,9 @@ public class ABC implements Openable {
                 }
             }
         }
-        
-        while(!newFunctionsToDelete.isEmpty()) {
-            Iterator<Integer> it = newFunctionsToDelete.iterator();            
+
+        while (!newFunctionsToDelete.isEmpty()) {
+            Iterator<Integer> it = newFunctionsToDelete.iterator();
             int m = it.next();
             it.remove();
             int usageCount = newFunctionsUsage.containsKey(m) ? newFunctionsUsage.get(m) : 0;
@@ -1893,9 +1909,9 @@ public class ABC implements Openable {
                         }
                     }
                 }
-            }            
+            }
         }
-        
+
         for (int m = 0; m < method_info.size(); m++) {
             if (method_info.get(m).deleted) {
                 removeMethod(m);
@@ -1908,7 +1924,7 @@ public class ABC implements Openable {
         for (int i = traits.traits.size() - 1; i >= 0; i--) {
             Trait t = traits.traits.get(i);
             if (t instanceof TraitClass) {
-                TraitClass tc = (TraitClass)t;
+                TraitClass tc = (TraitClass) t;
                 packTraits(instance_info.get(tc.class_info).instance_traits);
                 packTraits(class_info.get(tc.class_info).static_traits);
             }
@@ -1917,15 +1933,15 @@ public class ABC implements Openable {
             }
         }
     }
-    
+
     public void pack() {
-        for (ScriptInfo script:script_info) {
+        for (ScriptInfo script : script_info) {
             packTraits(script.traits);
         }
-        for (MethodBody body: bodies) {
+        for (MethodBody body : bodies) {
             packTraits(body.traits);
         }
-        
+
         packMethods();
         for (int c = 0; c < instance_info.size(); c++) {
             if (instance_info.get(c).deleted) {
@@ -1944,6 +1960,8 @@ public class ABC implements Openable {
         getSwf().clearScriptCache();
         getMethodIndexing();
         getSwf().getAbcIndex().refreshAbc(this);
+        
+        fireChanged();
     }
 
     /**
@@ -2355,9 +2373,9 @@ public class ABC implements Openable {
             return DottedChain.parseNoSuffix("AS3");
         }
 
-        return getSwf().getAbcIndex().nsValueToName(name);        
+        return getSwf().getAbcIndex().nsValueToName(name);
     }
-    
+
     public DottedChain findCustomNsOfMultiname(Multiname m) {
         int nskind = m.getSimpleNamespaceKind(constants);
         if (nskind != Namespace.KIND_NAMESPACE && nskind != Namespace.KIND_PACKAGE_INTERNAL) {
@@ -2368,7 +2386,7 @@ public class ABC implements Openable {
             return DottedChain.parseNoSuffix("AS3");
         }
 
-        return getSwf().getAbcIndex().nsValueToName(name);        
+        return getSwf().getAbcIndex().nsValueToName(name);
     }
 
     public void clearPacksCache() {
@@ -2475,7 +2493,7 @@ public class ABC implements Openable {
 
     public boolean isApiVersioned() {
         //assuming all traits are versioned
-        for (ScriptInfo si: script_info) {
+        for (ScriptInfo si : script_info) {
             for (Trait trait : si.traits.traits) {
                 return trait.isApiVersioned(this);
             }
@@ -2485,5 +2503,5 @@ public class ABC implements Openable {
 
     public long getDataSize() {
         return dataSize;
-    }       
+    }
 }

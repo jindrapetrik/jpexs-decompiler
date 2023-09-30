@@ -100,6 +100,8 @@ public class ABCExplorerDialog extends AppDialog {
     private final JTabbedPane cpTabbedPane;
     private MainPanel mainPanel;
 
+    private Runnable packListener;
+
     public ABCExplorerDialog(Window owner, MainPanel mainPanel, Openable openable, ABC abc) {
         super(owner);
         this.mainPanel = mainPanel;
@@ -149,6 +151,17 @@ public class ABCExplorerDialog extends AppDialog {
             abcs.add((ABC) openable);
             abcFrames.add(-1);
         }
+
+        this.packListener = new Runnable() {
+            @Override
+            public void run() {
+                int cpIndex = cpTabbedPane.getSelectedIndex();
+                int mainIndex = mainTabbedPane.getSelectedIndex();
+                abcComboBoxActionPerformed(null);
+                cpTabbedPane.setSelectedIndex(cpIndex);
+                mainTabbedPane.setSelectedIndex(mainIndex);
+            }
+        };
 
         tagInfoLabel = new JLabel();
         topPanel.add(tagInfoLabel);
@@ -266,6 +279,9 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("ci (" + abc.class_info.size() + ")", View.getIcon(TreeType.CLASS_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.CLASS_INFO));
         mainTabbedPane.addTab("si (" + abc.script_info.size() + ")", View.getIcon(TreeType.SCRIPT_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.SCRIPT_INFO));
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", View.getIcon(TreeType.METHOD_BODY.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_BODY));
+
+        abc.removeChangeListener(packListener);
+        abc.addChangeListener(packListener);
     }
 
     private JTree getCurrentTree() {
@@ -290,26 +306,26 @@ public class ABCExplorerDialog extends AppDialog {
         }
         int classTraitIndexInScript = -1;
         if (classIndex != -1) {
-            classTraitIndexInScript = findClassTraitIndexInScript(scriptIndex, classIndex);            
+            classTraitIndexInScript = findClassTraitIndexInScript(scriptIndex, classIndex);
             if (classTraitIndexInScript == -1) {
                 return;
             }
         }
         if (traitIndex == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/init");
+            selectPath(tree, "si" + scriptIndex + "/init");
         } else if (traitIndex == GraphTextWriter.TRAIT_CLASS_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/traits/t"+classTraitIndexInScript+"/class_info/cinit");
+            selectPath(tree, "si" + scriptIndex + "/traits/t" + classTraitIndexInScript + "/class_info/cinit");
         } else if (traitIndex == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/traits/t"+classTraitIndexInScript+"/instance_info/iinit");
+            selectPath(tree, "si" + scriptIndex + "/traits/t" + classTraitIndexInScript + "/instance_info/iinit");
         } else if (traitType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/traits/t"+traitIndex);
+            selectPath(tree, "si" + scriptIndex + "/traits/t" + traitIndex);
         } else if (traitType == GraphTextWriter.TRAIT_CLASS_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/traits/t"+classTraitIndexInScript+"/class_info/traits/t"+traitIndex);
+            selectPath(tree, "si" + scriptIndex + "/traits/t" + classTraitIndexInScript + "/class_info/traits/t" + traitIndex);
         } else if (traitType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
-            selectPath(tree, "si"+scriptIndex+"/traits/t"+classTraitIndexInScript+"/instance_info/traits/t"+traitIndex);
+            selectPath(tree, "si" + scriptIndex + "/traits/t" + classTraitIndexInScript + "/instance_info/traits/t" + traitIndex);
         }
     }
-    
+
     private int findClassTraitIndexInScript(int scriptIndex, int classIndex) {
         ABC abc = getSelectedAbc();
         for (int i = 0; i < abc.script_info.get(scriptIndex).traits.traits.size(); i++) {
@@ -332,8 +348,9 @@ public class ABCExplorerDialog extends AppDialog {
 
         Object treePathObjects[] = new Object[parts.length + 1];
         treePathObjects[0] = root;
-        
-        loopp:for (int p = 0; p < parts.length; p++) {
+
+        loopp:
+        for (int p = 0; p < parts.length; p++) {
             String part = parts[p];
             for (int i = 0; i < model.getChildCount(parent); i++) {
                 Object child = model.getChild(parent, i);
@@ -696,7 +713,7 @@ public class ABCExplorerDialog extends AppDialog {
                         if (scriptNameDc == null && (sv.getParentValue() instanceof ScriptInfo)) {
                             scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(traitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
                         }
-                        
+
                         String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
                     }
@@ -1535,595 +1552,607 @@ public class ABCExplorerDialog extends AppDialog {
 
         @Override
         public Object getChild(Object parent, int index) {
-            if (parent == type) {
-                return createValueWithIndex(parent, index, index, type, "");
-            }
-            if (parent instanceof ValueWithIndex) {
-                ValueWithIndex vwi = (ValueWithIndex) parent;
-                if (vwi.value instanceof NamespaceSet) {
-                    NamespaceSet nss = (NamespaceSet) vwi.value;
-                    int ns = nss.namespaces[index];
-                    return new ValueWithIndex(parent, index, ns, TreeType.CONSTANT_NAMESPACE, abc.constants.getNamespace(ns), Multiname.namespaceToString(abc.constants, ns));
+            try {
+                if (parent == type) {
+                    return createValueWithIndex(parent, index, index, type, "");
                 }
-                if (vwi.value instanceof Namespace) {
-                    Namespace ns = (Namespace) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return new SimpleValue(parent, index, "kind", Namespace.kindToStr(ns.kind), TreeIcon.KIND);
-                        case 1:
-                            return createValueWithIndex(parent, index, ns.name_index, TreeType.CONSTANT_STRING, "name");
+                if (parent instanceof ValueWithIndex) {
+                    ValueWithIndex vwi = (ValueWithIndex) parent;
+                    if (vwi.value instanceof NamespaceSet) {
+                        NamespaceSet nss = (NamespaceSet) vwi.value;
+                        int ns = nss.namespaces[index];
+                        return new ValueWithIndex(parent, index, ns, TreeType.CONSTANT_NAMESPACE, abc.constants.getNamespace(ns), Multiname.namespaceToString(abc.constants, ns));
                     }
-                }
-                if (vwi.value instanceof Multiname) {
-                    Multiname m = (Multiname) vwi.value;
-                    if (index == 0) {
-                        return new SimpleValue(parent, index, "kind", m.getKindStr(), TreeIcon.KIND);
+                    if (vwi.value instanceof Namespace) {
+                        Namespace ns = (Namespace) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return new SimpleValue(parent, index, "kind", Namespace.kindToStr(ns.kind), TreeIcon.KIND);
+                            case 1:
+                                return createValueWithIndex(parent, index, ns.name_index, TreeType.CONSTANT_STRING, "name");
+                        }
                     }
-                    int kind = m.kind;
-                    if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
-                        switch (index) {
-                            case 1:
-                                return createValueWithIndex(parent, index, m.namespace_index, TreeType.CONSTANT_NAMESPACE, "namespace");
-                            case 2:
-                                return createValueWithIndex(parent, index, m.name_index, TreeType.CONSTANT_STRING, "name");
+                    if (vwi.value instanceof Multiname) {
+                        Multiname m = (Multiname) vwi.value;
+                        if (index == 0) {
+                            return new SimpleValue(parent, index, "kind", m.getKindStr(), TreeIcon.KIND);
                         }
-                    } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
-                        if (index == 1) {
-                            return createValueWithIndex(parent, index, m.name_index, TreeType.CONSTANT_STRING, "name");
-                        }
-                    } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
-                        //ignore
-                    } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
-                        switch (index) {
-                            case 1:
+                        int kind = m.kind;
+                        if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
+                            switch (index) {
+                                case 1:
+                                    return createValueWithIndex(parent, index, m.namespace_index, TreeType.CONSTANT_NAMESPACE, "namespace");
+                                case 2:
+                                    return createValueWithIndex(parent, index, m.name_index, TreeType.CONSTANT_STRING, "name");
+                            }
+                        } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
+                            if (index == 1) {
                                 return createValueWithIndex(parent, index, m.name_index, TreeType.CONSTANT_STRING, "name");
-                            case 2:
+                            }
+                        } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
+                            //ignore
+                        } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
+                            switch (index) {
+                                case 1:
+                                    return createValueWithIndex(parent, index, m.name_index, TreeType.CONSTANT_STRING, "name");
+                                case 2:
+                                    return createValueWithIndex(parent, index, m.namespace_set_index, TreeType.CONSTANT_NAMESPACE_SET, "namespace_set");
+                            }
+                        } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
+                            if (index == 1) {
                                 return createValueWithIndex(parent, index, m.namespace_set_index, TreeType.CONSTANT_NAMESPACE_SET, "namespace_set");
-                        }
-                    } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
-                        if (index == 1) {
-                            return createValueWithIndex(parent, index, m.namespace_set_index, TreeType.CONSTANT_NAMESPACE_SET, "namespace_set");
-                        }
-                    } else if (kind == Multiname.TYPENAME) {
-                        if (index == 1) {
-                            return createValueWithIndex(parent, index, m.qname_index, TreeType.CONSTANT_MULTINAME, "qname");
-                        }
-                        if (index >= 2 && index - 2 < m.params.length) {
-                            return createValueWithIndex(parent, index, m.params[index - 2], TreeType.CONSTANT_MULTINAME, "param" + (index - 2));
+                            }
+                        } else if (kind == Multiname.TYPENAME) {
+                            if (index == 1) {
+                                return createValueWithIndex(parent, index, m.qname_index, TreeType.CONSTANT_MULTINAME, "qname");
+                            }
+                            if (index >= 2 && index - 2 < m.params.length) {
+                                return createValueWithIndex(parent, index, m.params[index - 2], TreeType.CONSTANT_MULTINAME, "param" + (index - 2));
+                            }
                         }
                     }
-                }
-                if (vwi.value instanceof MethodInfo) {
-                    MethodInfo mi = (MethodInfo) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return new SubValue(parent, index, mi, "param_types", "param_types", "", TreeIcon.PARAM_TYPES);
-                        case 1:
-                            return createValueWithIndex(parent, index, mi.ret_type, TreeType.CONSTANT_MULTINAME, "return_type");
-                        case 2:
-                            return createValueWithIndex(parent, index, mi.name_index, TreeType.CONSTANT_STRING, "name");
-                        case 3:
-                            List<String> flagList = new ArrayList<>();
-                            if (mi.flagNative()) {
-                                flagList.add("NATIVE");
-                            }
-                            if (mi.flagHas_optional()) {
-                                flagList.add("HAS_OPTIONAL");
-                            }
-                            if (mi.flagHas_paramnames()) {
-                                flagList.add("HAS_PARAM_NAMES");
-                            }
-                            if (mi.flagIgnore_rest()) {
-                                flagList.add("IGNORE_REST");
-                            }
-                            if (mi.flagNeed_activation()) {
-                                flagList.add("NEED_ACTIVATION");
-                            }
-                            if (mi.flagNeed_arguments()) {
-                                flagList.add("NEED_ARGUMENTS");
-                            }
-                            if (mi.flagNeed_rest()) {
-                                flagList.add("NEED_REST");
-                            }
-                            if (mi.flagSetsdxns()) {
-                                flagList.add("SET_DXNS");
-                            }
+                    if (vwi.value instanceof MethodInfo) {
+                        MethodInfo mi = (MethodInfo) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return new SubValue(parent, index, mi, "param_types", "param_types", "", TreeIcon.PARAM_TYPES);
+                            case 1:
+                                return createValueWithIndex(parent, index, mi.ret_type, TreeType.CONSTANT_MULTINAME, "return_type");
+                            case 2:
+                                return createValueWithIndex(parent, index, mi.name_index, TreeType.CONSTANT_STRING, "name");
+                            case 3:
+                                List<String> flagList = new ArrayList<>();
+                                if (mi.flagNative()) {
+                                    flagList.add("NATIVE");
+                                }
+                                if (mi.flagHas_optional()) {
+                                    flagList.add("HAS_OPTIONAL");
+                                }
+                                if (mi.flagHas_paramnames()) {
+                                    flagList.add("HAS_PARAM_NAMES");
+                                }
+                                if (mi.flagIgnore_rest()) {
+                                    flagList.add("IGNORE_REST");
+                                }
+                                if (mi.flagNeed_activation()) {
+                                    flagList.add("NEED_ACTIVATION");
+                                }
+                                if (mi.flagNeed_arguments()) {
+                                    flagList.add("NEED_ARGUMENTS");
+                                }
+                                if (mi.flagNeed_rest()) {
+                                    flagList.add("NEED_REST");
+                                }
+                                if (mi.flagSetsdxns()) {
+                                    flagList.add("SET_DXNS");
+                                }
 
-                            return new SimpleValue(parent, index, "flags", String.format("0x%02X", mi.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
-                    }
+                                return new SimpleValue(parent, index, "flags", String.format("0x%02X", mi.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
+                        }
 
-                    int currentIndex = 4;
+                        int currentIndex = 4;
 
-                    if (mi.flagHas_optional()) {
+                        if (mi.flagHas_optional()) {
+                            if (index == currentIndex) {
+                                return new SubValue(parent, index, mi, "optional", "optional", "", TreeIcon.OPTIONAL);
+                            }
+                            currentIndex++;
+                        }
+
+                        if (mi.flagHas_paramnames()) {
+                            if (index == currentIndex) {
+                                return new SubValue(parent, index, mi, "param_names", "param_names", "", TreeIcon.PARAM_NAMES);
+                            }
+                            currentIndex++;
+                        }
+
                         if (index == currentIndex) {
-                            return new SubValue(parent, index, mi, "optional", "optional", "", TreeIcon.OPTIONAL);
+                            int bodyIndex = abc.findBodyIndex(vwi.getIndex());
+                            if (bodyIndex != -1) {
+                                return createValueWithIndex(parent, index, bodyIndex, TreeType.METHOD_BODY, "method_body");
+                            }
+                        }
+                    }
+                    if (vwi.value instanceof MethodBody) {
+                        MethodBody body = (MethodBody) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return createValueWithIndex(parent, index, body.method_info, TreeType.METHOD_INFO, "method_info");
+                            case 1:
+                                return new SimpleValue(parent, index, "max_stack", "" + body.max_stack, TreeIcon.MAX_STACK);
+                            case 2:
+                                return new SimpleValue(parent, index, "max_regs", "" + body.max_regs, TreeIcon.MAX_REGS);
+                            case 3:
+                                return new SimpleValue(parent, index, "init_scope_depth", "" + body.init_scope_depth, TreeIcon.INIT_SCOPE_DEPTH);
+                            case 4:
+                                return new SimpleValue(parent, index, "max_scope_depth", "" + body.max_scope_depth, TreeIcon.MAX_SCOPE_DEPTH);
+                            case 5:
+                                return new SimpleValue(parent, index, "code", "" + body.getCodeBytes().length + " bytes", TreeIcon.CODE);
+                            case 6:
+                                return new SubValue(parent, index, body, "exceptions", "exceptions", "", TreeIcon.EXCEPTIONS);
+                            case 7:
+                                return new SubValue(parent, index, body, "traits", "traits", "", TreeIcon.TRAITS);
+                        }
+                    }
+                    if (vwi.value instanceof InstanceInfo) {
+                        InstanceInfo ii = (InstanceInfo) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return createValueWithIndex(parent, index, ii.name_index, TreeType.CONSTANT_MULTINAME, "name");
+                            case 1:
+                                return createValueWithIndex(parent, index, ii.super_index, TreeType.CONSTANT_MULTINAME, "super");
+                            case 2:
+                                List<String> flagList = new ArrayList<>();
+                                if ((ii.flags & InstanceInfo.CLASS_SEALED) == InstanceInfo.CLASS_SEALED) {
+                                    flagList.add("SEALED");
+                                }
+                                if ((ii.flags & InstanceInfo.CLASS_FINAL) == InstanceInfo.CLASS_FINAL) {
+                                    flagList.add("FINAL");
+                                }
+                                if ((ii.flags & InstanceInfo.CLASS_INTERFACE) == InstanceInfo.CLASS_INTERFACE) {
+                                    flagList.add("INTERFACE");
+                                }
+                                if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+                                    flagList.add("PROTECTEDNS");
+                                }
+                                if ((ii.flags & InstanceInfo.CLASS_NON_NULLABLE) == InstanceInfo.CLASS_NON_NULLABLE) {
+                                    flagList.add("NON_NULLABLE");
+                                }
+                                return new SimpleValue(parent, index, "flags", String.format("0x%02X", ii.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
+                        }
+                        int currentIndex = 3;
+                        if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+                            if (index == currentIndex) {
+                                return createValueWithIndex(parent, index, ii.protectedNS, TreeType.CONSTANT_NAMESPACE, "protected_ns");
+                            }
+                            currentIndex++;
+                        }
+                        if (index == currentIndex) {
+                            return new SubValue(parent, index, ii, "interfaces", "interfaces", "", TreeIcon.INTERFACES);
                         }
                         currentIndex++;
-                    }
-
-                    if (mi.flagHas_paramnames()) {
                         if (index == currentIndex) {
-                            return new SubValue(parent, index, mi, "param_names", "param_names", "", TreeIcon.PARAM_NAMES);
+                            return createValueWithIndex(parent, currentIndex, ii.iinit_index, TreeType.METHOD_INFO, "iinit");
                         }
                         currentIndex++;
-                    }
-
-                    if (index == currentIndex) {
-                        int bodyIndex = abc.findBodyIndex(vwi.getIndex());
-                        if (bodyIndex != -1) {
-                            return createValueWithIndex(parent, index, bodyIndex, TreeType.METHOD_BODY, "method_body");
-                        }
-                    }
-                }
-                if (vwi.value instanceof MethodBody) {
-                    MethodBody body = (MethodBody) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return createValueWithIndex(parent, index, body.method_info, TreeType.METHOD_INFO, "method_info");
-                        case 1:
-                            return new SimpleValue(parent, index, "max_stack", "" + body.max_stack, TreeIcon.MAX_STACK);
-                        case 2:
-                            return new SimpleValue(parent, index, "max_regs", "" + body.max_regs, TreeIcon.MAX_REGS);
-                        case 3:
-                            return new SimpleValue(parent, index, "init_scope_depth", "" + body.init_scope_depth, TreeIcon.INIT_SCOPE_DEPTH);
-                        case 4:
-                            return new SimpleValue(parent, index, "max_scope_depth", "" + body.max_scope_depth, TreeIcon.MAX_SCOPE_DEPTH);
-                        case 5:
-                            return new SimpleValue(parent, index, "code", "" + body.getCodeBytes().length + " bytes", TreeIcon.CODE);
-                        case 6:
-                            return new SubValue(parent, index, body, "exceptions", "exceptions", "", TreeIcon.EXCEPTIONS);
-                        case 7:
-                            return new SubValue(parent, index, body, "traits", "traits", "", TreeIcon.TRAITS);
-                    }
-                }
-                if (vwi.value instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return createValueWithIndex(parent, index, ii.name_index, TreeType.CONSTANT_MULTINAME, "name");
-                        case 1:
-                            return createValueWithIndex(parent, index, ii.super_index, TreeType.CONSTANT_MULTINAME, "super");
-                        case 2:
-                            List<String> flagList = new ArrayList<>();
-                            if ((ii.flags & InstanceInfo.CLASS_SEALED) == InstanceInfo.CLASS_SEALED) {
-                                flagList.add("SEALED");
-                            }
-                            if ((ii.flags & InstanceInfo.CLASS_FINAL) == InstanceInfo.CLASS_FINAL) {
-                                flagList.add("FINAL");
-                            }
-                            if ((ii.flags & InstanceInfo.CLASS_INTERFACE) == InstanceInfo.CLASS_INTERFACE) {
-                                flagList.add("INTERFACE");
-                            }
-                            if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
-                                flagList.add("PROTECTEDNS");
-                            }
-                            if ((ii.flags & InstanceInfo.CLASS_NON_NULLABLE) == InstanceInfo.CLASS_NON_NULLABLE) {
-                                flagList.add("NON_NULLABLE");
-                            }
-                            return new SimpleValue(parent, index, "flags", String.format("0x%02X", ii.flags) + (!flagList.isEmpty() ? " (" + String.join(", ", flagList) + ")" : ""), TreeIcon.FLAGS);
-                    }
-                    int currentIndex = 3;
-                    if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
                         if (index == currentIndex) {
-                            return createValueWithIndex(parent, index, ii.protectedNS, TreeType.CONSTANT_NAMESPACE, "protected_ns");
+                            return new SubValue(parent, index, ii, "traits", "traits", "", TreeIcon.TRAITS);
                         }
-                        currentIndex++;
                     }
-                    if (index == currentIndex) {
-                        return new SubValue(parent, index, ii, "interfaces", "interfaces", "", TreeIcon.INTERFACES);
+                    if (vwi.value instanceof ClassInfo) {
+                        ClassInfo ci = (ClassInfo) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return createValueWithIndex(parent, index, ci.cinit_index, TreeType.METHOD_INFO, "cinit");
+                            case 1:
+                                return new SubValue(parent, index, ci, "traits", "traits", "", TreeIcon.TRAITS);
+                        }
                     }
-                    currentIndex++;
-                    if (index == currentIndex) {
-                        return createValueWithIndex(parent, currentIndex, ii.iinit_index, TreeType.METHOD_INFO, "iinit");
+                    if (vwi.value instanceof ScriptInfo) {
+                        ScriptInfo si = (ScriptInfo) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return createValueWithIndex(parent, index, si.init_index, TreeType.METHOD_INFO, "init");
+                            case 1:
+                                return new SubValue(parent, index, si, "traits", "traits", "", TreeIcon.TRAITS);
+                        }
                     }
-                    currentIndex++;
-                    if (index == currentIndex) {
-                        return new SubValue(parent, index, ii, "traits", "traits", "", TreeIcon.TRAITS);
-                    }
-                }
-                if (vwi.value instanceof ClassInfo) {
-                    ClassInfo ci = (ClassInfo) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return createValueWithIndex(parent, index, ci.cinit_index, TreeType.METHOD_INFO, "cinit");
-                        case 1:
-                            return new SubValue(parent, index, ci, "traits", "traits", "", TreeIcon.TRAITS);
-                    }
-                }
-                if (vwi.value instanceof ScriptInfo) {
-                    ScriptInfo si = (ScriptInfo) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return createValueWithIndex(parent, index, si.init_index, TreeType.METHOD_INFO, "init");
-                        case 1:
-                            return new SubValue(parent, index, si, "traits", "traits", "", TreeIcon.TRAITS);
-                    }
-                }
 
-                if (vwi.value instanceof MetadataInfo) {
-                    MetadataInfo md = (MetadataInfo) vwi.value;
-                    switch (index) {
-                        case 0:
-                            return createValueWithIndex(parent, index, md.name_index, TreeType.CONSTANT_STRING, "name");
-                        case 1:
-                            return new SubValue(parent, index, md, "pairs", "pairs", "", TreeIcon.METADATA_PAIRS);
+                    if (vwi.value instanceof MetadataInfo) {
+                        MetadataInfo md = (MetadataInfo) vwi.value;
+                        switch (index) {
+                            case 0:
+                                return createValueWithIndex(parent, index, md.name_index, TreeType.CONSTANT_STRING, "name");
+                            case 1:
+                                return new SubValue(parent, index, md, "pairs", "pairs", "", TreeIcon.METADATA_PAIRS);
+                        }
                     }
                 }
-            }
-            if (parent instanceof SubValue) {
-                SubValue sv = (SubValue) parent;
-                if (sv.getParentValue() instanceof MethodInfo) {
-                    MethodInfo mi = (MethodInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "param_types":
-                            return createValueWithIndex(parent, index, mi.param_types[index], TreeType.CONSTANT_MULTINAME, "pt" + index);
-                        case "optional":
-                            if (sv.getIndex() > -1) {
-                                if (index == 0) {
-                                    switch (mi.optional[sv.getIndex()].value_kind) {
-                                        case ValueKind.CONSTANT_Int:
-                                            return new SimpleValue(parent, index, "value_kind", "Integer", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_UInt:
-                                            return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Double:
-                                            return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_DecimalOrFloat:
-                                            if (abc.hasDecimalSupport()) {
-                                                return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
-                                            }
-                                            return new SimpleValue(parent, index, "value_kind", "Float", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Float4:
-                                            return new SimpleValue(parent, index, "value_kind", "Float4", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Utf8:
-                                            return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_True:
-                                            return new SimpleValue(parent, index, "value_kind", "True", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_False:
-                                            return new SimpleValue(parent, index, "value_kind", "False", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Null:
-                                            return new SimpleValue(parent, index, "value_kind", "Null", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Undefined:
-                                            return new SimpleValue(parent, index, "value_kind", "Undefined", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_Namespace:
-                                            return new SimpleValue(parent, index, "value_kind", "Namespace", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_PackageInternalNs:
-                                            return new SimpleValue(parent, index, "value_kind", "PackageInternalNs", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_ProtectedNamespace:
-                                            return new SimpleValue(parent, index, "value_kind", "ProtectedNamespace", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_ExplicitNamespace:
-                                            return new SimpleValue(parent, index, "value_kind", "ExplicitNamespace", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_StaticProtectedNs:
-                                            return new SimpleValue(parent, index, "value_kind", "StaticProtectedNs", TreeIcon.VALUE_KIND);
-                                        case ValueKind.CONSTANT_PrivateNs:
-                                            return new SimpleValue(parent, index, "value_kind", "PrivateNamespace", TreeIcon.VALUE_KIND);
+                if (parent instanceof SubValue) {
+                    SubValue sv = (SubValue) parent;
+                    if (sv.getParentValue() instanceof MethodInfo) {
+                        MethodInfo mi = (MethodInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "param_types":
+                                return createValueWithIndex(parent, index, mi.param_types[index], TreeType.CONSTANT_MULTINAME, "pt" + index);
+                            case "optional":
+                                if (sv.getIndex() > -1) {
+                                    if (index == 0) {
+                                        switch (mi.optional[sv.getIndex()].value_kind) {
+                                            case ValueKind.CONSTANT_Int:
+                                                return new SimpleValue(parent, index, "value_kind", "Integer", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_UInt:
+                                                return new SimpleValue(parent, index, "value_kind", "UInteger", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Double:
+                                                return new SimpleValue(parent, index, "value_kind", "Double", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_DecimalOrFloat:
+                                                if (abc.hasDecimalSupport()) {
+                                                    return new SimpleValue(parent, index, "value_kind", "Decimal", TreeIcon.VALUE_KIND);
+                                                }
+                                                return new SimpleValue(parent, index, "value_kind", "Float", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Float4:
+                                                return new SimpleValue(parent, index, "value_kind", "Float4", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Utf8:
+                                                return new SimpleValue(parent, index, "value_kind", "String", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_True:
+                                                return new SimpleValue(parent, index, "value_kind", "True", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_False:
+                                                return new SimpleValue(parent, index, "value_kind", "False", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Null:
+                                                return new SimpleValue(parent, index, "value_kind", "Null", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Undefined:
+                                                return new SimpleValue(parent, index, "value_kind", "Undefined", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_Namespace:
+                                                return new SimpleValue(parent, index, "value_kind", "Namespace", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_PackageInternalNs:
+                                                return new SimpleValue(parent, index, "value_kind", "PackageInternalNs", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_ProtectedNamespace:
+                                                return new SimpleValue(parent, index, "value_kind", "ProtectedNamespace", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_ExplicitNamespace:
+                                                return new SimpleValue(parent, index, "value_kind", "ExplicitNamespace", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_StaticProtectedNs:
+                                                return new SimpleValue(parent, index, "value_kind", "StaticProtectedNs", TreeIcon.VALUE_KIND);
+                                            case ValueKind.CONSTANT_PrivateNs:
+                                                return new SimpleValue(parent, index, "value_kind", "PrivateNamespace", TreeIcon.VALUE_KIND);
+                                        }
                                     }
-                                }
-                                if (index == 1) {
-                                    int value_index = mi.optional[sv.getIndex()].value_index;
-                                    switch (mi.optional[sv.getIndex()].value_kind) {
-                                        case ValueKind.CONSTANT_Int:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_INT, "value_index");
-                                        case ValueKind.CONSTANT_UInt:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_UINT, "value_index");
-                                        case ValueKind.CONSTANT_Double:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DOUBLE, "value_index");
-                                        case ValueKind.CONSTANT_DecimalOrFloat:
-                                            if (abc.hasDecimalSupport()) {
-                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DECIMAL, "value_index");
-                                            }
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT, "value_index");
-                                        case ValueKind.CONSTANT_Float4:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT_4, "value_index");
-                                        case ValueKind.CONSTANT_Utf8:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_STRING, "value_index");
-                                        case ValueKind.CONSTANT_True:
-                                            break;
-                                        case ValueKind.CONSTANT_False:
-                                            break;
-                                        case ValueKind.CONSTANT_Null:
-                                            break;
-                                        case ValueKind.CONSTANT_Undefined:
-                                            break;
-                                        case ValueKind.CONSTANT_Namespace:
-                                        case ValueKind.CONSTANT_PackageInternalNs:
-                                        case ValueKind.CONSTANT_ProtectedNamespace:
-                                        case ValueKind.CONSTANT_ExplicitNamespace:
-                                        case ValueKind.CONSTANT_StaticProtectedNs:
-                                        case ValueKind.CONSTANT_PrivateNs:
-                                            return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_NAMESPACE, "value_index");
+                                    if (index == 1) {
+                                        int value_index = mi.optional[sv.getIndex()].value_index;
+                                        switch (mi.optional[sv.getIndex()].value_kind) {
+                                            case ValueKind.CONSTANT_Int:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_INT, "value_index");
+                                            case ValueKind.CONSTANT_UInt:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_UINT, "value_index");
+                                            case ValueKind.CONSTANT_Double:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DOUBLE, "value_index");
+                                            case ValueKind.CONSTANT_DecimalOrFloat:
+                                                if (abc.hasDecimalSupport()) {
+                                                    return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_DECIMAL, "value_index");
+                                                }
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT, "value_index");
+                                            case ValueKind.CONSTANT_Float4:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_FLOAT_4, "value_index");
+                                            case ValueKind.CONSTANT_Utf8:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_STRING, "value_index");
+                                            case ValueKind.CONSTANT_True:
+                                                break;
+                                            case ValueKind.CONSTANT_False:
+                                                break;
+                                            case ValueKind.CONSTANT_Null:
+                                                break;
+                                            case ValueKind.CONSTANT_Undefined:
+                                                break;
+                                            case ValueKind.CONSTANT_Namespace:
+                                            case ValueKind.CONSTANT_PackageInternalNs:
+                                            case ValueKind.CONSTANT_ProtectedNamespace:
+                                            case ValueKind.CONSTANT_ExplicitNamespace:
+                                            case ValueKind.CONSTANT_StaticProtectedNs:
+                                            case ValueKind.CONSTANT_PrivateNs:
+                                                return createValueWithIndex(parent, index, value_index, TreeType.CONSTANT_NAMESPACE, "value_index");
+                                        }
                                     }
+                                } else {
+                                    return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc), TreeIcon.OPTIONAL_SUB);
                                 }
-                            } else {
-                                return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc), TreeIcon.OPTIONAL_SUB);
-                            }
-                        case "param_names":
-                            return createValueWithIndex(parent, index, mi.paramNames[index], TreeType.CONSTANT_STRING, "pn" + index);
+                            case "param_names":
+                                return createValueWithIndex(parent, index, mi.paramNames[index], TreeType.CONSTANT_STRING, "pn" + index);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof MethodBody) {
-                    MethodBody body = (MethodBody) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "exceptions":
-                            if (sv.getIndex() > -1) {
-                                ABCException ex = body.exceptions[sv.getIndex()];
-                                switch (index) {
-                                    case 0:
-                                        return new SimpleValue(parent, index, "start", "" + ex.start, TreeIcon.EXCEPTION_START);
-                                    case 1:
-                                        return new SimpleValue(parent, index, "end", "" + ex.end, TreeIcon.EXCEPTION_END);
-                                    case 2:
-                                        return new SimpleValue(parent, index, "target", "" + ex.target, TreeIcon.EXCEPTION_TARGET);
-                                    case 3:
-                                        return createValueWithIndex(parent, index, ex.name_index, TreeType.CONSTANT_MULTINAME, "name");
-                                    case 4:
-                                        return createValueWithIndex(parent, index, ex.type_index, TreeType.CONSTANT_MULTINAME, "type");
+                    if (sv.getParentValue() instanceof MethodBody) {
+                        MethodBody body = (MethodBody) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "exceptions":
+                                if (sv.getIndex() > -1) {
+                                    ABCException ex = body.exceptions[sv.getIndex()];
+                                    switch (index) {
+                                        case 0:
+                                            return new SimpleValue(parent, index, "start", "" + ex.start, TreeIcon.EXCEPTION_START);
+                                        case 1:
+                                            return new SimpleValue(parent, index, "end", "" + ex.end, TreeIcon.EXCEPTION_END);
+                                        case 2:
+                                            return new SimpleValue(parent, index, "target", "" + ex.target, TreeIcon.EXCEPTION_TARGET);
+                                        case 3:
+                                            return createValueWithIndex(parent, index, ex.name_index, TreeType.CONSTANT_MULTINAME, "name");
+                                        case 4:
+                                            return createValueWithIndex(parent, index, ex.type_index, TreeType.CONSTANT_MULTINAME, "type");
+                                    }
+                                } else {
+                                    return new SubValue(parent, index, index, body, "exceptions", "ex" + index, "", TreeIcon.EXCEPTIONS_SUB);
                                 }
-                            } else {
-                                return new SubValue(parent, index, index, body, "exceptions", "ex" + index, "", TreeIcon.EXCEPTIONS_SUB);
-                            }
-                        case "traits":
-                            return handleGetChildTrait(parent, index, body, sv, body.traits);
+                            case "traits":
+                                return handleGetChildTrait(parent, index, body, sv, body.traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "interfaces":
-                            return createValueWithIndex(parent, index, ii.interfaces[index], TreeType.CONSTANT_MULTINAME, "in" + index);
-                        case "traits":
-                            return handleGetChildTrait(parent, index, ii, sv, ii.instance_traits);
+                    if (sv.getParentValue() instanceof InstanceInfo) {
+                        InstanceInfo ii = (InstanceInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "interfaces":
+                                return createValueWithIndex(parent, index, ii.interfaces[index], TreeType.CONSTANT_MULTINAME, "in" + index);
+                            case "traits":
+                                return handleGetChildTrait(parent, index, ii, sv, ii.instance_traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof ClassInfo) {
-                    ClassInfo ci = (ClassInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "traits":
-                            return handleGetChildTrait(parent, index, ci, sv, ci.static_traits);
+                    if (sv.getParentValue() instanceof ClassInfo) {
+                        ClassInfo ci = (ClassInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "traits":
+                                return handleGetChildTrait(parent, index, ci, sv, ci.static_traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof ScriptInfo) {
-                    ScriptInfo ci = (ScriptInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "traits":
-                            return handleGetChildTrait(parent, index, ci, sv, ci.traits);
+                    if (sv.getParentValue() instanceof ScriptInfo) {
+                        ScriptInfo ci = (ScriptInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "traits":
+                                return handleGetChildTrait(parent, index, ci, sv, ci.traits);
+                        }
                     }
-                }
 
-                if (sv.getParentValue() instanceof MetadataInfo) {
-                    MetadataInfo md = (MetadataInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "pairs":
-                            if (sv.getIndex() > -1) {
-                                switch (index) {
-                                    case 0:
-                                        return createValueWithIndex(parent, index, md.keys[sv.getIndex()], TreeType.CONSTANT_STRING, "key");
-                                    case 1:
-                                        return createValueWithIndex(parent, index, md.values[sv.getIndex()], TreeType.CONSTANT_STRING, "value");
+                    if (sv.getParentValue() instanceof MetadataInfo) {
+                        MetadataInfo md = (MetadataInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "pairs":
+                                if (sv.getIndex() > -1) {
+                                    switch (index) {
+                                        case 0:
+                                            return createValueWithIndex(parent, index, md.keys[sv.getIndex()], TreeType.CONSTANT_STRING, "key");
+                                        case 1:
+                                            return createValueWithIndex(parent, index, md.values[sv.getIndex()], TreeType.CONSTANT_STRING, "value");
+                                    }
+                                    return null;
                                 }
-                                return null;
-                            }
-                            String pairTitle = formatString(md.keys[index]) + " : " + formatString(md.values[index]);
-                            return new SubValue(parent, index, index, md, "pairs", "p" + index, pairTitle, TreeIcon.METADATA_PAIRS_SUB);
+                                String pairTitle = formatString(md.keys[index]) + " : " + formatString(md.values[index]);
+                                return new SubValue(parent, index, index, md, "pairs", "p" + index, pairTitle, TreeIcon.METADATA_PAIRS_SUB);
+                        }
                     }
-                }
 
-                if (sv.getParentValue() instanceof Trait) {
-                    Trait t = (Trait) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "metadata":
-                            return createValueWithIndex(parent, index, t.metadata[index], TreeType.METADATA_INFO, "");
+                    if (sv.getParentValue() instanceof Trait) {
+                        Trait t = (Trait) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "metadata":
+                                return createValueWithIndex(parent, index, t.metadata[index], TreeType.METADATA_INFO, "");
+                        }
                     }
-                }
 
+                }
+                return null;
+            } catch (IndexOutOfBoundsException iex) {
+                return "";
             }
-            return null;
         }
 
         @Override
         public int getChildCount(Object parent) {
-            if (parent == type) {
-                switch (type) {
-                    case CONSTANT_INT:
-                        return Math.max(1, abc.constants.getIntCount());
-                    case CONSTANT_UINT:
-                        return Math.max(1, abc.constants.getUIntCount());
-                    case CONSTANT_DOUBLE:
-                        return Math.max(1, abc.constants.getDoubleCount());
-                    case CONSTANT_DECIMAL:
-                        return Math.max(1, abc.constants.getDecimalCount());
-                    case CONSTANT_FLOAT:
-                        return Math.max(1, abc.constants.getFloatCount());
-                    case CONSTANT_FLOAT_4:
-                        return Math.max(1, abc.constants.getFloat4Count());
-                    case CONSTANT_STRING:
-                        return Math.max(1, abc.constants.getStringCount());
-                    case CONSTANT_NAMESPACE:
-                        return Math.max(1, abc.constants.getNamespaceCount());
-                    case CONSTANT_NAMESPACE_SET:
-                        return abc.constants.getNamespaceSetCount();
-                    case CONSTANT_MULTINAME:
-                        return Math.max(1, abc.constants.getMultinameCount());
-                    case METHOD_INFO:
-                        return abc.method_info.size();
-                    case METADATA_INFO:
-                        return abc.metadata_info.size();
-                    case INSTANCE_INFO:
-                        return abc.instance_info.size();
-                    case CLASS_INFO:
-                        return abc.class_info.size();
-                    case SCRIPT_INFO:
-                        return abc.script_info.size();
-                    case METHOD_BODY:
-                        return abc.bodies.size();
-                }
-            }
-            if (parent instanceof ValueWithIndex) {
-                ValueWithIndex vwi = (ValueWithIndex) parent;
-                if (vwi.value instanceof NamespaceSet) {
-                    NamespaceSet nss = (NamespaceSet) vwi.value;
-                    return nss.namespaces.length;
-                }
-                if (vwi.value instanceof Namespace) {
-                    //kind, name
-                    return 2;
-                }
-                if (vwi.value instanceof Multiname) {
-                    Multiname m = (Multiname) vwi.value;
-                    int kind = m.kind;
-                    if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
-                        return 1 + 2;
-                    } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
-                        return 1 + 1;
-                    } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
-                        return 1;
-                    } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
-                        return 1 + 2;
-                    } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
-                        return 1 + 1;
-                    } else if (kind == Multiname.TYPENAME) {
-                        return 1 + 1 + m.params.length;
+            try {
+                if (parent == type) {
+                    switch (type) {
+                        case CONSTANT_INT:
+                            return Math.max(1, abc.constants.getIntCount());
+                        case CONSTANT_UINT:
+                            return Math.max(1, abc.constants.getUIntCount());
+                        case CONSTANT_DOUBLE:
+                            return Math.max(1, abc.constants.getDoubleCount());
+                        case CONSTANT_DECIMAL:
+                            return Math.max(1, abc.constants.getDecimalCount());
+                        case CONSTANT_FLOAT:
+                            return Math.max(1, abc.constants.getFloatCount());
+                        case CONSTANT_FLOAT_4:
+                            return Math.max(1, abc.constants.getFloat4Count());
+                        case CONSTANT_STRING:
+                            return Math.max(1, abc.constants.getStringCount());
+                        case CONSTANT_NAMESPACE:
+                            return Math.max(1, abc.constants.getNamespaceCount());
+                        case CONSTANT_NAMESPACE_SET:
+                            return abc.constants.getNamespaceSetCount();
+                        case CONSTANT_MULTINAME:
+                            return Math.max(1, abc.constants.getMultinameCount());
+                        case METHOD_INFO:
+                            return abc.method_info.size();
+                        case METADATA_INFO:
+                            return abc.metadata_info.size();
+                        case INSTANCE_INFO:
+                            return abc.instance_info.size();
+                        case CLASS_INFO:
+                            return abc.class_info.size();
+                        case SCRIPT_INFO:
+                            return abc.script_info.size();
+                        case METHOD_BODY:
+                            return abc.bodies.size();
                     }
                 }
-                if (vwi.value instanceof MethodInfo) {
-                    MethodInfo mi = (MethodInfo) vwi.value;
-
-                    int count = 4;
-                    if (mi.flagHas_optional()) {
-                        count++;
+                if (parent instanceof ValueWithIndex) {
+                    ValueWithIndex vwi = (ValueWithIndex) parent;
+                    if (vwi.value instanceof NamespaceSet) {
+                        NamespaceSet nss = (NamespaceSet) vwi.value;
+                        return nss.namespaces.length;
                     }
-                    if (mi.flagHas_paramnames()) {
-                        count++;
+                    if (vwi.value instanceof Namespace) {
+                        //kind, name
+                        return 2;
                     }
-                    int bodyIndex = abc.findBodyIndex(vwi.getIndex());
-                    if (bodyIndex != -1) {
-                        count++;
+                    if (vwi.value instanceof Multiname) {
+                        Multiname m = (Multiname) vwi.value;
+                        int kind = m.kind;
+                        if ((kind == Multiname.QNAME) || (kind == Multiname.QNAMEA)) {
+                            return 1 + 2;
+                        } else if ((kind == Multiname.RTQNAME) || (kind == Multiname.RTQNAMEA)) {
+                            return 1 + 1;
+                        } else if ((kind == Multiname.RTQNAMEL) || (kind == Multiname.RTQNAMELA)) {
+                            return 1;
+                        } else if ((kind == Multiname.MULTINAME) || (kind == Multiname.MULTINAMEA)) {
+                            return 1 + 2;
+                        } else if ((kind == Multiname.MULTINAMEL) || (kind == Multiname.MULTINAMELA)) {
+                            return 1 + 1;
+                        } else if (kind == Multiname.TYPENAME) {
+                            return 1 + 1 + m.params.length;
+                        }
+                    }
+                    if (vwi.value instanceof MethodInfo) {
+                        MethodInfo mi = (MethodInfo) vwi.value;
+
+                        int count = 4;
+                        if (mi.flagHas_optional()) {
+                            count++;
+                        }
+                        if (mi.flagHas_paramnames()) {
+                            count++;
+                        }
+                        int bodyIndex = abc.findBodyIndex(vwi.getIndex());
+                        if (bodyIndex != -1) {
+                            count++;
+                        }
+
+                        return count;
+                    }
+                    if (vwi.value instanceof MethodBody) {
+                        return 8;
+                    }
+                    if (vwi.value instanceof InstanceInfo) {
+                        InstanceInfo ii = (InstanceInfo) vwi.value;
+                        if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+                            return 7;
+                        }
+                        return 6;
                     }
 
-                    return count;
-                }
-                if (vwi.value instanceof MethodBody) {
-                    return 8;
-                }
-                if (vwi.value instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo) vwi.value;
-                    if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
-                        return 7;
+                    if (vwi.value instanceof ClassInfo) {
+                        return 2;
                     }
-                    return 6;
-                }
 
-                if (vwi.value instanceof ClassInfo) {
-                    return 2;
-                }
+                    if (vwi.value instanceof ScriptInfo) {
+                        return 2;
+                    }
 
-                if (vwi.value instanceof ScriptInfo) {
-                    return 2;
+                    if (vwi.value instanceof MetadataInfo) {
+                        MetadataInfo md = (MetadataInfo) vwi.value;
+                        return 2;
+                    }
                 }
-
-                if (vwi.value instanceof MetadataInfo) {
-                    MetadataInfo md = (MetadataInfo) vwi.value;
-                    return 2;
-                }
-            }
-            if (parent instanceof SubValue) {
-                SubValue sv = (SubValue) parent;
-                if (sv.getParentValue() instanceof MethodInfo) {
-                    MethodInfo mi = (MethodInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "param_types":
-                            return mi.param_types.length;
-                        case "optional":
-                            if (sv.getIndex() > -1) {
-                                int index = sv.getIndex();
-                                int value_index = mi.optional[index].value_index;
-                                switch (mi.optional[index].value_kind) {
-                                    case ValueKind.CONSTANT_True:
-                                    case ValueKind.CONSTANT_False:
-                                    case ValueKind.CONSTANT_Null:
-                                    case ValueKind.CONSTANT_Undefined:
-                                        return 1;
-                                    case ValueKind.CONSTANT_Int:
-                                    case ValueKind.CONSTANT_UInt:
-                                    case ValueKind.CONSTANT_Double:
-                                    case ValueKind.CONSTANT_DecimalOrFloat:
-                                    case ValueKind.CONSTANT_Float4:
-                                    case ValueKind.CONSTANT_Utf8:
-                                    case ValueKind.CONSTANT_Namespace:
-                                    case ValueKind.CONSTANT_PackageInternalNs:
-                                    case ValueKind.CONSTANT_ProtectedNamespace:
-                                    case ValueKind.CONSTANT_ExplicitNamespace:
-                                    case ValueKind.CONSTANT_StaticProtectedNs:
-                                    case ValueKind.CONSTANT_PrivateNs:
-                                        return 2;
+                if (parent instanceof SubValue) {
+                    SubValue sv = (SubValue) parent;
+                    if (sv.getParentValue() instanceof MethodInfo) {
+                        MethodInfo mi = (MethodInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "param_types":
+                                return mi.param_types.length;
+                            case "optional":
+                                if (sv.getIndex() > -1) {
+                                    int index = sv.getIndex();
+                                    int value_index = mi.optional[index].value_index;
+                                    switch (mi.optional[index].value_kind) {
+                                        case ValueKind.CONSTANT_True:
+                                        case ValueKind.CONSTANT_False:
+                                        case ValueKind.CONSTANT_Null:
+                                        case ValueKind.CONSTANT_Undefined:
+                                            return 1;
+                                        case ValueKind.CONSTANT_Int:
+                                        case ValueKind.CONSTANT_UInt:
+                                        case ValueKind.CONSTANT_Double:
+                                        case ValueKind.CONSTANT_DecimalOrFloat:
+                                        case ValueKind.CONSTANT_Float4:
+                                        case ValueKind.CONSTANT_Utf8:
+                                        case ValueKind.CONSTANT_Namespace:
+                                        case ValueKind.CONSTANT_PackageInternalNs:
+                                        case ValueKind.CONSTANT_ProtectedNamespace:
+                                        case ValueKind.CONSTANT_ExplicitNamespace:
+                                        case ValueKind.CONSTANT_StaticProtectedNs:
+                                        case ValueKind.CONSTANT_PrivateNs:
+                                            return 2;
+                                    }
+                                    return 0;
                                 }
-                                return 0;
-                            }
-                            return mi.optional.length;
-                        case "param_names":
-                            return mi.paramNames.length;
+                                return mi.optional.length;
+                            case "param_names":
+                                return mi.paramNames.length;
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof MethodBody) {
-                    MethodBody body = (MethodBody) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "exceptions":
-                            if (sv.getIndex() > -1) {
-                                return 5;
-                            }
-                            return body.exceptions.length;
-                        case "traits":
-                            return handleGetChildCountTrait(sv, body.traits);
+                    if (sv.getParentValue() instanceof MethodBody) {
+                        MethodBody body = (MethodBody) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "exceptions":
+                                if (sv.getIndex() > -1) {
+                                    return 5;
+                                }
+                                return body.exceptions.length;
+                            case "traits":
+                                return handleGetChildCountTrait(sv, body.traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof InstanceInfo) {
-                    InstanceInfo ii = (InstanceInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "interfaces":
-                            return ii.interfaces.length;
-                        case "traits":
-                            return handleGetChildCountTrait(sv, ii.instance_traits);
+                    if (sv.getParentValue() instanceof InstanceInfo) {
+                        InstanceInfo ii = (InstanceInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "interfaces":
+                                return ii.interfaces.length;
+                            case "traits":
+                                return handleGetChildCountTrait(sv, ii.instance_traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof ClassInfo) {
-                    ClassInfo ci = (ClassInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "traits":
-                            return handleGetChildCountTrait(sv, ci.static_traits);
+                    if (sv.getParentValue() instanceof ClassInfo) {
+                        ClassInfo ci = (ClassInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "traits":
+                                return handleGetChildCountTrait(sv, ci.static_traits);
+                        }
                     }
-                }
-                if (sv.getParentValue() instanceof ScriptInfo) {
-                    ScriptInfo ci = (ScriptInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "traits":
-                            return handleGetChildCountTrait(sv, ci.traits);
+                    if (sv.getParentValue() instanceof ScriptInfo) {
+                        ScriptInfo ci = (ScriptInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "traits":
+                                return handleGetChildCountTrait(sv, ci.traits);
+                        }
                     }
-                }
 
-                if (sv.getParentValue() instanceof MetadataInfo) {
-                    MetadataInfo md = (MetadataInfo) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "pairs":
-                            if (sv.getIndex() > -1) {
-                                return 2;
-                            }
-                            return md.keys.length;
+                    if (sv.getParentValue() instanceof MetadataInfo) {
+                        MetadataInfo md = (MetadataInfo) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "pairs":
+                                if (sv.getIndex() > -1) {
+                                    return 2;
+                                }
+                                return md.keys.length;
+                        }
                     }
-                }
 
-                if (sv.getParentValue() instanceof Trait) {
-                    Trait t = (Trait) sv.getParentValue();
-                    switch (sv.getProperty()) {
-                        case "metadata":
-                            return t.metadata.length;
+                    if (sv.getParentValue() instanceof Trait) {
+                        Trait t = (Trait) sv.getParentValue();
+                        switch (sv.getProperty()) {
+                            case "metadata":
+                                return t.metadata.length;
+                        }
                     }
                 }
+                return 0;
+            } catch (IndexOutOfBoundsException iex) {
+                return 0;
             }
-            return 0;
         }
 
         @Override
         public boolean isLeaf(Object node) {
-            return getChildCount(node) == 0;
+            try {
+                return getChildCount(node) == 0;
+            } catch (IndexOutOfBoundsException iex) {
+                return false;
+            }
         }
 
         @Override

@@ -2630,7 +2630,8 @@ public class ActionScript3Parser {
             abcIndex.getSelectedAbc().script_info.remove(si);
             throw ex;
         }
-
+        
+        abcIndex.getSelectedAbc().fireChanged();
     }
 
     public void addScript(String s, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
