@@ -247,7 +247,7 @@ public class ABCExplorerDialog extends AppDialog {
                 + Math.max(0, abc.constants.getMultinameCount() - 1)
                 + (abc.hasDecimalSupport() ? Math.max(0, abc.constants.getDecimalCount() - 1) : 0)
                 + (abc.hasFloatSupport() ? (Math.max(0, abc.constants.getFloatCount() - 1) + Math.max(0, abc.constants.getFloat4Count() - 1)) : 0);
-        mainTabbedPane.addTab("cp (" + cpCount + ")", cpPanel);
+        mainTabbedPane.addTab("cp (" + cpCount + ")", View.getIcon("abcconstantpool16"), cpPanel);
         mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", View.getIcon(TreeType.METHOD_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_INFO));
         mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", View.getIcon(TreeType.METADATA_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.METADATA_INFO));
         mainTabbedPane.addTab("ii (" + abc.instance_info.size() + ")", View.getIcon(TreeType.INSTANCE_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.INSTANCE_INFO));
