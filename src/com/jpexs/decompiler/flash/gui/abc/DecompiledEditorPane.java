@@ -786,7 +786,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                             continue looph;
                         }
                     }
-                    final int fpos = th.startPos;
+                    final int fpos = th.startPos + 1; //+1 to skip script initializer which is on first character
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {

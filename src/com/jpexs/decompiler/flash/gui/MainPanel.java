@@ -2449,10 +2449,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             public void run() {
                 if (abcPanel != null) {
                     abcPanel.decompiledTextArea.removeScriptListener(this);
-                    boolean classChanged = false;
                     if (abcPanel.decompiledTextArea.getClassIndex() != classIndex) {
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                        classChanged = true;
                     }
                     if (traitIndex != -10) {
                         abcPanel.decompiledTextArea.gotoTrait(traitIndex);
