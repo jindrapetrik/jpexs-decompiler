@@ -149,6 +149,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.filechooser.FileFilter;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
@@ -2783,6 +2784,16 @@ public class Main {
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
+                        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_RESOURCES) {
+                            mainFrame.getPanel().valueChanged(new TreeSelectionEvent(
+                                    mainFrame.getPanel().tagTree, mainFrame.getPanel().tagTree.getSelectionPath(), false, null, null
+                            ));
+                        }
+                        if (mainFrame.getPanel().getCurrentView() == MainPanel.VIEW_TAGLIST) {
+                            mainFrame.getPanel().valueChanged(new TreeSelectionEvent(
+                                    mainFrame.getPanel().tagListTree, mainFrame.getPanel().tagListTree.getSelectionPath(), false, null, null
+                            ));
+                        }
                         setSessionLoaded(true);
                     });
                 }
