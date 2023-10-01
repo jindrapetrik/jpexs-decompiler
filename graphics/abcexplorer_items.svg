@@ -9,7 +9,7 @@
    id="svg5"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    sodipodi:docname="abcexplorer_items.svg"
-   inkscape:export-filename="abcnamespace16.png"
+   inkscape:export-filename="abcmethodbody16.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -29,8 +29,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="32.413584"
-     inkscape:cx="8.0676052"
-     inkscape:cy="7.3888775"
+     inkscape:cx="3.9952385"
+     inkscape:cy="10.905921"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -53,138 +53,6 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient1344">
-      <stop
-         style="stop-color:#ff2a2a;stop-opacity:1"
-         offset="0"
-         id="stop1340" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop1342" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1301">
-      <stop
-         style="stop-color:#00ff00;stop-opacity:1"
-         offset="0"
-         id="stop1297" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop1299" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1258">
-      <stop
-         style="stop-color:#dd55ff;stop-opacity:1"
-         offset="0"
-         id="stop1254" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop1256" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1215">
-      <stop
-         style="stop-color:#80b3ff;stop-opacity:1"
-         offset="0"
-         id="stop1211" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop1213" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1171">
-      <stop
-         style="stop-color:#00ffff;stop-opacity:1"
-         offset="0"
-         id="stop1167" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop1169" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1076">
-      <stop
-         style="stop-color:#ffcc00;stop-opacity:1"
-         offset="0"
-         id="stop1072" />
-      <stop
-         style="stop-color:#ffeeaa;stop-opacity:1"
-         offset="1"
-         id="stop1074" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1076"
-       id="linearGradient1070"
-       gradientUnits="userSpaceOnUse"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111141,0.14111143)" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1171"
-       id="linearGradient1164"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111148,0.14111137)"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1215"
-       id="linearGradient1207"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111151,0.14111131)"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1258"
-       id="linearGradient1250"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111154,0.14111125)"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1301"
-       id="linearGradient1293"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111157,0.14111119)"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1344"
-       id="linearGradient1336"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.93333346,0,0,0.93333328,0.14111166,0.14111117)"
-       x1="3.5555036"
-       y1="3.5785913"
-       x2="0.48484141"
-       y2="0.47329757" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient1868"
        id="linearGradient1713"
        gradientUnits="userSpaceOnUse"
@@ -199,228 +67,229 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="display:none;opacity:1;fill:url(#linearGradient1070);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;opacity:1;fill:#ffdd55;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-dasharray:none"
        id="rect238"
-       width="3.4572225"
-       height="3.4572222"
-       x="0.38805583"
-       y="0.38805583"
-       inkscape:label="yelllow_rect" />
+       width="3.7041667"
+       height="3.7041667"
+       x="0.26458332"
+       y="0.26458332"
+       inkscape:label="yelllow_rect"
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:3.175px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
-       x="1.1625471"
-       y="3.1399252"
+       style="font-weight:bold;font-size:2.99501px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.249584;stroke-dasharray:none"
+       x="1.6446084"
+       y="3.1172042"
        id="text1120"
        inkscape:label="text_i"><tspan
          sodipodi:role="line"
          id="tspan1118"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.264583"
-         x="1.1625471"
-         y="3.1399252">I</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.249584"
+         x="1.6446084"
+         y="3.1172042">I</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:3.175px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
-       x="1.1625471"
-       y="3.1399252"
-       id="text1298"
+       style="font-weight:bold;font-size:2.99501px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.249584;stroke-dasharray:none"
+       x="1.0324036"
+       y="3.1825061"
+       id="text1058"
        inkscape:label="text_u"><tspan
          sodipodi:role="line"
-         id="tspan1296"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.264583"
-         x="1.1625471"
-         y="3.1399252">U</tspan></text>
+         id="tspan1056"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.249584"
+         x="1.0324036"
+         y="3.1825061">U</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:3.175px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
-       x="1.1625471"
-       y="3.1399252"
-       id="text1328"
+       style="font-weight:bold;font-size:2.99501px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.249584;stroke-dasharray:none"
+       x="1.0324036"
+       y="3.1825061"
+       id="text1064"
        inkscape:label="text_d"><tspan
          sodipodi:role="line"
-         id="tspan1326"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.264583"
-         x="1.1625471"
-         y="3.1399252">D</tspan></text>
+         id="tspan1062"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.249584"
+         x="1.0324036"
+         y="3.1825061">D</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1347"
+       style="font-weight:bold;font-size:2.12396px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.176997;stroke-dasharray:none"
+       x="0.51188672"
+       y="2.7345223"
+       id="text1070"
        inkscape:label="text_dc"><tspan
          sodipodi:role="line"
-         id="tspan1345"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">Dc</tspan></text>
+         id="tspan1068"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.176997"
+         x="0.51188672"
+         y="2.7345223">DC</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:3.175px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
-       x="1.1625471"
-       y="3.1399252"
-       id="text1351"
+       style="font-weight:bold;font-size:2.99501px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.249584;stroke-dasharray:none"
+       x="1.2446345"
+       y="3.1906688"
+       id="text1076"
        inkscape:label="text_f"><tspan
          sodipodi:role="line"
-         id="tspan1349"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.264583"
-         x="1.1625471"
-         y="3.1399252">F</tspan></text>
+         id="tspan1074"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.249584"
+         x="1.2446345"
+         y="3.1906688">F</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1374"
+       style="font-weight:bold;font-size:2.45597px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.204664;stroke-dasharray:none"
+       x="0.64952731"
+       y="2.9517457"
+       id="text1082"
        inkscape:label="text_f4"><tspan
          sodipodi:role="line"
-         id="tspan1372"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">F4</tspan></text>
+         id="tspan1080"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.204664"
+         x="0.64952731"
+         y="2.9517457">F4</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:3.175px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
-       x="1.1625471"
-       y="3.1399252"
-       id="text1378"
+       style="font-weight:bold;font-size:2.99501px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.249584;stroke-dasharray:none"
+       x="1.0977054"
+       y="3.1580179"
+       id="text1152"
        inkscape:label="text_s"><tspan
          sodipodi:role="line"
-         id="tspan1376"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.264583"
-         x="1.1625471"
-         y="3.1399252">S</tspan></text>
+         id="tspan1150"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.249584"
+         x="1.0977054"
+         y="3.1580179">S</tspan></text>
     <rect
-       style="display:inline;fill:url(#linearGradient1164);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:#00ffff;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-dasharray:none"
        id="rect238-1"
-       width="3.4572225"
-       height="3.4572222"
-       x="0.38805583"
-       y="0.38805583"
+       width="3.7041667"
+       height="3.7041667"
+       x="0.26458332"
+       y="0.26458332"
        inkscape:label="lightblue_rect"
-       sodipodi:insensitive="true" />
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:inline;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.64128619"
-       y="2.9134934"
-       id="text1487"
+       style="font-weight:bold;font-size:2.30706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.192254;stroke-dasharray:none"
+       x="0.48129037"
+       y="2.8841455"
+       id="text1220"
        inkscape:label="text_ns"><tspan
          sodipodi:role="line"
-         id="tspan1485"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.64128619"
-         y="2.9134934">NS</tspan></text>
+         id="tspan1218"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.192254"
+         x="0.48129037"
+         y="2.8841455">NS</tspan></text>
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.06812px;line-height:0.8;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.172343;stroke-dasharray:none"
-       x="0.92347437"
-       y="2.0532992"
+       style="font-weight:bold;font-size:2.06812px;line-height:0;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.172343;stroke-dasharray:none"
+       x="2.0857008"
+       y="2.0451365"
        id="text1567"
        inkscape:label="text_nss"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';display:inline;fill:#000000;stroke:none;stroke-width:0.172343"
-         x="0.92347437"
-         y="3.7760248"
-         id="tspan1569"
-         dy="0"
-         inkscape:label="text_s">NS</tspan><text
-         xml:space="preserve"
-         style="font-weight:bold;font-size:2.06812px;line-height:0.8;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:inline;fill:#000000;stroke:none;stroke-width:0.172343;stroke-dasharray:none"
-         x="1.5881114"
-         y="3.5836921"
-         id="text1567-5"
-         inkscape:label="text_ns"><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.172343"
-           x="1.5881114"
-           y="3.5836921"
-           id="tspan1569-3">S</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.172343"
-           x="1.5881114"
-           y="5.3064179"
-           id="tspan1573-1" /></text></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.172343"
+         x="2.0857008"
+         y="2.0451365"
+         id="tspan1569-3"><tspan
+           dy="0"
+           id="tspan1327"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke:none;stroke-width:0.172343">NS</tspan></tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.172343"
+         x="2.0857008"
+         y="3.6996324"
+         id="tspan1329">S</tspan></text>
     <rect
-       style="display:none;fill:url(#linearGradient1207);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:#80b3ff;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-dasharray:none"
        id="rect238-1-8"
-       width="3.4572225"
-       height="3.4572222"
-       x="0.38805583"
-       y="0.38805583"
-       inkscape:label="blue_rect" />
+       width="3.7041667"
+       height="3.7041667"
+       x="0.26458332"
+       y="0.26458332"
+       inkscape:label="blue_rect"
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1653"
+       style="font-weight:bold;font-size:2.03865px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.169887;stroke-dasharray:none"
+       x="0.55018777"
+       y="2.8144534"
+       id="text1451"
        inkscape:label="text_mn"><tspan
          sodipodi:role="line"
-         id="tspan1651"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">MN</tspan></text>
+         id="tspan1449"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.169887"
+         x="0.55018777"
+         y="2.8144534">MN</tspan></text>
     <rect
-       style="display:none;fill:url(#linearGradient1250);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:#ff80e5;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-dasharray:none"
        id="rect238-1-8-9"
-       width="3.4572225"
-       height="3.4572222"
-       x="0.38805583"
-       y="0.38805583"
-       inkscape:label="violet_rect" />
+       width="3.7041667"
+       height="3.7041667"
+       x="0.26458332"
+       y="0.26458332"
+       inkscape:label="violet_rect"
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1795"
+       style="font-weight:bold;font-size:2.03865px;font-family:Neris;-inkscape-font-specification:'Neris Bold';letter-spacing:0.124354px;display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.169887;stroke-dasharray:none"
+       x="0.9338361"
+       y="2.8226161"
+       id="text1589"
        inkscape:label="text_mi"><tspan
          sodipodi:role="line"
-         id="tspan1793"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">MI</tspan></text>
+         id="tspan1587"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.169887"
+         x="0.9338361"
+         y="2.8226161">MI</tspan></text>
     <rect
-       style="display:none;fill:url(#linearGradient1293);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:none;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.246945;stroke-dasharray:none"
        id="rect238-1-8-9-9"
        width="3.4572225"
        height="3.4572222"
        x="0.38805583"
        y="0.38805583"
-       inkscape:label="green_rect" />
+       inkscape:label="green_rect"
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1838"
+       style="font-weight:bold;font-size:1.80424px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.150353;stroke-dasharray:none"
+       x="0.66553801"
+       y="2.728287"
+       id="text1852"
        inkscape:label="text_md"><tspan
          sodipodi:role="line"
-         id="tspan1836"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">MD</tspan></text>
+         id="tspan1850"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.150353"
+         x="0.66553801"
+         y="2.728287">MD</tspan></text>
     <rect
-       style="display:none;fill:url(#linearGradient1336);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
+       style="display:inline;fill:#ff8080;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-dasharray:none"
        id="rect238-1-8-9-9-0"
-       width="3.4572225"
-       height="3.4572222"
-       x="0.38805583"
-       y="0.38805583"
-       inkscape:label="red_rect" />
+       width="3.7041667"
+       height="3.7041667"
+       x="0.26458332"
+       y="0.26458332"
+       inkscape:label="red_rect"
+       ry="0.52916664"
+       rx="0.52916664" />
     <text
        xml:space="preserve"
-       style="font-weight:bold;font-size:2.51706px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:none;opacity:1;fill:#000000;stroke:none;stroke-width:0.209755;stroke-dasharray:none"
-       x="0.60863525"
-       y="2.8155406"
-       id="text1986"
+       style="font-weight:bold;font-size:1.80424px;font-family:Neris;-inkscape-font-specification:'Neris Bold';display:inline;opacity:1;fill:#000000;stroke:none;stroke-width:0.150353;stroke-dasharray:none"
+       x="0.75532806"
+       y="2.7364497"
+       id="text1903"
        inkscape:label="text_mb"><tspan
          sodipodi:role="line"
-         id="tspan1984"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New Bold';fill:#000000;stroke:none;stroke-width:0.209755"
-         x="0.60863525"
-         y="2.8155406">MB</tspan></text>
+         id="tspan1901"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#000000;stroke:none;stroke-width:0.150353"
+         x="0"
+         y="0">MB</tspan></text>
     <rect
        style="display:none;fill:url(#linearGradient1713);fill-opacity:1;stroke:#000000;stroke-width:0.246945;stroke-dasharray:none"
        id="rect238-1-8-9-9-0-5"
@@ -428,7 +297,7 @@
        height="3.4572222"
        x="0.38805583"
        y="0.38805583"
-       inkscape:label="red_roundrect"
+       inkscape:label="red_darkrect"
        ry="1.0611548" />
     <text
        xml:space="preserve"
