@@ -3159,6 +3159,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<FileFilter> xflFilters = new ArrayList<>();
         List<FLAVersion> versions = new ArrayList<>();
         boolean isAS3 = swf.isAS3();
+        Map<FileFilter, String> filterToVersion = new HashMap<>();
+        Map<FileFilter, Boolean> filterToCompressed = new HashMap<>();
+        
+        FLAVersion lastVersion = FLAVersion.fromString(Configuration.lastFlaExportVersion.get("CS6"));
+        boolean lastCompressed = Configuration.lastFlaExportCompressed.get(true);
+        
         for (int i = FLAVersion.values().length - 1; i >= 0; i--) {
             final FLAVersion v = FLAVersion.values()[i];
             if (!isAS3 && v.minASVersion() > 2) {
@@ -3176,11 +3182,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         return translate("filter.fla").replace("%version%", v.applicationName());
                     }
                 };
-                if (v == FLAVersion.CS6) {
+                if (v == lastVersion && lastCompressed) {
                     fc.setFileFilter(f);
                 } else {
                     fc.addChoosableFileFilter(f);
                 }
+                filterToVersion.put(f, "" + v);
+                filterToCompressed.put(f, true);
                 flaFilters.add(f);
                 f = new FileFilter() {
                     @Override
@@ -3193,13 +3201,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         return translate("filter.xfl").replace("%version%", v.applicationName());
                     }
                 };
-                fc.addChoosableFileFilter(f);
+                filterToVersion.put(f, "" + v);                
+                filterToCompressed.put(f, false);
+                
+                if (v == lastVersion && !lastCompressed) {
+                    fc.setFileFilter(f);
+                } else {
+                    fc.addChoosableFileFilter(f);
+                }
                 xflFilters.add(f);
             }
         }
 
         fc.setAcceptAllFileFilterUsed(false);
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            Configuration.lastFlaExportVersion.set(filterToVersion.get(fc.getFileFilter()));
+            Configuration.lastFlaExportCompressed.set(filterToCompressed.get(fc.getFileFilter()));
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 

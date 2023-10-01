@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Show "Renaming identifiers" status on file opening with auto rename identifiers on
 - [#2010] word wrapping in the translation tool
 - ABC Explorer tool
+- FLA export - remember last selected FLA version/compression
 
 ### Fixed
 - [#2043] StartSound2 tag handling
