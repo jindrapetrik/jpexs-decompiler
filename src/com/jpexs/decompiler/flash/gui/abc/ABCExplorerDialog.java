@@ -70,12 +70,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -2227,6 +2230,8 @@ public class ABCExplorerDialog extends AppDialog {
 
     public static class ExplorerTreeCellRenderer extends DefaultTreeCellRenderer {
 
+        Map<String, ImageIcon> iconCache = new HashMap<>();
+        
         public ExplorerTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);
@@ -2274,7 +2279,14 @@ public class ABCExplorerDialog extends AppDialog {
                 HasIcon hi = (HasIcon) value;
                 String iconFile = hi.getIcon().getFile();
                 if (!iconFile.isEmpty()) {
-                    setIcon(View.getIcon(iconFile));
+                    ImageIcon icon;
+                    if (iconCache.containsKey(iconFile)) {
+                        icon = iconCache.get(iconFile);
+                    } else {
+                        icon = View.getIcon(iconFile);
+                        iconCache.put(iconFile, icon);
+                    }
+                    setIcon(icon);
                 }
             } else {
                 setIcon(null);
