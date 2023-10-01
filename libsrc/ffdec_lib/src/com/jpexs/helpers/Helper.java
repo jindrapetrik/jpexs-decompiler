@@ -243,7 +243,7 @@ public class Helper {
 
     public static String joinEscapePCodeString(String glue, Collection<String> collection) {
         StringBuilder sb = new StringBuilder();
-        for (String s:collection) {
+        for (String s : collection) {
             if (sb.length() > 0) {
                 sb.append(glue);
             }
@@ -251,7 +251,7 @@ public class Helper {
         }
         return sb.toString();
     }
-    
+
     /**
      * Escapes string by adding backslashes
      *
@@ -294,6 +294,59 @@ public class Helper {
                     i += num - 1;
                 }
                 ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
+
+    /**
+     * Escapes string by adding backslashes - limits to english characters -
+     * other are unicode escaped.
+     *
+     * @param s String to escape
+     * @return Escaped string
+     */
+    public static String escapePCodeEnglishString(String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n') {
+                ret.append("\\n");
+            } else if (c == '\r') {
+                ret.append("\\r");
+            } else if (c == '\t') {
+                ret.append("\\t");
+            } else if (c == '\b') {
+                ret.append("\\b");
+            } else if (c == '\f') {
+                ret.append("\\f");
+            } else if (c == '\\') {
+                ret.append("\\\\");
+            } else if (c == '"') {
+                ret.append("\\\"");
+            } else if (c == '\'') {
+                ret.append("\\'");
+            } else if (c < 32) {
+                ret.append("\\x").append(byteToHex((byte) c));
+            } else {
+                int num = 1;
+                for (int j = i + 1; j < s.length(); j++) {
+                    if (s.charAt(j) == c) {
+                        num++;
+                    } else {
+                        break;
+                    }
+                }
+                if (num > Configuration.limitSameChars.get()) {
+                    ret.append("\\{").append(num).append("}");
+                    i += num - 1;
+                }
+                if (c >= 128) {
+                    ret.append(String.format("\\u%04x", (int) c));
+                } else {
+                    ret.append(c);
+                }
             }
         }
 
@@ -659,12 +712,12 @@ public class Helper {
     public static <E> E deepCopy(E o) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try ( ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
                 oos.writeObject(o);
                 oos.flush();
             }
             E copy;
-            try ( ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
+            try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
                 copy = (E) ois.readObject();
             }
             return copy;
@@ -674,7 +727,7 @@ public class Helper {
         } catch (StackOverflowError se) {
             throw new StackOverflowError("Stack overflow in deepcopy");
         }
-        
+
     }
 
     public static List<Object> toList(Object... rest) {
@@ -708,7 +761,7 @@ public class Helper {
     public static byte[] readFile(String... file) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (String f : file) {
-            try ( FileInputStream fis = new FileInputStream(f)) {
+            try (FileInputStream fis = new FileInputStream(f)) {
                 byte[] buf = new byte[4096];
                 int cnt;
                 while ((cnt = fis.read(buf)) > 0) {
@@ -812,7 +865,7 @@ public class Helper {
     }
 
     public static void appendFile(String file, byte[]... data) {
-        try ( FileOutputStream fos = new FileOutputStream(file, true)) {
+        try (FileOutputStream fos = new FileOutputStream(file, true)) {
             for (byte[] d : data) {
                 fos.write(d);
             }
@@ -822,7 +875,7 @@ public class Helper {
     }
 
     public static void writeFile(String file, byte[]... data) {
-        try ( FileOutputStream fos = new FileOutputStream(file)) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte[] d : data) {
                 fos.write(d);
             }
@@ -832,7 +885,7 @@ public class Helper {
     }
 
     public static void writeFile(String file, InputStream stream) {
-        try ( FileOutputStream fos = new FileOutputStream(file)) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             copyStream(stream, fos);
         } catch (IOException ex) {
             // ignore
@@ -1181,7 +1234,7 @@ public class Helper {
     public static void saveStream(InputStream is, File output) throws IOException {
         byte[] buf = new byte[4096];
         int cnt;
-        try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(output))) {
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(output))) {
             while ((cnt = is.read(buf)) > 0) {
                 fos.write(buf, 0, cnt);
                 fos.flush();
@@ -1255,8 +1308,7 @@ public class Helper {
 
         return false;
     }
-    
-    
+
     public static String escapeXmlExportString(String s) {
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
@@ -1275,7 +1327,7 @@ public class Helper {
                 ret.append("\\\\");
             } else if (c < 32) {
                 ret.append("\\u00").append(byteToHex((byte) c));
-            } else if (!isCharacterValidInXml(c)){
+            } else if (!isCharacterValidInXml(c)) {
                 ret.append("\\u").append(String.format("%04x", (int) c));
             } else {
                 ret.append(c);
@@ -1284,7 +1336,7 @@ public class Helper {
 
         return ret.toString();
     }
-    
+
     public static String unescapeXmlExportString(String st) {
 
         StringBuilder sb = new StringBuilder(st.length());
@@ -1702,7 +1754,7 @@ public class Helper {
         int dot = version.indexOf(".");
         if (dot != -1) {
             version = version.substring(0, dot);
-        }        
+        }
         return Integer.parseInt(version);
     }
 }
