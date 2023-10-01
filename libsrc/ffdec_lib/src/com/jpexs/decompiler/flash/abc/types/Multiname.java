@@ -269,8 +269,19 @@ public class Multiname {
                 break;
             }
         }
+        String versionAdd = "";
+        if (name != null && name.length() > 0) {
+            char lastChar = name.charAt(name.length() - 1);
+            
+            if (lastChar >= Namespace.MIN_API_MARK && lastChar <= Namespace.MAX_API_MARK) {
+                name = name.substring(0, name.length() - 1);
+                versionAdd = String.format("\\u%04x", (int) lastChar);
+            }
+        }
+        
+        
         return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + 
-                Helper.escapePCodeEnglishString(name) //Note: Versioned ABC files have high unicode characters in namespaces, escape them
+                Helper.escapePCodeString(name) + versionAdd
                 + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
