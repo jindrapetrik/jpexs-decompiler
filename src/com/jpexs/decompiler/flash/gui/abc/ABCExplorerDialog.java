@@ -549,7 +549,7 @@ public class ABCExplorerDialog extends AppDialog {
         }
     }
 
-    private boolean showMethodInfo(int round, ABC abc, int methodInfo, int searchMethodInfo, int scriptIndex, int classIndex, int globalTraitIndex) {
+    private boolean showMethodInfo(int round, ABC abc, int methodInfo, int searchMethodInfo, int scriptIndex, int classIndex, int globalTraitIndex, int scriptTraitIndex) {
         boolean found = false;
         if (methodInfo == searchMethodInfo) {
             found = true;
@@ -582,6 +582,9 @@ public class ABCExplorerDialog extends AppDialog {
         }
         if (found) {
             DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+            if (scriptNameDc == null && scriptTraitIndex > -1) {
+                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+            }
             String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
             //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
             mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
@@ -589,39 +592,42 @@ public class ABCExplorerDialog extends AppDialog {
         return found;
     }
 
-    private boolean showMethodInfoTraits(int round, int scriptIndex, int classIndex, int methodInfo, ABC abc, Traits traits, int traitsType) {
+    private boolean showMethodInfoTraits(int round, int scriptIndex, int classIndex, int methodInfo, ABC abc, Traits traits, int traitsType, int scriptTraitIndex) {
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = (Trait) traits.traits.get(j);
+            if (traitsType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+                scriptTraitIndex = j;
+            }
             int globalTraitIndex = j;
             if (traitsType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
                 globalTraitIndex += abc.class_info.get(classIndex).static_traits.traits.size();
             }
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
-                if (showMethodInfo(round, abc, abc.class_info.get(tc.class_info).cinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_CLASS_INITIALIZER)) {
+                if (showMethodInfo(round, abc, abc.class_info.get(tc.class_info).cinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_CLASS_INITIALIZER, scriptTraitIndex)) {
                     return true;
                 }
 
-                if (showMethodInfo(round, abc, abc.instance_info.get(tc.class_info).iinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+                if (showMethodInfo(round, abc, abc.instance_info.get(tc.class_info).iinit_index, methodInfo, scriptIndex, tc.class_info, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, scriptTraitIndex)) {
                     return true;
                 }
 
-                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.class_info.get(tc.class_info).static_traits, GraphTextWriter.TRAIT_CLASS_INITIALIZER)) {
+                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.class_info.get(tc.class_info).static_traits, GraphTextWriter.TRAIT_CLASS_INITIALIZER, scriptTraitIndex)) {
                     return true;
                 }
-                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.instance_info.get(tc.class_info).instance_traits, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+                if (showMethodInfoTraits(round, scriptIndex, tc.class_info, methodInfo, abc, abc.instance_info.get(tc.class_info).instance_traits, GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, scriptTraitIndex)) {
                     return true;
                 }
             }
             if (t instanceof TraitMethodGetterSetter) {
                 TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
-                if (showMethodInfo(round, abc, tmgs.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex)) {
+                if (showMethodInfo(round, abc, tmgs.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex, scriptTraitIndex)) {
                     return true;
                 }
             }
             if (t instanceof TraitFunction) {
                 TraitFunction tf = (TraitFunction) t;
-                if (showMethodInfo(round, abc, tf.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex)) {
+                if (showMethodInfo(round, abc, tf.method_info, methodInfo, scriptIndex, classIndex, globalTraitIndex, scriptTraitIndex)) {
                     return true;
                 }
             }
@@ -633,10 +639,10 @@ public class ABCExplorerDialog extends AppDialog {
         ABC abc = getSelectedAbc();
         for (int round = 1; round <= 2; round++) {
             for (int i = 0; i < abc.script_info.size(); i++) {
-                if (showMethodInfo(round, abc, abc.script_info.get(i).init_index, methodInfo, i, -1, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
+                if (showMethodInfo(round, abc, abc.script_info.get(i).init_index, methodInfo, i, -1, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, -1)) {
                     return;
                 }
-                if (showMethodInfoTraits(round, i, -1, methodInfo, abc, abc.script_info.get(i).traits, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
+                if (showMethodInfoTraits(round, i, -1, methodInfo, abc, abc.script_info.get(i).traits, GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, -1)) {
                     return;
                 }
             }
@@ -668,6 +674,7 @@ public class ABCExplorerDialog extends AppDialog {
                 case INSTANCE_INFO:
                 case CLASS_INFO:
                     int classIndex = vwi.getIndex();
+                    int scriptTraitIndex = -1;
                     loopc:
                     for (int i = 0; i < abc.script_info.size(); i++) {
                         for (int j = 0; j < abc.script_info.get(i).traits.traits.size(); j++) {
@@ -676,6 +683,7 @@ public class ABCExplorerDialog extends AppDialog {
                                 TraitClass tc = (TraitClass) t;
                                 if (tc.class_info == classIndex) {
                                     scriptIndex = i;
+                                    scriptTraitIndex = j;
                                     break loopc;
                                 }
                             }
@@ -683,6 +691,9 @@ public class ABCExplorerDialog extends AppDialog {
                     }
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc2 = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+                        if (scriptNameDc2 == null && scriptTraitIndex != -1) {
+                            scriptNameDc2 = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                        }
                         String scriptName2 = (scriptNameDc2 == null ? "script_" + scriptIndex : scriptNameDc2.toPrintableString(true));
                         mainPanel.gotoScriptTrait(abc.getSwf(), scriptName2, classIndex, GraphTextWriter.TRAIT_CLASS_INITIALIZER);
                     }
@@ -705,8 +716,10 @@ public class ABCExplorerDialog extends AppDialog {
                     ValueWithIndex wvi = (ValueWithIndex) sv1.getParent();
                     int scriptIndex = -1;
                     int classIndex = -1;
+                    int scriptTraitIndex = -1;
                     if (sv.getParentValue() instanceof ScriptInfo) {
                         scriptIndex = wvi.getIndex();
+                        scriptTraitIndex = traitIndex;
                     } else {
                         classIndex = wvi.getIndex();
                         if (sv.getParentValue() instanceof InstanceInfo) {
@@ -721,6 +734,7 @@ public class ABCExplorerDialog extends AppDialog {
                                     TraitClass tc = (TraitClass) t;
                                     if (tc.class_info == classIndex) {
                                         scriptIndex = i;
+                                        scriptTraitIndex = j;
                                         break loopi;
                                     }
                                 }
@@ -730,8 +744,8 @@ public class ABCExplorerDialog extends AppDialog {
 
                     if (scriptIndex != -1) {
                         DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-                        if (scriptNameDc == null && (sv.getParentValue() instanceof ScriptInfo)) {
-                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(traitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+                        if (scriptNameDc == null && scriptTraitIndex != -1) {
+                            scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
                         }
 
                         String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
