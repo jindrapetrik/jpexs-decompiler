@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import natorder.NaturalOrderComparator;
 
 /**
  *
@@ -37,9 +38,9 @@ public class AS3Package extends AS3ClassTreeItem {
 
     public String packageName;
 
-    private final Map<String, AS3Package> subPackages = new TreeMap<>();
+    private final Map<String, AS3Package> subPackages = new TreeMap<>(new NaturalOrderComparator());
 
-    private final Map<String, ScriptPack> scripts = new TreeMap<>();
+    private final Map<String, ScriptPack> scripts = new TreeMap<>(new NaturalOrderComparator());
 
     private List<AS3Package> sortedPackages;
 
