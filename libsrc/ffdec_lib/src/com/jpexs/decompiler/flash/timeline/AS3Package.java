@@ -38,8 +38,10 @@ public class AS3Package extends AS3ClassTreeItem {
 
     public String packageName;
 
+    @SuppressWarnings("unchecked")
     private final Map<String, AS3Package> subPackages = new TreeMap<>(new NaturalOrderComparator());
 
+    @SuppressWarnings("unchecked")
     private final Map<String, ScriptPack> scripts = new TreeMap<>(new NaturalOrderComparator());
 
     private List<AS3Package> sortedPackages;
