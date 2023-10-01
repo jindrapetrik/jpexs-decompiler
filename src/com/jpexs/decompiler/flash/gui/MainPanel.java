@@ -2445,6 +2445,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void gotoScriptMethod(SWF swf, String scriptName, int methodIndex) {
+        abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
+            @Override
+            public void run() {
+                if (abcPanel != null) {
+                    abcPanel.decompiledTextArea.removeScriptListener(this);                    
+                     abcPanel.decompiledTextArea.gotoMethod(methodIndex);          
+                }
+            }            
+        });
+        gotoScriptName(swf, scriptName);        
+    }
+    
     public void gotoScriptTrait(SWF swf, String scriptName, int classIndex, int traitIndex) {
         abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
             @Override
