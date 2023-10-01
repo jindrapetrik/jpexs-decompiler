@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#2010] word wrapping in the translation tool
 - ABC Explorer tool
 - FLA export - remember last selected FLA version/compression
+- AS3 Natural sorting of packages and script
 
 ### Fixed
 - [#2043] StartSound2 tag handling

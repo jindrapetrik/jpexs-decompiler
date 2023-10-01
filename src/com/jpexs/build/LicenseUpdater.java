@@ -44,7 +44,7 @@ public class LicenseUpdater {
     public static void updateLicense() {
         updateLicenseInDir(new File(".\\src\\"), false);
         updateLicenseInDir(new File(".\\test\\"), false);
-        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\src\\"), true);
+        updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\src\\com\\"), true); //Not in src/ as we need to skip natorder package
         updateLicenseInDir(new File(".\\libsrc\\ffdec_lib\\test\\"), true);
     }
 
