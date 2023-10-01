@@ -63,6 +63,83 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="19.0.0" date="2023-10-01">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1449 Updated Turkish translation</li>
+					<li>#2070 SWF to XML format has new meta fields describing XML export major/minor version (major = uncompatible change)</li>
+					<li>#2070 forceWriteAsLong Tag internal attribute is now visible and editable (including XML export), allows decide whether to write length in tag header as long</li>
+					<li>#2073 Editing of frame count in SWF header (with warning that it won't update ShowFrame count)</li>
+					<li>Show font AS linkage class in its name in the tree (besides font name)</li>
+					<li>#2057 Show all assigned AS linkage classes in the item name (instead just one)</li>
+					<li>Exporting ByteArrayRange in the raw editor with the Export button</li>
+					<li>Export DefineFont4 to OpenType CFF file</li>
+					<li>AS3 - Show `Embed` tag over asset classes (readonly)</li>
+					<li>AS3 - Checkbox for exporting assets embedded using `Embed` (-exportembed in commandline)</li>
+					<li>FLA export - AS3 - Using `Embed` tag for DefineBinaryData, images not extending BitmapData</li>
+					<li>#2066 AS3 Support for api-versioned SWFs</li>
+					<li>AS3 compound scripts (scripts containing multiple external definitions like compiled C code, etc.) have special node per script (script_0, script_1, ...) which contains included classes and script initializer</li>
+					<li>Show "Renaming identifiers" status on file opening with auto rename identifiers on</li>
+					<li>#2010 word wrapping in the translation tool</li>
+					<li>ABC Explorer tool</li>
+					<li>FLA export - remember last selected FLA version/compression</li>
+					<li>AS3 Natural sorting of packages and script</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2043 StartSound2 tag handling</li>
+					<li>PR176 - slow loading of allowed charsets - now lazy loaded</li>
+					<li>PR178 - infinite recursion when getter/setter calls same property of superclass</li>
+					<li>#2070 Handling newlines and tabs in string values inside SWF to XML export</li>
+					<li>#2017, PR179 Classes in same package displayed as fully qualified</li>
+					<li>PR177 AS3 direct editation - Vector literal</li>
+					<li>#2052, #2058 Adding new script placing class to incorrect DoABC tag</li>
+					<li>#2072 AS3 direct editation - incorrectly using trait names of top level classes</li>
+					<li>#2029 Simplify expressions stripping getlex and also ignoring some types of expressions</li>
+					<li>#2052 Detection of switches based on notequal operator</li>
+					<li>#2073 Recalculating frameCount field in SWF header and DefineSprite after deleting frame</li>
+					<li>Handling currently selected tags when using folder preview selection (Not working Replace button, etc.)</li>
+					<li>FLA export - Sprites which do not end with ShowFrame tag</li>
+					<li>PR109 FLA export - large font size of DefineEditText</li>
+					<li>PR110 FLA export - image instances</li>
+					<li>FLA export - missing AS linkage class for fonts</li>
+					<li>#2077 Switch detection problems producing §§goto</li>
+					<li>#2077 AS3 recursion of deleting method with newfunction instruction</li>
+					<li>#2077 AS3 direct editation - incorrect slot names</li>
+					<li>#2077 AS3 direct editation - switch statement missing offset</li>
+					<li>#2077 AS3 allow star string as property name (XML access)</li>
+					<li>#2077 AS3 try..catch parts outside block</li>
+					<li>AS3 try..catch inside loop unneccessary continue</li>
+					<li>#2077 AS3 colliding types in current package with trait names</li>
+					<li>NullPointer on reload / uncache</li>
+					<li>#2076 Auto rename identifiers infinite loop caused by renaming in playerglobal library</li>
+					<li>Not working "Show in Projector" button for DefineFont4 (hide)</li>
+					<li>Proper error message when there is no room for new characters in the font (DefineFont1)</li>
+					<li>Synchronization problems when adding characters to the font vs its display</li>
+					<li>#2086 AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements</li>
+					<li>#2086 AS3 direct editation - not deleting old nested methods when they have multiple usages</li>
+					<li>#2009 Missing images in MacOs icon</li>
+					<li>AS3 Initialization of var in script initializer</li>
+					<li>AS3 Nullpointer on getting multiname which is out of bounds</li>
+					<li>Exceptions on cancelling file loading</li>
+					<li>Switching between openables on session load and on view type change</li>
+					<li>Float/Float4 ABC format support</li>
+					<li>AS3 Hilighting (go to) scripts when script has obfuscated name</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2070 String values inside SWF to XML export are backslash escaped to properly handle newlines and tabs. Older versions of FFDec can read this new format wrong and corrupt SWFs. Major version of SWF to XML export changed to 2.</li>
+					<li>AS3 Compound scripts (scripts containing multiple external definitions like compiled C code, etc.) cannot be directly edited or imported (due to problems with script initializers)</li>
+					<li>#2022 - AS3 - Make script initializer always visible and available instead of config</li>
+					<li>#1355 Import panel moved to separate tab</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Removed AS3 Constants list (tab on navigator) in favor of new ABC Explorer</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.5.0" date="2023-06-25">
 			<description>
 				<p>Added</p>
