@@ -68,9 +68,14 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -549,13 +554,27 @@ public class ABCExplorerDialog extends AppDialog {
         if (methodInfo == searchMethodInfo) {
             found = true;
         } else if (round == 2) {
-            MethodBody body = abc.findBody(methodInfo);
-            if (body != null) {
-                for (AVM2Instruction ins : body.getCode().code) {
-                    if (ins.definition instanceof NewFunctionIns) {
-                        if (ins.operands[0] == methodInfo) {
-                            found = true;
-                            break;
+            Queue<Integer> methods = new ArrayDeque<>();
+            Set<Integer> visitedMethods = new HashSet<>();
+            methods.add(methodInfo);
+
+            loopm:
+            while (!methods.isEmpty()) {
+                methodInfo = methods.poll();
+                if (visitedMethods.contains(methodInfo)) {
+                    continue;
+                }
+                visitedMethods.add(methodInfo);
+                MethodBody body = abc.findBody(methodInfo);
+                if (body != null) {
+                    for (AVM2Instruction ins : body.getCode().code) {
+                        if (ins.definition instanceof NewFunctionIns) {
+                            if (ins.operands[0] == searchMethodInfo) {
+                                found = true;
+                                break loopm;
+                            } else {
+                                methods.add(ins.operands[0]);
+                            }
                         }
                     }
                 }
@@ -564,7 +583,8 @@ public class ABCExplorerDialog extends AppDialog {
         if (found) {
             DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
             String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
-            mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
+            //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
+            mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
         }
         return found;
     }

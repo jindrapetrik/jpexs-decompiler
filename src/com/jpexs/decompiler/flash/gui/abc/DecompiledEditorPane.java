@@ -771,6 +771,32 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
     }
     
+    public void gotoMethod(int methodId) {
+        Highlighting tm = Highlighting.searchIndex(highlightedText.getMethodHighlights(), methodId);
+        if (tm != null) {
+            int pos = 0;
+            if (tm.len > 1) {
+                ignoreCarret = true;
+                int startPos = tm.startPos + tm.len - 1;
+                if (startPos <= getDocument().getLength()) {
+                    setCaretPosition(startPos);
+                }
+                ignoreCarret = false;
+            }
+            pos = tm.startPos;
+
+            final int fpos = pos;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (fpos <= getDocument().getLength()) {
+                        setCaretPosition(fpos);
+                    }
+                }
+            }, 100);
+        }
+    }
+    
     public void gotoTrait(int traitId) {
         boolean isScriptInit = traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
 
