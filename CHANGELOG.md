@@ -24,7 +24,6 @@ All notable changes to this project will be documented in this file.
 - ABC Explorer tool
 - FLA export - remember last selected FLA version/compression
 - AS3 Natural sorting of packages and script
-- AS3 P-code - Escape unicode characters in namespaces (for example in api-versioned files)
 
 ### Fixed
 - [#2043] StartSound2 tag handling
