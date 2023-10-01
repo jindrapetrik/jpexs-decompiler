@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [19.0.0] - 2023-10-01
 ### Added
 - [#1449] Updated Turkish translation
@@ -2966,6 +2968,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.0.0...dev
 [19.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.5.0...version19.0.0
 [18.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.1...version18.5.0
 [18.4.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.0...version18.4.1
