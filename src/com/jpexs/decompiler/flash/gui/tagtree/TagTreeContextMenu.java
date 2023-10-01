@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -1868,7 +1869,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (item instanceof ScriptPack) {
             ScriptPack pack = (ScriptPack)item;
             ABCExplorerDialog dialog = mainPanel.showAbcExplorer(pack.getOpenable(), pack.abc);
-            dialog.selectScriptInfo(pack.scriptIndex);
+            if (!pack.isSimple && !pack.traitIndices.isEmpty()) {
+                dialog.selectTrait(pack.scriptIndex, -1, pack.traitIndices.get(0), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
+            } else {
+                dialog.selectScriptInfo(pack.scriptIndex);
+            }
         }
             
         if (item instanceof AS3Package) {
