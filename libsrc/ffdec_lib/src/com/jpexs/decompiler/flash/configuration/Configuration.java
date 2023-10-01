@@ -918,6 +918,12 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> lastExportEnableEmbed = null;
     
+    @ConfigurationDefaultString("CS6")
+    public static ConfigurationItem<String> lastFlaExportVersion = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
