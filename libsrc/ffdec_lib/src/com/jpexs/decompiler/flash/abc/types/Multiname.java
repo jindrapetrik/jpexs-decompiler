@@ -269,7 +269,9 @@ public class Multiname {
                 break;
             }
         }
-        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + Helper.escapePCodeString(name) + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
+        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + 
+                Helper.escapePCodeEnglishString(name) //Note: Versioned ABC files have high unicode characters in namespaces, escape them
+                + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
     public static String namespaceSetToString(AVM2ConstantPool constants, int index) {
