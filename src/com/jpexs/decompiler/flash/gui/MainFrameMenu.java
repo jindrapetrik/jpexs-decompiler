@@ -162,7 +162,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 try {
                     openable.saveTo(baos);
                     SWF swf = (SWF) openable;
-                    swf.binaryData.binaryData = new ByteArrayRange(baos.toByteArray());
+                    byte data[] = baos.toByteArray();
+                    if (swf.binaryData.usedPacker != null) {
+                       ByteArrayOutputStream encBaos = new ByteArrayOutputStream();
+                       swf.binaryData.usedPacker.encrypt(new ByteArrayInputStream(data), encBaos);
+                       data = encBaos.toByteArray();
+                    }
+                    swf.binaryData.binaryData = new ByteArrayRange(data);
                     swf.binaryData.setModified(true);
                     saved = saveOpenable(swf.binaryData.getSwf()); //save parent swf                   
                 } catch (IOException ex) {
