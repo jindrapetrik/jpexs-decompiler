@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.packers.MochiCryptPacker;
+import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -58,6 +60,13 @@ public class DefineBinaryDataTag extends CharacterTag {
     @Internal
     public SWF innerSwf;
 
+    @Internal
+    public Packer usedPacker;
+
+    private final Packer[] PACKERS = {
+        new MochiCryptPacker()
+    };
+
     /**
      * Constructor
      *
@@ -81,10 +90,10 @@ public class DefineBinaryDataTag extends CharacterTag {
         binaryData = sis.readByteRangeEx(sis.available(), "binaryData");
 
         if (Configuration.autoLoadEmbeddedSwfs.get()) {
-            String path = getSwf().getShortPathTitle()+"/DefineBinaryData (" + getCharacterId() + ")";
+            String path = getSwf().getShortPathTitle() + "/DefineBinaryData (" + getCharacterId() + ")";
             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                            
+
             try {
                 InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
                 SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get(), charset);
@@ -119,6 +128,15 @@ public class DefineBinaryDataTag extends CharacterTag {
         this.tag = characterId;
     }
 
+    public void detectPacker() {
+        for (Packer packer : PACKERS) {
+            if (packer.suitableForBinaryData(this) == Boolean.TRUE) {
+                usedPacker = packer;
+                break;
+            }
+        }
+    }
+
     public boolean isSwfData() {
         try {
             if (binaryData.getLength() > 8) {
@@ -129,8 +147,10 @@ public class DefineBinaryDataTag extends CharacterTag {
             }
         } catch (Exception ex) {
         }
-
-        return false;
+        
+        detectPacker();
+        
+        return usedPacker != null;
     }
 
     @Override

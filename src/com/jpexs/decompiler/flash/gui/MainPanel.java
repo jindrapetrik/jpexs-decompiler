@@ -4978,8 +4978,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                            InputStream is = new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData());
-                            SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
+                            byte data[] = binaryDataTag.binaryData.getRangeData();
+                            String packerAdd = "";
+                            if (binaryDataTag.usedPacker != null) {
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
+                                binaryDataTag.usedPacker.decrypt(new ByteArrayInputStream(data), baos);
+                                data = baos.toByteArray();
+                                packerAdd = " - " + binaryDataTag.usedPacker.getName();
+                            }
+                            InputStream is = new ByteArrayInputStream(data);
+                            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd +")", new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
