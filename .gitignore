@@ -90,3 +90,6 @@ exported1.all.bin
 /libsrc/nellymoser/dist/
 /libsrc/nellymoser/build/
 /libsrc/ttf/dist/
+/libsrc/gifreader/nbproject/private/
+/libsrc/gifreader/dist/
+/libsrc/gifreader/build/

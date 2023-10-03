@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#2090] Support for Mochicrypt packed binarydata tags - loading SWF as subtree
+- [#2079] Replace DefineSprite with GIF
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3121,6 +3122,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
+[#2079]: https://www.free-decompiler.com/flash/issues/2079
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073

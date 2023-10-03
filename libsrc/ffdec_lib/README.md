@@ -28,6 +28,7 @@ These include:
 * DDSReader - `ddsreader.jar` - DDS images reading (GFX files)
 * Reality Interactive ImageIO TGA library - `tga.jar` - TGA images reading (GFX files)
 * Flashdebugger library - `flashdebugger.jar` - Flash debugging
+* Open Imaging GIF Decoder - `gifreader.jar` - Importing GIFs
 
 ## Basic library usage
 ```java
@@ -166,6 +167,7 @@ And also links to these libraries:
 * [Reality Interactive ImageIO TGA library] (TGA file display in GFX files) - LGPL v2.1
 * [flashdebugger library] (Debugging ActionScript) - LGPLv3
 * [Java Native Access - JNA] (Registry association, Process memory reading) - LGPL
+* [Open Imaging GIF Decoder] (GIF file importing) - Apache License 2.0
 
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
@@ -182,3 +184,4 @@ And also links to these libraries:
 [Reality Interactive ImageIO TGA library]: https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga
 [flashdebugger library]: https://github.com/jindrapetrik/flashdebugger
 [Java Native Access - JNA]: https://github.com/twall/jna
+[Open Imaging GIF Decoder]: https://github.com/DhyanB/Open-Imaging
