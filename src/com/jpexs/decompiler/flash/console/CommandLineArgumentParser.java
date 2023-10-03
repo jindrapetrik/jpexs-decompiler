@@ -3346,6 +3346,14 @@ public class CommandLineArgumentParser {
                                 System.err.println("Import FAILED: " + iex.getMessage());
                                 System.exit(1);
                             }
+                        } else if (characterTag instanceof DefineSpriteTag) {
+                            DefineSpriteTag sprite = (DefineSpriteTag) characterTag;
+                            try {
+                                new SpriteImporter().importSprite(sprite, new ByteArrayInputStream(data));
+                            } catch (IOException iex) {
+                                System.err.println("Import FAILED: " + iex.getMessage());
+                                System.exit(1);
+                            }
                         } else {
                             System.err.println("The specified tag type is not supported for import");
                             System.exit(1);
