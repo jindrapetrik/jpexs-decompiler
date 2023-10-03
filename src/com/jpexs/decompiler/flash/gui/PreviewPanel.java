@@ -403,7 +403,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceSpriteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceWithGifButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
+                mainPanel.replaceSpriteWithGifButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
             }
         });
         replaceSpriteButton.setVisible(false);

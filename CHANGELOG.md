@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#2090] Support for Mochicrypt packed binarydata tags - loading SWF as subtree
-- [#2079] Replace DefineSprite with GIF
+- [#2079] Replace DefineSprite with GIF, Bulk import sprites from GIFs
 
 ## [19.0.0] - 2023-10-01
 ### Added

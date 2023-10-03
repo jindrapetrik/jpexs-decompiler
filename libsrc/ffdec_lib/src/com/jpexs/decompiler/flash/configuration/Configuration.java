@@ -924,6 +924,9 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportSpriteInfo = null;
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

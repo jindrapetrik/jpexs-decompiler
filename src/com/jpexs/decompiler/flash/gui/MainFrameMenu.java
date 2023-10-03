@@ -380,6 +380,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importShape((SWF) openable, true);
     }
+    
+    protected void importSpritesActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+        mainFrame.getPanel().importSprite((SWF) openable);
+    }
 
     protected void importMoviesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
@@ -1031,6 +1041,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/import/importtab/importText", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/import/importtab/importScript", allSameOpenable && openableSelected && !isWorking);
         setMenuEnabled("/import/importtab/importImages", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/import/importtab/importSprites", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/import/importtab/importShapes", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/import/importtab/importShapesNoFill", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/import/importtab/importMovies", allSameSwf && swfSelected && !isWorking);
@@ -1164,6 +1175,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/import/importtab/importImages", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importShapes", translate("menu.file.import.shape"), "importshape32", this::importShapesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/import/importtab/importSprites", translate("menu.file.import.sprite"), "importsprite32", this::importSpritesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importMovies", translate("menu.file.import.movie"), "importmovie32", this::importMoviesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
         addMenuItem("/import/importtab/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);

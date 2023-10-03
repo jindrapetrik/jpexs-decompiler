@@ -22,20 +22,27 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
-import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -144,5 +151,71 @@ public class SpriteImporter {
         swf.resetTimeline();
 
         return true;
+    }
+    
+    public int bulkImport(File spritesDir, SWF swf, boolean printOut) {    
+        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        int spriteCount = 0;
+        List<String> extensions = Arrays.asList("gif");
+        File allFiles[] = spritesDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String nameLower = name.toLowerCase();
+                for (String ext : extensions) {
+                    if (nameLower.endsWith("." + ext)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        for (int characterId : characters.keySet()) {
+            CharacterTag tag = characters.get(characterId);
+            if (tag instanceof DefineSpriteTag) {
+                DefineSpriteTag spriteTag = (DefineSpriteTag) tag;
+                List<File> existingFilesForSpriteTag = new ArrayList<>();
+                for (File f : allFiles) {
+                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                        existingFilesForSpriteTag.add(f);
+                    }
+                }
+                existingFilesForSpriteTag.sort(new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                        if (ret == 0) {
+                            return o1.getName().compareTo(o2.getName());
+                        }
+                        return ret;
+                    }
+                });
+
+                if (existingFilesForSpriteTag.isEmpty()) {
+                    continue;
+                }
+
+                if (existingFilesForSpriteTag.size() > 1) {
+                    Logger.getLogger(SpriteImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sprite tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSpriteTag.get(0).getName()});
+                }
+                File sourceFile = existingFilesForSpriteTag.get(0);
+
+                if (printOut) {
+                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
+                    }
+                    
+                try(FileInputStream fis = new FileInputStream(sourceFile.getAbsolutePath())) {
+                    importSprite(spriteTag, fis);
+                    spriteCount++;
+                } catch (IOException ex) {
+                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sprite " + characterId + " from file " + sourceFile.getName(), ex);
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+            }
+        }
+        return spriteCount;
     }
 }
