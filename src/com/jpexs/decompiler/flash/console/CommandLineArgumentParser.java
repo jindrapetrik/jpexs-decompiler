@@ -221,6 +221,7 @@ import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.SoundImporter;
+import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
@@ -623,6 +624,11 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("importimages")) {
             out.println(" " + (cnt++) + ") -importImages <infile> <outfile> <imagesfolder>");
             out.println(" ...imports images to <infile> and saves the result to <outfile>");
+        }
+        
+        if (filter == null || filter.equals("importsprites")) {
+            out.println(" " + (cnt++) + ") -importSprites <infile> <outfile> <spritesfolder>");
+            out.println(" ...imports sprites to <infile> and saves the result to <outfile>");
         }
 
         if (filter == null || filter.equals("importtext")) {
@@ -1098,6 +1104,9 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("importimages")) {
             parseImportImages(args, charset);
+            System.exit(0);
+        } else if (command.equals("importsprites")) {
+            parseImportSprites(args, charset);
             System.exit(0);
         } else if (command.equals("importtext")) {
             parseImportText(args, charset);
@@ -4031,6 +4040,42 @@ public class CommandLineArgumentParser {
         }
     }
 
+    private static void parseImportSprites(Stack<String> args, String charset) {
+        if (args.size() < 3) {
+            badArguments("importsprites");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+
+        try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            System.out.println("Source file opened");
+            String selFile = args.pop();
+
+            File spritesDir = new File(Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME));
+            if (spritesDir.exists()) {
+                System.out.println("Using the directory: " + spritesDir.getAbsolutePath());
+            } else {
+                spritesDir = new File(selFile);
+            }
+            if (!spritesDir.exists()) {
+                System.err.println("Sprites directory does not exist: " + spritesDir.getAbsolutePath());
+                System.exit(1);
+            }
+            SpriteImporter spriteImporter = new SpriteImporter();
+            int spriteCount = spriteImporter.bulkImport(spritesDir, swf, true);
+            System.out.println("Writing outfile");
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                swf.saveTo(fos);
+            }
+            System.out.println("" + spriteCount + " sprites successfully imported");
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during writing");
+            System.exit(2);
+        }
+    }
+    
     private static void parseImportText(Stack<String> args, String charset) {
         if (args.size() < 3) {
             badArguments("importtext");
