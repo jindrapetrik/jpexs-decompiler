@@ -363,7 +363,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithGifMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceWithGifButtonActionPerformed(getCurrentItem());
+                mainPanel.replaceSpriteWithGifButtonActionPerformed(getCurrentItem());
             }
         });
         replaceWithGifMenuItem.setIcon(View.getIcon("replacesprite16"));
