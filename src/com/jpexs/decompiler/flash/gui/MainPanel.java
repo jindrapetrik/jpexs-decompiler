@@ -131,6 +131,7 @@ import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.ScriptImporterProgressListener;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SoundImporter;
+import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
@@ -4438,6 +4439,33 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void replaceWithGifButtonActionPerformed(TreeItem item) {
+        if (item == null) {
+            return;
+        }
+        if (item instanceof DefineSpriteTag) {
+            String filter = "filter.images|*.gif";
+            File selectedFile = showImportFileChooser(filter, false);
+            if (selectedFile != null) {
+                File selfile = Helper.fixDialogFile(selectedFile);
+                DefineSpriteTag sprite = (DefineSpriteTag)item;
+                SWF swf = sprite.getSwf();
+                try(FileInputStream fis = new FileInputStream(selfile)){
+                    SpriteImporter spriteImporter = new SpriteImporter();
+                    spriteImporter.importSprite((DefineSpriteTag)item, fis);
+                    
+                    swf.clearImageCache();
+                    swf.clearShapeCache();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, "Invalid image", ex);
+                    ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                reload(true);
+                refreshTree(swf);
+            }
+        }
+    }
+    
     public void replaceNoFillButtonActionPerformed(TreeItem item) {
         if (item == null) {
             return;
@@ -5058,10 +5086,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showDisplayEditTagPanel((PlaceObjectTypeTag) treeItem, frame);
         } else if (treeItem instanceof ShapeTag) {
             previewPanel.showDisplayEditTagPanel((ShapeTag) treeItem, 0);
-            previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false, false, false);
+            previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false, false, false, false);
         } else if (treeItem instanceof MorphShapeTag) {
             previewPanel.showDisplayEditTagPanel((MorphShapeTag) treeItem, 0);
-            previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, !((Tag) treeItem).isReadOnly());
+            previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, !((Tag) treeItem).isReadOnly(), false);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
@@ -5076,7 +5104,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showUnknownPanel(unknownTag);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false, false, false);
+            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false, false, false, false);
             SWF imageSWF = makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true, true, false, false);
 
@@ -5092,10 +5120,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             previewPanel.setParametersPanelVisible(false);
             if (treeItem instanceof ShapeTag) {
-                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false, false, false);
+                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false, false, false, false);
             }
             if (treeItem instanceof DefineVideoStreamTag) {
-                previewPanel.setImageReplaceButtonVisible(false, false, false, false, !((Tag) treeItem).isReadOnly(), false);
+                previewPanel.setImageReplaceButtonVisible(false, false, false, false, !((Tag) treeItem).isReadOnly(), false, false);
+            }
+            if (treeItem instanceof DefineSpriteTag) {
+                previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, !((Tag) treeItem).isReadOnly());
             }
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag) || (treeItem instanceof ShapeTag));
         } else if (treeItem instanceof Frame && internalViewer) {
@@ -5112,7 +5143,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 if (!Configuration.autoPlaySounds.get()) {
@@ -5258,7 +5289,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         stopFlashPlayer();
 
-        previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false);
+        previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, false);
 
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
