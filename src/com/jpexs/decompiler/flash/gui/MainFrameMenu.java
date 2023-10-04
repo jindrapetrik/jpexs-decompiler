@@ -259,13 +259,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
     }
 
-    private void enumerateListsToClose(Set<OpenableList> listsToClose, Openable openable) {
+    private void enumerateListsToClose(Set<OpenableList> listsToClose, Openable openable, List<SWF> binaryDataClosedSwfs) {
         if (openable instanceof SWF) {
             SWF swf = (SWF) openable;
             if (swf.binaryData != null) {
                 // embedded swf
                 swf.binaryData.innerSwf = null;
                 swf.clearTagSwfs();
+                binaryDataClosedSwfs.add(swf);
             } else {
                 listsToClose.add(swf.openableList);
             }
@@ -282,16 +283,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
         Set<OpenableList> listsToClose = new LinkedHashSet<>();
+        List<SWF> binaryDataClosedSwfs = new ArrayList<>();
+        
         for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
             if (item instanceof OpenableList) {
                 listsToClose.add((OpenableList) item);
             } else {
                 Openable itemOpenable = item.getOpenable();
-                enumerateListsToClose(listsToClose, itemOpenable);
+                enumerateListsToClose(listsToClose, itemOpenable, binaryDataClosedSwfs);
             }
         }
-        if (openable != null) {
-            enumerateListsToClose(listsToClose, openable);
+        if (openable != null && !binaryDataClosedSwfs.contains(openable)) {
+            enumerateListsToClose(listsToClose, openable, binaryDataClosedSwfs);
         }
         for (OpenableList list : listsToClose) {
             Main.closeFile(list);
