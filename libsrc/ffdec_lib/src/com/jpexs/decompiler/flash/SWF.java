@@ -1533,6 +1533,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
             assignExportNamesToSymbols();
             assignClassesToSymbols();
+            if (Configuration.autoLoadEmbeddedSwfs.get()) {
+                loadAllEmbeddedSwfs();
+            }                
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
             boolean hasNonUnknownTag = false;
@@ -1560,6 +1563,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         getASMs(true); // Add scriptNames to ASMs                     
     }
 
+    private void loadAllEmbeddedSwfs()
+    {
+        for (Tag t : getTags()) {
+            if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag binaryData = (DefineBinaryDataTag) t;
+                binaryData.loadEmbeddedSwf();
+            }
+        }
+    }
+    
     private void resolveImported(UrlResolver resolver) {
         for (int p = 0; p < tags.size(); p++) {
             Tag t = tags.get(p);
@@ -2472,7 +2485,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             val >>= 8;
         }
     }
-
+    
     public static void createWavFromPcmData(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
         ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
         int audioFormat = 1; // PCM
