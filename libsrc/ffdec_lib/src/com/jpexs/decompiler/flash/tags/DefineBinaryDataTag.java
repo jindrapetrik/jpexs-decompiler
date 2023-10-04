@@ -88,30 +88,31 @@ public class DefineBinaryDataTag extends CharacterTag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         tag = sis.readUI16("tag");
         reserved = sis.readUI32("reserved");
-        binaryData = sis.readByteRangeEx(sis.available(), "binaryData");
+        binaryData = sis.readByteRangeEx(sis.available(), "binaryData");        
+    }
+    
+    public void loadEmbeddedSwf()
+    {
+        String path = getSwf().getShortPathTitle() + "/DefineBinaryData (" + getCharacterId() + ")";
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
+        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
 
-        if (Configuration.autoLoadEmbeddedSwfs.get()) {
-            String path = getSwf().getShortPathTitle() + "/DefineBinaryData (" + getCharacterId() + ")";
-            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
-            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-
-            try {
-                InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
-                detectPacker();
-                String packerAdd = "";
-                if (usedPacker != null) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
-                    usedPacker.decrypt(is, baos);
-                    is = new ByteArrayInputStream(baos.toByteArray());
-                    packerAdd = " - " + usedPacker.getName();
-                }
-
-                SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", Configuration.parallelSpeedUp.get(), charset);
-                innerSwf = bswf;
-                bswf.binaryData = this;
-            } catch (IOException | InterruptedException ex) {
-                // ignore
+        try {
+            InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
+            detectPacker();
+            String packerAdd = "";
+            if (usedPacker != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
+                usedPacker.decrypt(is, baos);
+                is = new ByteArrayInputStream(baos.toByteArray());
+                packerAdd = " - " + usedPacker.getName();
             }
+
+            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", Configuration.parallelSpeedUp.get(), charset);
+            innerSwf = bswf;
+            bswf.binaryData = this;
+        } catch (IOException | InterruptedException ex) {
+            // ignore
         }
     }
 
