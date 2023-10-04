@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
+- [#2093] AS3 Unnecessary use of fully qualified names for classes in same package
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3126,6 +3127,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
+[#2093]: https://www.free-decompiler.com/flash/issues/2093
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
