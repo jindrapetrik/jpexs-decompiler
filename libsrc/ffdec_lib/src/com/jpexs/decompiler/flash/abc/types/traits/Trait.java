@@ -277,6 +277,9 @@ public abstract class Trait implements Cloneable, Serializable {
 
         for (DottedChain imp : imports) {
             if (imp.getLast().equals("*")) {
+                if (imp.getWithoutLast().equals(ignorePackage)) {
+                    continue;
+                }
                 Set<String> objectsInPkg = abcIndex.getPackageObjects(imp.getWithoutLast());
                 for (String objectName : objectsInPkg) {
                     if (importnames.contains(objectName)) {

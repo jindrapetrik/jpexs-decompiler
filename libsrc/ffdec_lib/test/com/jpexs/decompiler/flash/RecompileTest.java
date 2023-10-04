@@ -71,6 +71,7 @@ public class RecompileTest extends FileTestBase {
         try {
             try ( FileInputStream fis = new FileInputStream(filePath)) {
                 Configuration._debugCopy.set(true);
+                Configuration.autoRenameIdentifiers.set(false);
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 swf.saveTo(new ByteArrayOutputStream());
             }
