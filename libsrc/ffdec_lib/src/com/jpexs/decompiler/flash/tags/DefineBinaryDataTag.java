@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -96,7 +97,16 @@ public class DefineBinaryDataTag extends CharacterTag {
 
             try {
                 InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
-                SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get(), charset);
+                detectPacker();
+                String packerAdd = "";
+                if (usedPacker != null) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
+                    usedPacker.decrypt(is, baos);
+                    is = new ByteArrayInputStream(baos.toByteArray());
+                    packerAdd = " - " + usedPacker.getName();
+                }
+
+                SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", Configuration.parallelSpeedUp.get(), charset);
                 innerSwf = bswf;
                 bswf.binaryData = this;
             } catch (IOException | InterruptedException ex) {
