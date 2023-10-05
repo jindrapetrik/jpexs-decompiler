@@ -93,3 +93,6 @@ exported1.all.bin
 /libsrc/gifreader/nbproject/private/
 /libsrc/gifreader/dist/
 /libsrc/gifreader/build/
+/libsrc/miterstroke/nbproject/private/
+/libsrc/miterstroke/build/
+/libsrc/miterstroke/dist/

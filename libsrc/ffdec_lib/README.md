@@ -29,6 +29,7 @@ These include:
 * Reality Interactive ImageIO TGA library - `tga.jar` - TGA images reading (GFX files)
 * Flashdebugger library - `flashdebugger.jar` - Flash debugging
 * Open Imaging GIF Decoder - `gifreader.jar` - Importing GIFs
+* Miter clip - modified openjdk8 Stroker - `miterclip.jar` - Support for miter clip join style in shapes
 
 ## Basic library usage
 ```java
@@ -154,6 +155,7 @@ It uses modified code of these libraries:
 * [Animated GIF Writer] (Frames to GIF export) - Creative Commons Attribution 3.0 Unported
 * [Animated GIF Encoder] (Frames to GIF export)
 * [gnujpdf] (PDF export) - LGPL License
+* [openjdk8 Stroker] (Shapes - Miter clip drawing) - GPL License
 
 And also links to these libraries:
 
@@ -185,3 +187,4 @@ And also links to these libraries:
 [flashdebugger library]: https://github.com/jindrapetrik/flashdebugger
 [Java Native Access - JNA]: https://github.com/twall/jna
 [Open Imaging GIF Decoder]: https://github.com/DhyanB/Open-Imaging
+[openjdk8 Stroker]: https://github.com/JetBrains/jdk8u_jdk
