@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Close action on SWF inside DefineBinaryData
 - [#2093] AS3 Unnecessary use of fully qualified names for classes in same package
+- [#1678] Shapes - Miter clip join style
 
 ## [19.0.0] - 2023-10-01
 ### Added

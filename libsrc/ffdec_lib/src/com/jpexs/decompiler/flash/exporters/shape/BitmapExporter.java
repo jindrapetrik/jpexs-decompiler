@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -29,6 +28,7 @@ import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.graphics.ExtendedBasicStroke;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -452,10 +452,11 @@ public class BitmapExporter extends ShapeExporterBase {
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
-            if (Configuration.allowMiterClipLinestyle.get()) {
+            //lineStroke =  new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
+            /*if (Configuration.allowMiterClipLinestyle.get()) {
                 lineStroke = new MiterClipBasicStroke((BasicStroke) lineStroke);
-            }
+            }*/
+            lineStroke = new ExtendedBasicStroke((float)thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
