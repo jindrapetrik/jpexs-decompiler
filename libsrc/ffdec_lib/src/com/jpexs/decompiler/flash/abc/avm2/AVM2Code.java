@@ -1434,15 +1434,27 @@ public class AVM2Code implements Cloneable {
 
     private int toSourceCount = 0;
 
-    public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc) {
+    public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc, int maxRegs) {
         Map<Integer, String> regIndexToName = new HashMap<>();
         Map<String, Integer> regNameToIndex = new HashMap<>();
+        
+        Set<String> reservedRegNames = new HashSet<>();
+        for (int i = 0; i < maxRegs; i++) {
+            reservedRegNames.add(String.format(Configuration.registerNameFormat.get(), i));
+        }
 
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
                     String v = abc.constants.getString(ins.operands[1]);
-                    int regIndex = ins.operands[2] + 1;
+                    
+                    if (reservedRegNames.contains(v)) {
+                        //do not allow reassigning reserved _loc%d_ format to other local regs
+                        continue;
+                    }
+                    
+                    int regIndex = ins.operands[2] + 1;                    
+                    
                     // Same name already exists, it may be wrong names inserted by obfuscator
                     if (regNameToIndex.containsKey(v)) {
                         int existingIndex = regNameToIndex.get(v);

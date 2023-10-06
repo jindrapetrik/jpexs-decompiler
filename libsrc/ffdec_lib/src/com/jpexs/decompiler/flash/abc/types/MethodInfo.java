@@ -310,7 +310,7 @@ public class MethodInfo {
     public GraphTextWriter getParamStr(GraphTextWriter writer, AVM2ConstantPool constants, MethodBody body, ABC abc, List<DottedChain> fullyQualifiedNames) {
         Map<Integer, String> localRegNames = new HashMap<>();
         if (body != null && Configuration.getLocalNamesFromDebugInfo.get()) {
-            localRegNames = body.getCode().getLocalRegNamesFromDebug(abc);
+            localRegNames = body.getCode().getLocalRegNamesFromDebug(abc, body.max_regs);
         }
 
         for (int i = 0; i < param_types.length; i++) {

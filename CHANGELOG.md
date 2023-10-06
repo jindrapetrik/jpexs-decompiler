@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2094] AS3 do not show body trait variables as FQN
 - [#2094] AS3 Missing use namespace
 - [#2094] AS3 missing star type on var and const
+- [#2094] AS3 Getting register names from debug info - do not allow assigning `_locX_` name to other register than X
 
 ## [19.0.0] - 2023-10-01
 ### Added
