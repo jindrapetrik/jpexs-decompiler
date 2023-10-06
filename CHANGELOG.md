@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2094] Embed font name taken from the fontTag, not DefineFontName
 - AS3 Simplify expressions - Do not convert this to {} when coerced
 - AS3 incorrect private modifier on internal namespaced traits of private class inside script
+- [#2095] AS3 Changing script when debugging
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3138,6 +3139,7 @@ Major version of SWF to XML export changed to 2.
 [#2093]: https://www.free-decompiler.com/flash/issues/2093
 [#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
+[#2095]: https://www.free-decompiler.com/flash/issues/2095
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
