@@ -127,7 +127,15 @@ public class CoerceAVM2Item extends AVM2Item {
             return false;
         }
         dependencies.add(value);
-        return value.isConvertedCompileTime(dependencies);
+        switch(typeObj.toString()) {
+            case "String":
+            case "Boolean":
+            case "int":
+            case "uint":
+            case "Number":
+                return value.isConvertedCompileTime(dependencies);              
+        }
+        return false;              
     }
 
     @Override

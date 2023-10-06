@@ -31,7 +31,7 @@ public class ObjectType implements Callable {
     public static final ObjectType EMPTY_OBJECT = new ObjectType();
 
     protected Map<String, Object> attributes;
-
+    
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
     }

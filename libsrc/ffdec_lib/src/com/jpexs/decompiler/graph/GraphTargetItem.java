@@ -180,7 +180,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             case "Boolean":
                 r = EcmaScript.toBoolean(r);
                 break;
-        }
+            }
 
         GraphTargetItem it2 = valToItem(r);
         if (it2 == null) {
