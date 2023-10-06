@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1678] Shapes - Miter clip join style
 - [#2094] AS3 do not show body trait variables as FQN
 - [#2094] AS3 Missing use namespace
+- [#2094] AS3 missing star type on var and const
 
 ## [19.0.0] - 2023-10-01
 ### Added
