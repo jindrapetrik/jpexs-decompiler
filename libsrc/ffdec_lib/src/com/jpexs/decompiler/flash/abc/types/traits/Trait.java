@@ -177,7 +177,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return getName(abc).getSimpleNamespaceName(abc.constants);
     }
 
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         if (ignoredCustom == null) {
             Multiname m = getName(abc);
             int nskind = m.getSimpleNamespaceKind(abc.constants);
@@ -185,7 +185,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 ignoredCustom = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
+        DependencyParser.parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
@@ -261,7 +261,8 @@ public abstract class Trait implements Cloneable, Serializable {
         if (nskind == Namespace.KIND_NAMESPACE) {
             customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
         }
-        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>());
+        List<String> uses = new ArrayList<>();
+        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses);
 
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
@@ -345,6 +346,13 @@ public abstract class Trait implements Cloneable, Serializable {
             }
         }
         if (hasImport) {
+            writer.newLine();
+        }
+        
+        if (!uses.isEmpty()) {
+            for (String u:uses) {
+                writer.appendNoHilight("use namespace " + u + ";").newLine();
+            }
             writer.newLine();
         }
     }

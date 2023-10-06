@@ -85,31 +85,31 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
-        super.getDependencies(abcIndex, scriptIndex, -1, false, customNs, abc, dependencies, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames);
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+        super.getDependencies(abcIndex, scriptIndex, -1, false, customNs, abc, dependencies, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames, uses);
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         //DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
         if (instanceInfo.super_index > 0) {
-            DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames, DependencyType.INHERITANCE);
+            DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
         }
         for (int i : instanceInfo.interfaces) {
-            DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(i), packageName, fullyQualifiedNames, DependencyType.INHERITANCE);
+            DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(i), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
         }
 
         //static
-        classInfo.static_traits.getDependencies(abcIndex, scriptIndex, class_info, true, customNs, abc, dependencies, packageName, fullyQualifiedNames);
+        classInfo.static_traits.getDependencies(abcIndex, scriptIndex, class_info, true, customNs, abc, dependencies, packageName, fullyQualifiedNames, uses);
 
         //static initializer
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, true, customNs, abc, classInfo.cinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>());
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, true, customNs, abc, classInfo.cinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses);
 
         //instance
-        instanceInfo.instance_traits.getDependencies(abcIndex, scriptIndex, class_info, false, customNs, abc, dependencies, packageName, fullyQualifiedNames);
+        instanceInfo.instance_traits.getDependencies(abcIndex, scriptIndex, class_info, false, customNs, abc, dependencies, packageName, fullyQualifiedNames, uses);
 
         //instance initializer
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNs, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>());
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNs, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses);
     }
 
     @Override
