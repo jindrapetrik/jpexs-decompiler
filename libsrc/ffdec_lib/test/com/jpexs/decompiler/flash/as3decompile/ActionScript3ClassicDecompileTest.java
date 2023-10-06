@@ -1998,6 +1998,16 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testVarFqn() {
+        decompileMethod("classic", "testVarFqn", "var b:int = TestClass + 5;\r\n"
+                + "var f:Function = function(x:int, y:int):int\r\n"
+                + "{\r\n"
+                + "return x + y + TestClass;\r\n"
+                + "};\r\n",
+                 false);
+    }
+
+    @Test
     public void testVector() {
         decompileMethod("classic", "testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
                 + "v.push(\"hello\");\r\n"

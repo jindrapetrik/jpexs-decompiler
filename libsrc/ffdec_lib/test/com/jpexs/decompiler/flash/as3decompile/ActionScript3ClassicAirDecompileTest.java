@@ -2008,6 +2008,16 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testVarFqn() {
+        decompileMethod("classic_air", "testVarFqn", "var b:int = TestClass + 5;\r\n"
+                + "var f:Function = function(x:int, y:int):int\r\n"
+                + "{\r\n"
+                + "return x + y + TestClass;\r\n"
+                + "};\r\n",
+                 false);
+    }
+
+    @Test
     public void testVector() {
         decompileMethod("classic_air", "testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
                 + "v.push(\"hello\");\r\n"
