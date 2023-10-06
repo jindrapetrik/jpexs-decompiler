@@ -174,7 +174,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             }
         }
         if (showModifier) {
-            getModifiers(abc, isStatic, insideInterface, writer);
+            getModifiers(abc, isStatic, insideInterface, writer, classIndex);
         }
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;

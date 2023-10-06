@@ -96,7 +96,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         MethodBody body = abc.findBody(method_info);
         
-        getModifiers(abc, isStatic, insideInterface, writer);
+        getModifiers(abc, isStatic, insideInterface, writer, classIndex);
         
         if (abc.method_info.get(method_info).flagNative()) {
             writer.appendNoHilight("native ");
