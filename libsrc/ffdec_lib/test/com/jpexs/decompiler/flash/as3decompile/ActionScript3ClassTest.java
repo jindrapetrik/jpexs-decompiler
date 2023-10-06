@@ -587,4 +587,43 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   };\n"
                 + "}");
     }
+
+    @Test
+    public void testSubClass() {
+        decompileScriptPack("standard", "tests_classes.TestSubClass", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestSubClass\n"
+                + "   {\n"
+                + "       \n"
+                + "      \n"
+                + "      public function TestSubClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function run() : *\n"
+                + "      {\n"
+                + "         var sc:SubClass = new SubClass();\n"
+                + "         sc.a_internal = 1;\n"
+                + "         sc.c_public = 3;\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+                + "\n"
+                + "class SubClass\n"
+                + "{\n"
+                + "    \n"
+                + "   \n"
+                + "   internal var a_internal:int;\n"
+                + "   \n"
+                + "   private var b_private:int;\n"
+                + "   \n"
+                + "   public var c_public:int;\n"
+                + "   \n"
+                + "   public function SubClass()\n"
+                + "   {\n"
+                + "      super();\n"
+                + "   }\n"
+                + "}");
+    }
 }

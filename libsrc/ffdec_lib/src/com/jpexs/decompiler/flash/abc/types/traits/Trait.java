@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -402,7 +404,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
-    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer) {
+    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
                 writer.appendNoHilight("final ");
@@ -430,10 +432,41 @@ public abstract class Trait implements Cloneable, Serializable {
                     writer.appendNoHilight(identifier).appendNoHilight(" ");
                 }
             } else if (nskind != 0) {
+                
+                //Traits of private classes inside script have same namespace as the class
+                if (nskind == Namespace.KIND_PRIVATE) {
+                    Set<Integer> namespaceIdsThis = new HashSet<>();
+                    if (m.isApiVersioned(abc.constants)) {
+                        NamespaceSet nss = m.getNamespaceSet(abc.constants);
+                        for (int n:nss.namespaces) {
+                            namespaceIdsThis.add(n);
+                        }
+                    } else {
+                        namespaceIdsThis.add(m.namespace_index);
+                    }
+                    Set<Integer> namespaceIdsClass = new HashSet<>();
+                    
+                    Multiname mc = abc.instance_info.get(classIndex).getName(abc.constants);
+                    if (mc.isApiVersioned(abc.constants)) {
+                        NamespaceSet nss = mc.getNamespaceSet(abc.constants);
+                        for (int n:nss.namespaces) {
+                            namespaceIdsClass.add(n);
+                        }
+                    } else {
+                        namespaceIdsClass.add(mc.namespace_index);
+                    }
+                    
+                    for (int ns:namespaceIdsThis) {
+                        if (namespaceIdsClass.contains(ns)) {
+                            nskind = Namespace.KIND_PACKAGE_INTERNAL;
+                            break;
+                        }
+                    }                    
+                }
                 String nsPrefix = Namespace.getPrefix(nskind);
                 if (nsPrefix != null && !nsPrefix.isEmpty()) {
                     writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
-                }
+                }                
             }
         }
         if (isStatic) {

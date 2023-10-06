@@ -146,6 +146,8 @@ package
         
         TestOtherClass;
         
+        TestSubClass;
+        
         initializedvar;
         initializedconst;
         

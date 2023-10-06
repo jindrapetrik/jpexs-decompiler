@@ -68,7 +68,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (body == null) {
             writer.appendNoHilight("native ");
         }
-        getModifiers(abc, isStatic, insideInterface, writer);
+        getModifiers(abc, isStatic, insideInterface, writer, classIndex);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");

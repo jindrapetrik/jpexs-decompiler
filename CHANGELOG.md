@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#2094] AS3 Getting register names from debug info - do not allow assigning `_locX_` name to other register than X
 - [#2094] Embed font name taken from the fontTag, not DefineFontName
 - AS3 Simplify expressions - Do not convert this to {} when coerced
+- AS3 incorrect private modifier on internal namespaced traits of private class inside script
 
 ## [19.0.0] - 2023-10-01
 ### Added
