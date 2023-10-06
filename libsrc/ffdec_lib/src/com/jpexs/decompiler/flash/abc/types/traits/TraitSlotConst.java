@@ -90,22 +90,20 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
-        if (typeStr.equals("*")) {
-            typeStr = "";
-        } else {
-            typeStr = ":" + typeStr;
-        }
         ValueKind val = null;
         if (value_kind != 0) {
             val = new ValueKind(value_index, value_kind);
         }
 
+        typeStr = ":" + typeStr;
+        
         String slotconst = "var";
         if (kindType == TRAIT_CONST) {
             slotconst = "const";
         }
         if (val != null && val.isNamespace()) {
             slotconst = "namespace";
+            typeStr = "";
         }
         writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(getName(abc).getName(abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
