@@ -134,6 +134,8 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   import tests_classes.mypackage2.TestClass;\n"
                 + "   import tests_classes.mypackage3.TestClass;\n"
                 + "   \n"
+                + "   use namespace myNamespace;"
+                + "   \n"
                 + "   public class TestClass2\n"
                 + "   {\n"
                 + "       \n"
