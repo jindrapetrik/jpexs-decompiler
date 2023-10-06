@@ -165,7 +165,7 @@ public class LinkReportExporter {
             List<Dependency> dependencies = new ArrayList<>();
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>());
+            tc.getDependencies(swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>(), new ArrayList<>());
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {
