@@ -126,7 +126,8 @@ public class InstanceInfo {
                         }
 
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".ttf\",").newLine();
-                        writer.appendNoHilight("fontName=\"" + ft.getFontName() + "\",").newLine();
+                        writer.appendNoHilight("fontName=\"" + ft.getFontNameIntag() + "\",").newLine();
+                        writer.appendNoHilight("fontFamily=\"" + ft.getFontName()+ "\",").newLine();                        
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft.isBold() ? "bold" : "normal") + "\",").newLine();
                         writer.appendNoHilight("fontStyle=\"" + (ft.isItalic() ? "italic" : "normal") + "\",").newLine();
