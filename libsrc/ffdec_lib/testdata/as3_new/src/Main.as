@@ -119,6 +119,7 @@ package
         TestTryReturn2;
         TestUndefined;
         TestUsagesTry;
+        TestVarFqn;
         TestVector;
         TestVector2;        
         TestWhileAnd;
