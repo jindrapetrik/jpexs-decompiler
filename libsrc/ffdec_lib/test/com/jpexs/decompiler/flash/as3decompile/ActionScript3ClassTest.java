@@ -570,7 +570,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   };\n"
                 + "}");
     }
-    
+
     @Test
     public void testInitializedConst() {
         decompileScriptPack("standard", "tests_classes.initializedconst", "package tests_classes\n"
