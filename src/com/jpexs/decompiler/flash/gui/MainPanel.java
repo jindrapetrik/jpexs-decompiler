@@ -5354,7 +5354,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if ((treeItem instanceof AS3Package) && ((AS3Package) treeItem).isCompoundScript()) {
             final ScriptPack scriptLeaf = ((AS3Package) treeItem).getCompoundInitializerPack();
-            if (Main.isInited() && !Main.isWorking() && !Main.isDebugging()) {            
+            if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {            
                 ABCPanel abcPanel = getABCPanel();
                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                 abcPanel.setAbc(scriptLeaf.abc);
@@ -5371,7 +5371,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDACTIONSCRIPT3PANEL);
         } else if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
-            if (Main.isInited() && !Main.isWorking() && !Main.isDebugging()) {            
+            if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {
                 ABCPanel abcPanel = getABCPanel();
                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                 abcPanel.setAbc(scriptLeaf.abc);
