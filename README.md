@@ -134,6 +134,7 @@ The application was made in Czech Republic.
 If you want to report a problem or request new feature, use our issue tracker at [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
 
 You should see [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before.
+Also see [Known problems list in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Known-problems)
 
 ### Email contact
 Emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
