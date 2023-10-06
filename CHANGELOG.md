@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Close action on SWF inside DefineBinaryData
 - [#2093] AS3 Unnecessary use of fully qualified names for classes in same package
 - [#1678] Shapes - Miter clip join style
+- [#2094] AS3 do not show body trait variables as FQN
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3129,6 +3130,8 @@ Major version of SWF to XML export changed to 2.
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
 [#2093]: https://www.free-decompiler.com/flash/issues/2093
+[#1678]: https://www.free-decompiler.com/flash/issues/1678
+[#2094]: https://www.free-decompiler.com/flash/issues/2094
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
@@ -3289,7 +3292,6 @@ Major version of SWF to XML export changed to 2.
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
 [#1865]: https://www.free-decompiler.com/flash/issues/1865
 [#1846]: https://www.free-decompiler.com/flash/issues/1846
-[#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1465]: https://www.free-decompiler.com/flash/issues/1465

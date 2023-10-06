@@ -368,7 +368,13 @@ public final class MethodBody implements Cloneable {
                         writer.appendNoHilight(this.method_info);
                         writer.newLine();
                     }
-                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods));
+                    List<DottedChain> fullyQualifiedNames2 = new ArrayList<>(fullyQualifiedNames);
+                    for (Trait t:traits.traits) {
+                        DottedChain tname = DottedChain.parseWithSuffix(t.getName(abc).getName(abc.constants, new ArrayList<>(), false, true));
+                        fullyQualifiedNames2.remove(tname);
+                    }
+                    
+                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {
                     // exception was logged in convert method
