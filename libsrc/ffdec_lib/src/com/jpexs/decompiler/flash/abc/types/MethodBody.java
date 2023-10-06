@@ -277,7 +277,7 @@ public final class MethodBody implements Cloneable {
         }
 
         if (Configuration.getLocalNamesFromDebugInfo.get()) {
-            Map<Integer, String> debugRegNames = getCode().getLocalRegNamesFromDebug(abc);
+            Map<Integer, String> debugRegNames = getCode().getLocalRegNamesFromDebug(abc, max_regs);
             for (int k : debugRegNames.keySet()) {
                 ret.put(k, debugRegNames.get(k));
             }
