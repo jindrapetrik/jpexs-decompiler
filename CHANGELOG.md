@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#2095] AS3 Changing script when debugging
 - [#223] AS2 Detecting uninitialized class fields
 - Embed tag not properly escaped on obfuscated files
+- [#116] AS3 Cyclic typenames protection
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3143,6 +3144,7 @@ Major version of SWF to XML export changed to 2.
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
 [#2095]: https://www.free-decompiler.com/flash/issues/2095
 [#223]: https://www.free-decompiler.com/flash/issues/223
+[#116]: https://www.free-decompiler.com/flash/issues/116
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
@@ -3575,7 +3577,6 @@ Major version of SWF to XML export changed to 2.
 [#1148]: https://www.free-decompiler.com/flash/issues/1148
 [#1152]: https://www.free-decompiler.com/flash/issues/1152
 [#1154]: https://www.free-decompiler.com/flash/issues/1154
-[#116]: https://www.free-decompiler.com/flash/issues/116
 [#1070]: https://www.free-decompiler.com/flash/issues/1070
 [#1098]: https://www.free-decompiler.com/flash/issues/1098
 [#1033]: https://www.free-decompiler.com/flash/issues/1033

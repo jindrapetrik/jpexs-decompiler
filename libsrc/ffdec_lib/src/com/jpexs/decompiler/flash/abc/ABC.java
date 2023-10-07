@@ -729,6 +729,7 @@ public class ABC implements Openable {
             }
             ais.endDumpLevel();
         }
+        constants.checkCyclicTypeNames();
 
         ais.endDumpLevel(); // cpool_info
 

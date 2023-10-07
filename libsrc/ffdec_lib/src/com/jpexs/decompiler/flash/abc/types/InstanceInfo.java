@@ -99,11 +99,11 @@ public class InstanceInfo {
                 CharacterTag ct = abc.getSwf().getCharacterByClass(className);
                 if (ct != null) {
                     if (ct instanceof DefineBinaryDataTag) {
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".bin\", mimeType=\"application/octet-stream\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ".bin\", mimeType=\"application/octet-stream\")]").newLine();
                     }
                     if (ct instanceof ImageTag) {
                         ImageTag it = (ImageTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSpriteTag) {
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + Helper.escapeActionScriptString(className) + "\")]").newLine();
@@ -111,7 +111,7 @@ public class InstanceInfo {
                     if (ct instanceof DefineSoundTag) {
                         //should be mp3, otherwise it won't work. Should we convert this?
                         DefineSoundTag st = (DefineSoundTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + "." + (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? "mp3" : "wav") + "\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + "." + (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? "mp3" : "wav") + "\")]").newLine();
                     }
                     if (ct instanceof FontTag) {
                         FontTag ft = (FontTag) ct;
@@ -125,7 +125,7 @@ public class InstanceInfo {
                             }
                         }
 
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".ttf\",").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ".ttf\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft.getFontNameIntag()) + "\",").newLine();
                         writer.appendNoHilight("fontFamily=\"" + Helper.escapeActionScriptString(ft.getFontName())+ "\",").newLine();                        
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
@@ -174,7 +174,7 @@ public class InstanceInfo {
                     
                     if (ct instanceof DefineFont4Tag) {
                         DefineFont4Tag ft4 = (DefineFont4Tag)ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".cff\",").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ".cff\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft4.fontName) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft4.fontFlagsBold ? "bold" : "normal") + "\",").newLine();
