@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -73,7 +74,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
+                Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -95,7 +96,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(doi, doi.getActions(), "", writer, swf.getCharset());
+                Action.actionsToSource(new HashMap<>(), doi, doi.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -124,7 +125,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);

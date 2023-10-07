@@ -31,10 +31,13 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -142,7 +145,7 @@ public class DoActionTag extends Tag implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset());
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, getCharset());
     }
     
     @Override
@@ -151,7 +154,7 @@ public class DoActionTag extends Tag implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset(), treeOperations);
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
     }
 
     /**
@@ -246,4 +249,13 @@ public class DoActionTag extends Tag implements ASMSource {
     public Tag getTag() {
         return null; //?
     }        
+    
+    @Override
+    public List<GraphTargetItem> getActionsToTree() {
+        try {
+            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, Graph.SOP_USE_STATIC, "", swf.getCharset());
+        } catch (InterruptedException ex) {
+            return new ArrayList<>();
+        }
+    }
 }

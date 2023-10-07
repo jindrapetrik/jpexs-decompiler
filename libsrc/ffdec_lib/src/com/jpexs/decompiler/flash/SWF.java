@@ -46,11 +46,13 @@ import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.as2.UninitializedClassFieldsDetector;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
@@ -412,6 +414,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private AbcIndexing abcIndex;
 
     private int numAbcIndexDependencies = 0;
+    
+    private Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
 
     private static AbcIndexing playerGlobalAbcIndex;
 
@@ -2750,7 +2754,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
-        ActionLocalData localData = new ActionLocalData(null, insideDoInitAction);
+        ActionLocalData localData = new ActionLocalData(null, insideDoInitAction, new HashMap<>() /*??*/);
         getVariables(null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 
@@ -2940,7 +2944,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
+                    dec = Action.actionsToTree(new HashMap<>() /*??*/, true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
                 } catch (EmptyStackException ex) {
                     continue;
                 }
@@ -3219,6 +3223,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public void clearScriptCache() {
+        uninitializedAs2ClassTraits = null;
         as2Cache.clear();
         as3Cache.clear();
         List<ABCContainerTag> abcList = getAbcList();
@@ -4562,4 +4567,17 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public OpenableList getOpenableList() {
         return openableList;
     }
+    
+    public void calculateAs2UninitializedClassTraits() {
+        uninitializedAs2ClassTraits = new HashMap<>();
+        UninitializedClassFieldsDetector detector = new UninitializedClassFieldsDetector();
+        uninitializedAs2ClassTraits = detector.calculateAs2UninitializedClassTraits(this);
+    }
+
+    public synchronized Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() {
+        if (uninitializedAs2ClassTraits == null) {
+            calculateAs2UninitializedClassTraits();
+        }
+        return uninitializedAs2ClassTraits;
+    }        
 }

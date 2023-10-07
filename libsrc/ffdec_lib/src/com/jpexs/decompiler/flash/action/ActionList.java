@@ -562,7 +562,7 @@ public class ActionList extends ArrayList<Action> {
         return writer.toString();
     }
 
-    public String toSource() {
+    /*public String toSource() {
         try {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             actionsToSource(null, this, "", writer, charset);
@@ -571,5 +571,5 @@ public class ActionList extends ArrayList<Action> {
             Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
-    }
+    }*/
 }

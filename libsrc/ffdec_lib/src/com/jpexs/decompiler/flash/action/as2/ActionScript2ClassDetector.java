@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.action;
+package com.jpexs.decompiler.flash.action.as2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -279,7 +281,7 @@ public class ActionScript2ClassDetector {
         return mnDv.getAsString();
     }
 
-    private boolean checkClassContent(List<GraphTargetItem> parts, HashMap<String, GraphTargetItem> variables, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
+    private boolean checkClassContent(Map<String, Map<String, Trait>> uninitializedClassTraits, List<GraphTargetItem> parts, HashMap<String, GraphTargetItem> variables, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
 
         try {
 
@@ -716,7 +718,17 @@ public class ActionScript2ClassDetector {
             } else {
                 //throw new AssertException("No constructor found");
             }
-
+            
+            String fullClassName = String.join(".", getMembersPath(classNameTargetPath));
+            if (uninitializedClassTraits.containsKey(fullClassName)) {
+                int t = 0;
+                for (String traitName:uninitializedClassTraits.get(fullClassName).keySet()) {
+                    Trait trait = uninitializedClassTraits.get(fullClassName).get(traitName);
+                    traitsStatic.add(t, trait.isStatic());
+                    traits.add(t, new MyEntry<>(new DirectValueActionItem(trait.getName()), null));
+                    t++;
+                }
+            }
             ClassActionItem clsItem = new ClassActionItem(classNameTargetPath, extendsOp, implementsOp, traits, traitsStatic);
             for (int k = commandsStartPos; k <= commandsEndPos; k++) {
                 commands.remove(commandsStartPos);
@@ -729,7 +741,8 @@ public class ActionScript2ClassDetector {
                     commands.remove(commandsStartPos + 1);
                 }
             }
-
+            
+            
             // goto next line and check next classes
             return true;
         } catch (AssertException ex) {
@@ -762,7 +775,7 @@ public class ActionScript2ClassDetector {
         }
     }
 
-    private boolean checkIfVariants(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, int pos, String scriptPath) {
+    private boolean checkIfVariants(Map<String, Map<String, Trait>> uninitializedClassTraits, List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, int pos, String scriptPath) {
 
         expandTernars(commands);
 
@@ -820,12 +833,12 @@ public class ActionScript2ClassDetector {
                         List<String> classPath = pathToSearchVariant1;
                         classPath.remove(0); //remove _global
                         if (ifItem.onTrue.isEmpty()) { //if can have zero offset as the code is larger than bytes limit. TODO: make this check also for variant 2 (?)
-                            if (this.checkClassContent(commands, variables, checkPos + 1, pos, commands.size() - 1, commands, classPath, scriptPath)) {
+                            if (this.checkClassContent(uninitializedClassTraits, commands, variables, checkPos + 1, pos, commands.size() - 1, commands, classPath, scriptPath)) {
                                 return true;
                             } else {
                                 break check_variant1;
                             }
-                        } else if (this.checkClassContent(ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
+                        } else if (this.checkClassContent(uninitializedClassTraits, ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
                             return true;
                         } else {
                             break check_variant1;
@@ -892,7 +905,7 @@ public class ActionScript2ClassDetector {
                         }
                     }
                 }
-                if (checkClassContent(parts, variables, checkPos, pos, pos, commands, memPath, scriptPath)) {
+                if (checkClassContent(uninitializedClassTraits, parts, variables, checkPos, pos, pos, commands, memPath, scriptPath)) {
                     return true;
                 }
             }
@@ -901,11 +914,11 @@ public class ActionScript2ClassDetector {
         return false;
     }
 
-    public void checkClass(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, String scriptPath) {
+    public void checkClass(Map<String, Map<String, Trait>> uninitializedClassTraits, List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, String scriptPath) {
         List<GraphTargetItem> localCommands = new ArrayList<>(commands);
         boolean changed = false;
         for (int pos = 0; pos < localCommands.size(); pos++) {
-            if (checkIfVariants(localCommands, variables, pos, scriptPath)) {
+            if (checkIfVariants(uninitializedClassTraits, localCommands, variables, pos, scriptPath)) {
                 changed = true;
             }
         }

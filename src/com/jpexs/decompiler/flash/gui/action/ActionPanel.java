@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -1103,7 +1104,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         if (lastCode != null) {
             try {
                 boolean insideDoInitAction = (this.src instanceof DoInitActionTag);
-                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, false, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName), "");
+                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(new HashMap<>(), this.src.getScriptName(), insideDoInitAction, false, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName), "");
                 gf.setVisible(true);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);

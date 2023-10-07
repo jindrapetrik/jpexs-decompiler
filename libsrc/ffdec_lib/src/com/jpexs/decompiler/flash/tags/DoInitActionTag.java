@@ -34,12 +34,16 @@ import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -151,7 +155,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset());
+        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(),this, actions, getScriptName(), writer, getCharset());
     }
     
     @Override
@@ -160,7 +164,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset(), treeOperations);
+        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset(), treeOperations);
     }
 
     @Override
@@ -280,4 +284,13 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(spriteId);
     }   
+    
+    @Override
+    public List<GraphTargetItem> getActionsToTree() {
+        try {
+            return Action.actionsToTree(swf.getUninitializedAs2ClassTraits(), true, false, getActions(), swf.version, Graph.SOP_USE_STATIC, "", swf.getCharset());
+        } catch (InterruptedException ex) {
+            return new ArrayList<>();
+        }
+    }
 }

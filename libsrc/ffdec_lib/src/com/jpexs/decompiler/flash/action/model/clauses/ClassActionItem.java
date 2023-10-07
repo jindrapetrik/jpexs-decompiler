@@ -221,8 +221,10 @@ public class ClassActionItem extends ActionItem implements Block {
                 } else {
                     writer.append("var ");
                     writer.append(IdentifiersDeobfuscation.printIdentifier(false, item.getKey().toStringNoQuotes(localData)));
-                    writer.append(" = ");
-                    item.getValue().toString(writer, localData);
+                    if (item.getValue() != null) {
+                        writer.append(" = ");
+                        item.getValue().toString(writer, localData);
+                    }
                     writer.append(";").newLine();
                 }
             }
@@ -262,4 +264,16 @@ public class ClassActionItem extends ActionItem implements Block {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        for (MyEntry<GraphTargetItem, GraphTargetItem> en: traits) {
+            GraphTargetItem value = en.getValue();
+            if (value != null) {
+                visitor.visit(value);
+            }
+        }
+    }       
+    
+    
 }

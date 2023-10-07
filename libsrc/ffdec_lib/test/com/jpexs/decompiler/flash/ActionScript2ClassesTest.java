@@ -26,6 +26,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
@@ -55,7 +56,7 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
         assertNotNull(dia);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
-            Action.actionsToSource(dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
+            Action.actionsToSource(new HashMap<>() /*FIXME*/,dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
         } catch (InterruptedException ex) {
             fail();
         }

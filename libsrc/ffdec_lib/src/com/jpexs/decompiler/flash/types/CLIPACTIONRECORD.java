@@ -32,11 +32,14 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -249,7 +252,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, actions.getCharset());
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, actions.getCharset());
     }
     
     @Override
@@ -258,7 +261,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, actions.getCharset(), treeOperations);
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, actions.getCharset(), treeOperations);
     }
 
     /**
@@ -360,5 +363,14 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public Tag getSourceTag() {
         return tag;
+    }
+    
+    @Override
+    public List<GraphTargetItem> getActionsToTree() {
+        try {
+            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, Graph.SOP_USE_STATIC, "", swf.getCharset());
+        } catch (InterruptedException ex) {
+            return new ArrayList<>();
+        }
     }
 }
