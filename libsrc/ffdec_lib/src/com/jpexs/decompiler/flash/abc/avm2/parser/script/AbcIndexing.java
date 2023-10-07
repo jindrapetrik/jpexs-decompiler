@@ -632,24 +632,22 @@ public final class AbcIndexing {
         return null;
     }
 
-    private static GraphTargetItem multinameToType(Set<Integer> visited, int m_index, AVM2ConstantPool constants) {
-        if (visited.contains(m_index)) {
-            Logger.getLogger(AbcIndexing.class.getName()).log(Level.WARNING, "Recursive typename detected");
-            return null;
-        }
+    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
         Multiname m = constants.getMultiname(m_index);
+        if (m.isCyclic()) {
+            return null;
+        }
         if (m.kind == Multiname.TYPENAME) {
-            visited.add(m_index);
-            GraphTargetItem obj = multinameToType(visited, m.qname_index, constants);
+            GraphTargetItem obj = multinameToType(m.qname_index, constants);
             if (obj == null) {
                 return null;
             }
             List<GraphTargetItem> params = new ArrayList<>();
             for (int pm : m.params) {
-                GraphTargetItem r = multinameToType(visited, pm, constants);
+                GraphTargetItem r = multinameToType(pm, constants);
                 if (r == null) {
                     return null;
                 }
@@ -665,10 +663,6 @@ public final class AbcIndexing {
             }
             return new TypeItem(m.getNameWithNamespace(constants, true));
         }
-    }
-
-    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
-        return multinameToType(new HashSet<>(), m_index, constants);
     }
 
     private static GraphTargetItem getTraitCallReturnType(ABC abc, Trait t) {

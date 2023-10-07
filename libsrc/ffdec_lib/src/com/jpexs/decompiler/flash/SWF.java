@@ -1896,9 +1896,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     private static void getAbcTags(Iterable<Tag> list, List<ABCContainerTag> actionScripts) {
         for (Tag t : list) {
-            if (t instanceof DefineSpriteTag) {
+            /*if (t instanceof DefineSpriteTag) {
                 getAbcTags(((DefineSpriteTag) t).getTags(), actionScripts);
-            }
+            }*/
             if (t instanceof ABCContainerTag) {
                 actionScripts.add((ABCContainerTag) t);
             }

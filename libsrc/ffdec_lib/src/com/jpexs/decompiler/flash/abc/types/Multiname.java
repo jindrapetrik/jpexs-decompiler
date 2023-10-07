@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
@@ -29,6 +30,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -167,7 +170,12 @@ public class Multiname {
         }
         Multiname m = constants.getMultiname(name_index);
         if (m != null) {
-            m.cyclic = checkCyclicTypeNameSub(constants, name_index, visited);                   
+            
+            boolean cyclic = checkCyclicTypeNameSub(constants, name_index, visited);                               
+            if (!m.cyclic && cyclic) {
+                Logger.getLogger(AbcIndexing.class.getName()).log(Level.WARNING, "Recursive typename detected");
+            }
+            m.cyclic = cyclic;
         }
     }
 
