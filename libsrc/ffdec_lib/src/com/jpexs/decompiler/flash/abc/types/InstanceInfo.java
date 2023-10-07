@@ -106,7 +106,7 @@ public class InstanceInfo {
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSpriteTag) {
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + className + "\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + Helper.escapeActionScriptString(className) + "\")]").newLine();
                     }
                     if (ct instanceof DefineSoundTag) {
                         //should be mp3, otherwise it won't work. Should we convert this?
@@ -126,8 +126,8 @@ public class InstanceInfo {
                         }
 
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".ttf\",").newLine();
-                        writer.appendNoHilight("fontName=\"" + ft.getFontNameIntag() + "\",").newLine();
-                        writer.appendNoHilight("fontFamily=\"" + ft.getFontName()+ "\",").newLine();                        
+                        writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft.getFontNameIntag()) + "\",").newLine();
+                        writer.appendNoHilight("fontFamily=\"" + Helper.escapeActionScriptString(ft.getFontName())+ "\",").newLine();                        
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft.isBold() ? "bold" : "normal") + "\",").newLine();
                         writer.appendNoHilight("fontStyle=\"" + (ft.isItalic() ? "italic" : "normal") + "\",").newLine();
@@ -175,7 +175,7 @@ public class InstanceInfo {
                     if (ct instanceof DefineFont4Tag) {
                         DefineFont4Tag ft4 = (DefineFont4Tag)ct;
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".cff\",").newLine();
-                        writer.appendNoHilight("fontName=\"" + ft4.fontName + "\",").newLine();
+                        writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft4.fontName) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft4.fontFlagsBold ? "bold" : "normal") + "\",").newLine();
                         writer.appendNoHilight("fontStyle=\"" + (ft4.fontFlagsItalic ? "italic" : "normal") + "\",").newLine();
