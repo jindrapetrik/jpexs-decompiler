@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -33,12 +34,16 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Actions to execute at particular button events
@@ -210,7 +215,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, actions.getCharset());
+        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, actions.getCharset());
     }
     
     @Override
@@ -219,7 +224,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, actions.getCharset(), treeOperations);
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, actions.getCharset(), treeOperations);
     }
 
     /**
@@ -378,5 +383,14 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public Tag getTag() {
         return tag;
+    }
+    
+    @Override
+    public List<GraphTargetItem> getActionsToTree() {
+        try {
+            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, Graph.SOP_USE_STATIC, "", swf.getCharset());
+        } catch (InterruptedException ex) {
+            return new ArrayList<>();
+        }
     }
 }

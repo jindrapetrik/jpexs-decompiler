@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -32,7 +33,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -61,7 +64,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         List<Action> actions = par.actionsFromString(str, Utf8Helper.charsetName);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         ActionList list = ActionListReader.readActionListTimeout(new ArrayList<>(), new SWFInputStream(swf, hex), SWF.DEFAULT_VERSION, 0, hex.length, "", 1);
-        Action.actionsToSource(null, list, "", writer, Utf8Helper.charsetName);
+        Action.actionsToSource(new HashMap<>(), null, list, "", writer, Utf8Helper.charsetName);
         return writer.toString();
     }
 
@@ -255,7 +258,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(actualResult.contains("case \"c\":"));
@@ -280,7 +283,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));
@@ -307,7 +310,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
+            Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));

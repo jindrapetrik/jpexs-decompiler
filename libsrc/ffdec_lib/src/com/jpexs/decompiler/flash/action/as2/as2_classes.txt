@@ -1,0 +1,1079 @@
+class Accessibility
+extends Object
+static function isActive Boolean
+static function updateProperties Void
+
+class arguments
+extends Object
+var callee Object
+var caller Object
+var length Number
+
+class Array
+extends Object
+var length Number
+static var CASEINSENSITIVE Number
+static var DESCENDING Number
+static var NUMERIC Number
+static var RETURNINDEXEDARRAY Number
+static var UNIQUESORT Number
+function concat Array
+function join String
+function pop Object
+function push Number
+function reverse Void
+function shift Object
+function slice Array
+function sort Array
+function sortOn Array
+function splice Array
+function toString String
+function unshift Number
+
+class AsBroadcaster
+extends Object
+var _listeners Array
+function addListener Boolean
+function broadcastMessage Void
+static function initialize Void
+function removeListener Boolean
+
+class Boolean
+extends Object
+function toString String
+function valueOf Boolean
+
+class Button
+extends Object
+var _alpha Number
+var blendMode Object
+var cacheAsBitmap Boolean
+var enabled Boolean
+var filters Array
+var _focusrect Boolean
+var _height Number
+var menu ContextMenu
+var _name String
+var _parent MovieClip
+var _quality String
+var _rotation Number
+var scale9Grid flash.geom.Rectangle
+var _soundbuftime Number
+var tabEnabled Boolean
+var tabIndex Number
+var _target String
+var trackAsMenu Boolean
+var _url String
+var useHandCursor Boolean
+var _visible Boolean
+var _width Number
+var _x Number
+var _xmouse Number
+var _xscale Number
+var _y Number
+var _ymouse Number
+var _yscale Number
+function getDepth Number
+
+class Camera
+extends Object
+var activityLevel Number
+var bandwidth Number
+var currentFps Number
+var fps Number
+var height Number
+var index Number
+var keyFrameInterval Number
+var loopback Boolean
+var motionLevel Number
+var motionTimeOut Number
+var muted Boolean
+var name String
+static var names Array
+var quality Number
+var width Number
+static function get Camera
+function setKeyFrameInterval Void
+function setLoopback Void
+function setMode Void
+function setMotionLevel Void
+function setQuality Void
+
+class Color
+extends Object
+
+class ContextMenu
+extends Object
+var builtInItems Object
+var customItems Array
+function copy ContextMenu
+function hideBuiltInItems Void
+
+class ContextMenuItem
+extends Object
+var caption String
+var enabled Boolean
+var separatorBefore Boolean
+var visible Boolean
+function copy ContextMenuItem
+
+class CustomActions
+extends Object
+static function get String
+static function install Boolean
+static function list Array
+static function uninstall Boolean
+
+class Date
+extends Object
+function getDate Number
+function getDay Number
+function getFullYear Number
+function getHours Number
+function getMilliseconds Number
+function getMinutes Number
+function getMonth Number
+function getSeconds Number
+function getTime Number
+function getTimezoneOffset Number
+function getUTCDate Number
+function getUTCDay Number
+function getUTCFullYear Number
+function getUTCHours Number
+function getUTCMilliseconds Number
+function getUTCMinutes Number
+function getUTCMonth Number
+function getUTCSeconds Number
+function getUTCYear Number
+function getYear Number
+function setDate Number
+function setFullYear Number
+function setHours Number
+function setMilliseconds Number
+function setMinutes Number
+function setMonth Number
+function setSeconds Number
+function setTime Number
+function setUTCDate Number
+function setUTCFullYear Number
+function setUTCHours Number
+function setUTCMilliseconds Number
+function setUTCMinutes Number
+function setUTCMonth Number
+function setUTCSeconds Number
+function setYear Number
+function toString String
+static function UTC Number
+function valueOf Number
+
+class Error
+extends Object
+var message String
+var name String
+function toString String
+
+class Function
+extends Object
+function apply Void
+function call Object
+
+class Key
+extends Object
+static var _listeners Array
+static var BACKSPACE Number
+static var CAPSLOCK Number
+static var CONTROL Number
+static var DELETEKEY Number
+static var DOWN Number
+static var END Number
+static var ENTER Number
+static var ESCAPE Number
+static var HOME Number
+static var INSERT Number
+static var LEFT Number
+static var PGDN Number
+static var PGUP Number
+static var RIGHT Number
+static var SHIFT Number
+static var SPACE Number
+static var TAB Number
+static var UP Number
+static function addListener Void
+static function getAscii Number
+static function getCode Number
+static function isAccessible Boolean
+static function isDown Boolean
+static function isToggled Boolean
+static function removeListener Boolean
+
+class LoadVars
+extends Object
+var contentType String
+var loaded Boolean
+function addRequestHeader Void
+function decode Void
+function getBytesLoaded Number
+function getBytesTotal Number
+function load Boolean
+function send Boolean
+function sendAndLoad Boolean
+function toString String
+
+class LocalConnection
+extends Object
+var isPerUser Boolean
+function close Void
+function connect Boolean
+function domain String
+function send Boolean
+
+class Math
+extends Object
+static var E Number
+static var LN10 Number
+static var LN2 Number
+static var LOG10E Number
+static var LOG2E Number
+static var PI Number
+static var SQRT1_2 Number
+static var SQRT2 Number
+static function abs Number
+static function acos Number
+static function asin Number
+static function atan Number
+static function atan2 Number
+static function ceil Number
+static function cos Number
+static function exp Number
+static function floor Number
+static function log Number
+static function max Number
+static function min Number
+static function pow Number
+static function random Number
+static function round Number
+static function sin Number
+static function sqrt Number
+static function tan Number
+
+class Microphone
+extends Object
+var activityLevel Number
+var codec String
+var encodeQuality Number
+var framesPerPacket Number
+var gain Number
+var index Number
+var muted Boolean
+var name String
+static var names Array
+var rate Number
+var silenceLevel Number
+var silenceTimeOut Number
+var useEchoSuppression Boolean
+static function get Microphone
+function setCodec Void
+function setEncodeQuality Void
+function setFramesPerPacket Void
+function setGain Void
+function setRate Void
+function setSilenceLevel Void
+function setUseEchoSuppression Void
+
+class Mouse
+extends Object
+static function addListener Void
+static function hide Number
+static function removeListener Boolean
+static function show Number
+
+class MovieClip
+extends Object
+var _alpha Number
+var blendMode Object
+var cacheAsBitmap Boolean
+var _currentframe Number
+var _droptarget String
+var enabled Boolean
+var filters Array
+var focusEnabled Boolean
+var _focusrect Boolean
+var forceSmoothing Boolean
+var _framesloaded Number
+var _height Number
+var hitArea Object
+var _lockroot Boolean
+var menu ContextMenu
+var _name String
+var opaqueBackground Number
+var _parent MovieClip
+var _quality String
+var _rotation Number
+var scale9Grid flash.geom.Rectangle
+var scrollRect Object
+var _soundbuftime Number
+var tabChildren Boolean
+var tabEnabled Boolean
+var tabIndex Number
+var _target String
+var _totalframes Number
+var trackAsMenu Boolean
+var transform flash.geom.Transform
+var _url String
+var useHandCursor Boolean
+var _visible Boolean
+var _width Number
+var _x Number
+var _xmouse Number
+var _xscale Number
+var _y Number
+var _ymouse Number
+var _yscale Number
+function attachAudio Void
+function attachBitmap Void
+function attachMovie MovieClip
+function beginBitmapFill Void
+function beginFill Void
+function beginGradientFill Void
+function clear Void
+function createEmptyMovieClip MovieClip
+function createTextField TextField
+function curveTo Void
+function duplicateMovieClip MovieClip
+function endFill Void
+function getBounds Object
+function getBytesLoaded Number
+function getBytesTotal Number
+function getDepth Number
+function getInstanceAtDepth MovieClip
+function getNextHighestDepth Number
+function getRect Object
+function getSWFVersion Number
+function getTextSnapshot TextSnapshot
+function getURL Void
+function globalToLocal Void
+function gotoAndPlay Void
+function gotoAndStop Void
+function hitTest Boolean
+function lineGradientStyle Void
+function lineStyle Void
+function lineTo Void
+function loadMovie Void
+function loadVariables Void
+function localToGlobal Void
+function moveTo Void
+function nextFrame Void
+function play Void
+function prevFrame Void
+function removeMovieClip Void
+function setMask Void
+function startDrag Void
+function stop Void
+function stopDrag Void
+function swapDepths Void
+function unloadMovie Void
+
+class MovieClipLoader
+extends Object
+var checkPolicyFile Boolean
+function addListener Boolean
+function getProgress Object
+function loadClip Boolean
+function removeListener Boolean
+function unloadClip Boolean
+
+class NetConnection
+extends Object
+var isConnected Boolean
+var protocol String
+var uri String
+function call Void
+function close Void
+function connect Boolean
+
+class NetStream
+extends Object
+var bufferLength Number
+var bufferTime Number
+var bytesLoaded Number
+var bytesTotal Number
+var checkPolicyFile Boolean
+var currentFps Number
+var liveDelay Number
+var maxPauseBufferTime Number
+var time Number
+function attachAudio Void
+function attachVideo Void
+function close Void
+function getInfo Object
+function pause Void
+function play Void
+function play2 Void
+function publish Void
+function receiveAudio Void
+function receiveVideo Void
+function seek Void
+function send Void
+function setBufferTime Void
+
+class Number
+extends Object
+static var MAX_VALUE Number
+static var MIN_VALUE Number
+static var NaN Number
+static var NEGATIVE_INFINITY Number
+static var POSITIVE_INFINITY Number
+function toString String
+function valueOf Number
+
+class Object
+var constructor Object
+var __proto__ Object
+static var prototype Object
+var __resolve Object
+function addProperty Boolean
+function hasOwnProperty Boolean
+function isPropertyEnumerable Boolean
+function isPrototypeOf Boolean
+static function registerClass Boolean
+function toString String
+function unwatch Boolean
+function valueOf Object
+function watch Boolean
+
+class PrintJob
+extends Object
+var orientation String
+var pageHeight Number
+var pageWidth Number
+var paperHeight Number
+var paperWidth Number
+function addPage Boolean
+function send Void
+function start Boolean
+
+class Selection
+extends Object
+static function addListener Void
+static function getBeginIndex Number
+static function getCaretIndex Number
+static function getEndIndex Number
+static function getFocus String
+static function removeListener Boolean
+static function setFocus Boolean
+static function setSelection Void
+
+class SharedObject
+extends Object
+var data Object
+function clear Void
+function close Void
+function connect Boolean
+function flush Object
+static function getLocal SharedObject
+static function getRemote SharedObject
+function getSize Number
+function send Void
+function setFps Boolean
+
+class Sound
+extends Object
+var checkPolicyFile Boolean
+var duration Number
+var id3 Object
+var position Number
+function attachSound Void
+function getBytesLoaded Number
+function getBytesTotal Number
+function getPan Number
+function getTransform Object
+function getVolume Number
+function loadSound Void
+function setPan Void
+function setTransform Void
+function setVolume Void
+function start Void
+function stop Void
+
+class Stage
+extends Object
+static var align String
+static var displayState String
+static var fullScreenHeight Number
+static var fullScreenSourceRect flash.geom.Rectangle
+static var fullScreenWidth Number
+static var height Number
+static var scaleMode String
+static var showMenu Boolean
+static var width Number
+static var wmodeGPU Boolean
+static function addListener Void
+static function removeListener Boolean
+
+class String
+extends Object
+var length Number
+function charAt String
+function charCodeAt Number
+function concat String
+static function fromCharCode String
+function indexOf Number
+function lastIndexOf Number
+function slice String
+function split Array
+function substr String
+function substring String
+function toLowerCase String
+function toString String
+function toUpperCase String
+function valueOf String
+
+class System
+extends Object
+static var exactSettings Boolean
+static var useCodepage Boolean
+static function setClipboard Void
+static function showSettings Void
+
+class TextField
+extends Object
+var _alpha Number
+var antiAliasType String
+var autoSize Object
+var background Boolean
+var backgroundColor Number
+var border Boolean
+var borderColor Number
+var bottomScroll Number
+var condenseWhite Boolean
+var embedFonts Boolean
+var filters Array
+var gridFitType String
+var _height Number
+var hscroll Number
+var html Boolean
+var htmlText String
+var length Number
+var maxChars Number
+var maxhscroll Number
+var maxscroll Number
+var menu ContextMenu
+var mouseWheelEnabled Boolean
+var multiline Boolean
+var _name String
+var _parent MovieClip
+var password Boolean
+var _quality String
+var restrict String
+var _rotation Number
+var scroll Number
+var selectable Boolean
+var sharpness Number
+var _soundbuftime Number
+var styleSheet TextField.StyleSheet
+var tabEnabled Boolean
+var tabIndex Number
+var _target String
+var text String
+var textColor Number
+var textHeight Number
+var textWidth Number
+var thickness Number
+var type String
+var _url String
+var variable String
+var _visible Boolean
+var _width Number
+var wordWrap Boolean
+var _x Number
+var _xmouse Number
+var _xscale Number
+var _y Number
+var _ymouse Number
+var _yscale Number
+function addListener Boolean
+function getDepth Number
+static function getFontList Array
+function getNewTextFormat TextFormat
+function getTextFormat TextFormat
+function removeListener Boolean
+function removeTextField Void
+function replaceSel Void
+function replaceText Void
+function setNewTextFormat Void
+function setTextFormat Void
+
+class TextFormat
+extends Object
+var align String
+var blockIndent Number
+var bold Boolean
+var bullet Boolean
+var color Number
+var font String
+var indent Number
+var italic Boolean
+var kerning Boolean
+var leading Number
+var leftMargin Number
+var letterSpacing Number
+var rightMargin Number
+var size Number
+var tabStops Array
+var target String
+var underline Boolean
+var url String
+function getTextExtent Object
+
+class TextSnapshot
+extends Object
+function findText Number
+function getCount Number
+function getSelected Boolean
+function getSelectedText String
+function getText String
+function getTextRunInfo Array
+function hitTestTextNearPos Number
+function setSelectColor Void
+function setSelected Void
+
+class Video
+extends Object
+var _alpha Number
+var deblocking Number
+var _height Number
+var height Number
+var _name String
+var _parent MovieClip
+var _rotation Number
+var smoothing Boolean
+var _visible Boolean
+var _width Number
+var width Number
+var _x Number
+var _xmouse Number
+var _xscale Number
+var _y Number
+var _ymouse Number
+var _yscale Number
+function attachVideo Void
+function clear Void
+
+class XML
+extends XMLNode
+extends Object
+var contentType String
+var docTypeDecl String
+var idMap Object
+var ignoreWhite Boolean
+var loaded Boolean
+var status Number
+var xmlDecl String
+function addRequestHeader Void
+function createElement XMLNode
+function createTextNode XMLNode
+function getBytesLoaded Number
+function getBytesTotal Number
+function load Boolean
+function parseXML Void
+function send Boolean
+function sendAndLoad Void
+
+class XMLNode
+extends Object
+var attributes Object
+var childNodes Array
+var firstChild XMLNode
+var lastChild XMLNode
+var localName String
+var namespaceURI String
+var nextSibling XMLNode
+var nodeName String
+var nodeType Number
+var nodeValue String
+var parentNode XMLNode
+var prefix String
+var previousSibling XMLNode
+function appendChild Void
+function cloneNode XMLNode
+function getNamespaceForPrefix String
+function getPrefixForNamespace String
+function hasChildNodes Boolean
+function insertBefore Void
+function removeNode Void
+function toString String
+
+class XMLSocket
+extends Object
+var timeout Number
+function close Void
+function connect Boolean
+function send Void
+
+class XMLUI
+extends Object
+static function accept Void
+static function cancel Void
+static function get String
+static function set Void
+
+class flash.display.BitmapData
+extends Object
+var height Number
+var rectangle flash.geom.Rectangle
+var transparent Boolean
+var width Number
+function applyFilter Number
+function clone flash.display.BitmapData
+function colorTransform Void
+function compare Object
+function copyChannel Void
+function copyPixels Void
+function dispose Void
+function draw Void
+function fillRect Void
+function floodFill Void
+function generateFilterRect flash.geom.Rectangle
+function getColorBoundsRect flash.geom.Rectangle
+function getPixel Number
+function getPixel32 Number
+function hitTest Boolean
+static function loadBitmap flash.display.BitmapData
+function merge Void
+function noise Void
+function paletteMap Void
+function perlinNoise Void
+function pixelDissolve Number
+function scroll Void
+function setPixel Void
+function setPixel32 Void
+function threshold Number
+
+class flash.external.ExternalInterface
+extends Object
+static var available Boolean
+static function addCallback Boolean
+static function call Object
+
+class flash.filters.BevelFilter
+extends flash.filters.BitmapFilter
+extends Object
+var angle Number
+var blurX Number
+var blurY Number
+var distance Number
+var highlightAlpha Number
+var highlightColor Number
+var knockout Boolean
+var quality Number
+var shadowAlpha Number
+var shadowColor Number
+var strength Number
+var type String
+function clone flash.filters.BevelFilter
+
+class flash.filters.BitmapFilter
+extends Object
+function clone flash.filters.BitmapFilter
+
+class flash.filters.BlurFilter
+extends flash.filters.BitmapFilter
+extends Object
+var blurX Number
+var blurY Number
+var quality Number
+function clone flash.filters.BlurFilter
+
+class flash.filters.ColorMatrixFilter
+extends flash.filters.BitmapFilter
+extends Object
+var matrix Array
+function clone flash.filters.ColorMatrixFilter
+
+class flash.filters.ConvolutionFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alpha Number
+var bias Number
+var clamp Boolean
+var color Number
+var divisor Number
+var matrix Array
+var matrixX Number
+var matrixY Number
+var preserveAlpha Boolean
+function clone flash.filters.ConvolutionFilter
+
+class flash.filters.DisplacementMapFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alpha Number
+var color Number
+var componentX Number
+var componentY Number
+var mapBitmap flash.display.BitmapData
+var mapPoint flash.geom.Point
+var mode String
+var scaleX Number
+var scaleY Number
+function clone flash.filters.DisplacementMapFilter
+
+class flash.filters.DropShadowFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alpha Number
+var angle Number
+var blurX Number
+var blurY Number
+var color Number
+var distance Number
+var hideObject Boolean
+var inner Boolean
+var knockout Boolean
+var quality Number
+var strength Number
+function clone flash.filters.DropShadowFilter
+
+class flash.filters.GlowFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alpha Number
+var blurX Number
+var blurY Number
+var color Number
+var inner Boolean
+var knockout Boolean
+var quality Number
+var strength Number
+function clone flash.filters.GlowFilter
+
+class flash.filters.GradientBevelFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alphas Array
+var angle Number
+var blurX Number
+var blurY Number
+var colors Array
+var distance Number
+var knockout Boolean
+var quality Number
+var ratios Array
+var strength Number
+var type String
+function clone flash.filters.GradientBevelFilter
+
+class flash.filters.GradientGlowFilter
+extends flash.filters.BitmapFilter
+extends Object
+var alphas Array
+var angle Number
+var blurX Number
+var blurY Number
+var colors Array
+var distance Number
+var knockout Boolean
+var quality Number
+var ratios Array
+var strength Number
+var type String
+function clone flash.filters.GradientGlowFilter
+
+class flash.geom.ColorTransform
+extends Object
+var alphaMultiplier Number
+var alphaOffset Number
+var blueMultiplier Number
+var blueOffset Number
+var greenMultiplier Number
+var greenOffset Number
+var redMultiplier Number
+var redOffset Number
+var rgb Number
+function concat Void
+function toString String
+
+class flash.geom.Matrix
+extends Object
+var a Number
+var b Number
+var c Number
+var d Number
+var tx Number
+var ty Number
+function clone flash.geom.Matrix
+function concat Void
+function createBox Void
+function createGradientBox Void
+function deltaTransformPoint flash.geom.Point
+function identity Void
+function invert Void
+function rotate Void
+function scale Void
+function toString String
+function transformPoint flash.geom.Point
+function translate Void
+
+class flash.geom.Point
+extends Object
+var length Number
+var x Number
+var y Number
+function add flash.geom.Point
+function clone flash.geom.Point
+static function distance Number
+function equals Boolean
+static function interpolate flash.geom.Point
+function normalize Void
+function offset Void
+static function polar flash.geom.Point
+function subtract flash.geom.Point
+function toString String
+
+class flash.geom.Rectangle
+extends Object
+var bottom Number
+var bottomRight flash.geom.Point
+var height Number
+var left Number
+var right Number
+var size flash.geom.Point
+var top Number
+var topLeft flash.geom.Point
+var width Number
+var x Number
+var y Number
+function clone flash.geom.Rectangle
+function contains Boolean
+function containsPoint Boolean
+function containsRectangle Boolean
+function equals Boolean
+function inflate Void
+function inflatePoint Void
+function intersection flash.geom.Rectangle
+function intersects Boolean
+function isEmpty Boolean
+function offset Void
+function offsetPoint Void
+function setEmpty Void
+function toString String
+function union flash.geom.Rectangle
+
+class flash.geom.Transform
+extends Object
+var colorTransform flash.geom.ColorTransform
+var concatenatedColorTransform flash.geom.ColorTransform
+var concatenatedMatrix flash.geom.Matrix
+var matrix flash.geom.Matrix
+var pixelBounds flash.geom.Rectangle
+
+class flash.net.FileReference
+extends Object
+var creationDate Date
+var creator String
+var modificationDate Date
+var name String
+var postData String
+var size Number
+var type String
+function addListener Void
+function browse Boolean
+function cancel Void
+function download Boolean
+function removeListener Boolean
+function upload Boolean
+
+class flash.net.FileReferenceList
+extends Object
+var fileList Array
+function addListener Void
+function browse Boolean
+function removeListener Boolean
+
+class flash.text.TextRenderer
+extends Object
+static var displayMode String
+static var maxLevel Number
+static function setAdvancedAntialiasingTable Void
+
+class mx.lang.Locale
+extends Object
+static var autoReplace Boolean
+static var languageCodeArray Array
+static var stringIDArray Array
+static function addDelayedInstance Void
+static function addXMLPath Void
+static function checkXMLStatus Boolean
+static function getDefaultLang String
+static function initialize Void
+static function loadLanguageXML Void
+static function loadString String
+static function loadStringEx String
+static function setDefaultLang Void
+static function setLoadCallback Void
+static function setString Void
+
+class System.capabilities
+extends Object
+static var avHardwareDisable Boolean
+static var hasAccessibility Boolean
+static var hasAudio Boolean
+static var hasAudioEncoder Boolean
+static var hasEmbeddedVideo Boolean
+static var hasIME Boolean
+static var hasMP3 Boolean
+static var hasPrinting Boolean
+static var hasScreenBroadcast Boolean
+static var hasScreenPlayback Boolean
+static var hasStreamingAudio Boolean
+static var hasStreamingVideo Boolean
+static var hasVideoEncoder Boolean
+static var isDebugger Boolean
+static var language String
+static var localFileReadDisable Boolean
+static var manufacturer String
+static var os String
+static var pixelAspectRatio Number
+static var playerType String
+static var screenColor String
+static var screenDPI Number
+static var screenResolutionX Number
+static var screenResolutionY Number
+static var serverString String
+static var version String
+
+class System.IME
+extends Object
+static var ALPHANUMERIC_FULL String
+static var ALPHANUMERIC_HALF String
+static var CHINESE String
+static var JAPANESE_HIRAGANA String
+static var JAPANESE_KATAKANA_FULL String
+static var JAPANESE_KATAKANA_HALF String
+static var KOREAN String
+static var UNKNOWN String
+static function addListener Void
+static function doConversion Boolean
+static function getConversionMode String
+static function getEnabled Boolean
+static function removeListener Boolean
+static function setCompositionString Boolean
+static function setConversionMode Boolean
+static function setEnabled Boolean
+
+class System.security
+extends Object
+static var sandboxType String
+static function allowDomain Void
+static function allowInsecureDomain Void
+static function loadPolicyFile Void
+
+class TextField.StyleSheet
+extends Object
+function clear Void
+function getStyle Object
+function getStyleNames Array
+function load Boolean
+function parseCSS Boolean
+function setStyle Void
+function transform TextFormat

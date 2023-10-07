@@ -17,11 +17,13 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +32,8 @@ import java.util.Set;
  */
 public class ActionLocalData extends BaseLocalData {
 
+    public final Map<String, Map<String, Trait>> uninitializedClassTraits;
+    
     public final HashMap<Integer, String> regNames;
 
     public final HashMap<String, GraphTargetItem> variables;
@@ -40,28 +44,31 @@ public class ActionLocalData extends BaseLocalData {
 
     public boolean insideDoInitAction;
 
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, Map<String, Map<String, Trait>> uninitializedClassTraits) {
         this.secondPassData = secondPassData;
         regNames = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
-        this.insideDoInitAction = insideDoInitAction;
+        this.insideDoInitAction = insideDoInitAction;  
+        this.uninitializedClassTraits = uninitializedClassTraits;
     }
 
-    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, Map<String, Map<String, Trait>> uninitializedClassTraits) {
         this.regNames = regNames;
         this.secondPassData = secondPassData;
         variables = new HashMap<>();
         functions = new HashMap<>();
         this.insideDoInitAction = insideDoInitAction;        
+        this.uninitializedClassTraits = uninitializedClassTraits;
     }
 
-    public ActionLocalData(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionLocalData(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Map<String, Map<String, Trait>> uninitializedClassTraits) {
         this.allSwitchParts = switchParts;
         this.regNames = regNames;
         this.variables = variables;
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
         this.secondPassData = secondPassData;
+        this.uninitializedClassTraits = uninitializedClassTraits;
     }
 }

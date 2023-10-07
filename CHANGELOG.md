@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Simplify expressions - Do not convert this to {} when coerced
 - AS3 incorrect private modifier on internal namespaced traits of private class inside script
 - [#2095] AS3 Changing script when debugging
+- [#223] AS2 Detecting uninitialized class fields
 
 ## [19.0.0] - 2023-10-01
 ### Added
@@ -3140,6 +3141,7 @@ Major version of SWF to XML export changed to 2.
 [#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
 [#2095]: https://www.free-decompiler.com/flash/issues/2095
+[#223]: https://www.free-decompiler.com/flash/issues/223
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
@@ -3898,7 +3900,6 @@ Major version of SWF to XML export changed to 2.
 [#318]: https://www.free-decompiler.com/flash/issues/318
 [#319]: https://www.free-decompiler.com/flash/issues/319
 [#323]: https://www.free-decompiler.com/flash/issues/323
-[#223]: https://www.free-decompiler.com/flash/issues/223
 [#261]: https://www.free-decompiler.com/flash/issues/261
 [#269]: https://www.free-decompiler.com/flash/issues/269
 [#274]: https://www.free-decompiler.com/flash/issues/274

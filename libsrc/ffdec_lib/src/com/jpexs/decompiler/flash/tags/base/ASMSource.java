@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import java.util.List;
 
@@ -88,6 +89,8 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
      * @param actions Action list
      */
     public void setActions(List<Action> actions);
+    
+    public List<GraphTargetItem> getActionsToTree();
 
     public void setModified();
 
@@ -113,6 +116,7 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
 
     public Tag getSourceTag();
 
+    @Override
     public void setSourceTag(Tag t);
 
     public String getScriptName();

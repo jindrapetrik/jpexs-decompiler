@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.action.Action.adr2ip;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
@@ -89,13 +91,21 @@ public class ActionGraph extends Graph {
     private boolean insideDoInitAction;
 
     private boolean insideFunction;
+    private Map<String, Map<String, Trait>> uninitializedClassTraits;
 
-    public ActionGraph(String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
+    public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
         super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
+        this.uninitializedClassTraits = uninitializedClassTraits;
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
     }
 
+    public Map<String, Map<String, Trait>> getUninitializedClassTraits() {
+        return uninitializedClassTraits;
+    }
+
+    
+    
     @Override
     public ActionGraphSource getGraphCode() {
         return (ActionGraphSource) code;
@@ -123,7 +133,7 @@ public class ActionGraph extends Graph {
 
                 for (ActionList al : outs) {
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph("", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset())
+                            new ActionGraph(uninitializedClassTraits, "", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource) getGraphCode()).getCharset())
                     );
                 }
             }
@@ -141,9 +151,9 @@ public class ActionGraph extends Graph {
 
     }
 
-    public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        ActionGraph g = new ActionGraph(path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
-        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames);
+    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        ActionGraph g = new ActionGraph(uninitializedClassTraits,path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
+        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -474,7 +484,7 @@ public class ActionGraph extends Graph {
         List<GraphTargetItem> ret = super.translate(localData, staticOperation, path);
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
-            detector.checkClass(ret, ((ActionGraphSource) code).getVariables(), path);
+            detector.checkClass(uninitializedClassTraits,ret, ((ActionGraphSource) code).getVariables(), path);
         }
         makeDefineRegistersUp(ret);
         return ret;

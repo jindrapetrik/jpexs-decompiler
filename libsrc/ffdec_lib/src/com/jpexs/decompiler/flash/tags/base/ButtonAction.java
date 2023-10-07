@@ -27,9 +27,12 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -73,7 +76,7 @@ public class ButtonAction implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, buttonTag.getCharset());
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, buttonTag.getCharset());
     }
     
     @Override
@@ -82,7 +85,7 @@ public class ButtonAction implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer, buttonTag.getCharset(), treeOperations);
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, buttonTag.getCharset(), treeOperations);
     }
 
     /**
@@ -216,5 +219,12 @@ public class ButtonAction implements ASMSource {
         return (SWF) getOpenable();
     }
     
-    
+    @Override
+    public List<GraphTargetItem> getActionsToTree() {
+        try {
+            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), buttonTag.getSwf().version, Graph.SOP_USE_STATIC, "", buttonTag.getSwf().getCharset());
+        } catch (InterruptedException ex) {
+            return new ArrayList<>();
+        }
+    }
 }
