@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - AS3 incorrect private modifier on internal namespaced traits of private class inside script
 - [#2095] AS3 Changing script when debugging
 - [#223] AS2 Detecting uninitialized class fields
+- Embed tag not properly escaped on obfuscated files
 
 ## [19.0.0] - 2023-10-01
 ### Added
