@@ -68,9 +68,7 @@ public class NewMethodActionItem extends ActionItem {
                 }
             }
         }
-        if (!blankMethod) {
-            writer.append("new ");
-        }
+        writer.append("new ");
         scriptObject.toString(writer, localData);
         if (!blankMethod) {
             if (methodName instanceof DirectValueActionItem) {

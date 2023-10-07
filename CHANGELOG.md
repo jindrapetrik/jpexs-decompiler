@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#116] AS3 Cyclic typenames
 - [#116] AS3 Do not parse DoABC tags inside sprites
 - [#116] Cyclic buttons
+- AS1/2 new keyword on empty method name
 
 ## [19.0.0] - 2023-10-01
 ### Added
