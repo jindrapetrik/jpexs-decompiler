@@ -43,6 +43,13 @@ public class CallMethodActionItem extends ActionItem {
 
     public List<GraphTargetItem> arguments;
 
+    public static int SPECIAL_GETTER = 1;
+    public static int SPECIAL_SETTER = 2;
+    
+    
+    private int special = 0;
+    private String setterGetterVarName = null;
+    
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visitAll(arguments);
@@ -54,10 +61,50 @@ public class CallMethodActionItem extends ActionItem {
         this.methodName = methodName;
         this.arguments = arguments;
         this.scriptObject = scriptObject;
+        
+        if (methodName instanceof DirectValueActionItem) {
+            DirectValueActionItem dv = (DirectValueActionItem) methodName;
+            if (dv.isString()) {
+                String methodNameStr = dv.getAsString();
+                if (methodNameStr.startsWith("__get__") && arguments.isEmpty()) {
+                    special = SPECIAL_GETTER;
+                    setterGetterVarName = methodNameStr.substring(7);
+                } else if (methodNameStr.startsWith("__set__") && arguments.size() == 1) {
+                    special = SPECIAL_SETTER;
+                    setterGetterVarName = methodNameStr.substring(7);
+                    precedence = PRECEDENCE_ASSIGMENT;
+                }
+            }
+        }
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (special == SPECIAL_GETTER) {
+            if (scriptObject.getPrecedence() > this.precedence) {
+                writer.append("(");
+                scriptObject.toString(writer, localData);
+                writer.append(")");
+            } else {
+                scriptObject.toString(writer, localData);
+            }
+            writer.append(".");
+            writer.append(setterGetterVarName);
+            return writer;
+        } else if (special == SPECIAL_SETTER) {
+            if (scriptObject.getPrecedence() > this.precedence) {
+                writer.append("(");
+                scriptObject.toString(writer, localData);
+                writer.append(")");
+            } else {
+                scriptObject.toString(writer, localData);
+            }
+            writer.append(".");
+            writer.append(setterGetterVarName);
+            writer.append(" = ");
+            arguments.get(0).toStringNL(writer, localData);
+            return writer;
+        }
         if (methodName instanceof DirectValueActionItem) {
             boolean blankMethod = false;
 
