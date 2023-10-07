@@ -56,7 +56,7 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
         assertNotNull(dia);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
-            Action.actionsToSource(new HashMap<>() /*FIXME*/, dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
+            Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
         } catch (InterruptedException ex) {
             fail();
         }
