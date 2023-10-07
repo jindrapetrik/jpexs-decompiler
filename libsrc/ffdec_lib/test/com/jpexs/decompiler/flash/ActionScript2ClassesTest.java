@@ -56,7 +56,7 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
         assertNotNull(dia);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         try {
-            Action.actionsToSource(new HashMap<>() /*FIXME*/,dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
+            Action.actionsToSource(new HashMap<>() /*FIXME*/, dia, dia.getActions(), "", writer, Utf8Helper.charsetName);
         } catch (InterruptedException ex) {
             fail();
         }
@@ -183,5 +183,29 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
                 + "{\r\n"
                 + "trace(\"okay\");\r\n"
                 + "}\r\n");
+    }
+
+    @Test
+    public void testCallSetterGetter() {
+        compareSrc("TestCallSetterGetter", "   var myobj;\n"
+                + "   function TestCallSetterGetter()\n"
+                + "   {\n"
+                + "   }\n"
+                + "   function testSetterCall()\n"
+                + "   {\n"
+                + "      this.myobj.myvar = 5;\n"
+                + "   }\n"
+                + "   function testGetterCall()\n"
+                + "   {\n"
+                + "      return this.myobj.myvar;\n"
+                + "   }\n"
+                + "   function testStatGetterCall()\n"
+                + "   {\n"
+                + "      return com.jpexs.flash.test.testcases.TestSetterGetter.mystvar;\n"
+                + "   }\n"
+                + "   function testStatSetterCall(val)\n"
+                + "   {\n"
+                + "      com.jpexs.flash.test.testcases.TestSetterGetter.mystvar = 6;\n"
+                + "   }");
     }
 }
