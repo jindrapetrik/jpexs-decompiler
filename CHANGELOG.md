@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#116] Cyclic buttons
 - AS1/2 new keyword on empty method name
 - AS2 getters and setters decoding
+- [#116] §§push at the end of switch branches
 
 ## [19.0.0] - 2023-10-01
 ### Added
