@@ -189,6 +189,7 @@ public class UninitializedClassFieldsDetector {
                         if (item instanceof InterfaceActionItem) {
                             InterfaceActionItem iai = (InterfaceActionItem) item;
                             String className = String.join(".", getMembersPath(iai.name));
+                            classInheritance.put(className, new ArrayList<>());                            
                             if (iai.superInterfaces != null) {
                                 for (GraphTargetItem imp: iai.superInterfaces) {
                                     String imtName = String.join(".", getMembersPath(imp));
