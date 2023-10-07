@@ -20,8 +20,9 @@ All notable changes to this project will be documented in this file.
 - [#2095] AS3 Changing script when debugging
 - [#223] AS2 Detecting uninitialized class fields
 - Embed tag not properly escaped on obfuscated files
-- [#116] AS3 Cyclic typenames protection
+- [#116] AS3 Cyclic typenames
 - [#116] AS3 Do not parse DoABC tags inside sprites
+- [#116] Cyclic buttons
 
 ## [19.0.0] - 2023-10-01
 ### Added

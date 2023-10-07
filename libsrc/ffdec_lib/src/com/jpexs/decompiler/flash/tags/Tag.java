@@ -645,14 +645,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public void getNeededCharactersDeep(Set<Integer> needed) {
         Set<Integer> needed2 = new LinkedHashSet<>();
         getNeededCharacters(needed2, swf);
-        List<Integer> needed3 = new ArrayList<>(needed2);
+        List<Integer> needed3 = new ArrayList<>(needed2);        
 
         for (int i = 0; i < needed3.size(); i++) {
             int characterId = needed3.get(i);
             if (swf == null) {
                 return;
             }
-            if (swf.getCharacters().containsKey(characterId)) {
+            if (swf.getCharacters().containsKey(characterId) && !swf.getCyclicCharacters().contains(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
                 CharacterTag character = swf.getCharacter(characterId);                
                 character.getNeededCharacters(needed4, swf);
