@@ -3366,7 +3366,7 @@ public class Graph {
 
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
-            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
+            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {        
         boolean hasDefault = false;
         /*
                 case 4:
@@ -3528,6 +3528,7 @@ public class Graph {
                 }
             }
             caseCommands.add(currentCaseCommands);
+            makeAllCommands(currentCaseCommands, stack);
         }
 
         /*
