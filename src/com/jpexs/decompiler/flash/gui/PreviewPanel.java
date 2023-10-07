@@ -2194,6 +2194,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditEditPointsButton.setVisible(true);
         }
         
+        if (displayEditTag instanceof DefineSpriteTag) {
+            replaceSpriteButton.setVisible(true);
+        }
+        
         if (displayEditTag instanceof MorphShapeTag) {
             morphShowPanel.setVisible(true);
             displayEditEditPointsButton.setVisible(true);
@@ -2445,6 +2449,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
             }
             sprite.resetTimeline();
+            replaceSpriteButton.setVisible(true);
         }
         mainPanel.clearEditingStatus();
         if (refreshTree) {
@@ -2465,6 +2470,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformSaveButton.setVisible(false);
         mainPanel.clearEditingStatus();
         mainPanel.reload(true);
+        
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+        if (item instanceof DefineSpriteTag) {
+            replaceSpriteButton.setVisible(true);
+        }
     }
 
     private void transformImageButtonActionPerformed(ActionEvent evt) {
@@ -2565,6 +2578,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel.setTimelined(sprite2, fSwf, 0, true, true, true, true, true, false);
         imagePanel.selectDepth(-1);
 
+        replaceSpriteButton.setVisible(false);
         imageTransformButton.setVisible(false);
         imageTransformSaveButton.setVisible(true);
         imageTransformCancelButton.setVisible(true);
