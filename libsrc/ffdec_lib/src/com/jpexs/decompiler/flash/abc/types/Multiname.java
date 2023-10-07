@@ -80,6 +80,9 @@ public class Multiname {
     @Internal
     private boolean displayNamespace = false;
 
+    @Internal
+    private boolean cyclic = false;
+
     public String getNamespaceSuffix() {
         if (displayNamespace) {
             return "#" + namespace_index;
@@ -155,6 +158,39 @@ public class Multiname {
 
     public static Multiname createTypeName(int qname_index, int[] params) {
         return new Multiname(TYPENAME, 0, 0, 0, qname_index, params);
+    }
+
+    public static void checkTypeNameCyclic(AVM2ConstantPool constants, int name_index) {
+        Set<Integer> visited = new HashSet<>();
+        if (name_index >= constants.getMultinameCount()) {
+            return;
+        }
+        Multiname m = constants.getMultiname(name_index);
+        if (m != null) {
+            m.cyclic = checkCyclicTypeNameSub(constants, name_index, visited);                   
+        }
+    }
+
+    private static boolean checkCyclicTypeNameSub(AVM2ConstantPool constants, int name_index, Set<Integer> visited) {
+        if (name_index >= constants.getMultinameCount()) {
+            return false;
+        }
+        Multiname m = constants.getMultiname(name_index);
+        if (m != null && m.kind == Multiname.TYPENAME) {
+            if (visited.contains(name_index)) {
+                return true;
+            }
+            visited.add(name_index);
+            if (checkCyclicTypeNameSub(constants, m.qname_index, visited)) {
+                return true;
+            }
+            for (int p : m.params) {
+                if (checkCyclicTypeNameSub(constants, p, visited)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isAttribute() {
@@ -272,16 +308,15 @@ public class Multiname {
         String versionAdd = "";
         if (name != null && name.length() > 0) {
             char lastChar = name.charAt(name.length() - 1);
-            
+
             if (lastChar >= Namespace.MIN_API_MARK && lastChar <= Namespace.MAX_API_MARK) {
                 name = name.substring(0, name.length() - 1);
                 versionAdd = String.format("\\u%04x", (int) lastChar);
             }
         }
-        
-        
-        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\"" + 
-                Helper.escapePCodeString(name) + versionAdd
+
+        return constants.getNamespace(index).getKindStr() + "(" + (name == null ? "null" : "\""
+                + Helper.escapePCodeString(name) + versionAdd
                 + "\"") + (sub > 0 ? ",\"" + sub + "\"" : "") + ")";
     }
 
@@ -331,6 +366,9 @@ public class Multiname {
             case MULTINAMELA:
                 return getKindStr() + "(" + namespaceSetToString(constants, namespace_set_index) + ")";
             case TYPENAME:
+                if (cyclic) {
+                    return "CyclicTypeName";
+                }
                 String tret = getKindStr() + "(";
                 tret += multinameToString(constants, qname_index, fullyQualifiedNames);
                 tret += "<";
@@ -350,8 +388,8 @@ public class Multiname {
     }
 
     private String typeNameToStr(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix) {
-        if (constants.getMultiname(qname_index).name_index == name_index) {
-            return "ambiguousTypeName";
+        if (cyclic) {
+            return "§§cyclic_typename()";
         }
         StringBuilder typeNameStr = new StringBuilder();
         typeNameStr.append(constants.getMultiname(qname_index).getName(constants, fullyQualifiedNames, dontDeobfuscate, withSuffix));
@@ -389,7 +427,7 @@ public class Multiname {
             if (nskind == Namespace.KIND_NAMESPACE || nskind == Namespace.KIND_PACKAGE_INTERNAL) {
                 DottedChain dc = abc.findCustomNsOfMultiname(this);
                 String nsname = dc != null ? dc.getLast() : null;
-                
+
                 if (nsname != null && !"AS3".equals(nsname)) {
                     String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
@@ -432,9 +470,9 @@ public class Multiname {
         if (cached != null) {
             return cached;
         }
-        
+
         DottedChain nsName = getSimpleNamespaceName(constants);
-        if (nsName == null) {                            
+        if (nsName == null) {
             Namespace ns = getNamespace(constants);
             if (ns == null) {
                 NamespaceSet nss = getNamespaceSet(constants);
@@ -453,7 +491,7 @@ public class Multiname {
         if (nsName != null) {
             ret = nsName.add(name, withSuffix ? getNamespaceSuffix() : "");
         } else {
-            ret = new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});        
+            ret = new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});
         }
         constants.cacheMultinameWithNamespace(this, ret);
         return ret;
@@ -466,19 +504,20 @@ public class Multiname {
             return constants.getNamespace(namespace_index);
         }
     }
-    
+
     /**
      * Gets simple namespace name as dottedchain. Ignores swf api versioning.
+     *
      * @param constants
-     * @return 
+     * @return
      */
-    public DottedChain getSimpleNamespaceName(AVM2ConstantPool constants) {                        
+    public DottedChain getSimpleNamespaceName(AVM2ConstantPool constants) {
         if (hasOwnNamespace()) {
             if (namespace_index == 0 || namespace_index == -1) {
                 return DottedChain.EMPTY;
             }
             return getNamespace(constants).getName(constants);
-        }           
+        }
         if (hasOwnNamespaceSet()) {
             NamespaceSet nss = getNamespaceSet(constants);
             if (nss == null) {
@@ -488,11 +527,12 @@ public class Multiname {
         }
         return null;
     }
-    
+
     /**
      * Gets simplpe namespace kind. Ignores swf api versioning.
+     *
      * @param constants
-     * @return 
+     * @return
      */
     public int getSimpleNamespaceKind(AVM2ConstantPool constants) {
         if (hasOwnNamespace()) {
@@ -500,7 +540,7 @@ public class Multiname {
                 return 0;
             }
             return getNamespace(constants).kind;
-        }   
+        }
         if (hasOwnNamespaceSet()) {
             NamespaceSet nss = getNamespaceSet(constants);
             if (nss == null) {
@@ -510,7 +550,7 @@ public class Multiname {
         }
         return 0;
     }
-    
+
     public List<Integer> getApiVersions(AVM2ConstantPool constants) {
         if (hasOwnNamespace()) {
             return new ArrayList<>();
@@ -520,7 +560,7 @@ public class Multiname {
         }
         return new ArrayList<>();
     }
-    
+
     public boolean isApiVersioned(AVM2ConstantPool constants) {
         if (hasOwnNamespace()) {
             return false;
@@ -656,4 +696,8 @@ public class Multiname {
 
         return true;
     }
+
+    public boolean isCyclic() {
+        return cyclic;
+    }        
 }
