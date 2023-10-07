@@ -5226,7 +5226,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 previewPanel.setParametersPanelVisible(false);
             }
-        } else if (treeItem instanceof BUTTONRECORD) {
+        } else if ((treeItem instanceof BUTTONRECORD) && (!((BUTTONRECORD) treeItem).getSwf().getCyclicCharacters().contains(((BUTTONRECORD) treeItem).characterId))) {
             BUTTONRECORD buttonRecord = (BUTTONRECORD) treeItem;
             previewPanel.setParametersPanelVisible(false);
             SWF swf = new SWF(buttonRecord.getSwf().getCharset());

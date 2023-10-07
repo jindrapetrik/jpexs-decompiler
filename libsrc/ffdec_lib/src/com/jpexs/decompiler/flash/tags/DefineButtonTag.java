@@ -248,7 +248,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
         Frame frameOver = new Frame(timeline, 0);
         Frame frameHit = new Frame(timeline, 0);
         for (BUTTONRECORD r : this.characters) {
-
+            if (swf.getCyclicCharacters().contains(r.characterId)) {
+                continue;
+            }
             DepthState layer = new DepthState(swf, null);
             layer.colorTransForm = clrTrans;
             layer.blendMode = r.blendMode;
@@ -303,5 +305,12 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     @Override
     public void setFrameCount(int frameCount) {
         throw new UnsupportedOperationException("Not supported yet.");
-    }  
+    }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+        for (BUTTONRECORD rec: characters) {
+            needed.add(rec.characterId);
+        }
+    }        
 }
