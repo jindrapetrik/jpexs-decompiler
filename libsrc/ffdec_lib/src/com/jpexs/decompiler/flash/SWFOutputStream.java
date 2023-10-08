@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -179,7 +180,12 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeString(String value) throws IOException {
-        byte[] data = value.getBytes(charset);
+        byte[] data;
+        if ("UTF-8".equals(charset)) {
+            data = Utf8Helper.getBytes(value);
+        } else {
+            data = value.getBytes(charset);
+        }
         for (int i = 0; i < data.length; i++) {
             if (data[i] == 0) {
                 throw new IOException("String should not contain null character.");

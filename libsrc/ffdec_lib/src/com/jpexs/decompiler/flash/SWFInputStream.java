@@ -508,7 +508,10 @@ public class SWFInputStream implements AutoCloseable {
             r = readEx();
             if (r == 0) {
                 endDumpLevel();
-                return new String(baos.toByteArray(), swf == null ? Utf8Helper.charsetName : swf.getCharset());
+                if (swf == null || "UTF-8".equals(swf.getCharset())) {
+                    return Utf8Helper.decode(baos.toByteArray());
+                }
+                return new String(baos.toByteArray(), swf.getCharset());
             }
             baos.write(r);
         }

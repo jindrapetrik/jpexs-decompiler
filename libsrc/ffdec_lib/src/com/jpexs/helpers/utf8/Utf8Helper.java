@@ -18,6 +18,8 @@ package com.jpexs.helpers.utf8;
 
 import com.jpexs.helpers.utf8.charset.Gb2312;
 import com.jpexs.helpers.utf8.charset.ShiftJis;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -29,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -98,13 +102,106 @@ public class Utf8Helper {
         }
     }
 
-    public static byte[] getBytes(String string) {
-        return string.getBytes(charset);
+    public static byte[] getBytes(String string) {        
+        if (!string.contains("{invalid_utf8:")) {
+            return string.getBytes(charset);
+        }
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();        
+
+        try {
+            Pattern invPattern = Pattern.compile("^(\\{invalid_utf8:([0-9]+)\\}).*", Pattern.DOTALL);
+            for (int i = 0; i < string.length(); i++) {
+                char c = string.charAt(i);
+                if (c == '{') {
+                    String subStr = string.substring(i);
+                    Matcher m = invPattern.matcher(subStr);
+                    if (m.matches()) {
+                        int v = Integer.parseInt(m.group(2));
+                        baos.write(v);
+                        i += m.group(1).length();
+                        i--;
+                        continue;
+                    }
+                }
+                baos.write(("" + c).getBytes(charset));                
+            }
+        } catch (IOException iex) {
+            //should not happen
+        }
+
+        return baos.toByteArray();
     }
 
     public static int getBytesLength(String string) {
         // todo: make it faster without actually writing it to an array
-        return string.getBytes(charset).length;
+        return getBytes(string).length;
+    }
+    
+    public static String decode(byte[] data) {
+        return decode(data, 0, data.length);
+    }
+
+    private static String escapeInvalidUtf8Char(int v) {
+        return "{invalid_utf8:" + v + "}";
+    }
+
+    public static String decode(byte[] data, int start, int length) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            for (int i = 0; i < length; i++) {
+                int v = data[i] & 0xff;
+                int numNextBytes = 0;
+                if ((v & 0x80) == 0) { //0xxxxxxx
+                    baos.write(v);
+                } else if ((v & 0xC0) == 0x80) { //10xxxxxx
+                    baos.write(escapeInvalidUtf8Char(v).getBytes("UTF-8"));
+                } else if ((v & 0xE0) == 0xC0) { //110xxxxx
+                    numNextBytes = 1;
+                } else if ((v & 0xF0) == 0xE0) { //1110xxxx
+                    numNextBytes = 2;
+                } else if ((v & 0xF8) == 0xF0) { //11110xxx
+                    numNextBytes = 3;
+                } else {
+                    baos.write(escapeInvalidUtf8Char(v).getBytes("UTF-8"));
+                }
+                if (numNextBytes > 0) {
+                    if (i + numNextBytes >= length) {
+                        baos.write(escapeInvalidUtf8Char(v).getBytes("UTF-8"));
+                        continue;
+                    }
+                    boolean validNextBytes = true;
+                    for (int j = 0; j < numNextBytes; j++) {
+                        int v2 = data[i + 1 + j] & 0xff;
+                        if ((v2 & 0xC0) != 0x80) { //must be 10xxxxxx
+                            
+                            if ((v2 & 0x80) == 0) { //0xxxxxxx
+                                numNextBytes = j;
+                            }
+                            validNextBytes = false;
+                            break;
+                        }
+                    }
+                    if (!validNextBytes) {
+                        baos.write(escapeInvalidUtf8Char(v).getBytes("UTF-8"));
+                        for (int j = 0; j < numNextBytes; j++) {
+                            int v2 = data[i + 1 + j] & 0xff;
+                            baos.write(escapeInvalidUtf8Char(v2).getBytes("UTF-8"));                            
+                        }
+                    } else {
+                        baos.write(v);
+                        for (int j = 0; j < numNextBytes; j++) {
+                            int v2 = data[i + 1 + j] & 0xff;
+                            baos.write(v2);
+                        }                        
+                    }
+                    i += numNextBytes; 
+                }
+            }
+        } catch (IOException ex) {
+
+        }
+        return new String(baos.toByteArray(), Utf8Helper.charset);
     }
 
     public static char codePointToChar(int codePoint, String charsetName) {

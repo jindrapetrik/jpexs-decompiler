@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2090] Support for Mochicrypt packed binarydata tags - loading SWF as subtree
 - [#2079] Replace DefineSprite with GIF, Bulk import sprites from GIFs, also from commandline
+- [#116] Show invalid utf-8 bytes in Strings as `{invalid_utf8:xxx}`
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
