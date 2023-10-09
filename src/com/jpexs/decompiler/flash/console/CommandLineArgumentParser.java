@@ -235,6 +235,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -747,6 +749,19 @@ public class CommandLineArgumentParser {
             out.println(" ...use AIR (airglobal.swc) for AS3 compilation instead of playerglobal.swc");
             out.println("   (use in combination with other commands)");
         }
+        
+        if (filter == null || filter.equals("header")) {
+            out.println(" " + (cnt++) + ") -header -set <key> <value> [-set <key2> <value2> ...] <swffile> [<outfile>]");
+            out.println(" ...prints header or sets SWF header values (with -set arguments) in <swffile> and saves it to <outfile>");
+            out.println("   Available keys: version");
+            out.println("                   gfx (true/false)");
+            out.println("                   displayrect ([x1,y1,x2,y2])");
+            out.println("                   width");
+            out.println("                   height");
+            out.println("                   framecount");
+            out.println("                   framerate");
+            out.println("   For width, height and displayrect subvalues you can use suffix px for pixel values. Otherwise its twips.");
+        }
 
         printCmdLineUsageExamples(out, filter);
 
@@ -843,6 +858,13 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("swf2exe")) {
             out.println(PREFIX + "-swf2exe wrapper result.exe myfile.swf");
+        }
+        
+        if (filter == null || filter.equals("header")) {
+            out.println(PREFIX + "-header myfile.swf");
+            out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
+            out.println(PREFIX + "-header -set displayrect [0,0,800px,600px] myfile.swf outfile.swf");        
+            out.println(PREFIX + "-header -set gfx true myfile.swf outfile.swf");
         }
 
         if (!exampleFound) {
@@ -983,7 +1005,10 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("translator")) {
+        if (command.equals("header")) {
+            parseHeader(args);
+            System.exit(0);
+        } else if (command.equals("translator")) {
             Translator.main(new String[]{});
         } else if (command.equals("swf2exe")) {
             parseSwf2Exe(args, charset);
@@ -4685,6 +4710,221 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
+    }
+    
+    private static void parseHeader(Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("header");
+        }
+        Float frameRate = null;
+        Integer frameCount = null;
+        Integer width = null;
+        Integer height = null;
+        Integer x = null;
+        Integer y = null;
+        Boolean gfx = null;
+        Integer version = null;
+        
+        Pattern displayRectPattern = Pattern.compile("\\[(?<x1>[0-9.]+)(?<x1px>px)?,(?<y1>[0-9.]+)(?<y1px>px)?,(?<x2>[0-9.]+)(?<x2px>px)?,(?<y2>[0-9.]+)(?<y2px>px)?\\]");
+                        
+        boolean printOnly = args.size() == 1;
+        
+        while (!args.isEmpty()) {
+            String arg = args.pop();
+            if (arg.equals("-set")) {
+                if (args.size() < 3) {
+                    badArguments("header");
+                }
+                String key = args.pop();
+                String value = args.pop();
+                switch(key.toLowerCase()) {
+                    case "version":
+                        try {
+                            version = Integer.valueOf(value);
+                        } catch (NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
+                    case "gfx":
+                        gfx = parseBooleanConfigValue(value);
+                        if (gfx == null) {
+                            badArguments("header");
+                        }
+                        break;
+                    case "displayrect":
+                        Matcher displayRectMatcher = displayRectPattern.matcher(value);
+                        if (!displayRectMatcher.matches()) {
+                            badArguments("header");
+                        }
+                        if (displayRectMatcher.group("x1px") != null) {
+                            x = (int) Math.round(Float.parseFloat(displayRectMatcher.group("x1")) * SWF.unitDivisor);
+                        } else {
+                            try {
+                                x = Integer.valueOf(displayRectMatcher.group("x1"));                        
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }                
+                        }
+                        if (displayRectMatcher.group("y1px") != null) {
+                            y = (int) Math.round(Float.parseFloat(displayRectMatcher.group("y1")) * SWF.unitDivisor);
+                        } else {
+                            try {
+                                y = Integer.valueOf(displayRectMatcher.group("y1"));                        
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        }
+                        
+                        int x2 = 0;
+                        int y2 = 0;
+                        
+                        if (displayRectMatcher.group("x2px") != null) {
+                            x2 = (int) Math.round(Float.parseFloat(displayRectMatcher.group("x2")) * SWF.unitDivisor);
+                        } else {
+                            try {
+                                x2 = Integer.parseInt(displayRectMatcher.group("x2"));
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }                
+                        }
+                        if (displayRectMatcher.group("y2px") != null) {
+                            y2 = (int) Math.round(Float.parseFloat(displayRectMatcher.group("y2")) * SWF.unitDivisor);
+                        } else {
+                            try {
+                                y2 = Integer.parseInt(displayRectMatcher.group("y2"));
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        }
+                        
+                        width = x2 - x;
+                        height = y2 - y;
+                        break;
+                    case "width":
+                        if (value.endsWith("px")) {
+                            value = value.substring(0, value.length() - 2).trim();                            
+                            try {
+                                width = (int)Math.round(Float.parseFloat(value) * SWF.unitDivisor);
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        } else {
+                            try {
+                                width = Integer.valueOf(value);                            
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        }
+                        break;
+                    case "height":
+                        if (value.endsWith("px")) {
+                            value = value.substring(0, value.length() - 2).trim();                            
+                            try {
+                                height = (int)Math.round(Float.parseFloat(value) * SWF.unitDivisor);
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        } else {
+                            try {
+                                height = Integer.valueOf(value);                            
+                            } catch(NumberFormatException nfe) {
+                                badArguments("header");
+                            }
+                        }
+                        break;
+                    case "framecount":
+                        try {
+                            frameCount = Integer.valueOf(value);
+                        } catch(NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
+                    case "framerate":
+                        try {
+                            frameRate = Float.valueOf(value);
+                        } catch(NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
+                    default:
+                        badArguments("header");
+                }
+            } else {
+                args.push(arg);
+                break;
+            }
+        }
+        
+        if (!printOnly && args.size() != 2) {
+            badArguments("header");
+        }
+        
+        File file = new File(args.pop());
+        File outfile = printOnly ? null : new File(args.pop());
+        PrintWriter pw = new PrintWriter(System.out);
+        try {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
+                SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), true);
+                
+                if (printOnly) {
+                    pw.println("[header]");
+                    pw.println("fileSize=" + swf.fileSize);
+                    pw.println("version=" + swf.version);
+                    pw.println("compression=" + swf.compression);
+                    pw.println("gfx=" + swf.gfx);
+                    pw.println("displayRect=[" + swf.displayRect.Xmin + ", " +swf.displayRect.Ymin + ", " + swf.displayRect.Xmax + ", " + swf.displayRect.Ymax + "]");
+                    pw.println("width=" + swf.displayRect.getWidth());
+                    pw.println("widthPx=" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor));
+                    pw.println("height=" + swf.displayRect.getHeight());
+                    pw.println("heightPx=" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor));
+                    pw.println("frameCount=" + swf.frameCount);
+                    pw.println("frameRate=" + doubleToString(swf.frameRate));
+                    pw.flush();
+                    return;
+                }
+                if (version != null) {
+                    swf.version = version;
+                    pw.println("version set to " + version);
+                }
+                if (gfx != null) {
+                    swf.gfx = gfx;
+                    pw.println("gfx set to " + gfx);
+                }
+                if (x != null) {
+                    swf.displayRect.Xmin = x;
+                    pw.println("displayrect.x1 set to " + x);
+                }                
+                if (y != null) {
+                    swf.displayRect.Ymin = y;
+                    pw.println("displayrect.y1 set to " + y);
+                }
+                if (width != null) {
+                    swf.displayRect.Xmax = swf.displayRect.Xmin + width;
+                    pw.println("displayrect.x2 set to " + swf.displayRect.Xmax);
+                }
+                if (height != null) {
+                    swf.displayRect.Ymax = swf.displayRect.Ymin + height;
+                    pw.println("displayrect.y2 set to " + swf.displayRect.Ymax);
+                }
+                if (frameCount != null) {
+                    swf.frameCount = frameCount;
+                    pw.println("framecount set to " + frameCount);
+                }
+                if (frameRate != null) {
+                    swf.frameRate = frameRate;
+                    pw.println("framerate set to " + frameRate);
+                }
+                
+                try (FileOutputStream fos = new FileOutputStream(outfile)) {
+                    swf.saveTo(fos);
+                }
+                pw.println("Successfully saved");
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during reading");
+            System.exit(2);
+        }
+        pw.flush();
     }
 
     private static FilenameFilter getSwfFilter() {
