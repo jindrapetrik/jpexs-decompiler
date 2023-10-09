@@ -858,6 +858,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("swf2exe")) {
             out.println(PREFIX + "-swf2exe wrapper result.exe myfile.swf");
+            exampleFound = true;
         }
         
         if (filter == null || filter.equals("header")) {
@@ -865,6 +866,7 @@ public class CommandLineArgumentParser {
             out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
             out.println(PREFIX + "-header -set displayrect [0,0,800px,600px] myfile.swf outfile.swf");        
             out.println(PREFIX + "-header -set gfx true myfile.swf outfile.swf");
+            exampleFound = true;
         }
 
         if (!exampleFound) {
