@@ -4737,7 +4737,7 @@ public class CommandLineArgumentParser {
                 }
                 String key = args.pop();
                 String value = args.pop();
-                switch(key.toLowerCase()) {
+                switch (key.toLowerCase()) {
                     case "version":
                         try {
                             version = Integer.valueOf(value);
@@ -4761,7 +4761,7 @@ public class CommandLineArgumentParser {
                         } else {
                             try {
                                 x = Integer.valueOf(displayRectMatcher.group("x1"));                        
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }                
                         }
@@ -4770,7 +4770,7 @@ public class CommandLineArgumentParser {
                         } else {
                             try {
                                 y = Integer.valueOf(displayRectMatcher.group("y1"));                        
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         }
@@ -4783,7 +4783,7 @@ public class CommandLineArgumentParser {
                         } else {
                             try {
                                 x2 = Integer.parseInt(displayRectMatcher.group("x2"));
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }                
                         }
@@ -4792,7 +4792,7 @@ public class CommandLineArgumentParser {
                         } else {
                             try {
                                 y2 = Integer.parseInt(displayRectMatcher.group("y2"));
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         }
@@ -4804,14 +4804,14 @@ public class CommandLineArgumentParser {
                         if (value.endsWith("px")) {
                             value = value.substring(0, value.length() - 2).trim();                            
                             try {
-                                width = (int)Math.round(Float.parseFloat(value) * SWF.unitDivisor);
-                            } catch(NumberFormatException nfe) {
+                                width = (int) Math.round(Float.parseFloat(value) * SWF.unitDivisor);
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         } else {
                             try {
                                 width = Integer.valueOf(value);                            
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         }
@@ -4820,14 +4820,14 @@ public class CommandLineArgumentParser {
                         if (value.endsWith("px")) {
                             value = value.substring(0, value.length() - 2).trim();                            
                             try {
-                                height = (int)Math.round(Float.parseFloat(value) * SWF.unitDivisor);
-                            } catch(NumberFormatException nfe) {
+                                height = (int) Math.round(Float.parseFloat(value) * SWF.unitDivisor);
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         } else {
                             try {
                                 height = Integer.valueOf(value);                            
-                            } catch(NumberFormatException nfe) {
+                            } catch (NumberFormatException nfe) {
                                 badArguments("header");
                             }
                         }
@@ -4835,14 +4835,14 @@ public class CommandLineArgumentParser {
                     case "framecount":
                         try {
                             frameCount = Integer.valueOf(value);
-                        } catch(NumberFormatException nfe) {
+                        } catch (NumberFormatException nfe) {
                             badArguments("header");
                         }
                         break;
                     case "framerate":
                         try {
                             frameRate = Float.valueOf(value);
-                        } catch(NumberFormatException nfe) {
+                        } catch (NumberFormatException nfe) {
                             badArguments("header");
                         }
                         break;
@@ -4872,7 +4872,7 @@ public class CommandLineArgumentParser {
                     pw.println("version=" + swf.version);
                     pw.println("compression=" + swf.compression);
                     pw.println("gfx=" + swf.gfx);
-                    pw.println("displayRect=[" + swf.displayRect.Xmin + ", " +swf.displayRect.Ymin + ", " + swf.displayRect.Xmax + ", " + swf.displayRect.Ymax + "]");
+                    pw.println("displayRect=[" + swf.displayRect.Xmin + ", " + swf.displayRect.Ymin + ", " + swf.displayRect.Xmax + ", " + swf.displayRect.Ymax + "]");
                     pw.println("width=" + swf.displayRect.getWidth());
                     pw.println("widthPx=" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor));
                     pw.println("height=" + swf.displayRect.getHeight());
