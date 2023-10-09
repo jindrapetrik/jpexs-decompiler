@@ -76,7 +76,7 @@ public class SWFSearch {
 
             @Override
             public void status(String status) {
-            }            
+            }
         },
                 "FWS".getBytes(), // Uncompressed Flash
                 "CWS".getBytes(), // ZLib compressed Flash
@@ -86,8 +86,8 @@ public class SWFSearch {
                 "fWS".getBytes(), //Harman encrypted uncompressed Flash,
                 "cWS".getBytes(), //Harman encrypted ZLib compressed Flash,
                 "zWS".getBytes() //Harman encrypted LZMA compressed Flash    
-                );
-                    
+        );
+
         int pos = 0;
         long biggestSize = 0;
         long smallestSize = Long.MAX_VALUE;
@@ -137,6 +137,7 @@ public class SWFSearch {
             } catch (OutOfMemoryError ome) {
                 Helper.freeMem();
             } catch (Exception | Error ex) {
+                //ignored
             }
         }
         setProgress(100);

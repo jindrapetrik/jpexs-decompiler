@@ -23,6 +23,7 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class GraphPartEdge {
+
     public GraphPart from;
     public GraphPart to;
 

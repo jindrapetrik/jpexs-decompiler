@@ -51,6 +51,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
                 flashPanel = new FlashPlayerPanel(this);
                 flashPanel2 = new FlashPlayerPanel(this);
             } catch (FlashUnsupportedException fue) {
+                //ignored
             }
         }
 

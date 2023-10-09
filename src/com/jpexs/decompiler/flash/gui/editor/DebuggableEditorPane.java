@@ -156,7 +156,6 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             g.fillRect(0, line == 1 ? 0 : lineY + h, getWidth(), getHeight() - lineY - lineHeight);
         }
 
-
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         ((Graphics2D) g).setStroke(new BasicStroke(0.5f));

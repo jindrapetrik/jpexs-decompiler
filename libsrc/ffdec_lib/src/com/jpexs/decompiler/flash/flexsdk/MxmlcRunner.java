@@ -35,7 +35,7 @@ public class MxmlcRunner {
     }
 
     public void mxmlc(String... arguments) throws MxmlcException, InterruptedException, IOException {
-        String runArgs[] = new String[arguments.length + 1];
+        String[] runArgs = new String[arguments.length + 1];
         runArgs[0] = getMxmlcPath(flexSdkPath);
         System.arraycopy(arguments, 0, runArgs, 1, arguments.length);
         //System.out.println("" + String.join(" ", runArgs));

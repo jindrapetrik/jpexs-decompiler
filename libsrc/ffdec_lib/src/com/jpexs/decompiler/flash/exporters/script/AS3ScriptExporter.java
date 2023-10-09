@@ -79,7 +79,6 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -458,6 +457,7 @@ public class AS3ScriptExporter {
                     logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
                 }
             } catch (InterruptedException ex) {
+                //ignored
             } finally {
                 executor.shutdownNow();
             }
@@ -468,6 +468,7 @@ public class AS3ScriptExporter {
                         ret.add(futureResults.get(f).get());
                     }
                 } catch (InterruptedException ex) {
+                    //ignored
                 } catch (ExecutionException ex) {
                     logger.log(Level.SEVERE, "Error during ABC export", ex);
                 }
@@ -475,11 +476,11 @@ public class AS3ScriptExporter {
         }
 
         if (exportSettings.exportEmbedFlaMode || exportSettings.exportEmbed) {
-            
+
             if (Thread.currentThread().isInterrupted()) {
                 return ret;
             }
-            
+
             final String ASSETS_DIR = outdir + "/_assets/";
             List<Tag> exportTagList = new ArrayList<>();
             List<DefineSpriteTag> spriteTagList = new ArrayList<>();
@@ -529,22 +530,22 @@ public class AS3ScriptExporter {
                 ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
-                }                
+                }
                 SoundExporter se = new SoundExporter();
                 se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
-                }                
+                }
                 FontExporter fe = new FontExporter();
                 fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
-                }                
+                }
                 Font4Exporter f4e = new Font4Exporter();
                 f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
-                }                
+                }
                 if (!spriteTagList.isEmpty()) {
                     new RetryTask(() -> {
                         try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
@@ -582,12 +583,12 @@ public class AS3ScriptExporter {
                                 List<CharacterIdTag> cidTags = swf.getCharacterIdTags(n);
                                 for (CharacterIdTag t : cidTags) {
                                     if (t instanceof PlaceObjectTypeTag) {
-                                        continue;                                        
+                                        continue;
                                     }
                                     if (t instanceof RemoveTag) {
                                         continue;
                                     }
-                                    ((Tag) t).writeTag(sos2);                                    
+                                    ((Tag) t).writeTag(sos2);
                                 }
                             }
 
@@ -595,17 +596,17 @@ public class AS3ScriptExporter {
                             sc.names = symbolClassNames;
                             sc.tags = symbolClassIds;
                             sc.writeTag(sos2);
-                            
+
                             new ShowFrameTag(swf).writeTag(sos2);
                             new EndTag(swf).writeTag(sos2);
 
                             SWFOutputStream sos = new SWFOutputStream(fos, swf.version, swf.getCharset());
                             sos.write("FWS".getBytes());
                             sos.write(swf.version);
-                            byte data[] = baos.toByteArray();
+                            byte[] data = baos.toByteArray();
                             long fileSize = sos.getPos() + data.length + 4;
                             sos.writeUI32(fileSize);
-                            sos.write(data);                           
+                            sos.write(data);
                         }
                     }, handler).run();
                 }

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +66,7 @@ public class HarmanDecryption {
         return ret & 0xffffffffL;
     }
 
-    private static long unpack(byte data[], int start) {
+    private static long unpack(byte[] data, int start) {
         return (data[start] & 0xff)
                 + ((long) (data[start + 1] & 0xff) << 8)
                 + ((long) (data[start + 2] & 0xff) << 16)
@@ -82,7 +81,7 @@ public class HarmanDecryption {
         //get the length
         DataInputStream dais = new DataInputStream(is);
 
-        byte encryptedLengthBytes[] = new byte[4];
+        byte[] encryptedLengthBytes = new byte[4];
         dais.readFully(encryptedLengthBytes);
         long encryptedLength = unpack(encryptedLengthBytes, 0);
         int decryptedLength = (int) (encryptedLength ^ key);
@@ -91,7 +90,7 @@ public class HarmanDecryption {
         int paddedLength = (int) (decryptedLength + 0x1F) & ~0x1F;
 
         //aes iv
-        byte aesIV[] = new byte[16];
+        byte[] aesIV = new byte[16];
         System.arraycopy(header, 0, aesIV, 0, header.length); //header
         System.arraycopy(encryptedLengthBytes, 0, aesIV, 8, 4); //encrypted length
         aesIV[12] = (byte) (key & 0xff);
@@ -105,11 +104,11 @@ public class HarmanDecryption {
 
         // aes key
         // this one is stored at the end of the file
-        byte aesKey[] = new byte[32];        
-        byte data[] = new byte[paddedLength];
+        byte[] aesKey = new byte[32];
+        byte[] data = new byte[paddedLength];
         dais.readFully(data);
 
-        byte aesKeyData[] = new byte[32];
+        byte[] aesKeyData = new byte[32];
         dais.readFully(aesKeyData);
 
         for (int i = 0; i < 32; i += 4) {
@@ -129,7 +128,7 @@ public class HarmanDecryption {
         Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(aesIV));
 
-        byte decryptedData[] = cipher.doFinal(data);
+        byte[] decryptedData = cipher.doFinal(data);
         return new ByteArrayInputStream(Arrays.copyOfRange(decryptedData, 0, decryptedLength));
     }
 }

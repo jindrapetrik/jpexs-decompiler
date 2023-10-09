@@ -23,5 +23,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
  * @author JPEXS
  */
 public interface TagRemoveListener {
+
     public void tagRemoved(Tag tag);
 }

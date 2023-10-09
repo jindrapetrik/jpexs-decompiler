@@ -129,19 +129,19 @@ public class ActionScriptSearch {
             List<String> ignoredNss = new ArrayList<>();
 
             if (Configuration._ignoreAdditionalFlexClasses.get() && (openable instanceof SWF)) {
-                ((SWF)openable).getFlexMainClass(ignoredClasses, ignoredNss);
+                ((SWF) openable).getFlexMainClass(ignoredClasses, ignoredNss);
             }
 
             final List<ABCSearchResult> found = Collections.synchronizedList(new ArrayList<>());
             final List<ScriptPack> fscope;
             if (scope == null) {
                 if (openable instanceof SWF) {
-                    fscope = ((SWF)openable).getAS3Packs();
+                    fscope = ((SWF) openable).getAS3Packs();
                 } else {
-                    ABC abc = (ABC)openable;
+                    ABC abc = (ABC) openable;
                     List<ABC> allAbcs = new ArrayList<>();
                     allAbcs.add(abc);
-                    fscope = abc.getScriptPacks(null, allAbcs);                    
+                    fscope = abc.getScriptPacks(null, allAbcs);
                 }
             } else {
                 fscope = scope;

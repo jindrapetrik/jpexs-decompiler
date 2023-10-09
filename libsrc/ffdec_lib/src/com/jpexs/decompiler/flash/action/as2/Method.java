@@ -21,6 +21,7 @@ package com.jpexs.decompiler.flash.action.as2;
  * @author JPEXS
  */
 public class Method implements Trait {
+
     private final boolean isStatic;
     private final String name;
     private final String returnType;
@@ -37,7 +38,7 @@ public class Method implements Trait {
     public String getClassName() {
         return className;
     }
-    
+
     @Override
     public boolean isStatic() {
         return isStatic;
@@ -51,10 +52,10 @@ public class Method implements Trait {
     public String getReturnType() {
         return returnType;
     }
-    
+
     @Override
     public String toString() {
-        return (isStatic ? "static " : "") + "function " + name + ": " +returnType;
+        return (isStatic ? "static " : "") + "function " + name + ": " + returnType;
     }
 
     @Override
@@ -65,5 +66,5 @@ public class Method implements Trait {
     @Override
     public String getType() {
         return "Function";
-    }        
+    }
 }

@@ -28,7 +28,6 @@ import org.pushingpixels.flamingo.api.common.popup.PopupPanelManager;
 import org.pushingpixels.substance.flamingo.common.ui.SubstanceCommandButtonUI;
 
 /**
- *
  * Own CommandButtonUI because original Flamingo UI throws Exception in some
  * cases
  *

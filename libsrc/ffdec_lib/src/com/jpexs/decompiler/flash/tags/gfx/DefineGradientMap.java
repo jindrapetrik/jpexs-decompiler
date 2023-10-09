@@ -65,8 +65,6 @@ public class DefineGradientMap extends Tag {
         super(swf, ID, NAME, null);
         indices = new int[0];
     }
-    
-    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {

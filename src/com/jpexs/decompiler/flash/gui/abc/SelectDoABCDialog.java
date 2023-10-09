@@ -41,47 +41,47 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class SelectDoABCDialog extends AppDialog {
-    
+
     private JComboBox<ComboItem> abcComboBox;
     private ABCContainerTag result = null;
-    
+
     public SelectDoABCDialog(Window window, SWF swf) {
         super(window);
         setTitle(translate("dialog.title"));
         Container cnt = getContentPane();
-        
+
         abcComboBox = new JComboBox<>();
         int pos = 0;
-        for(Tag t : swf.getTags()) {
+        for (Tag t : swf.getTags()) {
             if (t instanceof ABCContainerTag) {
-               abcComboBox.addItem(new ComboItem(pos, (ABCContainerTag) t));
-               pos++;
+                abcComboBox.addItem(new ComboItem(pos, (ABCContainerTag) t));
+                pos++;
             }
-        }        
-        
-        abcComboBox.setRenderer(new DefaultListCellRenderer(){
+        }
+
+        abcComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 label.setIcon(TagTree.getIconForType(TreeNodeType.AS));
                 label.setText(value.toString());
                 return label;
-            }            
+            }
         });
-        
+
         JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(this::okButtonActionPerformed);
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
-        
+
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
         cnt.add(abcComboBox);
         cnt.add(buttonsPanel);
-        
+
         pack();
         setModal(true);
         setResizable(false);
@@ -93,8 +93,8 @@ public class SelectDoABCDialog extends AppDialog {
         return result;
     }
 
-    @SuppressWarnings("unchecked")    
-    private void okButtonActionPerformed(ActionEvent evt) {        
+    @SuppressWarnings("unchecked")
+    private void okButtonActionPerformed(ActionEvent evt) {
         result = ((ComboItem) abcComboBox.getSelectedItem()).abc;
         setVisible(false);
     }
@@ -103,8 +103,8 @@ public class SelectDoABCDialog extends AppDialog {
         result = null;
         setVisible(false);
     }
-    
-    public ABCContainerTag showDialog() {        
+
+    public ABCContainerTag showDialog() {
         result = null;
         if (abcComboBox.getItemCount() == 0) {
             return null;
@@ -116,22 +116,21 @@ public class SelectDoABCDialog extends AppDialog {
         setVisible(true);
         return result;
     }
-    
-}
 
-class ComboItem {
-    public int index;
-    public ABCContainerTag abc;
+    class ComboItem {
 
-    public ComboItem(int index, ABCContainerTag abc) {
-        this.index = index;
-        this.abc = abc;
+        public int index;
+        public ABCContainerTag abc;
+
+        public ComboItem(int index, ABCContainerTag abc) {
+            this.index = index;
+            this.abc = abc;
+        }
+
+        @Override
+        public String toString() {
+            return "" + (index + 1) + ". " + abc.toString();
+        }
+
     }
-
-    @Override
-    public String toString() {
-        return "" + (index + 1) +". " + abc.toString();
-    }
-    
-    
 }

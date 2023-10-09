@@ -136,7 +136,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             //String compiledFilePath = scriptFileToCompile.getAbsolutePath();
             Pattern errPattern = Pattern.compile("^" + Pattern.quote(tempDir.getAbsolutePath()) + "(?<file>.*)\\((?<line>[0-9]+)\\): col: (?<col>[0-9]+) (?<message>.*)$");
             String err = ex1.getMxmlcErrorOutput();
-            String errLines[] = err.split("\r?\n");
+            String[] errLines = err.split("\r?\n");
             List<As3ScriptReplaceExceptionItem> errorItems = new ArrayList<>();
             for (int i = 0; i < errLines.length; i++) {
                 String line = errLines[i].trim();
@@ -235,7 +235,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
                 pack.abc.reorganizeClasses(classesRemap);
             }
             ((Tag) pack.abc.parentTag).setModified(true);
-            deinitReplacement(pack);//successfull finish
+            deinitReplacement(pack); //successfull finish
         }
 
     }
@@ -265,7 +265,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
 
             //Make copy without the old script
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             SWF swfCopy = recompileSWF(swf);
 
             List<ABC> modAbcs = new ArrayList<>();

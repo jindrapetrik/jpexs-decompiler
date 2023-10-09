@@ -69,7 +69,7 @@ public class SWC extends ZippedBundle {
                     };
                     saxParser.parse(zip, handler);
                 } catch (Exception ex) {
-
+                    //ignored
                 }
                 return;
             }

@@ -44,10 +44,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,7 +53,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -81,7 +76,7 @@ public class FolderPreviewPanel extends JPanel {
     private Map<Integer, TreeItem> selectedItems = new TreeMap<>();
 
     private Cache<Integer, SerializableImage> cachedPreviews;
-    
+
     private MainPanel mainPanel;
 
     private static final int PREVIEW_SIZE = 150;
@@ -173,8 +168,8 @@ public class FolderPreviewPanel extends JPanel {
         selectedItems.clear();
         selectedIndex = -1;
         revalidate();
-        repaint();        
-        ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);
+        repaint();
+        ((JScrollPane) getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
 
     public void clear() {
@@ -257,12 +252,12 @@ public class FolderPreviewPanel extends JPanel {
                     } else {
                         s = treeItem.toString();
                     }
-                    
+
                     int itemIndex = mainPanel.getCurrentTree().getFullModel().getItemIndex(treeItem);
                     if (itemIndex > 1) {
                         s += " [" + itemIndex + "]";
                     }
-                    
+
                     g.setFont(f);
                     g.setColor(borderColor);
                     g.drawLine(x * CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE, x * CELL_WIDTH + CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE);
@@ -280,7 +275,7 @@ public class FolderPreviewPanel extends JPanel {
 
     private synchronized void renderImageTask(final int index, final TreeItem treeItem) {
         executor.submit(() -> {
-            cachedPreviews.put(index, renderImage((SWF)treeItem.getOpenable(), treeItem));
+            cachedPreviews.put(index, renderImage((SWF) treeItem.getOpenable(), treeItem));
             if (!repaintQueued) {
                 repaintQueued = true;
                 View.execInEventDispatchLater(() -> {
@@ -386,11 +381,11 @@ public class FolderPreviewPanel extends JPanel {
         }
         return image;
     }
-    
+
     public List<TreeItem> getSelectedItemsSorted() {
         return new ArrayList<>(selectedItems.values());
     }
-    
+
     public boolean isSomethingSelected() {
         return !selectedItems.isEmpty();
     }
@@ -402,6 +397,5 @@ public class FolderPreviewPanel extends JPanel {
     public void setSelectedItems(Map<Integer, TreeItem> selectedItems) {
         this.selectedItems = selectedItems;
     }
-    
-    
+
 }

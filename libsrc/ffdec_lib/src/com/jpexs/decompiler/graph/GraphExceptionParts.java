@@ -21,6 +21,7 @@ package com.jpexs.decompiler.graph;
  * @author JPEXS
  */
 public class GraphExceptionParts {
+
     public GraphPart start;
     public GraphPart end;
     public GraphPart target;

@@ -39,7 +39,7 @@ public class ConfigurationFileSelection extends JPanel {
 
     private JTextField textField;
 
-    public ConfigurationFileSelection(ConfigurationItem item,ConfigurationFile confFile, String value, String description) {
+    public ConfigurationFileSelection(ConfigurationItem item, ConfigurationFile confFile, String value, String description) {
         setLayout(new BorderLayout());
 
         textField = new JTextField();
@@ -89,7 +89,7 @@ public class ConfigurationFileSelection extends JPanel {
             return (String) config.get();
         }
     }
-    
+
     public String getValue() {
         return textField.getText();
     }
@@ -97,7 +97,5 @@ public class ConfigurationFileSelection extends JPanel {
     public JTextField getTextField() {
         return textField;
     }
-    
-    
 
 }

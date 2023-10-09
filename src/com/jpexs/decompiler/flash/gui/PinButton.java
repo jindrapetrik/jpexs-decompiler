@@ -73,7 +73,7 @@ public class PinButton extends JPanel {
     private Color selectedTextColor;
     private Color borderColor;
     private Color textColor;
-    
+
     private JLabel label;
     private MainPanel mainPanel;
 
@@ -97,26 +97,25 @@ public class PinButton extends JPanel {
             borderColor = SystemColor.controlShadow;
             textColor = SystemColor.controlText;
             hilightedTextColor = SystemColor.textHighlightText;
-        }        
-                
+        }
+
         Color color2 = Color.white;
         selectedColor = new Color(
                 (color.getRed() + color2.getRed()) / 2,
                 (color.getGreen() + color2.getGreen()) / 2,
                 (color.getBlue() + color2.getBlue()) / 2
         );
-        
+
         Color color3 = Color.black;
         selectedTextColor = new Color(
                 (textColor.getRed() + color3.getRed()) / 2,
                 (textColor.getGreen() + color3.getGreen()) / 2,
                 (textColor.getBlue() + color3.getBlue()) / 2
         );
-        
-             
+
         label = new JLabel();
-        label.setIcon(AbstractTagTree.getIconFor(item));        
-        refresh();        
+        label.setIcon(AbstractTagTree.getIconFor(item));
+        refresh();
         button = new JLabel();
         button.setMinimumSize(new Dimension(10 + 16, 16));
         button.setPreferredSize(new Dimension(10 + 16, 16));
@@ -242,7 +241,7 @@ public class PinButton extends JPanel {
 
         setLayout(new BorderLayout());
         add(label, BorderLayout.CENTER);
-        add(button, BorderLayout.EAST);       
+        add(button, BorderLayout.EAST);
     }
 
     private void updateIcon() {
@@ -315,19 +314,19 @@ public class PinButton extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(borderColor);        
+        g.setColor(borderColor);
         g.drawLine(0, 0, getWidth() - 1, 0);
         g.drawLine(0, 0, 0, getHeight() - 1);
         g.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight() - 1);
-        g.drawLine(0, getHeight() -1, getWidth() - 1, getHeight() - 1);
+        g.drawLine(0, getHeight() - 1, getWidth() - 1, getHeight() - 1);
         if (selected) {
             g.setColor(hilightedColor);
-            g.drawLine(0, 0, getWidth() - 1, 0);        
+            g.drawLine(0, 0, getWidth() - 1, 0);
             g.drawLine(0, 1, getWidth() - 1, 1);
             g.drawLine(0, 2, getWidth() - 1, 2);
         }
     }
-    
+
     private String getTreeItemPath(TreeItem item) {
         TreePath path = mainPanel.getCurrentTree().getFullModel().getTreePath(item);
         if (path == null) {

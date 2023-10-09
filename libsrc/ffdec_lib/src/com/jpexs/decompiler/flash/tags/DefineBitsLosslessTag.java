@@ -214,6 +214,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
                 bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight, "bitmapData");
             }
         } catch (IOException ex) {
+            //ignored
         }
         decompressed = true;
     }

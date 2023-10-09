@@ -34,11 +34,11 @@ public class GetSuperAVM2Item extends AVM2Item {
     public FullMultinameAVM2Item propertyName;
 
     public GraphTargetItem type;
-    
+
     public GraphTargetItem callType;
-    
+
     public boolean isStatic;
-    
+
     public GetSuperAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

@@ -35,13 +35,11 @@ import java.util.List;
 public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
     private boolean air;
-    
+
     public FFDecAs3ScriptReplacer(boolean air) {
-        this.air = air;                 
+        this.air = air;
     }
 
-    
-    
     @Override
     public void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException {
         ABC abc = pack.abc;
@@ -73,8 +71,8 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             abc.script_info.get(oldIndex).delete(abc, true);
             AbcIndexing abcIndex = swf.getAbcIndex();
             abcIndex.selectAbc(abc);
-            
-            ActionScript3Parser.compile(text, abc, abcIndex, scriptName, newClassIndex, oldIndex, air);           
+
+            ActionScript3Parser.compile(text, abc, abcIndex, scriptName, newClassIndex, oldIndex, air);
             if (pack.isSimple) {
                 // Move newly added script to its position
                 abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
@@ -83,7 +81,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
                 //???
             }
             abc.script_info.get(oldIndex).setModified(true);
-            abc.pack();//remove old deleted items
+            abc.pack(); //remove old deleted items
             ((Tag) abc.parentTag).setModified(true);
         } catch (AVM2ParseException ex) {
             //ex.printStackTrace();
@@ -95,7 +93,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
     }
 
     @Override
-    public boolean isAvailable() {                
+    public boolean isAvailable() {
         File swc = air ? Configuration.getAirSWC() : Configuration.getPlayerSWC();
         return !(swc == null || !swc.exists());
     }
@@ -103,8 +101,6 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
     public boolean isAir() {
         return air;
     }
-    
-    
 
     @Override
     public void initReplacement(ScriptPack pack) {

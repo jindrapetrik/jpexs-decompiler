@@ -145,7 +145,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         if (dependencies.contains(value)) {
             return false;
         }
-        if (!((value instanceof SimpleValue) && ((SimpleValue)value).isSimpleValue())) {
+        if (!((value instanceof SimpleValue) && ((SimpleValue) value).isSimpleValue())) {
             dependencies.add(value);
         }
         return value.isCompileTime(dependencies);
@@ -159,7 +159,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
 
         if (forceUseSet) {
             return toSourceMerge(localData, generator, name, value, new ActionSetVariable(), new ActionPush(Undefined.INSTANCE, charset));

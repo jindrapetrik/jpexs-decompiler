@@ -47,7 +47,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public void delete(ABC abc, boolean d) {
         super.delete(abc, d);
-        
+
         abc.constants.getMultiname(name_index).deleted = d;
         abc.method_info.get(method_info).delete(abc, d);
     }
@@ -55,12 +55,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public int getSlotIndex() {
         return slot_id;
-    }
-
-    @Override
-    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
-        return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
-    }
+    }    
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
@@ -83,6 +78,11 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
+        return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+    }
+
+    @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         getMetaData(parent, convertData, abc, writer);
@@ -95,7 +95,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).toString(callStack, abcIndex,path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
         }
         writer.endBlock();
 
@@ -140,10 +140,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             ignorePackage = getPackage(abc);
         }
         super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
-        //if (method_info != 0)
-        {
-            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
-        }
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
     }
 
     @Override

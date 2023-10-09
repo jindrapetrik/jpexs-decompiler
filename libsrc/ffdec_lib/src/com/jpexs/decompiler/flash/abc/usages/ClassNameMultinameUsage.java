@@ -84,7 +84,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
         }
         return false;
     }
-    
+
     @Override
     public int getScriptIndex() {
         return scriptIndex;

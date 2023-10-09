@@ -59,7 +59,7 @@ public class DeletePropertyIns extends InstructionDefinition {
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
-        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);      
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
         stack.add(new DeletePropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, isStatic.getVal()));
     }
 

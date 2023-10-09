@@ -112,12 +112,12 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.fontID = characterId;
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + " (" + fontID + ")";
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontID);

@@ -44,13 +44,13 @@ public class HighlightData implements Cloneable, Serializable {
     public long firstLineOffset = -1;
 
     public int regIndex = -1;
-    
+
     public int namespaceIndex = -1;
-    
+
     public boolean isStatic = false;
-    
+
     public String propertyType;
-    
+
     public String propertySubType;
 
     public boolean isEmpty() {

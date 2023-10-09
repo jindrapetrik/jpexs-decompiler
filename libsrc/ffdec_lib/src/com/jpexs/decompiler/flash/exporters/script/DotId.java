@@ -16,10 +16,6 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
-/**
- *
- * @author JPEXS
- */
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -30,14 +26,14 @@ import java.util.regex.Pattern;
  */
 public final class DotId {
 
-    final static String[] RESERVED_WORDS = new String[]{"node", "edge", "graph", "digraph", "subgraph", "strict"};
-    final static Pattern RESERVED_PATTERN = Pattern.compile("^" + String.join("|", RESERVED_WORDS) + "$", Pattern.CASE_INSENSITIVE);
-    final static Pattern NUMERAL_PATTERN = Pattern.compile("^[-]?(.[0-9]+|[0-9]+(.[0-9]*)?)$");
-    final static String IDENTIFIER_FIRST_CHARS = "a-zA-Z\\u0200-\\u0377_";
-    final static String IDENTIFIER_NEXT_CHARS = IDENTIFIER_FIRST_CHARS + "0-9";
-    final static String CH = "^[" + IDENTIFIER_FIRST_CHARS + "][" + IDENTIFIER_NEXT_CHARS + "]*$";
-    final static Pattern IDENTIFIER_PATTERN = Pattern.compile(CH);
-    
+    static final String[] RESERVED_WORDS = new String[]{"node", "edge", "graph", "digraph", "subgraph", "strict"};
+    static final Pattern RESERVED_PATTERN = Pattern.compile("^" + String.join("|", RESERVED_WORDS) + "$", Pattern.CASE_INSENSITIVE);
+    static final Pattern NUMERAL_PATTERN = Pattern.compile("^[-]?(.[0-9]+|[0-9]+(.[0-9]*)?)$");
+    static final String IDENTIFIER_FIRST_CHARS = "a-zA-Z\\u0200-\\u0377_";
+    static final  String IDENTIFIER_NEXT_CHARS = IDENTIFIER_FIRST_CHARS + "0-9";
+    static final String CH = "^[" + IDENTIFIER_FIRST_CHARS + "][" + IDENTIFIER_NEXT_CHARS + "]*$";
+    static final Pattern IDENTIFIER_PATTERN = Pattern.compile(CH);
+
     private final String value;
     private final boolean isHtml;
     private final String toStringValue;
@@ -46,7 +42,7 @@ public final class DotId {
         this.value = value;
         this.isHtml = isHtml;
         this.toStringValue = generateToString();
-    }   
+    }
 
     @Override
     public String toString() {

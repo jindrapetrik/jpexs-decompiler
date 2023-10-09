@@ -38,7 +38,7 @@ public class As3ScriptReplacerFactory {
     public static As3ScriptReplacerInterface createFFDec() {
         return new FFDecAs3ScriptReplacer(false);
     }
-    
+
     public static As3ScriptReplacerInterface createFFDecAir() {
         return new FFDecAs3ScriptReplacer(true);
     }

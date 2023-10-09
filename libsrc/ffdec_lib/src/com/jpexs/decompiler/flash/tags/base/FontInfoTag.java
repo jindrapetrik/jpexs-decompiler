@@ -61,11 +61,11 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
     public abstract boolean getFontFlagsItalic();
 
     public abstract void setFontFlagsItalic(boolean value);
-    
+
     public abstract boolean isShiftJIS();
-    
+
     public abstract boolean isAnsi();
-    
+
     @Override
     public String toString() {
         return super.toString() + " (" + fontID + ")";

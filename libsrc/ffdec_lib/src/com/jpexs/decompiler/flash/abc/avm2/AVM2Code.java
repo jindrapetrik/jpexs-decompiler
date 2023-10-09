@@ -129,6 +129,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindDefIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
@@ -137,6 +139,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetDescendantsIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSlotIns;
@@ -156,55 +159,50 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AbsJumpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AddDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.TimestampIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.AddPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AllocIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptLineIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallInterfaceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallSuperIdIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CodeGenOpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceBIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceDIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceUIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.ConcatIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertF4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertFIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ConvertMIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ConvertMPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecLocalPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DecodeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecrementPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DelDescendantsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DeletePropertyLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DividePIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DoubleToAtomIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.FindPropGlobalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncrementPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.InvalidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Lf32x4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.MarkIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ModuloPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.MultiplyPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.NegatePIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PrologueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PushConstantIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.PushDNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.PushDecimalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.SubtractPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceBIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceIIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceUIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertF4Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertFIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Lf32x4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.PushFloat4Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.PushFloatIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Sf32x4Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.UnPlusIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AbsJumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AddDIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AllocIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallInterfaceIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallSuperIdIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CodeGenOpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.ConcatIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DecodeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DelDescendantsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DeletePropertyLateIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DoubleToAtomIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.InvalidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.MarkIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PrologueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PushConstantIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SendEnterIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SetPropertyLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Sf32x4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.SubtractPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SweepIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.TimestampIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.UnPlusIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.VerifyOpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.VerifyPassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.WbIns;
@@ -231,6 +229,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
@@ -278,7 +277,6 @@ import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -442,7 +440,8 @@ public class AVM2Code implements Cloneable {
         {"setlocal0", "setlocal_0"},
         {"setlocal1", "setlocal_1"},
         {"setlocal2", "setlocal_2"},
-        {"setlocal3", "setlocal_3"},};
+        {"setlocal3", "setlocal_3"}
+    };
     public static final Map<String, String> instructionAliases = new HashMap<>();
 
     static {
@@ -714,7 +713,8 @@ public class AVM2Code implements Cloneable {
         /*0xFC*/ new SweepIns(),
         /*0xFD*/ new CodeGenOpIns(),
         /*0xFE*/ new VerifyOpIns(),
-        /*0xFF*/ new DecodeIns(),};
+        /*0xFF*/ new DecodeIns()
+    };
     // endoflist
 
     static {
@@ -726,11 +726,9 @@ public class AVM2Code implements Cloneable {
                     instructionSet[opCode] = allInstructionSet[i];
                 } else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.NO_FLASH_PLAYER) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.NO_FLASH_PLAYER)) {
                     instructionSet[opCode] = allInstructionSet[i];
-                } //Prefer without decimal:
-                else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR)) {
+                } else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.ES4_NUMERICS_MINOR)) { //Prefer without decimal:
                     instructionSet[opCode] = allInstructionSet[i];
-                } //Prefer without float:
-                else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR)) {
+                } else if (instructionSet[opCode].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR) && !allInstructionSet[i].hasFlag(AVM2InstructionFlag.FLOAT_MAJOR)) { //Prefer without float:
                     instructionSet[opCode] = allInstructionSet[i];
                 }
             }
@@ -949,8 +947,7 @@ public class AVM2Code implements Cloneable {
                 address = unAdresses.remove(0);
                 handleJumps = false;
             }
-            if (address < startPos) // no jump outside block
-            {
+            if (address < startPos) { // no jump outside block            
                 continue;
             }
             try {
@@ -1159,6 +1156,7 @@ public class AVM2Code implements Cloneable {
                 cos.write(instruction.getBytes());
             }
         } catch (IOException ex) {
+            //ignored
         }
         return bos.toByteArray();
     }
@@ -1430,14 +1428,14 @@ public class AVM2Code implements Cloneable {
 
         AVM2Instruction ins = code.get(code.size() - 1);
         return (int) (ins.getAddress() + ins.getBytesLength());
-    }  
+    }
 
     private int toSourceCount = 0;
 
     public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc, int maxRegs) {
         Map<Integer, String> regIndexToName = new HashMap<>();
         Map<String, Integer> regNameToIndex = new HashMap<>();
-        
+
         Set<String> reservedRegNames = new HashSet<>();
         for (int i = 0; i < maxRegs; i++) {
             reservedRegNames.add(String.format(Configuration.registerNameFormat.get(), i));
@@ -1447,14 +1445,14 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
                     String v = abc.constants.getString(ins.operands[1]);
-                    
+
                     if (reservedRegNames.contains(v)) {
                         //do not allow reassigning reserved _loc%d_ format to other local regs
                         continue;
                     }
-                    
-                    int regIndex = ins.operands[2] + 1;                    
-                    
+
+                    int regIndex = ins.operands[2] + 1;
+
                     // Same name already exists, it may be wrong names inserted by obfuscator
                     if (regNameToIndex.containsKey(v)) {
                         int existingIndex = regNameToIndex.get(v);
@@ -1471,7 +1469,7 @@ public class AVM2Code implements Cloneable {
 
         // TODO: Make this immune to using existing multinames (?)
         return regIndexToName;
-    }  
+    }
 
     public int getIpThroughJumpAndDebugLine(int ip) {
         if (code.isEmpty()) {
@@ -1625,7 +1623,7 @@ public class AVM2Code implements Cloneable {
                                             if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
                                                 if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
                                                     functionName = abc.constants.getMultiname(code.get(ip + plus + 3).operands[0]).getName(abc.constants, fullyQualifiedNames, true, true);
-                                                    localScopeStack.pop();// with
+                                                    localScopeStack.pop(); // with
                                                     output.remove(output.size() - 1); // with
                                                     ip = ip + plus + 4; // +1 below
                                                 }
@@ -1762,14 +1760,14 @@ public class AVM2Code implements Cloneable {
         } else if (assignment.value instanceof GetLexAVM2Item) {
             vtype = assignment.value.returnType();
         }
-        
+
         boolean isNull = false;
         if (vtype.equals(new TypeItem(DottedChain.NULL))) {
             vtype = TypeItem.UNBOUNDED;
             isNull = true;
         }
 
-        if (declaredRegisters[reg] == null) {            
+        if (declaredRegisters[reg] == null) {
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
             if (assignment instanceof SetTypeAVM2Item) {
                 ((SetTypeAVM2Item) assignment).setDeclaration(declaredRegisters[reg]);
@@ -1782,7 +1780,7 @@ public class AVM2Code implements Cloneable {
             declaredRegisters[reg].type = vtype;
             declaredRegisters[reg].typeIsNull = isNull;
         } else if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
-
+            //empty
         } else if (!declaredRegisters[reg].type.equals(vtype)) { //already declared with different type
             declaredRegisters[reg].type = TypeItem.UNBOUNDED;
         }
@@ -2088,7 +2086,7 @@ public class AVM2Code implements Cloneable {
                     if ((ss.slotObject instanceof GlobalAVM2Item) && (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
                         for (Trait t : initTraits.traits) {
                             if (t instanceof TraitSlotConst) {
-                                TraitSlotConst tsc = (TraitSlotConst)t;
+                                TraitSlotConst tsc = (TraitSlotConst) t;
                                 if (tsc.slot_id == ss.slotIndex) {
                                     GraphTargetItem value = ss.value;
                                     if (value != null && !convertData.assignedValues.containsKey(tsc)) {
@@ -2173,7 +2171,7 @@ public class AVM2Code implements Cloneable {
                                 }
                                 break;
                             }
-                        }                        
+                        }
                     }
                 } else {
                     // In obfuscated code, SetLocal instructions comes first
@@ -2293,13 +2291,7 @@ public class AVM2Code implements Cloneable {
                     target = ins.getAddress() + ins.operands[k];
                     ins.operands[k] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[k]);
                 }
-            } else /*for (int j = 0; j < ins.definition.operands.length; j++) {
-             if (ins.definition.operands[j] == AVM2Code.DAT_OFFSET) {
-             long target = ins.offset + ins.getBytes().length + ins.operands[j];
-             ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
-             }
-             }*/ //Faster, but not so universal
-            if (ins.definition instanceof IfTypeIns) {
+            } else if (ins.definition instanceof IfTypeIns) {
                 long target = ins.getTargetAddress();
                 try {
                     ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
@@ -2419,20 +2411,7 @@ public class AVM2Code implements Cloneable {
         }, body);
         code.remove(pos);
         //checkValidOffsets(body);
-    }
-
-    /**
-     * Inserts instruction at specified point. Handles offsets properly. Note:
-     * If newinstruction is jump, the offset operand must be handled properly by
-     * caller. All old jump offsets to pos are targeted before new instruction.
-     *
-     * @param pos Position in the list
-     * @param instruction Instruction False means before new instruction
-     * @param body Method body (used for try handling)
-     */
-    public void insertInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
-        insertInstruction(pos, instruction, false, body);
-    }
+    }   
 
     /**
      * Replaces instruction by another. Properly handles offsets. Note: If
@@ -2473,6 +2452,19 @@ public class AVM2Code implements Cloneable {
             }, body);
         }
         code.set(pos, instruction);
+    }
+
+    /**
+     * Inserts instruction at specified point. Handles offsets properly. Note:
+     * If newinstruction is jump, the offset operand must be handled properly by
+     * caller. All old jump offsets to pos are targeted before new instruction.
+     *
+     * @param pos Position in the list
+     * @param instruction Instruction False means before new instruction
+     * @param body Method body (used for try handling)
+     */
+    public void insertInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
+        insertInstruction(pos, instruction, false, body);
     }
 
     /**
@@ -2745,7 +2737,7 @@ public class AVM2Code implements Cloneable {
         return stats;
     }
 
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {        
+    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         Queue<Integer> toVisit = new LinkedList<>();
         Queue<Integer> toVisitLast = new LinkedList<>();
         toVisit.add(ip);
@@ -2784,6 +2776,7 @@ public class AVM2Code implements Cloneable {
                         ip = adr2pos(pos2adr(ip) + ins.operands[0]);
                         continue;
                     } catch (ConvertException ex) {
+                        //ignored
                     }
                 }
                 if (ins.definition instanceof JumpIns) {
@@ -2803,10 +2796,10 @@ public class AVM2Code implements Cloneable {
                 }
                 ip++;
             }
-        };
+        }
     }
 
-    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {        
+    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < code.size(); i++) {
             refs.put(i, new ArrayList<>());
@@ -2836,7 +2829,7 @@ public class AVM2Code implements Cloneable {
     public int removeDeadCode(MethodBody body) throws InterruptedException {
         return removeDeadCode(body, new Reference<>(-1));
     }
-    
+
     public int removeDeadCode(MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         int cnt = 0;
@@ -2867,7 +2860,7 @@ public class AVM2Code implements Cloneable {
         removeIgnored(body);
 
         minChangedIpRef.setVal(minChangedIp);
-        
+
         return cnt;
     }
 

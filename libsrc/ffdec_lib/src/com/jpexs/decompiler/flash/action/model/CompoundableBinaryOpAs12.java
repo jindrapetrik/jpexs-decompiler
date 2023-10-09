@@ -19,9 +19,11 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 
 /**
- * CompoundableBinaryOp but for AS1/2, which does not have &&, || compound operator.
+ * CompoundableBinaryOp but for AS1/2, which does not have &&, || compound
+ * operator.
+ *
  * @author JPEXS
  */
 public interface CompoundableBinaryOpAs12 extends CompoundableBinaryOp {
-    
+
 }

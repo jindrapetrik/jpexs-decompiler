@@ -24,11 +24,13 @@ import java.util.Date;
  */
 public class Stopwatch {
 
-    private long startTime, elapsedTime;
+    private long startTime;
+    private long elapsedTime;
 
     private boolean running;
 
-    public Date startDate, endDate;
+    public Date startDate;
+    public Date endDate;
 
     public static Stopwatch startNew() {
         Stopwatch sw = new Stopwatch();

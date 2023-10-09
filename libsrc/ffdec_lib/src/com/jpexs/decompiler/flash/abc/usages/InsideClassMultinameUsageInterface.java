@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 public interface InsideClassMultinameUsageInterface {
 
     public int getScriptIndex();
-    
+
     public int getClassIndex();
 
     public ABC getAbc();

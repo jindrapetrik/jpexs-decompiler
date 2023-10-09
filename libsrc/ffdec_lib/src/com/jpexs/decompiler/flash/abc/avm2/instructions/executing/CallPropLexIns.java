@@ -85,7 +85,7 @@ public class CallPropLexIns extends CallPropertyIns {
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        
+
         stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, obj, multiname, args, callType.getVal(), isStatic.getVal()));
     }
 

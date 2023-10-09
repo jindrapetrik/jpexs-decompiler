@@ -5,7 +5,9 @@
     <loadproperties srcfile="build.properties" />
     <property name="jar.filename" value="${prefix.filename}"/>
     <property name="exe.filename" value="${prefix.filename}"/>
-    <property name="exe64.filename" value="${prefix.filename}64"/>                  
+    <property name="exe64.filename" value="${prefix.filename}64"/>
+    <property name="checkstyle_config.path" location="checkstyle.xml"/>
+
         
     <path id="ant.lib.classpath">
         <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
@@ -20,8 +22,8 @@
     <taskdef name="desktopentry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant.lib.classpath" />
     <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
     <taskdef name="nsis" classname="com.danielreese.nsisant.Task" classpathref="ant.lib.classpath" />
-    
-    
+    <taskdef name="checkstyle" classname="com.puppycrawl.tools.checkstyle.ant.CheckstyleAntTask" classpathref="ant.lib.classpath" />
+        
     <property name="dist.lib.dir" value="${dist.dir}/${dist.lib.dirname}"/>    
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>  
@@ -73,7 +75,17 @@
         <echo level="info" message="Loaded Version:${version.major}.${version.minor}.${version.release}.${version.build}"/>
     </target>
     
- 
+    <target name="checkstyle">
+        <checkstyle config="${checkstyle_config.path}" failonviolation="true">
+            <fileset dir="src/com/jpexs" includes="**/*.java">
+                <exclude name="**/FontPreviewDialog.java" />
+                <exclude name="**/*Lexer.java" />
+            </fileset>
+            <fileset dir="libsrc/ffdec_lib/src/com/jpexs" includes="**/*.java">
+                <exclude name="**/*Lexer.java" />
+            </fileset>
+        </checkstyle>
+    </target>
 
     <target name="compile" depends="build_lib,-copy-lib">
         <!--<delete dir="${compile.dir}"/>-->        
@@ -539,7 +551,7 @@
 
     </target>
          
-    <target name="all" depends="clean,build,test,release">    
+    <target name="all" depends="checkstyle,clean,build,test,release">    
         
     </target>                         
         

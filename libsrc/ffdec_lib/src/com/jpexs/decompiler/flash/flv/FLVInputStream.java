@@ -17,14 +17,10 @@
 package com.jpexs.decompiler.flash.flv;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,7 +45,7 @@ public class FLVInputStream {
     }
 
     public void readHeader(Reference<Boolean> audioPresent, Reference<Boolean> videoPresent) throws IOException {
-        byte signature[] = new byte[3];
+        byte[] signature = new byte[3];
         is.readFully(signature);
         if (signature[0] != 'F' || signature[1] != 'L' || signature[2] != 'V') {
             throw new IOException("Invalid FLV file - invalid signature");
@@ -184,7 +180,7 @@ public class FLVInputStream {
         int timeStampExtended = readUI8();
         int timeStampFull = (timeStampExtended << 24) + timeStamp;
         readUI24(); //streamId, always 0
-        byte data[] = readBytes(dataLen);
+        byte[] data = readBytes(dataLen);
         readUI32(); //tag size
 
         FLVInputStream subStream = new FLVInputStream(new ByteArrayInputStream(data));
@@ -215,7 +211,7 @@ public class FLVInputStream {
         SCRIPTDATAVALUE value = readSCRIPTDATAVALUE();
         return new SCRIPTDATA(name, value);
     }
-    
+
     /**
      * Reads one DOUBLE (double precision floating point value) value from the
      * stream
@@ -254,7 +250,7 @@ public class FLVInputStream {
     public SCRIPTDATAOBJECT readSCRIPTDATAOBJECT() throws IOException {
         System.out.println("reading obj");
         String objectName = readSCRIPTDATASTRING();
-        System.out.println("objectName "+objectName);
+        System.out.println("objectName " + objectName);
         if (objectName.length() == 0) {
             int endMarker = readUI8();
             if (endMarker != 9) {
@@ -272,7 +268,6 @@ public class FLVInputStream {
         byte[] videoData = readBytes(available());
         return new VIDEODATA(frameType, codecId, videoData);
     }
-  
 
     public SCRIPTDATAVALUE readSCRIPTDATAVALUE() throws IOException {
         int type = readUI8();
@@ -374,5 +369,5 @@ public class FLVInputStream {
     public String readSCRIPTDATASTRING() throws IOException {
         int len = readUI16();
         return new String(readBytes(len), Utf8Helper.charset);
-    }   
+    }
 }

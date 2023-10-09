@@ -63,6 +63,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * @author JPEXS
  */
 public class SoundImporter {
+
     public boolean importDefineSound(DefineSoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
         int newSoundRate = -1;
         boolean newSoundSize = false;
@@ -92,7 +93,7 @@ public class SoundImporter {
                             newSoundRate = 3;
                             break;
                         default:
-                            throw new UnsupportedSamplingRateException(newSoundRate, new int[]{5512,11025,22050,44100});
+                            throw new UnsupportedSamplingRateException(newSoundRate, new int[]{5512, 11025, 22050, 44100});
                     }
                 } catch (UnsupportedAudioFileException | IOException ex) {
                     return false;
@@ -134,7 +135,7 @@ public class SoundImporter {
                                 newSoundRate = 3;
                                 break;
                             default:
-                                throw new UnsupportedSamplingRateException(newSoundRate, new int[]{11025,22050,44100});
+                                throw new UnsupportedSamplingRateException(newSoundRate, new int[]{11025, 22050, 44100});
                         }
 
                         newSoundSize = true;
@@ -171,7 +172,7 @@ public class SoundImporter {
         }
         return false;
     }
-    
+
     private void loadID3v2(InputStream in) {
         int size = -1;
         try {
@@ -179,11 +180,13 @@ public class SoundImporter {
             in.mark(10);
             size = readID3v2Header(in);
         } catch (IOException e) {
+            //ignored
         } finally {
             try {
                 // Unread ID3v2 header (10 bytes).
                 in.reset();
             } catch (IOException e) {
+                //ignored
             }
         }
         // Load ID3v2 tags.
@@ -193,6 +196,7 @@ public class SoundImporter {
                 in.read(rawid3v2, 0, rawid3v2.length);
             }
         } catch (IOException e) {
+            //ignored
         }
     }
 
@@ -218,7 +222,7 @@ public class SoundImporter {
         }
         return (size + 10);
     }
-    
+
     public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException {
         List<MP3FRAME> mp3Frames = null;
         int newSoundRate = -1;
@@ -233,37 +237,37 @@ public class SoundImporter {
         switch (newSoundFormat) {
             case SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
                 try (AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
-                AudioFormat fmt = audioIs.getFormat();
-                newSoundType = fmt.getChannels() == 2;
-                newSoundSize = fmt.getSampleSizeInBits() == 16;
-                //newSoundSampleCount = audioIs.getFrameLength();
-                uncompressedSoundData = Helper.readStream(audioIs);
-                sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
-                soundRateHz = (int) Math.round(fmt.getSampleRate());
-                newSoundSampleCount = (int) Math.ceil(soundRateHz / swf.frameRate);
+                    AudioFormat fmt = audioIs.getFormat();
+                    newSoundType = fmt.getChannels() == 2;
+                    newSoundSize = fmt.getSampleSizeInBits() == 16;
+                    //newSoundSampleCount = audioIs.getFrameLength();
+                    uncompressedSoundData = Helper.readStream(audioIs);
+                    sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
+                    soundRateHz = (int) Math.round(fmt.getSampleRate());
+                    newSoundSampleCount = (int) Math.ceil(soundRateHz / swf.frameRate);
 
-                bytesPerSwfFrame = (int) Math.ceil(soundRateHz / swf.frameRate) * sampleLen;
-                switch (soundRateHz) {
-                    case 5512:
-                        newSoundRate = 0;
-                        break;
-                    case 11025:
-                        newSoundRate = 1;
-                        break;
-                    case 22050:
-                        newSoundRate = 2;
-                        break;
-                    case 44100:
-                        newSoundRate = 3;
-                        break;
-                    default:
-                        throw new UnsupportedSamplingRateException(newSoundRate, new int[]{5512, 11025, 22050, 44100});
+                    bytesPerSwfFrame = (int) Math.ceil(soundRateHz / swf.frameRate) * sampleLen;
+                    switch (soundRateHz) {
+                        case 5512:
+                            newSoundRate = 0;
+                            break;
+                        case 11025:
+                            newSoundRate = 1;
+                            break;
+                        case 22050:
+                            newSoundRate = 2;
+                            break;
+                        case 44100:
+                            newSoundRate = 3;
+                            break;
+                        default:
+                            throw new UnsupportedSamplingRateException(newSoundRate, new int[]{5512, 11025, 22050, 44100});
+                    }
+
+                } catch (UnsupportedAudioFileException | IOException ex) {
+                    return false;
                 }
-
-            } catch (UnsupportedAudioFileException | IOException ex) {
-                return false;
-            }
-            break;
+                break;
             case SoundFormat.FORMAT_MP3:
                 BufferedInputStream bis = new BufferedInputStream(is);
                 loadID3v2(bis);
@@ -362,7 +366,7 @@ public class SoundImporter {
                     lastNumSamplesLong = numSamplesAfterFrameLong;
 
                     if (deltaNumSamples > 0) {
-                        byte buf[] = new byte[(int) deltaNumSamples * sampleLen];
+                        byte[] buf = new byte[(int) deltaNumSamples * sampleLen];
                         dais.readFully(buf);
                         SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
                         block.streamSoundData = new ByteArrayRange(buf);
@@ -379,7 +383,7 @@ public class SoundImporter {
             }
         }
         if (mp3Frames != null) {
-            
+
             int frame = 0;
 
             int mp3FrameNum = 0;
@@ -390,24 +394,24 @@ public class SoundImporter {
                 long numSamplesBeforeFrameLong = Math.round(frame * soundRateHz / swf.frameRate);
 
                 int seekSamples = (int) (lastNumSamplesLong - numSamplesBeforeFrameLong);
-                
+
                 SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
-                
+
                 List<MP3FRAME> blockMp3Frames = new ArrayList<>();
                 int blockSamples = 0;
-                while(lastNumSamplesLong < numSamplesAfterFrame && mp3FrameNum < mp3Frames.size()) {
+                while (lastNumSamplesLong < numSamplesAfterFrame && mp3FrameNum < mp3Frames.size()) {
                     MP3FRAME mp3Frame = mp3Frames.get(mp3FrameNum);
                     lastNumSamplesLong += mp3Frame.getSampleCount();
                     blockSamples += mp3Frame.getSampleCount();
                     blockMp3Frames.add(mp3Frame);
                     mp3FrameNum++;
-                }                                    
+                }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, null);
                 try {
-                    sos.writeUI16(blockSamples);  
+                    sos.writeUI16(blockSamples);
                     sos.writeSI16(seekSamples);
-                    for (MP3FRAME mp3Frame:blockMp3Frames) {
+                    for (MP3FRAME mp3Frame : blockMp3Frames) {
                         sos.write(mp3Frame.getBytes());
                     }
                 } catch (IOException ex) {
@@ -434,7 +438,7 @@ public class SoundImporter {
                 }
             }
         }
-        
+
         int framesBefore = timelined.getFrameCount();
         //enlarge timeline when necessary
         while (!blocks.isEmpty()) {
@@ -443,7 +447,7 @@ public class SoundImporter {
             timelined.addTag(block);
             ShowFrameTag sft = new ShowFrameTag(swf);
             sft.setTimelined(timelined);
-            timelined.addTag(sft);  
+            timelined.addTag(sft);
             framesBefore++;
         }
         timelined.setFrameCount(framesBefore);
@@ -458,23 +462,23 @@ public class SoundImporter {
         swf.resetTimeline(); //to reload blocks
         return true;
     }
-    
+
     public boolean importSound(SoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
         if (soundTag instanceof DefineSoundTag) {
-            return importDefineSound((DefineSoundTag)soundTag, is, newSoundFormat);
+            return importDefineSound((DefineSoundTag) soundTag, is, newSoundFormat);
         }
         if (soundTag instanceof SoundStreamHeadTypeTag) {
-            return importSoundStream((SoundStreamHeadTypeTag)soundTag, is, newSoundFormat);
+            return importSoundStream((SoundStreamHeadTypeTag) soundTag, is, newSoundFormat);
         }
         return false;
     }
-    
+
     public int bulkImport(File soundDir, SWF swf, boolean printOut) {
-        
+
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         int soundCount = 0;
         List<String> extensions = Arrays.asList("mp3", "wav");
-        File allFiles[] = soundDir.listFiles(new FilenameFilter() {
+        File[] allFiles = soundDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();
@@ -486,8 +490,7 @@ public class SoundImporter {
                 return false;
             }
         });
-        
-        
+
         List<SoundTag> soundTags = new ArrayList<>();
         for (int characterId : characters.keySet()) {
             CharacterTag tag = characters.get(characterId);
@@ -498,65 +501,65 @@ public class SoundImporter {
                 DefineSpriteTag sprite = (DefineSpriteTag) tag;
                 for (Tag subTag : sprite.getTags()) {
                     if (subTag instanceof SoundStreamHeadTypeTag) {
-                        soundTags.add((SoundStreamHeadTypeTag)subTag);
+                        soundTags.add((SoundStreamHeadTypeTag) subTag);
                     }
                 }
             }
         }
-        for (Tag tag:swf.getTags()) {
+        for (Tag tag : swf.getTags()) {
             if (tag instanceof SoundStreamHeadTypeTag) {
                 soundTags.add((SoundStreamHeadTypeTag) tag);
             }
         }
-        
+
         for (SoundTag tag : soundTags) {
             int characterId = tag.getCharacterId();
-                List<File> existingFilesForSoundTag = new ArrayList<>();
-                for (File f : allFiles) {
-                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
-                        existingFilesForSoundTag.add(f);
-                    }
+            List<File> existingFilesForSoundTag = new ArrayList<>();
+            for (File f : allFiles) {
+                if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                    existingFilesForSoundTag.add(f);
                 }
-                existingFilesForSoundTag.sort(new Comparator<File>() {
-                    @Override
-                    public int compare(File o1, File o2) {
-                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
-                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
-                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
-                        if (ret == 0) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                        return ret;
+            }
+            existingFilesForSoundTag.sort(new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                    String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                    int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                    if (ret == 0) {
+                        return o1.getName().compareTo(o2.getName());
                     }
-                });
+                    return ret;
+                }
+            });
 
-                if (existingFilesForSoundTag.isEmpty()) {
-                    continue;
-                }
+            if (existingFilesForSoundTag.isEmpty()) {
+                continue;
+            }
 
-                if (existingFilesForSoundTag.size() > 1) {
-                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sound tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSoundTag.get(0).getName()});
-                }
-                File sourceFile = existingFilesForSoundTag.get(0);
+            if (existingFilesForSoundTag.size() > 1) {
+                Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sound tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSoundTag.get(0).getName()});
+            }
+            File sourceFile = existingFilesForSoundTag.get(0);
 
-                try {
-                    if (printOut) {
-                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
-                    }
-                    int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                    if (sourceFile.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
-                        soundFormat = SoundFormat.FORMAT_MP3;
-                    }
-                    try (FileInputStream fis = new FileInputStream(sourceFile)){
-                        importSound(tag,fis, soundFormat);
-                        soundCount++;
-                    }                    
-                } catch (IOException|SoundImportException ex) {
-                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sound " + characterId + " from file " + sourceFile.getName(), ex);
+            try {
+                if (printOut) {
+                    System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
                 }
-                if (Thread.currentThread().isInterrupted()) {
-                    break;
-                }            
+                int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                if (sourceFile.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
+                    soundFormat = SoundFormat.FORMAT_MP3;
+                }
+                try (FileInputStream fis = new FileInputStream(sourceFile)) {
+                    importSound(tag, fis, soundFormat);
+                    soundCount++;
+                }
+            } catch (IOException | SoundImportException ex) {
+                Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sound " + characterId + " from file " + sourceFile.getName(), ex);
+            }
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
         }
         return soundCount;
     }

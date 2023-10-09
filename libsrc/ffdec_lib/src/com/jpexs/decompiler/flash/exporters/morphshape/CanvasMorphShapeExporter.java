@@ -468,7 +468,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                         .append(",").append(useRatioDouble((fillMatrix.translateX + deltaX) / unitDivisor, (fillMatrixEnd.translateX + deltaX) / unitDivisor))
                         .append(",").append(useRatioDouble((fillMatrix.translateY + deltaY) / unitDivisor, (fillMatrixEnd.translateY + deltaY) / unitDivisor)).append(");\r\n");
 
-                if (fillWidth > 0) {//repeating bitmap glitch fix
+                if (fillWidth > 0) { //repeating bitmap glitch fix
                     //make bitmap 1px wider
                     double s_w = (fillWidth + 1) / (double) fillWidth;
                     double s_h = (fillHeight + 1) / (double) fillHeight;

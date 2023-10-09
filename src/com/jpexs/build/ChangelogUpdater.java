@@ -26,16 +26,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Updates CHANGELOG.md file. Adds links to issue numbers - brackets, adds links to versions
+ * Updates CHANGELOG.md file. Adds links to issue numbers - brackets, adds links
+ * to versions
+ *
  * @author JPEXS
  */
 public class ChangelogUpdater {
 
     private static final String GITHUB_ADDRESS = "https://github.com/jindrapetrik/jpexs-decompiler/";
-    private static final String ISSUE_TRACKER_ADDRESS = "https://www.free-decompiler.com/flash/issues/";    
-    
+    private static final String ISSUE_TRACKER_ADDRESS = "https://www.free-decompiler.com/flash/issues/";
+
     private static final String PR_URL_PREFIX = GITHUB_ADDRESS + "pull/";
-    
+
     private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
 
     public static void main(String[] args) throws UnsupportedEncodingException {
@@ -44,10 +46,9 @@ public class ChangelogUpdater {
 
         changeLog = changeLog.replaceAll("\\[#([0-9]+)\\]", "#$1");
         changeLog = changeLog.replaceAll("#([0-9]+)", "[#$1]");
-        
+
         changeLog = changeLog.replaceAll("\\[PR([0-9]+)\\]", "PR$1");
         changeLog = changeLog.replaceAll("PR([0-9]+)", "[PR$1]");
-
 
         Pattern issuePattern = Pattern.compile("\\[#([0-9]+)\\]");
 
@@ -58,13 +59,12 @@ public class ChangelogUpdater {
         }
 
         Pattern prPattern = Pattern.compile("PR([0-9]+)");
-        Matcher prMatcher = prPattern.matcher(changeLog);        
+        Matcher prMatcher = prPattern.matcher(changeLog);
         Set<Integer> prs = new LinkedHashSet<>();
         while (prMatcher.find()) {
-            prs.add(Integer.parseInt(prMatcher.group(1)));            
+            prs.add(Integer.parseInt(prMatcher.group(1)));
         }
-        
-        
+
         Pattern headerPattern = Pattern.compile("## \\[([^\\]]+)\\]");
 
         Matcher headerMatcher = headerPattern.matcher(changeLog);

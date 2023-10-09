@@ -220,7 +220,7 @@ public class IggyIndexBuilder {
         return writeIndex(CODE_FC_SKIP1, false, 0);
     }
 
-    public long writeLengthCustom(int totalLen, int localOffsets[], int platformTypes[]) {
+    public long writeLengthCustom(int totalLen, int[] localOffsets, int[] platformTypes) {
         return writeIndex(CODE_FD_OFS8_SKIP_TWICE8, false, totalLen, localOffsets, platformTypes);
     }
 
@@ -249,13 +249,12 @@ public class IggyIndexBuilder {
         return writeIndex(code, is64, val, null, null);
     }
 
-    private long writeIndex(int code, boolean is64, long val, int localOffsets[], int platformTypes[]) {
+    private long writeIndex(int code, boolean is64, long val, int[] localOffsets, int[] platformTypes) {
         try {
             //LOGGER.finest(String.format("index offset: %d, %04X", STATIC_HDR.length + indexStream.position(), STATIC_HDR.length + indexStream.position()));
             LOGGER.finer(String.format("Code = 0x%02X", code));
             indexStream.writeUI8(code);
-            if (code < 0x80) // 0-0x7F
-            {
+            if (code < 0x80) { // 0-0x7F            
                 LOGGER.finest("0-0x7F: code is directly an index to the index_table");
                 // code is directly an index to the index_table
                 if (code >= constTable.size()) {
@@ -267,8 +266,7 @@ public class IggyIndexBuilder {
                 long ret = constTable.get(code);
                 position += ret;
                 return ret;
-            } else if (code < 0xC0) // 0x80-BF
-            {
+            } else if (code < 0xC0) { // 0x80-BF            
                 LOGGER.finest("0x80-BF: table[0..255]*(code-0x7F)");
                 int index;
 
@@ -286,14 +284,12 @@ public class IggyIndexBuilder {
                 long ret = constTable.get(index) * n;
                 position += ret;
                 return ret;
-            } else if (code < 0xD0) // 0xC0-0xCF
-            {
+            } else if (code < 0xD0) { // 0xC0-0xCF            
                 LOGGER.finest("0xC0-CF: code*2-0x17E");
                 long ret = ((code * 2) - 0x17E);
                 position += ret;
                 return ret;
-            } else if (code < 0xE0) // 0xD0-0xDF
-            {
+            } else if (code < 0xE0) { // 0xD0-0xDF            
                 LOGGER.finest("0xD0-0xDF: platform based");
 
                 // Code here depends on plattform[0], we are assuming it is 1, as we checked in load function
@@ -363,7 +359,8 @@ public class IggyIndexBuilder {
                 return 1; //seek 1
             } else if (code == CODE_FD_OFS8_SKIP_TWICE8) {
                 LOGGER.finest(String.format("0xFD: 0..255, skip 2 * 0..255 "));
-                int n, m;
+                int n;
+                int m;
 
                 n = (int) val;
                 indexStream.writeUI8((int) val);

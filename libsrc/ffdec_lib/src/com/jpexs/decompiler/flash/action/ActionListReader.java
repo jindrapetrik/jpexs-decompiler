@@ -171,7 +171,6 @@ public class ActionListReader {
             System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
             p++;
         }*/
-
         //TODO: This cleaner needs to be executed only before actual decompilation, not when disassembly only
         try {
             new ActionDefineFunctionPushRegistersCleaner().actionListParsed(actions, sis.getSwf());

@@ -50,7 +50,7 @@ public class FontHelper {
     /**
      * Gets all available fonts in the system
      *
-     * @return Map<FamilyName,Map<FontNAme,Font>>
+     * @return Map of FamilyName to Map FontName to Font
      */
     public static Map<String, Map<String, Font>> getInstalledFonts() {
         Map<String, Map<String, Font>> ret = new HashMap<>();
@@ -310,7 +310,7 @@ public class FontHelper {
     private static List<File> getTtfFilesRecursively(File dir) {
         List<File> ret = new ArrayList<>();
         try {
-            File files[] = dir.listFiles();
+            File[] files = dir.listFiles();
             for (File f : files) {
                 if (f.isDirectory()) {
                     ret.addAll(getTtfFilesRecursively(f));

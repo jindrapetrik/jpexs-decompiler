@@ -240,7 +240,6 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         }
         return true;
     }*/
-
     @Override
     public Object getResult() {
         if (!actions.isEmpty()) {
@@ -285,8 +284,8 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
-        
+        String charset = asGenerator.getCharset();
+
         Set<String> usedNames = new HashSet<>();
         for (VariableActionItem v : variables) {
             usedNames.add(v.getVariableName());

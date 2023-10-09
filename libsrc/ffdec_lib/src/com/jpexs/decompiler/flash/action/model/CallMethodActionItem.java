@@ -45,11 +45,10 @@ public class CallMethodActionItem extends ActionItem {
 
     public static int SPECIAL_GETTER = 1;
     public static int SPECIAL_SETTER = 2;
-    
-    
+
     private int special = 0;
     private String setterGetterVarName = null;
-    
+
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visitAll(arguments);
@@ -61,7 +60,7 @@ public class CallMethodActionItem extends ActionItem {
         this.methodName = methodName;
         this.arguments = arguments;
         this.scriptObject = scriptObject;
-        
+
         if (methodName instanceof DirectValueActionItem) {
             DirectValueActionItem dv = (DirectValueActionItem) methodName;
             if (dv.isString()) {

@@ -80,7 +80,7 @@ public class CallPropVoidIns extends InstructionDefinition {
         }
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
 
-        GraphTargetItem obj = stack.pop();        
+        GraphTargetItem obj = stack.pop();
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);

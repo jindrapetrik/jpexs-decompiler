@@ -43,7 +43,7 @@ public class CallAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> arguments;
 
-    private static abstract class Func implements Callable {
+    private abstract static class Func implements Callable {
 
         @Override
         public Object call(String methodName, List<Object> args) {
@@ -227,10 +227,10 @@ public class CallAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         if (function instanceof GetPropertyAVM2Item) {
-            return ((GetPropertyAVM2Item)function).callType;
+            return ((GetPropertyAVM2Item) function).callType;
         }
         if (function instanceof GetLexAVM2Item) {
-            return ((GetLexAVM2Item)function).callType;
+            return ((GetLexAVM2Item) function).callType;
         }
         return TypeItem.UNBOUNDED;
     }

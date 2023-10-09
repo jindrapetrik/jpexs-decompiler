@@ -34,8 +34,6 @@ public class KerningPairType implements Serializable {
     public KerningPairType() {
     }
 
-    
-    
     public KerningPairType(int char1, int char2, int advance) {
         this.char1 = char1;
         this.char2 = char2;

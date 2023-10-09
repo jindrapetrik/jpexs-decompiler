@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
 import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;
@@ -46,7 +47,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
 
 /**
@@ -141,6 +141,7 @@ public class ActionGetURL2 extends Action {
                     try {
                         num = Integer.valueOf(tarStr.substring(levelPrefix.length()));
                     } catch (NumberFormatException nfe) {
+                        //ignored
                     }
                 }
             }

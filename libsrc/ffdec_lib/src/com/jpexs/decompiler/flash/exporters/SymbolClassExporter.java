@@ -48,7 +48,7 @@ public class SymbolClassExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         int count = 0;
         for (Tag t : tags) {
             if (t instanceof ExportAssetsTag || t instanceof SymbolClassTag) {

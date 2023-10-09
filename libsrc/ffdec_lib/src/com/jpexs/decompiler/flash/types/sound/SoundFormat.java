@@ -222,7 +222,7 @@ public class SoundFormat {
         } else {
             int inPoint = (soundInfo.hasInPoint ? (int) Math.round(soundInfo.inPoint * samplingRate / 44100.0) : 0);
             int outPoint = (soundInfo.hasOutPoint ? (int) Math.round(soundInfo.outPoint * samplingRate / 44100.0) : Integer.MAX_VALUE);
-            byte data[] = baos.toByteArray();
+            byte[] data = baos.toByteArray();
             baosFiltered = new ByteArrayOutputStream();
             int inPointBytes = inPoint * 2 /*16bit*/ * (stereo ? 2 : 1);
             int outPointBytes = soundInfo.hasOutPoint ? outPoint * 2 /*16bit*/ * (stereo ? 2 : 1) : data.length;
@@ -235,8 +235,8 @@ public class SoundFormat {
                 if (stereo) {
                     if (i + 3 >= data.length) {
                         break;
-                    }  
-                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;                                  
+                    }
+                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;
                 }
 
                 if (soundInfo.hasEnvelope) {
@@ -279,7 +279,7 @@ public class SoundFormat {
         int numChannels = stereo ? 2 : 1;
         writeLE(subChunk1Data, numChannels, 2);
 
-        int sampleRate = soundRateHz;//rateMap[soundRate];
+        int sampleRate = soundRateHz;
         writeLE(subChunk1Data, sampleRate, 4);
         int bitsPerSample = sample16bit ? 16 : 8;
         int byteRate = sampleRate * numChannels * bitsPerSample / 8;

@@ -266,7 +266,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                 if (ins.definition instanceof JumpIns) {
 
                     long address = ins.getTargetAddress();
-                    idx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
+                    idx = code.adr2pos(address);
                     if (idx == -1) {
                         throw new TranslateException("Jump target not found: " + address);
                     }
@@ -299,15 +299,15 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                         public int adr2pos(long adr) {
                             return code.adr2pos(adr);
                         }
+                        
+                        @Override
+                        public int adr2pos(long adr, boolean nearest) {
+                            return code.adr2pos(adr, nearest);
+                        }
 
                         @Override
                         public long pos2adr(int pos) {
                             return code.pos2adr(pos);
-                        }
-
-                        @Override
-                        public int adr2pos(long adr, boolean nearest) {
-                            return code.adr2pos(adr, nearest);
                         }
 
                         @Override

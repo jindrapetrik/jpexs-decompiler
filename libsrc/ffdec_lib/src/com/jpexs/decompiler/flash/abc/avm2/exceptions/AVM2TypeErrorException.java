@@ -32,8 +32,8 @@ public class AVM2TypeErrorException extends AVM2ExecutionException {
 
     private static String codeToMessage(int code, boolean debug, Object[] params) {
         String msg = null;
-        switch (code) {
-        }
+        /*switch (code) {
+        }*/
 
         String result = "TypeError: Error #" + code;
         if (debug && msg != null) {

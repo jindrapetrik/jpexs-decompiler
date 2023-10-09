@@ -69,7 +69,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
     public ScriptInfo currentScript;
-    
+
     public int scriptIndex;
 
     public boolean subMethod = false;
@@ -84,7 +84,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public List<List<Long>> catchesOpenedLoops = new ArrayList<>();
     public List<Integer> catchesTempRegs = new ArrayList<>();
-    
+
     public boolean secondRun = false;
 
     public String getFullClass() {

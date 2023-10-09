@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
  * @author JPEXS
  */
 public class DisplayPoint {
+
     public int x;
     public int y;
     public boolean onPath;
@@ -30,18 +31,21 @@ public class DisplayPoint {
     public DisplayPoint(Point2D point) {
         this(point, true);
     }
+
     public DisplayPoint(Point2D point, boolean onPath) {
-        x = (int)Math.round(point.getX());
-        y = (int)Math.round(point.getY());
+        x = (int) Math.round(point.getX());
+        y = (int) Math.round(point.getY());
         this.onPath = onPath;
     }
+
     public DisplayPoint(DisplayPoint src) {
         this(src.x, src.y, src.onPath);
     }
-    
+
     public DisplayPoint(int x, int y) {
         this(x, y, true);
     }
+
     public DisplayPoint(int x, int y, boolean onPath) {
         this.x = x;
         this.y = y;
@@ -50,10 +54,10 @@ public class DisplayPoint {
 
     @Override
     public String toString() {
-        return "["+x+","+y+"]";
+        return "[" + x + "," + y + "]";
     }
-    
-    public Point2D toPoint2D(){
+
+    public Point2D toPoint2D() {
         return new Point2D.Double(x, y);
     }
 }

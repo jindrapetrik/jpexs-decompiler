@@ -72,7 +72,6 @@ public class ClassActionItem extends ActionItem implements Block {
 
     }
 
-
     public ClassActionItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<MyEntry<GraphTargetItem, GraphTargetItem>> traits, List<Boolean> traitsStatic) {
         super(null, null, NOPRECEDENCE);
         this.className = className;
@@ -187,7 +186,7 @@ public class ClassActionItem extends ActionItem implements Block {
             }
         }
         writer.startBlock();
-        writer.startClass(className.toStringNoQuotes(localData));        
+        writer.startClass(className.toStringNoQuotes(localData));
 
         /*if (constructor != null) {
             constructor.toString(writer, localData).newLine();
@@ -267,13 +266,12 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
-        for (MyEntry<GraphTargetItem, GraphTargetItem> en: traits) {
+        for (MyEntry<GraphTargetItem, GraphTargetItem> en : traits) {
             GraphTargetItem value = en.getValue();
             if (value != null) {
                 visitor.visit(value);
             }
         }
-    }       
-    
-    
+    }
+
 }

@@ -45,7 +45,7 @@ public class FastActionList implements Collection<ActionItem> {
     private final Map<Action, ActionItem> actionItemMap;
 
     private final Set<ActionItem> actionItemSet;
-    
+
     private String charset;
 
     public FastActionList(ActionList actions) {
@@ -63,20 +63,13 @@ public class FastActionList implements Collection<ActionItem> {
 
     public String getCharset() {
         return charset;
-    }
-
-    
+    }    
     
     public final ActionItem insertItemBefore(ActionItem item, Action action) {
         ActionItem newItem = new ActionItem(action);
         return insertItemBefore(item, newItem);
     }
-
-    public final ActionItem insertItemAfter(ActionItem item, Action action) {
-        ActionItem newItem = new ActionItem(action);
-        return insertItemAfter(item, newItem);
-    }
-
+    
     public final ActionItem insertItemBefore(ActionItem item, ActionItem newItem) {
         insertItemAfter(item.prev, newItem);
         if (item == firstItem) {
@@ -84,6 +77,11 @@ public class FastActionList implements Collection<ActionItem> {
         }
 
         return newItem;
+    }
+
+    public final ActionItem insertItemAfter(ActionItem item, Action action) {
+        ActionItem newItem = new ActionItem(action);
+        return insertItemAfter(item, newItem);
     }
 
     public final ActionItem insertItemAfter(ActionItem item, ActionItem newItem) {

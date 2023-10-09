@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
@@ -173,20 +172,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         }
 
         return cnt;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(definition.instructionName);
-        if (operands != null) {
-            for (int i = 0; i < operands.length; i++) {
-                s.append(" ");
-                s.append(operands[i]);
-            }
-        }
-        return s.toString();
-    }
+    } 
 
     public List<Long> getOffsets() {
         List<Long> ret = new ArrayList<>();
@@ -331,7 +317,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                             s.append(EcmaScript.toString(constants.getDouble(operands[i])));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
-                        }  
+                        }
                     }
                     break;
                 case AVM2Code.DAT_FLOAT_INDEX:
@@ -343,7 +329,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                             s.append(EcmaScript.toString(constants.getFloat(operands[i])));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
-                        }  
+                        }
                     }
                     break;
                 case AVM2Code.DAT_FLOAT4_INDEX:
@@ -358,7 +344,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                             s.append(" ").append(EcmaScript.toString(f4.values[3]));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append(" Unknown(").append(operands[i]).append(")");
-                        }  
+                        }
                     }
                     break;
                 case AVM2Code.DAT_DECIMAL_INDEX:
@@ -370,7 +356,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                             s.append(constants.getDecimal(operands[i]));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
-                        }  
+                        }
                     }
                     break;
                 case AVM2Code.DAT_OFFSET:
@@ -427,6 +413,19 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return ignored;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append(definition.instructionName);
+        if (operands != null) {
+            for (int i = 0; i < operands.length; i++) {
+                s.append(" ");
+                s.append(operands[i]);
+            }
+        }
+        return s.toString();
+    }
+
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
         writer.appendNoHilight(Helper.formatAddress(address) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + getCustomizedInstructionName());
         writer.appendNoHilight(getParams(localData.constantsAvm2, localData.fullyQualifiedNames) + getComment());
@@ -467,14 +466,14 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return getStackPopCount(aLocalData);
     }
 
+    public int getStackPopCount(AVM2LocalData aLocalData) {
+        return definition.getStackPopCount(this, aLocalData.abc);
+    }
+
     @Override
     public int getStackPushCount(BaseLocalData localData, TranslateStack stack) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         return getStackPushCount(aLocalData);
-    }
-
-    public int getStackPopCount(AVM2LocalData aLocalData) {
-        return definition.getStackPopCount(this, aLocalData.abc);
     }
 
     public int getStackPushCount(AVM2LocalData aLocalData) {
@@ -598,7 +597,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
      * @param code
      * @param body
      */
-    public void setOperands(int operands[], AVM2Code code, MethodBody body) {
+    public void setOperands(int[] operands, AVM2Code code, MethodBody body) {
         int oldByteCount = getBytesLength();
         this.operands = operands;
         int newByteCount = getBytesLength();

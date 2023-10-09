@@ -93,7 +93,7 @@ public class MainFrameClassicMenu extends MainFrameMenu {
                     public void menuCanceled(MenuEvent e) {
                     }
                 });
-            };
+            }
         }
         menuElements.put(path, menu);
     }

@@ -151,7 +151,7 @@ public class View {
      * Sets windows Look and Feel
      */
     public static void setLookAndFeel() {
-        
+
         // Save default font for Chinese characters
         final Font defaultFont = (new JLabel()).getFont();
         try {
@@ -159,6 +159,7 @@ public class View {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+            //ignored
         }
 
         try {
@@ -180,7 +181,7 @@ public class View {
                 SubstanceLookAndFeel.setSkin("com.jpexs.decompiler.flash.gui.OceanicSkin");
             }
 
-            UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
+            UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999); //This works for not changing labels color and not changing Dialogs title
             if (View.isOceanic()) {
                 UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                 UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
@@ -350,7 +351,12 @@ public class View {
     public static void centerScreen(Window f, int screen) {
 
         GraphicsDevice[] allDevices = getEnv().getScreenDevices();
-        int topLeftX, topLeftY, screenX, screenY, windowPosX, windowPosY;
+        int topLeftX;
+        int topLeftY;
+        int screenX;
+        int screenY;
+        int windowPosX;
+        int windowPosY;
 
         if (screen < allDevices.length && screen > -1) {
             topLeftX = allDevices[screen].getDefaultConfiguration().getBounds().x;
@@ -461,6 +467,7 @@ public class View {
             try {
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException ex) {
+                //ignored
             } catch (InvocationTargetException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -490,7 +497,7 @@ public class View {
         int rowCount = tree.getRowCount();
         for (int i = 0; i < rowCount; i++) {
             try {
-                TreePath path = tree.getPathForRow(i);               
+                TreePath path = tree.getPathForRow(i);
                 if (tree.isExpanded(path)) {
                     List<String> pathAsStringList = new ArrayList<>();
                     for (Object pathCompnent : path.getPath()) {
@@ -505,11 +512,7 @@ public class View {
         return expandedNodes;
     }
 
-    public static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
-        for (List<String> pathAsStringList : pathsToExpand) {
-            expandTreeNode(tree, pathAsStringList);
-        }
-    }
+    
 
     private static TreePath expandTreeNode(JTree tree, List<String> pathAsStringList) {
         TreePath tp = getTreePathByPathStrings(tree, pathAsStringList);
@@ -541,7 +544,7 @@ public class View {
             for (int j = 0; j < childCount; j++) {
                 Object child = model.getChild(node, j);
                 String childStr = child.toString();
-                int index = 1;                
+                int index = 1;
                 if (model instanceof AbstractTagTreeModel) {
                     AbstractTagTreeModel aModel = (AbstractTagTreeModel) model;
                     index = aModel.getItemIndex((TreeItem) child);
@@ -559,6 +562,12 @@ public class View {
 
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         return tp;
+    }
+    
+    public static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
+        for (List<String> pathAsStringList : pathsToExpand) {
+            expandTreeNode(tree, pathAsStringList);
+        }
     }
 
     public static void expandTreeNodes(JTree tree, TreePath parent, boolean expand) {
@@ -682,7 +691,7 @@ public class View {
         }
         return conf;
     }
-    
+
     public static BufferedImage toCompatibleImage(BufferedImage image) {
         if (image.getColorModel().equals(getDefaultConfiguration().getColorModel())) {
             return image;

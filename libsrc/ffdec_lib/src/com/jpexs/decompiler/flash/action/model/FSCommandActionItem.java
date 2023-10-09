@@ -52,6 +52,11 @@ public class FSCommandActionItem extends ActionItem {
         writer.append("(");
         command.appendTry(writer, localData);
         return writer.append(")");
+    }    
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
     }
 
     @Override
@@ -59,15 +64,9 @@ public class FSCommandActionItem extends ActionItem {
         return toSource(localData, generator, true);
     }
 
-    @Override
-    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSource(localData, generator, false);
-    }
-
-
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         if ((command instanceof DirectValueActionItem) && ((DirectValueActionItem) command).isString()) {
             return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + ((DirectValueActionItem) command).getAsString(), "", charset));
         }

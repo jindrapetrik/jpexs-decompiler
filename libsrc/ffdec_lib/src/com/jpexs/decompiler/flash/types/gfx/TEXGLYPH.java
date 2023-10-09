@@ -38,8 +38,8 @@ public class TEXGLYPH implements Serializable {
     public float uvOriginY;
 
     public TEXGLYPH() {
-    } 
-    
+    }
+
     public TEXGLYPH(float uvBoundsLeft, float uvBoundsTop, float uvBoundsRight, float uvBoundsBottom, float uvOriginX, float uvOriginY) {
         this.uvBoundsLeft = uvBoundsLeft;
         this.uvBoundsTop = uvBoundsTop;

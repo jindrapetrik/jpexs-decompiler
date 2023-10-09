@@ -78,7 +78,7 @@ public class ButtonAction implements ASMSource {
 
         return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, buttonTag.getCharset());
     }
-    
+
     @Override
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         if (actions == null) {
@@ -218,7 +218,7 @@ public class ButtonAction implements ASMSource {
     public SWF getSwf() {
         return (SWF) getOpenable();
     }
-    
+
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {

@@ -25,19 +25,19 @@ import java.util.Map;
  * @author JPEXS
  */
 public class SwfSpecificCustomConfiguration implements Serializable {
-    
+
     private static final long serialVersionUID = 0x2acb421da57f5eb4L;
-    
-    private Map<String, String> customData = new HashMap<>();       
-    
+
+    private Map<String, String> customData = new HashMap<>();
+
     public String getCustomData(String key, String defaultValue) {
         if (customData.containsKey(key)) {
             return customData.get(key);
         }
-                
+
         return defaultValue;
     }
-    
+
     public void setCustomData(String key, String value) {
         customData.put(key, value);
     }

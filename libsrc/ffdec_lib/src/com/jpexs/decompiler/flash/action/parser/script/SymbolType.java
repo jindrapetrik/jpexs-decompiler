@@ -78,7 +78,7 @@ public enum SymbolType {
     NOT(GraphTargetItem.PRECEDENCE_UNARY, false),
     NEGATE(GraphTargetItem.PRECEDENCE_UNARY, false),
     TERNAR(GraphTargetItem.PRECEDENCE_CONDITIONAL, true, true), /*!! ternar !!!*/
-    COLON(GraphTargetItem.PRECEDENCE_CONDITIONAL, false),/*!! ternar !!!*/
+    COLON(GraphTargetItem.PRECEDENCE_CONDITIONAL, false), /*!! ternar !!!*/
     EQUALS(GraphTargetItem.PRECEDENCE_EQUALITY, true),
     STRICT_EQUALS(GraphTargetItem.PRECEDENCE_EQUALITY, true),
     LOWER_EQUAL(GraphTargetItem.PRECEDENCE_RELATIONAL, true),
@@ -89,7 +89,7 @@ public enum SymbolType {
     OR(GraphTargetItem.PRECEDENCE_LOGICALOR, true),
     FULLAND(GraphTargetItem.PRECEDENCE_LOGICALAND, true),
     FULLOR(GraphTargetItem.PRECEDENCE_LOGICALOR, true),
-    INCREMENT(GraphTargetItem.PRECEDENCE_POSTFIX, false),//OR Unary
+    INCREMENT(GraphTargetItem.PRECEDENCE_POSTFIX, false), //OR Unary
     DECREMENT(GraphTargetItem.PRECEDENCE_POSTFIX, false), //OR Unary
     PLUS(GraphTargetItem.PRECEDENCE_ADDITIVE, true),
     MINUS(GraphTargetItem.PRECEDENCE_ADDITIVE, true), //OR Unary

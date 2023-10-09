@@ -44,7 +44,7 @@ public class PushFloatIns extends InstructionDefinition {
 
         super.verify(lda, constants, ins);
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;

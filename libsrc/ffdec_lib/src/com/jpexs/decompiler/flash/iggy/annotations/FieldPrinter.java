@@ -50,7 +50,7 @@ public class FieldPrinter {
                             break;
                     }
                 } catch (IllegalAccessException ex) {
-
+                    //ignored
                 }
             }
             sb.append("\r\n");

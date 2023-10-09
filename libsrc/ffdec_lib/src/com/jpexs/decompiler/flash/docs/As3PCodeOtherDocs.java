@@ -65,7 +65,7 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         }
         sb.append("<div class=\"otherdoc\">");
 
-        String pathParts[] = new String[]{path};
+        String[] pathParts = new String[]{path};
         if (path.contains(".")) {
             pathParts = path.split("\\.");
         }
@@ -108,24 +108,24 @@ public class As3PCodeOtherDocs extends AbstractDocs {
     protected static String htmlHeader(String js, String style) {
         Date dateGenerated = new Date();
         StringBuilder sb = new StringBuilder();
-        sb.append("<!DOCTYPE html>").append(NEWLINE).
-                append("<html>").append(NEWLINE).
-                append("\t<head>").append(NEWLINE);
+        sb.append("<!DOCTYPE html>").append(NEWLINE)
+                .append("<html>").append(NEWLINE)
+                .append("\t<head>").append(NEWLINE);
         if (style != null && !style.isEmpty()) {
             sb.append("\t\t<style>").append(style).append("</style>").append(NEWLINE);
         }
         if (js != null && !js.isEmpty()) {
             sb.append("\t\t<script>").append(js).append("</script>").append(NEWLINE);
         }
-        sb.append("\t\t<meta charset=\"UTF-8\">").append(NEWLINE).
-                append(meta("generator", ApplicationInfo.applicationVerName)).
-                append(meta("description", getProperty("ui.list.pageDescription"))).
-                append(metaProp("og:title", getProperty("ui.list.pageTitle"))).
-                append(metaProp("og:type", "article")).
-                append(metaProp("og:description", getProperty("ui.list.pageDescription"))).
-                append(meta("date", dateGenerated)).
-                append("\t\t<title>").append(getProperty("ui.list.documentTitle")).append("</title>").append(NEWLINE).
-                append("\t</head>").append(NEWLINE);
+        sb.append("\t\t<meta charset=\"UTF-8\">").append(NEWLINE)
+                .append(meta("generator", ApplicationInfo.applicationVerName))
+                .append(meta("description", getProperty("ui.list.pageDescription")))
+                .append(metaProp("og:title", getProperty("ui.list.pageTitle")))
+                .append(metaProp("og:type", "article"))
+                .append(metaProp("og:description", getProperty("ui.list.pageDescription")))
+                .append(meta("date", dateGenerated))
+                .append("\t\t<title>").append(getProperty("ui.list.documentTitle")).append("</title>").append(NEWLINE)
+                .append("\t</head>").append(NEWLINE);
         return sb.toString();
     }
 

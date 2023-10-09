@@ -218,9 +218,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         if (fontName != null) {
             nameAppendList.add(fontName);
         }
-        
-        if (!nameAppendList.isEmpty())
-        {
+
+        if (!nameAppendList.isEmpty()) {
             nameAppend = ": " + String.join(", ", nameAppendList);
         }
         return tagName + " (" + getCharacterId() + nameAppend + ")";
@@ -486,13 +485,13 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
-    public RECT getRectWithStrokes() {
-        return getRect();
-    }
-
-    @Override
     public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (PREVIEWSIZE * SWF.unitDivisor), 0, (int) (PREVIEWSIZE * SWF.unitDivisor));
+    }
+    
+    @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
     }
 
     @Override
@@ -542,5 +541,5 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public abstract String getCodesCharset();
-    
+
 }

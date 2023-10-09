@@ -64,13 +64,13 @@ public class GraphPart implements Serializable {
     public List<GraphPart> refs = new ArrayList<>();
 
     public boolean ignored = false;
-    
+
     public int level;
 
     public int discoveredTime;
 
     public int finishedTime;
-    
+
     public int closedTime;
 
     public int order;
@@ -134,77 +134,9 @@ public class GraphPart implements Serializable {
                 next.setNumblocks(numBlocks);
             }
         }
-    }
+    }    
 
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException();
-        }
-
-        Stack<GraphPart> todo = new Stack<>();
-        todo.push(this);
-
-        looptodo:while (!todo.isEmpty()) {
-            GraphPart thisPart = todo.pop();
-
-            GraphPart tpart = gr.checkPart(null, localData, prev, thisPart, null);
-            if (tpart == null) {
-                continue;
-            }
-            if (tpart != thisPart) {
-                todo.push(tpart);                
-                continue;
-            }
-            for (Loop l : loops) {
-                if (l.phase == 1) {
-                    if (l.loopContinue == thisPart) {
-                        continue looptodo;
-                    }
-                    if (l.loopPreContinue == thisPart) {
-                        continue looptodo;
-                    }
-                    if (l.loopBreak == thisPart) {
-                        //return false;    //?
-                    }
-                }
-            }
-            if (visited.contains(thisPart)) {
-                continue;
-            }
-            visited.add(thisPart);
-            if (thisPart.end < code.size() && code.get(thisPart.end).isBranch() && (code.get(thisPart.end).ignoredLoops())) {
-                continue;
-            }
-            for (GraphPart p : thisPart.nextParts) {                
-                if (p == part) {
-                    return true;
-                }
-                if (visited.contains(p)) {
-                    continue;
-                }
-                todo.push(p);
-            }
-            for (ThrowState ts : throwStates) {
-                if (ts.state != 1) {
-                    if (ts.throwingParts.contains(thisPart)) {
-                        GraphPart p = ts.targetPart;
-                        
-                        if (p == part) {
-                            return true;
-                        }
-                        if (visited.contains(p)) {
-                            continue;
-                        }
-                        
-                        todo.push(p);
-                    }
-                }
-            }            
-        }
-        return false;
-    }
-    
-    private boolean leadsToRecursive(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {        
+    private boolean leadsToRecursive(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -263,6 +195,75 @@ public class GraphPart implements Serializable {
                         return true;
                     } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, throwStates, useThrow)) {
                         return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
+        Stack<GraphPart> todo = new Stack<>();
+        todo.push(this);
+
+        looptodo:
+        while (!todo.isEmpty()) {
+            GraphPart thisPart = todo.pop();
+
+            GraphPart tpart = gr.checkPart(null, localData, prev, thisPart, null);
+            if (tpart == null) {
+                continue;
+            }
+            if (tpart != thisPart) {
+                todo.push(tpart);
+                continue;
+            }
+            for (Loop l : loops) {
+                if (l.phase == 1) {
+                    if (l.loopContinue == thisPart) {
+                        continue looptodo;
+                    }
+                    if (l.loopPreContinue == thisPart) {
+                        continue looptodo;
+                    }
+                    if (l.loopBreak == thisPart) {
+                        //return false;    //?
+                    }
+                }
+            }
+            if (visited.contains(thisPart)) {
+                continue;
+            }
+            visited.add(thisPart);
+            if (thisPart.end < code.size() && code.get(thisPart.end).isBranch() && (code.get(thisPart.end).ignoredLoops())) {
+                continue;
+            }
+            for (GraphPart p : thisPart.nextParts) {
+                if (p == part) {
+                    return true;
+                }
+                if (visited.contains(p)) {
+                    continue;
+                }
+                todo.push(p);
+            }
+            for (ThrowState ts : throwStates) {
+                if (ts.state != 1) {
+                    if (ts.throwingParts.contains(thisPart)) {
+                        GraphPart p = ts.targetPart;
+
+                        if (p == part) {
+                            return true;
+                        }
+                        if (visited.contains(p)) {
+                            continue;
+                        }
+
+                        todo.push(p);
                     }
                 }
             }
@@ -351,11 +352,19 @@ public class GraphPart implements Serializable {
         int printEnd = end + 1;
 
         return "" + (printStart < 0 ? "(" : "") + printStart + (printStart < 0 ? ")" : "")
-                + "-" + (printEnd < 0 ? "(" : "") + printEnd + (printEnd < 0 ? ")" : "") + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");// + "  p" + path;
+                + "-" + (printEnd < 0 ? "(" : "") + printEnd + (printEnd < 0 ? ")" : "") + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");
     }
 
     public boolean containsIP(int ip) {
         return (ip >= start) && (ip <= end);
+    }    
+
+    public int getHeight() {
+        return end - start + 1;
+    }
+
+    public int getPosAt(int offset) {
+        return start + offset;
     }
 
     private boolean containsPart(GraphPart part, GraphPart what, List<GraphPart> used) {
@@ -372,14 +381,6 @@ public class GraphPart implements Serializable {
             }
         }
         return false;
-    }
-
-    public int getHeight() {
-        return end - start + 1;
-    }
-
-    public int getPosAt(int offset) {
-        return start + offset;
     }
 
     public boolean containsPart(GraphPart what) {

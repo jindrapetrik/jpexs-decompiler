@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -88,27 +87,26 @@ public class AVM2ConstantPool implements Cloneable {
 
     @Internal
     public Map<String, DottedChain> dottedChainCache = new HashMap<>();
-    
+
     @Internal
     public Map<Multiname, DottedChain> multinameWithNamespaceCache = new HashMap<>();
 
-    
     public DottedChain getCachedMultinameWithNamespace(Multiname multiName) {
         return multinameWithNamespaceCache.get(multiName);
     }
-    
+
     public void cacheMultinameWithNamespace(Multiname multiName, DottedChain multinameWithNamespace) {
         multinameWithNamespaceCache.put(multiName, multinameWithNamespace);
     }
-    
+
     public void clearCachedMultinames() {
         multinameWithNamespaceCache.clear();
     }
-    
+
     public void clearCachedDottedChains() {
         dottedChainCache.clear();
     }
-    
+
     private void ensureDefault(List<?> list) {
         if (list.isEmpty()) {
             list.add(null);
@@ -216,7 +214,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     public synchronized int addUInt(long value) {
         ensureDefault(constant_uint);
-        value &= 0xffffffffl;
+        value &= 0xffffffffL;
         constant_uint.add(value);
         return constant_uint.size() - 1;
     }
@@ -362,14 +360,6 @@ public class AVM2ConstantPool implements Cloneable {
         return constant_decimal.get(index);
     }
 
-    public int getDecimalId(Decimal val, boolean add) {
-        int id = getDecimalId(val);
-        if (add && id == -1) {
-            id = addDecimal(val);
-        }
-        return id;
-    }
-
     public Float getFloat(int index) {
         return constant_float.get(index);
     }
@@ -472,36 +462,16 @@ public class AVM2ConstantPool implements Cloneable {
         return getNamespaceId(kind, nameIndex, index, add);
     }
 
-    private int getIntId(int value) {
-        return constant_int.indexOf(value);
-    }
-
-    private int getUIntId(long value) {
-        return constant_uint.indexOf(value);
-    }
-
-    private int getDoubleId(double value) {
-        return constant_double.indexOf(value);
-    }
-
-    private int getFloatId(float value) {
-        return constant_float.indexOf(value);
-    }
-
-    private int getFloat4Id(Float4 value) {
-        return constant_float4.indexOf(value);
+    public int getDecimalId(Decimal val, boolean add) {
+        int id = getDecimalId(val);
+        if (add && id == -1) {
+            id = addDecimal(val);
+        }
+        return id;
     }
 
     private int getDecimalId(Decimal value) {
         return constant_decimal.indexOf(value);
-    }
-
-    private int getStringId(String value) {
-        return constant_string.indexOf(value);
-    }
-
-    private int getMultinameId(Multiname value) {
-        return constant_multiname.indexOf(value);
     }
 
     public int getQnameId(String name, int namespaceKind, String namespaceName, boolean add) {
@@ -510,6 +480,10 @@ public class AVM2ConstantPool implements Cloneable {
 
     public int getPublicQnameId(String name, boolean add) {
         return getQnameId(name, Namespace.KIND_PACKAGE, "", add);
+    }
+
+    private int getMultinameId(Multiname value) {
+        return constant_multiname.indexOf(value);
     }
 
     public int getMultinameId(Multiname val, boolean add) {
@@ -538,6 +512,10 @@ public class AVM2ConstantPool implements Cloneable {
         return ret;
     }
 
+    private int getStringId(String value) {
+        return constant_string.indexOf(value);
+    }
+
     public int getStringId(String val, boolean add) {
         if (val == null) {
             return 0;
@@ -555,6 +533,10 @@ public class AVM2ConstantPool implements Cloneable {
         }
 
         return getStringId(val.toRawString(), add);
+    }
+
+    private int getIntId(int value) {
+        return constant_int.indexOf(value);
     }
 
     public int getIntId(int val, boolean add) {
@@ -597,12 +579,20 @@ public class AVM2ConstantPool implements Cloneable {
         return id;
     }
 
+    private int getUIntId(long value) {
+        return constant_uint.indexOf(value);
+    }
+
     public int getUIntId(long val, boolean add) {
         int id = getUIntId(val);
         if (add && id == -1) {
             id = addUInt(val);
         }
         return id;
+    }
+
+    private int getDoubleId(double value) {
+        return constant_double.indexOf(value);
     }
 
     public int getDoubleId(double val, boolean add) {
@@ -613,12 +603,20 @@ public class AVM2ConstantPool implements Cloneable {
         return id;
     }
 
+    private int getFloatId(float value) {
+        return constant_float.indexOf(value);
+    }
+
     public int getFloatId(float val, boolean add) {
         int id = getFloatId(val);
         if (add && id == -1) {
             id = addFloat(val);
         }
         return id;
+    }
+
+    private int getFloat4Id(Float4 value) {
+        return constant_float4.indexOf(value);
     }
 
     public int getFloat4Id(Float4 val, boolean add) {
@@ -796,7 +794,7 @@ public class AVM2ConstantPool implements Cloneable {
             Namespace secondNamespace = secondPool.constant_namespace.get(i);
             int mappedId;
             int newNameIndex = stringMap.get(secondNamespace.name_index);
-            if (secondNamespace.kind == Namespace.KIND_PRIVATE) {//always add, this does not exists in this ABC. Conflicting private namespaces can have same names.
+            if (secondNamespace.kind == Namespace.KIND_PRIVATE) { //always add, this does not exists in this ABC. Conflicting private namespaces can have same names.
                 mappedId = addNamespace(secondNamespace.kind, newNameIndex);
             } else {
                 mappedId = getNamespaceId(secondNamespace.kind, newNameIndex, 0, true);
@@ -806,7 +804,7 @@ public class AVM2ConstantPool implements Cloneable {
         namespaceSetMap.put(0, 0);
         for (int i = 1; i < secondPool.constant_namespace_set.size(); i++) {
             NamespaceSet secondNamespaceSet = secondPool.constant_namespace_set.get(i);
-            int mappedsNss[] = new int[secondNamespaceSet.namespaces.length];
+            int[] mappedsNss = new int[secondNamespaceSet.namespaces.length];
             for (int n = 0; n < secondNamespaceSet.namespaces.length; n++) {
                 mappedsNss[n] = namespaceMap.get(secondNamespaceSet.namespaces[n]);
             }
@@ -854,7 +852,7 @@ public class AVM2ConstantPool implements Cloneable {
                     break;
                 case Multiname.TYPENAME:
                     int newQnameIndex = multinameMap.get(secondMultiname.qname_index);
-                    int newParams[] = new int[secondMultiname.params.length];
+                    int[] newParams = new int[secondMultiname.params.length];
                     for (int p = 0; p < secondMultiname.params.length; p++) {
                         newParams[p] = multinameMap.get(secondMultiname.params[p]);
                     }
@@ -867,7 +865,7 @@ public class AVM2ConstantPool implements Cloneable {
         }
 
     }
-    
+
     public void checkCyclicTypeNames() {
         for (int i = 0; i < constant_multiname.size(); i++) {
             Multiname.checkTypeNameCyclic(this, i);

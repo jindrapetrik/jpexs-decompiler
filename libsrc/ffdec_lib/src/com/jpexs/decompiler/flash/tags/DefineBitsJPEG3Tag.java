@@ -166,7 +166,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag, HasSeparat
     public boolean hasAlphaChannel() {
         return bitmapAlphaData.getLength() > 0;
     }
-    
+
     @Override
     public ImageFormat getImageFormat() {
         ImageFormat fmt = getOriginalImageFormat();

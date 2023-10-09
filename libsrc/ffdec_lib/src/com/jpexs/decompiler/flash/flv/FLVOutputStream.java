@@ -216,7 +216,7 @@ public class FLVOutputStream extends OutputStream {
                 for (SCRIPTDATAOBJECT o : objects) {
                     writeSCRIPTDATAOBJECT(o);
                 }
-                writeUI24(9);//SCRIPTDATAOBJECTEND
+                writeUI24(9); //SCRIPTDATAOBJECTEND
                 break;
             //MovieClip type
             case 4:
@@ -239,7 +239,7 @@ public class FLVOutputStream extends OutputStream {
                 for (SCRIPTDATAVARIABLE var : variables) {
                     writeSCRIPTDATAVARIABLE(var);
                 }
-                writeUI24(9);//SCRIPTDATAVARIABLEEND
+                writeUI24(9); //SCRIPTDATAVARIABLEEND
                 break;
             //Reserved
             case 9:

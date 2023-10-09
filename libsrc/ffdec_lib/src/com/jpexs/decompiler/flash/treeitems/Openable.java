@@ -24,25 +24,26 @@ import java.io.OutputStream;
  * @author JPEXS
  */
 public interface Openable extends TreeItem {
+
     public String getFileTitle();
-    
+
     public String getShortPathTitle();
-    
+
     public String getShortFileName();
-   
+
     public String getFile();
-    
+
     public String getTitleOrShortFileName();
-    
+
     public String getFullPathTitle();
-    
+
     public void setOpenableList(OpenableList openableList);
-    
+
     public OpenableList getOpenableList();
-    
+
     public void saveTo(OutputStream os) throws IOException;
-    
+
     public void setFile(String file);
-    
+
     public void clearModified();
 }

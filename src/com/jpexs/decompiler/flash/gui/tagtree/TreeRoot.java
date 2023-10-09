@@ -21,5 +21,5 @@ package com.jpexs.decompiler.flash.gui.tagtree;
  * @author JPEXS
  */
 public interface TreeRoot {
-    
+
 }

@@ -37,11 +37,11 @@ import javax.swing.event.DocumentListener;
 public class QuickTreeFindPanel extends JPanel {
 
     private List<ActionListener> listeners = new ArrayList<>();
-    
+
     private JTextField filterField = new MyTextField("");
-    
+
     public QuickTreeFindPanel() {
-        
+
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -62,7 +62,7 @@ public class QuickTreeFindPanel extends JPanel {
                 fireAction();
             }
         });
-        
+
         setLayout(new BorderLayout());
         add(filterField, BorderLayout.CENTER);
         add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
@@ -79,24 +79,23 @@ public class QuickTreeFindPanel extends JPanel {
         add(closeSearchButton, BorderLayout.EAST);
         setVisible(false);
     }
-    
+
     private void fireAction() {
-        for (ActionListener listener:listeners) {
+        for (ActionListener listener : listeners) {
             listener.actionPerformed(new ActionEvent(this, 0, ""));
         }
     }
-    
+
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
     }
-    
+
     public void removeActionListener(ActionListener listener) {
         listeners.remove(listener);
     }
-    
-    
+
     public String getFilter() {
-        return filterField.getText().trim();                
+        return filterField.getText().trim();
     }
 
     @Override
@@ -108,6 +107,5 @@ public class QuickTreeFindPanel extends JPanel {
             filterField.setText("");
         }
     }
-    
-    
+
 }

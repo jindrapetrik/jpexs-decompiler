@@ -93,6 +93,48 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
     }
 
     @Override
+    public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, x, y, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, x, y, observer);
+        return ok1 && ok2;
+    }
+
+    @Override
+    public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, x, y, width, height, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, x, y, width, height, observer);
+        return ok1 && ok2;
+    }
+
+    @Override
+    public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, x, y, bgcolor, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, x, y, bgcolor, observer);
+        return ok1 && ok2;
+    }
+
+    @Override
+    public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
+        return ok1 && ok2;
+    }
+
+    @Override
+    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+        return ok1 && ok2;
+    }
+
+    @Override
+    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+        boolean ok1 = imageGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+        boolean ok2 = pdfGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+        return ok1 && ok2;
+    }
+    
+    @Override
     public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
         imageGraphics.drawRenderedImage(img, xform);
         pdfGraphics.drawRenderedImage(img, xform);
@@ -341,6 +383,11 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
     public void clipRect(int x, int y, int width, int height) {
         imageGraphics.clearRect(x, y, width, height);
         pdfGraphics.clipRect(x, y, width, height);
+    }    
+
+    @Override
+    public Shape getClip() {
+        return pdfGraphics.getClip();
     }
 
     @Override
@@ -348,12 +395,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
         imageGraphics.setClip(x, y, width, height);
         pdfGraphics.setClip(x, y, width, height);
     }
-
-    @Override
-    public Shape getClip() {
-        return pdfGraphics.getClip();
-    }
-
+    
     @Override
     public void setClip(Shape clip) {
         imageGraphics.setClip(clip);
@@ -436,49 +478,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         imageGraphics.fillPolygon(xPoints, yPoints, nPoints);
         pdfGraphics.fillPolygon(xPoints, yPoints, nPoints);
-    }
-
-    @Override
-    public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, x, y, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, x, y, observer);
-        return ok1 && ok2;
-    }
-
-    @Override
-    public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, x, y, width, height, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, x, y, width, height, observer);
-        return ok1 && ok2;
-    }
-
-    @Override
-    public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, x, y, bgcolor, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, x, y, bgcolor, observer);
-        return ok1 && ok2;
-    }
-
-    @Override
-    public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, x, y, width, height, bgcolor, observer);
-        return ok1 && ok2;
-    }
-
-    @Override
-    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
-        return ok1 && ok2;
-    }
-
-    @Override
-    public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
-        boolean ok1 = imageGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
-        boolean ok2 = pdfGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
-        return ok1 && ok2;
-    }
+    }    
 
     @Override
     public void dispose() {

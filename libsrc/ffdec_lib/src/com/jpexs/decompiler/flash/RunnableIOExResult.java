@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash;
 
 /**
  *
- * @param <T>
+ * @param <T> Type of result
  * @author JPEXS
  */
 public abstract class RunnableIOExResult<T> implements RunnableIOEx {

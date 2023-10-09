@@ -42,7 +42,7 @@ public final class EcmaNumberToString {
     /**
      * Actual digits.
      */
-    private char digits[];
+    private char[] digits;
 
     /**
      * Number of digits to use. (nDigits <= digits.length).
@@ -65,7 +65,7 @@ public final class EcmaNumberToString {
     /**
      * Powers of 5 fitting a long.
      */
-    private static final long powersOf5[] = {
+    private static final long[] powersOf5 = {
         1L,
         5L,
         5L * 5,
@@ -96,7 +96,7 @@ public final class EcmaNumberToString {
     };
 
     // Approximately ceil(log2(longPowers5[i])).
-    private static final int nBitsPowerOf5[] = {
+    private static final int[] nBitsPowerOf5 = {
         0,
         3,
         5,
@@ -129,17 +129,17 @@ public final class EcmaNumberToString {
     /**
      * Digits used for infinity result.
      */
-    private static final char infinityDigits[] = {'I', 'n', 'f', 'i', 'n', 'i', 't', 'y'};
+    private static final char[] infinityDigits = {'I', 'n', 'f', 'i', 'n', 'i', 't', 'y'};
 
     /**
      * Digits used for NaN result.
      */
-    private static final char nanDigits[] = {'N', 'a', 'N'};
+    private static final char[] nanDigits = {'N', 'a', 'N'};
 
     /**
      * Zeros used to pad result.
      */
-    private static final char zeroes[] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'};
+    private static final char[] zeroes = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'};
 
     /**
      * Convert a number into a JavaScript string.
@@ -275,7 +275,7 @@ public final class EcmaNumberToString {
                         halfULP /= 10L;
                     }
 
-                    /**
+                    /*
                      * This is the easy subcase -- all the significant bits,
                      * after scaling, are held in bits. isNegative and
                      * decExponent tell us what processing and scaling has
@@ -356,9 +356,7 @@ public final class EcmaNumberToString {
          * is <= M.
          *
          * We keep track of powers of 2 and powers of 5.
-         */
-
- /*
+         *
          * Estimate decimal exponent. (If it is small-ish,
          * we could double-check.)
          *
@@ -425,9 +423,10 @@ public final class EcmaNumberToString {
          * 26 Sept 96 is not that day.
          * So we use a symmetric test.
          */
-        final char digits0[] = this.digits = new char[32];
+        final char[] digits0 = this.digits = new char[32];
         int ndigit;
-        boolean low, high;
+        boolean low;
+        boolean high;
         long lowDigitDifference;
         int q;
 
@@ -599,7 +598,7 @@ public final class EcmaNumberToString {
     /*
      * Cache big powers of 5 handy for future reference.
      */
-    private static BigInteger powerOf5Cache[];
+    private static BigInteger[] powerOf5Cache;
 
     /**
      * Determine the largest power of 5 needed (as BigInteger.)
@@ -611,7 +610,7 @@ public final class EcmaNumberToString {
         if (powerOf5Cache == null) {
             powerOf5Cache = new BigInteger[power + 1];
         } else if (powerOf5Cache.length <= power) {
-            final BigInteger t[] = new BigInteger[power + 1];
+            final BigInteger[] t = new BigInteger[power + 1];
             System.arraycopy(powerOf5Cache, 0, t, 0, powerOf5Cache.length);
             powerOf5Cache = t;
         }

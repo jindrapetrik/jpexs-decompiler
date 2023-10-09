@@ -35,7 +35,7 @@ public class MP3FRAME {
     private Header h;
 
     private SampleBuffer samples;
-    
+
     private byte[] fullData;
 
     private MP3FRAME() {
@@ -45,11 +45,10 @@ public class MP3FRAME {
     public void setFullData(byte[] fullData) {
         this.fullData = fullData;
     }
-   
+
     public byte[] getBytes() {
         return fullData;
     }
-    
 
     public static MP3FRAME readFrame(Bitstream bitstream, Decoder decoder) throws IOException {
         MP3FRAME ret = new MP3FRAME();
@@ -66,32 +65,32 @@ public class MP3FRAME {
         } catch (DecoderException ex) {
             Logger.getLogger(MP3FRAME.class.getName()).log(Level.SEVERE, null, ex);
         }
-        bitstream.closeFrame();        
+        bitstream.closeFrame();
         return ret;
     }
-    
+
     public int getSampleCount() {
-       if (h.version() == Header.MPEG1) {
-           switch(h.layer()) {
-               case 1:
-                   return 384;
-               case 2:
-                   return 1152;
-               case 3:
-                   return 1152;
-           }
-       }
-       if (h.version() == Header.MPEG2_LSF || h.version() == Header.MPEG25_LSF) {
-           switch(h.layer()) {
-               case 1:
-                   return 384;
-               case 2:
-                   return 1152;
-               case 3:
-                   return 576;
-           }
-       }
-       return 0;
+        if (h.version() == Header.MPEG1) {
+            switch (h.layer()) {
+                case 1:
+                    return 384;
+                case 2:
+                    return 1152;
+                case 3:
+                    return 1152;
+            }
+        }
+        if (h.version() == Header.MPEG2_LSF || h.version() == Header.MPEG25_LSF) {
+            switch (h.layer()) {
+                case 1:
+                    return 384;
+                case 2:
+                    return 1152;
+                case 3:
+                    return 576;
+            }
+        }
+        return 0;
     }
 
     public boolean isStereo() {
@@ -109,8 +108,7 @@ public class MP3FRAME {
                     return 32000;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 16000;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 8000;
                 }
             case Header.FOURTYFOUR_POINT_ONE:
@@ -118,8 +116,7 @@ public class MP3FRAME {
                     return 44100;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 22050;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 11025;
                 }
             case Header.FOURTYEIGHT:
@@ -127,8 +124,7 @@ public class MP3FRAME {
                     return 48000;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 24000;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 12000;
                 }
             default:

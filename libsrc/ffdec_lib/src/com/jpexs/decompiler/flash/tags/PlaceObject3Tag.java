@@ -212,7 +212,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @EnumValue(value = BlendMode.ALPHA, text = "alpha")
     @EnumValue(value = BlendMode.ERASE, text = "erase")
     @EnumValue(value = BlendMode.OVERLAY, text = "overlay")
-    @EnumValue(value = BlendMode.HARDLIGHT, text = "hardlight")    
+    @EnumValue(value = BlendMode.HARDLIGHT, text = "hardlight")
     public int blendMode;
 
     /**

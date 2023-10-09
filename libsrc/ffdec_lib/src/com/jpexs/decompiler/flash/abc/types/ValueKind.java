@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 
@@ -29,37 +28,37 @@ public class ValueKind {
 
     public static final int CONSTANT_DecimalOrFloat = 0x02; //decimal or float depending on ABC version
 
-    public static final int CONSTANT_Int = 0x03;// integer
+    public static final int CONSTANT_Int = 0x03; //integer
 
-    public static final int CONSTANT_UInt = 0x04;// uinteger
+    public static final int CONSTANT_UInt = 0x04; //uinteger
 
-    public static final int CONSTANT_Double = 0x06;// double
+    public static final int CONSTANT_Double = 0x06; //double
 
-    public static final int CONSTANT_Utf8 = 0x01;// string
+    public static final int CONSTANT_Utf8 = 0x01; //string
 
-    public static final int CONSTANT_True = 0x0B;// -
+    public static final int CONSTANT_True = 0x0B; //-
 
-    public static final int CONSTANT_False = 0x0A;// -
+    public static final int CONSTANT_False = 0x0A; //-
 
-    public static final int CONSTANT_Null = 0x0C;// -
+    public static final int CONSTANT_Null = 0x0C; //-
 
-    public static final int CONSTANT_Undefined = 0x00;// -
+    public static final int CONSTANT_Undefined = 0x00; //-
 
-    public static final int CONSTANT_Namespace = 0x08;// namespace
+    public static final int CONSTANT_Namespace = 0x08; //namespace
 
-    public static final int CONSTANT_PackageNamespace = 0x16;// namespace
+    public static final int CONSTANT_PackageNamespace = 0x16; //namespace
 
-    public static final int CONSTANT_PackageInternalNs = 0x17;// Namespace
+    public static final int CONSTANT_PackageInternalNs = 0x17; //namespace
 
-    public static final int CONSTANT_ProtectedNamespace = 0x18;// Namespace
+    public static final int CONSTANT_ProtectedNamespace = 0x18; //namespace
 
-    public static final int CONSTANT_ExplicitNamespace = 0x19;// Namespace
+    public static final int CONSTANT_ExplicitNamespace = 0x19; //namespace
 
-    public static final int CONSTANT_StaticProtectedNs = 0x1A;// Namespace
+    public static final int CONSTANT_StaticProtectedNs = 0x1A; //namespace
 
-    public static final int CONSTANT_PrivateNs = 0x05;// namespace
+    public static final int CONSTANT_PrivateNs = 0x05; //namespace
 
-    public static final int CONSTANT_Float4 = 0x1E;// float4
+    public static final int CONSTANT_Float4 = 0x1E; //float4
 
     private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05, 0x1E};
 
@@ -95,6 +94,20 @@ public class ValueKind {
                 return CONSTANT_StaticProtectedNs;
         }
         return 0;
+    }    
+
+    public boolean isNamespace() {
+        switch (value_kind) {
+            case CONSTANT_Namespace:
+            case CONSTANT_PackageInternalNs:
+            case CONSTANT_ProtectedNamespace:
+            case CONSTANT_ExplicitNamespace:
+            case CONSTANT_StaticProtectedNs:
+            case CONSTANT_PrivateNs:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -113,20 +126,6 @@ public class ValueKind {
             s += "?";
         }
         return s;
-    }
-
-    public boolean isNamespace() {
-        switch (value_kind) {
-            case CONSTANT_Namespace:
-            case CONSTANT_PackageInternalNs:
-            case CONSTANT_ProtectedNamespace:
-            case CONSTANT_ExplicitNamespace:
-            case CONSTANT_StaticProtectedNs:
-            case CONSTANT_PrivateNs:
-                return true;
-            default:
-                return false;
-        }
     }
 
     public String toString(ABC abc) {
@@ -194,7 +193,7 @@ public class ValueKind {
             case CONSTANT_Double:
                 ret = "Double(" + EcmaScript.toString(abc.constants.getDouble(value_index)) + ")";
                 break;
-            case CONSTANT_DecimalOrFloat:     
+            case CONSTANT_DecimalOrFloat:
                 if (abc.hasDecimalSupport()) {
                     ret = "Decimal(" + abc.constants.getDecimal(value_index) + ")";
                 } else {

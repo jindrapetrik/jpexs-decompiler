@@ -276,7 +276,7 @@ public class IdentifiersDeobfuscation {
 
     public static boolean isValidNameWithSlash(String s, String... exceptions) {
         if (s.contains(":")) {
-            String pathVar[] = s.split(":");
+            String[] pathVar = s.split(":");
             if (!isValidSlashPath(pathVar[0], exceptions)) {
                 return false;
             }
@@ -393,7 +393,7 @@ public class IdentifiersDeobfuscation {
      * @param s Identifier
      * @param validExceptions Exceptions which are valid (e.g. some reserved
      * words)
-     * @return
+     * @return Printable identifier
      */
     public static String printIdentifier(boolean as3, String s, String... validExceptions) {
         if (s == null || s.isEmpty()) {

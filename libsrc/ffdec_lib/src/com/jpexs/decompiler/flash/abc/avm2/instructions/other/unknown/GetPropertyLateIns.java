@@ -24,8 +24,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 /**
  *
  * @author JPEXS
- * 
- * source: https://github.com/magicalhobo/SWFWire/blob/master/SWFWireDecompiler/src/com/swfwire/decompiler/abc/ABCInstructions.as
+ *
+ * source:
+ * https://github.com/magicalhobo/SWFWire/blob/master/SWFWireDecompiler/src/com/swfwire/decompiler/abc/ABCInstructions.as
  * collides with getouterscope
  */
 public class GetPropertyLateIns extends InstructionDefinition {

@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class IggyFile implements StructureInterface {
 
-    final static Logger LOGGER = Logger.getLogger(IggyFile.class.getName());
+    static final Logger LOGGER = Logger.getLogger(IggyFile.class.getName());
 
     private File originalFile;
 
@@ -165,8 +165,8 @@ public class IggyFile implements StructureInterface {
 
     public boolean updateFlashEntry() throws IOException {
 
-        byte replacementData[];
-        byte replacementIndexData[];
+        byte[] replacementData;
+        byte[] replacementIndexData;
         IggyIndexBuilder ib = new IggyIndexBuilder();
         try (DataStreamInterface stream = new TemporaryDataStream()) {
             stream.setIndexing(ib);

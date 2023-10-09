@@ -58,7 +58,6 @@ public class SwfJavaExporter {
         "SOUNDINFO", "SOUNDENVELOPE", "GLYPHENTRY", "TEXTRECORD", "MORPHGRADRECORD", "MORPHGRADIENT", "MORPHFOCALGRADIENT",
         "MORPHFILLSTYLE", "MORPHFILLSTYLEARRAY", "MORPHLINESTYLE", "MORPHLINESTYLE2", "MORPHLINESTYLEARRAY", "KERNINGRECORD",
         "LANGCODE", "ZONERECORD", "ZONEDATA", "PIX15", "PIX24", "COLORMAPDATA", "BITMAPDATA", "ALPHABITMAPDATA", "ALPHACOLORMAPDATA",
-        
         //GFX
         "ContourType", "EdgeType", "FONTINFO", "FontType", "GLYPHIDX", "GlyphInfoType", "GlyphType", "KerningPairType", "TEXGLYPH"
     };
@@ -84,7 +83,7 @@ public class SwfJavaExporter {
         writer.append("import com.jpexs.decompiler.flash.SWFCompression;").newLine();
         writer.append("import com.jpexs.decompiler.flash.tags.*;").newLine();
         if (swf.gfx) {
-            writer.append("import com.jpexs.decompiler.flash.tags.gfx.*;").newLine();        
+            writer.append("import com.jpexs.decompiler.flash.tags.gfx.*;").newLine();
         }
         writer.append("import com.jpexs.decompiler.flash.types.*;").newLine();
         if (swf.gfx) {
@@ -254,7 +253,7 @@ public class SwfJavaExporter {
                     Logger.getLogger(SwfJavaExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             if ((obj instanceof SWF) || (obj instanceof DefineSpriteTag)) {
                 Timelined tim = (Timelined) obj;
                 ReadOnlyTagList tags = tim.getTags();
@@ -264,19 +263,18 @@ public class SwfJavaExporter {
                     if (value2 != null) {
                         sb2.appendLine("tag = " + value2 + ";");
                         sb2.appendLine(resultName + ".addTag(tag);");
-                        sb2.appendLine("tag.setTimelined(" + resultName + ");");                        
+                        sb2.appendLine("tag.setTimelined(" + resultName + ");");
                     }
                 }
-            }            
-           
+            }
 
             writer.append("private ").append(className).append(" ").append(tagObjName).append("(").append(isSwf ? "" : "SWF swf").append(") {").newLine();
-            writer.indent();      
+            writer.indent();
             writer.append(className).append(" ").append(resultName).append(" = new ").append(className).append("(").append(obj instanceof Tag ? "swf" : "").append(");");
             writer.unindent().unindent();
-            writer.newLine();            
+            writer.newLine();
             writer.append(sb2.toString());
-            writer.indent().indent();            
+            writer.indent().indent();
             writer.append(indent).append("return ").append(resultName).append(";").newLine();
             writer.unindent();
             writer.append("}").newLine().newLine();

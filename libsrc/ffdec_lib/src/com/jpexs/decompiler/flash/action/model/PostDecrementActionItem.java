@@ -103,8 +103,8 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
-        
+        String charset = asGenerator.getCharset();
+
         List<GraphSourceItem> ret = new ArrayList<>();
 
         GraphTargetItem val = object;

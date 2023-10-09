@@ -50,12 +50,12 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
 
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        
+
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj /*??*/, multiname, isStatic, type, callType);
-        
+
         SetSuperAVM2Item result = new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname, type.getVal(), callType.getVal(), isStatic.getVal());
 
         if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {

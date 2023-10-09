@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
@@ -524,7 +523,7 @@ public class ABCInputStream implements AutoCloseable {
             stringDataBuffer = new byte[newLength];
         }
 
-        safeRead(length, stringDataBuffer);                
+        safeRead(length, stringDataBuffer);
         String r = Utf8Helper.decode(stringDataBuffer, 0, length);
         endDumpLevel(r);
         return r;

@@ -235,11 +235,10 @@ public class Cache<K, V> implements Freed {
     private synchronized int clearOverMax() {
         Set<K> keys = new HashSet<>(lastAccessed.keySet());
         int num = 0;
-        
-        if (Configuration.maxCachedNum.get() > 0 && keys.size() > Configuration.maxCachedNum.get())
-        {
+
+        if (Configuration.maxCachedNum.get() > 0 && keys.size() > Configuration.maxCachedNum.get()) {
             List<K> keysList = new ArrayList<>(keys);
-            Collections.sort(keysList, new Comparator<K>(){
+            Collections.sort(keysList, new Comparator<K>() {
                 @Override
                 public int compare(K o1, K o2) {
                     long t1 = lastAccessed.get(o1);
@@ -248,10 +247,10 @@ public class Cache<K, V> implements Freed {
                         return 1;
                     }
                     if (t2 > t1) {
-                        return  -1;
+                        return -1;
                     }
                     return 0;
-                }                
+                }
             });
             int cnt = keysList.size() - Configuration.maxCachedNum.get();
             for (int i = 0; i < cnt; i++) {
@@ -259,10 +258,10 @@ public class Cache<K, V> implements Freed {
                 num++;
             }
         }
-        
+
         return num;
     }
-    
+
     private synchronized int clearOld() {
         long currentTime = System.currentTimeMillis();
         Set<K> keys = new HashSet<>(lastAccessed.keySet());
@@ -270,7 +269,7 @@ public class Cache<K, V> implements Freed {
         if (temporaryThreshold == 0) {
             return 0;
         }
-        int num = 0;                       
+        int num = 0;
         for (K key : keys) {
             long time = lastAccessed.get(key);
             if (time < currentTime - temporaryThreshold) {

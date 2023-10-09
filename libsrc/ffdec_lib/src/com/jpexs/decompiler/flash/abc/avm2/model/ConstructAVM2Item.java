@@ -53,13 +53,13 @@ public class ConstructAVM2Item extends AVM2Item {
             return object.toString(writer, localData);
         }
         writer.append("new ");
-        
-        boolean objectIsCall = (object instanceof CallAVM2Item) ||
-                (object instanceof CallPropertyAVM2Item) ||
-                (object instanceof CallMethodAVM2Item) || 
-                (object instanceof CallStaticAVM2Item) || 
-                (object instanceof CallSuperAVM2Item);
-        
+
+        boolean objectIsCall = (object instanceof CallAVM2Item)
+                || (object instanceof CallPropertyAVM2Item)
+                || (object instanceof CallMethodAVM2Item)
+                || (object instanceof CallStaticAVM2Item)
+                || (object instanceof CallSuperAVM2Item);
+
         if (object.getPrecedence() > getPrecedence() || objectIsCall) {
             writer.append("(");
         }

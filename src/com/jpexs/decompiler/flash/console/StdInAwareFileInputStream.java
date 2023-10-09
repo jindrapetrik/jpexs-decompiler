@@ -23,16 +23,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * FileInputStream to which can be passed /dev/stdin as special file for stdin on Windows.
- * On linux, standard /dev/stdin is used.
+ * FileInputStream to which can be passed /dev/stdin as special file for stdin
+ * on Windows. On linux, standard /dev/stdin is used.
+ *
  * @author JPEXS
  */
 public class StdInAwareFileInputStream extends InputStream implements AutoCloseable {
 
     public static final String STDIN_PATH = "/dev/stdin";
-    
+
     private InputStream is;
-    
+
     public StdInAwareFileInputStream(File file) throws FileNotFoundException {
         String absPath = file.getPath().replace("\\", "/");
         if (absPath.equals(STDIN_PATH) && !file.exists()) {
@@ -41,15 +42,10 @@ public class StdInAwareFileInputStream extends InputStream implements AutoClosea
             is = new FileInputStream(file);
         }
     }
-    
+
     public StdInAwareFileInputStream(String file) throws FileNotFoundException {
         this(new File(file));
-    }
-
-    @Override
-    public int read() throws IOException {
-        return is.read();
-    }
+    }   
 
     @Override
     public int available() throws IOException {
@@ -64,12 +60,17 @@ public class StdInAwareFileInputStream extends InputStream implements AutoClosea
     @Override
     public synchronized void reset() throws IOException {
         is.reset();
-    }    
+    }
 
     @Override
     public void close() throws IOException {
         is.close();
-    }    
+    }
+    
+    @Override
+    public int read() throws IOException {
+        return is.read();
+    }
 
     @Override
     public int read(byte[] b) throws IOException {
@@ -79,5 +80,5 @@ public class StdInAwareFileInputStream extends InputStream implements AutoClosea
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         return is.read(b, off, len);
-    }    
+    }
 }

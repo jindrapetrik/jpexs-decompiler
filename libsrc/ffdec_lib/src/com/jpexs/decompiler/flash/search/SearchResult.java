@@ -23,5 +23,6 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
  * @author JPEXS
  */
 public interface SearchResult {
+
     public Openable getOpenable();
 }

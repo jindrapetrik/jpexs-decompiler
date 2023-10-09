@@ -64,7 +64,7 @@ public class FontExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         if (tags.isEmpty()) {
             return ret;
         }

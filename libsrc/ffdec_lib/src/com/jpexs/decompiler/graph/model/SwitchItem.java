@@ -69,7 +69,6 @@ public class SwitchItem extends LoopItem implements Block {
         visitor.visitAll(caseValues);
     }
 
-
     public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
         super(instruction, lineStartIns, loop);
         this.switchedObject = switchedObject;

@@ -132,9 +132,9 @@ public class Traits implements Cloneable, Serializable {
         Trait parent;
 
         ConvertData convertData;
-        
+
         AbcIndexing abcIndex;
-        
+
         ScopeStack scopeStack;
 
         public TraitConvertTask(AbcIndexing abcIndex, Trait trait, Trait parent, ConvertData convertData, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, int traitIndex, boolean parallel, ScopeStack scopeStack) {
@@ -184,7 +184,6 @@ public class Traits implements Cloneable, Serializable {
                 }
                 GraphTargetItem v1 = convertData.assignedValues.get(o1).value;
 
-
                 Set<GraphTargetItem> subitems1 = v1.getAllSubItemsRecursively();
                 subitems1.add(v1);
                 for (GraphTargetItem si : subitems1) {
@@ -233,21 +232,13 @@ public class Traits implements Cloneable, Serializable {
             }
             writer.newLine();
             int h = abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t);
-            //if (trait instanceof TraitClass) {
-//                writer.startClass(((TraitClass) trait).class_info);
-            //} else {
-                writer.startTrait(h);
-            //}
+            writer.startTrait(h);
             if (makePackages) {
                 trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             } else {
                 trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
-            //if (trait instanceof TraitClass) {
-            //    writer.endClass();
-            //} else {
-                writer.endTrait();
-            //}
+            writer.endTrait();
         }
         return writer;
     }

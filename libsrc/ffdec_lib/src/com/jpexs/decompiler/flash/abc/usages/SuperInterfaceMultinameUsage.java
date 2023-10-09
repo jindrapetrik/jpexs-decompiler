@@ -76,7 +76,7 @@ public class SuperInterfaceMultinameUsage extends MultinameUsage implements Insi
     public boolean collides(MultinameUsage other) {
         return false;
     }
-    
+
     @Override
     public int getScriptIndex() {
         return scriptIndex;

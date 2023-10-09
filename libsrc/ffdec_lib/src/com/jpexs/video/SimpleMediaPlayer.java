@@ -17,25 +17,20 @@
 package com.jpexs.video;
 
 import com.jpexs.helpers.Helper;
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
-import uk.co.caprica.vlcj.media.Media;
-import uk.co.caprica.vlcj.media.MediaEventAdapter;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.medialist.MediaList;
 import uk.co.caprica.vlcj.medialist.MediaListRef;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.base.State;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
@@ -144,8 +139,8 @@ public class SimpleMediaPlayer {
     public void stop() {
         embeddedMediaPlayer.controls().stop();
     }
-    
-    public float getPosition(){
+
+    public float getPosition() {
         return embeddedMediaPlayer.status().position();
     }
 
@@ -162,12 +157,12 @@ public class SimpleMediaPlayer {
                 }
             }
         }
-        
+
         //embeddedMediaPlayer.controls().setPosition(0);
-        embeddedMediaPlayer.controls().setPosition(position);        
+        embeddedMediaPlayer.controls().setPosition(position);
         embeddedMediaPlayer.controls().play();
-        
-                /*synchronized (pauseLock) {
+
+        /*synchronized (pauseLock) {
             embeddedMediaPlayer.controls().setPause(true);
             try {
                 pauseLock.wait();
@@ -175,7 +170,6 @@ public class SimpleMediaPlayer {
                 Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }*/
-        
         //setPaused(false);        
         /*synchronized (displayLock) {
             this.position = position;
@@ -184,7 +178,6 @@ public class SimpleMediaPlayer {
         }*/
         //embeddedMediaPlayer.controls().play();
         //embeddedMediaPlayer.controls().setPause(true);
-        
         //embeddedMediaPlayer.controls().nextFrame();
         //embeddedMediaPlayer.controls().play();
         /*if (paused) {
@@ -194,7 +187,6 @@ public class SimpleMediaPlayer {
                     Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }*/
-
         //embeddedMediaPlayer.controls().play();
     }
 
@@ -209,7 +201,7 @@ public class SimpleMediaPlayer {
     public void pause() {
         embeddedMediaPlayer.controls().pause();
     }
-    
+
     /*public void rewind() {
         System.out.println("rewinding");
         //embeddedMediaPlayer.controls().stop();
@@ -247,14 +239,14 @@ public class SimpleMediaPlayer {
         embeddedMediaPlayer.videoSurface().set(callbackVideoSurface);
         embeddedMediaPlayer.videoSurface().attachVideoSurface();
 
-        MediaPlayerEventAdapter adapter = (new MediaPlayerEventAdapter() {            
+        MediaPlayerEventAdapter adapter = (new MediaPlayerEventAdapter() {
 
             @Override
             public void lengthChanged(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, long newLength) {
                 //System.out.println("lengthChanged = "+newLength);
-                length = newLength;           
-            }            
-                        
+                length = newLength;
+            }
+
             @Override
             public void paused(MediaPlayer mediaPlayer) {
                 setPaused(true);
@@ -274,15 +266,13 @@ public class SimpleMediaPlayer {
                     }
                 }*/
                 finished = false;
-                setPaused(false);                
+                setPaused(false);
                 //System.out.println("playing");
                 //embeddedMediaPlayer.controls().setRepeat(true);
             }
 
         });
-        
-        
-        
+
         //embeddedMediaPlayer.controls().setRepeat(true);
         mediaListPlayer = mediaPlayerFactory.mediaPlayers().newMediaListPlayer();
 
@@ -296,9 +286,9 @@ public class SimpleMediaPlayer {
         mediaListPlayer.mediaPlayer().setMediaPlayer(embeddedMediaPlayer);
 
         mediaListPlayer.controls().setMode(PlaybackMode.LOOP);
-        
+
         embeddedMediaPlayer.events().addMediaPlayerEventListener(adapter);
-        
+
     }
 
     public boolean isFinished() {

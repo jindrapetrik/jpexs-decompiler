@@ -120,6 +120,7 @@ public class ActionGetURL extends Action {
                 }
                 return;
             } catch (NumberFormatException nfe) {
+                //ignored
             }
 
         }

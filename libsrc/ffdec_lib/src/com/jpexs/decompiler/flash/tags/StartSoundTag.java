@@ -81,7 +81,7 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(soundId);
         sos.writeSOUNDINFO(soundInfo);
-    }   
+    }
 
     @Override
     public int getCharacterId() {
@@ -91,5 +91,5 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     @Override
     public void setCharacterId(int characterId) {
         soundId = characterId;
-    }        
+    }
 }

@@ -35,7 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -43,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -135,6 +133,7 @@ public class ImageImporter extends TagImporter {
 
             newData = data;
         } catch (IOException ex) {
+            //ignored
         }
 
         if (it instanceof DefineBitsJPEG3Tag) {
@@ -177,7 +176,7 @@ public class ImageImporter extends TagImporter {
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
         List<String> alphaExtensions = Arrays.asList("png");
-        File allFiles[] = imagesDir.listFiles(new FilenameFilter() {
+        File[] allFiles = imagesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();
@@ -194,7 +193,7 @@ public class ImageImporter extends TagImporter {
             }
         });
 
-        File alphaFiles[] = imagesDir.listFiles(new FilenameFilter() {
+        File[] alphaFiles = imagesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();

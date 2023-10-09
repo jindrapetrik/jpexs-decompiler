@@ -147,7 +147,7 @@ public class DoActionTag extends Tag implements ASMSource {
 
         return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, getCharset());
     }
-    
+
     @Override
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         if (actions == null) {
@@ -248,8 +248,8 @@ public class DoActionTag extends Tag implements ASMSource {
     @Override
     public Tag getTag() {
         return null; //?
-    }        
-    
+    }
+
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {

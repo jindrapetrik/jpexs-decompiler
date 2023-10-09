@@ -68,7 +68,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String fileName;
 
     public static final int SOUND_FORMAT_WAV = 0;
-    
+
     @Internal
     private int virtualCharacterId = -1;
 
@@ -107,8 +107,6 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
         super(swf, ID, NAME, null);
         fileName = "";
     }
-    
-    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
@@ -122,7 +120,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
         lastFrame = sis.readUI32("lastFrame");
         fileName = sis.readNetString("fileName");
     }
-    
+
     @Override
     public SoundExportFormat getExportFormat() {
         return SoundExportFormat.WAV; //?
@@ -240,12 +238,12 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String getCharacterExportFileName() {
         return "" + getCharacterId();
     }
-    
+
     @Override
     public String toString() {
         return getName() + " (" + virtualCharacterId + ")";
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);

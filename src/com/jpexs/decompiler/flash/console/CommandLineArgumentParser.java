@@ -18,12 +18,13 @@ package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
-import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
@@ -53,6 +54,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
+import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
+import com.jpexs.decompiler.flash.exporters.Font4Exporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
@@ -63,10 +66,12 @@ import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -81,6 +86,7 @@ import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
@@ -101,6 +107,7 @@ import com.jpexs.decompiler.flash.gui.SearchInMemory;
 import com.jpexs.decompiler.flash.gui.SearchInMemoryListener;
 import com.jpexs.decompiler.flash.gui.SwfInMemory;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
+import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
@@ -114,8 +121,12 @@ import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
+import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
+import com.jpexs.decompiler.flash.importers.SoundImporter;
+import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
+import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
@@ -125,6 +136,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -136,14 +148,20 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -158,6 +176,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.stat.StatisticData;
 import com.jpexs.helpers.stat.Statistics;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -166,8 +185,12 @@ import com.jpexs.process.Process;
 import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
+import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedInputStream;
@@ -212,29 +235,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.jpexs.decompiler.flash.Bundle;
-import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
-import com.jpexs.decompiler.flash.exporters.Font4Exporter;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
-import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
-import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
-import com.jpexs.decompiler.flash.gui.translator.Translator;
-import com.jpexs.decompiler.flash.importers.MovieImporter;
-import com.jpexs.decompiler.flash.importers.SoundImporter;
-import com.jpexs.decompiler.flash.importers.SpriteImporter;
-import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
-import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
-import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.SoundImportException;
-import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
-import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
-import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.helpers.SerializableImage;
-import gnu.jpdf.PDFGraphics;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
 
 /**
  *
@@ -456,7 +456,7 @@ public class CommandLineArgumentParser {
             out.println("  ...Allows exporting embedded assets via [Embed tag]");
             out.println("     Use in combination with -export -format script:as");
         }
-        
+
         if (filter == null || filter.equals("dumpswf")) {
             out.println(" " + (cnt++) + ") -dumpSWF <infile>");
             out.println("  ...dumps list of SWF tags to console");
@@ -481,7 +481,7 @@ public class CommandLineArgumentParser {
             out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
             out.println("  ...Decompress <infile> and save it to <outfile>");
         }
-        
+
         if (filter == null || filter.equals("decrypt")) {
             out.println(" " + (cnt++) + ") -decrypt <infile> <outfile>");
             out.println("  ...Decrypts HARMAN Air encrypted file <infile> and save it to <outfile>");
@@ -625,7 +625,7 @@ public class CommandLineArgumentParser {
             out.println(" " + (cnt++) + ") -importImages <infile> <outfile> <imagesfolder>");
             out.println(" ...imports images to <infile> and saves the result to <outfile>");
         }
-        
+
         if (filter == null || filter.equals("importsprites")) {
             out.println(" " + (cnt++) + ") -importSprites <infile> <outfile> <spritesfolder>");
             out.println(" ...imports sprites to <infile> and saves the result to <outfile>");
@@ -880,7 +880,8 @@ public class CommandLineArgumentParser {
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
-        String nextParam = null, nextParamOriginal = null;
+        String nextParam = null;
+        String nextParamOriginal = null;
         OUTER:
         while (true) {
             nextParamOriginal = args.pop();
@@ -2258,7 +2259,7 @@ public class CommandLineArgumentParser {
         }
         List<String> ret = new ArrayList<>();
         String classesStr = args.pop();
-        String classes[];
+        String[] classes;
         if (classesStr.contains(",")) {
             classes = classesStr.split(",");
         } else {
@@ -2463,7 +2464,7 @@ public class CommandLineArgumentParser {
                     System.out.println("Exporting DefineFont4s...");
                     new Font4Exporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new Font4ExportSettings(enumFromStr(formats.get("font4"), Font4ExportMode.class)), evl);
                 }
-                
+
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
                     new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
@@ -2609,7 +2610,7 @@ public class CommandLineArgumentParser {
         String outFile = outDir;
         if (multipleExportTypes) {
             outFile = Path.combine(outFile, exportFormat);
-        };
+        }
 
         String outFileName = inFile.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf") ? inFile.getName().substring(0, inFile.getName().length() - 3) + exportFormat : inFile.getName();
         outFile = Path.combine(outFile, outFileName);
@@ -2739,7 +2740,7 @@ public class CommandLineArgumentParser {
         if (args.size() < 2) {
             badArguments("decrypt");
         }
-        
+
         boolean result = false;
         try {
             try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop())); OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
@@ -2755,6 +2756,7 @@ public class CommandLineArgumentParser {
 
         System.exit(result ? 0 : 1);
     }
+
     private static void parseDecompress(Stack<String> args) {
         if (args.size() < 2) {
             badArguments("decompress");
@@ -3319,7 +3321,7 @@ public class CommandLineArgumentParser {
                                 }
                             }).importText(textTag, new String(data, Utf8Helper.charset));
                         } else if (characterTag instanceof SoundTag) {
-                            SoundTag st = (SoundTag) characterTag;                            
+                            SoundTag st = (SoundTag) characterTag;
                             boolean ok = false;
                             SoundImporter soundImporter = new SoundImporter();
                             try {
@@ -4083,7 +4085,7 @@ public class CommandLineArgumentParser {
             System.exit(2);
         }
     }
-    
+
     private static void parseImportText(Stack<String> args, String charset) {
         if (args.size() < 3) {
             badArguments("importtext");
@@ -4348,8 +4350,6 @@ public class CommandLineArgumentParser {
                 System.err.println(flexPage);
                 System.err.println("Download FLEX Sdk, unzip it to some directory and set its directory path in the configuration");
 
-            } else {
-
             }
             System.exit(1);
         }
@@ -4418,7 +4418,7 @@ public class CommandLineArgumentParser {
 
                                             @Override
                                             public void status(String status) {
-                                            }                                                                                        
+                                            }
                                         }, Configuration.parallelSpeedUp.get(), charset);
                                         return swf;
                                     }
@@ -4455,7 +4455,7 @@ public class CommandLineArgumentParser {
 
                                         @Override
                                         public void status(String status) {
-                                        }                                                                                
+                                        }
                                     }, Configuration.parallelSpeedUp.get(), charset);
                                     return swf;
                                 }

@@ -402,6 +402,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
                     mainPanel.showTextTagWithNewValue(textTag, copyTextTag);
                 }
             } catch (TextParseException | InterruptedException | IOException ex) {
+                //ignored
             }
 
             if (!ok) {
@@ -428,7 +429,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     public boolean isEditing() {
         return textSaveButton.isVisible() && textSaveButton.isEnabled();
     }
-    
+
     public void startEdit() {
         if (!textEditButton.isVisible()) {
             return;

@@ -123,7 +123,7 @@ public class TagTree extends AbstractTagTree {
             setOpaque(false);
             if (View.isOceanic()) {
                 setBackgroundNonSelectionColor(Color.white);
-            }            
+            }
         }
 
         @Override
@@ -181,11 +181,11 @@ public class TagTree extends AbstractTagTree {
             }
 
             boolean isModified = val.isModified();
-            
+
             if (isReadOnly) {
                 isModified = false;
             }
-            
+
             if (isModified) {
                 if (boldFont == null) {
                     Font font = getFont();
@@ -213,7 +213,7 @@ public class TagTree extends AbstractTagTree {
                     List<String> missingAsStr = new ArrayList<>();
                     for (int v : missingNeededCharacters) {
                         missingAsStr.add("" + v);
-                    }                    
+                    }
                     if (missingAsStr.size() == 1) {
                         setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
                     } else {
@@ -238,7 +238,7 @@ public class TagTree extends AbstractTagTree {
 
     public TagTree(TagTreeModel treeModel, MainPanel mainPanel) {
         super(treeModel, mainPanel);
-        setCellRenderer(new TagTreeCellRenderer());        
+        setCellRenderer(new TagTreeCellRenderer());
     }
 
     public static List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
@@ -318,7 +318,7 @@ public class TagTree extends AbstractTagTree {
             sel = new ArrayList<>();
 
             List<TreeItem> siSorted = mainPanel.folderPreviewPanel.getSelectedItemsSorted();
-            
+
             for (TreeItem treeItem : siSorted) {
                 sel.add(treeItem);
                 getAllSubs(treeItem, sel);
@@ -342,5 +342,5 @@ public class TagTree extends AbstractTagTree {
     public TagTreeModel getFullModel() {
         return (TagTreeModel) super.getFullModel();
     }
-    
+
 }

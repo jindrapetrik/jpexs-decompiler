@@ -27,23 +27,25 @@ import java.io.Serializable;
  * @author JPEXS
  */
 public abstract class ShapeRecordAdvanced implements Serializable {
+
     public abstract double changeX(double x);
+
     public abstract double changeY(double y);
-    
+
     public abstract SHAPERECORD toBasicRecord();
-    
+
     public static ShapeRecordAdvanced createFromSHAPERECORD(SHAPERECORD rec) {
-        if(rec instanceof StyleChangeRecord) {
-            return new StyleChangeRecordAdvanced((StyleChangeRecord)rec);
+        if (rec instanceof StyleChangeRecord) {
+            return new StyleChangeRecordAdvanced((StyleChangeRecord) rec);
         }
-        if(rec instanceof CurvedEdgeRecord) {
-            return new CurvedEdgeRecordAdvanced((CurvedEdgeRecord)rec);
+        if (rec instanceof CurvedEdgeRecord) {
+            return new CurvedEdgeRecordAdvanced((CurvedEdgeRecord) rec);
         }
-        if(rec instanceof StraightEdgeRecord) {
-            return new StraightEdgeRecordAdvanced((StraightEdgeRecord)rec);
+        if (rec instanceof StraightEdgeRecord) {
+            return new StraightEdgeRecordAdvanced((StraightEdgeRecord) rec);
         }
         return null;
     }
-    
+
     public abstract void round();
 }

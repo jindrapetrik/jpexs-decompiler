@@ -41,7 +41,7 @@ import java.util.List;
  * @author JPEXS
  */
 public interface SourceGenerator {
-    
+
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException;
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PopItem item) throws CompilationException;

@@ -70,7 +70,7 @@ public class WithActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();        
+        String charset = asGenerator.getCharset();
         List<GraphSourceItem> data = generator.generate(localData, items);
         List<Action> dataA = new ArrayList<>();
         for (GraphSourceItem s : data) {

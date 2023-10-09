@@ -31,7 +31,7 @@ public class SCRIPTDATA extends DATA {
 
     public SCRIPTDATAVALUE name;
     public SCRIPTDATAVALUE value;
-        
+
     public SCRIPTDATA(SCRIPTDATAVALUE name, SCRIPTDATAVALUE value) {
         this.name = name;
         this.value = value;
@@ -54,13 +54,13 @@ public class SCRIPTDATA extends DATA {
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
         values.add(new SCRIPTDATAVARIABLE("width", new SCRIPTDATAVALUE(width)));
         values.add(new SCRIPTDATAVARIABLE("height", new SCRIPTDATAVALUE(height)));
-        values.add(new SCRIPTDATAVARIABLE("framerate", new SCRIPTDATAVALUE(framerate)));        
+        values.add(new SCRIPTDATAVARIABLE("framerate", new SCRIPTDATAVALUE(framerate)));
         values.add(new SCRIPTDATAVARIABLE("videocodecid", new SCRIPTDATAVALUE(videocodecid)));
         SCRIPTDATAVALUE valuesList = new SCRIPTDATAVALUE(8, values);
-        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2,"onMetaData");
+        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2, "onMetaData");
         return new SCRIPTDATA(onMetadataKey, valuesList);
     }
-    
+
     public static SCRIPTDATA onMetaData(double duration, double width, double height, double videodatarate, double framerate, double videocodecid, double audiosamplerate, double audiosamplesize, boolean stereo, double audiocodecid, double filesize) {
         List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
@@ -75,7 +75,7 @@ public class SCRIPTDATA extends DATA {
         values.add(new SCRIPTDATAVARIABLE("audiocodecid", new SCRIPTDATAVALUE(audiocodecid)));
         values.add(new SCRIPTDATAVARIABLE("filesize", new SCRIPTDATAVALUE(filesize)));
         SCRIPTDATAVALUE valuesList = new SCRIPTDATAVALUE(8, values);
-        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2,"onMetaData");
+        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2, "onMetaData");
         return new SCRIPTDATA(onMetadataKey, valuesList);
     }
 }

@@ -35,8 +35,8 @@ public class DumpInfoSwfNode extends DumpInfo {
     @Override
     public Openable getOpenable() {
         return openable;
-    }       
-    
+    }
+
     public SWF getSwf() {
         return (SWF) openable;
     }

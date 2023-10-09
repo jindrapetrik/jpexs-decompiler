@@ -24,8 +24,8 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
  *
  * @author JPEXS
  */
-public class TagListTreeRoot implements TreeItem, TreeRoot{
-       
+public class TagListTreeRoot implements TreeItem, TreeRoot {
+
     @Override
     public Openable getOpenable() {
         return null;
@@ -39,5 +39,5 @@ public class TagListTreeRoot implements TreeItem, TreeRoot{
     @Override
     public String toString() {
         return "root";
-    }    
+    }
 }

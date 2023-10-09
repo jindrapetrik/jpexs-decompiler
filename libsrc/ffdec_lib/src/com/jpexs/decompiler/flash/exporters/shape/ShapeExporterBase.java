@@ -56,7 +56,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private final List<LineStyle> _lineStyles;
 
     private final List<List<IEdge>> _fillPaths;
-    
+
     private final List<List<IEdge>> _aliasedFillPaths;
 
     private final List<List<IEdge>> _linePaths;
@@ -64,7 +64,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private final ColorTransform colorTransform;
 
     private boolean canUseSmoothing = true;
-    
+
     public ShapeExporterBase(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
@@ -128,16 +128,16 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     public void setCanUseSmoothing(boolean canUseSmoothing) {
         this.canUseSmoothing = canUseSmoothing;
-    }        
+    }
 
     public void export() {
         // Let the doc handler know that a shape export starts
         beginShape();
         // Export fills and strokes for each group separately
         for (int i = 0; i < _linePaths.size(); i++) {
-            
+
             if (Configuration.fixAntialiasConflation.get()) {
-                exportFillPath(_aliasedFillPaths.get(i), true);            
+                exportFillPath(_aliasedFillPaths.get(i), true);
             }
             // Export fills first
             exportFillPath(_fillPaths.get(i), false);
@@ -245,10 +245,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 subPath.add(new CurvedEdge(xPosFrom, yPosFrom, xPosControl, yPosControl, xPos, yPos, currentLineStyleIdx, currentFillStyleIdx1));
             } else if (shapeRecord instanceof EndShapeRecord) {
                 // We're done. Process the last subpath, if any
-                processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap, currentAliasedFillEdgeMap);                
+                processSubPath(subPath, currentLineStyleIdx, currentFillStyleIdx0, currentFillStyleIdx1, currentFillEdgeMap, currentLineEdgeMap, currentAliasedFillEdgeMap);
                 cleanEdgeMap(currentFillEdgeMap);
-                cleanEdgeMap(currentAliasedFillEdgeMap);                
-                cleanEdgeMap(currentLineEdgeMap);                
+                cleanEdgeMap(currentAliasedFillEdgeMap);
+                cleanEdgeMap(currentLineEdgeMap);
                 fillEdgeMaps.add(currentFillEdgeMap);
                 aliasedFillEdgeMaps.add(currentAliasedFillEdgeMap);
                 lineEdgeMaps.add(currentLineEdgeMap);
@@ -260,7 +260,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             Map<Integer, List<IEdge>> currentFillEdgeMap, Map<Integer, List<IEdge>> currentLineEdgeMap, Map<Integer, List<IEdge>> currentAliasedFillEdgeMap) {
         List<IEdge> path;
         List<IEdge> apath = null;
-        boolean bothFillStyles = fillStyleIdx0 !=0 && fillStyleIdx1 != 0;
+        boolean bothFillStyles = fillStyleIdx0 != 0 && fillStyleIdx1 != 0;
         if (fillStyleIdx0 != 0) {
             path = currentFillEdgeMap.get(fillStyleIdx0);
             if (bothFillStyles) {
@@ -272,7 +272,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             }
             if (bothFillStyles && apath == null) {
                 apath = new ArrayList<>();
-                currentAliasedFillEdgeMap.put(fillStyleIdx0, apath);                        
+                currentAliasedFillEdgeMap.put(fillStyleIdx0, apath);
             }
             for (int j = subPath.size() - 1; j >= 0; j--) {
                 IEdge rev = subPath.get(j).reverseWithNewFillStyle(fillStyleIdx0);
@@ -282,7 +282,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     apath.add(rev);
                 }
             }
-            
+
         }
         if (fillStyleIdx1 != 0) {
             /*if (bothFillStyles) {
@@ -409,6 +409,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
+                        //ignored
                     }
                     if (lineStyle != null) {
                         String scaleMode = "NORMAL";

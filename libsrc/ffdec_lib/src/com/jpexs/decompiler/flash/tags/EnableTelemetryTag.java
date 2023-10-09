@@ -112,7 +112,7 @@ public class EnableTelemetryTag extends Tag implements PasswordTag {
             md.update(password.getBytes(Utf8Helper.charset));
             return Helper.byteArrayToHex(md.digest());
         } catch (NoSuchAlgorithmException ex) {
-
+            //ignored
         }
         return null;
     }

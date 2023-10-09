@@ -24,5 +24,6 @@ import java.util.List;
  * @author JPEXS
  */
 public interface ActionTreeOperation {
+
     public void run(List<GraphTargetItem> tree);
 }

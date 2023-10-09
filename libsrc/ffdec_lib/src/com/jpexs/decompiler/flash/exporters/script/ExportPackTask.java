@@ -56,7 +56,7 @@ public class ExportPackTask implements Callable<File> {
     long stopTime;
 
     EventListener eventListener;
-    
+
     AbcIndexing abcIndex;
 
     public ExportPackTask(AbcIndexing abcIndex, AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
@@ -77,7 +77,7 @@ public class ExportPackTask implements Callable<File> {
         RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
             @Override
             public void run() throws IOException, InterruptedException {
-                startTime = System.currentTimeMillis();                
+                startTime = System.currentTimeMillis();
                 this.result = pack.export(abcIndex, file, exportSettings, parallel);
                 stopTime = System.currentTimeMillis();
             }

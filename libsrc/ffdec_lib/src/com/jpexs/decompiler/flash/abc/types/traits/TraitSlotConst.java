@@ -62,23 +62,14 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     @Override
     public void delete(ABC abc, boolean d) {
         super.delete(abc, d);
-        
+
         abc.constants.getMultiname(name_index).deleted = d;
     }
 
     @Override
     public int getSlotIndex() {
         return slot_id;
-    }
-
-    @Override
-    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
-        String typeStr = "*";
-        if (type_index > 0) {
-            typeStr = abc.constants.getMultiname(type_index).toString(abc.constants, fullyQualifiedNames);
-        }
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc) + " metadata=" + Helper.intArrToString(metadata);
-    }
+    }    
 
     public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
@@ -96,7 +87,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
 
         typeStr = ":" + typeStr;
-        
+
         String slotconst = "var";
         if (kindType == TRAIT_CONST) {
             slotconst = "const";
@@ -116,13 +107,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             return true;
         }
         if (value_kind == ValueKind.CONSTANT_Namespace) {
-                if (abc.constants.getNamespace(value_index).kind == Namespace.KIND_PACKAGE_INTERNAL) {
-                    return false;
-                }
+            if (abc.constants.getNamespace(value_index).kind == Namespace.KIND_PACKAGE_INTERNAL) {
+                return false;
             }
+        }
         return value_kind != 0;
     }
-    
+
     public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
@@ -146,7 +137,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             return;
         }
 
-        if (value_kind != 0) {            
+        if (value_kind != 0) {
             ValueKind val = new ValueKind(value_index, value_kind);
             writer.hilightSpecial(val.toString(abc), HighlightSpecialType.TRAIT_VALUE);
         }
@@ -158,6 +149,15 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             return val.isNamespace();
         }
         return false;
+    }
+    
+    @Override
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
+        String typeStr = "*";
+        if (type_index > 0) {
+            typeStr = abc.constants.getMultiname(type_index).toString(abc.constants, fullyQualifiedNames);
+        }
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc) + " metadata=" + Helper.intArrToString(metadata);
     }
 
     @Override
@@ -197,7 +197,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (hasValueStr(abc, convertData)) {
-            getValueStr(abcIndex,exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(abcIndex, exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 

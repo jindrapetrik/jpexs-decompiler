@@ -99,8 +99,6 @@ public class ExporterInfo extends Tag {
         prefix = "";
         swfName = "";
     }
-    
-    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
@@ -111,8 +109,7 @@ public class ExporterInfo extends Tag {
         bitmapFormat = sis.readUI16("bitmapFormat");
         prefix = sis.readNetString("prefix");
         swfName = sis.readNetString("swfName");
-        if (sis.available() > 0) // (version >= 0x401) //?
-        {
+        if (sis.available() > 0) { // (version >= 0x401) //?        
             codeOffsets = new ArrayList<>();
             int numCodeOffsets = sis.readUI16("numCodeOffsets");
             for (int i = 0; i < numCodeOffsets; i++) {

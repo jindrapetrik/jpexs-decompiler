@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -81,7 +80,7 @@ public class SelectTagPositionDialog extends AppDialog {
     private boolean allowInsideSprites;
 
     private boolean selectNext;
-    
+
     private static class MyTreeNode implements TreeNode {
 
         private final List<TreeNode> children = new ArrayList<>();
@@ -197,7 +196,7 @@ public class SelectTagPositionDialog extends AppDialog {
         int f = 1;
 
         MyTreeNode frameNode = new MyTreeNode();
-        List<String> labels = new ArrayList<>();        
+        List<String> labels = new ArrayList<>();
         frameNode.setData(new MyFrame(1, labels));
         frameNode.setParent(root);
         root.addChild(frameNode);
@@ -213,7 +212,7 @@ public class SelectTagPositionDialog extends AppDialog {
                 }
             }
             if (t instanceof FrameLabelTag) {
-                labels.add(((FrameLabelTag)t).name);
+                labels.add(((FrameLabelTag) t).name);
             }
             if (t instanceof ShowFrameTag) {
                 f++;
@@ -221,7 +220,7 @@ public class SelectTagPositionDialog extends AppDialog {
                 labels = new ArrayList<>();
                 frameNode.setData(new MyFrame(f, labels));
                 frameNode.setParent(root);
-                root.addChild(frameNode);                
+                root.addChild(frameNode);
             }
         }
         if (frameNode.isLeaf()) {
@@ -247,17 +246,12 @@ public class SelectTagPositionDialog extends AppDialog {
     }
 
     private void selectCurrent(MyTreeNode root, Timelined timelined, List<Object> path) {
-
-        if (selectedTag == null && !allowInsideSprites) {
-
-        }
-
         for (int i = 0; i < root.getChildCount(); i++) {
             MyTreeNode node = (MyTreeNode) root.getChildAt(i);
 
             List<Object> subPath = new ArrayList<>(path);
             subPath.add(node);
-            
+
             List<Object> nextPath = new ArrayList<>(path);
             if (i + 1 < root.getChildCount()) {
                 nextPath.add(root.getChildAt(i + 1));
@@ -275,7 +269,6 @@ public class SelectTagPositionDialog extends AppDialog {
                 selectPath(nextPath);
                 return;
             }
-        
 
             if (node.getData() instanceof DefineSpriteTag) {
                 selectCurrent(node, (DefineSpriteTag) node.getData(), subPath);
@@ -357,7 +350,7 @@ public class SelectTagPositionDialog extends AppDialog {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                int rows[] = getSelectionRows();
+                int[] rows = getSelectionRows();
                 if (rows.length == 1) {
                     int row = rows[0];
 
@@ -532,7 +525,6 @@ public class SelectTagPositionDialog extends AppDialog {
      * Gets current selected tag to determine position. null = end of timeline
      * position
      *
-     * @return
      */
     public Tag getSelectedTag() {
         return selectedTag;
@@ -540,8 +532,6 @@ public class SelectTagPositionDialog extends AppDialog {
 
     /**
      * Gets selected timelined
-     *
-     * @return
      */
     public Timelined getSelectedTimelined() {
         return selectedTimelined;

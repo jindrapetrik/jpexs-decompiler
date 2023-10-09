@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2023 JPEXS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2023 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
@@ -77,7 +77,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -349,12 +348,12 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private void selectPath(JTree tree, String path) {
-        String parts[] = path.split("/");
+        String[] parts = path.split("/");
         TreeModel model = tree.getModel();
         Object root = model.getRoot();
         Object parent = root;
 
-        Object treePathObjects[] = new Object[parts.length + 1];
+        Object[] treePathObjects = new Object[parts.length + 1];
         treePathObjects[0] = root;
 
         loopp:
@@ -552,48 +551,7 @@ public class ABCExplorerDialog extends AppDialog {
         }
     }
 
-    private boolean showMethodInfo(int round, ABC abc, int methodInfo, int searchMethodInfo, int scriptIndex, int classIndex, int globalTraitIndex, int scriptTraitIndex) {
-        boolean found = false;
-        if (methodInfo == searchMethodInfo) {
-            found = true;
-        } else if (round == 2) {
-            Queue<Integer> methods = new ArrayDeque<>();
-            Set<Integer> visitedMethods = new HashSet<>();
-            methods.add(methodInfo);
-
-            loopm:
-            while (!methods.isEmpty()) {
-                methodInfo = methods.poll();
-                if (visitedMethods.contains(methodInfo)) {
-                    continue;
-                }
-                visitedMethods.add(methodInfo);
-                MethodBody body = abc.findBody(methodInfo);
-                if (body != null) {
-                    for (AVM2Instruction ins : body.getCode().code) {
-                        if (ins.definition instanceof NewFunctionIns) {
-                            if (ins.operands[0] == searchMethodInfo) {
-                                found = true;
-                                break loopm;
-                            } else {
-                                methods.add(ins.operands[0]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (found) {
-            DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-            if (scriptNameDc == null && scriptTraitIndex > -1) {
-                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
-            }
-            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
-            //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
-            mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
-        }
-        return found;
-    }
+    
 
     private boolean showMethodInfoTraits(int round, int scriptIndex, int classIndex, int methodInfo, ABC abc, Traits traits, int traitsType, int scriptTraitIndex) {
         for (int j = 0; j < traits.traits.size(); j++) {
@@ -638,6 +596,49 @@ public class ABCExplorerDialog extends AppDialog {
         return false;
     }
 
+    private boolean showMethodInfo(int round, ABC abc, int methodInfo, int searchMethodInfo, int scriptIndex, int classIndex, int globalTraitIndex, int scriptTraitIndex) {
+        boolean found = false;
+        if (methodInfo == searchMethodInfo) {
+            found = true;
+        } else if (round == 2) {
+            Queue<Integer> methods = new ArrayDeque<>();
+            Set<Integer> visitedMethods = new HashSet<>();
+            methods.add(methodInfo);
+
+            loopm:
+            while (!methods.isEmpty()) {
+                methodInfo = methods.poll();
+                if (visitedMethods.contains(methodInfo)) {
+                    continue;
+                }
+                visitedMethods.add(methodInfo);
+                MethodBody body = abc.findBody(methodInfo);
+                if (body != null) {
+                    for (AVM2Instruction ins : body.getCode().code) {
+                        if (ins.definition instanceof NewFunctionIns) {
+                            if (ins.operands[0] == searchMethodInfo) {
+                                found = true;
+                                break loopm;
+                            } else {
+                                methods.add(ins.operands[0]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (found) {
+            DottedChain scriptNameDc = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+            if (scriptNameDc == null && scriptTraitIndex > -1) {
+                scriptNameDc = abc.script_info.get(scriptIndex).traits.traits.get(scriptTraitIndex).getName(abc).getNameWithNamespace(abc.constants, false);
+            }
+            String scriptName = (scriptNameDc == null ? "script_" + scriptIndex : scriptNameDc.toPrintableString(true));
+            //mainPanel.gotoScriptTrait(abc.getSwf(), scriptName, classIndex, globalTraitIndex);
+            mainPanel.gotoScriptMethod(abc.getSwf(), scriptName, searchMethodInfo);
+        }
+        return found;
+    }
+    
     private void showMethodInfo(int methodInfo) {
         ABC abc = getSelectedAbc();
         for (int round = 1; round <= 2; round++) {
@@ -1891,6 +1892,7 @@ public class ABCExplorerDialog extends AppDialog {
                                 } else {
                                     return new SubValue(parent, index, index, mi, "optional", "op" + index, mi.optional[index].toASMString(abc), TreeIcon.OPTIONAL_SUB);
                                 }
+                                break;
                             case "param_names":
                                 return createValueWithIndex(parent, index, mi.paramNames[index], TreeType.CONSTANT_STRING, "pn" + index);
                         }
@@ -2231,7 +2233,7 @@ public class ABCExplorerDialog extends AppDialog {
     public static class ExplorerTreeCellRenderer extends DefaultTreeCellRenderer {
 
         Map<String, ImageIcon> iconCache = new HashMap<>();
-        
+
         public ExplorerTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);

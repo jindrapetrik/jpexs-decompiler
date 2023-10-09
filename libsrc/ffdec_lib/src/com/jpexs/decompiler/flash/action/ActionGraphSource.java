@@ -53,7 +53,7 @@ public class ActionGraphSource extends GraphSource {
     private final boolean insideDoInitAction;
 
     private final String path;
-    
+
     private String charset;
 
     public List<Action> getActions() {
@@ -75,8 +75,6 @@ public class ActionGraphSource extends GraphSource {
         return charset;
     }
 
-    
-    
     @Override
     public Set<Long> getImportantAddresses() {
         return Action.getActionsAllRefs(actions);
@@ -113,7 +111,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree((ActionGraph)graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
+        List<GraphTargetItem> r = Action.actionsPartToTree((ActionGraph) graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }
@@ -127,32 +125,15 @@ public class ActionGraphSource extends GraphSource {
         }
     }
 
-    /* public int adr2posInside(long addr){
-     long lastAddr=0;
-     if(addr==0){
-     return 0;
-     }
-     for(int i=0;i<size();i++){
-     long curAdr=pos2adr(i);
-     if(curAdr==addr){
-     return i;
-     }
-     if(curAdr>addr){
-     System.err.println("lastAddr="+lastAddr+" addr="+addr+" curAddr="+curAdr);
-     int contPos=adr2pos(lastAddr);
-     System.err.println("/insadr2po");
-     GraphSourceItem src=get(contPos);
-     if(src instanceof ActionContainer){
-     ActionContainer cnt=(ActionContainer)src;
-     return new ActionGraphSource(cnt.getActions(), version, registerNames, variables, functions).adr2pos(addr);
-     }else{
-     return -1;
-     }
-     }
-     lastAddr=curAdr;
-     }
-     return -1;
-     }*/
+    @Override
+    public long pos2adr(int pos) {
+        GraphSourceItem si = actions.get(pos);
+        if (si instanceof Action) {
+            return ((Action) si).getAddress();
+        }
+        return 0;
+    }
+
     @Override
     public int adr2pos(long adr) {
         if (posCache == null) {
@@ -171,15 +152,6 @@ public class ActionGraphSource extends GraphSource {
             }
         }
         return ret;
-    }
-
-    @Override
-    public long pos2adr(int pos) {
-        GraphSourceItem si = actions.get(pos);
-        if (si instanceof Action) {
-            return ((Action) si).getAddress();//Action.ip2adr(actions, pos, version);
-        }
-        return 0;
     }
 
     @Override

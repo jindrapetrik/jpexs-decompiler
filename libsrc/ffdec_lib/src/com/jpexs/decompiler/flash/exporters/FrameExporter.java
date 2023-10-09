@@ -172,7 +172,7 @@ public class FrameExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         if (swf.getTags().isEmpty()) {
             return ret;
         }
@@ -223,7 +223,7 @@ public class FrameExporter {
                         rect.xMax *= settings.zoom;
                         rect.yMax *= settings.zoom;
                         rect.xMin *= settings.zoom;
-                        rect.yMin *= settings.zoom;                        
+                        rect.yMin *= settings.zoom;
                         SVGExporter exporter = new SVGExporter(rect, settings.zoom);
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
@@ -234,7 +234,7 @@ public class FrameExporter {
                     }
                     ret.add(f);
                 }, handler).run();
-                
+
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }
@@ -418,7 +418,7 @@ public class FrameExporter {
             }
 
             @Override
-            public BufferedImage next() {                
+            public BufferedImage next() {
                 if (!hasNext()) {
                     return null;
                 }
@@ -712,7 +712,7 @@ public class FrameExporter {
         int maxDepth = timeline.getMaxDepth();
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
-            
+
             if (Thread.currentThread().isInterrupted()) {
                 break;
             }

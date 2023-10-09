@@ -49,7 +49,7 @@ import java.util.Objects;
 public class NameAVM2Item extends AssignableAVM2Item {
 
     private boolean attribute;
-    
+
     private String variableName;
 
     private boolean definition;
@@ -75,7 +75,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem redirect;
 
     private AbcIndexing abcIndex;
-    
+
     private String namespaceSuffix;
 
     @Override
@@ -91,8 +91,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public boolean isAttribute() {
         return attribute;
     }
-    
-    
 
     public void setSlotScope(int slotScope) {
         this.slotScope = slotScope;
@@ -149,8 +147,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public String getNamespaceSuffix() {
         return namespaceSuffix;
     }
-    
-    
 
     public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
         super(storeValue);
@@ -366,10 +362,10 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 generateCoerce(localData, generator, returnType()),
                 generateSetLoc(regNumber),
                 slotNumber > -1 ? Arrays.asList(
-                        ins(AVM2Instructions.GetScopeObject, slotScope),
-                        ins(AVM2Instructions.Swap),
-                        ins(AVM2Instructions.SetSlot, slotNumber)
-                ) : null
+                                ins(AVM2Instructions.GetScopeObject, slotScope),
+                                ins(AVM2Instructions.Swap),
+                                ins(AVM2Instructions.SetSlot, slotNumber)
+                        ) : null
         );
     }
 
@@ -414,7 +410,5 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
         return Objects.equals(this.variableName, other.variableName);
     }
-
-    
 
 }

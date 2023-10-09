@@ -88,8 +88,8 @@ public class SwfToIggyConvertor {
         if (!abcTags.isEmpty()) {
             DoABC2Tag abcTag = abcTags.get(0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte abcTagData[] = abcTag.getData();
-            byte declData[] = Arrays.copyOfRange(abcTagData, 4/*UI32 flags*/ + 1 /*empty string as name*/ + 3 /*versions, leaving one zero intact*/, abcTagData.length);
+            byte[] abcTagData = abcTag.getData();
+            byte[] declData = Arrays.copyOfRange(abcTagData, 4/*UI32 flags*/ + 1 /*empty string as name*/ + 3 /*versions, leaving one zero intact*/, abcTagData.length);
             iggySwf.getDeclStrings().setData(declData);
         }
     }
@@ -169,10 +169,10 @@ public class SwfToIggyConvertor {
     }
 
     public static IggyFont createIggyFont(DefineFont2Tag fontTag) {
-        byte zeroone[] = new byte[28];
+        byte[] zeroone = new byte[28];
         zeroone[12] = 1;
         long flags = 65795;
-        float unk_float[] = new float[]{
+        float[] unk_float = new float[]{
             -0.6484375f,
             -1.116211f,
             1.116211f,
@@ -185,8 +185,8 @@ public class SwfToIggyConvertor {
         float ssr2 = 0.3f;
         long what_2 = 33188160;
         long what_3 = 33600216;
-        byte zeroes48a[] = new byte[48];
-        byte zeroes48b[] = new byte[48];
+        byte[] zeroes48a = new byte[48];
+        byte[] zeroes48b = new byte[48];
         float sss1 = 1.1728859f;
         float sss2 = 1.1728706f;
         float sss3 = 1.1728821f;

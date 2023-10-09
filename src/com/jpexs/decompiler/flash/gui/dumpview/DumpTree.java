@@ -417,12 +417,14 @@ public class DumpTree extends JTree {
         View.expandTreeNodes(this, path, true);
     }
 
-    private void saveToFileButtonActionPerformed(ActionEvent evt) {
-        saveToFileButtonActionPerformed(false);
-    }
+    
 
     private void saveUncompressedToFileButtonActionPerformed(ActionEvent evt) {
         saveToFileButtonActionPerformed(true);
+    }
+
+    private void saveToFileButtonActionPerformed(ActionEvent evt) {
+        saveToFileButtonActionPerformed(false);
     }
 
     private void saveToFileButtonActionPerformed(boolean decompress) {
@@ -433,7 +435,7 @@ public class DumpTree extends JTree {
         fc.setCurrentDirectory(new File(selDir));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
-            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
                 byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                 if (decompress) {
                     fos.write(SWFInputStream.uncompressByteArray(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1)));
@@ -597,7 +599,7 @@ public class DumpTree extends JTree {
             expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
         }
     }
-    
+
     public void expandSwfNode(SWF swf) {
         DumpTreeModel dtm = getModel();
         DumpInfo root = dtm.getRoot();
@@ -606,12 +608,12 @@ public class DumpTree extends JTree {
         for (int i = 0; i < childCount; i++) {
             DumpInfoSwfNode swfNode = (DumpInfoSwfNode) dtm.getChild(root, i);
             if (swfNode.getSwf() == swf) {
-                expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));            
+                expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
                 break;
             }
         }
     }
-    
+
     public Tag getOriginalTag(TreeItem item) {
         Tag tag;
         if (item instanceof Tag) {
@@ -628,7 +630,7 @@ public class DumpTree extends JTree {
         long address = range.getPos();
         return searchTimelinedForTag((SWF) item.getOpenable(), address);
     }
-    
+
     public Timelined getTimelinedForItem(TreeItem item) {
         Tag original = getOriginalTag(item);
         if (original == null) {
@@ -636,9 +638,9 @@ public class DumpTree extends JTree {
         }
         return original.getTimelined();
     }
-    
+
     public int getFrameForItem(TreeItem item) {
-        
+
         Tag originalTag = getOriginalTag(item);
         if (originalTag == null) {
             return -1;
@@ -654,7 +656,7 @@ public class DumpTree extends JTree {
         }
         return -1;
     }
-    
+
     public void setSelectedItem(TreeItem item) {
         Tag tag;
         if (item instanceof Tag) {
@@ -674,7 +676,7 @@ public class DumpTree extends JTree {
         for (DumpInfo sd : d.getChildInfos()) {
             if (sd instanceof DumpInfoSwfNode) {
                 DumpInfoSwfNode si = (DumpInfoSwfNode) sd;
-                if (si.getSwf() == item.getOpenable()) {                    
+                if (si.getSwf() == item.getOpenable()) {
                     DumpInfo di = si;
                     while (model.getChildCount(di) > 0) {
                         boolean found = false;
@@ -693,7 +695,7 @@ public class DumpTree extends JTree {
                     }
                     di = di.parent; // tagId is selected, lets select the tag instead
                     TreePath selPath = model.getDumpInfoPath(di);
-                    
+
                     if (item instanceof CLIPACTIONRECORD) {
                         CLIPACTIONS clipActions = ((PlaceObjectTypeTag) tag).getClipActions();
                         int index = clipActions.clipActionRecords.indexOf(item);
@@ -732,7 +734,7 @@ public class DumpTree extends JTree {
                             }
                         }
                     }
-                    
+
                     if (item instanceof BUTTONRECORD) {
                         ButtonTag button = (ButtonTag) tag;
                         int index = button.getRecords().indexOf(item);
@@ -752,7 +754,7 @@ public class DumpTree extends JTree {
                             }
                         }
                     }
-                    
+
                     if (selPath != null) {
                         setSelectionPath(selPath);
                         scrollPathToVisible(selPath);

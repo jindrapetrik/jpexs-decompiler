@@ -27,8 +27,6 @@ import java.io.InputStream;
  */
 public class JpegAnalyzer {
 
-    
-
     public void analyze(InputStream is) throws IOException {
         int val;
 
@@ -42,7 +40,7 @@ public class JpegAnalyzer {
                 if (val == -1) {
                     break;
                 }
-                if (val != 0) {    
+                if (val != 0) {
                     int len = 2;
                     if (JpegMarker.markerHasLength(val)) {
                         int len1 = is.read();
@@ -55,8 +53,6 @@ public class JpegAnalyzer {
             }
         }
     }
-
-    
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
         JpegAnalyzer analyzer = new JpegAnalyzer();

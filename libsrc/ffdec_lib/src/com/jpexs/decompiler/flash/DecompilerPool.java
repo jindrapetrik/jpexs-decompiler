@@ -207,8 +207,7 @@ public class DecompilerPool {
 
     public void shutdown() throws InterruptedException {
         executor.shutdown();
-        if (!executor.awaitTermination(100, TimeUnit.SECONDS)) {
-        }
+        executor.awaitTermination(100, TimeUnit.SECONDS);
     }
 
     public void destroySwf(SWF swf) {

@@ -119,6 +119,6 @@ public class BEVELFILTER extends FILTER {
 
     @Override
     public double getDeltaY() {
-        return blurY + Math.abs(distance * Math.sin(angle));        
+        return blurY + Math.abs(distance * Math.sin(angle));
     }
 }

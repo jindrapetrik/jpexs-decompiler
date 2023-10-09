@@ -100,7 +100,7 @@ public abstract class Trait implements Cloneable, Serializable {
     public static final int TRAIT_FUNCTION = 5;
 
     public static final int TRAIT_CONST = 6;
-    
+
     public boolean deleted = false;
 
     public void delete(ABC abc, boolean d) {
@@ -204,7 +204,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     private void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
         boolean publicProtectedOnly = isParent;
-        for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {            
+        for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {
             if (publicProtectedOnly) {
                 int nskind = it.getName(abc).getSimpleNamespaceKind(abc.constants);
                 if (nskind != Namespace.KIND_PACKAGE && nskind != Namespace.KIND_PROTECTED) {
@@ -220,7 +220,7 @@ public abstract class Trait implements Cloneable, Serializable {
                     continue;
                 }
             }
-            traitNamesInThisScript.add(ct.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));        
+            traitNamesInThisScript.add(ct.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
         }
         if (abc.instance_info.get(classIndex).super_index == 0) {
             return;
@@ -228,7 +228,7 @@ public abstract class Trait implements Cloneable, Serializable {
         DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, true);
         AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(fullClassName), abc, scriptIndex);
         if (ci != null) {
-            getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);        
+            getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);
         }
     }
 
@@ -350,9 +350,9 @@ public abstract class Trait implements Cloneable, Serializable {
         if (hasImport) {
             writer.newLine();
         }
-        
+
         if (!uses.isEmpty()) {
-            for (String u:uses) {
+            for (String u : uses) {
                 writer.appendNoHilight("use namespace " + u + ";").newLine();
             }
             writer.newLine();
@@ -391,14 +391,14 @@ public abstract class Trait implements Cloneable, Serializable {
         getApiVersions(abc, writer);
         return writer;
     }
-    
+
     public boolean isApiVersioned(ABC abc) {
         return abc.constants.getMultiname(name_index).isApiVersioned(abc.constants);
     }
-    
+
     public final GraphTextWriter getApiVersions(ABC abc, GraphTextWriter writer) {
         List<Integer> apiVersions = abc.constants.getMultiname(name_index).getApiVersions(abc.constants);
-        for(int version:apiVersions) {
+        for (int version : apiVersions) {
             writer.appendNoHilight("[API(\"" + version + "\")]").newLine();
         }
         return writer;
@@ -432,41 +432,41 @@ public abstract class Trait implements Cloneable, Serializable {
                     writer.appendNoHilight(identifier).appendNoHilight(" ");
                 }
             } else if (nskind != 0) {
-                
+
                 //Traits of private classes inside script have same namespace as the class
                 if (nskind == Namespace.KIND_PRIVATE) {
                     Set<Integer> namespaceIdsThis = new HashSet<>();
                     if (m.isApiVersioned(abc.constants)) {
                         NamespaceSet nss = m.getNamespaceSet(abc.constants);
-                        for (int n:nss.namespaces) {
+                        for (int n : nss.namespaces) {
                             namespaceIdsThis.add(n);
                         }
                     } else {
                         namespaceIdsThis.add(m.namespace_index);
                     }
                     Set<Integer> namespaceIdsClass = new HashSet<>();
-                    
+
                     Multiname mc = abc.instance_info.get(classIndex).getName(abc.constants);
                     if (mc.isApiVersioned(abc.constants)) {
                         NamespaceSet nss = mc.getNamespaceSet(abc.constants);
-                        for (int n:nss.namespaces) {
+                        for (int n : nss.namespaces) {
                             namespaceIdsClass.add(n);
                         }
                     } else {
                         namespaceIdsClass.add(mc.namespace_index);
                     }
-                    
-                    for (int ns:namespaceIdsThis) {
+
+                    for (int ns : namespaceIdsThis) {
                         if (namespaceIdsClass.contains(ns)) {
                             nskind = Namespace.KIND_PACKAGE_INTERNAL;
                             break;
                         }
-                    }                    
+                    }
                 }
                 String nsPrefix = Namespace.getPrefix(nskind);
                 if (nsPrefix != null && !nsPrefix.isEmpty()) {
                     writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
-                }                
+                }
             }
         }
         if (isStatic) {
@@ -641,10 +641,10 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public abstract void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos);
-    
+
     public String getKindToStr() {
         String traitKindStr = "";
-        switch(kindType) {
+        switch (kindType) {
             case Trait.TRAIT_CLASS:
                 traitKindStr = "class";
                 break;

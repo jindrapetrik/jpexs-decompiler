@@ -170,7 +170,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     @Override
     public void addTag(int index, Tag tag) {
     }
-    
+
     @Override
     public int indexOfTag(Tag tag) {
         return -1;
@@ -181,7 +181,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
         removeTag(index);
         addTag(index, newTag);
     }
-    
+
     @Override
     public void replaceTag(Tag oldTag, Tag newTag) {
         setModified(true);
@@ -194,16 +194,16 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     @Override
     public void setSwf(SWF swf, boolean deep) {
         this.swf = swf;
-        for(BUTTONRECORD record:getRecords()) {
+        for (BUTTONRECORD record : getRecords()) {
             record.setSourceTag(this);
         }
-    }        
+    }
 
     @Override
     public void setModified(boolean value) {
         super.setModified(value);
-        for(BUTTONRECORD record:getRecords()) {
+        for (BUTTONRECORD record : getRecords()) {
             record.setModified(value);
         }
-    }       
+    }
 }

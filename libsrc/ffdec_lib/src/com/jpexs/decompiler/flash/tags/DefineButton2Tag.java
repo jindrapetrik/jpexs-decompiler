@@ -228,7 +228,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
                 }
             }
         }
-        
+
         if (!foundSomething) {
             rect = new RECT();
         }
@@ -315,11 +315,11 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
     public void setFrameCount(int frameCount) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        for (BUTTONRECORD rec: characters) {
+        for (BUTTONRECORD rec : characters) {
             needed.add(rec.characterId);
         }
-    }   
+    }
 }

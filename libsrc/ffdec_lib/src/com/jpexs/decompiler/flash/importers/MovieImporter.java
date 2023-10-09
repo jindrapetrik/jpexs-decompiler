@@ -60,7 +60,7 @@ public class MovieImporter {
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         int movieCount = 0;
         List<String> extensions = Arrays.asList("flv");
-        File allFiles[] = moviesDir.listFiles(new FilenameFilter() {
+        File[] allFiles = moviesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();
@@ -286,7 +286,7 @@ public class MovieImporter {
                 for (FLVTAG ftag : videoTags) {
                     videoData = ((VIDEODATA) ftag.data);
                     if (videoData.codecId == VIDEODATA.CODEC_VP6 || videoData.codecId == VIDEODATA.CODEC_VP6_ALPHA) {
-                        dis = new FLVInputStream(new ByteArrayInputStream(videoData.videoData));                    
+                        dis = new FLVInputStream(new ByteArrayInputStream(videoData.videoData));
                         int horizontalAdjustment = (int) dis.readUB(4);
                         int verticalAdjustment = (int) dis.readUB(4);
                         if (videoData.codecId == VIDEODATA.CODEC_VP6_ALPHA) {
@@ -404,7 +404,7 @@ public class MovieImporter {
                             placeObject.ratio = swfFrameNum - startFrame;
                             timelined.addTag(placeObject);
                             ShowFrameTag sft = new ShowFrameTag(swf);
-                            sft.setTimelined(timelined);                           
+                            sft.setTimelined(timelined);
                             timelined.addTag(sft);
                             numTimelineFrames++;
                         }
@@ -418,7 +418,7 @@ public class MovieImporter {
             if (timelined != null) {
                 timelined.setFrameCount(numTimelineFrames);
             }
-            
+
             movie.numFrames = importLastFrame - startFrame + 1;
 
             List<Tag> tagsToRemove = new ArrayList<>();
@@ -438,8 +438,8 @@ public class MovieImporter {
                         }
                     }
                     if (t instanceof RemoveTag) {
-                        RemoveTag rt = (RemoveTag)t;
-                        if(placed && rt.getDepth() == placeDepth) {
+                        RemoveTag rt = (RemoveTag) t;
+                        if (placed && rt.getDepth() == placeDepth) {
                             tagsToRemove.add(t);
                             placed = false;
                         }
@@ -449,7 +449,7 @@ public class MovieImporter {
                     timelined.removeTag(t);
                 }
             }
-            
+
             if (timelined != null) {
                 int f = -1;
                 ReadOnlyTagList tags = timelined.getTags();

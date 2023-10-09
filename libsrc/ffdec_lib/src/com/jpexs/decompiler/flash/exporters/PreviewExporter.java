@@ -402,6 +402,7 @@ public class PreviewExporter {
                         jtt.writeTag(sos2);
                     }
                 } else if (treeItem instanceof AloneTag) {
+                    //empty
                 } else {
                     Set<Integer> needed = new HashSet<>();
                     ((Tag) treeItem).getNeededCharactersDeep(needed);

@@ -35,7 +35,7 @@ import java.util.Objects;
 public class NamespaceItem {
 
     public static final int KIND_NAMESPACE_CUSTOM = -2;
-    
+
     public DottedChain name;
 
     public int kind;
@@ -55,8 +55,8 @@ public class NamespaceItem {
         this.name = DottedChain.parseWithSuffix(name);
         this.kind = kind;
     }
-    
-    public NamespaceItem(int nsIndex) {        
+
+    public NamespaceItem(int nsIndex) {
         this.nsIndex = nsIndex;
     }
 

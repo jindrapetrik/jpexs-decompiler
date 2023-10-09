@@ -30,8 +30,8 @@ public class GLYPHIDX implements Serializable {
     public int indexInTexture;
 
     public GLYPHIDX() {
-    }    
-    
+    }
+
     public GLYPHIDX(int indexInFont, int indexInTexture) {
         this.indexInFont = indexInFont;
         this.indexInTexture = indexInTexture;

@@ -40,10 +40,10 @@ public class LocalRegAVM2Item extends AVM2Item {
     public GraphTargetItem computedValue;
 
     public GraphTargetItem type;
-    
+
     private final Object computedResult;
 
-    private boolean isCT = false;        
+    private boolean isCT = false;
 
     public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem computedValue, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);

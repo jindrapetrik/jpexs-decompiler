@@ -32,9 +32,9 @@ import java.io.OutputStream;
 public class BMPFile extends Component {
 
     //--- Private constants
-    private final static int BITMAPFILEHEADER_SIZE = 14;
+    private static final int BITMAPFILEHEADER_SIZE = 14;
 
-    private final static int BITMAPINFOHEADER_SIZE = 40;
+    private static final int BITMAPINFOHEADER_SIZE = 40;
 
     //--- Private variable declaration
     //--- Bitmap file header

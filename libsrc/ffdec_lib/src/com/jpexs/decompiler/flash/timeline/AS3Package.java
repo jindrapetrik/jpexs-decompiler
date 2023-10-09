@@ -47,20 +47,20 @@ public class AS3Package extends AS3ClassTreeItem {
     private List<AS3Package> sortedPackages;
 
     private List<ScriptPack> sortedScripts;
-    
+
     private boolean flat;
-    
+
     private boolean defaultPackage;
-    
+
     private Integer compoundScriptIndex;
-    
+
     private ABC abc;
-    
+
     private ScriptPack compoundInitializerPack = null;
-    
+
     private boolean partOfCompoundScript;
 
-    public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage, ABC abc, boolean partOfCompoundScript,  Integer compoundScriptIndex) {
+    public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage, ABC abc, boolean partOfCompoundScript, Integer compoundScriptIndex) {
         super(packageName, "", null);
         this.flat = flat;
         this.openable = openable;
@@ -68,13 +68,13 @@ public class AS3Package extends AS3ClassTreeItem {
         this.defaultPackage = defaultPackage;
         this.compoundScriptIndex = compoundScriptIndex;
         this.abc = abc;
-        this.partOfCompoundScript = partOfCompoundScript;        
+        this.partOfCompoundScript = partOfCompoundScript;
     }
 
     public boolean isPartOfCompoundScript() {
         return partOfCompoundScript;
     }
-        
+
     public void setCompoundInitializerPack(ScriptPack compoundInitializerPack) {
         this.compoundInitializerPack = compoundInitializerPack;
     }
@@ -83,8 +83,6 @@ public class AS3Package extends AS3ClassTreeItem {
         return compoundInitializerPack;
     }
 
-    
-    
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
@@ -104,9 +102,7 @@ public class AS3Package extends AS3ClassTreeItem {
     public ABC getAbc() {
         return abc;
     }
-    
-    
-        
+
     @Override
     public Openable getOpenable() {
         return openable;

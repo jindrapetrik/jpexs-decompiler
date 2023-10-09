@@ -53,8 +53,7 @@ public class MyRibbonApplicationMenuPopupPanelUI extends BasicRibbonApplicationM
     @Override
     protected void installComponents() {
         super.installComponents();
-        Border newBorder = new CompoundBorder(new SubstanceBorder(new Insets(2,
-                2, 2, 2)), new Border() {
+        Border b = new Border() {
             @Override
             public boolean isBorderOpaque() {
                 return true;
@@ -83,7 +82,7 @@ public class MyRibbonApplicationMenuPopupPanelUI extends BasicRibbonApplicationM
                 // draw the application menu button
                 JRibbonApplicationMenuButton rendererButton = new JRibbonApplicationMenuButton(
                         applicationMenuPopupPanel.getAppMenuButton()
-                        .getRibbon());
+                                .getRibbon());
 
                 JRibbonApplicationMenuButton appMenuButton = applicationMenuPopupPanel
                         .getAppMenuButton();
@@ -113,7 +112,9 @@ public class MyRibbonApplicationMenuPopupPanelUI extends BasicRibbonApplicationM
                 /*g.setColor(Color.red);
                          g.fillRect(0, 0, width,height);*/
             }
-        });
+        };
+        Border newBorder = new CompoundBorder(new SubstanceBorder(new Insets(2,
+                2, 2, 2)), b);
         this.applicationMenuPopupPanel.setBorder(newBorder);
 
         this.panelLevel2.setBorder(new Border() {

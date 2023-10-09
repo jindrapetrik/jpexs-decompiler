@@ -66,7 +66,7 @@ public class FontEmbedDialog extends AppDialog {
 
     private final JCheckBox[] rangeCheckboxes;
 
-    private final String rangeNames[];
+    private final String[] rangeNames;
 
     private final JLabel[] rangeSamples;
 

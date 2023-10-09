@@ -73,6 +73,7 @@ public class NewMethodActionItem extends ActionItem {
         if (!blankMethod) {
             if (methodName instanceof DirectValueActionItem) {
                 if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
+                    //empty
                 } else if ((((DirectValueActionItem) methodName).value instanceof String)
                         && (IdentifiersDeobfuscation.isValidName(false, (String) ((DirectValueActionItem) methodName).value))) {
                     writer.append(".");

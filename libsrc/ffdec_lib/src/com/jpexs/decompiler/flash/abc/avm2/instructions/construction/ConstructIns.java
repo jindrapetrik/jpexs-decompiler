@@ -30,13 +30,10 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.SlotAVM2Item;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -85,6 +82,7 @@ public class ConstructIns extends InstructionDefinition {
         }
         return ret;
     }
+
     public static boolean walkXMLSub(GraphTargetItem item, List<GraphTargetItem> list) {
         boolean ret = false;
         if (item instanceof AddAVM2Item) {
@@ -93,14 +91,14 @@ public class ConstructIns extends InstructionDefinition {
             }
             if (walkXMLSub(((AddAVM2Item) item).rightSide, list)) {
                 ret = true;
-            }                
+            }
         } else if ((item instanceof EscapeXElemAVM2Item) || (item instanceof EscapeXAttrAVM2Item)) {
             ret = true;
             list.add(item);
         } else {
             list.add(item);
         }
-        
+
         return ret;
     }
 

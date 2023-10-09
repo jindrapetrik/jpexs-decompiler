@@ -116,6 +116,5 @@ public class DefineShape4Tag extends ShapeTag {
         super.updateBounds();
         edgeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, null, 4, true);
     }
-    
-    
+
 }

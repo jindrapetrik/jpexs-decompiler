@@ -72,7 +72,6 @@ public class ConstructPropIns extends InstructionDefinition {
         }
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        
 
         if (multiname.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)) {
             if (args.size() == 1) {
@@ -83,7 +82,7 @@ public class ConstructPropIns extends InstructionDefinition {
                     return;
                 }
             }
-        }//
+        }
         boolean isRegExp = false;
         if (multiname.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)) {
             isRegExp = true;
@@ -97,7 +96,7 @@ public class ConstructPropIns extends InstructionDefinition {
             stack.push(new RegExpAvm2Item(pattern, modifiers, ins, localData.lineStartInstruction));
             return;
         }
-        
+
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);

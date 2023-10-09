@@ -77,7 +77,6 @@ public class DoWhileItem extends LoopItem implements Block {
         }
     }
 
-
     public DoWhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
         super(src, lineStartIns, loop);
         this.expression = expression;
@@ -109,7 +108,7 @@ public class DoWhileItem extends LoopItem implements Block {
             if (!first) {
                 writer.append(", ");
             }
-            first = false;            
+            first = false;
             if (i == expression.size() - 1) {
                 expression.get(i).toStringBoolean(writer, localData);
             } else {

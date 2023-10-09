@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.LoopWithType;
@@ -70,10 +68,9 @@ public class ForInAVM2Item extends LoopItem implements Block {
         visitor.visit(expression);
     }
 
-
     public ForInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
-        
+
         //Commented out - see the comment in ForEachInAVM2Item
         /*if (!commands.isEmpty()) {
             GraphTargetItem firstAssign = commands.get(0);

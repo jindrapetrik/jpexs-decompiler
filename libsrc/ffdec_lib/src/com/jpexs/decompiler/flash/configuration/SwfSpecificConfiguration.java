@@ -28,5 +28,5 @@ public class SwfSpecificConfiguration implements Serializable {
 
     public Map<String, String> fontPairingMap = new HashMap<>();
 
-    public String lastSelectedPath = null;            
+    public String lastSelectedPath = null;
 }

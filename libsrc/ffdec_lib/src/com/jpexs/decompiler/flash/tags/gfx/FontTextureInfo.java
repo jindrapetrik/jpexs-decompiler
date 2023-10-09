@@ -103,8 +103,6 @@ public class FontTextureInfo extends Tag {
         super(swf, ID, NAME, null);
         fileName = "";
     }
-    
-    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {

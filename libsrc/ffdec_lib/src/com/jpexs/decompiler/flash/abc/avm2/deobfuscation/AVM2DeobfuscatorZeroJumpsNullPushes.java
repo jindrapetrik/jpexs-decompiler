@@ -46,10 +46,10 @@ import java.util.Set;
  */
 public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
 
-    
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
         return removeZeroJumps(code, body, new Reference<>(-1));
     }
+
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         boolean result = false;
         int minChangedIp = -1;

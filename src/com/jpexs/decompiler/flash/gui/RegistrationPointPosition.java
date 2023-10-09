@@ -46,5 +46,5 @@ public enum RegistrationPointPosition {
     public double getPositionY() {
         return positionY;
     }
-        
+
 }

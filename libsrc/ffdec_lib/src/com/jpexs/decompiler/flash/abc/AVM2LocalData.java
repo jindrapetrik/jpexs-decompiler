@@ -50,19 +50,19 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, GraphTargetItem> localRegs;
 
     public ScopeStack scopeStack;
-    
+
     public ScopeStack localScopeStack;
 
     public MethodBody methodBody;
-    
+
     public List<MethodBody> callStack;
 
     public ABC abc;
-    
+
     public AbcIndexing abcIndex;
 
     public HashMap<Integer, String> localRegNames;
-    
+
     public HashMap<Integer, GraphTargetItem> localRegTypes;
 
     public List<DottedChain> fullyQualifiedNames;
@@ -92,11 +92,11 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, GraphPart> defaultParts = new HashMap<>();
 
     public Map<Integer, Integer> switchedRegs = new HashMap<>();
-    
+
     public Map<Integer, GraphPart> pushDefaultPart = new HashMap<>();
 
     public Map<Integer, Integer> finallyKinds = new HashMap<>();
-    
+
     /**
      * exception index -> switch throw part
      */
@@ -112,7 +112,7 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, Integer> localRegAssignmentIps;
 
     public Integer ip;
-    
+
     public AVM2Code code;
 
     public boolean thisHasDefaultToPrimitive;
@@ -126,7 +126,7 @@ public class AVM2LocalData extends BaseLocalData {
     public boolean inGetLoops = false;
 
     public Set<Integer> seenMethods = new HashSet<>();
-        
+
     public AVM2LocalData() {
 
     }

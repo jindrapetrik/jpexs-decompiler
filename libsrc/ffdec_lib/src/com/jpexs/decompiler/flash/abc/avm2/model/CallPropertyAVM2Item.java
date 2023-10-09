@@ -43,9 +43,9 @@ public class CallPropertyAVM2Item extends AVM2Item {
     public List<GraphTargetItem> arguments;
 
     public boolean isVoid;
-    
+
     public GraphTargetItem type;
-    
+
     public boolean isStatic;
 
     public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments, GraphTargetItem type, boolean isStatic) {

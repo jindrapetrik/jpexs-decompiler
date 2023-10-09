@@ -24,15 +24,15 @@ import java.io.InputStream;
  * @author JPEXS
  */
 public class MarkingInputStream extends InputStream {
-   
+
     private InputStream is;
-    
+
     private long pos = 0;
 
     public MarkingInputStream(InputStream is) {
         this.is = is;
     }
-    
+
     @Override
     public int read() throws IOException {
         pos++;
@@ -41,5 +41,5 @@ public class MarkingInputStream extends InputStream {
 
     public long getPos() {
         return pos;
-    }    
+    }
 }

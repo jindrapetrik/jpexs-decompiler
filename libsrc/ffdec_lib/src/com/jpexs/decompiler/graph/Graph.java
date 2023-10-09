@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
@@ -63,7 +62,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -390,7 +388,7 @@ public class Graph {
             return null;
         }
 
-        List<GraphPart> loopContinues = new ArrayList<>();//getLoopsContinues(loops);
+        List<GraphPart> loopContinues = new ArrayList<>();
         for (Loop l : loops) {
             if (l.phase == 1) {
                 loopContinues.add(l.loopContinue);
@@ -452,7 +450,7 @@ public class Graph {
         Set<GraphPart> s = new HashSet<>(parts); //unique
         parts = new ArrayList<>(s); //make local copy
 
-        List<GraphPart> loopContinues = new ArrayList<>();//getLoopsContinues(loops);
+        List<GraphPart> loopContinues = new ArrayList<>();
         for (Loop l : loops) {
             if (l.phase == 1) {
                 loopContinues.add(l.loopContinue);
@@ -643,7 +641,7 @@ public class Graph {
             int ret = o.level - level;
             if (ret == 0) {
                 ret = part.closedTime - o.part.closedTime;
-                
+
                 if (ret == 0) { //some nodes may be split in half and thus have same closedTime - like in try..catch
                     return part.start - o.part.start;
                 }
@@ -826,14 +824,14 @@ public class Graph {
         makeAllCommands(ret, stack);
         finalProcessAll(ret, 0, getFinalData(localData, loops, throwStates), path);
         return ret;
+    }    
+
+    protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
+        return null;
     }
 
     protected void processSwitches(List<GraphTargetItem> list) {
         processSwitches(list, -1);
-    }
-
-    protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
-        return null;
     }
 
     /*
@@ -1517,33 +1515,7 @@ public class Graph {
         }
         return ret;
     }
-
-    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<ThrowState> throwStates) {
-        if (stopPart.contains(part)) {
-            return null;
-        }
-
-        GraphSourceItem firstIns = null;
-        if (part != null) {
-            if (part.start >= 0 && part.start < code.size()) {
-                firstIns = code.get(part.start);
-            }
-        }
-
-        for (Loop l : loops) {
-            if (l.phase == 2) {
-                continue;
-            }
-            if (l.loopContinue == part) {
-                return (new ContinueItem(null, firstIns, l.id));
-            }
-            if (l.loopBreak == part) {
-                return (new BreakItem(null, firstIns, l.id));
-            }
-        }
-        return null;
-    }
-
+   
     private void checkContinueAtTheEnd(List<GraphTargetItem> commands, Loop loop) {
         if (!commands.isEmpty()) {
             int i = commands.size() - 1;
@@ -1661,10 +1633,32 @@ public class Graph {
         list.remove(list.size() - 1);
     }
 
-    protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
-        return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
-    }
+    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<ThrowState> throwStates) {
+        if (stopPart.contains(part)) {
+            return null;
+        }
 
+        GraphSourceItem firstIns = null;
+        if (part != null) {
+            if (part.start >= 0 && part.start < code.size()) {
+                firstIns = code.get(part.start);
+            }
+        }
+
+        for (Loop l : loops) {
+            if (l.phase == 2) {
+                continue;
+            }
+            if (l.loopContinue == part) {
+                return (new ContinueItem(null, firstIns, l.id));
+            }
+            if (l.loopBreak == part) {
+                return (new BreakItem(null, firstIns, l.id));
+            }
+        }
+        return null;
+    }
+    
     protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates, TranslateStack stack) {
         return loopItem;
     }
@@ -1814,13 +1808,7 @@ public class Graph {
 
             if (part.nextParts.size() == 2 && !partIsSwitch(part)) {
 
-                List<GraphPart> nps;/* = new ArrayList<>(part.nextParts);
-             for(int i=0;i<nps.size();i++){
-             nps.set(i,getNextNoJump(nps.get(i),localData));
-             }
-             if(nps.get(0) == nps.get(1)){
-             nps = part.nextParts;
-             }*/
+                List<GraphPart> nps;
 
                 nps = part.nextParts;
                 GraphPart next = getCommonPart(localData, part, nps, loops, throwStates);
@@ -2055,6 +2043,7 @@ public class Graph {
                         }
                     }
                     if (otherBreakCandidate) {
+                        //empty
                     } else if (count.get(cand) > winnerCount) {
                         winnerCount = count.get(cand);
                         winner = cand;
@@ -2171,6 +2160,10 @@ public class Graph {
         return true;
     }
 
+    protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
+        return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
+    }
+    
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         loopPrintGraph:
         while (true) {
@@ -2445,7 +2438,7 @@ public class Graph {
                     currentRet.addAll(output);
                 }
             }
-//********************************END PART DECOMPILING
+            //********************************END PART DECOMPILING
             if (parseNext) {
 
                 if (getNextParts(localData, part).size() > 2 || partIsSwitch(part)) {
@@ -2934,8 +2927,9 @@ public class Graph {
                                 if (continueCommands.isEmpty()) {
                                     commands.addAll(precoCommands);
                                     precoCommands = new ArrayList<>();
-                                } //Single continue and there is break/continue/return/throw at end of the commands
-                                else if (!commands.isEmpty() && continueCommands.size() == 1) {
+                                    
+                                    //Single continue and there is break/continue/return/throw at end of the commands
+                                } else if (!commands.isEmpty() && continueCommands.size() == 1) {
                                     GraphTargetItem lastItem = commands.get(commands.size() - 1);
                                     if ((lastItem instanceof BreakItem) || (lastItem instanceof ContinueItem) || (lastItem instanceof ExitItem)) {
                                         continueCommands.get(0).addAll(continueCommands.get(0).size() - 1, precoCommands);
@@ -3093,6 +3087,22 @@ public class Graph {
     }
 
     protected void checkGraph(List<GraphPart> allBlocks) {
+    }    
+
+    protected int checkIp(int ip) {
+        return ip;
+    }
+
+    public GraphPart searchPart(int ip, Collection<? extends GraphPart> allParts) {
+        if (ip < 0) {
+            return null;
+        }
+        for (GraphPart p : allParts) {
+            if (ip >= p.start && ip <= p.end) {
+                return p;
+            }
+        }
+        return null;
     }
 
     public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<GraphException> exceptions) throws InterruptedException {
@@ -3113,22 +3123,6 @@ public class Graph {
         }
         checkGraph(allBlocks);
         return ret;
-    }
-
-    protected int checkIp(int ip) {
-        return ip;
-    }
-
-    public GraphPart searchPart(int ip, Collection<? extends GraphPart> allParts) {
-        if (ip < 0) {
-            return null;
-        }
-        for (GraphPart p : allParts) {
-            if (ip >= p.start && ip <= p.end) {
-                return p;
-            }
-        }
-        return null;
     }
 
     private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited) throws InterruptedException {
@@ -3366,7 +3360,7 @@ public class Graph {
 
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
-            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {        
+            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
         boolean hasDefault = false;
         /*
                 case 4:

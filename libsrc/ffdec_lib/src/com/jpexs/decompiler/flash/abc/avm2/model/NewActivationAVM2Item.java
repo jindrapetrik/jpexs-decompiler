@@ -58,7 +58,7 @@ public class NewActivationAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
-    }  
+    }
 
     @Override
     public int hashCode() {
@@ -79,6 +79,5 @@ public class NewActivationAVM2Item extends AVM2Item {
         }
         return true;
     }
-    
-    
+
 }

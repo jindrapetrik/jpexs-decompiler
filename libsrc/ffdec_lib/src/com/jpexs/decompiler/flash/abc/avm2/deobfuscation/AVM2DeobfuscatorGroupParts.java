@@ -37,68 +37,68 @@ import java.util.Map;
 public class AVM2DeobfuscatorGroupParts extends SWFDecompilerAdapter {
 
     /*
-    	blk_1
-	jump A
-	B:
-	blk_2
-	jump C
-A:	blk_3
-	jump B
-C:	blk_4
+      blk_1
+      jump A
+    B:
+      blk_2
+      jump C
+A:    blk_3
+      jump B
+C:    blk_4
 
-=>	
-	jump A	
-A:	jump B
-B:	jump C
-	blk_1
-	blk_3
-	blk_2
-	blk_4
+=>    
+      jump A    
+A:    jump B
+B:    jump C
+      blk_1
+      blk_3
+      blk_2
+      blk_4
 
 ----------------------
 
-	blk_1
-	jump A
-	B:
-	blk_2
-	jump C
-A:	blk_3
-	if B
-	blk_5
-C:	blk_4
+    blk_1
+    jump A
+    B:
+    blk_2
+    jump C
+A:  blk_3
+    if B
+    blk_5
+C:  blk_4
 
 =>
-	jump A
+    jump A
 B:
-	blk_2
-	jump C
-A:	blk_1
-	blk_3
-	if B
-	blk_5
+    blk_2
+    jump C
+A:  blk_1
+    blk_3
+    if B
+    blk_5
 C:
-	blk_4
+    blk_4
 
 ----------------------
-	blk_1
-	jump A
-	B:
-	blk_2
-	if C
-A:	blk_3
-	jump B
-C:	blk_4
+    blk_1
+    jump A
+    B:
+    blk_2
+    if C
+A:  blk_3
+    jump B
+C:  blk_4
 
 =>
 
-	blk_1
-	jump A
-	B:
-	blk_3
-	blk_2
-	if C
-A:	jump B
-C:	blk_4
+    blk_1
+    jump A
+    B:
+    blk_3
+    blk_2
+    if C
+A:  jump B
+C:  blk_4
     
      */
     @Override

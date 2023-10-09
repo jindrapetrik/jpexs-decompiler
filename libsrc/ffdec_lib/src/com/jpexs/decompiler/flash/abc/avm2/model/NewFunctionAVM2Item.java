@@ -51,7 +51,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public int classIndex;
 
     public ABC abc;
-    
+
     public int methodIndex;
 
     public ScopeStack scopeStack;

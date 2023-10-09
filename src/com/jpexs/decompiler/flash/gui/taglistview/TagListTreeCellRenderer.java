@@ -138,7 +138,7 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                         if (missingAsStr.size() == 1) {
                             lab.setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
                         } else {
-                            lab.setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%",String.join(", ", missingAsStr)));
+                            lab.setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%", String.join(", ", missingAsStr)));
                         }
                         setForeground(Color.red);
                     }

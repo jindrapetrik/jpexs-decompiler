@@ -86,10 +86,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         } else if (name.isEmpty()) {
             return DottedChain.TOPLEVEL;
         } else {
-            String parts[] = name.split("\\.");
+            String[] parts = name.split("\\.");
             List<PathPart> newParts = new ArrayList<>();
             for (String part : parts) {
-                newParts.add(new PathPart(part, false, ""));                
+                newParts.add(new PathPart(part, false, ""));
             }
 
             return new DottedChain(newParts, false);
@@ -102,7 +102,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         } else if (name.isEmpty()) {
             return DottedChain.TOPLEVEL;
         } else {
-            String parts[] = name.split("\\.");
+            String[] parts = name.split("\\.");
             List<PathPart> newParts = new ArrayList<>();
             for (String part : parts) {
                 String nameNoSuffix = part;
@@ -111,7 +111,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
                     nameNoSuffix = part.substring(0, part.lastIndexOf("#"));
                     namespaceSuffix = part.substring(part.lastIndexOf("#"));
                 }
-                newParts.add(new PathPart(nameNoSuffix, false, namespaceSuffix));                                
+                newParts.add(new PathPart(nameNoSuffix, false, namespaceSuffix));
             }
 
             return new DottedChain(newParts, false);
@@ -149,7 +149,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         this(new boolean[parts.length], parts, namespaceSuffixes);
     }
 
-    public DottedChain(boolean attributes[], String[] parts, String[] namespaceSuffixes) {
+    public DottedChain(boolean[] attributes, String[] parts, String[] namespaceSuffixes) {
         List<PathPart> newParts = new ArrayList<>();
         for (int i = 0; i < attributes.length; i++) {
             newParts.add(new PathPart(parts[i], attributes[i], namespaceSuffixes[i]));
@@ -248,11 +248,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         newParts.add(new PathPart(name, attribute, namespaceSuffix));
         return new DottedChain(newParts, false);
     }
-    
+
     public DottedChain preAdd(String name, String namespaceSuffix) {
         return preAdd(false, name, namespaceSuffix);
     }
-    
+
     public DottedChain preAdd(boolean attribute, String name, String namespaceSuffix) {
         if (name == null) {
             return new DottedChain(this);
@@ -262,6 +262,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return new DottedChain(newParts, false);
     }
 
+    @Override
+    public String toString() {
+        return toRawString();
+    }
+    
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
         if (isNull) {
             return "";
@@ -322,11 +327,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     public String toRawString() { //Is SUFFIX correctly handled?
         return toString(false/*ignored*/, true, true);
-    }
-
-    @Override
-    public String toString() {
-        return toRawString();
     }
 
     @Override
@@ -400,6 +400,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
                 return false;
             }
             return Objects.equals(this.namespaceSuffix, other.namespaceSuffix);
-        }                
+        }
     }
 }

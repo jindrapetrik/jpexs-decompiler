@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class JpegMarker {
+
     public static final int SOF0 = 0xC0; //Start of Frame 0
     public static final int SOF1 = 0xC1; //Start of Frame 1
     public static final int SOF2 = 0xC2; //Start of Frame 2
@@ -103,7 +104,7 @@ public class JpegMarker {
     public static final int COM = 0xFE; //Comment       
 
     public static boolean markerHasLength(int marker) {
-        return marker != 0 
+        return marker != 0
                 && marker != SOI
                 && marker != EOI
                 && marker != RST0
@@ -115,7 +116,7 @@ public class JpegMarker {
                 && marker != RST6
                 && marker != RST7;
     }
-    
+
     public static String markerToString(int marker) {
         for (Field field : JpegAnalyzer.class.getDeclaredFields()) {
             try {

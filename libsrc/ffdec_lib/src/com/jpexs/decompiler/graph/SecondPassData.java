@@ -24,5 +24,6 @@ import java.util.Set;
  * @author JPEXS
  */
 public class SecondPassData {
-    public Set<GraphPart> allSwitchParts = new HashSet<>();       
+
+    public Set<GraphPart> allSwitchParts = new HashSet<>();
 }

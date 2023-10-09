@@ -46,11 +46,11 @@ public class GetPropertyAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public GraphTargetItem propertyName;
-    
+
     public GraphTargetItem type;
-    
+
     public GraphTargetItem callType;
-    
+
     public boolean isStatic;
 
     @Override
@@ -157,11 +157,11 @@ public class GetPropertyAVM2Item extends AVM2Item {
     @Override
     public GraphTargetItem returnType() {
         if (object instanceof FindPropertyAVM2Item) {
-            FindPropertyAVM2Item fprop = (FindPropertyAVM2Item)object;
+            FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) object;
             if (fprop.propertyName instanceof FullMultinameAVM2Item) {
-                FullMultinameAVM2Item fmul = (FullMultinameAVM2Item)fprop.propertyName;                
+                FullMultinameAVM2Item fmul = (FullMultinameAVM2Item) fprop.propertyName;
                 if (this.propertyName.equals(fmul)) {
-                    switch(fmul.resolvedMultinameName) {
+                    switch (fmul.resolvedMultinameName) {
                         case "NaN":
                             return TypeItem.NUMBER;
                         case "undefined":

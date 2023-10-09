@@ -143,75 +143,7 @@ import java.util.logging.Logger;
  */
 public class ASMParser {
 
-    private static final Logger logger = Logger.getLogger(ASMParser.class.getName());
-
-    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
-        ActionList list = new ActionList(charset);
-        Stack<GraphSourceItemContainer> containers = new Stack<>();
-
-        ActionConstantPool cpool = new ActionConstantPool(constantPool, charset);
-        cpool.setAddress(address);
-        address += cpool.getTotalActionLength();
-        list.add(cpool);
-
-        while (true) {
-            ASMParsedSymbol symb = lexer.yylex();
-            if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
-                labels.add(new Label((String) symb.value, address));
-            } else if (symb.type == ASMParsedSymbol.TYPE_COMMENT) {
-                if (!list.isEmpty()) {
-                    String cmt = (String) symb.value;
-                    if (cmt.equals("compileTimeJump")) {
-                        Action a = list.get(list.size() - 1);
-                        if (a instanceof ActionIf) {
-                            ((ActionIf) a).ignoreUsed = false;
-                        }
-                    } else if (cmt.equals("compileTimeIgnore")) {
-                        Action a = list.get(list.size() - 1);
-                        if (a instanceof ActionIf) {
-                            ((ActionIf) a).jumpUsed = false;
-                        }
-                    }
-                }
-            } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
-                if (containers.isEmpty()) {
-                    throw new ActionParseException("Block end without start", lexer.yyline());
-                }
-                GraphSourceItemContainer a = containers.peek();
-                if (!a.parseDivision(address - ((Action) a).getAddress(), lexer)) {
-                    containers.pop();
-                }
-            } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                String instructionName = (String) symb.value;
-                Action a = parseAction(instructionName, lexer, constantPool, version, charset);
-                if (ignoreNops && a instanceof ActionNop) {
-                    a = null;
-                }
-                if (a instanceof ActionConstantPool) {
-                    a = null;
-                }
-                if (a instanceof ActionNop) {
-                    a.setAddress(address);
-                    address += 1;
-                } else if (a != null) {
-                    a.setAddress(address);
-                    address += a.getTotalActionLength();
-                }
-                if (a instanceof GraphSourceItemContainer) {
-                    containers.push((GraphSourceItemContainer) a);
-                }
-                if (a != null) {
-                    list.add(a);
-                    lineMap.put(a, lexer.yyline());
-                }
-            } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
-            } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
-                return list;
-            } else {
-                throw new ActionParseException("Label or Instruction name expected, found:" + symb.type + " " + symb.value, lexer.yyline());
-            }
-        }
-    }
+    private static final Logger logger = Logger.getLogger(ASMParser.class.getName());    
 
     private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
         Action a = null;
@@ -228,7 +160,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("PrevFrame") == 0) {
             a = new ActionPrevFrame();
         } else if (instructionName.compareToIgnoreCase("SetTarget") == 0) {
-            a = new ActionSetTarget(lexer,charset);
+            a = new ActionSetTarget(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Stop") == 0) {
             a = new ActionStop();
         } else if (instructionName.compareToIgnoreCase("StopSounds") == 0) {
@@ -236,7 +168,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("ToggleQuality") == 0) {
             a = new ActionToggleQuality();
         } else if (instructionName.compareToIgnoreCase("WaitForFrame") == 0) {
-            a = new ActionWaitForFrame(lexer,charset);
+            a = new ActionWaitForFrame(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Add") == 0) {
             a = new ActionAdd();
         } else if (instructionName.compareToIgnoreCase("And") == 0) {
@@ -260,15 +192,15 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("GetTime") == 0) {
             a = new ActionGetTime();
         } else if (instructionName.compareToIgnoreCase("GetURL2") == 0) {
-            a = new ActionGetURL2(lexer,charset);
+            a = new ActionGetURL2(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("GetVariable") == 0) {
             a = new ActionGetVariable();
         } else if (instructionName.compareToIgnoreCase("GotoFrame2") == 0) {
-            a = new ActionGotoFrame2(lexer,charset);
+            a = new ActionGotoFrame2(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("If") == 0) {
-            a = new ActionIf(lexer,charset);
+            a = new ActionIf(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Jump") == 0) {
-            a = new ActionJump(lexer,charset);
+            a = new ActionJump(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Less") == 0) {
             a = new ActionLess();
         } else if (instructionName.compareToIgnoreCase("MBAsciiToChar") == 0) {
@@ -461,6 +393,75 @@ public class ASMParser {
                 }
             } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
                 return list;
+            }
+        }
+    }
+
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
+        ActionList list = new ActionList(charset);
+        Stack<GraphSourceItemContainer> containers = new Stack<>();
+
+        ActionConstantPool cpool = new ActionConstantPool(constantPool, charset);
+        cpool.setAddress(address);
+        address += cpool.getTotalActionLength();
+        list.add(cpool);
+
+        while (true) {
+            ASMParsedSymbol symb = lexer.yylex();
+            if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
+                labels.add(new Label((String) symb.value, address));
+            } else if (symb.type == ASMParsedSymbol.TYPE_COMMENT) {
+                if (!list.isEmpty()) {
+                    String cmt = (String) symb.value;
+                    if (cmt.equals("compileTimeJump")) {
+                        Action a = list.get(list.size() - 1);
+                        if (a instanceof ActionIf) {
+                            ((ActionIf) a).ignoreUsed = false;
+                        }
+                    } else if (cmt.equals("compileTimeIgnore")) {
+                        Action a = list.get(list.size() - 1);
+                        if (a instanceof ActionIf) {
+                            ((ActionIf) a).jumpUsed = false;
+                        }
+                    }
+                }
+            } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
+                if (containers.isEmpty()) {
+                    throw new ActionParseException("Block end without start", lexer.yyline());
+                }
+                GraphSourceItemContainer a = containers.peek();
+                if (!a.parseDivision(address - ((Action) a).getAddress(), lexer)) {
+                    containers.pop();
+                }
+            } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                String instructionName = (String) symb.value;
+                Action a = parseAction(instructionName, lexer, constantPool, version, charset);
+                if (ignoreNops && a instanceof ActionNop) {
+                    a = null;
+                }
+                if (a instanceof ActionConstantPool) {
+                    a = null;
+                }
+                if (a instanceof ActionNop) {
+                    a.setAddress(address);
+                    address += 1;
+                } else if (a != null) {
+                    a.setAddress(address);
+                    address += a.getTotalActionLength();
+                }
+                if (a instanceof GraphSourceItemContainer) {
+                    containers.push((GraphSourceItemContainer) a);
+                }
+                if (a != null) {
+                    list.add(a);
+                    lineMap.put(a, lexer.yyline());
+                }
+            } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
+                //empty
+            } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
+                return list;
+            } else {
+                throw new ActionParseException("Label or Instruction name expected, found:" + symb.type + " " + symb.value, lexer.yyline());
             }
         }
     }

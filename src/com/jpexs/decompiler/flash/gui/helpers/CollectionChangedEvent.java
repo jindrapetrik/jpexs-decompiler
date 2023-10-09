@@ -49,7 +49,7 @@ public class CollectionChangedEvent<E> {
                 break;
         }
     }
-    
+
     public CollectionChangedEvent(CollectionChangedAction action, E oldItem, E newItem, int oldIndex, int newIndex) {
         this.action = action;
         this.oldItem = oldItem;

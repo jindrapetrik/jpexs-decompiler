@@ -72,7 +72,6 @@ public class WhileItem extends LoopItem implements Block {
         }
     }
 
-
     public WhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop);
         this.expression = expression;

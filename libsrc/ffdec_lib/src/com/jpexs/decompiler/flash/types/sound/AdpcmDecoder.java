@@ -65,7 +65,7 @@ public class AdpcmDecoder extends SoundDecoder {
         public int index;
 
         public int sample;
-    };
+    }
 
     private static int decode2bit(int deltaCode, AdpcmState state) {
         assert (deltaCode == (deltaCode & 3));
@@ -279,6 +279,7 @@ public class AdpcmDecoder extends SoundDecoder {
                 }
             } while (sis.available() > 0);
         } catch (EndOfStreamException eos) {
+            //ignored
         }
     }
 }

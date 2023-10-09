@@ -42,7 +42,7 @@ public class ThisAVM2Item extends AVM2Item {
     public DottedChain className;
 
     public boolean basicObject;
-    
+
     public boolean showClassName;
 
     public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, DottedChain className, boolean basicObject, boolean showClassName) {
@@ -50,7 +50,7 @@ public class ThisAVM2Item extends AVM2Item {
         this.className = className;
         this.basicObject = basicObject;
         this.showClassName = showClassName;
-        getSrcData().localName = "this";        
+        getSrcData().localName = "this";
     }
 
     public boolean isBasicObject() {

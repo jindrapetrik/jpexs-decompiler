@@ -76,12 +76,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         super(swf, id, name, data);
     }
 
-    public abstract int getShapeNum();
-
-    @Override
-    public RECT getRect() {
-        return getRect(new HashSet<>());
-    }
+    public abstract int getShapeNum();    
 
     @Override
     public RECT getRectWithStrokes() {
@@ -155,6 +150,11 @@ public abstract class MorphShapeTag extends DrawableTag {
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
+    
+    @Override
+    public RECT getRect() {
+        return getRect(new HashSet<>());
+    }
 
     @Override
     public RECT getRect(Set<BoundedTag> added) {
@@ -195,9 +195,12 @@ public abstract class MorphShapeTag extends DrawableTag {
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), ratio);
 
-        int startPosX = 0, startPosY = 0;
-        int endPosX = 0, endPosY = 0;
-        int posX = 0, posY = 0;
+        int startPosX = 0;
+        int startPosY = 0;
+        int endPosX = 0;
+        int endPosY = 0;
+        int posX = 0;
+        int posY = 0;
 
         for (int startIndex = 0, endIndex = 0;
                 startIndex < startEdges.shapeRecords.size()
@@ -230,8 +233,8 @@ public abstract class MorphShapeTag extends DrawableTag {
                 }
                 StyleChangeRecord scr = scr1.clone();
                 if (scr1.stateMoveTo || scr2.stateMoveTo) {
-                    scr.moveDeltaX = startPosX + (int)Math.round((endPosX - startPosX) * ratio / (double)MAX_RATIO);
-                    scr.moveDeltaY = startPosY + (int)Math.round((endPosY - startPosY) * ratio / (double)MAX_RATIO);
+                    scr.moveDeltaX = startPosX + (int) Math.round((endPosX - startPosX) * ratio / (double) MAX_RATIO);
+                    scr.moveDeltaY = startPosY + (int) Math.round((endPosY - startPosY) * ratio / (double) MAX_RATIO);
                     scr.stateMoveTo = scr.moveDeltaX != posX || scr.moveDeltaY != posY;
                 }
                 finalRecords.add(scr);
@@ -264,10 +267,10 @@ public abstract class MorphShapeTag extends DrawableTag {
                     continue;
                 }
                 CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                cer.controlDeltaX = cer1.controlDeltaX + (int)Math.round((cer2.controlDeltaX - cer1.controlDeltaX) * ratio / (double)MAX_RATIO);
-                cer.controlDeltaY = cer1.controlDeltaY + (int)Math.round((cer2.controlDeltaY - cer1.controlDeltaY) * ratio / (double)MAX_RATIO);
-                cer.anchorDeltaX = cer1.anchorDeltaX + (int)Math.round((cer2.anchorDeltaX - cer1.anchorDeltaX) * ratio / (double)MAX_RATIO);
-                cer.anchorDeltaY = cer1.anchorDeltaY + (int)Math.round((cer2.anchorDeltaY - cer1.anchorDeltaY) * ratio / (double)MAX_RATIO);
+                cer.controlDeltaX = cer1.controlDeltaX + (int) Math.round((cer2.controlDeltaX - cer1.controlDeltaX) * ratio / (double) MAX_RATIO);
+                cer.controlDeltaY = cer1.controlDeltaY + (int) Math.round((cer2.controlDeltaY - cer1.controlDeltaY) * ratio / (double) MAX_RATIO);
+                cer.anchorDeltaX = cer1.anchorDeltaX + (int) Math.round((cer2.anchorDeltaX - cer1.anchorDeltaX) * ratio / (double) MAX_RATIO);
+                cer.anchorDeltaY = cer1.anchorDeltaY + (int) Math.round((cer2.anchorDeltaY - cer1.anchorDeltaY) * ratio / (double) MAX_RATIO);
                 startPosX += cer1.controlDeltaX + cer1.anchorDeltaX;
                 startPosY += cer1.controlDeltaY + cer1.anchorDeltaY;
                 endPosX += cer2.controlDeltaX + cer2.anchorDeltaX;
@@ -290,8 +293,8 @@ public abstract class MorphShapeTag extends DrawableTag {
                 StraightEdgeRecord ser = new StraightEdgeRecord();
                 ser.generalLineFlag = true;
                 ser.vertLineFlag = false;
-                ser.deltaX = ser1.deltaX + (int)Math.round((ser2.deltaX - ser1.deltaX) * ratio / (double)MAX_RATIO);
-                ser.deltaY = ser1.deltaY + (int)Math.round((ser2.deltaY - ser1.deltaY) * ratio / (double)MAX_RATIO);
+                ser.deltaX = ser1.deltaX + (int) Math.round((ser2.deltaX - ser1.deltaX) * ratio / (double) MAX_RATIO);
+                ser.deltaY = ser1.deltaY + (int) Math.round((ser2.deltaY - ser1.deltaY) * ratio / (double) MAX_RATIO);
                 startPosX += ser1.deltaX;
                 startPosY += ser1.deltaY;
                 endPosX += ser2.deltaX;
@@ -307,7 +310,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         shape.shapeRecords = finalRecords;
         return shape;
     }
-    
+
     @Override
     public int getUsedParameters() {
         return PARAMETER_RATIO;
@@ -359,15 +362,15 @@ public abstract class MorphShapeTag extends DrawableTag {
         cmse.export();
         result.append(cmse.getShapeData());
     }
-    
+
     public void updateStartBounds() {
         startBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, morphLineStyles.getStartLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
     }
-    
+
     public void updateEndBounds() {
         startBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, morphLineStyles.getEndLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
     }
-    
+
     public void updateBounds() {
         updateStartBounds();
         updateEndBounds();

@@ -57,18 +57,12 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
         }
 
         size = code.size();
-//        getContainerLastActions(avm2code, actionItemMap);
         getJumps(avm2code, actionItemMap);
-    }
-
+    }   
+    
     public final AVM2InstructionItem insertItemBefore(AVM2InstructionItem item, AVM2Instruction action) {
         AVM2InstructionItem newItem = new AVM2InstructionItem(action);
         return insertItemBefore(item, newItem);
-    }
-
-    public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2Instruction action) {
-        AVM2InstructionItem newItem = new AVM2InstructionItem(action);
-        return insertItemAfter(item, newItem);
     }
 
     public final AVM2InstructionItem insertItemBefore(AVM2InstructionItem item, AVM2InstructionItem newItem) {
@@ -80,6 +74,11 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
         return newItem;
     }
 
+    public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2Instruction action) {
+        AVM2InstructionItem newItem = new AVM2InstructionItem(action);
+        return insertItemAfter(item, newItem);
+    }    
+    
     public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2InstructionItem newItem) {
         if (item == null && firstItem == null) {
             firstItem = newItem;
@@ -165,42 +164,6 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
         }
     }
 
-//    private void getContainerLastActions(AVM2Code actions, Map<AVM2Instruction, AVM2InstructionItem> actionItemMap) {
-//        AVM2InstructionItem item = firstItem;
-//        if (item == null) {
-//            return;
-//        }
-//
-//        do {
-//            AVM2Instruction action = item.ins;
-//            if (action instanceof GraphSourceItemContainer) {
-//                item.setContainerLastInstructions(getContainerLastActions(actions, action, actionItemMap));
-//            }
-//
-//            item = item.next;
-//        } while (item != firstItem);
-//    }
-//    private List<AVM2InstructionItem> getContainerLastActions(AVM2Code actions, AVM2Instruction action, Map<AVM2Instruction, AVM2InstructionItem> actionItemMap) {
-//        GraphSourceItemContainer container = (GraphSourceItemContainer) action;
-//        List<Long> sizes = container.getContainerSizes();
-//        long endAddress = action.getAddress() + container.getHeaderSize();
-//        List<AVM2InstructionItem> lasts = new ArrayList<>(sizes.size());
-//        for (long size : sizes) {
-//            endAddress += size;
-//            long lastActionAddress = getNearAddress(actions.code, endAddress - 1, false);
-//            AVM2Instruction lastAction = null;
-//            if (lastActionAddress != -1) {
-//                lastAction = actions.getByAddress(lastActionAddress);
-//            }
-//
-//            if (lastAction != null) {
-//                lasts.add(actionItemMap.get(lastAction));
-//            } else {
-//                lasts.add(null);
-//            }
-//        }
-//        return lasts;
-//    }
     private long getNearAddress(List<AVM2Instruction> instructions, long address, boolean next) {
         int min = 0;
         int max = instructions.size() - 1;

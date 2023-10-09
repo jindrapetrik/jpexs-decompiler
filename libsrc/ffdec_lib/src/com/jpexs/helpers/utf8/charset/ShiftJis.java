@@ -29,8 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * ShiftJis to unicode and back conversion.
- * Based on https://github.com/MoarVM/MoarVM/blob/master/src/strings/shiftjis_codeindex.h
+ * ShiftJis to unicode and back conversion. Based on
+ * https://github.com/MoarVM/MoarVM/blob/master/src/strings/shiftjis_codeindex.h
  */
 public class ShiftJis extends AbstractCharsetConverter {
 
@@ -69,7 +69,7 @@ public class ShiftJis extends AbstractCharsetConverter {
 
     static {
         //Since data is too long to save it directly into Java source, load it from bin
-        
+
         InputStream is = Gb2312.class.getResourceAsStream("/com/jpexs/helpers/utf8/charset/ShiftJisdata.bin");
         if (is == null) {
             System.exit(0);
@@ -90,7 +90,7 @@ public class ShiftJis extends AbstractCharsetConverter {
         if (codePoint < 128) {
             return codePoint;
         }
-        
+
         if (shiftjis_cp_to_index.containsKey(codePoint)) {
             return shiftjis_cp_to_index.get(codePoint);
         }

@@ -173,7 +173,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             searchHistoryPanel.addButtonGroup(groupName);
 
             Openable openable = Main.getMainFrame().getPanel().getCurrentOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             List<Integer> indices = Main.searchResultsStorage.getIndicesForOpenable(openable);
 
             int height = 0;
@@ -331,8 +331,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 ActionListener subAction = menuActions.get(sub);
                 final ActionListener subLoader = menuLoaders.get(sub);
 
-                if (sub.startsWith("_/$")) //FooterMenu
-                {
+                if (sub.startsWith("_/$")) { //FooterMenu                
                     RibbonApplicationMenuEntryFooter footerMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon(subIcon, 16), subTitle, subAction);
                     menuItems.put(sub, footerMenu);
                     mainMenu.addFooterEntry(footerMenu);
@@ -386,7 +385,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     if (subAction != null) {
                         menuItem.addActionListener(subAction);
                     }
-                    menuItems.put(sub, menuItem);                    
+                    menuItems.put(sub, menuItem);
                 } else {
                     JCommandButton cbut;
                     if (subIcon != null) {
@@ -438,8 +437,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         }
 
         //if (parts.length == 3)
-        if (parts.length == 4)
-        {
+        if (parts.length == 4) {
             JCommandButton popupButton;
             if (icon != null) {
                 popupButton = new JCommandButton(fixCommandTitle(title), View.getResizableIcon(icon, priority == PRIORITY_TOP ? 32 : 16));
@@ -464,8 +462,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 int subType = menuType.get(sub);
                 ActionListener subAction = menuActions.get(sub);
                 if (subType != TYPE_MENU || (subAction != null)) {
-                    if (o instanceof JMenuItem) {                        
-                        JMenuItem mi = (JMenuItem)o;
+                    if (o instanceof JMenuItem) {
+                        JMenuItem mi = (JMenuItem) o;
                         popupMenu.add((JMenuItem) o);
                         cnt++;
                     }
@@ -474,9 +472,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             if (cnt > 0) {
                 menuItems.put(path, popupButton);
             }
-        }
-        else
-        { //3rd level - it's a Band!
+        } else { //3rd level - it's a Band!
             JRibbonBand band = new JRibbonBand(title, icon != null ? View.getResizableIcon(icon, 16) : null, null);
             band.setResizePolicies(getResizePolicies(band));
             int cnt = 0;
@@ -489,31 +485,28 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 int subPriority = menuPriorities.get(sub);
                 int subType = menuType.get(sub);
                 ActionListener subAction = menuActions.get(sub);
-                //if (subType != TYPE_MENU || (subAction != null)) 
-                {
-                    if (o instanceof AbstractCommandButton) {
-                        RibbonElementPriority ribbonPriority = RibbonElementPriority.MEDIUM;
-                        switch (subPriority) {
-                            case PRIORITY_LOW:
-                                ribbonPriority = RibbonElementPriority.LOW;
-                                break;
-                            case PRIORITY_MEDIUM:
-                                ribbonPriority = RibbonElementPriority.MEDIUM;
-                                break;
-                            case PRIORITY_TOP:
-                                ribbonPriority = RibbonElementPriority.TOP;
-                                break;
-                        }
-
-                        band.addCommandButton((AbstractCommandButton) o, ribbonPriority);
-                        cnt++;
-                    } else if (o instanceof JRibbonBand) {
-                        //ignore
-                    } else if (o instanceof JComponent) {
-                        band.addRibbonComponent(new JRibbonComponent((JComponent) o));
-                        cnt++;
+                if (o instanceof AbstractCommandButton) {
+                    RibbonElementPriority ribbonPriority = RibbonElementPriority.MEDIUM;
+                    switch (subPriority) {
+                        case PRIORITY_LOW:
+                            ribbonPriority = RibbonElementPriority.LOW;
+                            break;
+                        case PRIORITY_MEDIUM:
+                            ribbonPriority = RibbonElementPriority.MEDIUM;
+                            break;
+                        case PRIORITY_TOP:
+                            ribbonPriority = RibbonElementPriority.TOP;
+                            break;
                     }
-                }
+
+                    band.addCommandButton((AbstractCommandButton) o, ribbonPriority);
+                    cnt++;
+                } else if (o instanceof JRibbonBand) {
+                    //ignore
+                } else if (o instanceof JComponent) {
+                    band.addRibbonComponent(new JRibbonComponent((JComponent) o));
+                    cnt++;
+                }                
             }
             if (cnt > 0) {
                 if (parts.length != 3) {
@@ -747,7 +740,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                             try {
                                 ribbon.setVisible(rg, val);
                             } catch (Exception ex) {
-
+                                //ignored
                             }
                         }
                     });

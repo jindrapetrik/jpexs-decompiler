@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -253,9 +252,8 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public String toString() {
         return getName() + " (" + virtualCharacterId + ")";
     }
-    
+
     //getNeededCharacters intentionally not defined
-    
     @Override
     public void setSoundSize(boolean soundSize) {
         this.streamSoundSize = soundSize;
@@ -275,9 +273,9 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public void setSoundCompression(int soundCompression) {
         this.streamSoundCompression = soundCompression;
     }
-    
+
     @Override
     public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
-    }       
+    }
 }

@@ -76,7 +76,7 @@ public class ImageHelper {
             g.fillRect(0, 0, 1, 1);
             return img;
         }
-        
+
         int type = in.getType();
         if (type != BufferedImage.TYPE_INT_ARGB_PRE && type != BufferedImage.TYPE_INT_RGB) {
             // convert to ARGB
@@ -207,6 +207,7 @@ public class ImageHelper {
                 }
             }
         } catch (IOException ex) {
+            //ignored
         }
 
         BufferedImage image = read(input);

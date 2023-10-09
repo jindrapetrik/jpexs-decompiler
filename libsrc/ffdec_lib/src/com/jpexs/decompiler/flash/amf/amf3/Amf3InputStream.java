@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 
 public class Amf3InputStream extends InputStream {
 
-    public final static Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());
     private final MemoryInputStream is;
     public DumpInfo dumpInfo;
     private static final String NO_REFERENCE_BIT_TEXT = "not reference";

@@ -227,11 +227,11 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
                                 hasBeenExpanded = tree.hasBeenExpanded(path);
                             }
                             bounds = getPathBounds(path, insets, boundsBuffer);
-                            if (bounds == null) // This will only happen if the model changes out
-                            // from under us (usually in another thread).
-                            // Swing isn't multithreaded, but I'll put this
-                            // check in anyway.
-                            {
+                            if (bounds == null) {
+                                // This will only happen if the model changes out
+                                // from under us (usually in another thread).
+                                // Swing isn't multithreaded, but I'll put this
+                                // check in anyway.                            
                                 return;
                             }
                             // See if the vertical line to the parent has been drawn.

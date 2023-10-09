@@ -35,10 +35,10 @@ public class IggyDeclStrings implements StructureInterface {
     //@IggyFieldType(DataType.uint32_t)
     //long size;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 3)
-    byte xxx[];
+    byte[] xxx;
     @IggyArrayFieldType(value = DataType.uint8_t, countField = "size")
-    byte data[];
-    byte padd[];
+    byte[] data;
+    byte[] padd;
     @IggyFieldType(DataType.uint64_t)
     long one2;
     @IggyFieldType(DataType.uint64_t)

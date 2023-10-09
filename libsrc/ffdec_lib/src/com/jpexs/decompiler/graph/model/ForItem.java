@@ -81,7 +81,6 @@ public class ForItem extends LoopItem implements Block {
         visitor.visit(expression);
     }
 
-
     public ForItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop);
         this.firstCommands = firstCommands;

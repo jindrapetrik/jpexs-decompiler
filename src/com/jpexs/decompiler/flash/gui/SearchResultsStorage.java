@@ -77,9 +77,9 @@ public class SearchResultsStorage {
         Openable s = swf;
         String binaryDataSuffix = "";
 
-        while ((s instanceof SWF) && ((SWF)s).binaryData != null) {
-            binaryDataSuffix += "|binaryData[" + ((SWF)s).binaryData.getCharacterId() + "]";
-            s = ((SWF)s).binaryData.getSwf();
+        while ((s instanceof SWF) && ((SWF) s).binaryData != null) {
+            binaryDataSuffix += "|binaryData[" + ((SWF) s).binaryData.getCharacterId() + "]";
+            s = ((SWF) s).binaryData.getSwf();
         }
 
         if (s.getOpenableList() != null) {
@@ -195,8 +195,7 @@ public class SearchResultsStorage {
     public void load() throws IOException {
         String configFile = getConfigFile();
         if (new File(configFile).exists()) {
-            try (FileInputStream fis = new FileInputStream(configFile);
-                    ObjectInputStream ois = new ObjectInputStream(fis)) {
+            try (FileInputStream fis = new FileInputStream(configFile); ObjectInputStream ois = new ObjectInputStream(fis)) {
                 int major = ois.read();
                 ois.read(); // minor
                 if (major != SERIAL_VERSION_MAJOR) { //incompatible version
@@ -228,8 +227,7 @@ public class SearchResultsStorage {
 
     public void save() throws IOException {
         String configFile = getConfigFile();
-        try (FileOutputStream fos = new FileOutputStream(configFile);
-                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+        try (FileOutputStream fos = new FileOutputStream(configFile); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.write(SERIAL_VERSION_MAJOR);
             oos.write(SERIAL_VERSION_MINOR);
             oos.writeObject(openableIds);
@@ -332,7 +330,7 @@ public class SearchResultsStorage {
         int cnt = ois.readInt();
         for (int i = 0; i < cnt; i++) {
             int len = ois.readInt();
-            byte buf[] = new byte[len];
+            byte[] buf = new byte[len];
             ois.readFully(buf);
             ret.add(buf);
         }

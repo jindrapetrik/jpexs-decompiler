@@ -569,6 +569,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
             try {
                 port = Integer.parseInt(portField.getText());
             } catch (NumberFormatException nfe) {
+                //ignored
             }
             if ((port <= 0) || (port > 65535)) {
                 ViewMessages.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -715,29 +716,13 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
                     r.urlPattern
                 });
             } catch (IOException e) {
+                //ignored
             }
         }
 
         return result;
     }
-
-    /**
-     * Shows or hides this {@code Window} depending on the value of parameter
-     * {@code b}.
-     *
-     * @param b if {@code true}, makes the {@code Window} visible, otherwise
-     * hides the {@code Window}. If the {@code Window} and/or its owner are not
-     * yet displayable, both are made displayable. The {@code Window} will be
-     * validated prior to being made visible. If the {@code Window} is already
-     * visible, this will bring the {@code Window} to the front.<p>
-     * If {@code false}, hides this {@code Window}, its subcomponents, and all
-     * of its owned children. The {@code Window} and its subcomponents can be
-     * made visible again with a call to {@code #setVisible(true)}.
-     * @see java.awt.Component#isDisplayable
-     * @see java.awt.Component#setVisible
-     * @see java.awt.Window#toFront
-     * @see java.awt.Window#dispose
-     */
+    
     @Override
     public void setVisible(boolean b) {
         if (b == true) {

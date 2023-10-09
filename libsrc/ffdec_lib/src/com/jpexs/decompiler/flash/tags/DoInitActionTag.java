@@ -42,8 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -155,9 +153,9 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(),this, actions, getScriptName(), writer, getCharset());
+        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, getCharset());
     }
-    
+
     @Override
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         if (actions == null) {
@@ -279,12 +277,12 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public Tag getTag() {
         return null; //?
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(spriteId);
-    }   
-    
+    }
+
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {

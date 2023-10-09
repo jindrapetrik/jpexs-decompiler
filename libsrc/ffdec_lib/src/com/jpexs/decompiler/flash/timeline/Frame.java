@@ -60,7 +60,7 @@ public class Frame implements TreeItem, Exportable {
     public List<ASMSourceContainer> actionContainers = new ArrayList<>();
 
     public List<Tag> innerTags = new ArrayList<>();
-    
+
     public List<Tag> allInnerTags = new ArrayList<>();
 
     public ShowFrameTag showFrameTag = null; // can be null for the last frame
@@ -98,7 +98,7 @@ public class Frame implements TreeItem, Exportable {
         List<String> labels = new ArrayList<>();
         for (Tag t : innerTags) {
             if (t instanceof FrameLabelTag) {
-                labels.add(((FrameLabelTag)t).name);
+                labels.add(((FrameLabelTag) t).name);
             }
         }
         if (!labels.isEmpty()) {
@@ -132,10 +132,10 @@ public class Frame implements TreeItem, Exportable {
             if (t.isModified() && !t.isReadOnly()) {
                 return true;
             }
-        }        
+        }
         return false;
     }
-    
+
     @Override
     public boolean isModified() {
         for (Tag t : innerTags) {
@@ -161,8 +161,8 @@ public class Frame implements TreeItem, Exportable {
 
     public void getNeededCharacters(Set<Integer> needed) {
         for (Tag t : innerTags) {
-            if(t instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag place = (PlaceObjectTypeTag)t;                
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
                 int characterId = place.getCharacterId();
                 if (characterId != -1) {
                     needed.add(characterId);
@@ -170,12 +170,12 @@ public class Frame implements TreeItem, Exportable {
             }
         }
     }
-    
+
     public void getNeededCharactersDeep(Set<Integer> needed) {
         for (Tag t : innerTags) {
-            if(t instanceof PlaceObjectTypeTag) {  
-                PlaceObjectTypeTag place = (PlaceObjectTypeTag)t;                
-                int characterId = ((PlaceObjectTypeTag)t).getCharacterId();
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
+                int characterId = ((PlaceObjectTypeTag) t).getCharacterId();
                 if (characterId != -1) {
                     CharacterTag character = place.getSwf().getCharacter(characterId);
                     if (character != null) {

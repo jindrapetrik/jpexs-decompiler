@@ -40,7 +40,7 @@ public class IggyText implements StructureInterface {
     @IggyFieldType(DataType.uint16_t)
     int textIndex;
     @IggyArrayFieldType(value = DataType.uint8_t, count = 28)
-    byte zeroone[];
+    byte[] zeroone;
     @IggyFieldType(DataType.float_t)
     float par1;
     @IggyFieldType(DataType.float_t)

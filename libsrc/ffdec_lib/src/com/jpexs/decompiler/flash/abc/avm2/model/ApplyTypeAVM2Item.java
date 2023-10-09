@@ -114,7 +114,7 @@ public class ApplyTypeAVM2Item extends AVM2Item {
         //int qname = AVM2SourceGenerator.resolveType(localData, object, ((AVM2SourceGenerator)generator).abc, ((AVM2SourceGenerator)generator).allABCs);
         List<GraphSourceItem> nparams = new ArrayList<>();
         for (GraphTargetItem i : params) {
-            nparams.addAll(i.toSource(localData, generator));//ins(AVM2Instructions.GetLex, AVM2SourceGenerator.resolveType(localData, i, ((AVM2SourceGenerator)generator).abc,((AVM2SourceGenerator)generator).allABCs)));
+            nparams.addAll(i.toSource(localData, generator));
         }
         return toSourceMerge(localData, generator,
                 object,
@@ -140,7 +140,5 @@ public class ApplyTypeAVM2Item extends AVM2Item {
         }
         return ret;
     }
-    
-    
 
 }

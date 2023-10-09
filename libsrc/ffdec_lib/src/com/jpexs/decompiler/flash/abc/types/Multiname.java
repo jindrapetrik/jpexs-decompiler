@@ -26,7 +26,6 @@ import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -170,8 +169,8 @@ public class Multiname {
         }
         Multiname m = constants.getMultiname(name_index);
         if (m != null) {
-            
-            boolean cyclic = checkCyclicTypeNameSub(constants, name_index, visited);                               
+
+            boolean cyclic = checkCyclicTypeNameSub(constants, name_index, visited);
             if (!m.cyclic && cyclic) {
                 Logger.getLogger(AbcIndexing.class.getName()).log(Level.WARNING, "Recursive typename detected");
             }
@@ -277,22 +276,7 @@ public class Multiname {
             }
         }
         return kindStr;
-    }
-
-    @Override
-    public String toString() {
-        String kindStr = getKindStr();
-        StringBuilder sb = new StringBuilder();
-        sb.append("kind=").append(kindStr);
-        sb.append(" name_index=").append(name_index);
-        sb.append(" namespace_index=").append(namespace_index);
-        sb.append(" namespace_set_index=").append(namespace_set_index);
-        sb.append(" qname_index=").append(qname_index);
-        sb.append(" params_size:");
-        sb.append(params == null ? "null" : params.length);
-        return sb.toString();
-
-    }
+    }    
 
     public static String namespaceToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
@@ -353,6 +337,21 @@ public class Multiname {
             return "null";
         }
         return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
+    }
+    
+    @Override
+    public String toString() {
+        String kindStr = getKindStr();
+        StringBuilder sb = new StringBuilder();
+        sb.append("kind=").append(kindStr);
+        sb.append(" name_index=").append(name_index);
+        sb.append(" namespace_index=").append(namespace_index);
+        sb.append(" namespace_set_index=").append(namespace_set_index);
+        sb.append(" qname_index=").append(qname_index);
+        sb.append(" params_size:");
+        sb.append(params == null ? "null" : params.length);
+        return sb.toString();
+
     }
 
     public String toString(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
@@ -707,5 +706,5 @@ public class Multiname {
 
     public boolean isCyclic() {
         return cyclic;
-    }        
+    }
 }

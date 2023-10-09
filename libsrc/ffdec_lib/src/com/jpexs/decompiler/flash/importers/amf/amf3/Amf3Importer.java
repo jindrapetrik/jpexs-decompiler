@@ -164,11 +164,7 @@ public class Amf3Importer {
 
         public JsObject getJsObject(Object key) throws Amf3ParseException {
             return (JsObject) getRequired(key, "JsObject");
-        }
-
-        public JsArray getJsArray(Object key) throws Amf3ParseException {
-            return (JsArray) getRequired(key, "JsArray");
-        }
+        }      
 
         public List<Object> getJsArrayOfObject(Object key) throws Amf3ParseException {
             return getJsArray(key).getValues();
@@ -193,6 +189,10 @@ public class Amf3Importer {
         @SuppressWarnings("unchecked")
         public List<Double> getJsArrayOfNumber(Object key) throws Amf3ParseException {
             return (List<Double>) getJsArray(key, "Number");
+        }
+        
+        public JsArray getJsArray(Object key) throws Amf3ParseException {
+            return (JsArray) getRequired(key, "JsArray");
         }
 
         public List getJsArray(Object key, String valueType) throws Amf3ParseException {

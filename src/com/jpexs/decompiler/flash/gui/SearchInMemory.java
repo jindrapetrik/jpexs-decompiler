@@ -63,7 +63,7 @@ public class SearchInMemory {
 
                 @Override
                 public void status(String status) {
-             
+
                 }
             }, "CWS".getBytes(), "FWS".getBytes(), "ZWS".getBytes());
             int pos = 0;
@@ -86,6 +86,7 @@ public class SearchInMemory {
                 } catch (OutOfMemoryError ome) {
                     Helper.freeMem();
                 } catch (Exception | Error ex) {
+                    //ignored
                 }
 
             }

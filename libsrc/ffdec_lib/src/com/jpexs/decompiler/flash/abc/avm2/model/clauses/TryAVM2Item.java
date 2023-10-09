@@ -94,7 +94,6 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     }
 
-
     public TryAVM2Item(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands, String finCatchName) {
         super(null, null, NOPRECEDENCE);
         this.tryCommands = tryCommands;

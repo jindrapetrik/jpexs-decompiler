@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2023 JPEXS
- *
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *
+ * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *
+ * 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -91,9 +91,6 @@ import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
-import com.jpexs.decompiler.flash.flv.FLVInputStream;
-import com.jpexs.decompiler.flash.flv.FLVTAG;
-import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
@@ -144,11 +141,8 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
-import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -157,17 +151,14 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -203,7 +194,6 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
@@ -252,14 +242,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -267,7 +254,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -284,7 +270,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
@@ -1737,6 +1722,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             Main.openFile(sourceInfos, null);
                         }
                     } catch (UnsupportedFlavorException | IOException ex) {
+                        //ignored
                     }
                 }
             });
@@ -1788,7 +1774,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        TreePath selectionPaths[] = tree.getSelectionPaths();
+        TreePath[] selectionPaths = tree.getSelectionPaths();
         tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel(), tree));
         if (!isFilterEmpty(newFilter)) {
             for (int i = 0; i < tree.getRowCount(); i++) {
@@ -2451,14 +2437,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             public void run() {
                 if (abcPanel != null) {
-                    abcPanel.decompiledTextArea.removeScriptListener(this);                    
-                     abcPanel.decompiledTextArea.gotoMethod(methodIndex);          
+                    abcPanel.decompiledTextArea.removeScriptListener(this);
+                    abcPanel.decompiledTextArea.gotoMethod(methodIndex);
                 }
-            }            
+            }
         });
-        gotoScriptName(swf, scriptName);        
+        gotoScriptName(swf, scriptName);
     }
-    
+
     public void gotoScriptTrait(SWF swf, String scriptName, int classIndex, int traitIndex) {
         abcPanel.decompiledTextArea.addScriptListener(new Runnable() {
             @Override
@@ -2470,11 +2456,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                     if (traitIndex != -10) {
                         abcPanel.decompiledTextArea.gotoTrait(traitIndex);
-                    }            
+                    }
                 }
-            }            
+            }
         });
-        gotoScriptName(swf, scriptName);        
+        gotoScriptName(swf, scriptName);
     }
 
     public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
@@ -2570,7 +2556,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        String documentClass = swf.getDocumentClass();        
+        String documentClass = swf.getDocumentClass();
         if (documentClass != null && currentView != VIEW_DUMP) {
             String documentClassPrintable = DottedChain.parseNoSuffix(documentClass).toPrintableString(true);
             List<ABCContainerTag> abcList = swf.getAbcList();
@@ -3162,10 +3148,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         boolean isAS3 = swf.isAS3();
         Map<FileFilter, String> filterToVersion = new HashMap<>();
         Map<FileFilter, Boolean> filterToCompressed = new HashMap<>();
-        
+
         FLAVersion lastVersion = FLAVersion.fromString(Configuration.lastFlaExportVersion.get("CS6"));
         boolean lastCompressed = Configuration.lastFlaExportCompressed.get(true);
-        
+
         for (int i = FLAVersion.values().length - 1; i >= 0; i--) {
             final FLAVersion v = FLAVersion.values()[i];
             if (!isAS3 && v.minASVersion() > 2) {
@@ -3202,9 +3188,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         return translate("filter.xfl").replace("%version%", v.applicationName());
                     }
                 };
-                filterToVersion.put(f, "" + v);                
+                filterToVersion.put(f, "" + v);
                 filterToCompressed.put(f, false);
-                
+
                 if (v == lastVersion && !lastCompressed) {
                     fc.setFileFilter(f);
                 } else {
@@ -3389,7 +3375,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }.execute();
         }
     }
-    
+
     public void importSprite(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSprites"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSpriteInfo);
         JFileChooser chooser = new JFileChooser();
@@ -3405,7 +3391,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             final File fSpritesDir = spritesDir;
             SpriteImporter spriteImporter = new SpriteImporter();
-            
+
             final long timeBefore = System.currentTimeMillis();
             new CancellableWorker<Void>() {
 
@@ -3416,7 +3402,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         count = spriteImporter.bulkImport(fSpritesDir, swf, false);
                         swf.clearImageCache();
-                        swf.clearShapeCache();                        
+                        swf.clearShapeCache();
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Error during import", ex);
                         ViewMessages.showMessageDialog(null, translate("error.import") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
@@ -4171,10 +4157,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void refreshTree() {
-        refreshTree(new SWF[0]);
-    }
-
     public void treeOperation(Runnable runnable) {
         TreeItem treeItem = getCurrentTree().getCurrentTreeItem();
         tagTree.clearSelection();
@@ -4204,6 +4186,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         reload(true);
         pinsPanel.refresh();
+    }
+    
+    public void refreshTree() {
+        refreshTree(new SWF[0]);
     }
 
     public void refreshTree(Openable openable) {
@@ -4507,12 +4493,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             File selectedFile = showImportFileChooser(filter, false);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
-                DefineSpriteTag sprite = (DefineSpriteTag)item;
+                DefineSpriteTag sprite = (DefineSpriteTag) item;
                 SWF swf = sprite.getSwf();
-                try(FileInputStream fis = new FileInputStream(selfile)){
+                try (FileInputStream fis = new FileInputStream(selfile)) {
                     SpriteImporter spriteImporter = new SpriteImporter();
-                    spriteImporter.importSprite((DefineSpriteTag)item, fis);
-                    
+                    spriteImporter.importSprite((DefineSpriteTag) item, fis);
+
                     swf.clearImageCache();
                     swf.clearShapeCache();
                 } catch (IOException ex) {
@@ -4524,7 +4510,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
     }
-    
+
     public void replaceNoFillButtonActionPerformed(TreeItem item) {
         if (item == null) {
             return;
@@ -5065,16 +5051,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                            byte data[] = binaryDataTag.binaryData.getRangeData();
+                            byte[] data = binaryDataTag.binaryData.getRangeData();
                             String packerAdd = "";
                             if (binaryDataTag.usedPacker != null) {
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 binaryDataTag.usedPacker.decrypt(new ByteArrayInputStream(data), baos);
                                 data = baos.toByteArray();
                                 packerAdd = " - " + binaryDataTag.usedPacker.getName();
                             }
                             InputStream is = new ByteArrayInputStream(data);
-                            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd +")", new ProgressListener() {
+                            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
@@ -5135,13 +5121,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
             } else {
                 previewPanel.setParametersPanelVisible(false);
-                //if (flashPanel != null) { //same for flashPanel2
                 previewPanel.showFlashViewerPanel();
                 previewPanel.showSwf(swf);
-
-                //}
             }
-        } else if ((treeItem instanceof PlaceObjectTypeTag)) {// && (previewPanel != dumpPreviewPanel)) {
+        } else if ((treeItem instanceof PlaceObjectTypeTag)) {
             previewPanel.showDisplayEditTagPanel((PlaceObjectTypeTag) treeItem, frame);
         } else if (treeItem instanceof ShapeTag) {
             previewPanel.showDisplayEditTagPanel((ShapeTag) treeItem, 0);
@@ -5354,7 +5337,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if ((treeItem instanceof AS3Package) && ((AS3Package) treeItem).isCompoundScript()) {
             final ScriptPack scriptLeaf = ((AS3Package) treeItem).getCompoundInitializerPack();
-            if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {            
+            if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {
                 ABCPanel abcPanel = getABCPanel();
                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
                 abcPanel.setAbc(scriptLeaf.abc);
@@ -5682,10 +5665,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         statusPanel.setErrorState(errorState);
     }
 
-    public static Timelined makeTimelined(final Tag tag) {
-        return makeTimelined(tag, -1);
-    }
-
     public static SWF makeTimelinedImage(ImageTag imageTag) {
         SWF swf = new SWF();
         swf.gfx = imageTag.getSwf().gfx;
@@ -5737,7 +5716,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             SHAPEWITHSTYLE shapeData = new SHAPEWITHSTYLE();
             FILLSTYLEARRAY fillStyleArray = new FILLSTYLEARRAY();
-            FILLSTYLE fillStyles[] = new FILLSTYLE[1];
+            FILLSTYLE[] fillStyles = new FILLSTYLE[1];
             FILLSTYLE fillStyle = new FILLSTYLE();
             fillStyle.bitmapId = imageCharId;
             fillStyle.inShape3 = false;
@@ -5812,6 +5791,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             //ignore
         }
         return swf;
+    }
+
+    public static Timelined makeTimelined(final Tag tag) {
+        return makeTimelined(tag, -1);
     }
 
     public static Timelined makeTimelined(final Tag tag, final int fontFrameNum) {
@@ -5976,6 +5959,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         setDropTarget(null);
         disposeInner(this);
         Helper.emptyObject(this);
+    }   
+
+    public void updateMissingNeededCharacters() {
+        if (calculateMissingNeededThread != null) {
+            calculateMissingNeededThread.recalculate();
+        }
     }
 
     private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> neededMap, Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
@@ -6020,13 +6009,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }*/
         }
     }
-
-    public void updateMissingNeededCharacters() {
-        if (calculateMissingNeededThread != null) {
-            calculateMissingNeededThread.recalculate();
-        }
-    }
-
+    
     private void calculateMissingNeededCharacters() {
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
         Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
@@ -6134,7 +6117,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             abcExplorerDialogs.remove(dialog);
         }
     }
-    
+
     public ABCExplorerDialog showAbcExplorer(Openable openable, ABC abc) {
         ABCExplorerDialog dialog = abcExplorerDialogs.get(openable);
         if (dialog != null) {

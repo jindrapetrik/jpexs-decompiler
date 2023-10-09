@@ -101,17 +101,6 @@ public final class Matrix implements Cloneable {
         }
     }
 
-    public Point transform(double x, double y) {
-        Point result = new Point(
-                scaleX * x + rotateSkew1 * y + translateX,
-                rotateSkew0 * x + scaleY * y + translateY);
-        return result;
-    }
-
-    public Point transform(Point point) {
-        return transform(point.x, point.y);
-    }
-
     public Point deltaTransform(double x, double y) {
         Point result = new Point(
                 scaleX * x + rotateSkew1 * y,
@@ -126,6 +115,18 @@ public final class Matrix implements Cloneable {
     public java.awt.Point deltaTransform(java.awt.Point point) {
         Point p = deltaTransform(point.x, point.y);
         return new java.awt.Point((int) p.x, (int) p.y);
+    }
+
+    
+    public Point transform(double x, double y) {
+        Point result = new Point(
+                scaleX * x + rotateSkew1 * y + translateX,
+                rotateSkew0 * x + scaleY * y + translateY);
+        return result;
+    }
+
+    public Point transform(Point point) {
+        return transform(point.x, point.y);
     }
 
     public java.awt.Point transform(java.awt.Point point) {

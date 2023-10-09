@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -32,7 +31,7 @@ public interface SoundTag extends TreeItem {
     public SoundExportFormat getExportFormat();
 
     public boolean importSupported();
-    
+
     public int getSoundRate();
 
     public boolean getSoundType();
@@ -48,7 +47,7 @@ public interface SoundTag extends TreeItem {
     public String getCharacterExportFileName();
 
     public SoundFormat getSoundFormat();
-    
+
     public void setSoundSize(boolean soundSize);
 
     public void setSoundType(boolean soundType);
@@ -58,6 +57,6 @@ public interface SoundTag extends TreeItem {
     public void setSoundCompression(int soundCompression);
 
     public void setSoundRate(int soundRate);
-    
+
     public int getCharacterId();
 }

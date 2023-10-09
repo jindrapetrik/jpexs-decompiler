@@ -88,7 +88,7 @@ public class FirstInstance {
                                                     Main.openFile(fileNames[i], null);
                                                 }
                                             });
-                                        //no break - focus too
+                                        //fallthrough
                                         case "focus":
 
                                             View.execInEventDispatch(new Runnable() {

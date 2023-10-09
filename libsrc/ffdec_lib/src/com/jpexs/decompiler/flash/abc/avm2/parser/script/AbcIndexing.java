@@ -47,8 +47,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Indexing of ABCs for faster access. Indexes ABC classes for faster class and
@@ -161,7 +159,7 @@ public final class AbcIndexing {
             int builtInIndex = -1;
             if (abc != null) {
                 Integer builtInNs = builtInNsPerAbc.get(abc);
-                
+
                 if (builtInNs == null) {
                     builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
                     builtInNsPerAbc.put(abc, builtInIndex);
@@ -324,16 +322,17 @@ public final class AbcIndexing {
     }
 
     private static class ClassDef {
+
         public GraphTargetItem type;
         public DottedChain pkg;
 
         private GraphTargetItem noNsType(GraphTargetItem type) {
-            TypeItem ti = (TypeItem)type;
-            ti = (TypeItem)ti.clone();
+            TypeItem ti = (TypeItem) type;
+            ti = (TypeItem) ti.clone();
             ti.ns = null;
             return ti;
         }
-        
+
         public ClassDef(GraphTargetItem type, ABC abc, Integer scriptIndex) {
             this.type = type;
             if (scriptIndex != null) {
@@ -433,7 +432,7 @@ public final class AbcIndexing {
     }
 
     private Map<DottedChain, Set<String>> pkgToObjectsName = new LinkedHashMap<>();
-    
+
     private final Map<ClassDef, ClassIndex> classes = new HashMap<>();
 
     private final Map<PropertyDef, TraitIndex> instanceProperties = new HashMap<>();
@@ -445,26 +444,26 @@ public final class AbcIndexing {
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
-    
+
     public void rebuildPkgToObjectsNameMap() {
         pkgToObjectsName.clear();
-        for (ClassDef cd:classes.keySet()) {
+        for (ClassDef cd : classes.keySet()) {
             if (!(cd.type instanceof TypeItem)) {
                 continue;
             }
             if (!pkgToObjectsName.containsKey(cd.pkg)) {
                 pkgToObjectsName.put(cd.pkg, new LinkedHashSet<>());
-            }            
-            pkgToObjectsName.get(cd.pkg).add(((TypeItem)cd.type).fullTypeName.getLast());
+            }
+            pkgToObjectsName.get(cd.pkg).add(((TypeItem) cd.type).fullTypeName.getLast());
         }
-        for (PropertyNsDef nsdef:scriptProperties.keySet()) {
+        for (PropertyNsDef nsdef : scriptProperties.keySet()) {
             if (!pkgToObjectsName.containsKey(nsdef.ns)) {
                 pkgToObjectsName.put(nsdef.ns, new LinkedHashSet<>());
             }
             pkgToObjectsName.get(nsdef.ns).add(nsdef.propName);
         }
     }
-    
+
     public Set<String> getPackageObjects(DottedChain pkg) {
         Set<String> classNames = new LinkedHashSet<>();
         if (pkgToObjectsName.containsKey(pkg)) {
@@ -584,7 +583,7 @@ public final class AbcIndexing {
                 if (ret != null) {
                     return ret;
                 }
-            }            
+            }
         }
 
         //now search instance
@@ -842,7 +841,7 @@ public final class AbcIndexing {
             }
         }
         abcs.add(abc);
-        selectedAbc = abc;        
+        selectedAbc = abc;
     }
 
     public void selectAbc(ABC abc) {
@@ -870,7 +869,7 @@ public final class AbcIndexing {
         }
         return null;
     }
-    
+
     public boolean isInstanceOf(ABC abc, int classIndex, DottedChain searchClassName) {
         DottedChain clsName = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
         if (searchClassName.equals(clsName)) {

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -103,20 +102,19 @@ public class AddAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
         if (leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.INT)) {
             return TypeItem.INT;
         }
-        
-        if ((leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.UINT))||
-            (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.INT))
-                ) {
+
+        if ((leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.UINT))
+                || (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.INT))) {
             return TypeItem.INT;
-        }                
-        
+        }
+
         if (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.UINT)) {
             return TypeItem.UINT;
         }
-                
+
         if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
             return TypeItem.NUMBER;
-        }                
+        }
         return TypeItem.NUMBER;
     }
 

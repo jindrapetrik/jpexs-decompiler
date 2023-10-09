@@ -21,14 +21,15 @@ package com.jpexs.decompiler.flash.tags.base;
  * @author JPEXS
  */
 public class UnsupportedSamplingRateException extends SoundImportException {
-    private final int soundRate; 
+
+    private final int soundRate;
     private final int[] supportedRates;
 
     public UnsupportedSamplingRateException(int soundRate, int[] supportedRates) {
         super("Unsupported sound rate: " + soundRate);
-        this.soundRate = soundRate;        
+        this.soundRate = soundRate;
         this.supportedRates = supportedRates;
-    }    
+    }
 
     public int[] getSupportedRates() {
         return supportedRates;
@@ -36,6 +37,6 @@ public class UnsupportedSamplingRateException extends SoundImportException {
 
     public int getSoundRate() {
         return soundRate;
-    }            
-        
+    }
+
 }

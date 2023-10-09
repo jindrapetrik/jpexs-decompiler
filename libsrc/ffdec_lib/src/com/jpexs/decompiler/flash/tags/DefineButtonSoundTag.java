@@ -157,7 +157,7 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
         }
         needed.add(buttonId);
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + " (" + buttonId + ")";

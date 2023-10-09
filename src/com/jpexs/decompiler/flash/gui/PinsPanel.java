@@ -86,7 +86,7 @@ public class PinsPanel extends JPanel {
             }
 
             String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
-            
+
             missingTagTreePaths.add(tagTreePath);
             missingTagListPaths.add(tagListPath);
             missingScrollPos.add(scrollPos);
@@ -104,8 +104,7 @@ public class PinsPanel extends JPanel {
         if (item instanceof TagScript) {
             itemNoTs = ((TagScript) item).getTag();
         }
-        
-        
+
         for (int i = 0; i < items.size(); i++) {
             TreeItem item2 = items.get(i);
             TreeItem item2NoTs = item2;
@@ -141,7 +140,6 @@ public class PinsPanel extends JPanel {
 
         rebuild();
     }
-    
 
     private void rebuild() {
         removeAll();
@@ -269,9 +267,9 @@ public class PinsPanel extends JPanel {
             if (tagListPath == null) {
                 tagListPath = "";
             }
-            
+
             String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
-            
+
             if (!first) {
                 tagTreePathsBuilder.append(PATHS_SEPARATOR);
                 tagListPathsBuilder.append(PATHS_SEPARATOR);
@@ -298,7 +296,7 @@ public class PinsPanel extends JPanel {
         String tagTreePathsCombined = Configuration.pinnedItemsTagTreePaths.get() + PATHS_SEPARATOR + PATHS_END;
         String tagListPathsCombined = Configuration.pinnedItemsTagListPaths.get() + PATHS_SEPARATOR + PATHS_END;
         String scrollPosCombined = Configuration.pinnedItemsScrollPos.get() + PATHS_SEPARATOR + PATHS_END;
-        
+
         String[] tagTreePaths = tagTreePathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
         String[] tagListPaths = tagListPathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
         String[] scrollPoses = scrollPosCombined.split(Pattern.quote(PATHS_SEPARATOR));
@@ -317,7 +315,7 @@ public class PinsPanel extends JPanel {
             if (!Configuration.pinnedItemsScrollPos.get().isEmpty()) {
                 scrollPosStr = scrollPoses[i];
             }
-            
+
             if (item != null && !(item instanceof TreeRoot)) {
                 items.add(item);
                 mainPanel.scrollPosStorage.setSerializedScrollPos(item, scrollPosStr);
@@ -349,7 +347,7 @@ public class PinsPanel extends JPanel {
                 if (tagListPath == null) {
                     tagListPath = "";
                 }
-                
+
                 String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
 
                 missingTagTreePaths.add(tagTreePath);
@@ -364,14 +362,14 @@ public class PinsPanel extends JPanel {
     }
 
     public void replaceItem(TreeItem oldItem, TreeItem newItem) {
-        
+
         TreeItem oldItemNoTs = oldItem;
         if (oldItem instanceof TagScript) {
             oldItemNoTs = ((TagScript) oldItem).getTag();
         }
-        
+
         for (int i = 0; i < items.size(); i++) {
-            TreeItem item2NoTs = items.get(i);            
+            TreeItem item2NoTs = items.get(i);
             if (item2NoTs instanceof TagScript) {
                 item2NoTs = ((TagScript) item2NoTs).getTag();
             }
@@ -389,7 +387,7 @@ public class PinsPanel extends JPanel {
         rebuild();
         save();
     }
-    
+
     public void pin(TreeItem item) {
         if (!isPinned(item)) {
             items.add(item);
@@ -397,11 +395,11 @@ public class PinsPanel extends JPanel {
             save();
         }
     }
-    
+
     public int getPinCount() {
         return items.size();
     }
-    
+
     public boolean isPinned(TreeItem item) {
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
@@ -418,7 +416,7 @@ public class PinsPanel extends JPanel {
         }
         return false;
     }
-    
+
     public void removeItem(TreeItem item) {
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
@@ -431,7 +429,7 @@ public class PinsPanel extends JPanel {
             }
             if (item2 == item) {
                 items.remove(i);
-                rebuild();                
+                rebuild();
                 break;
             }
         }

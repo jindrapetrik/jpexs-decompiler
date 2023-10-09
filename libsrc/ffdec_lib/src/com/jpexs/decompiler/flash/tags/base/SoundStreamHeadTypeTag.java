@@ -37,6 +37,6 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
     public abstract long getSoundSampleCount();
 
-    public abstract List<SoundStreamBlockTag> getBlocks();       
+    public abstract List<SoundStreamBlockTag> getBlocks();
 
 }

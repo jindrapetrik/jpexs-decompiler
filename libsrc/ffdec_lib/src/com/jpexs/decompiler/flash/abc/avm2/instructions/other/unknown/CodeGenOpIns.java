@@ -29,7 +29,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  *
  * @author JPEXS
  *
- * source: https://github.com/apache/flex-sdk/blob/414b9a3e55effd243a697e614b702d1fa0b53efe/modules/asc/src/java/macromedia/abc/Opcodes.java
+ * source:
+ * https://github.com/apache/flex-sdk/blob/414b9a3e55effd243a697e614b702d1fa0b53efe/modules/asc/src/java/macromedia/abc/Opcodes.java
  */
 public class CodeGenOpIns extends InstructionDefinition {
 

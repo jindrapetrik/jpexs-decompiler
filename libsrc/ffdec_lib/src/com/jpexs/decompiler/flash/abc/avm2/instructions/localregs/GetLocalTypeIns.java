@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
@@ -75,7 +74,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             if (localData.classIndex == -1) {
                 stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.parseNoSuffix("global"), false, false));
                 return;
-            }            
+            }
             if ((localData.classIndex >= localData.getInstanceInfo().size())) {
                 stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.OBJECT /*?*/, false, false));
                 return;
@@ -137,8 +136,8 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 } else if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
                     if (setLocal.regIndex == regId) {
-                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());                    
-                        if (localData.getSetLocalUsages(setLocalIp).size() == 1) {                    
+                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());
+                        if (localData.getSetLocalUsages(setLocalIp).size() == 1) {
                             if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
                                 setItem.value.value = setLocal.value;
                             } else {

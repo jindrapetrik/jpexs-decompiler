@@ -70,7 +70,6 @@ public class CommaExpressionItem extends GraphTargetItem {
         return generator.generate(localData, this, false);
     }
 
-
     @Override
     public boolean hasReturnValue() {
         return false;

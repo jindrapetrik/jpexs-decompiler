@@ -90,12 +90,12 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.fontId = characterId;
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + " (" + fontId + ")";
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontId);

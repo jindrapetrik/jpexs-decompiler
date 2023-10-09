@@ -96,8 +96,6 @@ public class TryActionItem extends ActionItem implements Block {
 
     }
 
-
-
     public TryActionItem(List<GraphTargetItem> tryCommands, List<GraphTargetItem> catchExceptionNames, List<GraphTargetItem> catchExceptionTypes, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
         super(null, null, NOPRECEDENCE);
         this.tryCommands = tryCommands;

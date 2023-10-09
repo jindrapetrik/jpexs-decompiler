@@ -80,7 +80,7 @@ public class ModuloAVM2Item extends BinaryOpItem implements CompoundableBinaryOp
     }
 
     @Override
-    public GraphTargetItem returnType() {        
+    public GraphTargetItem returnType() {
         return TypeItem.NUMBER;
     }
 

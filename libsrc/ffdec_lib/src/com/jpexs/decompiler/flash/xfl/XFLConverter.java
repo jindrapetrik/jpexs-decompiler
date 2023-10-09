@@ -16,12 +16,6 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
-import com.jpexs.debugger.flash.GetVariableFlag;
-import com.jpexs.helpers.XmlPrettyFormat;
-import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
-import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
-import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
-import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
@@ -36,12 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptLexer;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.ParsedSymbol;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolGroup;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -52,7 +41,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -150,14 +138,17 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.awt.Point;
@@ -182,8 +173,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -198,7 +187,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -239,7 +227,6 @@ public class XFLConverter {
      */
     private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 
-    
     private static String formatEdgeDouble(double value, boolean curved) {
         if (value % 1 == 0) {
             return "" + (int) value;
@@ -247,14 +234,14 @@ public class XFLConverter {
         DecimalFormat df = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
         df.setGroupingUsed(false);
         String strValue = "" + df.format(value);
-            
+
         if (curved) {
-            String parts[] = strValue.split("\\.");                        
+            String[] parts = strValue.split("\\.");
             return ("#" + Integer.toHexString(Integer.parseInt(parts[0])) + "." + Integer.toHexString(Integer.parseInt(parts[1]))).toUpperCase(Locale.ENGLISH);
         }
         return "" + strValue;
     }
-    
+
     private static void convertShapeEdge(MATRIX mat, ShapeRecordAdvanced record, double x, double y, StringBuilder ret) {
         if (record instanceof StyleChangeRecordAdvanced) {
             StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) record;
@@ -283,8 +270,8 @@ public class XFLConverter {
         }
     }
 
-    private static void convertShapeEdges(boolean close, double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {                        
-        
+    private static void convertShapeEdges(boolean close, double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {
+
         double x = startX;
         double y = startY;
         boolean hasMove = false;
@@ -300,14 +287,14 @@ public class XFLConverter {
             ret.append("! ").append(formatEdgeDouble(startX, false)).append(" ").append(formatEdgeDouble(startY, false));
         }
         double lastMoveToX = startX;
-        double lastMoveToY = startY; 
-        
+        double lastMoveToY = startY;
+
         for (ShapeRecordAdvanced rec : recordsAdvanced) {
             if (rec instanceof StyleChangeRecordAdvanced) {
-                StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced)rec;
+                StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) rec;
                 if (scr.stateMoveTo) {
-                   lastMoveToX = scr.moveDeltaX;
-                   lastMoveToY = scr.moveDeltaY;
+                    lastMoveToX = scr.moveDeltaX;
+                    lastMoveToY = scr.moveDeltaY;
                 }
             }
             convertShapeEdge(mat, rec, x, y, ret);
@@ -317,8 +304,8 @@ public class XFLConverter {
         //hack for morphshapes. TODO: make this better
         if (close && (Double.compare(lastMoveToX, x) != 0 || Double.compare(lastMoveToY, y) != 0)) {
             StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced(lastMoveToX - x, lastMoveToY - y);
-            convertShapeEdge(mat, ser, x, y, ret);            
-        }            
+            convertShapeEdge(mat, ser, x, y, ret);
+        }
     }
 
     private static String getScaleMode(ILINESTYLE lineStyle) {
@@ -341,7 +328,7 @@ public class XFLConverter {
     private static void convertLineStyle(ILINESTYLE ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
         writer.writeStartElement("SolidStroke", new String[]{
             "scaleMode", getScaleMode(ls),
-            "weight", Double.toString(((float) ls.getWidth()) / SWF.unitDivisor),});
+            "weight", Double.toString(((float) ls.getWidth()) / SWF.unitDivisor)});
 
         writer.writeStartElement("fill");
         if (!(ls instanceof LINESTYLE2) || !((LINESTYLE2) ls).hasFillFlag) {
@@ -733,7 +720,7 @@ public class XFLConverter {
             index++;
         }
         return ret;
-    }   
+    }
 
     private static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
         if (mat == null) {
@@ -741,18 +728,16 @@ public class XFLConverter {
         }
 
         List<ShapeRecordAdvanced> shapeRecordsAdvanced = new ArrayList<>();
-        for(SHAPERECORD rec:shapeRecords) {
+        for (SHAPERECORD rec : shapeRecords) {
             ShapeRecordAdvanced arec = ShapeRecordAdvanced.createFromSHAPERECORD(rec);
             if (arec != null) {
                 shapeRecordsAdvanced.add(arec);
             }
         }
-        
-       
+
         //#1903, #503, #1257 This is not working at all :-(
         //ShapeFixer fixer = new ShapeFixer();
         //shapeRecordsAdvanced = fixer.fixShape(shapeRecordsAdvanced);
-                
         List<ShapeRecordAdvanced> edges = new ArrayList<>();
         int lineStyleCount = 0;
         int fillStyle0 = -1;
@@ -827,7 +812,7 @@ public class XFLConverter {
                     strokesNewStr.writeStartElement("strokes");
                     if (fillStyleCount > 0 || lineStyleCount > 0) {
 
-                        if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {                            
+                        if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
                             currentLayer.writeStartElement("Edge");
                             if (fillStyle0 > -1) {
                                 currentLayer.writeAttribute("fillStyle0", fillStyle0);
@@ -842,7 +827,7 @@ public class XFLConverter {
                             convertShapeEdges(((fillStyle0 > 0 || fillStyle1 > 0) && morphshape), startEdgeX, startEdgeY, mat, edges, edgesSb);
                             currentLayer.writeAttribute("edges", edgesSb.toString());
                             currentLayer.writeEndElement();
-                            hasEdge = true;                            
+                            hasEdge = true;
                         }
                     }
                     if (currentLayer.length() > 0) {
@@ -891,7 +876,7 @@ public class XFLConverter {
                     actualLinestyles = scr.lineStyles;
                 }
                 if (scr.stateFillStyle0) {
-                    int fillStyle0_new = scr.fillStyle0;// == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
+                    int fillStyle0_new = scr.fillStyle0;
                     if (morphshape) { //???
                         fillStyle1 = fillStyle0_new;
                     } else {
@@ -900,7 +885,7 @@ public class XFLConverter {
                     styleChange = true;
                 }
                 if (scr.stateFillStyle1) {
-                    int fillStyle1_new = scr.fillStyle1;// == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
+                    int fillStyle1_new = scr.fillStyle1;
                     if (morphshape) {
                         fillStyle0 = fillStyle1_new;
                     } else {
@@ -914,7 +899,7 @@ public class XFLConverter {
                     styleChange = true;
                 }
                 if (!edges.isEmpty()) {
-                    if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {                                                
+                    if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
                         currentLayer.writeStartElement("Edge");
                         if (lastFillStyle0 > -1) {
                             currentLayer.writeAttribute("fillStyle0", lastFillStyle0);
@@ -930,7 +915,7 @@ public class XFLConverter {
                         currentLayer.writeAttribute("edges", edgesSb.toString());
                         currentLayer.writeEndElement();
                         hasEdge = true;
-                        
+
                         startEdgeX = x;
                         startEdgeY = y;
                     }
@@ -942,7 +927,7 @@ public class XFLConverter {
             y = edge.changeY(y);
         }
         if (!edges.isEmpty()) {
-            if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {                
+            if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
                 currentLayer.writeStartElement("Edge");
                 if (fillStyle0 > -1) {
                     currentLayer.writeAttribute("fillStyle0", fillStyle0);
@@ -957,14 +942,14 @@ public class XFLConverter {
                 convertShapeEdges(((fillStyle0 > 0 || fillStyle1 > 0) && morphshape), startEdgeX, startEdgeY, mat, edges, edgesSb);
                 currentLayer.writeAttribute("edges", edgesSb.toString());
                 currentLayer.writeEndElement();
-                hasEdge = true;                
+                hasEdge = true;
             }
         }
         edges.clear();
         if (currentLayer.length() > 0) {
             currentLayer.writeEndElement(); // edges
             currentLayer.writeEndElement(); // DOMShape
-            
+
             if (currentLayer.length() > 0 && hasEdge) { //no empty layers
                 String s = currentLayer.toString();
                 if (morphshape) {
@@ -975,13 +960,14 @@ public class XFLConverter {
         }
         return layers;
     }
-    
+
     /**
-     * A hack. This will remove a stroked path with no fill which has same stroke as subsequent path (or is its prefix).
-     * This happens in the morphshape edges. This needs to be cleaned up before exporting to FLA.
-     * 
+     * A hack. This will remove a stroked path with no fill which has same
+     * stroke as subsequent path (or is its prefix). This happens in the
+     * morphshape edges. This needs to be cleaned up before exporting to FLA.
+     *
      * @param layer
-     * @return 
+     * @return
      */
     private static String removeOnlyStrokeEdgesBeforeSameFilled(String layer) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1016,12 +1002,12 @@ public class XFLConverter {
                     String fillStyle0 = fillStyle0Node != null ? fillStyle0Node.getNodeValue() : null;
                     String fillStyle1 = fillStyle1Node != null ? fillStyle1Node.getNodeValue() : null;
 
-                    if (prevStrokeOnly != null &&
-                            strokeStyle != null &&
-                            strokeStyle.equals(prevStrokeOnly) &&
-                            edgesStr.startsWith(prevEdgesStr)) {
-                            Node edgeToRemove = prevNode;
-                            edgeToRemove.getParentNode().removeChild(edgeToRemove);
+                    if (prevStrokeOnly != null
+                            && strokeStyle != null
+                            && strokeStyle.equals(prevStrokeOnly)
+                            && edgesStr.startsWith(prevEdgesStr)) {
+                        Node edgeToRemove = prevNode;
+                        edgeToRemove.getParentNode().removeChild(edgeToRemove);
                     }
 
                     prevStrokeOnly = null;
@@ -1030,7 +1016,7 @@ public class XFLConverter {
                     }
                     prevNode = edge;
                     prevEdgesStr = edgesStr;
-               }
+                }
             }
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
@@ -1072,14 +1058,14 @@ public class XFLConverter {
                 walkShapeUsages(sprite.getTags(), characters, usages);
             }
             if (t instanceof RemoveTag) {
-                depthMap.remove(((RemoveTag)t).getDepth());
+                depthMap.remove(((RemoveTag) t).getDepth());
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int d = po.getDepth();
                 if (po.flagMove() || !depthMap.containsKey(d)) {
                     int ch = po.getCharacterId();
-                    if (ch == -1) {      
+                    if (ch == -1) {
                         if (depthMap.containsKey(d)) {
                             ch = depthMap.get(d);
                         }
@@ -1089,7 +1075,7 @@ public class XFLConverter {
                     if (ch == -1) {
                         continue;
                     }
-                   
+
                     if (!usages.containsKey(ch)) {
                         usages.put(ch, 0);
                     }
@@ -1101,12 +1087,12 @@ public class XFLConverter {
                         usageCount++;
                     } else if (po.cacheAsBitmap()) {
                         usageCount++;
-                    } else if (po.getMatrix() != null && !po.getMatrix().isEmpty()){
+                    } else if (po.getMatrix() != null && !po.getMatrix().isEmpty()) {
                         usageCount++;
                     }
-                    usages.put(ch, usageCount);                    
+                    usages.put(ch, usageCount);
                 }
-                
+
             }
         }
     }
@@ -1519,7 +1505,7 @@ public class XFLConverter {
         }
         return writer.toString();
     }
-    
+
     private static String convertActionScript12(ASMSource as) {
         return convertActionScript12(as, new ArrayList<>());
     }
@@ -1581,7 +1567,7 @@ public class XFLConverter {
                     symbolStr.writeAttribute("scaleGridTop", doubleToString(scalingGrid.splitter.Ymin / SWF.unitDivisor));
                     symbolStr.writeAttribute("scaleGridBottom", doubleToString(scalingGrid.splitter.Ymax / SWF.unitDivisor));
                 }
-                
+
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
                     symbolStr.writeStartElement("timeline");
@@ -1629,7 +1615,7 @@ public class XFLConverter {
                             }
                             symbolStr.writeStartElement("DOMFrame", new String[]{
                                 "index", Integer.toString(frame - 1),
-                                "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                             if (soundChar > 0) {
                                 DefineSoundTag sound = (DefineSoundTag) swf.getCharacter(soundChar);
                                 convertSoundUsage(symbolStr, sound, soundInfo);
@@ -1713,13 +1699,13 @@ public class XFLConverter {
                                                 symbolStr.writeStartElement("DOMFrame", new String[]{
                                                     "index", Integer.toString(frame - duration),
                                                     "duration", Integer.toString(duration - 1),
-                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                                    "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                                                 symbolStr.writeElementValue("elements", "");
                                                 symbolStr.writeEndElement();
                                             }
                                             symbolStr.writeStartElement("DOMFrame", new String[]{
                                                 "index", Integer.toString(frame - 1),
-                                                "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                                                "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                                             symbolStr.writeStartElement("elements");
                                             symbolStr.writeCharactersRaw(recCharWriter.toString());
                                             symbolStr.writeEndElement();
@@ -1760,7 +1746,7 @@ public class XFLConverter {
                     symbolStr.writeEndElement(); // DOMTimeline
                     symbolStr.writeEndElement(); // timeline
                 }
-                
+
                 symbolStr.writeEndElement(); // DOMSymbolItem
                 String symbolStr2 = prettyFormatXML(symbolStr.toString());
                 String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
@@ -1798,7 +1784,7 @@ public class XFLConverter {
                     || symbol instanceof DefineSoundTag
                     || symbol instanceof DefineVideoStreamTag) {
                 //symbol instanceof SoundStreamHeadTypeTag  FIXME
-                hasMedia = true;                
+                hasMedia = true;
             }
         }
 
@@ -1856,7 +1842,7 @@ public class XFLConverter {
                 writer.writeStartElement("DOMBitmapItem", new String[]{
                     "name", symbolFile,
                     "sourceLastImported", Long.toString(getTimestamp(swf)),
-                    "externalFileSize", Integer.toString(imageBytes.length),});
+                    "externalFileSize", Integer.toString(imageBytes.length)});
                 if (allowSmoothing) {
                     writer.writeAttribute("allowSmoothing", true);
                 }
@@ -2301,7 +2287,7 @@ public class XFLConverter {
         writer.writeStartElement("DOMVideoInstance", new String[]{
             "libraryItemName", "movie" + video.characterID + ".flv",
             "frameRight", Integer.toString((int) (SWF.unitDivisor * video.width)),
-            "frameBottom", Integer.toString((int) (SWF.unitDivisor * video.height)),});
+            "frameBottom", Integer.toString((int) (SWF.unitDivisor * video.height))});
         if (instanceName != null) {
             writer.writeAttribute("name", instanceName);
         }
@@ -2314,15 +2300,14 @@ public class XFLConverter {
         writer.writeEndElement();
         writer.writeEndElement();
     }
-    
+
     private static void convertImageInstance(String instanceName, MATRIX matrix, ImageTag bitmap, CLIPACTIONS clipActions, XFLXmlWriter writer) throws XMLStreamException {
         writer.writeStartElement("DOMBitmapInstance", new String[]{
-           "libraryItemName", "bitmap" + bitmap.characterID + bitmap.getImageFormat().getExtension(),
-        });
+            "libraryItemName", "bitmap" + bitmap.characterID + bitmap.getImageFormat().getExtension()});
         if (instanceName != null) {
             writer.writeAttribute("name", instanceName);
         }
-        
+
         writer.writeStartElement("matrix");
         convertMatrix(matrix, writer);
         writer.writeEndElement();
@@ -2446,7 +2431,7 @@ public class XFLConverter {
                     if (shapeTween && character != null) {
                         MorphShapeTag m = (MorphShapeTag) character;
                         shapeTweener = m;
-                        shapeTween = false;     
+                        shapeTween = false;
                         lastTweenRatio = ratio;
                     }
                     character = null;
@@ -2474,14 +2459,14 @@ public class XFLConverter {
                         if (shapeTweener != null) {
                             MorphShapeTag m = shapeTweener;
                             XFLXmlWriter addLastWriter = new XFLXmlWriter();
-                            SHAPEWITHSTYLE endShape = m.getShapeAtRatio(lastTweenRatio);                            
+                            SHAPEWITHSTYLE endShape = m.getShapeAtRatio(lastTweenRatio);
                             convertShape(characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter);
                             duration--;
                             convertFrame(true, null, null, frame - duration, duration, "", lastElements, files, writer2);
                             duration = 1;
                             lastElements = addLastWriter.toString();
                             shapeTweener = null;
-                        } 
+                        }
                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) { // || shapeTweener != null)) {
                             ShapeTag shape = (ShapeTag) character;
                             convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
@@ -2637,7 +2622,7 @@ public class XFLConverter {
                     "size", "0",
                     "id", Integer.toString(fontId),
                     "embedRanges", embedRanges});
-                
+
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(fontId)) {
                     linkageExportForAS = true;
@@ -2646,7 +2631,7 @@ public class XFLConverter {
                 if (linkageExportForAS) {
                     writer.writeAttribute("linkageExportForAS", true);
                 }
-                
+
                 if (!"".equals(embeddedCharacters)) {
                     writer.writeAttribute("embeddedCharacters", embeddedCharacters);
                 }
@@ -2775,10 +2760,10 @@ public class XFLConverter {
 
         String script = initClipScript;
         int duration = 0;
-        int frame = 0;        
+        int frame = 0;
         if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
-        }        
+        }
 
         Map<Integer, String> frameToScriptMap = new HashMap<>();
 
@@ -3027,9 +3012,9 @@ public class XFLConverter {
         ret.add(0, varName);
         return String.join(".", ret);
     }
-    
+
     private void convertTimeline(AbcIndexing abcIndex, int spriteId, String linkageIdentifier, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
-        
+
         List<String> classNames = new ArrayList<>();
         //Searches for Object.registerClass("linkageIdentifier",mypkg.MyClass);        
         ActionTreeOperation getRegisterClassOp = new ActionTreeOperation() {
@@ -3046,7 +3031,7 @@ public class XFLConverter {
                     if (!(callMethod.scriptObject instanceof GetVariableActionItem)) {
                         continue;
                     }
-                    GetVariableActionItem methodObject = (GetVariableActionItem)callMethod.scriptObject;
+                    GetVariableActionItem methodObject = (GetVariableActionItem) callMethod.scriptObject;
                     if (!(methodObject.name instanceof DirectValueActionItem)) {
                         continue;
                     }
@@ -3067,7 +3052,7 @@ public class XFLConverter {
                     }
                     if (linkageIdentifier != null && !linkageIdentifier.equals(callMethod.arguments.get(0).toString())) {
                         continue;
-                    }                        
+                    }
                     String className = getMembersToClassName(callMethod.arguments.get(1));
                     if (className == null) {
                         continue;
@@ -3080,12 +3065,12 @@ public class XFLConverter {
                     return;
                 }
                 classNames.add(newClassNames.get(0));
-                tree.remove((int)listToRemove.get(0));                
+                tree.remove((int) listToRemove.get(0));
             }
-        };                
+        };
         List<ActionTreeOperation> treeOps = new ArrayList<>();
-        treeOps.add(getRegisterClassOp);                
-        
+        treeOps.add(getRegisterClassOp);
+
         String initClipScript = "";
         for (Tag t : tags) {
             if (t instanceof DoInitActionTag) {
@@ -3097,7 +3082,7 @@ public class XFLConverter {
         }
         if (classNames.size() == 1) {
             writer.writeAttribute("linkageClassName", classNames.get(0));
-        }              
+        }
         if (spriteId == -1) {
             writer.writeStartElement("timelines");
         } else {
@@ -3154,11 +3139,11 @@ public class XFLConverter {
             }
             lastTag = t;
         }
-        
+
         //Some sprites do not end with ShowFrame:
         if (lastTag != null && !(lastTag instanceof ShowFrameTag)) {
             f++;
-        }            
+        }
 
         int frameCount = f;
 
@@ -3232,10 +3217,10 @@ public class XFLConverter {
             }*/
             boolean nonEmpty = writeLayer(index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
             if (nonEmpty) {
-                index++;                
+                index++;
             }
         }
-        
+
         if (index == 0) {
             writeEmptyLayer(writer, frameCount);
             index++;
@@ -3246,7 +3231,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMTimeline
         writer.writeEndElement(); //timeline/s
     }
-    
+
     private void writeEmptyLayer(XFLXmlWriter writer, int frameCount) throws XMLStreamException {
         writer.writeStartElement("DOMLayer", new String[]{
             "name", "Layer 1",
@@ -3255,7 +3240,7 @@ public class XFLConverter {
         writer.writeAttribute("current", true);
         writer.writeAttribute("isSelected", true);
         writer.writeStartElement("frames");
-        
+
         writer.writeStartElement("DOMFrame");
         writer.writeAttribute("index", 0);
         writer.writeAttribute("duration", frameCount);
@@ -3263,9 +3248,9 @@ public class XFLConverter {
         writer.writeStartElement("elements");
         writer.writeEndElement(); //elements
         writer.writeEndElement(); //DOMFrame
-        
-        writer.writeEndElement();//frames
-        writer.writeEndElement();//DOMLayer        
+
+        writer.writeEndElement(); //frames
+        writer.writeEndElement(); //DOMLayer        
     }
 
     private boolean writeLayer(int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files) throws XMLStreamException {
@@ -3332,19 +3317,18 @@ public class XFLConverter {
                 for (int i = 0; i < sc.tags.size(); i++) {
                     if (!ret.containsKey(sc.tags.get(i)) && !ret.containsValue(sc.names.get(i))) {
                         ret.put(sc.tags.get(i), sc.names.get(i));
-                    } else if (ret.containsKey(sc.tags.get(i))){
+                    } else if (ret.containsKey(sc.tags.get(i))) {
                         multipleClassesCharacters.add(sc.tags.get(i));
                     }
                 }
             }
         }
-        
-        for (int i: multipleClassesCharacters) {
+
+        for (int i : multipleClassesCharacters) {
             ret.remove(i);
         }
-        
+
         //TODO: handle multiple classes assigned to same character (Can happen when Embed tag used with identical file)
-        
         return ret;
     }
 
@@ -3751,29 +3735,27 @@ public class XFLConverter {
 
         if (!useAS3 && flaVersion.minASVersion() > 2) {
             throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
-        }        
+        }
         File flaFile = new File(outfile);  //c:/mydir/myfile.fla                      
         String baseName = swfFileName;
         File f = new File(baseName); //myfile.swf
         baseName = f.getName();
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf('.')); //myfile
-        }        
-        
+        }
+
         File scriptsDir = flaFile.getParentFile(); //c:/mydir
-        
+
         Path.createDirectorySafe(scriptsDir);
-        
+
         File xflDataDir = null;
         String xflFile = null;
         if (!settings.compressed) {
             xflDataDir = new File(Path.combine(flaFile.getParentFile().getAbsolutePath(), baseName)); //c:/mydir/myfile/
             xflFile = Path.combine(xflDataDir.getAbsolutePath(), baseName + ".xfl"); // c:/mydir/myfile.xfl
-            Path.createDirectorySafe(xflDataDir);        
+            Path.createDirectorySafe(xflDataDir);
         }
-        
-        
-        
+
         final HashMap<String, byte[]> files = new HashMap<>();
         final HashMap<String, byte[]> datfiles = new HashMap<>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.getTags());
@@ -4254,12 +4236,21 @@ public class XFLConverter {
                 index++;
             }
         }
-        double a11 = matrix[0][0], a12 = matrix[0][1], a13 = matrix[0][2],
-                a21 = matrix[1][0], a22 = matrix[1][1], a23 = matrix[1][2],
-                a31 = matrix[2][0], a32 = matrix[2][1], a33 = matrix[2][2],
-                a41 = matrix[4][0];
+        double a11 = matrix[0][0];
+        double a12 = matrix[0][1];
+        double a13 = matrix[0][2];
+        double a21 = matrix[1][0];
+        double a22 = matrix[1][1];
+        double a23 = matrix[1][2];
+        double a31 = matrix[2][0];
+        double a32 = matrix[2][1];
+        double a33 = matrix[2][2];
+        double a41 = matrix[4][0];
 
-        double b, c, h, s;
+        double b;
+        double c;
+        double h;
+        double s;
         b = (24872168661075.0 * a11 * a11 - 151430415740925.0 * a12 + 341095051289483.0 * a12 * a12 - 15302094789450.0 * a13 + 82428663495404.0 * a12 * a13
                 - 4592294873812.0 * a13 * a13 + 43556251470.0 * Math.sqrt(216225 * a11 * a11 + 332369 * a12 * a12 - 397828 * a12 * a13 + 281684 * a13 * a13
                         - 930 * a11 * (287 * a12 + 178 * a13)) + 2384730956550.0 * a12 * a41 + 240977870700.0 * a13 * a41
@@ -4283,9 +4274,7 @@ public class XFLConverter {
 
         if (sameDouble(410 * a12, 1543 * a31) && sameDouble(410 * a12, 1543 * a32) && sameDouble(3047 * a12, 1543 * a21) && sameDouble(3047 * a12, 1543 * a23)
                 && sameDouble(a22, a11 + (1504 * a12) / 1543.) && sameDouble((1133 * a12) / 1543. + a33, a11)
-                /*&& (b == (195961 * a11 + 439039 * a12 + 1543 * (-127 + 2 * a41)) / (3086 * a11 + 6914 * a12))
-                 && (c == 127 * a11 + (439039 * a12) / 1543.) && (s == (1543 * (a11 - a12)) / (1543 * a11 + 3457 * a12))
-                 */ && !sameDouble(a11, a12) && !sameDouble(1543 * a11 + 3457 * a12, 0)) {
+                && !sameDouble(a11, a12) && !sameDouble(1543 * a11 + 3457 * a12, 0)) {
             h = 0;
         }
 
@@ -4293,7 +4282,7 @@ public class XFLConverter {
             "brightness", Integer.toString(normBrightness(b)),
             "contrast", Integer.toString(normContrast(c)),
             "saturation", Integer.toString(normSaturation(s)),
-            "hue", Integer.toString(normHue(h)),});
+            "hue", Integer.toString(normHue(h))});
     }
 
     private static String convertHTMLText(ReadOnlyTagList tags, DefineEditTextTag det, String html) {

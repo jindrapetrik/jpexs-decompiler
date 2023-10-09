@@ -184,15 +184,16 @@ public class OceanicSkin extends SubstanceSkin {
         setSelectedTabFadeStart(0.7);
         setSelectedTabFadeEnd(0.9);
 
-        this.addOverlayPainter(new BottomLineOverlayPainter(
-                new ColorSchemeSingleColorQuery() {
+        ColorSchemeSingleColorQuery query = new ColorSchemeSingleColorQuery() {
             @Override
             public Color query(SubstanceColorScheme scheme) {
                 Color fg = scheme.getForegroundColor();
                 return new Color(fg.getRed(), fg.getGreen(), fg
                         .getBlue(), 72);
             }
-        }), DecorationAreaType.PRIMARY_TITLE_PANE,
+        };
+        this.addOverlayPainter(new BottomLineOverlayPainter(query),
+                DecorationAreaType.PRIMARY_TITLE_PANE,
                 DecorationAreaType.SECONDARY_TITLE_PANE);
 
         this.buttonShaper = new ClassicButtonShaper();
@@ -212,28 +213,31 @@ public class OceanicSkin extends SubstanceSkin {
                     ColorSchemeSingleColorQuery.EXTRALIGHT,
                     ColorSchemeSingleColorQuery.DARK,
                     ColorSchemeSingleColorQuery.MID});
-        SubstanceBorderPainter innerBorderPainter = new DelegateFractionBasedBorderPainter(
-                "Oceanic Inner", outerBorderPainter, new int[]{
-                    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
-                new ColorSchemeTransform() {
+        ColorSchemeTransform schemeTransform = new ColorSchemeTransform() {
             @Override
             public SubstanceColorScheme transform(
                     SubstanceColorScheme scheme) {
                 return scheme.tint(0.8f);
             }
-        });
+        };
+        SubstanceBorderPainter innerBorderPainter = new DelegateFractionBasedBorderPainter(
+                "Oceanic Inner", outerBorderPainter, new int[]{
+                    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                schemeTransform
+        );
         this.borderPainter = new CompositeBorderPainter("Oceanic",
                 outerBorderPainter, innerBorderPainter);
 
+        ColorSchemeSingleColorQuery[] query2 = new ColorSchemeSingleColorQuery[]{
+            ColorSchemeSingleColorQuery.LIGHT,
+            ColorSchemeSingleColorQuery.LIGHT,
+            ColorSchemeSingleColorQuery.ULTRADARK,
+            ColorSchemeSingleColorQuery.MID,
+            ColorSchemeSingleColorQuery.ULTRALIGHT,
+            ColorSchemeSingleColorQuery.LIGHT};
         this.decorationPainter = new FractionBasedDecorationPainter(
                 "Oceanic", new float[]{0.0f, 0.1199999f, 0.12f,
-                    0.5f, 0.9f, 1.0f}, new ColorSchemeSingleColorQuery[]{
-                    ColorSchemeSingleColorQuery.LIGHT,
-                    ColorSchemeSingleColorQuery.LIGHT,
-                    ColorSchemeSingleColorQuery.ULTRADARK,
-                    ColorSchemeSingleColorQuery.MID,
-                    ColorSchemeSingleColorQuery.ULTRALIGHT,
-                    ColorSchemeSingleColorQuery.LIGHT});
+                    0.5f, 0.9f, 1.0f}, query2);
         this.highlightPainter = new ClassicHighlightPainter();
     }
 

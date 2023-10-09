@@ -52,18 +52,18 @@ public class NamespaceSet {
         }
         return sb.toString();
     }
-    
+
     public boolean isApiVersioned(AVM2ConstantPool constants) {
         Set<String> namespaceNames = new HashSet<>();
         Set<Integer> namespaceKinds = new HashSet<>();
-        for (int n:namespaces) {
+        for (int n : namespaces) {
             Namespace ns = constants.getNamespace(n);
             String nsName = ns.getRawName(constants);
             if (nsName != null && nsName.length() > 0) {
                 int lastChar = nsName.codePointAt(nsName.length() - 1);
                 if (lastChar >= Namespace.MIN_API_MARK && lastChar <= Namespace.MAX_API_MARK) {
                     namespaceNames.add(nsName.substring(0, nsName.length() - 1));
-                    namespaceKinds.add(ns.kind);                    
+                    namespaceKinds.add(ns.kind);
                 } else {
                     return false;
                 }
@@ -77,12 +77,12 @@ public class NamespaceSet {
         }
         return true;
     }
-    
+
     public List<Integer> getApiVersions(AVM2ConstantPool constants) {
         Set<String> namespaceNames = new HashSet<>();
         Set<Integer> namespaceKinds = new HashSet<>();
         List<Integer> apiVersions = new ArrayList<>();
-        for (int n:namespaces) {
+        for (int n : namespaces) {
             Namespace ns = constants.getNamespace(n);
             String nsName = ns.getRawName(constants);
             if (nsName != null && nsName.length() > 0) {
@@ -107,18 +107,18 @@ public class NamespaceSet {
         }
         return apiVersions;
     }
-    
+
     public int getNonversionedKind(AVM2ConstantPool constants) {
         Set<String> namespaceNames = new HashSet<>();
         Set<Integer> namespaceKinds = new HashSet<>();
-        for (int n:namespaces) {
+        for (int n : namespaces) {
             Namespace ns = constants.getNamespace(n);
             String nsName = ns.getRawName(constants);
             namespaceKinds.add(ns.kind);
             if (nsName != null && nsName.length() > 0) {
                 int lastChar = nsName.codePointAt(nsName.length() - 1);
                 if (lastChar >= Namespace.MIN_API_MARK && lastChar <= Namespace.MAX_API_MARK) {
-                    namespaceNames.add(nsName.substring(0, nsName.length() - 1));                    
+                    namespaceNames.add(nsName.substring(0, nsName.length() - 1));
                 } else {
                     namespaceNames.add(nsName);
                 }
@@ -134,10 +134,10 @@ public class NamespaceSet {
         }
         return namespaceKinds.iterator().next();
     }
-    
+
     public DottedChain getNonversionedName(AVM2ConstantPool constants) {
         Set<String> namespaceNames = new HashSet<>();
-        for (int n:namespaces) {
+        for (int n : namespaces) {
             String nsName = constants.getNamespace(n).getRawName(constants);
             if (nsName != null && nsName.length() > 0) {
                 int lastChar = nsName.codePointAt(nsName.length() - 1);

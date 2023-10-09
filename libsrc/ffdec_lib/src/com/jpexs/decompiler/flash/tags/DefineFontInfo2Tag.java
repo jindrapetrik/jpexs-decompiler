@@ -184,8 +184,8 @@ public class DefineFontInfo2Tag extends FontInfoTag {
     @Override
     public boolean isShiftJIS() {
         return fontFlagsShiftJIS;
-    }                
-    
+    }
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontID);

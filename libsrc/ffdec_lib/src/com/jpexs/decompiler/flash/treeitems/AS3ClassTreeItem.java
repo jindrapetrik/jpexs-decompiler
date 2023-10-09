@@ -44,7 +44,7 @@ public abstract class AS3ClassTreeItem implements TreeItem {
         }
         return ret;
     }
-    
+
     public String getPrintableNameWithNamespaceSuffix() {
         String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
         if (namespaceSuffix != null) {

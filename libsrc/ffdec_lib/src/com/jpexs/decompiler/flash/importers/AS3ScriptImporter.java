@@ -58,7 +58,7 @@ public class AS3ScriptImporter {
                 File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false, false, false));
                 if (file.exists()) {
                     Openable openable = pack.getOpenable();
-                    SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+                    SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
                     swf.informListeners("importing_as", file.getAbsolutePath());
                     String fileName = file.getAbsolutePath();
                     String txt = Helper.readTextFile(fileName);

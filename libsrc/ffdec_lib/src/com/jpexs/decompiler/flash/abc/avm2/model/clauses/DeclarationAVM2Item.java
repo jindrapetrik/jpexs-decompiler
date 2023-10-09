@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
@@ -44,7 +42,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     public GraphTargetItem assignment;
 
     public GraphTargetItem type;
-    
+
     public boolean typeIsNull = false;
 
     public boolean showValue = true;
@@ -63,8 +61,8 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     public DeclarationAVM2Item(GraphTargetItem assignment) {
         this(assignment, null);
-    }   
-    
+    }
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
@@ -118,7 +116,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
 
-            GraphTargetItem val = ssti.value;                        
+            GraphTargetItem val = ssti.value;
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             ssti.getName(writer, localData);
@@ -138,7 +136,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.localName = ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName;
             srcData.declaration = true;
 
-            GraphTargetItem val = spti.value;      
+            GraphTargetItem val = spti.value;
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             writer.append(IdentifiersDeobfuscation.printIdentifier(true, ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName));

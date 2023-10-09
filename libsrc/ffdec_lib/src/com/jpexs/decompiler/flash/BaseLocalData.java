@@ -29,8 +29,8 @@ import java.util.Set;
 public abstract class BaseLocalData {
 
     public GraphSourceItem lineStartInstruction;
-    
+
     public Set<GraphPart> allSwitchParts = new HashSet<>();
-    
+
     public SecondPassData secondPassData = null;
 }

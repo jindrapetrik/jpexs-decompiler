@@ -60,7 +60,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         if (classIndex > -1) {
             insideInterface = abc.instance_info.get(classIndex).isInterface();
         }
-        
+
         if (parentTraitIndex > -1) {
             if (traitsType == TRAITS_TYPE_CLASS) {
                 ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);

@@ -42,7 +42,7 @@ public class MochiCryptPacker implements Packer {
 
     @Override
     public boolean decrypt(InputStream is, OutputStream os) throws IOException {
-        byte payload[] = Helper.readStream(is);
+        byte[] payload = Helper.readStream(is);
         if (!handleXor(payload)) {
             return false;
         }
@@ -50,7 +50,7 @@ public class MochiCryptPacker implements Packer {
         return true;
     }
 
-    private boolean handleXor(byte payload[]) {
+    private boolean handleXor(byte[] payload) {
         if (payload.length < 32) {
             return false;
         }
@@ -70,7 +70,7 @@ public class MochiCryptPacker implements Packer {
         j = 0;
         i = 0;
         while (i < 256) {
-            j = (j + S[i] + (payload[n + (i & 31)] & 0xff) ) & 255;
+            j = (j + S[i] + (payload[n + (i & 31)] & 0xff)) & 255;
             u = S[i];
             S[i] = S[j];
             S[j] = u;
@@ -95,26 +95,26 @@ public class MochiCryptPacker implements Packer {
         }
         return true;
     }
-    
+
     @Override
     public boolean encrypt(InputStream is, OutputStream os) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(baos);
         Helper.copyStream(is, def);
         def.finish();
-        byte payload[] = baos.toByteArray();
-        
+        byte[] payload = baos.toByteArray();
+
         if (!handleXor(payload)) {
             return false;
         }
-        
+
         os.write(payload);
-        
+
         return true;
     }
 
     @Override
     public String getName() {
         return "MochiCrypt";
-    }   
+    }
 }

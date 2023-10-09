@@ -38,21 +38,22 @@ import java.awt.image.TileObserver;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * BufferedImage that has link to ImageTag. This is mainly used for PDF export coupling.
+ * BufferedImage that has link to ImageTag. This is mainly used for PDF export
+ * coupling.
+ *
  * @author JPEXS
  */
 public class ImageTagBufferedImage extends BufferedImage {
+
     private byte[] imageData;
     private ImageTag tag;
     private final BufferedImage image;
-    
+
     public ImageTagBufferedImage(ImageTag tag, BufferedImage image) {
         super(1, 1, TYPE_INT_RGB);
-        this.image = image;               
+        this.image = image;
         this.tag = tag;
     }
 
@@ -61,11 +62,12 @@ public class ImageTagBufferedImage extends BufferedImage {
     }
 
     public boolean isJpeg() {
-        return tag.getOriginalImageFormat()== ImageFormat.JPEG;
-    }       
+        return tag.getOriginalImageFormat() == ImageFormat.JPEG;
+    }
+
     public byte[] getAlphaChannel() {
         if (tag instanceof HasSeparateAlphaChannel) {
-            HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel)tag;
+            HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel) tag;
             try {
                 return hsac.getImageAlpha();
             } catch (IOException ex) {
@@ -74,13 +76,13 @@ public class ImageTagBufferedImage extends BufferedImage {
         }
         return null;
     }
-    
+
     public byte[] getImageData() {
         if (imageData != null) {
             return imageData;
         }
         imageData = Helper.readStream(tag.getOriginalImageData());
-        return imageData;        
+        return imageData;
     }
 
     @Override
@@ -135,7 +137,7 @@ public class ImageTagBufferedImage extends BufferedImage {
 
     @Override
     public Raster getData(Rectangle rect) {
-       return image.getData(rect);
+        return image.getData(rect);
     }
 
     @Override
@@ -257,6 +259,16 @@ public class ImageTagBufferedImage extends BufferedImage {
     @Override
     public ImageProducer getSource() {
         return image.getSource();
+    }    
+
+    @Override
+    public int getWidth(ImageObserver observer) {
+        return image.getWidth(observer);
+    }
+    
+    @Override
+    public int getWidth() {
+        return image.getWidth();
     }
 
     @Override
@@ -265,18 +277,8 @@ public class ImageTagBufferedImage extends BufferedImage {
     }
 
     @Override
-    public int getWidth(ImageObserver observer) {
-        return image.getWidth(observer);
-    }
-
-    @Override
     public int getHeight() {
         return image.getHeight();
-    }
-
-    @Override
-    public int getWidth() {
-        return image.getWidth();
     }
 
     @Override
@@ -355,5 +357,5 @@ public class ImageTagBufferedImage extends BufferedImage {
     @Override
     public int hashCode() {
         return tag.getCharacterId();
-    }    
+    }
 }

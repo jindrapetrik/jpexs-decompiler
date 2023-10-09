@@ -123,7 +123,7 @@ public class CheckResources {
                             }
 
                             if (firstMissing2) {
-                                stream.println(clazz.getSimpleName() + ":");                                
+                                stream.println(clazz.getSimpleName() + ":");
                                 firstMissing2 = false;
                             }
 
@@ -196,6 +196,7 @@ public class CheckResources {
                     uc = latestUrl.openConnection();
                     latestProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
+                    //ignored
                 }
 
                 Properties prevProp = new LinkedProperties();
@@ -203,6 +204,7 @@ public class CheckResources {
                     uc = prevUrl.openConnection();
                     prevProp.load(new BufferedReader(new InputStreamReader(uc.getInputStream())));
                 } catch (IOException ex) {
+                    //ignored
                 }
 
                 boolean firstMissing2 = true;
@@ -264,7 +266,8 @@ public class CheckResources {
             NewTraitDialog.class,
             UsageFrame.class,
             // Proxy
-            ProxyFrame.class,};
+            ProxyFrame.class
+        };
         return classes;
     }
 

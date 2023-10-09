@@ -20,10 +20,15 @@ package com.jpexs.decompiler.flash.action.as2;
  *
  * @author JPEXS
  */
-public interface Trait {    
+public interface Trait {
+
     public boolean isStatic();
+
     public String getName();
+
     public String getType();
+
     public String getCallType();
+
     public String getClassName();
 }

@@ -164,7 +164,7 @@ public class ShapeImporter {
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         int shapeCount = 0;
         List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
-        File allFiles[] = shapesDir.listFiles(new FilenameFilter() {
+        File[] allFiles = shapesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();

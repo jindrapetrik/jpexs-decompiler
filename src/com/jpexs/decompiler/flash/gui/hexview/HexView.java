@@ -313,16 +313,7 @@ public class HexView extends JTable {
         selectionStart = -1;
         selectionEnd = -1;
         getModel().fireTableDataChanged();
-    }
-
-    public void scrollToByte(long byteNum) {
-
-        int row = (int) (byteNum / bytesInRow);
-
-        //final int pageSize = (int) (getParent().getSize().getHeight() / getRowHeight());
-        getSelectionModel().setSelectionInterval(row, row);
-        scrollRectToVisible(new Rectangle(getCellRect(row, 0, true)));
-    }
+    }   
 
     private int getIdxByColAndRow(int row, int col) {
         int idx = -1;
@@ -345,6 +336,15 @@ public class HexView extends JTable {
 
         int idx = getIdxByColAndRow(row, col);
         return idx;
+    }
+
+    public void scrollToByte(long byteNum) {
+
+        int row = (int) (byteNum / bytesInRow);
+
+        //final int pageSize = (int) (getParent().getSize().getHeight() / getRowHeight());
+        getSelectionModel().setSelectionInterval(row, row);
+        scrollRectToVisible(new Rectangle(getCellRect(row, 0, true)));
     }
 
     public void scrollToByte(long[] byteNumStarts, long[] byteNumEnds) {

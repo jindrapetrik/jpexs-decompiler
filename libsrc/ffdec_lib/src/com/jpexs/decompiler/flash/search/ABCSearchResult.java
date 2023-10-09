@@ -80,18 +80,18 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         this.classIndex = ois.readInt();
         this.traitId = ois.readInt();
         boolean packFound = false;
-         
+
         List<ScriptPack> packs;
-        
+
         if (openable instanceof SWF) {
-            packs = ((SWF)openable).getAS3Packs();
+            packs = ((SWF) openable).getAS3Packs();
         } else {
-            ABC abc = (ABC)openable;
+            ABC abc = (ABC) openable;
             List<ABC> allAbcs = new ArrayList<>();
             allAbcs.add(abc);
             packs = abc.getScriptPacks(null, allAbcs);
         }
-        
+
         for (ScriptPack pack : packs) {
             if (cp.equals(pack.getClassPath()) && traitIndices.equals(pack.traitIndices)) {
                 this.scriptPack = pack;

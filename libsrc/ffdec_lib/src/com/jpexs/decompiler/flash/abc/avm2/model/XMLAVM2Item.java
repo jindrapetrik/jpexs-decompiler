@@ -45,11 +45,11 @@ public class XMLAVM2Item extends AVM2Item {
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {        
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (int i = 0; i < parts.size(); i++) {
             GraphTargetItem part = parts.get(i);
             GraphTargetItem partBefore = i > 0 ? parts.get(i - 1) : null;
-            GraphTargetItem partAfter = i < parts.size() - 1 ? parts.get(i + 1) : null;                                    
+            GraphTargetItem partAfter = i < parts.size() - 1 ? parts.get(i + 1) : null;
             if (part instanceof StringAVM2Item) {
                 String s = ((StringAVM2Item) part).getValue();
                 if (partAfter instanceof EscapeXAttrAVM2Item) {

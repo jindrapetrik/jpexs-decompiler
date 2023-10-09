@@ -52,7 +52,7 @@ import javax.imageio.ImageIO;
 public class SpriteImporter {
 
     private void removeCharacters(Set<Integer> usedCharacters, SWF swf) {
-        for (int ch:usedCharacters) {
+        for (int ch : usedCharacters) {
             CharacterTag ct = swf.getCharacter(ch);
             if (ct == null) {
                 continue;
@@ -63,7 +63,7 @@ public class SpriteImporter {
             if (ct.getExportName() != null) {
                 continue;
             }
-            Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);            
+            Set<Integer> dependentCharacters = swf.getDependentCharacters(ch);
             if (dependentCharacters.isEmpty()) {
                 Set<Integer> needed = new LinkedHashSet<>();
                 ct.getNeededCharacters(needed, swf);
@@ -80,7 +80,7 @@ public class SpriteImporter {
             }
         }
     }
-    
+
     public boolean importSprite(DefineSpriteTag spriteTag, InputStream is) throws IOException {
         final GifImage gif = GifDecoder.read(is);
         final int frameCount = gif.getFrameCount();
@@ -88,7 +88,7 @@ public class SpriteImporter {
         for (int i = spriteTag.getTags().size() - 1; i >= 0; i--) {
             Tag t = spriteTag.getTags().get(i);
             if (t instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag pt = (PlaceObjectTypeTag)t;
+                PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
                 int characterId = pt.getCharacterId();
                 if (characterId != -1) {
                     usedCharacters.add(characterId);
@@ -97,9 +97,8 @@ public class SpriteImporter {
             spriteTag.removeTag(i);
         }
         spriteTag.getSwf().computeDependentCharacters();
-        
+
         removeCharacters(usedCharacters, spriteTag.getSwf());
-        
 
         ShapeImporter shapeImporter = new ShapeImporter();
         SWF swf = spriteTag.getSwf();
@@ -116,7 +115,7 @@ public class SpriteImporter {
                 final BufferedImage img = gif.getFrame(gifFrame);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(img, "png", baos);
-                byte frameImageData[] = baos.toByteArray();
+                byte[] frameImageData = baos.toByteArray();
                 DefineShape2Tag shapeTag = new DefineShape2Tag(spriteTag.getSwf());
                 SWF.addTagBefore(shapeTag, spriteTag);
                 shapeImporter.importImage(shapeTag, frameImageData, 0, false);
@@ -139,7 +138,7 @@ public class SpriteImporter {
             showFrame.setTimelined(spriteTag);
             lastGifFrame = gifFrame;
             swfFrame++;
-            float swfFrameTimeMs = swfFrame * 100 / swfFrameRate;            
+            float swfFrameTimeMs = swfFrame * 100 / swfFrameRate;
             while (gifFrame < gifFrameCount && gifFrameTimeMs + gif.getDelay(gifFrame) < swfFrameTimeMs) {
                 gifFrameTimeMs += gif.getDelay(gifFrame);
                 gifFrame++;
@@ -152,12 +151,12 @@ public class SpriteImporter {
 
         return true;
     }
-    
-    public int bulkImport(File spritesDir, SWF swf, boolean printOut) {    
+
+    public int bulkImport(File spritesDir, SWF swf, boolean printOut) {
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         int spriteCount = 0;
         List<String> extensions = Arrays.asList("gif");
-        File allFiles[] = spritesDir.listFiles(new FilenameFilter() {
+        File[] allFiles = spritesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String nameLower = name.toLowerCase();
@@ -202,10 +201,10 @@ public class SpriteImporter {
                 File sourceFile = existingFilesForSpriteTag.get(0);
 
                 if (printOut) {
-                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
-                    }
-                    
-                try(FileInputStream fis = new FileInputStream(sourceFile.getAbsolutePath())) {
+                    System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
+                }
+
+                try (FileInputStream fis = new FileInputStream(sourceFile.getAbsolutePath())) {
                     importSprite(spriteTag, fis);
                     spriteCount++;
                 } catch (IOException ex) {

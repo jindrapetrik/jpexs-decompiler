@@ -45,15 +45,15 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public GraphTargetItem propertyName;
-    
+
     private int line;
 
     public boolean isStatic;
-    
+
     //Constructor for compiler
     public DeletePropertyAVM2Item(GraphTargetItem property, int line) {
         this(null, null, property, null, false);
-        this.line = line;        
+        this.line = line;
     }
 
     @Override

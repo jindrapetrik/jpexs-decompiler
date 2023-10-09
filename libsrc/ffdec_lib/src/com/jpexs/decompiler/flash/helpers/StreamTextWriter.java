@@ -50,16 +50,16 @@ public class StreamTextWriter extends GraphTextWriter implements AutoCloseable {
     public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         writeToOutputStream(text);
         return this;
-    }
+    }   
 
     @Override
-    public StreamTextWriter append(String str) {
+    public GraphTextWriter appendWithData(String str, HighlightData data) {
         writeToOutputStream(str);
         return this;
     }
 
     @Override
-    public GraphTextWriter appendWithData(String str, HighlightData data) {
+    public StreamTextWriter append(String str) {
         writeToOutputStream(str);
         return this;
     }

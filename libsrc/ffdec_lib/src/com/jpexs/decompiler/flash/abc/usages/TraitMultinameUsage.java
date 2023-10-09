@@ -64,7 +64,7 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
             return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
         }
         DottedChain scriptSimpleName = abc.script_info.get(scriptIndex).getSimplePackName(abc);
-        return "script " + (scriptSimpleName == null ? "" + scriptIndex:scriptSimpleName.toPrintableString(true));
+        return "script " + (scriptSimpleName == null ? "" + scriptIndex : scriptSimpleName.toPrintableString(true));
     }
 
     @Override

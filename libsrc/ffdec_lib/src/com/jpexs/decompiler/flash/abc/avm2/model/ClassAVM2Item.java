@@ -31,14 +31,14 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class ClassAVM2Item extends AVM2Item {
 
     public Multiname className;
-    
+
     public DottedChain classNameAsStr;
 
     public ClassAVM2Item(Multiname className) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.className = className;
     }
-    
+
     public ClassAVM2Item(DottedChain className) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.classNameAsStr = className;

@@ -92,7 +92,7 @@ public class NameCharacterTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(characterId);

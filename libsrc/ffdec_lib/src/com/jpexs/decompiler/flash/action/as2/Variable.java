@@ -21,6 +21,7 @@ package com.jpexs.decompiler.flash.action.as2;
  * @author JPEXS
  */
 public class Variable implements Trait {
+
     private final boolean isStatic;
     private final String name;
     private final String type;
@@ -42,23 +43,24 @@ public class Variable implements Trait {
     public String getName() {
         return name;
     }
+
     @Override
     public String getType() {
         return type;
-    }        
+    }
 
     @Override
     public String toString() {
         return (isStatic ? "static " : "") + "var " + name + ": " + getType();
-    }        
+    }
 
     @Override
     public String getCallType() {
         return null;
-    }        
-    
+    }
+
     @Override
     public String getClassName() {
         return className;
-    }    
+    }
 }

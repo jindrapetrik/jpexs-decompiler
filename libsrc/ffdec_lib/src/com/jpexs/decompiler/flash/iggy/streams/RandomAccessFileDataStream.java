@@ -84,7 +84,7 @@ public class RandomAccessFileDataStream extends AbstractDataStream {
 
     @Override
     public byte[] readBytes(int numBytes) throws IOException {
-        byte buf[] = new byte[numBytes];
+        byte[] buf = new byte[numBytes];
         raf.readFully(buf);
         return buf;
     }

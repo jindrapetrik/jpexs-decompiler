@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
@@ -83,7 +82,7 @@ public class FilteredTreeModel implements TreeModel {
         subItems.clear();
         this.root = fullModel.getRoot();
         List<String> selectionPathsList = new ArrayList<>();
-        TreePath selectionPaths[] = tree.getSelectionPaths();
+        TreePath[] selectionPaths = tree.getSelectionPaths();
         if (selectionPaths != null) {
             List<String> currentPathItems = new ArrayList<>();
             for (TreePath tp : selectionPaths) {

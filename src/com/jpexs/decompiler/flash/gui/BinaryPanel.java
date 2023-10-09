@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
-import com.jpexs.decompiler.flash.packers.MochiCryptPacker;
-import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,8 +44,8 @@ public final class BinaryPanel extends JPanel {
     private DefineBinaryDataTag binaryDataTag = null;
 
     private final MainPanel mainPanel;
-    
-    private final JLabel swfInsideLabel;        
+
+    private final JLabel swfInsideLabel;
 
     public BinaryPanel(final MainPanel mainPanel) {
         super(new BorderLayout());
@@ -68,9 +66,8 @@ public final class BinaryPanel extends JPanel {
          setBinaryData(binaryDataTag);
          }
          });*/
-        
         swfInsideLabel = new JLabel(AppStrings.translate("binarydata.swfInside"));
-        
+
         swfInsidePanel = new JPanel();
         swfInsidePanel.setBackground(new Color(253, 205, 137));
         swfInsidePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -95,7 +92,7 @@ public final class BinaryPanel extends JPanel {
         data = binaryDataTag == null ? null : binaryDataTag.binaryData.getRangeData();
         if (data != null) {
             hexEditor.setData(data, null, null);
-            boolean isSwfData = binaryDataTag.isSwfData();            
+            boolean isSwfData = binaryDataTag.isSwfData();
             if (isSwfData) {
                 if (binaryDataTag.usedPacker != null) {
                     swfInsideLabel.setText(AppStrings.translate("binarydata.swfInside.packer").replace("%packer%", binaryDataTag.usedPacker.getName()));

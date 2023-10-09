@@ -220,7 +220,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
         if (!foundSomething) {
             rect = new RECT();
         }
-        
+
         if (cache != null) {
             cache.put(this, rect);
         }
@@ -296,8 +296,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
         timeline.addFrame(frameHit);
     }
-    
-     @Override
+
+    @Override
     public int getFrameCount() {
         return 4;
     }
@@ -309,8 +309,8 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        for (BUTTONRECORD rec: characters) {
+        for (BUTTONRECORD rec : characters) {
             needed.add(rec.characterId);
         }
-    }        
+    }
 }

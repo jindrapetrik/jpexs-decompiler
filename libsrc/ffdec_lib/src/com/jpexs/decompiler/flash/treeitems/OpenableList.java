@@ -85,27 +85,12 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
     @Override
     public <T> T[] toArray(T[] ts) {
         return items.toArray(ts);
-    }
-
-    @Override
-    public boolean add(Openable e) {
-        return items.add(e);
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return items.remove(o);
-    }
+    }      
 
     @Override
     public boolean containsAll(Collection<?> clctn) {
         return items.containsAll(clctn);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Openable> clctn) {
-        return items.addAll(clctn);
-    }
+    }    
 
     @Override
     public boolean removeAll(Collection<?> clctn) {
@@ -120,6 +105,11 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
     @Override
     public void clear() {
         items.clear();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Openable> clctn) {
+        return items.addAll(clctn);
     }
 
     @Override
@@ -141,8 +131,18 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
     }
 
     @Override
+    public boolean add(Openable e) {
+        return items.add(e);
+    }
+
+    @Override
     public void add(int i, Openable e) {
         items.add(i, e);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return items.remove(o);
     }
 
     @Override

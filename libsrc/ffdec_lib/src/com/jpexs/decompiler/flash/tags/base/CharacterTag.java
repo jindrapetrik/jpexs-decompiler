@@ -42,7 +42,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     public LinkedHashSet<String> getClassNames() {
         return new LinkedHashSet<>(classNames);
     }
-    
+
     public void addClassName(String className) {
         classNames.add(className);
     }
@@ -62,11 +62,11 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     @Override
     public String getExportFileName() {
         String result = super.getExportFileName();
-        return result + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___",classNames) : "");
+        return result + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___", classNames) : "");
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___",classNames) : "");
+        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___", classNames) : "");
     }
 
     protected String exportName;

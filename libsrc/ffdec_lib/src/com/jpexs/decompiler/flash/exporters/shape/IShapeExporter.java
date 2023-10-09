@@ -30,9 +30,9 @@ public interface IShapeExporter {
     public void beginShape();
 
     public void endShape();
-    
+
     public void beginAliasedFills();
-    
+
     public void beginFills();
 
     public void endFills();

@@ -211,7 +211,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public boolean importSupported() {
         return true;
-    }   
+    }
 
     @Override
     public List<ByteArrayRange> getRawSoundData() {
@@ -262,9 +262,8 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     public String toString() {
         return getName() + " (" + virtualCharacterId + ")";
     }
-        
-    //getNeededCharacters intentionally not defined
 
+    //getNeededCharacters intentionally not defined
     @Override
     public void setSoundSize(boolean soundSize) {
         this.streamSoundSize = soundSize;
@@ -288,5 +287,5 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
-    }        
+    }
 }

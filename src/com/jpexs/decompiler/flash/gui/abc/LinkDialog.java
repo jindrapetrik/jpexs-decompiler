@@ -22,10 +22,6 @@ import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.treeitems.Openable;
-import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -171,8 +167,6 @@ public class LinkDialog extends JDialog {
         return ret;
     }
 
-    
-
     private void populateSWFs(SWF ignoreSWF, List<SWF> selectedSWFs) {
         Map<String, SWF> swfs = new LinkedHashMap<>();
         Main.populateAllSWFs(swfs);
@@ -195,54 +189,51 @@ public class LinkDialog extends JDialog {
         pack();
     }
 
-    
-}
+    class LinkItem {
 
-class LinkItem {
+        private String name;
+        private SWF swf;
+        private boolean selected;
 
-    private String name;
-    private SWF swf;
-    private boolean selected;
+        public LinkItem(String name, SWF swf, boolean selected) {
+            this.name = name;
+            this.swf = swf;
+            this.selected = selected;
+        }
 
-    public LinkItem(String name, SWF swf, boolean selected) {
-        this.name = name;
-        this.swf = swf;
-        this.selected = selected;
+        public void setSelected(boolean selected) {
+            this.selected = selected;
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public SWF getSwf() {
+            return swf;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    class CustomLibraryListCellRenderer extends JCheckBox implements ListCellRenderer<LinkItem> {
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends LinkItem> list, LinkItem value, int index, boolean isSelected, boolean cellHasFocus) {
+            setEnabled(list.isEnabled());
+            setSelected(value.isSelected());
+            setFont(list.getFont());
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+            setText(value.toString());
+            return this;
+        }
     }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public SWF getSwf() {
-        return swf;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-}
-
-class CustomLibraryListCellRenderer extends JCheckBox implements ListCellRenderer<LinkItem> {
-
-    @Override
-    public Component getListCellRendererComponent(JList<? extends LinkItem> list, LinkItem value, int index, boolean isSelected, boolean cellHasFocus) {
-        setEnabled(list.isEnabled());
-        setSelected(value.isSelected());
-        setFont(list.getFont());
-        setBackground(list.getBackground());
-        setForeground(list.getForeground());
-        setText(value.toString());
-        return this;
-    }
-
 }

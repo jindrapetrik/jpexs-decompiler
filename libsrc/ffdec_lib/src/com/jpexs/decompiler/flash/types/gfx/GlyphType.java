@@ -45,8 +45,6 @@ public class GlyphType implements Serializable {
         boundingBox[2] = 1; //xmax
         boundingBox[3] = 1; //ymax
     }
-    
-    
 
     public GlyphType(List<SHAPERECORD> records) {
         LINESTYLEARRAY lsa = new LINESTYLEARRAY();
