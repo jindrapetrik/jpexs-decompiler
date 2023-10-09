@@ -24,5 +24,4 @@ import com.jpexs.decompiler.flash.types.HasCharacterId;
  */
 public interface CharacterIdTag extends HasCharacterId {
 
-    
 }

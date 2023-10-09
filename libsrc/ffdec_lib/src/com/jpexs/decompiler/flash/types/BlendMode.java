@@ -21,6 +21,7 @@ package com.jpexs.decompiler.flash.types;
  * @author JPEXS
  */
 public class BlendMode {
+
     public static final int NORMAL = 1;
     public static final int LAYER = 2;
     public static final int MULTIPLY = 3;

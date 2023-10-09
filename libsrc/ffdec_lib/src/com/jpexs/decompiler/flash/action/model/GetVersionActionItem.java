@@ -47,7 +47,7 @@ public class GetVersionActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         return toSourceMerge(localData, generator, new ActionPush("/:$version", charset), new ActionGetVariable());
     }
 

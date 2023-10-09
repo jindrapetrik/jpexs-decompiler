@@ -38,9 +38,9 @@ public class LocalData {
     public ConstantPool constants;
 
     public AVM2ConstantPool constantsAvm2;
-    
+
     public AbcIndexing abcIndex;
-    
+
     public List<MethodBody> callStack;
 
     public HashMap<Integer, String> localRegNames;

@@ -228,7 +228,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (resolved == null) {
-            throw new CompilationException("Undefined variable or property: "+ toString(), line);
+            throw new CompilationException("Undefined variable or property: " + toString(), line);
         }
         return resolved.toSource(localData, generator);
     }
@@ -236,7 +236,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (resolved == null) {
-            throw new CompilationException("Undefined variable or property: "+ toString(), line);
+            throw new CompilationException("Undefined variable or property: " + toString(), line);
         }
         return resolved.toSourceIgnoreReturnValue(localData, generator);
     }
@@ -279,7 +279,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) throws CompilationException {
         if (resolved == null) {
-            throw new CompilationException("Undefined variable or property: "+ toString(), line);
+            throw new CompilationException("Undefined variable or property: " + toString(), line);
         }
         if (resolved instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) resolved).toSourceChange(localData, generator, post, decrement, needsReturn);
@@ -320,7 +320,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             int ind = paramNames.indexOf(name.get(0));
             GraphTargetItem t = TypeItem.UNBOUNDED;
             if (ind == -1) {
-
+                //empty
             } else if (ind < paramTypes.size()) {
                 t = paramTypes.get(ind);
             } //else rest parameter
@@ -362,7 +362,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             DottedChain classChain = DottedChain.parseWithSuffix(currentClass);
             DottedChain pkg = classChain.getWithoutLast();
 
-            TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));           
+            TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
             if (ci != null) {

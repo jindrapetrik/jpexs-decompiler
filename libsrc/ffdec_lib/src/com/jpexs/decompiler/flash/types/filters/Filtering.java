@@ -286,8 +286,8 @@ public class Filtering {
         BufferedImage shadowInner = null;
         BufferedImage hilightInner = null;
         if (type != OUTER) {
-            BufferedImage hilightIm = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
+            BufferedImage hilightIm = dropShadow(src, 0, 0, angle, distance, Color.red, true, iterations, strength, true, true);
+            BufferedImage shadowIm = dropShadow(src, 0, 0, angle + 180, distance, Color.blue, true, iterations, strength, true, true);
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
             Graphics2D hc = h2.createGraphics();
@@ -306,8 +306,8 @@ public class Filtering {
         BufferedImage shadowOuter = null;
         BufferedImage hilightOuter = null;
         if (type != INNER) {
-            BufferedImage hilightIm = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true, true);//new DropShadowFilter(blurX, blurY, strength, inner ? highlightColor : shadowColor, angle, distance, inner, true, iterations).filter(src
-            BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true, true); //new DropShadowFilter(blurX, blurY, strength, inner ? shadowColor : highlightColor, angle + 180, distance, inner, true, iterations).filter(src);
+            BufferedImage hilightIm = dropShadow(src, 0, 0, angle + 180, distance, Color.red, false, iterations, strength, true, true);
+            BufferedImage shadowIm = dropShadow(src, 0, 0, angle, distance, Color.blue, false, iterations, strength, true, true);
             BufferedImage h2 = new BufferedImage(width, height, src.getType());
             BufferedImage s2 = new BufferedImage(width, height, src.getType());
             Graphics2D hc = h2.createGraphics();
@@ -383,21 +383,7 @@ public class Filtering {
 
     public static SerializableImage glow(SerializableImage src, int blurX, int blurY, float strength, Color color, boolean inner, boolean knockout, int iterations) {
         return new SerializableImage(dropShadow(src.getBufferedImage(), blurX, blurY, 45, 0, color, inner, iterations, strength, knockout, true));
-    }
-
-    public static SerializableImage dropShadow(SerializableImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout, boolean compositeSource) {
-        return new SerializableImage(dropShadow(src.getBufferedImage(), blurX, blurY, angle, distance, color, inner, iterations, strength, knockout, compositeSource));
-    }
-
-    private static int cut(int val, int min, int max) {
-        if (val > max) {
-            val = max;
-        }
-        if (val < min) {
-            val = min;
-        }
-        return val;
-    }
+    }      
 
     private static Color over(Color a, Color b) {
         int resultA = a.getAlpha() + b.getAlpha() * (255 - a.getAlpha()) / 255;
@@ -405,7 +391,11 @@ public class Filtering {
         int resultG = cut((a.getGreen() * (a.getAlpha() / 255.0) + b.getGreen() * (b.getAlpha() / 255.0) * (1 - (a.getAlpha() / 255.0))) / (resultA / 255.0));
         int resultB = cut((a.getBlue() * (a.getAlpha() / 255.0) + b.getBlue() * (b.getAlpha() / 255.0) * (1 - (a.getAlpha() / 255.0))) / (resultA / 255.0));
         return new Color(resultR, resultG, resultB, resultA);
-    }  
+    }
+
+    public static SerializableImage dropShadow(SerializableImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout, boolean compositeSource) {
+        return new SerializableImage(dropShadow(src.getBufferedImage(), blurX, blurY, angle, distance, color, inner, iterations, strength, knockout, compositeSource));
+    }
 
     private static BufferedImage dropShadow(BufferedImage src, int blurX, int blurY, float angle, double distance, Color color, boolean inner, int iterations, float strength, boolean knockout, boolean compositeSource) {
         int width = src.getWidth();
@@ -416,7 +406,7 @@ public class Filtering {
             int alpha = (srcPixels[i] >> 24) & 0xff;
             if (inner) {
                 alpha = 255 - alpha;
-            }            
+            }
             Color shadowColor;
             shadowColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255 * strength));
             shadow[i] = shadowColor.getRGB();
@@ -602,6 +592,16 @@ public class Filtering {
         }
         setRGB(dst, src.getWidth(), src.getHeight(), pixels);
         return new SerializableImage(dst);
+    }
+
+    private static int cut(int val, int min, int max) {
+        if (val > max) {
+            val = max;
+        }
+        if (val < min) {
+            val = min;
+        }
+        return val;
     }
 
     private static int cut(double val) {

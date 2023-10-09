@@ -24,6 +24,7 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class DisplayObjectCacheKey {
+
     public PlaceObjectTypeTag placeObject;
     public double zoom;
     public ExportRectangle viewRect;

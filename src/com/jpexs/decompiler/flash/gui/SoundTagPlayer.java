@@ -198,8 +198,8 @@ public class SoundTagPlayer implements MediaDisplay {
         }
 
         long soundLength44 = 0;
-        boolean isUnCompressed = tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN ||
-                tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN;
+        boolean isUnCompressed = tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN
+                || tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN;
         int sampleLen = (isUnCompressed ? (tag.getSoundSize() ? 2 : 1) : 2) * (tag.getSoundFormat().stereo ? 2 : 1);
         switch (tag.getSoundRate()) {
             case 0: //5.5kHz
@@ -272,9 +272,10 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private void playLoop() {
 
-        loop: while (true) {
+        loop:
+        while (true) {
 
-            final byte[] data = new byte[16];            
+            final byte[] data = new byte[16];
             setActiveFlag(true);
             long posBytes = 0;
             try {
@@ -498,14 +499,14 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public void setDisplayed(boolean value) {
-        
+
     }
-    
+
     @Override
     public void setFrozen(boolean value) {
-        
+
     }
-    
+
     @Override
     public boolean isDisplayed() {
         return true;
@@ -518,11 +519,11 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public void setMuted(boolean value) {
-        
+
     }
 
     @Override
     public boolean isMutable() {
         return true;
-    }        
+    }
 }

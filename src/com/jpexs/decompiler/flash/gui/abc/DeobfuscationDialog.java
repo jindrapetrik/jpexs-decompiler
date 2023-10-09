@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationScope;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Window;

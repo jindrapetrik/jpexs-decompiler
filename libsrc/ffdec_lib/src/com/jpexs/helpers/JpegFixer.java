@@ -23,10 +23,8 @@ import java.io.OutputStream;
 /**
  * Fixes probles in some JPEGs to be readable by standard viewers.
  *
- * It removes:
- * 1) EOI markers followed by SOI markers
- * 2) EOI SOI on the beginning of the file
- * 3) Second or more SOI markers in the file
+ * It removes: 1) EOI markers followed by SOI markers 2) EOI SOI on the
+ * beginning of the file 3) Second or more SOI markers in the file
  *
  * @author JPEXS
  */
@@ -36,8 +34,8 @@ public class JpegFixer {
     public static final int EOI = 0xD9;
 
     public void fixJpeg(InputStream is, OutputStream os) throws IOException {
-        boolean prevEoi = false;       
-        
+        boolean prevEoi = false;
+
         int val = is.read();
         if (val == -1) {
             return;
@@ -109,9 +107,10 @@ public class JpegFixer {
         }
 
         //main removing EOI+SOI
-        loopread: while ((val = is.read()) > -1) {
+        loopread:
+        while ((val = is.read()) > -1) {
             if (val == 0xFF) {
-                val = is.read();                
+                val = is.read();
                 if (val == 0) {
                     os.write(0xFF);
                     os.write(val);
@@ -136,7 +135,7 @@ public class JpegFixer {
                         os.write(val);
                     }
                 }
-                
+
                 if (val != -1 && JpegMarker.markerHasLength(val)) {
                     int len1 = is.read();
                     if (len1 == -1) {
@@ -149,7 +148,7 @@ public class JpegFixer {
                     }
                     os.write(len1);
                     os.write(len2);
-                    int len = (len1 << 8) + len2;                    
+                    int len = (len1 << 8) + len2;
                     for (int i = 0; i < len - 2; i++) {
                         int val2 = is.read();
                         if (val2 == -1) {

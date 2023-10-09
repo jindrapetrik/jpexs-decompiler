@@ -44,11 +44,11 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
-    
+
     public GraphTargetItem type;
-    
+
     public boolean hideValue = false;
-    
+
     public boolean causedByDup = false;
 
     @Override
@@ -84,7 +84,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         writer.append(" = ");
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
-        }*/        
+        }*/
         return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
     }
 
@@ -151,7 +151,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     }
 
     @Override
-    public GraphTargetItem returnType() {        
+    public GraphTargetItem returnType() {
         return type;
     }
 
@@ -215,6 +215,5 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         }
         return precedence;
     }
-    
-    
+
 }

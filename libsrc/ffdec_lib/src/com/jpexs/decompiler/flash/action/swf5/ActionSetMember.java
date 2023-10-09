@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
@@ -41,7 +42,6 @@ import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
 
 /**
@@ -162,7 +162,7 @@ public class ActionSetMember extends Action {
                 }
                 TemporaryRegister tr = new TemporaryRegister(sr.register.number, ret);
                 variables.put("__register" + sr.register.number, tr);
-                output.add(new TemporaryRegisterMark(tr));   
+                output.add(new TemporaryRegisterMark(tr));
                 return;
             }
         }

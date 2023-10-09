@@ -37,7 +37,7 @@ public class GetSlotAVM2Item extends AVM2Item {
     public GraphTargetItem slotObject;
 
     public int slotIndex;
-    
+
     public GraphTargetItem slotType;
 
     public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem slotType) {

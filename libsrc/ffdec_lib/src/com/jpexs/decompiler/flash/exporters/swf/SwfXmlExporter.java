@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
@@ -69,7 +68,7 @@ public class SwfXmlExporter {
 
                 xmlWriter.writeStartDocument();
                 xmlWriter.writeComment("\r\nWARNING: The structure of this XML is not final.\r\nIn later versions of FFDec it can be changed.\r\nMake sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.\r\n");
-                
+
                 exportXml(swf, xmlWriter);
 
                 xmlWriter.writeEndDocument();
@@ -198,20 +197,20 @@ public class SwfXmlExporter {
             }
 
             writer.writeStartElement(name);
-            
+
             if (obj instanceof SWF) {
                 writer.writeAttribute("_xmlExportMajor", "" + XML_EXPORT_VERSION_MAJOR);
                 writer.writeAttribute("_xmlExportMinor", "" + XML_EXPORT_VERSION_MINOR);
                 writer.writeAttribute("_generator", ApplicationInfo.applicationVerName);
             }
-            
+
             writer.writeAttribute("type", clazz.getSimpleName());
 
             if (obj instanceof UnknownTag) {
                 writer.writeAttribute("tagId", String.valueOf(((Tag) obj).getId()));
             }
             if (obj instanceof SWF) {
-                writer.writeAttribute("charset", ((SWF) obj).getCharset());                
+                writer.writeAttribute("charset", ((SWF) obj).getCharset());
             }
 
             for (Field f : fields) {

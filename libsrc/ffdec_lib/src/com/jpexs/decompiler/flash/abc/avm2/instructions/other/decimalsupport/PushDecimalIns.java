@@ -48,8 +48,8 @@ public class PushDecimalIns extends InstructionDefinition {
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;
-    }    
-    
+    }
+
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;

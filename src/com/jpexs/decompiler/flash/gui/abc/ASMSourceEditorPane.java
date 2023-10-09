@@ -73,8 +73,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public ABC abc;
 
     public int bodyIndex = -1;
-    
-    
+
     public int methodIndex = -1;
 
     private int scriptIndex = -1;
@@ -129,7 +128,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             trait.convertTraitHeader(abc, writer);
         }
         if (bodyIndex > -1) {
-            MethodBody body = abc.bodies.get(bodyIndex);        
+            MethodBody body = abc.bodies.get(bodyIndex);
             abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
         } else {
             writer.appendNoHilight("method");
@@ -137,9 +136,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 writer.indent();
             }
             writer.newLine();
-            
+
             abc.method_info.get(methodIndex).toASMSource(abc, writer);
-            
+
             if (Configuration.indentAs3PCode.get()) {
                 writer.unindent();
             }
@@ -246,7 +245,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         this.abc = abc;
         this.name = name;
         this.trait = trait;
-        this.scriptIndex = scriptIndex;        
+        this.scriptIndex = scriptIndex;
         textWithHex = null;
         textNoHex = null;
         textHexOnly = null;
@@ -342,8 +341,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             textNoHex = null;
             textHexOnly = null;
             setHex(exportMode, true);
-        } catch (IOException ex) {
-        } catch (InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
+            //ignored
         } catch (AVM2ParseException ex) {
             gotoLine((int) ex.line);
             markError();
@@ -462,7 +461,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(getText().replace("\r\n", "\n")));
         ParsedSymbol symb;
         String lastLevel;
-        final Integer singleUse[] = new Integer[]{
+        final Integer[] singleUse = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_FINAL,
             ParsedSymbol.TYPE_KEYWORD_OVERRIDE,
             ParsedSymbol.TYPE_KEYWORD_METADATA,
@@ -475,14 +474,14 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL
         };
 
-        final Integer openingBlocks[] = new Integer[]{
+        final Integer[] openingBlocks = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_METHOD,
             ParsedSymbol.TYPE_KEYWORD_CODE,
             ParsedSymbol.TYPE_KEYWORD_BODY,
             ParsedSymbol.TYPE_KEYWORD_TRAIT,
             ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK
         };
-        final Integer singleLine[] = new Integer[]{
+        final Integer[] singleLine = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_ITEM,
             ParsedSymbol.TYPE_KEYWORD_NAME,
             ParsedSymbol.TYPE_KEYWORD_FLAG,
@@ -498,8 +497,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             ParsedSymbol.TYPE_KEYWORD_DISPID,
             ParsedSymbol.TYPE_KEYWORD_SLOTID,
             ParsedSymbol.TYPE_KEYWORD_TYPE,
-            ParsedSymbol.TYPE_KEYWORD_VALUE,};
-        final Integer parameters[] = new Integer[]{
+            ParsedSymbol.TYPE_KEYWORD_VALUE
+        };
+        final Integer[] parameters = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_FROM,
             ParsedSymbol.TYPE_KEYWORD_TO,
             ParsedSymbol.TYPE_KEYWORD_TARGET,
@@ -508,7 +508,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             ParsedSymbol.TYPE_KEYWORD_SLOT,
             ParsedSymbol.TYPE_KEYWORD_CONST,
             ParsedSymbol.TYPE_KEYWORD_GETTER,
-            ParsedSymbol.TYPE_KEYWORD_SETTER};
+            ParsedSymbol.TYPE_KEYWORD_SETTER
+        };
         final List<Integer> openingBlocksList = Arrays.asList(openingBlocks);
         final List<Integer> singleLineList = Arrays.asList(singleLine);
         final List<Integer> parameterList = Arrays.asList(parameters);

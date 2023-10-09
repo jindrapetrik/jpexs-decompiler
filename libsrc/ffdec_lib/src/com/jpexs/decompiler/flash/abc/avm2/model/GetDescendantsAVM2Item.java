@@ -72,7 +72,7 @@ public class GetDescendantsAVM2Item extends AVM2Item {
         } else {
             object.toString(writer, localData);
         }
-        
+
         writer.append("..");
         return multiname.toString(writer, localData);
     }

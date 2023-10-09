@@ -64,7 +64,7 @@ public class HtmlLabel extends JEditorPane {
         if (nightMode) {
             linkColor = new Color(0x88, 0x88, 0xff);
         }
-        
+
         String aRule = "a {color: " + String.format("#%02x%02x%02x", linkColor.getRed(), linkColor.getGreen(), linkColor.getBlue()) + "}";
 
         ((HTMLDocument) getDocument()).getStyleSheet().addRule(aRule);

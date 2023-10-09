@@ -370,7 +370,6 @@ public class CssParser {
         return true;
     }
 
-
     private void media() throws IOException, CssParseException {
         expect(CssSymbolType.MEDIA_SYM);
         sstar();

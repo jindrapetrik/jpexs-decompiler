@@ -93,7 +93,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -102,7 +101,6 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -123,13 +121,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private static final int FIELD_INDEX = 0;
 
-    private List<TreeModelListener> modelListeners = new ArrayList<>();        
-    
+    private List<TreeModelListener> modelListeners = new ArrayList<>();
+
     public void addTreeModelListener(TreeModelListener listener) {
         modelListeners.add(listener);
         ((DefaultTreeModel) tree.getModel()).addTreeModelListener(listener);
     }
-    
+
     public void addTreeSelectionListener(TreeSelectionListener listener) {
         tree.addTreeSelectionListener(listener);
     }
@@ -301,7 +299,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 JPanel panSum = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
                 panSum.setOpaque(false);
                 for (int i = 0; i < fnode.fieldSet.size(); i++) {
-                    Field field = fnode.fieldSet.get(i);//fnode.fieldSet.get(FIELD_INDEX);
+                    Field field = fnode.fieldSet.get(i);
                     int index = fnode.index;
                     Object obj = fnode.obj;
                     Class<?> type;
@@ -470,7 +468,6 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
     }
 
-    
     @Override
     public boolean tryAutoSave() {
         if (Configuration.autoSaveTagModifications.get()) {
@@ -481,7 +478,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         return true;
     }
-    
+
     public GenericTagTreePanel(MainPanel mainPanel) {
         super(mainPanel);
         setLayout(new BorderLayout());
@@ -489,10 +486,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         add(new FasterScrollPane(tree), BorderLayout.CENTER);
-        tree.addTreeSelectionListener(new TreeSelectionListener(){
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-            }            
+            }
         });
         tree.addMouseListener(new MouseAdapter() {
             @Override
@@ -540,7 +537,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                         mi.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
-                                                TreePath tps[] = tree.getSelectionPaths();
+                                                TreePath[] tps = tree.getSelectionPaths();
                                                 if (tps == null) {
                                                     tps = new TreePath[]{selPath};
                                                 }
@@ -622,7 +619,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             mi.addActionListener(new ActionListener() {
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
-                                                    TreePath tps[] = tree.getSelectionPaths();
+                                                    TreePath[] tps = tree.getSelectionPaths();
                                                     if (tps == null) {
                                                         tps = new TreePath[]{selPath};
                                                     }
@@ -741,21 +738,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private int index;
 
         private MyTreeModel model;
-        
+
         private Object parentObject;
-        
+
         public Object getParentObject() {
             return parentObject;
         }
-        
+
         public FieldNode(Object parent, MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index) {
             this.tag = tag;
             this.obj = obj;
             this.fieldSet = fieldSet;
             this.index = index;
-            this.model = model;  
-            this.parentObject = parent;                        
-            
+            this.model = model;
+            this.parentObject = parent;
+
             for (int i = 0; i < fieldSet.size(); i++) {
                 if (getValue(i) == null) {
                     try {
@@ -1220,6 +1217,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         try {
             editedTag = tag == null ? null : tag.cloneTag();
         } catch (InterruptedException ex) {
+            //ignore
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -1525,13 +1523,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //ignore
             }
         }
-        ((MyTreeModel) tree.getModel()).vchanged(new TreePath(tree.getModel().getRoot()));        
+        ((MyTreeModel) tree.getModel()).vchanged(new TreePath(tree.getModel().getRoot()));
         refreshTree();
     }
 
     public void refreshTree() {
         View.refreshTree(tree, getModel());
-        for (TreeModelListener listener:modelListeners) {
+        for (TreeModelListener listener : modelListeners) {
             ((DefaultTreeModel) tree.getModel()).addTreeModelListener(listener);
         }
         revalidate();

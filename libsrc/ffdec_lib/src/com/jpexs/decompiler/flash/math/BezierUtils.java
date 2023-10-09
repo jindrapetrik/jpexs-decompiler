@@ -22,11 +22,10 @@ import java.util.List;
 
 /**
  *
- * Bezier utils.
- * Based on
- * https://code.google.com/archive/p/degrafa/source/default/source
- * which is derived from an algorithm in the book "Graphics Gems" 
- * 
+ * Bezier utils. Based on
+ * https://code.google.com/archive/p/degrafa/source/default/source which is
+ * derived from an algorithm in the book "Graphics Gems"
+ *
  * This modification does not have cubic curves support.
  */
 public class BezierUtils {
@@ -183,13 +182,13 @@ public class BezierUtils {
      * subdivide( _c:Array, _t:Number, _left:Array, _right:Array ) - deCasteljau
      * subdivision of an arbitrary-order Bezier curve
      *
-     * @param _c:Array array of control points for the Bezier curve
-     * @param _t:Number t-parameter at which the curve is subdivided (must be in
+     * @param _c Array array of control points for the Bezier curve
+     * @param _t Number t-parameter at which the curve is subdivided (must be in
      * (0,1) = no check at this point
-     * @param _left:Array reference to an array in which the control points,
+     * @param _left Array reference to an array in which the control points,
      * <code>Array</code> of <code>Point</code> references, of the left control
      * cage after subdivision are stored
-     * @param _right:Array reference to an array in which the control points,
+     * @param _right Array reference to an array in which the control points,
      * <code>Array</code> of <code>Point</code> references, of the right control
      * cage after subdivision are stored
      *

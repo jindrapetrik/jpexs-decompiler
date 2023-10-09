@@ -32,15 +32,17 @@ import java.util.logging.Logger;
 
 /**
  * Index of ActionScript 2 built in classes.
+ *
  * @author JPEXS
  */
 public class ActionScript2Classes {
-    private static final Map<String, Map<String,Trait>> classToTraits = new HashMap<>();
+
+    private static final Map<String, Map<String, Trait>> classToTraits = new HashMap<>();
     private static final Map<String, List<String>> classInheritance = new HashMap<>();
-    
+
     private static boolean inited = false;
-    
-    private synchronized static void initClasses() {
+
+    private static synchronized void initClasses() {
         if (inited) {
             return;
         }
@@ -49,12 +51,12 @@ public class ActionScript2Classes {
             BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             String line;
             String clsName = "";
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty()) {
                     continue;
                 }
-                String parts[] = line.split(" ");
+                String[] parts = line.split(" ");
                 if (parts[0].equals("class")) {
                     clsName = parts[1];
                     classToTraits.put(clsName, new TreeMap<>());
@@ -73,21 +75,21 @@ public class ActionScript2Classes {
                     classInheritance.get(clsName).add(parts[pos + 1]);
                     continue;
                 }
-                
+
                 String traitType = parts[pos];
                 String name = parts[pos + 1];
                 String type = parts[pos + 2];
                 Trait trait;
-                switch(traitType) {
-                    case "function": 
+                switch (traitType) {
+                    case "function":
                         trait = new Method(isStatic, name, type, clsName);
                         break;
                     case "var":
                         trait = new Variable(isStatic, name, type, clsName);
                         break;
-                     default:
-                         throw new RuntimeException("Unknown trait type: "+traitType);
-                }                
+                    default:
+                        throw new RuntimeException("Unknown trait type: " + traitType);
+                }
                 classToTraits.get(clsName).put(name, trait);
             }
         } catch (UnsupportedEncodingException ex) {
@@ -97,17 +99,16 @@ public class ActionScript2Classes {
         }
         inited = true;
     }
-        
-    
+
     public static boolean traitExists(String className, String name, boolean withInheritance) {
         if (!classToTraits.containsKey(className)) {
             return false;
         }
-        
+
         if (classToTraits.get(className).containsKey(name)) {
             return true;
         }
-        
+
         if (withInheritance) {
             if (classInheritance.containsKey(className)) {
                 for (String parentClassName : classInheritance.get(className)) {
@@ -121,29 +122,30 @@ public class ActionScript2Classes {
         }
         return false;
     }
-    
+
     /**
      * Get class traits, null when class not exists (or is not built-in)
+     *
      * @param className
      * @param withInheritance
-     * @return 
+     * @return
      */
     public static Map<String, Trait> getClassTraits(String className, boolean withInheritance) {
         initClasses();
-        
+
         Map<String, Trait> result = new LinkedHashMap<>();
         if (!classToTraits.containsKey(className)) {
             return null;
         }
-        for (String name: classToTraits.get(className).keySet()) {
+        for (String name : classToTraits.get(className).keySet()) {
             result.put(name, classToTraits.get(className).get(name));
         }
-        
+
         if (withInheritance) {
             if (classInheritance.containsKey(className)) {
                 for (String parentClassName : classInheritance.get(className)) {
                     if (classToTraits.containsKey(parentClassName)) {
-                        for (String name: classToTraits.get(parentClassName).keySet()) {
+                        for (String name : classToTraits.get(parentClassName).keySet()) {
                             if (!result.containsKey(name)) {
                                 result.put(name, classToTraits.get(parentClassName).get(name));
                             }
@@ -163,18 +165,18 @@ public class ActionScript2Classes {
     public static Map<String, List<String>> getClassInheritance() {
         initClasses();
         return classInheritance;
-    }        
-    
+    }
+
     public static void main(String[] args) {
         Map<String, Trait> traits = getClassTraits("flash.filters.BevelFilter", true);
         if (traits != null) {
-            for(String name:traits.keySet()) {
+            for (String name : traits.keySet()) {
                 Trait t = traits.get(name);
-                System.out.println(t.toString() + " (" + t.getClassName() +")");
+                System.out.println(t.toString() + " (" + t.getClassName() + ")");
             }
         }
-        
-        System.out.println("trait exists: "+ traitExists("flash.filters.BevelFilter", "quality", false));
+
+        System.out.println("trait exists: " + traitExists("flash.filters.BevelFilter", "quality", false));
     }
-           
+
 }

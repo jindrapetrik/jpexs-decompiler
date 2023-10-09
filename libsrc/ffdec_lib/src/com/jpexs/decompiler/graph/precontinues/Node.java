@@ -25,6 +25,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class Node {
+
     public List<Node> next = new ArrayList<>();
     public List<Node> prev = new ArrayList<Node>();
     public GraphPart graphPart;
@@ -70,7 +71,6 @@ public class Node {
         }
         return true;
     }
-
 
     public void replacePrevs(Node newNode) {
         for (Node p : this.prev) {

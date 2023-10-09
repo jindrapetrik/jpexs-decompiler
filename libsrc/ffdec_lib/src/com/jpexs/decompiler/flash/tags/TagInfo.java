@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class TagInfo {
 
-    private SWF swf;            
+    private SWF swf;
     private final Map<String, List<TagInfoItem>> infos = new LinkedHashMap<>();
 
     public TagInfo(SWF swf) {
@@ -37,8 +37,8 @@ public class TagInfo {
 
     public SWF getSwf() {
         return swf;
-    }        
-    
+    }
+
     public void addInfo(String categoryName, String name, Object value) {
         categoryName = "general"; // temporary add everything to general catagory
         List<TagInfoItem> category = infos.get(categoryName);

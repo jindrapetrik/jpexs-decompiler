@@ -44,7 +44,7 @@ public interface SetTypeIns {
         }
         return value;
     }
-    
+
     public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId, GraphTargetItem type) {
         GraphTargetItem notCoercedValue = value;
         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
@@ -75,8 +75,8 @@ public interface SetTypeIns {
                             stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : value.returnType()));
                         }
                         return;
-                    } else {                       
-                        
+                    } else {
+
                         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
                             value.value = insideDup;
                         } else {
@@ -84,9 +84,9 @@ public interface SetTypeIns {
                         }
 
                         result.value = value;
-                        
+
                         if ((result instanceof SetLocalAVM2Item) && regId > -1) {
-                            ((SetLocalAVM2Item)result).causedByDup = true;
+                            ((SetLocalAVM2Item) result).causedByDup = true;
                         }
 
                         if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
@@ -100,7 +100,7 @@ public interface SetTypeIns {
                     }
                 }
             }
-        }                
+        }
         output.add(result);
     }
 }

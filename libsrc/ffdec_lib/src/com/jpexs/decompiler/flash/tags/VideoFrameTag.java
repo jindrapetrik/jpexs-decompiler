@@ -97,7 +97,7 @@ public class VideoFrameTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.streamID = characterId;
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(streamID);

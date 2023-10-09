@@ -57,11 +57,7 @@ public class ConfigurationItem<T> {
         hasValue = true;
         this.defaultValue = defaultValue;
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
+    }    
 
     public T get() {
         if (!hasValue) {
@@ -117,6 +113,10 @@ public class ConfigurationItem<T> {
         } else {
             return (Class<?>) ((ParameterizedType) type).getRawType();
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static String getName(Field field) {

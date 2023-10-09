@@ -84,7 +84,7 @@ public class StreamSearch implements Searchable {
                         }
                         if (match) {
                             // todo: support > 2GB files
-                            InputStream fis = new MemoryInputStream(is.getAllRead(), (int) pos + i);                            
+                            InputStream fis = new MemoryInputStream(is.getAllRead(), (int) pos + i);
                             ret.put(pos + i, fis);
                             continue loopdata;
                         }

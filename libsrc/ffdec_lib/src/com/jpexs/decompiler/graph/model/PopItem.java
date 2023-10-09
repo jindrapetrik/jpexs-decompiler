@@ -66,5 +66,5 @@ public class PopItem extends GraphTargetItem {
     @Override
     public boolean hasSideEffect() {
         return true; //?
-    }        
+    }
 }

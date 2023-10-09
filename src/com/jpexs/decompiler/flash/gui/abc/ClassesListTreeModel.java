@@ -49,7 +49,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     private final AS3Package root;
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
-    
+
     private boolean flat = true;
 
     public List<ScriptPack> getList() {
@@ -64,7 +64,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         this.list = swf.getAS3Packs();
         setFilter(null);
     }
-    
+
     public ClassesListTreeModel(ABC abc, boolean flat) {
         super(null, null, null);
         this.flat = flat;
@@ -83,7 +83,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     public final void update() {
         if (targetItem instanceof SWF) {
-            this.list = ((SWF)targetItem).getAS3Packs();
+            this.list = ((SWF) targetItem).getAS3Packs();
         } else if (targetItem instanceof ABC) {
             ABC abc = (ABC) targetItem;
             List<ABC> allAbcs = new ArrayList<>();
@@ -101,9 +101,9 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
-        if (Configuration._ignoreAdditionalFlexClasses.get()) {     
+        if (Configuration._ignoreAdditionalFlexClasses.get()) {
             if (targetItem instanceof SWF) {
-                ((SWF)targetItem).getFlexMainClass(ignoredClasses, ignoredNss);
+                ((SWF) targetItem).getFlexMainClass(ignoredClasses, ignoredNss);
             }
         }
 
@@ -140,7 +140,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     private AS3Package ensurePackage(DottedChain packageStr, ABC abc, Integer scriptIndex, ScriptPack pack) {
         AS3Package parent = root;
-        
+
         if (scriptIndex != null) {
             String pathElement = "script_" + scriptIndex;
             AS3Package pkg = parent.getSubPackage(pathElement);
@@ -151,10 +151,10 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             if (pack.traitIndices.isEmpty()) {
                 pkg.setCompoundInitializerPack(pack);
                 return null;
-            }            
+            }
             parent = pkg;
         }
-        
+
         if (flat) {
             String fullName = packageStr.toPrintableString(true);
             boolean defaultPackage = false;

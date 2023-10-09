@@ -56,7 +56,7 @@ public class GraphVizDotCommands {
         String dotLocation = Configuration.graphVizDotLocation.get();
         if (dotLocation.isEmpty() && !new File(dotLocation).exists()) {
             return false;
-        }//
+        }
         String[] commandPlusDot = new String[command.length + 1];
         commandPlusDot[0] = dotLocation;
         for (int i = 0; i < command.length; i++) {

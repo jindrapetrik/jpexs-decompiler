@@ -15,7 +15,7 @@
  * License along with this library.
  */
 /* Method info lexer specification */
-package com.jpexs.decompiler.flash.abc.methodinfo_parser;
+package com.jpexs.decompiler.flash.abc.methodinfoparser;
 
 %%
 

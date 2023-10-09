@@ -29,8 +29,8 @@ public class TemporaryRegisterMark extends ActionItem {
 
     public TemporaryRegisterMark(TemporaryRegister tempReg) {
         this.tempReg = tempReg;
-    }        
-    
+    }
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer;
@@ -44,7 +44,7 @@ public class TemporaryRegisterMark extends ActionItem {
     @Override
     public boolean needsSemicolon() {
         return false;
-    }        
+    }
 
     @Override
     public boolean hasReturnValue() {
@@ -55,6 +55,5 @@ public class TemporaryRegisterMark extends ActionItem {
     public boolean isEmpty() {
         return true;
     }
-    
-    
+
 }

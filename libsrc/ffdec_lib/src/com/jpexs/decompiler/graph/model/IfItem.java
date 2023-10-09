@@ -52,7 +52,7 @@ public class IfItem extends GraphTargetItem implements Block {
         if (dependencies.contains(expression)) {
             return false;
         }
-        if (!((expression instanceof SimpleValue) && ((SimpleValue)expression).isSimpleValue())) {
+        if (!((expression instanceof SimpleValue) && ((SimpleValue) expression).isSimpleValue())) {
             dependencies.add(expression);
         }
         return expression.isCompileTime(dependencies);
@@ -85,7 +85,6 @@ public class IfItem extends GraphTargetItem implements Block {
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
         visitor.visit(expression);
     }
-
 
     public IfItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
         super(src, lineStartIns, NOPRECEDENCE);

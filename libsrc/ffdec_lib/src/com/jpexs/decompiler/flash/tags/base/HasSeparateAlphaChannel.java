@@ -23,10 +23,10 @@ import java.io.IOException;
  * @author JPEXS
  */
 public interface HasSeparateAlphaChannel {
-    
+
     public boolean hasAlphaChannel();
-    
+
     public byte[] getImageAlpha() throws IOException;
-    
+
     public void setImageAlpha(byte[] data) throws IOException;
 }

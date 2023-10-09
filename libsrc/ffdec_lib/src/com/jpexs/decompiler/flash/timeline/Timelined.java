@@ -43,12 +43,12 @@ public interface Timelined extends BoundedTag {
     public void addTag(int index, Tag tag);
 
     public void replaceTag(int index, Tag newTag);
-    
+
     public void replaceTag(Tag oldTag, Tag newTag);
-    
+
     public int indexOfTag(Tag tag);
-    
+
     public void setFrameCount(int frameCount);
-    
+
     public int getFrameCount();
 }

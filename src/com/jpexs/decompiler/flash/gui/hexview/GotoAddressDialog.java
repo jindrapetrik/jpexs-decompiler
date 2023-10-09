@@ -128,7 +128,6 @@ public class GotoAddressDialog extends AppDialog {
         setVisible(false);
     }
 
-
     public Long showDialog() {
         setVisible(true);
         if (okPressed) {

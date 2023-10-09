@@ -111,15 +111,15 @@ public abstract class AVM2Item extends GraphTargetItem {
         if (empty) {
             return propertyName.toString(writer, localData);
         }
-        
+
         if (propertyName instanceof FullMultinameAVM2Item) {
-            
+
             HighlightData data = new HighlightData();
             int multinameIndex = ((FullMultinameAVM2Item) propertyName).multinameIndex;
             int namespaceIndex = localData.constantsAvm2.getMultiname(multinameIndex).namespace_index;
             GraphTargetItem returnType = object.returnType();
             if (returnType instanceof ApplyTypeAVM2Item) {
-                ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item)returnType;
+                ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item) returnType;
                 data.propertyType = ati.object.toString();
                 data.propertySubType = ati.params.get(0).toString();
             } else {
@@ -127,9 +127,9 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
             data.namespaceIndex = namespaceIndex;
             data.isStatic = isStatic;
-            
+
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                if (((FullMultinameAVM2Item) propertyName).namespace != null) {                    
+                if (((FullMultinameAVM2Item) propertyName).namespace != null) {
                     //writer.append(".");
                     writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 }

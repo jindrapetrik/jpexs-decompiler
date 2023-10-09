@@ -68,11 +68,11 @@ public class DecrementAVM2Item extends AVM2Item {
         if (value.returnType().equals(TypeItem.UINT)) {
             return TypeItem.UINT;
         }
-        
+
         if (value.returnType().equals(TypeItem.NUMBER)) {
             return TypeItem.NUMBER;
         }
-        
+
         return TypeItem.NUMBER;
     }
 

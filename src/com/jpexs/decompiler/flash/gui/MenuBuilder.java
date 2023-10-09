@@ -51,7 +51,7 @@ public interface MenuBuilder {
                         keyCodesToNames.put(keyCode, keyName);
                         keyNamesToCodes.put(keyName, keyCode);
                     } catch (Exception ex) {
-
+                        //ignored
                     }
                 }
             }

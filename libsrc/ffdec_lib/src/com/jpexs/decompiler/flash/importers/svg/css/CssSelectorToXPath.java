@@ -55,6 +55,7 @@ public class CssSelectorToXPath {
         return "substring-before(concat(substring-after("
                 + (s == null || s.isEmpty() ? xpath_url_attrs : s) + ",\"://\"),\"/\"),\"/\")";
     }
+
     private final String xpath_url_attrs = "@href|@src";
     private final String xpath_lower_case = xpath_to_lower(null);
     private final String xpath_ns_uri = "ancestor-or-self::*[last()]/@url";
@@ -145,9 +146,6 @@ public class CssSelectorToXPath {
             case "~":
                 return prefix + "/following-sibling::" + literal;
             case ",":
-                if (axis == null) {
-
-                }
                 axis = ".//";
                 return "|" + axis + literal;
             case "^": // first child
@@ -361,7 +359,7 @@ public class CssSelectorToXPath {
             case "root":
                 return "/ancestor::[last()]";
             case "range":
-                String arr[] = arg.split(",");
+                String[] arr = arg.split(",");
 
                 return "[" + arr[0] + "<=position() and position()<=" + arr[1] + "]";
             case "input": // Sizzle: "input, button, select, and textarea are all considered to be input elements."
@@ -478,6 +476,7 @@ public class CssSelectorToXPath {
                     if (depth == 0) {
                         return ++i + offset;
                     }
+                    //fallthrough (?)
                 default:
                     offset = 0;
             }

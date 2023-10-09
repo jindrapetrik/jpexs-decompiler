@@ -129,23 +129,7 @@ public class Helper {
         }
         sb.append("]");
         return sb.toString();
-    }
-
-    /**
-     * Adds zeros to beginning of the number to fill specified length. Returns
-     * as string
-     *
-     * @param number Number as string
-     * @param length Length of new string
-     * @return Number with added zeros
-     */
-    public static String padZeros(String number, int length) {
-        int count = length - number.length();
-        for (int i = 0; i < count; i++) {
-            number = "0" + number;
-        }
-        return number;
-    }
+    }    
 
     /**
      * Formats specified address to four numbers xxxx (or five numbers when
@@ -496,9 +480,9 @@ public class Helper {
         return sb.toString();
     }
 
-    private final static String SPACES12 = "            ";
+    private static final String SPACES12 = "            ";
 
-    private final static String ZEROS8 = "00000000";
+    private static final String ZEROS8 = "00000000";
 
     public static String formatHex(int value, int width) {
         StringBuilder sb = new StringBuilder();
@@ -586,6 +570,22 @@ public class Helper {
         return parts.length;
     }
 
+    /**
+     * Adds zeros to beginning of the number to fill specified length. Returns
+     * as string
+     *
+     * @param number Number as string
+     * @param length Length of new string
+     * @return Number with added zeros
+     */
+    public static String padZeros(String number, int length) {
+        int count = length - number.length();
+        for (int i = 0; i < count; i++) {
+            number = "0" + number;
+        }
+        return number;
+    }
+
     public static String padZeros(long number, int length) {
         String ret = Long.toString(number);
         while (ret.length() < length) {
@@ -596,50 +596,7 @@ public class Helper {
 
     public static String byteToHex(byte b) {
         return hexStringCache[b & 0xff];
-    }
-
-    public static String byteArrayToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        for (byte b : data) {
-            sb.append(hexStringCache[b & 0xff]);
-        }
-
-        return sb.toString();
-    }
-
-    public static String bytesToHexString(byte[] bytes) {
-        return bytesToHexString(bytes, 0);
-    }
-
-    public static String bytesToHexString(byte[] bytes, int start) {
-        StringBuilder sb = new StringBuilder();
-        if (start < bytes.length) {
-            for (int ii = start; ii < bytes.length; ii++) {
-                sb.append(formatHex(bytes[ii] & 0xff, 2));
-                sb.append(' ');
-            }
-            sb.setLength(sb.length() - 1);
-        }
-        return sb.toString();
-    }
-
-    public static String bytesToHexString(int maxByteCountInString, byte[] bytes, int start) {
-        if (bytes.length - start <= maxByteCountInString) {
-            return bytesToHexString(bytes, start);
-        }
-        byte[] trailingBytes = new byte[maxByteCountInString / 2];
-        byte[] headingBytes = new byte[maxByteCountInString - trailingBytes.length];
-        System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
-        int startOfTrailingBytes = bytes.length - trailingBytes.length;
-        System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
-        StringBuilder sb = new StringBuilder();
-        sb.append(bytesToHexString(headingBytes, 0));
-        if (trailingBytes.length > 0) {
-            sb.append(" ... ");
-            sb.append(bytesToHexString(trailingBytes, 0));
-        }
-        return sb.toString();
-    }
+    }   
 
     public static String format(String str, int len) {
         if (len <= str.length()) {
@@ -754,6 +711,7 @@ public class Helper {
                 baos.write(d);
             }
         } catch (IOException iex) {
+            //ignored
         }
         return new ByteArrayInputStream(baos.toByteArray());
     }
@@ -1024,6 +982,7 @@ public class Helper {
                             }
                         }
                     } catch (Throwable t) {
+                        //ignored
                     }
 
                     f.set(obj, null);
@@ -1108,6 +1067,49 @@ public class Helper {
         return byteArrayToHex(writer, data, 8, 8, false, false);
     }
 
+    public static String bytesToHexString(byte[] bytes) {
+        return bytesToHexString(bytes, 0);
+    }
+    
+    public static String bytesToHexString(byte[] bytes, int start) {
+        StringBuilder sb = new StringBuilder();
+        if (start < bytes.length) {
+            for (int ii = start; ii < bytes.length; ii++) {
+                sb.append(formatHex(bytes[ii] & 0xff, 2));
+                sb.append(' ');
+            }
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
+    public static String bytesToHexString(int maxByteCountInString, byte[] bytes, int start) {
+        if (bytes.length - start <= maxByteCountInString) {
+            return bytesToHexString(bytes, start);
+        }
+        byte[] trailingBytes = new byte[maxByteCountInString / 2];
+        byte[] headingBytes = new byte[maxByteCountInString - trailingBytes.length];
+        System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
+        int startOfTrailingBytes = bytes.length - trailingBytes.length;
+        System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
+        StringBuilder sb = new StringBuilder();
+        sb.append(bytesToHexString(headingBytes, 0));
+        if (trailingBytes.length > 0) {
+            sb.append(" ... ");
+            sb.append(bytesToHexString(trailingBytes, 0));
+        }
+        return sb.toString();
+    }
+    
+    public static String byteArrayToHex(byte[] data) {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        for (byte b : data) {
+            sb.append(hexStringCache[b & 0xff]);
+        }
+
+        return sb.toString();
+    }
+    
     public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
@@ -1255,9 +1257,9 @@ public class Helper {
         }
 
         writer.appendNoHilight(" */").newLine();
-        writer.appendNoHilight("throw new Error(\"").
-                appendNoHilight(AppResources.translate("decompilationError.timeout.description")).
-                appendNoHilight("\");").newLine();
+        writer.appendNoHilight("throw new Error(\"")
+                .appendNoHilight(AppResources.translate("decompilationError.timeout.description"))
+                .appendNoHilight("\");").newLine();
     }
 
     public static void appendTimeoutCommentAs3(GraphTextWriter writer, int timeout, int instructionCount) {
@@ -1269,9 +1271,9 @@ public class Helper {
         }
 
         writer.appendNoHilight(" */").newLine();
-        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
-                appendNoHilight(AppResources.translate("decompilationError.timeout.description")).
-                appendNoHilight("\");").newLine();
+        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"")
+                .appendNoHilight(AppResources.translate("decompilationError.timeout.description"))
+                .appendNoHilight("\");").newLine();
     }
 
     public static void appendErrorComment(GraphTextWriter writer, Throwable ex) {
@@ -1281,12 +1283,12 @@ public class Helper {
         if (decompilationErrorAdd != null) {
             writer.appendNoHilight(" * ").appendNoHilight(decompilationErrorAdd).newLine();
         }
-        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.errorType")).
-                appendNoHilight(": " + ex.getClass().getSimpleName() + " (" + ex.getMessage() + ")").newLine();
+        writer.appendNoHilight(" * ").appendNoHilight(AppResources.translate("decompilationError.errorType"))
+                .appendNoHilight(": " + ex.getClass().getSimpleName() + " (" + ex.getMessage() + ")").newLine();
         writer.appendNoHilight(" */").newLine();
-        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"").
-                appendNoHilight(AppResources.translate("decompilationError.error.description")).
-                appendNoHilight("\");").newLine();
+        writer.appendNoHilight("throw new flash.errors.IllegalOperationError(\"")
+                .appendNoHilight(AppResources.translate("decompilationError.error.description"))
+                .appendNoHilight("\");").newLine();
     }
 
     public static String escapeHTML(String text) {
@@ -1427,7 +1429,8 @@ public class Helper {
     public static Shape imageToShapeOld(BufferedImage image) {
         Area area = new Area();
         Rectangle rectangle = new Rectangle();
-        int y1, y2;
+        int y1;
+        int y2;
         int width = image.getWidth();
         int height = image.getHeight();
 

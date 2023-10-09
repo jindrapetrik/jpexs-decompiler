@@ -18,14 +18,13 @@ package com.jpexs.decompiler.flash.xfl.shapefixer;
 
 import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -106,14 +105,13 @@ public class ShapeFixer {
                         for(Edge e:newEdges2) {
                             System.out.println("..."+e);
                         }*/
-                        
                         Point2D a = edge1.getFrom();
                         Point2D b = edge1.getTo();
                         Point2D c = edge2.getTo();
 
                         boolean edge2isRight = ((b.getX() - a.getX()) * (c.getY() - a.getY())) - ((b.getY() - a.getY()) * (c.getX() - a.getX())) > 0;
                         //edge2isRight = !edge2isRight;
-                        
+
                         fillStyle0 = edge2isRight ? edge1.fillStyle0 : edge2.fillStyle0;
                         fillStyle1 = edge2isRight ? edge2.fillStyle1 : edge1.fillStyle1;
 
@@ -130,14 +128,14 @@ public class ShapeFixer {
                         StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced();
                         ser.deltaX = newEdges1.get(0).getTo().getX() - edge1.getFrom().getX();
                         ser.deltaY = newEdges1.get(0).getTo().getY() - edge1.getFrom().getY();
-                        
+
                         StyleChangeRecordAdvanced scrStart1 = new StyleChangeRecordAdvanced();
                         scrStart1.stateMoveTo = false;
                         scrStart1.stateFillStyle0 = true;
                         scrStart1.stateFillStyle1 = true;
                         scrStart1.fillStyle0 = newEdges1.get(1).fillStyle0;
                         scrStart1.fillStyle1 = newEdges1.get(1).fillStyle1;
-                        
+
                         StyleChangeRecordAdvanced moveBack1 = new StyleChangeRecordAdvanced();
                         moveBack1.stateMoveTo = true;
                         Edge edge1NotInverted = edge1.inverted ? edge1.invert() : edge1;
@@ -183,7 +181,7 @@ public class ShapeFixer {
                         records.remove(edge2.recordIndex);
                         records.add(edge2.recordIndex, moveStart2);
                         records.add(edge2.recordIndex + 1, newEdges2.get(1).toShapeRecordAdvanced());
-                        records.add(edge2.recordIndex + 2, moveBack2);                       
+                        records.add(edge2.recordIndex + 2, moveBack2);
                         return true;
                     }
                 }
@@ -194,169 +192,169 @@ public class ShapeFixer {
 
     public List<ShapeRecordAdvanced> fixShape(List<ShapeRecordAdvanced> records) {
         List<ShapeRecordAdvanced> ret = Helper.deepCopy(records);
-        while(fixSingleEdge(ret)) {
+        while (fixSingleEdge(ret)) {
             //nothing
         }
-        for(ShapeRecordAdvanced rec:ret) {
+        for (ShapeRecordAdvanced rec : ret) {
             rec.round();
         }
         return ret;
     }
-}
 
-class Edge {
+    class Edge {
 
-    int recordIndex;
-    boolean inverted;
-    int fillStyle0 = 0;
-    int fillStyle1 = 0;
+        int recordIndex;
+        boolean inverted;
+        int fillStyle0 = 0;
+        int fillStyle1 = 0;
 
-    List<Point2D> points = new ArrayList<>();
+        List<Point2D> points = new ArrayList<>();
 
-    public Point2D getFrom() {
-        return points.get(0);
-    }
-
-    public Point2D getTo() {
-        return points.get(points.size() - 1);
-    }
-
-    public BezierEdge toBezierEdge() {
-        return new BezierEdge(new ArrayList<>(points));
-    }
-
-    public boolean intersection(Edge otherEdge, List<Edge> newThisEdges, List<Edge> newOtherEdges) {
-        List<Double> t1s = new ArrayList<>();
-        List<Double> t2s = new ArrayList<>();
-        BezierEdge be1 = this.toBezierEdge();
-        BezierEdge be2 = otherEdge.toBezierEdge();
-        if (!be1.intersects(be2, t1s, t2s)) {
-            return false;
-        }
-        Reference<BezierEdge> be1aRef = new Reference<>(null);
-        Reference<BezierEdge> be1bRef = new Reference<>(null);
-        Reference<BezierEdge> be2aRef = new Reference<>(null);
-        Reference<BezierEdge> be2bRef = new Reference<>(null);
-
-        t1s.sort(new Comparator<Double>() {
-            @Override
-            public int compare(Double o1, Double o2) {
-                return Double.compare(o1, o2);
-            }
-        });
-
-        t2s.sort(new Comparator<Double>() {
-            @Override
-            public int compare(Double o1, Double o2) {
-                return Double.compare(o1, o2);
-            }
-        });
-
-        if (t1s.size() == 1) {
-            return false;
+        public Point2D getFrom() {
+            return points.get(0);
         }
 
-        double t1 = t1s.get(t1s.size() - 1);
-        double t2 = t2s.get(t2s.size() - 1);
-        /*System.out.println("t1 = "+t1);
+        public Point2D getTo() {
+            return points.get(points.size() - 1);
+        }
+
+        public BezierEdge toBezierEdge() {
+            return new BezierEdge(new ArrayList<>(points));
+        }
+
+        public boolean intersection(Edge otherEdge, List<Edge> newThisEdges, List<Edge> newOtherEdges) {
+            List<Double> t1s = new ArrayList<>();
+            List<Double> t2s = new ArrayList<>();
+            BezierEdge be1 = this.toBezierEdge();
+            BezierEdge be2 = otherEdge.toBezierEdge();
+            if (!be1.intersects(be2, t1s, t2s)) {
+                return false;
+            }
+            Reference<BezierEdge> be1aRef = new Reference<>(null);
+            Reference<BezierEdge> be1bRef = new Reference<>(null);
+            Reference<BezierEdge> be2aRef = new Reference<>(null);
+            Reference<BezierEdge> be2bRef = new Reference<>(null);
+
+            t1s.sort(new Comparator<Double>() {
+                @Override
+                public int compare(Double o1, Double o2) {
+                    return Double.compare(o1, o2);
+                }
+            });
+
+            t2s.sort(new Comparator<Double>() {
+                @Override
+                public int compare(Double o1, Double o2) {
+                    return Double.compare(o1, o2);
+                }
+            });
+
+            if (t1s.size() == 1) {
+                return false;
+            }
+
+            double t1 = t1s.get(t1s.size() - 1);
+            double t2 = t2s.get(t2s.size() - 1);
+            /*System.out.println("t1 = "+t1);
         System.out.println("t2 = "+t2);*/
 
-        be1.split(t1, be1aRef, be1bRef);
-        be2.split(t2, be2aRef, be2bRef);
+            be1.split(t1, be1aRef, be1bRef);
+            be2.split(t2, be2aRef, be2bRef);
 
-        newThisEdges.add(new Edge(this.fillStyle0, this.fillStyle1, -1, this.inverted, be1aRef.getVal()));
-        newThisEdges.add(new Edge(this.fillStyle0, this.fillStyle1, -1, this.inverted, be1bRef.getVal()));
+            newThisEdges.add(new Edge(this.fillStyle0, this.fillStyle1, -1, this.inverted, be1aRef.getVal()));
+            newThisEdges.add(new Edge(this.fillStyle0, this.fillStyle1, -1, this.inverted, be1bRef.getVal()));
 
-        newOtherEdges.add(new Edge(otherEdge.fillStyle0, otherEdge.fillStyle1, -1, otherEdge.inverted, be2aRef.getVal()));
-        newOtherEdges.add(new Edge(otherEdge.fillStyle0, otherEdge.fillStyle1, -1, otherEdge.inverted, be2bRef.getVal()));
+            newOtherEdges.add(new Edge(otherEdge.fillStyle0, otherEdge.fillStyle1, -1, otherEdge.inverted, be2aRef.getVal()));
+            newOtherEdges.add(new Edge(otherEdge.fillStyle0, otherEdge.fillStyle1, -1, otherEdge.inverted, be2bRef.getVal()));
 
-        if (newThisEdges.get(0).isEmpty() || newOtherEdges.get(0).isEmpty()) {
-            newThisEdges.clear();
-            newOtherEdges.clear();
-            return false;
+            if (newThisEdges.get(0).isEmpty() || newOtherEdges.get(0).isEmpty()) {
+                newThisEdges.clear();
+                newOtherEdges.clear();
+                return false;
+            }
+
+            return true;
         }
-        
-        return true;
-    }
 
-    public Point2D pointAt(double t) {
-        return toBezierEdge().pointAt(t);
-    }
-
-    public Edge invert() {
-        List<Point2D> newPoints = new ArrayList<>();
-        for (int i = points.size() - 1; i >= 0; i--) {
-            newPoints.add(points.get(i));
+        public Point2D pointAt(double t) {
+            return toBezierEdge().pointAt(t);
         }
-        return new Edge(fillStyle1, fillStyle0, recordIndex, !inverted, newPoints);
-    }
 
-    public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, BezierEdge be) {
-        List<Point2D> points2D = be.points;
-        List<Point2D> points = new ArrayList<>();
-        for (Point2D p : points2D) {
-            points.add(new Point2D.Double(p.getX(),p.getY()));
+        public Edge invert() {
+            List<Point2D> newPoints = new ArrayList<>();
+            for (int i = points.size() - 1; i >= 0; i--) {
+                newPoints.add(points.get(i));
+            }
+            return new Edge(fillStyle1, fillStyle0, recordIndex, !inverted, newPoints);
         }
-        this.points = points;
-        this.recordIndex = recordIndex;
-        this.inverted = inverted;
-        this.fillStyle0 = fillStyle0;
-        this.fillStyle1 = fillStyle1;
-    }
 
-    public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, List<Point2D> points) {
-        this.points = points;
-        this.recordIndex = recordIndex;
-        this.inverted = inverted;
-        this.fillStyle0 = fillStyle0;
-        this.fillStyle1 = fillStyle1;
-    }
-
-    public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, double fromX, double fromY, double toX, double toY) {
-        points.add(new Point2D.Double(fromX, fromY));
-        points.add(new Point2D.Double(toX, toY));
-        this.recordIndex = recordIndex;
-        this.inverted = inverted;
-        this.fillStyle0 = fillStyle0;
-        this.fillStyle1 = fillStyle1;
-    }
-
-    public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, double fromX, double fromY, double controlX, double controlY, double toX, double toY) {
-        points.add(new Point2D.Double(fromX, fromY));
-        points.add(new Point2D.Double(controlX, controlY));
-        points.add(new Point2D.Double(toX, toY));
-        this.recordIndex = recordIndex;
-        this.inverted = inverted;
-        this.fillStyle0 = fillStyle0;
-        this.fillStyle1 = fillStyle1;
-
-    }
-
-    @Override
-    public String toString() {
-        List<String> list = new ArrayList<>();
-        for (Point2D p : points) {
-            list.add("[" + p.getX() + "," + p.getY() + "]");
+        public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, BezierEdge be) {
+            List<Point2D> points2D = be.points;
+            List<Point2D> points = new ArrayList<>();
+            for (Point2D p : points2D) {
+                points.add(new Point2D.Double(p.getX(), p.getY()));
+            }
+            this.points = points;
+            this.recordIndex = recordIndex;
+            this.inverted = inverted;
+            this.fillStyle0 = fillStyle0;
+            this.fillStyle1 = fillStyle1;
         }
-        return "{" + String.join("-", list) + "}";
-    }
-    
-    public boolean isEmpty() {
-        return getFrom().equals(getTo());
-    }
 
-    public ShapeRecordAdvanced toShapeRecordAdvanced() {
-        if (points.size() == 3) {
-            CurvedEdgeRecordAdvanced cer = new CurvedEdgeRecordAdvanced();
-            cer.controlDeltaX = points.get(1).getX() - points.get(0).getX();
-            cer.controlDeltaY = points.get(1).getY() - points.get(0).getY();
-            cer.anchorDeltaX = points.get(2).getX() - points.get(1).getX();
-            cer.anchorDeltaY = points.get(2).getY() - points.get(1).getY();
-            return cer;
+        public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, List<Point2D> points) {
+            this.points = points;
+            this.recordIndex = recordIndex;
+            this.inverted = inverted;
+            this.fillStyle0 = fillStyle0;
+            this.fillStyle1 = fillStyle1;
         }
-        StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced();
-        ser.deltaX = points.get(1).getX() - points.get(0).getX();
-        ser.deltaY = points.get(1).getY() - points.get(0).getY();
-        return ser;
+
+        public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, double fromX, double fromY, double toX, double toY) {
+            points.add(new Point2D.Double(fromX, fromY));
+            points.add(new Point2D.Double(toX, toY));
+            this.recordIndex = recordIndex;
+            this.inverted = inverted;
+            this.fillStyle0 = fillStyle0;
+            this.fillStyle1 = fillStyle1;
+        }
+
+        public Edge(int fillStyle0, int fillStyle1, int recordIndex, boolean inverted, double fromX, double fromY, double controlX, double controlY, double toX, double toY) {
+            points.add(new Point2D.Double(fromX, fromY));
+            points.add(new Point2D.Double(controlX, controlY));
+            points.add(new Point2D.Double(toX, toY));
+            this.recordIndex = recordIndex;
+            this.inverted = inverted;
+            this.fillStyle0 = fillStyle0;
+            this.fillStyle1 = fillStyle1;
+
+        }
+
+        @Override
+        public String toString() {
+            List<String> list = new ArrayList<>();
+            for (Point2D p : points) {
+                list.add("[" + p.getX() + "," + p.getY() + "]");
+            }
+            return "{" + String.join("-", list) + "}";
+        }
+
+        public boolean isEmpty() {
+            return getFrom().equals(getTo());
+        }
+
+        public ShapeRecordAdvanced toShapeRecordAdvanced() {
+            if (points.size() == 3) {
+                CurvedEdgeRecordAdvanced cer = new CurvedEdgeRecordAdvanced();
+                cer.controlDeltaX = points.get(1).getX() - points.get(0).getX();
+                cer.controlDeltaY = points.get(1).getY() - points.get(0).getY();
+                cer.anchorDeltaX = points.get(2).getX() - points.get(1).getX();
+                cer.anchorDeltaY = points.get(2).getY() - points.get(1).getY();
+                return cer;
+            }
+            StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced();
+            ser.deltaX = points.get(1).getX() - points.get(0).getX();
+            ser.deltaY = points.get(1).getY() - points.get(0).getY();
+            return ser;
+        }
     }
 }

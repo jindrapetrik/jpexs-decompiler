@@ -176,8 +176,8 @@ public class GetPropertyIns extends InstructionDefinition {
                         if (currentClassName != null) {
                             localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType);
                         }
-                        if (type.getVal().equals(TypeItem.UNKNOWN)) {                            
-                            GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);//new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
+                        if (type.getVal().equals(TypeItem.UNKNOWN)) {
+                            GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);
                             if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                                 type.setVal(ti);
                                 callType.setVal(ti); //coercion  i = int(xx);
@@ -255,7 +255,7 @@ public class GetPropertyIns extends InstructionDefinition {
                     localData.abcIndex.findPropertyTypeOrCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false, type, callType);
                     if (receiverType.equals(new TypeItem("XML")) && !type.getVal().equals(new TypeItem("Function"))) {
                         type.setVal(new TypeItem("XMLList"));
-                    }                    
+                    }
                 }
             }
         }

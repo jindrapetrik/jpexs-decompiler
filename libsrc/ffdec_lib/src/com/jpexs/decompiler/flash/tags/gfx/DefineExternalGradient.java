@@ -76,7 +76,7 @@ public class DefineExternalGradient extends Tag {
     public DefineExternalGradient(SWF swf) {
         super(swf, ID, NAME, null);
         fileName = "";
-    }        
+    }
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
@@ -85,7 +85,7 @@ public class DefineExternalGradient extends Tag {
         gradientSize = sis.readUI16("gradientSize");
         fileName = sis.readNetString("fileName");
     }
-    
+
     @Override
     public String toString() {
         return tagName + " (g" + gradientId + ")";

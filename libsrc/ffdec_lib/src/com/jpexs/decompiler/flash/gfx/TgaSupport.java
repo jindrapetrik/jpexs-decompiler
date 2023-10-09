@@ -23,9 +23,9 @@ import javax.imageio.spi.IIORegistry;
  * @author JPEXS
  */
 public class TgaSupport {
-    
+
     private static boolean inited = false;
-    
+
     public static void init() {
         if (inited) {
             return;

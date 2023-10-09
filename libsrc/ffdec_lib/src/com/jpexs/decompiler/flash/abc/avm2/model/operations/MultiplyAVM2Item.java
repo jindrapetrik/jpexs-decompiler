@@ -88,7 +88,7 @@ public class MultiplyAVM2Item extends BinaryOpItem implements CompoundableBinary
         if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
             return TypeItem.NUMBER;
         }
-        
+
         return TypeItem.NUMBER;
     }
 

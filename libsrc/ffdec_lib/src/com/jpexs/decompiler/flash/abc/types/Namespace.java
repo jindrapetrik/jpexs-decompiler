@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -26,9 +25,9 @@ import com.jpexs.decompiler.graph.DottedChain;
  * @author JPEXS
  */
 public class Namespace {
-    
+
     public static final int MIN_API_MARK = 0xE000;
-    
+
     public static final int MAX_API_MARK = 0xF8FF;
 
     public static final int KIND_NAMESPACE = 8;
@@ -121,7 +120,7 @@ public class Namespace {
         }
         return kindStr;
     }
-    
+
     public static String getPrefix(int kind) {
         String kindStr = "?";
         for (int k = 0; k < nameSpaceKinds.length; k++) {

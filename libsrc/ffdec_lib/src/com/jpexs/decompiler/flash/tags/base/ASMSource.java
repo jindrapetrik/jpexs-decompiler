@@ -58,7 +58,8 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions) throws InterruptedException;
 
     /**
-     * Converts actions to ActionScript source with executing operation on the tree.
+     * Converts actions to ActionScript source with executing operation on the
+     * tree.
      *
      * @param writer
      * @param actions
@@ -67,7 +68,7 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
      * @throws java.lang.InterruptedException
      */
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException;
-    
+
     /**
      * Whether or not this object contains ASM source
      *
@@ -89,7 +90,7 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
      * @param actions Action list
      */
     public void setActions(List<Action> actions);
-    
+
     public List<GraphTargetItem> getActionsToTree();
 
     public void setModified();

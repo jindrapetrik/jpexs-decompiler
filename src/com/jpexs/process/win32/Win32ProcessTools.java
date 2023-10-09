@@ -334,6 +334,7 @@ public class Win32ProcessTools extends ProcessTools {
                         Logger.getLogger(Win32ProcessTools.class.getName()).log(Level.SEVERE, "Can't get EXE path");
                     }
                 } catch (Exception | UnsatisfiedLinkError e) {
+                    //ignored
                 }
 
                 try {
@@ -342,6 +343,7 @@ public class Win32ProcessTools extends ProcessTools {
                         Logger.getLogger(Win32ProcessTools.class.getName()).log(Level.SEVERE, "Can't get EXE path");
                     }
                 } catch (Exception | UnsatisfiedLinkError e) {
+                    //ignored
                 }
                 i = 0;
                 for (; i < outputnames.length; i++) {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
@@ -52,9 +53,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -126,6 +126,7 @@ public class ActionPush extends Action {
                 }
             }
         } catch (EndOfStreamException ex) {
+            //ignored
         }
     }
 
@@ -338,24 +339,7 @@ public class ActionPush extends Action {
             ret = value.toString();
         }
         return ret;
-    }
-
-    public String toString(int i) {
-        String ret;
-        Object value = values.get(i);
-        if (value instanceof ConstantIndex) {
-            ret = ((ConstantIndex) value).toString(constantPool, Configuration.resolveConstants.get());
-        } else if (value instanceof String) {
-            ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
-        } else if (value instanceof RegisterNumber) {
-            ret = ((RegisterNumber) value).toStringNoName();
-        } else if ((value instanceof Float)||(value instanceof Double)) {
-            ret = EcmaScript.toString(value);
-        } else {
-            ret = value.toString();
-        }
-        return ret;
-    }
+    }    
 
     public GraphTextWriter paramsToString(GraphTextWriter writer) {
         int pos = 0;
@@ -369,6 +353,23 @@ public class ActionPush extends Action {
         return writer;
     }
 
+    public String toString(int i) {
+        String ret;
+        Object value = values.get(i);
+        if (value instanceof ConstantIndex) {
+            ret = ((ConstantIndex) value).toString(constantPool, Configuration.resolveConstants.get());
+        } else if (value instanceof String) {
+            ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
+        } else if (value instanceof RegisterNumber) {
+            ret = ((RegisterNumber) value).toStringNoName();
+        } else if ((value instanceof Float) || (value instanceof Double)) {
+            ret = EcmaScript.toString(value);
+        } else {
+            ret = value.toString();
+        }
+        return ret;
+    }
+    
     @Override
     public String toString() {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
@@ -415,7 +416,7 @@ public class ActionPush extends Action {
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
-            }           
+            }
             if (o instanceof Boolean) {
                 Boolean b = (Boolean) o;
                 if (b) {
@@ -426,18 +427,18 @@ public class ActionPush extends Action {
             } else {
                 DirectValueActionItem dvt = new DirectValueActionItem(this, lineStartAction, pos, o, constantPool);
 
-                if (o instanceof RegisterNumber) {//TemporaryRegister
+                if (o instanceof RegisterNumber) { //TemporaryRegister
                     dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
                     if (regNames.containsKey(((RegisterNumber) o).number)) {
                         ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
                     }
                 }
                 if (dvt.computedRegValue instanceof TemporaryRegister) {
-                    ((TemporaryRegister)dvt.computedRegValue).used = true;
-                    for(int i = 0; i < output.size(); i++) {
-                        if(output.get(i) instanceof TemporaryRegisterMark) {
-                            TemporaryRegisterMark trm = (TemporaryRegisterMark)output.get(i);
-                            if(trm.tempReg == dvt.computedRegValue) {
+                    ((TemporaryRegister) dvt.computedRegValue).used = true;
+                    for (int i = 0; i < output.size(); i++) {
+                        if (output.get(i) instanceof TemporaryRegisterMark) {
+                            TemporaryRegisterMark trm = (TemporaryRegisterMark) output.get(i);
+                            if (trm.tempReg == dvt.computedRegValue) {
                                 output.remove(i);
                                 break;
                             }

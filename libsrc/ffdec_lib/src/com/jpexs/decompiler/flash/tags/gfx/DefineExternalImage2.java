@@ -93,7 +93,7 @@ public class DefineExternalImage2 extends ImageTag {
 
     @HideInRawEdit
     private String cachedImageFilename = null;
-    
+
     /**
      * Gets data bytes
      *
@@ -206,7 +206,7 @@ public class DefineExternalImage2 extends ImageTag {
 
             if (targetWidth <= 0 || targetHeight <= 0) {
                 serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-                serImage.fillTransparent();               
+                serImage.fillTransparent();
             } else if (bitmapFormat == BITMAP_FORMAT2_JPEG || bitmapFormat == BITMAP_FORMAT2_TGA || bitmapFormat == BITMAP_FORMAT_TGA) {
                 Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
                 if (imagePath != null && imagePath.toFile().exists()) {
@@ -225,7 +225,7 @@ public class DefineExternalImage2 extends ImageTag {
                     }
                 } else {
                     createFailedImage();
-                }               
+                }
             } else if (bitmapFormat == BITMAP_FORMAT2_DDS || bitmapFormat == BITMAP_FORMAT2_DDS) {
                 Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
                 if (imagePath != null && imagePath.toFile().exists()) {

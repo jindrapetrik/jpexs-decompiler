@@ -57,16 +57,18 @@ public class UsageFrame extends AppDialog implements MouseListener {
     private final ABCPanel abcPanel;
 
     /**
-     * 
-     * @param abc
-     * @param multinameIndex
-     * @param exactMatch False = also consider Multiname.MULTINAME kind equal to QNAME with same name+namespace in the list. This is used in some of "extends/implements" cause.
-     * @param abcPanel
-     * @param definitions 
+     *
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param exactMatch False = also consider Multiname.MULTINAME kind equal to
+     * QNAME with same name+namespace in the list. This is used in some of
+     * "extends/implements" cause.
+     * @param abcPanel ABC Panel
+     * @param definitions Definitions
      */
     public UsageFrame(ABC abc, int multinameIndex, boolean exactMatch, ABCPanel abcPanel, boolean definitions) {
         super(abcPanel.getMainPanel().getMainFrame().getWindow());
-        this.abcPanel = abcPanel;         
+        this.abcPanel = abcPanel;
         List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(multinameIndex) : abc.findMultinameUsage(multinameIndex, exactMatch);
         Multiname m = abc.constants.getMultiname(multinameIndex);
         if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
@@ -149,7 +151,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);
-                String scriptName;                
+                String scriptName;
                 if (icu.getClassIndex() > -1) {
                     scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toPrintableString(true);
                 } else if (icu.getScriptIndex() > -1) {

@@ -76,8 +76,8 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
 
     protected List<GraphSourceItem> toSourceCall(SourceGeneratorLocalData localData, SourceGenerator gen, List<GraphTargetItem> list) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) gen;
-        String charset = asGenerator.getCharset();  
-        
+        String charset = asGenerator.getCharset();
+
         List<GraphSourceItem> ret = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             ret.addAll(0, list.get(i).toSource(localData, gen));

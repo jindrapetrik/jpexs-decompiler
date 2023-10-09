@@ -66,6 +66,7 @@ public class SvgPathReader {
             char ch = str.charAt(pos);
 
             if (ch >= '0' && ch <= '9') {
+                //empty
             } else {
                 break;
             }

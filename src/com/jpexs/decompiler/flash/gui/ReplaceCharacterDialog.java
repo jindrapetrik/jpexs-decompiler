@@ -57,9 +57,8 @@ public class ReplaceCharacterDialog extends AppDialog {
 
         charactersComboBox.setPreferredSize(new Dimension(400, charactersComboBox.getPreferredSize().height));
         add(charactersComboBox, BorderLayout.CENTER);
-        
+
         charactersComboBox.setRenderer(new CharacterTagListCellRenderer());
-        
 
         JPanel panButtons = new JPanel(new FlowLayout());
         okButton.addActionListener(this::okButtonActionPerformed);
@@ -110,19 +109,19 @@ public class ReplaceCharacterDialog extends AppDialog {
         setVisible(true);
         return result;
     }
-}
 
-class CharacterTagListCellRenderer extends DefaultListCellRenderer {
+    class CharacterTagListCellRenderer extends DefaultListCellRenderer {
 
-    @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        if (component instanceof JLabel) {
-            JLabel label = (JLabel) component;
-            @SuppressWarnings("unchecked")
-            ComboBoxItem<CharacterTag> comboboxItem = (ComboBoxItem<CharacterTag>) value;
-            label.setIcon(AbstractTagTree.getIconForType(AbstractTagTree.getTreeNodeType(comboboxItem.getValue())));
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (component instanceof JLabel) {
+                JLabel label = (JLabel) component;
+                @SuppressWarnings("unchecked")
+                ComboBoxItem<CharacterTag> comboboxItem = (ComboBoxItem<CharacterTag>) value;
+                label.setIcon(AbstractTagTree.getIconForType(AbstractTagTree.getTreeNodeType(comboboxItem.getValue())));
+            }
+            return component;
         }
-        return component;
-    }       
+    }
 }

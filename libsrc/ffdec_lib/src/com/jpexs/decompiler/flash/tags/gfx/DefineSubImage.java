@@ -121,14 +121,14 @@ public class DefineSubImage extends ImageTag {
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        
+
     }
 
     @Override
     public boolean importSupported() {
         return false;
     }
-        
+
     @Override
     public ImageFormat getImageFormat() {
         return ImageFormat.PNG;
@@ -171,7 +171,7 @@ public class DefineSubImage extends ImageTag {
     public Dimension getImageDimension() {
         return new Dimension(x2 - x1, y2 - y1);
     }
-   
+
     private void initImage() {
         DefineExternalImage2 image = swf.getExternalImage2(imageId);
 

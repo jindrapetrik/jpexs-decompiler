@@ -43,16 +43,16 @@ public class StringBuilderTextWriter extends GraphTextWriter {
     public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         writeToOutputStream(text);
         return this;
-    }
+    }    
 
     @Override
-    public StringBuilderTextWriter append(String str) {
+    public GraphTextWriter appendWithData(String str, HighlightData data) {
         writeToOutputStream(str);
         return this;
     }
 
     @Override
-    public GraphTextWriter appendWithData(String str, HighlightData data) {
+    public StringBuilderTextWriter append(String str) {
         writeToOutputStream(str);
         return this;
     }

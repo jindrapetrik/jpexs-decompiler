@@ -126,7 +126,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     @EnumValue(value = BlendMode.ALPHA, text = "alpha")
     @EnumValue(value = BlendMode.ERASE, text = "erase")
     @EnumValue(value = BlendMode.OVERLAY, text = "overlay")
-    @EnumValue(value = BlendMode.HARDLIGHT, text = "hardlight")                             
+    @EnumValue(value = BlendMode.HARDLIGHT, text = "hardlight")
     public int blendMode;
 
     @Internal
@@ -134,7 +134,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     @Internal
     private ButtonTag tag;
-    
+
     @Internal
     private boolean modified;
 
@@ -146,8 +146,8 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public BUTTONRECORD() {
         swf = null;
         tag = null;
-    }                
-    
+    }
+
     @Override
     public String toString() {
         return "BUTTONRECORD (" + characterId + ") Depth:" + placeDepth + " State:" + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : ""));
@@ -157,7 +157,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public SWF getSwf() {
         return swf;
     }
-    
+
     @Override
     public Openable getOpenable() {
         return swf;
@@ -166,7 +166,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public void setModified(boolean value) {
         modified = value;
     }
-    
+
     @Override
     public boolean isModified() {
         return modified;
@@ -175,7 +175,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     @Override
     public ButtonTag getTag() {
         return tag;
-    }        
+    }
 
     @Override
     public void setSourceTag(Tag tag) {
@@ -192,7 +192,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
-    
+
     public PlaceObject3Tag toPlaceObject() {
         PlaceObject3Tag placeTag = new PlaceObject3Tag(swf);
         placeTag.depth = placeDepth;
@@ -215,7 +215,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
         placeTag.matrix = new MATRIX(placeMatrix);
         placeTag.placeFlagHasMatrix = true;
-        
+
         if (buttonHasBlendMode) {
             placeTag.blendMode = blendMode;
             placeTag.placeFlagHasBlendMode = true;

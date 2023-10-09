@@ -445,16 +445,16 @@ public class DefineEditTextTag extends TextTag {
                                     }
                                 }
                                 String face = unescape(attributes.getValue("face"));
-                                 {
-                                    if (face != null && face.length() > 0) {
-                                        style.fontFace = face;
-                                        FontTag insideFont = swf.getFontByNameInTag(face);
-                                        style.font = insideFont;
-                                        if (insideFont != null) {
-                                            style.fontFace = null;
-                                        }
+                                 
+                                if (face != null && face.length() > 0) {
+                                    style.fontFace = face;
+                                    FontTag insideFont = swf.getFontByNameInTag(face);
+                                    style.font = insideFont;
+                                    if (insideFont != null) {
+                                        style.fontFace = null;
                                     }
                                 }
+                                
                                 // todo: parse the following attributes: letterSpacing, kerning
                                 styles.add(style);
                                 break;
@@ -513,7 +513,7 @@ public class DefineEditTextTag extends TextTag {
                 str = str.replace("&quot;", "/{entity-quot}");
                 str = str.replace("&amp;", "/{entity-amp}");
                 str = str.replace("&", "&amp;");
-                
+
                 str = "<!DOCTYPE html [\n"
                         + "]><root>" + str + "</root>";
                 saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
@@ -751,7 +751,7 @@ public class DefineEditTextTag extends TextTag {
                                 fontClass = paramValue;
                                 break;
                             case "height":
-                                try {//TODO: font parameter must be also present
+                                try { //TODO: font parameter must be also present
                                     fontHeight = Integer.parseInt(paramValue);
                                     hasFont = true;
                                 } catch (NumberFormatException ne) {
@@ -1034,7 +1034,7 @@ public class DefineEditTextTag extends TextTag {
         }
     }
 
-    public List<TEXTRECORD> getTextRecords() {        
+    public List<TEXTRECORD> getTextRecords() {
         DynamicTextModel textModel = new DynamicTextModel();
         List<CharacterWithStyle> txt = getTextWithStyle();
         TextStyle lastStyle = null;

@@ -20,19 +20,14 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
-import com.jpexs.decompiler.flash.flv.FLVInputStream;
-import com.jpexs.decompiler.flash.flv.FLVTAG;
-import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -49,7 +44,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.video.FrameListener;
 import com.jpexs.video.SimpleMediaPlayer;
@@ -62,15 +56,9 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -365,7 +353,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         if (ratio == -1) {
             ratio = 0;
         }
-        
+
         Set<Integer> keyFrames = getFrames().keySet();
 
         int f = 0;
@@ -533,5 +521,5 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     public int getFrameCount() {
         return numFrames;
     }
-    
+
 }

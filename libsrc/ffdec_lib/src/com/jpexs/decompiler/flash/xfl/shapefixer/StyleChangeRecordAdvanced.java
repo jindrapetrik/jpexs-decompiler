@@ -18,14 +18,14 @@ package com.jpexs.decompiler.flash.xfl.shapefixer;
 
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 
 /**
  *
  * @author JPEXS
  */
-public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
+public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced {
+
     public boolean stateNewStyles;
 
     public boolean stateLineStyle;
@@ -35,7 +35,7 @@ public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
     public boolean stateFillStyle0;
 
     public boolean stateMoveTo;
-    
+
     public double moveDeltaX;
 
     public double moveDeltaY;
@@ -49,10 +49,11 @@ public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
     public FILLSTYLEARRAY fillStyles;
 
     public LINESTYLEARRAY lineStyles;
-    
+
     public StyleChangeRecordAdvanced() {
-        
+
     }
+
     public StyleChangeRecordAdvanced(StyleChangeRecord scr) {
         this.stateNewStyles = scr.stateNewStyles;
         this.stateLineStyle = scr.stateLineStyle;
@@ -65,10 +66,9 @@ public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
         this.fillStyle1 = scr.fillStyle1;
         this.lineStyle = scr.lineStyle;
         this.fillStyles = scr.fillStyles;
-        this.lineStyles = scr.lineStyles;        
+        this.lineStyles = scr.lineStyles;
     }
-    
-    
+
     @Override
     public StyleChangeRecord toBasicRecord() {
         StyleChangeRecord ret = new StyleChangeRecord();
@@ -77,20 +77,20 @@ public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
         ret.stateFillStyle0 = this.stateFillStyle0;
         ret.stateFillStyle1 = this.stateFillStyle1;
         ret.stateMoveTo = this.stateMoveTo;
-        ret.moveDeltaX = (int)Math.round(this.moveDeltaX);
-        ret.moveDeltaY = (int)Math.round(this.moveDeltaY);
+        ret.moveDeltaX = (int) Math.round(this.moveDeltaX);
+        ret.moveDeltaY = (int) Math.round(this.moveDeltaY);
         ret.fillStyle0 = this.fillStyle0;
         ret.fillStyle1 = this.fillStyle1;
         ret.lineStyle = this.lineStyle;
         ret.fillStyles = this.fillStyles;
-        ret.lineStyles = this.lineStyles;  
+        ret.lineStyles = this.lineStyles;
         return ret;
     }
 
     @Override
     public double changeX(double x) {
         if (stateMoveTo) {
-            return moveDeltaX;            
+            return moveDeltaX;
         }
         return x;
     }
@@ -107,10 +107,8 @@ public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced{
     public void round() {
         if (stateMoveTo) {
             moveDeltaX = Math.round(moveDeltaX);
-            moveDeltaY = Math.round(moveDeltaY);            
+            moveDeltaY = Math.round(moveDeltaY);
         }
     }
-    
-    
 
 }

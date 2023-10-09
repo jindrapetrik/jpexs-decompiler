@@ -63,15 +63,15 @@ public class ScriptInfo {
     public void clearPacksCache() {
         cachedPacks = null;
     }
-    
+
     /**
-     * 
+     *
      * @param abc
      * @return Simple pack name - Can be null!
      */
     public DottedChain getSimplePackName(ABC abc) {
         List<Integer> packageTraits = new ArrayList<>();
-        
+
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             if (t.name_index >= abc.constants.getMultinameCount()) {
@@ -106,7 +106,7 @@ public class ScriptInfo {
                 otherTraits.add(j);
             }
         }
-        
+
         int publicTraitsCount = 0;
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
@@ -117,10 +117,9 @@ public class ScriptInfo {
                 publicTraitsCount++;
             }
         }
-        
+
         boolean isSimple = publicTraitsCount == 1;
-        
-        
+
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
@@ -139,20 +138,20 @@ public class ScriptInfo {
                 }
 
                 if (packagePrefix == null || packageName.toPrintableString(true).startsWith(packagePrefix)) {
-                    
+
                     ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
                     ScriptPack pack = new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices);
                     pack.isSimple = isSimple;
                     ret.add(pack);
                 }
             }
-        }        
+        }
         if (ret.isEmpty() && !otherTraits.isEmpty()) { //no public/package internal traits to determine common pack name
             //make each trait separate pack
             for (int traitIndex : otherTraits) {
                 Trait t = traits.traits.get(traitIndex);
                 Multiname name = t.getName(abc);
-                
+
                 DottedChain packageName = name.getSimpleNamespaceName(abc.constants);
                 String objectName = name.getName(abc.constants, null, true, false);
                 String namespaceSuffix = name.getNamespaceSuffix();
@@ -163,9 +162,9 @@ public class ScriptInfo {
                 ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
                 ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
             }
-        }               
+        }
         if (!isSimple) {
-            ret.add(new ScriptPack(new ClassPath(DottedChain.EMPTY, "script_"+scriptIndex, ""), abc, allAbcs, scriptIndex, new ArrayList<>()));
+            ret.add(new ScriptPack(new ClassPath(DottedChain.EMPTY, "script_" + scriptIndex, ""), abc, allAbcs, scriptIndex, new ArrayList<>()));
         }
         if (packagePrefix == null) {
             cachedPacks = new ArrayList<>(ret);

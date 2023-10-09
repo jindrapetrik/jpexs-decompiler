@@ -91,19 +91,13 @@ public abstract class TextTag extends DrawableTag {
     public abstract HighlightedText getFormattedText(boolean ignoreLetterSpacing);
 
     // use the texts from the "texts" argument when it is not null
-    public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;
-
-    public abstract void updateTextBounds();
-
-    public abstract boolean alignText(TextAlign textAlign);
+    public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;     
 
     public abstract boolean translateText(int diff);
 
     public abstract RECT getBounds();
 
-    public abstract void setBounds(RECT r);
-
-    public abstract ExportRectangle calculateTextBounds();
+    public abstract void setBounds(RECT r);   
 
     @Override
     public RECT getRect() {
@@ -125,6 +119,9 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+
+    public abstract boolean alignText(TextAlign textAlign);
+    
     public static void alignText(SWF swf, List<TEXTRECORD> textRecords, TextAlign textAlign) {
         // Remove Justify align entries
         for (TEXTRECORD tr : textRecords) {
@@ -531,6 +528,8 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    public abstract ExportRectangle calculateTextBounds();
+    
     public static ExportRectangle calculateTextBounds(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix) {
         FontTag font = null;
         int textHeight = 12;
@@ -587,6 +586,8 @@ public abstract class TextTag extends DrawableTag {
 
         return result;
     }
+    
+    public abstract void updateTextBounds();   
 
     protected void updateTextBounds(RECT textBounds) {
         TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get();

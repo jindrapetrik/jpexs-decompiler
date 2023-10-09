@@ -24,7 +24,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**

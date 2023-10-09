@@ -46,7 +46,8 @@ public class SwfHeaderStreamSearch implements Searchable {
 
         Map<Long, InputStream> ret = new LinkedHashMap<>();
         byte[] buf = is.getAllRead();
-        byte byte2 = buf[0], byte3 = buf[1];
+        byte byte2 = buf[0];
+        byte byte3 = buf[1];
         boolean match = false;
         for (int i = 2; i < buf.length - 2; i++) {
             byte b = byte2;

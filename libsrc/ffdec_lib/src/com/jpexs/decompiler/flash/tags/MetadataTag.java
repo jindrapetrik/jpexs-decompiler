@@ -58,6 +58,7 @@ public class MetadataTag extends Tag {
         try {
             xmlMetadata = sis.readString("xmlMetadata");
         } catch (IOException ex) {
+            //ignored
         }
     }
 

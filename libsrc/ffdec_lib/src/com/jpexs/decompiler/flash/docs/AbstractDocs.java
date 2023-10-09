@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.docs;
 
-import static com.jpexs.decompiler.flash.docs.As3PCodeOtherDocs.NEWLINE;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -57,16 +56,16 @@ public class AbstractDocs {
         return style;
     }
 
-    protected static String meta(String name, String content) {
-        return "\t\t<meta name=\"" + name + "\" content=\"" + content + "\">" + NEWLINE;
-    }
-
     protected static String metaProp(String name, String content) {
-        return "\t\t<meta property=\"" + name + "\" content=\"" + content + "\">" + NEWLINE;
+        return "\t\t<meta property=\"" + name + "\" content=\"" + content + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
 
+    protected static String meta(String name, String content) {
+        return "\t\t<meta name=\"" + name + "\" content=\"" + content + "\">" + As3PCodeOtherDocs.NEWLINE;
+    }
+    
     protected static String meta(String name, Date content) {
-        return "\t\t<meta name=\"" + name + "\" content=\"" + getISO8601StringForDate(content) + "\">" + NEWLINE;
+        return "\t\t<meta name=\"" + name + "\" content=\"" + getISO8601StringForDate(content) + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
 
     protected static String getISO8601StringForDate(Date date) {

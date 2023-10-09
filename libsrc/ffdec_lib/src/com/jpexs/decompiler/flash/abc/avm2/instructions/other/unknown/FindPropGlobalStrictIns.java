@@ -29,8 +29,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 /**
  *
  * @author JPEXS
- * 
- * source: https://github.com/adobe-flash/avmplus/blob/65a05927767f3735db37823eebf7d743531f5d37/utils/abcdis/abc/Constants.as
+ *
+ * source:
+ * https://github.com/adobe-flash/avmplus/blob/65a05927767f3735db37823eebf7d743531f5d37/utils/abcdis/abc/Constants.as
  * (internal only)
  */
 public class FindPropGlobalStrictIns extends InstructionDefinition {
@@ -47,7 +48,7 @@ public class FindPropGlobalStrictIns extends InstructionDefinition {
 
         super.verify(lda, constants, ins);
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         throw new UnsupportedOperationException();

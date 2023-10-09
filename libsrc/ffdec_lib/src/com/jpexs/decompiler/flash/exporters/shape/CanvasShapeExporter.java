@@ -81,7 +81,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected int fillWidth = 0;
 
     protected int fillHeight = 0;
-    
+
     protected boolean aliasedFill = false;
 
     public static String getJsPrefix() {
@@ -484,7 +484,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                         .append(",").append(Helper.doubleStr(fillMatrix.scaleY / unitDivisor))
                         .append(",").append(Helper.doubleStr((fillMatrix.translateX + deltaX) / unitDivisor))
                         .append(",").append(Helper.doubleStr((fillMatrix.translateY + deltaY) / unitDivisor)).append(");\r\n");
-                if (fillWidth > 0) {//repeating bitmap glitch fix
+                if (fillWidth > 0) { //repeating bitmap glitch fix
                     //make bitmap 1px wider
                     double s_w = (fillWidth + 1) / (double) fillWidth;
                     double s_h = (fillHeight + 1) / (double) fillHeight;

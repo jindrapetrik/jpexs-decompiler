@@ -33,8 +33,8 @@ public abstract class LoopItem extends GraphTargetItem {
         super(src, lineStartItem, NOPRECEDENCE);
         this.loop = loop;
     }
-    
+
     public abstract boolean hasBaseBody();
-    
+
     public abstract List<GraphTargetItem> getBaseBodyCommands();
 }

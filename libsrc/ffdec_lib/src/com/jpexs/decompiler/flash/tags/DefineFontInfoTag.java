@@ -175,7 +175,7 @@ public class DefineFontInfoTag extends FontInfoTag {
     @Override
     public void setFontFlagsItalic(boolean value) {
         fontFlagsItalic = value;
-    }       
+    }
 
     @Override
     public boolean isShiftJIS() {
@@ -186,7 +186,7 @@ public class DefineFontInfoTag extends FontInfoTag {
     public boolean isAnsi() {
         return fontFlagsANSI;
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontID);

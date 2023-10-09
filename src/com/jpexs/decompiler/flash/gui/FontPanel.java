@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
@@ -115,7 +114,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     public boolean isEditing() {
         return saveButton.isVisible();
     }
-    
+
     private void setEditable(boolean editable) {
         if (editable) {
             editButton.setVisible(false);
@@ -222,7 +221,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
             }
 
             if (!f.addCharacter(c, font)) {
-                ViewMessages.showMessageDialog(mainPanel,AppStrings.translate("error.font.cannotaddcharacter").replace("%numchars%", "" + numAdded), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showMessageDialog(mainPanel, AppStrings.translate("error.font.cannotaddcharacter").replace("%numchars%", "" + numAdded), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 break;
             }
             numAdded++;
@@ -348,7 +347,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
         TableLayout tlFontParamsPanel;
         fontParamsPanel.setLayout(tlFontParamsPanel = new TableLayout(new double[][]{
             {TableLayout.PREFERRED, TableLayout.FILL},
-            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL,}
+            {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL}
         }));
 
         JLabel fontNameIntagLabLabel = new JLabel();
@@ -801,7 +800,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
             }
         }
     }
-    
+
     public void startEdit() {
         if (!editButton.isVisible()) {
             return;

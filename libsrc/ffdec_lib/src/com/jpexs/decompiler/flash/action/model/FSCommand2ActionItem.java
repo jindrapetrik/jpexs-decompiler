@@ -79,11 +79,10 @@ public class FSCommand2ActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        
+
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
-        
-        
+        String charset = asGenerator.getCharset();
+
         List<GraphSourceItem> ret = new ArrayList<>();
         for (GraphTargetItem a : arguments) {
             ret.addAll(a.toSource(localData, generator));

@@ -34,9 +34,9 @@ public class ConvertData {
     public boolean thisHasDefaultToPrimitive;
 
     public boolean ignoreFrameScripts;
-    
+
     public boolean exportEmbed;
-    
+
     public boolean exportEmbedFlaMode;
 
     public ConvertData() {

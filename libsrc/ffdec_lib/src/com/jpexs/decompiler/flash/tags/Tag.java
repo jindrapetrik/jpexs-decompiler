@@ -92,7 +92,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     @Internal
     protected boolean imported = false;
-    
+
     @Internal
     protected boolean importedDeep = false;
 
@@ -104,7 +104,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public boolean isImported() {
         return imported;
     }
-    
+
     public boolean isImportedDeep() {
         return importedDeep;
     }
@@ -167,7 +167,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public Openable getOpenable() {
         return swf;
     }
-    
+
     public SWF getSwf() {
         return swf;
     }
@@ -200,13 +200,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private static final Object lockObject = new Object();
 
-    private volatile static Integer[] knownTagIds;
+    private static volatile Integer[] knownTagIds;
 
-    private volatile static Map<Integer, TagTypeInfo> knownTagInfosById;
+    private static volatile Map<Integer, TagTypeInfo> knownTagInfosById;
 
-    private volatile static Map<String, TagTypeInfo> knownTagInfosByName;
+    private static volatile Map<String, TagTypeInfo> knownTagInfosByName;
 
-    private volatile static List<Integer> requiredTagIds;
+    private static volatile List<Integer> requiredTagIds;
 
     public static Integer[] getKnownTags() {
         if (knownTagIds == null) {
@@ -322,7 +322,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
         return knownTagInfosByName;
     }
-    
+
     private static void addTagInfo(Map<Integer, TagTypeInfo> map, Map<String, TagTypeInfo> map2, int id, Class cls, String name) {
         map.put(id, new TagTypeInfo(id, cls, name));
         map2.put(name, new TagTypeInfo(id, cls, name));
@@ -609,7 +609,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
     }
-    
+
     public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
         Set<Integer> needed2 = new ListSet<>(needed);
         if (needed2.isEmpty()) {
@@ -619,8 +619,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (tim == null) {
             return needed2;
         }
-        ReadOnlyTagList tags = tim.getTags();        
-        for (int i = tags.indexOf(this) - 1; i >= 0; i--) {            
+        ReadOnlyTagList tags = tim.getTags();
+        for (int i = tags.indexOf(this) - 1; i >= 0; i--) {
             if (tags.get(i) instanceof CharacterTag) {
                 int charId = ((CharacterTag) tags.get(i)).getCharacterId();
                 needed2.remove(charId);
@@ -628,7 +628,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     return needed2;
                 }
             }
-        }        
+        }
         return needed2;
     }
 
@@ -645,7 +645,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public void getNeededCharactersDeep(Set<Integer> needed) {
         Set<Integer> needed2 = new LinkedHashSet<>();
         getNeededCharacters(needed2, swf);
-        List<Integer> needed3 = new ArrayList<>(needed2);        
+        List<Integer> needed3 = new ArrayList<>(needed2);
 
         for (int i = 0; i < needed3.size(); i++) {
             int characterId = needed3.get(i);
@@ -654,10 +654,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
             if (swf.getCharacters().containsKey(characterId) && !swf.getCyclicCharacters().contains(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
-                CharacterTag character = swf.getCharacter(characterId);                
+                CharacterTag character = swf.getCharacter(characterId);
                 character.getNeededCharacters(needed4, swf);
                 List<Integer> newItems = new ArrayList<>();
-                for(int n : needed4) {
+                for (int n : needed4) {
                     int index = needed3.indexOf((Integer) n);
                     if (index > i) {
                         needed3.remove(index);
@@ -667,10 +667,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     }
                 }
                 if (!newItems.isEmpty()) {
-                    needed3.addAll(i, newItems);                
+                    needed3.addAll(i, newItems);
                     i--;
                 }
-            }            
+            }
         }
 
         for (Integer characterId : needed3) {
@@ -702,9 +702,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
         }
     }
-    
+
     public void getDependentCharacters(Set<Integer> dependent) {
-        getDependentCharactersOnTimelined(swf, dependent);        
+        getDependentCharactersOnTimelined(swf, dependent);
     }
 
     public void getTagInfo(TagInfo tagInfo) {
@@ -754,7 +754,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
         }*/
     }
-    
+
     public String getCharset() {
         if (swf == null) {
             return Utf8Helper.charsetName;

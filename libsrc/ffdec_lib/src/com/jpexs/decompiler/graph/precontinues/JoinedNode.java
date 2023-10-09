@@ -24,6 +24,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class JoinedNode extends Node {
+
     public List<Node> nodes = new ArrayList<>();
 
     @Override

@@ -86,7 +86,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
@@ -155,7 +154,7 @@ public class Translator extends JFrame implements ItemListener {
     );
 
     private String readStreamAsString(InputStream is) throws IOException {
-        byte buf[] = new byte[1024];
+        byte[] buf = new byte[1024];
         int cnt = 0;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while ((cnt = is.read(buf)) > 0) {
@@ -312,10 +311,10 @@ public class Translator extends JFrame implements ItemListener {
     public Translator() throws IOException, FileNotFoundException, URISyntaxException {
 
         loadItems();
-        
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Container cnt = getContentPane();
-        
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -364,7 +363,7 @@ public class Translator extends JFrame implements ItemListener {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setVerticalAlignment(JLabel.TOP);                
+                label.setVerticalAlignment(JLabel.TOP);
                 String key = (String) value;
                 String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
                 String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
@@ -399,16 +398,16 @@ public class Translator extends JFrame implements ItemListener {
                 String valueStr = "" + value;
                 label.setText("<html>" + valueStr.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\r\n", "<br/>") + "</html>");
                 label.setVerticalAlignment(JLabel.TOP);
-                
+
                 return label;
             }
 
-        });        
+        });
         table.getColumn("translated").setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setVerticalAlignment(JLabel.TOP);                
+                label.setVerticalAlignment(JLabel.TOP);
                 String key = (String) table.getValueAt(row, 0);
                 String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
                 String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
@@ -742,17 +741,17 @@ public class Translator extends JFrame implements ItemListener {
         setSize(800, 600);
         setTitle("JPEXS Free Flash Decompiler Translator");
         itemStateChanged(null);
-        table.setRowHeight(table.getFont().getSize() + 10);        
+        table.setRowHeight(table.getFont().getSize() + 10);
         table.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 updateRowHeights(table);
-            }            
+            }
         });
         View.centerScreen(this);
 
         load();
-        loadWindow();                          
+        loadWindow();
     }
 
     private void updateCounts() {
@@ -832,7 +831,7 @@ public class Translator extends JFrame implements ItemListener {
                             table.getCellRenderer(row, column), row, column);
                     int maxHeight = 0;
                     int columnWidth = table.getColumn(table.getColumnName(column)).getWidth();
-                            
+
                     if (comp instanceof JLabel) {
                         JLabel lab = (JLabel) comp;
                         javax.swing.text.View view = (javax.swing.text.View) lab.getClientProperty("html");
@@ -840,7 +839,7 @@ public class Translator extends JFrame implements ItemListener {
                             String text = lab.getText();
                             float textWidth = view.getPreferredSpan(javax.swing.text.View.X_AXIS);
                             float charHeight = view.getPreferredSpan(javax.swing.text.View.Y_AXIS);
-                            double lines = Math.ceil(textWidth / (double)columnWidth);
+                            double lines = Math.ceil(textWidth / (double) columnWidth);
                             double height = lines * charHeight;
                             int heightInt = (int) Math.ceil(height);
                             if (heightInt > maxHeight) {
@@ -851,14 +850,15 @@ public class Translator extends JFrame implements ItemListener {
                     if (maxHeight == 0) {
                         maxHeight = comp.getPreferredSize().height;
                     }
-                    
+
                     comp.setPreferredSize(new Dimension(columnWidth, maxHeight));
-                    
+
                     rowHeight = Math.max(rowHeight, maxHeight);
                 }
                 table.setRowHeight(row, rowHeight);
             }
         } catch (ClassCastException e) {
+            //ignored
         }
     }
 
@@ -1137,13 +1137,13 @@ public class Translator extends JFrame implements ItemListener {
         writer.close();
     }
 
-    private void save() throws FileNotFoundException, IOException {
-        save(getStorageFile(), newValues);
-    }
-
     private void saveAll() throws FileNotFoundException, IOException {
         String storageFile = Configuration.getFFDecHome() + "alltranslated.zip";
         save(storageFile, resourceValues);
+    }
+
+    private void save() throws FileNotFoundException, IOException {
+        save(getStorageFile(), newValues);
     }
 
     private void save(String storageFile, Map<String, LinkedHashMap<String, LinkedHashMap<String, String>>> values) throws FileNotFoundException, IOException {
@@ -1213,154 +1213,154 @@ public class Translator extends JFrame implements ItemListener {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+            //ignored
         }
         try {
             Translator t = new Translator();
             t.setVisible(true);
-            t.updateRowHeights(t.table); 
+            t.updateRowHeights(t.table);
         } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-}
 
-class LocaleItem {
+    class LocaleItem {
 
-    public String locale;
-    public int missingCount = 0;
-    public int modifiedCount = 0;
-    public int newCount = 0;
+        public String locale;
+        public int missingCount = 0;
+        public int modifiedCount = 0;
+        public int newCount = 0;
 
-    public LocaleItem(String locale) {
-        this.locale = locale;
-    }
-
-    @Override
-    public String toString() {
-        String[] parts = locale.split("_");
-        Locale loc;
-        if (parts.length == 2) {
-            loc = new Locale(parts[0], parts[1]);
-        } else {
-            loc = new Locale(parts[0]);
+        public LocaleItem(String locale) {
+            this.locale = locale;
         }
 
-        String ret = loc.getDisplayName() + " [" + locale + "]";
-        if (missingCount > 0 || modifiedCount > 0 || newCount > 0) {
-            ret += " (";
-            List<String> parts2 = new ArrayList<>();
-            if (missingCount > 0) {
-                parts2.add("" + missingCount + " missing");
+        @Override
+        public String toString() {
+            String[] parts = locale.split("_");
+            Locale loc;
+            if (parts.length == 2) {
+                loc = new Locale(parts[0], parts[1]);
+            } else {
+                loc = new Locale(parts[0]);
             }
-            if (modifiedCount > 0) {
-                parts2.add("" + modifiedCount + " modified");
-            }
-            if (newCount > 0) {
-                parts2.add("" + newCount + " new");
-            }
-            ret += String.join(", ", parts2);
 
-            ret += ")";
+            String ret = loc.getDisplayName() + " [" + locale + "]";
+            if (missingCount > 0 || modifiedCount > 0 || newCount > 0) {
+                ret += " (";
+                List<String> parts2 = new ArrayList<>();
+                if (missingCount > 0) {
+                    parts2.add("" + missingCount + " missing");
+                }
+                if (modifiedCount > 0) {
+                    parts2.add("" + modifiedCount + " modified");
+                }
+                if (newCount > 0) {
+                    parts2.add("" + newCount + " new");
+                }
+                ret += String.join(", ", parts2);
 
+                ret += ")";
+
+            }
+
+            return ret;
         }
 
-        return ret;
     }
 
-}
+    class ResourceItem {
 
-class ResourceItem {
+        public String resource;
+        public int missingCount = 0;
+        public int modifiedCount = 0;
+        public int newCount = 0;
 
-    public String resource;
-    public int missingCount = 0;
-    public int modifiedCount = 0;
-    public int newCount = 0;
-
-    public ResourceItem(String resource) {
-        this.resource = resource;
-    }
-
-    @Override
-    public String toString() {
-        String ret = resource;
-        if (missingCount > 0 || modifiedCount > 0 || newCount > 0) {
-            ret += " (";
-            List<String> parts = new ArrayList<>();
-            if (missingCount > 0) {
-                parts.add("" + missingCount + " missing");
-            }
-            if (modifiedCount > 0) {
-                parts.add("" + modifiedCount + " modified");
-            }
-            if (newCount > 0) {
-                parts.add("" + newCount + " new");
-            }
-            ret += String.join(", ", parts);
-
-            ret += ")";
-
+        public ResourceItem(String resource) {
+            this.resource = resource;
         }
 
-        return ret;
-    }
-}
+        @Override
+        public String toString() {
+            String ret = resource;
+            if (missingCount > 0 || modifiedCount > 0 || newCount > 0) {
+                ret += " (";
+                List<String> parts = new ArrayList<>();
+                if (missingCount > 0) {
+                    parts.add("" + missingCount + " missing");
+                }
+                if (modifiedCount > 0) {
+                    parts.add("" + modifiedCount + " modified");
+                }
+                if (newCount > 0) {
+                    parts.add("" + newCount + " new");
+                }
+                ret += String.join(", ", parts);
 
-class JTextAreaColumn extends AbstractCellEditor implements TableCellEditor {
+                ret += ")";
 
-    private JTextArea textArea = new JTextArea();
-    private JTextField textField = new JTextField();
-    private JScrollPane pane = new JScrollPane(textArea);
-    private boolean areaMode = false;
-    private Map<String, LinkedHashMap<String, LinkedHashMap<String, String>>> resourceValues;
-    private JComboBox<LocaleItem> localeComboBox;
-    private JComboBox<ResourceItem> resourcesComboBox;
+            }
 
-    public JTextAreaColumn(
-            Map<String, LinkedHashMap<String, LinkedHashMap<String, String>>> resourceValues,
-            JComboBox<LocaleItem> localeComboBox,
-            JComboBox<ResourceItem> resourcesComboBox
-    ) {
-        pane.setBorder(null);
-        this.resourceValues = resourceValues;
-        this.localeComboBox = localeComboBox;
-        this.resourcesComboBox = resourcesComboBox;
-    }
-
-    @Override
-    public Object getCellEditorValue() {
-        String val;
-        if (areaMode) {
-            return textArea.getText().replace("\r\n", "\n").replace("\n", "\r\n");
+            return ret;
         }
-        return textField.getText();
     }
 
-    @Override
-    public Component getTableCellEditorComponent(JTable table,
-            Object value, boolean isSelected, int row, int column) {
+    class JTextAreaColumn extends AbstractCellEditor implements TableCellEditor {
 
-        String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
-        String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
-        String key = (String) table.getModel().getValueAt(row, 0);
+        private JTextArea textArea = new JTextArea();
+        private JTextField textField = new JTextField();
+        private JScrollPane pane = new JScrollPane(textArea);
+        private boolean areaMode = false;
+        private Map<String, LinkedHashMap<String, LinkedHashMap<String, String>>> resourceValues;
+        private JComboBox<LocaleItem> localeComboBox;
+        private JComboBox<ResourceItem> resourcesComboBox;
 
-        String enValue = "";
-        if (resourceValues.containsKey(resource)
-                && resourceValues.get(resource).containsKey("en")
-                && resourceValues.get(resource).get("en").containsKey(key)) {
-            enValue = resourceValues.get(resource).get("en").get(key);
+        public JTextAreaColumn(
+                Map<String, LinkedHashMap<String, LinkedHashMap<String, String>>> resourceValues,
+                JComboBox<LocaleItem> localeComboBox,
+                JComboBox<ResourceItem> resourcesComboBox
+        ) {
+            pane.setBorder(null);
+            this.resourceValues = resourceValues;
+            this.localeComboBox = localeComboBox;
+            this.resourcesComboBox = resourcesComboBox;
         }
 
-        String valueStr = value == null ? "" : value.toString();
-        
-        areaMode = true;
-        textArea.setFont(new JLabel().getFont());
-        textArea.setText(valueStr);
-        textArea.setEditable(column == 2);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        return pane;
-        
-        /*
+        @Override
+        public Object getCellEditorValue() {
+            String val;
+            if (areaMode) {
+                return textArea.getText().replace("\r\n", "\n").replace("\n", "\r\n");
+            }
+            return textField.getText();
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table,
+                Object value, boolean isSelected, int row, int column) {
+
+            String locale = ((LocaleItem) localeComboBox.getSelectedItem()).locale;
+            String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
+            String key = (String) table.getModel().getValueAt(row, 0);
+
+            String enValue = "";
+            if (resourceValues.containsKey(resource)
+                    && resourceValues.get(resource).containsKey("en")
+                    && resourceValues.get(resource).get("en").containsKey(key)) {
+                enValue = resourceValues.get(resource).get("en").get(key);
+            }
+
+            String valueStr = value == null ? "" : value.toString();
+
+            areaMode = true;
+            textArea.setFont(new JLabel().getFont());
+            textArea.setText(valueStr);
+            textArea.setEditable(column == 2);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            return pane;
+
+            /*
         String valueStr = value == null ? "" : value.toString();
         if (enValue.contains("\n") || valueStr.contains("\n")) {
             textArea.setText(valueStr);
@@ -1372,5 +1372,6 @@ class JTextAreaColumn extends AbstractCellEditor implements TableCellEditor {
         textField.setText(valueStr);
         textField.setEditable(column == 2);        
         return textField;*/
+        }
     }
 }

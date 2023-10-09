@@ -67,7 +67,6 @@ public class GetPropertyActionItem extends ActionItem {
             writer.append(Action.propertyNames[propertyIndex]);
             return writer;
         }*/
-
         writer.append("getProperty");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(");
@@ -138,7 +137,7 @@ public class GetPropertyActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex, charset), new ActionGetProperty());
     }
 

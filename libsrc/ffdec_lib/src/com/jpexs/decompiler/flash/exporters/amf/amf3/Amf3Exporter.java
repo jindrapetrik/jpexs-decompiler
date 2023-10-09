@@ -39,33 +39,6 @@ import java.util.Map;
 public class Amf3Exporter {
 
     /**
-     * Converts AMF value to something human-readable with indentStr " " and
-     * CRLF newlines
-     *
-     * @param amfValue
-     * @return
-     */
-    public static String amfToString(Object amfValue) {
-        return amfToString(amfValue, "  ", "\r\n");
-    }
-
-    /**
-     * Converts AMF value to something human-readable.
-     *
-     * @param amfValue
-     * @param indentStr
-     * @param newLine
-     * @return
-     */
-    public static String amfToString(Object amfValue, String indentStr, String newLine) {
-        Map<Object, Integer> refCount = new HashMap<>();
-        List<Object> objectList = new ArrayList<>();
-        Map<Object, String> objectAlias = new HashMap<>();
-        populateObjects(amfValue, refCount, objectList, objectAlias);
-        return amfToString(indentStr, newLine, new ArrayList<>(), 0, amfValue, refCount, objectAlias);
-    }
-
-    /**
      * Populates all object instances and their references and generates aliases
      *
      * @param object Object to be populated
@@ -103,6 +76,33 @@ public class Amf3Exporter {
             na += "  ";
         }
         return na;
+    }
+
+    /**
+     * Converts AMF value to something human-readable with indentStr " " and
+     * CRLF newlines
+     *
+     * @param amfValue
+     * @return
+     */
+    public static String amfToString(Object amfValue) {
+        return amfToString(amfValue, "  ", "\r\n");
+    }
+
+    /**
+     * Converts AMF value to something human-readable.
+     *
+     * @param amfValue
+     * @param indentStr
+     * @param newLine
+     * @return
+     */
+    public static String amfToString(Object amfValue, String indentStr, String newLine) {
+        Map<Object, Integer> refCount = new HashMap<>();
+        List<Object> objectList = new ArrayList<>();
+        Map<Object, String> objectAlias = new HashMap<>();
+        populateObjects(amfValue, refCount, objectList, objectAlias);
+        return amfToString(indentStr, newLine, new ArrayList<>(), 0, amfValue, refCount, objectAlias);
     }
 
     /**
@@ -168,7 +168,7 @@ public class Amf3Exporter {
                     ret.append(indent(level + 1)).append("\"serialized\": \"").append(Helper.byteArrayToHex(serData)).append("\",").append(newLine);
                     if (!ot.getSerializedMembers().isEmpty()) {
                         ret.append(indent(level + 1)).append("\"unserializedMembers\": {").append(newLine);
-                        {
+                        if (true) {
                             int i = 0;
                             for (String key : ot.sealedMembersKeySet()) {
                                 Object val = ot.getSealedMember(key);
@@ -189,7 +189,7 @@ public class Amf3Exporter {
                 ret.append(indent(level + 1)).append("\"dynamic\": ").append(ot.isDynamic()).append(",").append(newLine);
                 //if (!ot.getSealedMembers().isEmpty()) {
                 ret.append(indent(level + 1)).append("\"sealedMembers\": {").append(newLine);
-                {
+                if (true) {
                     int i = 0;
                     for (String key : ot.sealedMembersKeySet()) {
                         Object val = ot.getSealedMember(key);
@@ -210,7 +210,7 @@ public class Amf3Exporter {
                 //}
                 //if (!ot.getDynamicMembers().isEmpty()) {
                 ret.append(indent(level + 1)).append("\"dynamicMembers\": {").append(newLine);
-                {
+                if (true) {
                     int i = 0;
                     for (String key : ot.dynamicMembersKeySet()) {
                         Object val = ot.getDynamicMember(key);
@@ -246,7 +246,7 @@ public class Amf3Exporter {
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(newLine);
             }
-            {
+            if (true) {
                 int i = 0;
                 for (String key : at.associativeKeySet()) {
                     Object val = at.getAssociative(key);
@@ -270,7 +270,7 @@ public class Amf3Exporter {
             ret.append(addId);
             ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",").append(newLine);
             ret.append(indent(level + 1)).append("\"entries\": {").append(newLine);
-            {
+            if (true) {
                 int i = 0;
                 for (Object key : dt.keySet()) {
                     Object val = dt.get(key);

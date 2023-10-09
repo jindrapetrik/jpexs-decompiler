@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.ValueTooLargeException;
 import java.awt.Font;
 import java.util.Map;
 

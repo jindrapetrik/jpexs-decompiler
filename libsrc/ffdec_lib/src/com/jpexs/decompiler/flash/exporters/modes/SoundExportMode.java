@@ -24,7 +24,9 @@ public enum SoundExportMode {
 
     MP3_WAV_FLV(true, true, true), FLV(false, false, true), MP3_WAV(true, true, false), WAV(false, true, false);
 
-    private final boolean mp3, wav, flv;
+    private final boolean mp3;
+    private final boolean wav;
+    private final boolean flv;
 
     private SoundExportMode(boolean mp3, boolean wav, boolean flv) {
         this.mp3 = mp3;

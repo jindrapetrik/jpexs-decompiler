@@ -23,7 +23,7 @@ package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 public enum DeobfuscationLevel {
 
     LEVEL_REMOVE_DEAD_CODE(1),
-    LEVEL_REMOVE_TRAPS(2);   
+    LEVEL_REMOVE_TRAPS(2);
     private final int level;
 
     public int getLevel() {
@@ -35,7 +35,7 @@ public enum DeobfuscationLevel {
             case 1:
                 return LEVEL_REMOVE_DEAD_CODE;
             case 2:
-                return LEVEL_REMOVE_TRAPS;            
+                return LEVEL_REMOVE_TRAPS;
         }
 
         return null;

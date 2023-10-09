@@ -67,7 +67,7 @@ public class Loop implements Serializable {
         }
         Set<String> bcAsStr = new LinkedHashSet<>();
         for (int i = 0; i < breakCandidates.size(); i++) {
-            bcAsStr.add(breakCandidates.get(i) + " - level " + breakCandidatesLevels.get(i) +" - numblocks " + breakCandidates.get(i).numBlocks);
+            bcAsStr.add(breakCandidates.get(i) + " - level " + breakCandidatesLevels.get(i) + " - numblocks " + breakCandidates.get(i).numBlocks);
         }
 
         return "loop(id:" + id + (loopPreContinue != null ? ",precontinue:" + loopPreContinue : "") + ",continue:" + loopContinue + ", break:" + loopBreak + ", phase:" + phase + ", backedges: " + String.join(",", edgesAsStr) + ", breakCandidates: " + String.join(",", bcAsStr) + ")";

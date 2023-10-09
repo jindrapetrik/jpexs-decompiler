@@ -152,8 +152,7 @@ public class MP3Decoder extends SoundDecoder {
                     return 32000;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 16000;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 8000;
                 }
             case Header.FOURTYFOUR_POINT_ONE:
@@ -161,8 +160,7 @@ public class MP3Decoder extends SoundDecoder {
                     return 44100;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 22050;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 11025;
                 }
             case Header.FOURTYEIGHT:
@@ -170,8 +168,7 @@ public class MP3Decoder extends SoundDecoder {
                     return 48000;
                 } else if (h.version() == Header.MPEG2_LSF) {
                     return 24000;
-                } else // SZD
-                {
+                } else { // SZD                
                     return 12000;
                 }
             default:

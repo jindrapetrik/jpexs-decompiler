@@ -128,7 +128,6 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
         return false;
     }
 
-
     protected void initLocalRegs(LocalDataArea localData, int localReservedCount, int maxRegs, boolean executeFromFirst) {
         for (int i = 0; i < localReservedCount; i++) {
             localData.localRegisters.put(i, NotCompileTime.INSTANCE);

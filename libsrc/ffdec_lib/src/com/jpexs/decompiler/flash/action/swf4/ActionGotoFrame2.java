@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.DisplayObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -35,7 +36,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
 
 /**

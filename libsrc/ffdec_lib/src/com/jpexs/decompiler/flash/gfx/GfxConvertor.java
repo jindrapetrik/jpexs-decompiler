@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
 import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
@@ -51,10 +49,11 @@ import java.util.logging.Logger;
 
 /**
  * Converts GFX SWF to normal SWF.
+ *
  * @author JPEXS
  */
 public class GfxConvertor {
-    
+
     public DefineFont2Tag convertDefineCompactedFont(DefineCompactedFont compactedFont) {
         DefineFont2Tag ret = new DefineFont2Tag(compactedFont.getSwf());
         ret.fontID = compactedFont.getFontId();
@@ -93,7 +92,7 @@ public class GfxConvertor {
         }
         return ret;
     }
-    
+
     public DefineBitsLossless2Tag convertDefineSubImage(DefineSubImage defineSubImage) {
         DefineBitsLossless2Tag ret = new DefineBitsLossless2Tag(defineSubImage.getSwf());
         ret.characterID = defineSubImage.characterID;
@@ -104,10 +103,10 @@ public class GfxConvertor {
             ret.setImage(Helper.readStream(defineSubImage.getImageData()));
         } catch (IOException ex) {
             Logger.getLogger(GfxConvertor.class.getName()).log(Level.SEVERE, null, ex);
-        }       
+        }
         return ret;
     }
-    
+
     public DefineBitsLossless2Tag convertDefineExternalImage(DefineExternalImage defineExternalImage) {
         DefineBitsLossless2Tag ret = new DefineBitsLossless2Tag(defineExternalImage.getSwf());
         ret.characterID = defineExternalImage.characterID;
@@ -118,10 +117,10 @@ public class GfxConvertor {
             ret.setImage(Helper.readStream(defineExternalImage.getImageData()));
         } catch (IOException ex) {
             Logger.getLogger(GfxConvertor.class.getName()).log(Level.SEVERE, null, ex);
-        }       
+        }
         return ret;
     }
-    
+
     public DefineSoundTag convertDefineExternalSound(DefineExternalSound defineExternalSound) {
         DefineSoundTag ret = new DefineSoundTag(defineExternalSound.getSwf());
         ret.soundId = defineExternalSound.characterId;
@@ -133,10 +132,10 @@ public class GfxConvertor {
         ret.soundData = new ByteArrayRange(defineExternalSound.getRawSoundData().get(0).getRangeData());
         return ret;
     }
-    
+
     public List<Tag> convertDefineExternalStreamSound(DefineExternalStreamSound defineExternalStreamSound) {
         List<Tag> ret = new ArrayList<>();
-        
+
         //TODO: distribute stream to particular frames
         /*SoundStreamHead2Tag head = new SoundStreamHead2Tag(defineExternalStreamSound.getSwf());
         head.streamSoundCompression = defineExternalStreamSound.getSoundFormatId();
@@ -152,7 +151,7 @@ public class GfxConvertor {
         ret.add(block);*/
         return ret;
     }
-    
+
     public DefineSpriteTag convertDefineSprite(DefineSpriteTag defineSprite) {
         DefineSpriteTag ret = new DefineSpriteTag(defineSprite.getSwf());
         ret.frameCount = defineSprite.frameCount;
@@ -161,22 +160,22 @@ public class GfxConvertor {
         converTags(defineSprite, ret);
         return ret;
     }
-    
+
     public List<Tag> converTags(Timelined source, Timelined target) {
         List<Tag> ret = new ArrayList<>();
-        for (Tag t:source.getTags()) {
+        for (Tag t : source.getTags()) {
             List<Tag> convertedTags = convertTag(t);
-            for (Tag ct:convertedTags) {
+            for (Tag ct : convertedTags) {
                 target.addTag(ct);
             }
         }
         return ret;
     }
-    
+
     public List<Tag> convertTag(Tag tag) {
         List<Tag> ret = new ArrayList<>();
         if (tag instanceof DefineCompactedFont) {
-            ret.add(convertDefineCompactedFont((DefineCompactedFont)tag));
+            ret.add(convertDefineCompactedFont((DefineCompactedFont) tag));
             return ret;
         }
         if (tag instanceof DefineExternalGradient) {
@@ -186,54 +185,54 @@ public class GfxConvertor {
             ret.add(convertDefineExternalImage((DefineExternalImage) tag));
             return ret;
         }
-        
+
         if (tag instanceof DefineExternalImage2) {
             return ret;
         }
-        
+
         if (tag instanceof DefineExternalSound) {
-            ret.add(convertDefineExternalSound((DefineExternalSound)tag));
+            ret.add(convertDefineExternalSound((DefineExternalSound) tag));
             return ret;
         }
-        
+
         if (tag instanceof DefineExternalStreamSound) {
-            return convertDefineExternalStreamSound((DefineExternalStreamSound)tag);
+            return convertDefineExternalStreamSound((DefineExternalStreamSound) tag);
         }
-        
+
         if (tag instanceof DefineGradientMap) {
             return ret;
         }
-        
+
         if (tag instanceof DefineSubImage) {
             ret.add(convertDefineSubImage((DefineSubImage) tag));
             return ret;
         }
-                        
+
         if (tag instanceof ExporterInfo) {
             return ret;
         }
-        
+
         if (tag instanceof FontTextureInfo) {
             return ret;
-        }        
-        
+        }
+
         if (tag instanceof ImportAssetsTag) {
             return ret;
         }
-        
+
         if (tag instanceof ImportAssets2Tag) {
             return ret;
         }
-        
+
         if (tag instanceof DefineSpriteTag) {
-            ret.add(convertDefineSprite((DefineSpriteTag)tag));
+            ret.add(convertDefineSprite((DefineSpriteTag) tag));
             return ret;
         }
-                
+
         ret.add(tag);
         return ret;
     }
-    
+
     public SWF convertSwf(SWF gfxSwf) {
         if (!gfxSwf.gfx) {
             return gfxSwf;
@@ -244,9 +243,9 @@ public class GfxConvertor {
         ret.compression = gfxSwf.compression;
         ret.frameCount = gfxSwf.frameCount;
         ret.gfx = false;
-        ret.hasEndTag = gfxSwf.hasEndTag;        
+        ret.hasEndTag = gfxSwf.hasEndTag;
         converTags(gfxSwf, ret);
-        
-        return ret;       
+
+        return ret;
     }
 }

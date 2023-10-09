@@ -40,9 +40,9 @@ public class AS2Package implements TreeItem {
     public Map<String, AS2Package> subPackages = new TreeMap<>();
 
     public Map<String, ASMSource> scripts = new TreeMap<>();
-    
+
     private boolean flat;
-    
+
     private boolean defaultPackage;
 
     public AS2Package(String name, AS2Package parent, SWF swf, boolean flat, boolean defaultPackage) {
@@ -56,8 +56,6 @@ public class AS2Package implements TreeItem {
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
-    
-    
 
     @Override
     public Openable getOpenable() {
@@ -131,7 +129,6 @@ public class AS2Package implements TreeItem {
         return name;
     }
 
-
     @Override
     public boolean isModified() {
         for (ASMSource s : scripts.values()) {
@@ -149,5 +146,5 @@ public class AS2Package implements TreeItem {
 
     public boolean isFlat() {
         return flat;
-    }        
+    }
 }

@@ -328,7 +328,7 @@ public class SWFInputStream implements AutoCloseable {
         }
         return swf.getCharset();
     }
-    
+
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
@@ -369,7 +369,7 @@ public class SWFInputStream implements AutoCloseable {
         this.swf = swf;
         this.startingPos = startingPos;
         this.data = data;
-        this.limit = limit;       
+        this.limit = limit;
         is = new MemoryInputStream(data, 0, limit);
     }
 
@@ -516,7 +516,7 @@ public class SWFInputStream implements AutoCloseable {
             baos.write(r);
         }
     }
-    
+
     /**
      * Reads one netstring (length + string) value from the stream
      *
@@ -608,7 +608,7 @@ public class SWFInputStream implements AutoCloseable {
         }
         return uval;
     }
-    
+
     /**
      * Reads one SI16 (Signed 16bit integer) value from the stream
      *
@@ -622,7 +622,7 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(uval);
         return uval;
     }
-    
+
     private int readSI16Internal() throws IOException {
         int uval = readEx() + (readEx() << 8);
         if (uval >= 0x8000) {
@@ -669,7 +669,7 @@ public class SWFInputStream implements AutoCloseable {
     public double readFIXED(String name) throws IOException {
         newDumpLevel(name, "FIXED");
         long si = readSI32Internal();
-        double ret = si / (double)(1 << 16);
+        double ret = si / (double) (1 << 16);
         endDumpLevel(ret);
         return ret;
     }
@@ -684,7 +684,7 @@ public class SWFInputStream implements AutoCloseable {
     public float readFIXED8(String name) throws IOException {
         newDumpLevel(name, "FIXED8");
         int si = readSI16Internal();
-        float ret = si / (float)(1 << 8);
+        float ret = si / (float) (1 << 8);
         endDumpLevel(ret);
         return ret;
     }
@@ -3089,9 +3089,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHFOCALGRADIENT value from the stream
+     * Reads one MORPHFOCALGRADIENT value from the stream.
      *
-     * This is undocumented feature
+     * <p>This is undocumented feature
      *
      * @param name
      * @return MORPHGRADIENT value

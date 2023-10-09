@@ -38,7 +38,7 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     protected StringBuilder pathData;
 
     protected double zoom;
-    
+
     protected boolean aliasedFill;
 
     public DefaultSVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
@@ -162,6 +162,5 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     public void beginAliasedFills() {
         aliasedFill = true;
     }
-    
-    
+
 }

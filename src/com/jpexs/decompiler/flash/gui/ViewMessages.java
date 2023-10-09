@@ -30,6 +30,7 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class ViewMessages {
+
     public static int showOptionDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageType, final Icon icon, final Object[] options, final Object initialValue) {
         final int[] ret = new int[1];
         View.execInEventDispatch(() -> {

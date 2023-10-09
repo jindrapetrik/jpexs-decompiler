@@ -63,7 +63,7 @@ public class AddClassDialog extends AppDialog {
     private Openable openable;
 
     private int abcCount = 0;
-    
+
     private ABCContainerTag preselectedAbcContainer;
 
     private JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("abc.where.existing"));

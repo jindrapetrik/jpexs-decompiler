@@ -32,8 +32,8 @@ public class GlyphInfoType implements Serializable {
     public long globalOffset;
 
     public GlyphInfoType() {
-    }   
-    
+    }
+
     public GlyphInfoType(int glyphCode, int advance, int glyphPos) {
         this.glyphCode = glyphCode;
         this.advanceX = advance;

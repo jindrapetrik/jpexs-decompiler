@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -56,7 +55,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     public JPanel unsupportedTraitPanel;
 
     public SlotConstTraitDetailPanel slotConstTraitPanel;
-    
+
     public ClassTraitDetailPanel classTraitPanel;
 
     public static final String METHOD_GETTER_SETTER_TRAIT_CARD = "abc.detail.methodtrait";
@@ -64,7 +63,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     public static final String UNSUPPORTED_TRAIT_CARD = "abc.detail.unsupported";
 
     public static final String SLOT_CONST_TRAIT_CARD = "abc.detail.slotconsttrait";
-    
+
     public static final String CLASS_TRAIT_CARD = "abc.detail.classstrait";
 
     private final JPanel innerPanel;
@@ -92,7 +91,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private boolean buttonsShouldBeShown = false;
 
     private final DebuggerHandler.ConnectionListener conListener;
-    
+
     private MainPanel mainPanel;
 
     public DetailPanel(ABCPanel abcPanel, MainPanel mainPanel) {
@@ -112,7 +111,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
         slotConstTraitPanel = new SlotConstTraitDetailPanel(abcPanel.decompiledTextArea);
         cardMap.put(SLOT_CONST_TRAIT_CARD, slotConstTraitPanel);
-        
+
         classTraitPanel = new ClassTraitDetailPanel(abcPanel.decompiledTextArea);
         cardMap.put(CLASS_TRAIT_CARD, classTraitPanel);
 
@@ -132,15 +131,10 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         saveButton.addActionListener(this::saveButtonActionPerformed);
         editButton.addActionListener(this::editButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        /*if (Configuration.editorMode.get()) {
-            editButton.setVisible(false);
-            saveButton.setEnabled(false);
-            cancelButton.setEnabled(false);
-        } else */
-        {
-            saveButton.setVisible(false);
-            cancelButton.setVisible(false);
-        }
+
+        saveButton.setVisible(false);
+        cancelButton.setVisible(false);
+
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
         buttonsPanel.add(editButton);
         buttonsPanel.add(saveButton);
@@ -206,27 +200,14 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     }
 
     public void setEditMode(boolean val) {
-        /*if (Configuration.editorMode.get()) {
-            slotConstTraitPanel.setEditMode(true);
-            methodTraitPanel.setEditMode(true);
-            editButton.setVisible(false);
-            saveButton.setVisible(true);
-            saveButton.setEnabled(false);
-            cancelButton.setVisible(true);
-            cancelButton.setEnabled(false);
-            selectedLabel.setIcon(View.getIcon("editing16"));            
-        } else 
-*/      
-        {
-            slotConstTraitPanel.setEditMode(val);
-            methodTraitPanel.setEditMode(val);
-            classTraitPanel.setEditMode(val);
-            saveButton.setVisible(val);
-            saveButton.setEnabled(false);
-            editButton.setVisible(!val);
-            cancelButton.setVisible(val);
-            selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
-        }
+        slotConstTraitPanel.setEditMode(val);
+        methodTraitPanel.setEditMode(val);
+        classTraitPanel.setEditMode(val);
+        saveButton.setVisible(val);
+        saveButton.setEnabled(false);
+        editButton.setVisible(!val);
+        cancelButton.setVisible(val);
+        selectedLabel.setIcon(val ? View.getIcon("editing16") : null);        
     }
 
     public void showCard(final String name, final Trait trait, int traitIndex, ABC abc) {
@@ -344,7 +325,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private void save(boolean refreshTree) {
         if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-                
+
                 DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
                 if (!refreshTree) {
                     decompiledTextArea.reloadClass();
@@ -365,17 +346,17 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                             decompiledTextArea.gotoTrait(lastTrait);
                         }
                         setEditMode(false);
-                        mainPanel.clearEditingStatus();                        
-                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);                        
+                        mainPanel.clearEditingStatus();
+                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }
                 };
 
                 decompiledTextArea.addScriptListener(reloadComplete);
-                decompiledTextArea.reloadClass();                
+                decompiledTextArea.reloadClass();
             }
         }
     }
-    
+
     private void saveButtonActionPerformed(ActionEvent evt) {
         save(true);
     }

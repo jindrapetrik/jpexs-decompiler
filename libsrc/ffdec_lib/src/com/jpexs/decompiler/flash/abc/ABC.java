@@ -50,13 +50,13 @@ import com.jpexs.decompiler.flash.abc.usages.ClassNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.ConstVarNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.ConstVarTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.DefinitionUsage;
-import com.jpexs.decompiler.flash.abc.usages.SuperClassMultinameUsage;
-import com.jpexs.decompiler.flash.abc.usages.SuperInterfaceMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodBodyMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.SuperClassMultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.SuperInterfaceMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
@@ -72,7 +72,6 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.File;
 import java.io.IOException;
@@ -1961,7 +1960,7 @@ public class ABC implements Openable {
         getSwf().clearScriptCache();
         getMethodIndexing();
         getSwf().getAbcIndex().refreshAbc(this);
-        
+
         fireChanged();
     }
 
@@ -2054,17 +2053,17 @@ public class ABC implements Openable {
         //Method Info
         for (int i = 0; i < secondABC.method_info.size(); i++) {
             MethodInfo secondMethodInfo = secondABC.method_info.get(i);
-            int newParamTypes[] = new int[secondMethodInfo.param_types.length];
+            int[] newParamTypes = new int[secondMethodInfo.param_types.length];
             for (int t = 0; t < secondMethodInfo.param_types.length; t++) {
                 newParamTypes[t] = mergeMultinameMap.get(secondMethodInfo.param_types[t]);
             }
-            int newParamNames[] = new int[secondMethodInfo.paramNames.length];
+            int[] newParamNames = new int[secondMethodInfo.paramNames.length];
             for (int n = 0; n < secondMethodInfo.paramNames.length; n++) {
                 newParamNames[n] = mergeStringMap.get(secondMethodInfo.paramNames[n]);
             }
             int newRetType = mergeMultinameMap.get(secondMethodInfo.ret_type);
             int newNameIndex = mergeStringMap.get(secondMethodInfo.name_index);
-            ValueKind newOptional[] = new ValueKind[secondMethodInfo.optional.length];
+            ValueKind[] newOptional = new ValueKind[secondMethodInfo.optional.length];
             for (int k = 0; k < secondMethodInfo.optional.length; k++) {
                 int vkind = secondMethodInfo.optional[k].value_kind;
                 Map<Integer, Integer> valueMergeMap = null;
@@ -2175,7 +2174,7 @@ public class ABC implements Openable {
             }
             AVM2Code newCode = newBody.getCode();
             for (AVM2Instruction newIns : newCode.code) {
-                int newOperands[] = newIns.operands == null ? null : newIns.operands.clone();
+                int[] newOperands = newIns.operands == null ? null : newIns.operands.clone();
                 boolean modified = false;
                 if (newIns.operands != null) {
                     for (int i = 0; i < newIns.definition.operands.length; i++) {

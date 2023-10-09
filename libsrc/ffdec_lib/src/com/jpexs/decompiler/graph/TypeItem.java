@@ -35,40 +35,42 @@ public class TypeItem extends GraphTargetItem {
     public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
     public static TypeItem STRING = new TypeItem(DottedChain.STRING);
-    
+
     public static TypeItem NUMBER = new TypeItem(DottedChain.NUMBER);
-    
+
     public static TypeItem INT = new TypeItem(DottedChain.INT);
-    
+
     public static TypeItem UINT = new TypeItem(DottedChain.UINT);
-    
+
     public static TypeItem UNDEFINED = new TypeItem(DottedChain.UNDEFINED);
 
     public static TypeItem ARRAY = new TypeItem(DottedChain.ARRAY);
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
-    
+
     public static TypeItem UNKNOWN = new TypeItem("--UNKNOWN--");
 
     public final DottedChain fullTypeName;
-    
+
     public boolean printRaw = false;
-    
+
     public String ns;
 
     public TypeItem(String s) {
         this(s, null);
     }
+
     public TypeItem(String s, String ns) {
         this(s == null ? new DottedChain(new String[]{}, new String[]{""}) : DottedChain.parseWithSuffix(s), ns);
     }
 
     public TypeItem(DottedChain fullTypeName) {
-        this(fullTypeName, (String)null);
-    }            
+        this(fullTypeName, (String) null);
+    }
+
     public TypeItem(DottedChain fullTypeName, String ns) {
         this(fullTypeName, new ArrayList<>(), ns);
-   }
+    }
 
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes, String ns) {
         super(null, null, NOPRECEDENCE);
@@ -101,8 +103,6 @@ public class TypeItem extends GraphTargetItem {
         }
         return Objects.equals(this.fullTypeName, other.fullTypeName);
     }
-
-    
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {

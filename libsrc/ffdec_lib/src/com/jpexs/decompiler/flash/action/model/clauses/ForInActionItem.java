@@ -85,9 +85,6 @@ public class ForInActionItem extends LoopActionItem implements Block {
         visitor.visit(enumVariable);
     }
 
-
-
-
     public ForInActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem variableName, GraphTargetItem enumVariable, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
         this.variableName = variableName;
@@ -134,7 +131,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         enumVariable.toString(writer, localData);
         if (enumVariable.getPrecedence() > PRECEDENCE_PRIMARY) {
             writer.append(")");
-        }        
+        }
         writer.append(")").startBlock();
         for (GraphTargetItem ti : commands) {
             ti.toStringSemicoloned(writer, localData).newLine();

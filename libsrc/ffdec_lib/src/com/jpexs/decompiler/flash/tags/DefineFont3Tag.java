@@ -440,7 +440,7 @@ public class DefineFont3Tag extends FontTag {
         int fontStyle = getFontStyle();
         SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
         int code = (int) Utf8Helper.charToCodePoint(character, getCodesCharset());
-        
+
         if (code == -1) { //Fixme - throw exception, etc.
             code = 0;
         }
@@ -491,13 +491,13 @@ public class DefineFont3Tag extends FontTag {
                 }
                 int glyph1 = charToGlyph(pair.char1);
                 if (pair.char1 == code) {
-
+                    //empty
                 } else if (glyph1 == -1) {
                     continue;
                 }
                 int glyph2 = charToGlyph(pair.char2);
                 if (pair.char2 == code) {
-
+                    //empty
                 } else if (glyph2 == -1) {
                     continue;
                 }
@@ -632,7 +632,7 @@ public class DefineFont3Tag extends FontTag {
     public synchronized int getCharKerningAdjustment(char c1, char c2) {
         int c1Code = Utf8Helper.charToCodePoint(c1, getCodesCharset());
         int c2Code = Utf8Helper.charToCodePoint(c2, getCodesCharset());
-        
+
         int kerningAdjustment = 0;
         for (KERNINGRECORD ker : fontKerningTable) {
             if (ker.fontKerningCode1 == c1Code && ker.fontKerningCode2 == c2Code) {
@@ -705,7 +705,7 @@ public class DefineFont3Tag extends FontTag {
     public boolean isLeadingEditable() {
         return hasLayout();
     }
-    
+
     @Override
     public String getCodesCharset() {
         if (fontFlagsShiftJIS) {

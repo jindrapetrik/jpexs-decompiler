@@ -111,16 +111,7 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         write(val & 0xff);
         write((val >> 8) & 0xff);
         return true;
-    }
-
-    @Override
-    public int readUI8() throws IOException {
-        try {
-            return read() & 0xff;
-        } catch (EOFException ex) {
-            return -1;
-        }
-    }
+    }   
 
     @Override
     public boolean writeUI8(int val) throws IOException {
@@ -179,6 +170,15 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     }
 
     @Override
+    public int readUI8() throws IOException {
+        try {
+            return read() & 0xff;
+        } catch (EOFException ex) {
+            return -1;
+        }
+    }
+
+    @Override
     public int readUI8(long addr) throws IOException {
         long curPos = position();
         seek(addr, SeekMode.SET);
@@ -215,16 +215,22 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         switch (pad8) {
             case 1:
                 write(0);
+                //fallthrough
             case 2:
                 write(0);
+                //fallthrough
             case 3:
                 write(0);
+                //fallthrough
             case 4:
                 write(0);
+                //fallthrough
             case 5:
                 write(0);
+                //fallthrough
             case 6:
                 write(0);
+                //fallthrough
             case 7:
                 write(0);
         }

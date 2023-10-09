@@ -44,7 +44,7 @@ public class IncLocalPIns extends InstructionDefinition {
 
         super.verify(lda, constants, ins);
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;
@@ -53,5 +53,5 @@ public class IncLocalPIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 0;
-    } 
+    }
 }

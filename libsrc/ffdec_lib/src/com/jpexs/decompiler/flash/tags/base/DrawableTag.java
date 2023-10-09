@@ -46,7 +46,9 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
 
     /**
      * Calculates drawable outline.
-     * @param fast When the structure is large, can approximate to rectangles instead of being slow.
+     *
+     * @param fast When the structure is large, can approximate to rectangles
+     * instead of being slow.
      * @param frame
      * @param time
      * @param ratio
@@ -55,10 +57,10 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
      * @param stroked
      * @param viewRect
      * @param unzoom
-     * @return 
+     * @return
      */
     public abstract Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom);
-    
+
     public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing);
 
     public abstract void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException;

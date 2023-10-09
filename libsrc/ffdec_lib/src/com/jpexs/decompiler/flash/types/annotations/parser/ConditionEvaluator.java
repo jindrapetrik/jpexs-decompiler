@@ -119,10 +119,10 @@ public class ConditionEvaluator {
                 if (revert) {
                     return !result;
                 }
-                return result;                
+                return result;
             }
         }
-        
+
         ConditionLexer lex = new ConditionLexer(new StringReader(prepareCond()));
 
         Stack<Boolean> stack = new Stack<>();

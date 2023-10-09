@@ -50,7 +50,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     private final SWF swf;
 
-    private final SVGExporter exporter;    
+    private final SVGExporter exporter;
 
     public SVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
         super(shapeNum, swf, shape, colorTransform, zoom);
@@ -58,7 +58,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
-    }       
+    }
 
     @Override
     public void beginFill(RGB color) {

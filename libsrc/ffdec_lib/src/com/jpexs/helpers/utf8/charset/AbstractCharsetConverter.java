@@ -53,7 +53,7 @@ public abstract class AbstractCharsetConverter {
         lexer.lex(); //;
     }
 
-    protected static void readOneDimensionalInt(int data[], ActionScriptLexer lexer) throws IOException, ActionParseException {
+    protected static void readOneDimensionalInt(int[] data, ActionScriptLexer lexer) throws IOException, ActionParseException {
         ParsedSymbol s;
         lexer.lex(); //identifier
         lexer.lex(); //=
@@ -79,7 +79,7 @@ public abstract class AbstractCharsetConverter {
         lexer.lex(); //;
     }
 
-    protected static void readTwoDimensionalInt(int data[][], ActionScriptLexer lexer) throws IOException, ActionParseException {
+    protected static void readTwoDimensionalInt(int[][] data, ActionScriptLexer lexer) throws IOException, ActionParseException {
         ParsedSymbol s;
         lexer.lex(); //identifier;
         lexer.lex(); //=
@@ -111,8 +111,8 @@ public abstract class AbstractCharsetConverter {
         //lexer.lex(); // }
         lexer.lex(); //;
     }
-    
-     public abstract int toUnicode(int codePoint);
+
+    public abstract int toUnicode(int codePoint);
 
     public abstract int fromUnicode(int codePoint);
 }

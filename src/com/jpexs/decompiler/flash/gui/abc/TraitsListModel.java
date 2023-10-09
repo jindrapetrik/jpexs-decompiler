@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +39,7 @@ public final class TraitsListModel implements ListModel<Object> {
     private final int classIndex;
 
     private final int scriptIndex;
-    
+
     private final boolean hasScriptInitializer;
 
     public void setSorted(boolean sorted) {

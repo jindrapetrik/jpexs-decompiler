@@ -117,8 +117,6 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
         return abc;
     }
 
-    
-    
     @Override
     public String getName() {
         return super.getName() + (!name.isEmpty() ? " (" + name + ")" : "");
@@ -145,9 +143,9 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
             }
         }
     }
-    
+
     @Override
     public void setABC(ABC abc) {
         this.abc = abc;
-    }   
+    }
 }

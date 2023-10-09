@@ -48,7 +48,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
-    
+
     public GraphTargetItem type;
 
     @Override

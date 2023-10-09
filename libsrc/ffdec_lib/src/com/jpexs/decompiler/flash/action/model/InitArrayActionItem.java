@@ -131,5 +131,4 @@ public class InitArrayActionItem extends ActionItem {
         return false;
     }
 
-
 }

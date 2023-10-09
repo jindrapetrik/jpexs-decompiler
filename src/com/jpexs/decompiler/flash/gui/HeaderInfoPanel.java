@@ -43,7 +43,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import layout.TableLayout;
 
 /**
@@ -65,9 +64,9 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JLabel frameRateLabel = new JLabel();
 
     private final JLabel frameCountLabel = new JLabel();
-    
+
     private final JSpinner frameCountEditor = new JSpinner();
-    
+
     private final JPanel frameCountEditorPanel = new JPanel();
 
     private final JLabel displayRectTwipsLabel = new JLabel();
@@ -113,10 +112,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JLabel warningLabel = new JLabel();
 
     private JComboBox<String> unitComboBox;
-        
+
     private final int UNIT_PIXELS = 0;
     private final int UNIT_TWIPS = 1;
-    
+
     private int unit = UNIT_PIXELS;
 
     private SWF swf;
@@ -163,11 +162,11 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         frameRateEditorPanel.setLayout(layout);
         frameRateEditor.setPreferredSize(new Dimension(80, frameRateEditor.getPreferredSize().height));
         frameRateEditorPanel.add(frameRateEditor);
-        
+
         frameCountEditorPanel.setLayout(layout);
         frameCountEditor.setPreferredSize(new Dimension(80, frameCountEditor.getPreferredSize().height));
         frameCountEditorPanel.add(frameCountEditor);
-        
+
         JLabel frameCountWarningIcon = new JLabel(View.getIcon("warning16"));
         frameCountWarningIcon.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         frameCountWarningIcon.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -179,10 +178,9 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
                     ViewMessages.showMessageDialog(HeaderInfoPanel.this,
                             AppStrings.translate("warning.edit.headerframecount"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
                 }
-            }            
+            }
         });
         frameCountEditorPanel.add(frameCountWarningIcon);
-
 
         displayRectEditorPanel.setLayout(layout);
         displayRectEditorPanel.setMinimumSize(new Dimension(10, displayRectEditorPanel.getMinimumSize().height));
@@ -197,14 +195,13 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         displayRectEditorPanel.add(xMaxEditor);
         displayRectEditorPanel.add(new JLabel(","));
         displayRectEditorPanel.add(yMaxEditor);
-        
+
         unitComboBox = new JComboBox<>(new String[]{
             AppStrings.translate("header.displayrect.unit.pixels"),
             AppStrings.translate("header.displayrect.unit.twips")
         });
         displayRectEditorPanel.add(unitComboBox);
-        
-        
+
         unitComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -218,15 +215,15 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
                         multiplier = 1 / 20.0;
                     }
                     unit = newUnit;
-                    
-                    xMinEditor.setValue(((double)xMinEditor.getValue()) * multiplier);
-                    yMinEditor.setValue(((double)yMinEditor.getValue()) * multiplier);
-                    xMaxEditor.setValue(((double)xMaxEditor.getValue()) * multiplier);
-                    yMaxEditor.setValue(((double)yMaxEditor.getValue()) * multiplier);
+
+                    xMinEditor.setValue(((double) xMinEditor.getValue()) * multiplier);
+                    yMinEditor.setValue(((double) yMinEditor.getValue()) * multiplier);
+                    xMaxEditor.setValue(((double) xMaxEditor.getValue()) * multiplier);
+                    yMaxEditor.setValue(((double) yMaxEditor.getValue()) * multiplier);
                 }
-            }            
+            }
         });
-        
+
         warningLabel.setIcon(View.getIcon("warning16"));
         warningPanel.setLayout(layout);
         warningPanel.setBackground(new Color(255, 213, 29));
@@ -314,10 +311,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         if (unit == UNIT_PIXELS) {
             multiplier = 20.0;
         }
-        swf.displayRect.Xmin = (int) (multiplier * (double)xMinEditor.getModel().getValue());
-        swf.displayRect.Xmax = (int) (multiplier * (double)xMaxEditor.getModel().getValue());
-        swf.displayRect.Ymin = (int) (multiplier * (double)yMinEditor.getModel().getValue());
-        swf.displayRect.Ymax = (int) (multiplier * (double)yMaxEditor.getModel().getValue());
+        swf.displayRect.Xmin = (int) (multiplier * (double) xMinEditor.getModel().getValue());
+        swf.displayRect.Xmax = (int) (multiplier * (double) xMaxEditor.getModel().getValue());
+        swf.displayRect.Ymin = (int) (multiplier * (double) yMinEditor.getModel().getValue());
+        swf.displayRect.Ymax = (int) (multiplier * (double) yMaxEditor.getModel().getValue());
         swf.setHeaderModified(true);
 
         load(swf);
@@ -363,8 +360,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
         frameCountLabel.setText("" + swf.frameCount);
         frameCountEditor.setModel(new SpinnerNumberModel(swf.frameCount, -0x80000000, 0x7fffffff, 1));
-        
-        
+
         displayRectTwipsLabel.setText(AppStrings.translate("header.displayrect.value.twips")
                 .replace("%xmin%", Integer.toString(swf.displayRect.Xmin))
                 .replace("%ymin%", Integer.toString(swf.displayRect.Ymin))

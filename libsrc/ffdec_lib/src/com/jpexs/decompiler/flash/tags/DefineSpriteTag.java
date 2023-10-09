@@ -233,14 +233,14 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
             MATRIX m = null;
             int characterId = -1;
             if (t instanceof RemoveTag) {
-                RemoveTag rt = (RemoveTag)t;
+                RemoveTag rt = (RemoveTag) t;
                 depthMap.remove(rt.getDepth());
                 depthMatrixMap.remove(rt.getDepth());
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
                 m = pot.getMatrix();
-                
+
                 if (m == null) {
                     if (pot.flagMove()) {
                         if (!depthMatrixMap.containsKey(pot.getDepth())) {
@@ -250,13 +250,13 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                         }
                     }
                 }
-                
-                if (!pot.flagMove() && depthMap.containsKey(pot.getDepth())) {                
+
+                if (!pot.flagMove() && depthMap.containsKey(pot.getDepth())) {
                     continue;
                 }
-                
+
                 depthMatrixMap.put(pot.getDepth(), m);
-                
+
                 int charId = pot.getCharacterId();
                 if (charId > -1) {
                     depthMap.put(pot.getDepth(), charId);
@@ -266,7 +266,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                     if (chi != null) {
                         characterId = chi;
                     }
-                }                
+                }
             }
             if (characterId != -1 && swf != null) {
                 //Do not handle Fonts as characters. TODO: make this better
@@ -474,9 +474,9 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         removeTag(index);
         addTag(index, newTag);
     }
-    
+
     @Override
-    public void replaceTag(Tag oldTag, Tag newTag) {        
+    public void replaceTag(Tag oldTag, Tag newTag) {
         int index = indexOfTag(oldTag);
         if (index != -1) {
             replaceTag(index, newTag);
@@ -487,7 +487,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     public RECT getRectWithStrokes() {
         return getRect(); //?
     }
-    
+
     @Override
     public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
         Set<Integer> ret = new LinkedHashSet<>();
@@ -499,7 +499,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         }
         return ret;
     }
-    
+
     @Override
     public int getFrameCount() {
         return frameCount;
@@ -508,5 +508,5 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public void setFrameCount(int frameCount) {
         this.frameCount = frameCount;
-    }  
+    }
 }

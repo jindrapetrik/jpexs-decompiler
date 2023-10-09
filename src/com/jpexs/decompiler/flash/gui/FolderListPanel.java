@@ -33,8 +33,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +44,6 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
@@ -59,15 +56,16 @@ import org.pushingpixels.substance.api.SubstanceSkin;
  *
  * @author JPEXS
  */
-public class FolderListPanel extends JPanel {    
-    private List<TreeItem> items;       
-    
+public class FolderListPanel extends JPanel {
+
+    private List<TreeItem> items;
+
     private TreePath parentPath;
 
     private int selectedIndex = -1;
 
     private Map<Integer, TreeItem> selectedItems = new TreeMap<>();
-    
+
     private static final int PREVIEW_SIZE = 150;
 
     private static final int BORDER_SIZE = 5;
@@ -78,11 +76,10 @@ public class FolderListPanel extends JPanel {
 
     private static final int CELL_WIDTH = 2 * BORDER_SIZE + PREVIEW_SIZE;
 
-    
-    private static final Map<TreeNodeType, Icon> ICONS;        
-    
+    private static final Map<TreeNodeType, Icon> ICONS;
+
     protected Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
-    
+
     private MainPanel mainPanel;
 
     static {
@@ -90,16 +87,16 @@ public class FolderListPanel extends JPanel {
         for (TreeNodeType treeNodeType : TreeNodeType.values()) {
             if (treeNodeType != TreeNodeType.UNKNOWN) {
                 String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
-                try{
+                try {
                     ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "32"));
-                }catch(NullPointerException npe) {
-                    System.err.println("ICON "+tagTypeStr + "32.png does not exist!");
+                } catch (NullPointerException npe) {
+                    System.err.println("ICON " + tagTypeStr + "32.png does not exist!");
                     ICONS.put(treeNodeType, View.getIcon("about32"));
                 }
             }
-        }        
+        }
     }
-    
+
     private static final SerializableImage noImage = new SerializableImage(PREVIEW_SIZE, PREVIEW_SIZE, BufferedImage.TYPE_INT_ARGB);
 
     static {
@@ -109,13 +106,13 @@ public class FolderListPanel extends JPanel {
     public FolderListPanel(final MainPanel mainPanel, List<TreeItem> items) {
         this.items = items;
         this.mainPanel = mainPanel;
-        
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
                     if (selectedIndex > -1) {
-                        TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);                       
+                        TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);
                         TreePath subPath = parentPath.pathByAddingChild(selectedItem);
                         mainPanel.getCurrentTree().setSelectionPath(subPath);
                     }
@@ -178,7 +175,7 @@ public class FolderListPanel extends JPanel {
         repaint();
         selectedItems.clear();
         selectedIndex = -1;
-        ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);        
+        ((JScrollPane) getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
 
     public void clear() {
@@ -237,9 +234,9 @@ public class FolderListPanel extends JPanel {
                         g.setColor(selectedColor);
                     }
                     g.fillRect(x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
-                    
+
                     TreeItem treeItem = items.get(index);
-                    
+
                     TreeNodeType type = AbstractTagTree.getTreeNodeType(treeItem);
                     Icon icon = ICONS.get(type);
                     icon.paintIcon(l, g, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconHeight() / 2);
@@ -252,12 +249,12 @@ public class FolderListPanel extends JPanel {
                     } else {
                         s = treeItem.toString();
                     }
-                    
+
                     int itemIndex = mainPanel.getCurrentTree().getFullModel().getItemIndex(treeItem);
                     if (itemIndex > 1) {
                         s += " [" + itemIndex + "]";
                     }
-                    
+
                     g.setFont(f);
                     g.setColor(borderColor);
                     g.drawLine(x * CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE, x * CELL_WIDTH + CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE);
@@ -271,12 +268,12 @@ public class FolderListPanel extends JPanel {
                 }
             }
         }
-    }      
-    
+    }
+
     public List<TreeItem> getSelectedItemsSorted() {
         return new ArrayList<>(selectedItems.values());
     }
-    
+
     public boolean isSomethingSelected() {
         return !selectedItems.isEmpty();
     }

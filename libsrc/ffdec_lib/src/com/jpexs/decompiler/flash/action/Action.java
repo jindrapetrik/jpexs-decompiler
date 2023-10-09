@@ -124,7 +124,7 @@ public abstract class Action implements GraphSourceItem {
     private long address;
 
     private long virtualAddress = -1;
-    
+
     private String charset;
 
     @Override
@@ -135,8 +135,6 @@ public abstract class Action implements GraphSourceItem {
     public String getCharset() {
         return charset;
     }
-    
-    
 
     /**
      * Names of ActionScript properties
@@ -190,7 +188,7 @@ public abstract class Action implements GraphSourceItem {
         this.charset = charset;
     }
 
-    public Action() {        
+    public Action() {
     }
 
     /**
@@ -423,6 +421,7 @@ public abstract class Action implements GraphSourceItem {
                 lastAction = a;
                 baos.write(a.getBytes(version));
             } catch (IOException e) {
+                //ignore
             }
         }
         if (addZero && (lastAction == null || !(lastAction instanceof ActionEnd))) {
@@ -759,29 +758,6 @@ public abstract class Action implements GraphSourceItem {
 
     public abstract boolean execute(LocalDataArea lda);
 
-    /* {
-     //throw new UnsupportedOperationException("Action " + toString() + " not implemented");
-     return false;
-     }*/
-    /**
-     * Translates this function to stack and output.
-     *
-     * @param uninitializedClassTraits
-     * @param secondPassData
-     * @param insideDoInitAction
-     * @param lineStartIns Line start instruction
-     * @param stack Stack
-     * @param output Output
-     * @param regNames Register names
-     * @param variables Variables
-     * @param functions Functions
-     * @param staticOperation the value of staticOperation
-     * @param path the value of path
-     * @throws java.lang.InterruptedException
-     */
-    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
-    }
-
     @Override
     public int getStackPopCount(BaseLocalData localData, TranslateStack stack) {
         return 0;
@@ -855,14 +831,10 @@ public abstract class Action implements GraphSourceItem {
         return -1;
     }
 
-    public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        return actionsToTree(uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
-    }
-
     public static GraphTextWriter actionsToSource(Map<String, Map<String, Trait>> uninitializedClassTraits, final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset) throws InterruptedException {
         return Action.actionsToSource(uninitializedClassTraits, asm, actions, path, writer, charset, new ArrayList<>());
     }
-    
+
     /**
      * Converts list of actions to ActionScript source code
      *
@@ -890,7 +862,7 @@ public abstract class Action implements GraphSourceItem {
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
                     List<GraphTargetItem> tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
-                    for (ActionTreeOperation treeOperation:treeOperations) {
+                    for (ActionTreeOperation treeOperation : treeOperations) {
                         treeOperation.run(tree);
                     }
                     if (Configuration.autoDeobfuscate.get()) {
@@ -937,6 +909,10 @@ public abstract class Action implements GraphSourceItem {
         return writer;
     }
 
+    public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        return actionsToTree(uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+    }
+
     /**
      * Converts list of actions to List of treeItems
      *
@@ -964,19 +940,29 @@ public abstract class Action implements GraphSourceItem {
         }
     }
 
+    /**
+     * Translates this function to stack and output.
+     *
+     * @param uninitializedClassTraits
+     * @param secondPassData
+     * @param insideDoInitAction
+     * @param lineStartIns Line start instruction
+     * @param stack Stack
+     * @param output Output
+     * @param regNames Register names
+     * @param variables Variables
+     * @param functions Functions
+     * @param staticOperation the value of staticOperation
+     * @param path the value of path
+     * @throws java.lang.InterruptedException
+     */
+    public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    }
+
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
         ActionLocalData aLocalData = (ActionLocalData) localData;
-        /*int expectedSize = stack.size() - getStackPopCount(localData, stack);
-         if (expectedSize < 0) {
-         expectedSize = 0;
-         }
-         expectedSize += getStackPushCount(localData, stack);*/
-
         translate(aLocalData.uninitializedClassTraits, aLocalData.secondPassData, aLocalData.insideDoInitAction, aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
-        /*if (stack.size() != expectedSize && !(this instanceof ActionPushDuplicate)) {
-         throw new Error("HONFIKA stack size mismatch");
-         }*/
     }
 
     @Override
@@ -1101,14 +1087,15 @@ public abstract class Action implements GraphSourceItem {
                         }
 
                         out = new ArrayList<>();
-                        out.add(new CommentItem(new String[]{
+                        String[] lines = new String[]{
                             "",
                             " * " + AppResources.translate("decompilationError"),
                             " * " + AppResources.translate("decompilationError.obfuscated"),
                             Helper.decompilationErrorAdd == null ? null : " * " + Helper.decompilationErrorAdd,
                             " * " + AppResources.translate("decompilationError.errorType") + ": "
                             + ex.getClass().getSimpleName(),
-                            ""}));
+                            ""};
+                        out.add(new CommentItem(lines));
                     }
                     outs.add(out);
                     endAddr += size;

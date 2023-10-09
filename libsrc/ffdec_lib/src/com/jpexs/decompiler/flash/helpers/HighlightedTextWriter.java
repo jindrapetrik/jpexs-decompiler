@@ -185,12 +185,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
         appendNoHilight(text);
         return end(HighlightType.SPECIAL);
     }
-
-    @Override
-    public HighlightedTextWriter append(String str) {
-        return appendWithData(str, null);
-    }
-
+    
     @Override
     public HighlightedTextWriter appendWithData(String str, HighlightData data) {
         Highlighting h = null;
@@ -222,6 +217,11 @@ public class HighlightedTextWriter extends GraphTextWriter {
             h.len = sb.length() - newLineCount - h.startPos;
         }
         return this;
+    }
+
+    @Override
+    public HighlightedTextWriter append(String str) {
+        return appendWithData(str, null);
     }
 
     @Override

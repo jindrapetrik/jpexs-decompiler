@@ -215,7 +215,7 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
     public String toString() {
         return super.toString() + " (" + characterId + ")";
     }
-    
+
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(characterId);

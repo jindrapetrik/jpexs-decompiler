@@ -44,23 +44,23 @@ public class MP3SOUNDDATA {
         frames = new ArrayList<>();
         MP3FRAME f;
         Decoder decoder = new Decoder();
-        
-        byte data[] = sis.readBytesEx(sis.available(), "soundStream");
+
+        byte[] data = sis.readBytesEx(sis.available(), "soundStream");
         MarkingBufferedInputStream mis = new MarkingBufferedInputStream(new ByteArrayInputStream(data));
         Bitstream bitstream = new Bitstream(mis); //new ByteArrayInputStream(data)
         long initLen = mis.getPosition();
         MarkingPushbackInputStream mpis = bitstream.getSource();
         while (true) {
             //System.err.println("initLen = "+initLen);
-            long posBefore = initLen+mpis.getPosition();
+            long posBefore = initLen + mpis.getPosition();
             MP3FRAME frame = MP3FRAME.readFrame(bitstream, decoder);
             if (frame == null) {
                 break;
             }
-            long posAfter = initLen+mpis.getPosition();
-            frame.setFullData(Arrays.copyOfRange(data, (int)posBefore, (int)posAfter));
+            long posAfter = initLen + mpis.getPosition();
+            frame.setFullData(Arrays.copyOfRange(data, (int) posBefore, (int) posAfter));
             frames.add(frame);
-        }        
+        }
     }
 
     public int sampleCount() {

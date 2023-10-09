@@ -99,7 +99,7 @@ public class MyMarkers {
             }
 
         } catch (BadLocationException ex) {
-
+            //ignored
         }
     }
 

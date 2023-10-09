@@ -77,7 +77,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,9 +86,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import org.w3c.dom.Element;
 
 /**
@@ -324,7 +320,7 @@ public class Timeline {
                 frame.layersChanged = true;
                 fl.placeObjectTag = po;
                 fl.minPlaceObjectNum = Math.max(fl.minPlaceObjectNum, po.getPlaceObjectNum());
-                
+
                 boolean wasEmpty = fl.characterId == -1 && fl.className == null;
 
                 if (po.flagMove() || wasEmpty) {
@@ -338,7 +334,7 @@ public class Timeline {
                         if (swf.getCyclicCharacters().contains(characterId)) {
                             fl.characterId = -1;
                         }
-                    }                    
+                    }
                     String className = po.getClassName();
                     if (className != null) {
                         fl.className = className;
@@ -418,7 +414,7 @@ public class Timeline {
                     fl.clipDepth = po.getClipDepth();
                     fl.isVisible = po.isVisible();
                 }
-                
+
             } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
@@ -758,8 +754,8 @@ public class Timeline {
         if (cacheAsBitmap && renderContext.displayObjectCache != null) {
             DisplayObjectCacheKey key = new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect);
             img = renderContext.displayObjectCache.get(key);
-        }       
-        
+        }
+
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
         int dframe;
         if (fontFrameNum != -1) {

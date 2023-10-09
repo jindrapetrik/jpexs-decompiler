@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import static com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns.resolvePropertyType;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSuperAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -33,8 +32,8 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class GetSuperIns extends InstructionDefinition {   
-    
+public class GetSuperIns extends InstructionDefinition {
+
     public GetSuperIns() {
         super(0x04, "getsuper", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }
@@ -44,13 +43,13 @@ public class GetSuperIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        
+
         Reference<Boolean> isStatic = new Reference<>(false);
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
-        resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        
-        stack.push(new GetSuperAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type.getVal(), callType.getVal(),isStatic.getVal()));
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
+
+        stack.push(new GetSuperAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type.getVal(), callType.getVal(), isStatic.getVal()));
     }
 
     @Override

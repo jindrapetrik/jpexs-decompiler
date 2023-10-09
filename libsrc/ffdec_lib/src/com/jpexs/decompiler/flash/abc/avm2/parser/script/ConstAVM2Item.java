@@ -42,7 +42,7 @@ public class ConstAVM2Item extends AVM2Item {
     public int line;
 
     public NamespaceItem pkg;
-    
+
     public boolean generatedNs;
 
     public boolean isStatic() {

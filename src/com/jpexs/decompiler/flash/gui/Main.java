@@ -47,7 +47,6 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
-import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.LinkDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
@@ -131,7 +130,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -149,7 +147,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.filechooser.FileFilter;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
@@ -299,7 +296,7 @@ public class Main {
     public static synchronized void dumpBytes(Variable v) {
         InCallFunction icf;
         try {
-            long objectId = 0l;
+            long objectId = 0L;
             if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
                 objectId = (Long) v.value;
             }
@@ -380,7 +377,7 @@ public class Main {
                         try {
                             runProcess.destroy();
                         } catch (Exception ex) {
-
+                            //ignored
                         }
                     }
                 }
@@ -565,7 +562,7 @@ public class Main {
     }
 
     public static void run(SWF swf) {
-        String flashVars = "";//key=val&key2=val2
+        String flashVars = ""; //key=val&key2=val2
         String playerLocation = Configuration.playerLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -606,7 +603,7 @@ public class Main {
     }
 
     public static void runDebug(SWF swf, final boolean doPCode) {
-        String flashVars = "";//key=val&key2=val2
+        String flashVars = ""; //key=val&key2=val2
         String playerLocation = Configuration.playerDebugLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -621,7 +618,7 @@ public class Main {
         try {
             tempFile = File.createTempFile("ffdec_debug_", ".swf");
         } catch (Exception ex) {
-
+            //ignored
         }
 
         if (tempFile != null) {
@@ -678,11 +675,11 @@ public class Main {
         return isDebugRunning();
     }
 
-    public synchronized static int getIp(Object pack) {
+    public static synchronized int getIp(Object pack) {
         return getDebugHandler().getBreakIp();
     }
 
-    public synchronized static String getIpClass() {
+    public static synchronized String getIpClass() {
         return getDebugHandler().getBreakScriptName();
     }
 
@@ -690,15 +687,15 @@ public class Main {
         return !getDebugHandler().isBreakpointInvalid(scriptName, line);
     }
 
-    public synchronized static void addBreakPoint(String scriptName, int line) {
+    public static synchronized void addBreakPoint(String scriptName, int line) {
         getDebugHandler().addBreakPoint(scriptName, line);
     }
 
-    public synchronized static void removeBreakPoint(String scriptName, int line) {
+    public static synchronized void removeBreakPoint(String scriptName, int line) {
         getDebugHandler().removeBreakPoint(scriptName, line);
     }
 
-    public synchronized static boolean toggleBreakPoint(String scriptName, int line) {
+    public static synchronized boolean toggleBreakPoint(String scriptName, int line) {
         if (getDebugHandler().isBreakpointToAdd(scriptName, line) || getDebugHandler().isBreakpointConfirmed(scriptName, line) || getDebugHandler().isBreakpointInvalid(scriptName, line)) {
             getDebugHandler().removeBreakPoint(scriptName, line);
             return false;
@@ -708,11 +705,11 @@ public class Main {
         }
     }
 
-    public synchronized static Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly) {
+    public static synchronized Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly) {
         return getDebugHandler().getAllBreakPoints(validOnly);
     }
 
-    public synchronized static Set<Integer> getScriptBreakPoints(String pack, boolean onlyValid) {
+    public static synchronized Set<Integer> getScriptBreakPoints(String pack, boolean onlyValid) {
         return getDebugHandler().getBreakPoints(pack, onlyValid);
     }
 
@@ -774,11 +771,11 @@ public class Main {
         }
     }
 
-    public synchronized static boolean isInited() {
+    public static synchronized boolean isInited() {
         return inited;
     }
 
-    public synchronized static void setSessionLoaded(boolean v) {
+    public static synchronized void setSessionLoaded(boolean v) {
         inited = v;
     }
 
@@ -802,11 +799,7 @@ public class Main {
         }
         proxyFrame.setVisible(true);
         proxyFrame.setState(Frame.NORMAL);
-    }
-
-    public static void startWork(String name, CancellableWorker worker) {
-        startWork(name, -1, worker);
-    }
+    }   
 
     public static void continueWork(String name) {
         continueWork(name, -1);
@@ -834,6 +827,10 @@ public class Main {
         }, 5000, 5000);
     }
 
+    public static void startWork(String name, CancellableWorker worker) {
+        startWork(name, -1, worker);
+    }
+    
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
         long nowTime = System.currentTimeMillis();
@@ -1049,7 +1046,7 @@ public class Main {
                                 String[] parts = (impAssetsStr + IMPORT_ASSETS_SEPARATOR).split(Pattern.quote(IMPORT_ASSETS_SEPARATOR));
                                 for (String s : parts) {
                                     if (!s.isEmpty()) {
-                                        String urlPlusStatus[] = (s + "|").split(Pattern.quote("|"));
+                                        String[] urlPlusStatus = (s + "|").split(Pattern.quote("|"));
                                         String url = urlPlusStatus[0];
                                         String status = urlPlusStatus[1];
                                         configuredImportAssets.put(url, status);
@@ -1103,8 +1100,7 @@ public class Main {
                                         opt = 1; // no
                                     }
 
-                                    if (opt == 1) //no
-                                    {
+                                    if (opt == 1) { //no
                                         loadedStatus.add("NO");
                                         return null;
                                     }
@@ -1368,11 +1364,7 @@ public class Main {
 
         return result;
     }
-
-    public static void saveFile(Openable openable, String outfile) throws IOException {
-        saveFile(openable, outfile, SaveFileMode.SAVE, null);
-    }
-
+    
     public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {
@@ -1427,6 +1419,10 @@ public class Main {
                     bos.write((swfSize >> 24) & 0xff);
             }
         }
+    }
+
+    public static void saveFile(Openable openable, String outfile) throws IOException {
+        saveFile(openable, outfile, SaveFileMode.SAVE, null);
     }
 
     public static void saveFile(Openable openable, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
@@ -1714,62 +1710,7 @@ public class Main {
         Cache.clearAll();
         initGui();
         reloadSWFs();
-    }
-
-    public static OpenFileResult openFile(String swfFile, String fileTitle) {
-        View.checkAccess();
-
-        return openFile(swfFile, fileTitle, null);
-    }
-
-    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
-        View.checkAccess();
-
-        try {
-            File file = new File(swfFile);
-            if (!file.exists()) {
-                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.fileNotFound"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
-                return OpenFileResult.NOT_FOUND;
-            }
-            swfFile = file.getCanonicalPath();
-            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, swfFile, fileTitle);
-            OpenFileResult openResult = openFile(sourceInfo);
-            return openResult;
-        } catch (IOException ex) {
-            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
-            return OpenFileResult.ERROR;
-        }
-    }
-
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo) {
-        View.checkAccess();
-
-        return openFile(new OpenableSourceInfo[]{sourceInfo});
-    }
-
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen) {
-        View.checkAccess();
-
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen);
-    }
-
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
-        View.checkAccess();
-
-        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
-    }
-
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos) {
-        View.checkAccess();
-
-        return openFile(newSourceInfos, null);
-    }
-
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
-        View.checkAccess();
-
-        return openFile(newSourceInfos, executeAfterOpen, null);
-    }
+    }   
 
     public static void newFile() {
         View.checkAccess();
@@ -1827,6 +1768,61 @@ public class Main {
         }
     }
 
+    public static OpenFileResult openFile(String swfFile, String fileTitle) {
+        View.checkAccess();
+
+        return openFile(swfFile, fileTitle, null);
+    }
+
+    public static OpenFileResult openFile(String swfFile, String fileTitle, Runnable executeAfterOpen) {
+        View.checkAccess();
+
+        try {
+            File file = new File(swfFile);
+            if (!file.exists()) {
+                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.fileNotFound"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
+                return OpenFileResult.NOT_FOUND;
+            }
+            swfFile = file.getCanonicalPath();
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, swfFile, fileTitle);
+            OpenFileResult openResult = openFile(sourceInfo);
+            return openResult;
+        } catch (IOException ex) {
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
+            return OpenFileResult.ERROR;
+        }
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo) {
+        View.checkAccess();
+
+        return openFile(new OpenableSourceInfo[]{sourceInfo});
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen) {
+        View.checkAccess();
+
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen);
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+        View.checkAccess();
+
+        return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos) {
+        View.checkAccess();
+
+        return openFile(newSourceInfos, null);
+    }
+
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
+        View.checkAccess();
+
+        return openFile(newSourceInfos, executeAfterOpen, null);
+    }
+    
     public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
         View.checkAccess();
 
@@ -2243,7 +2239,7 @@ public class Main {
         ErrorLogFrame.getInstance().setVisible(true);
     }
 
-    private static String md5(byte data[]) {
+    private static String md5(byte[] data) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(data);
@@ -2253,6 +2249,7 @@ public class Main {
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
+            //ignore
         }
         return null;
     }
@@ -2678,7 +2675,6 @@ public class Main {
      * To bypass wrong encoded unicode characters coming from EXE, it Launch5j
      * encodes characters using URLEncoder.
      *
-     * @param args
      */
     private static void decodeLaunch5jArgs(String[] args) {
         String encargs = System.getProperty("l5j.encargs");
@@ -2687,6 +2683,7 @@ public class Main {
                 try {
                     args[i] = URLDecoder.decode(args[i], "UTF-8");
                 } catch (Exception e) {
+                    //ignored
                 }
             }
         }
@@ -2887,6 +2884,7 @@ public class Main {
             try {
                 tray.add(trayIcon);
             } catch (AWTException ex) {
+                //ignored
             }
         }
     }
@@ -2930,7 +2928,7 @@ public class Main {
             if (t instanceof DefineBinaryDataTag) {
                 DefineBinaryDataTag binaryData = (DefineBinaryDataTag) t;
                 if (binaryData.innerSwf != null) {
-                    populateSwf(ret, binaryData.innerSwf, binaryData.innerSwf.getShortPathTitle());//name + " / " + t.getTagName() + " (" + ((DefineBinaryDataTag) t).getCharacterId() + ")");
+                    populateSwf(ret, binaryData.innerSwf, binaryData.innerSwf.getShortPathTitle());
                 }
             }
         }

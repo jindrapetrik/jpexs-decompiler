@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
-import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -162,11 +161,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 try {
                     openable.saveTo(baos);
                     SWF swf = (SWF) openable;
-                    byte data[] = baos.toByteArray();
+                    byte[] data = baos.toByteArray();
                     if (swf.binaryData.usedPacker != null) {
-                       ByteArrayOutputStream encBaos = new ByteArrayOutputStream();
-                       swf.binaryData.usedPacker.encrypt(new ByteArrayInputStream(data), encBaos);
-                       data = encBaos.toByteArray();
+                        ByteArrayOutputStream encBaos = new ByteArrayOutputStream();
+                        swf.binaryData.usedPacker.encrypt(new ByteArrayInputStream(data), encBaos);
+                        data = encBaos.toByteArray();
                     }
                     swf.binaryData.binaryData = new ByteArrayRange(data);
                     swf.binaryData.setModified(true);
@@ -274,7 +273,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             listsToClose.add(openable.getOpenableList());
         }
     }
-    
+
     protected void closeActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -284,7 +283,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         Set<OpenableList> listsToClose = new LinkedHashSet<>();
         List<SWF> binaryDataClosedSwfs = new ArrayList<>();
-        
+
         for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
             if (item instanceof OpenableList) {
                 listsToClose.add((OpenableList) item);
@@ -383,7 +382,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importShape((SWF) openable, true);
     }
-    
+
     protected void importSpritesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -403,7 +402,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importMovie((SWF) openable);
     }
-    
+
     protected void importSoundsActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -413,7 +412,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importSound((SWF) openable);
     }
-    
+
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -490,7 +489,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainFrame.getPanel().exportSwfXml(getSelectedOrCurrentOpenable());
     }
-    
+
     private List<TreeItem> getSelectedOrCurrentOpenable() {
         List<TreeItem> sel = mainFrame.getPanel().getCurrentTree().getSelected();
         if (sel.isEmpty() && openable != null) {
@@ -699,7 +698,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         lang = null;
                     }
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    try ( PrintStream stream = new PrintStream(os, false, "UTF-8")) {
+                    try (PrintStream stream = new PrintStream(os, false, "UTF-8")) {
                         CheckResources.checkResources(stream, lang);
                         String str = new String(os.toByteArray(), Utf8Helper.charset);
                         editor.setText(str);
@@ -837,13 +836,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void autoRenameIdentifiersActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
-                
+
         if (!selected || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.autoRenameIdentifiers") + "\r\n" + translate("message.confirm.on"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningRenameIdentifiers, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             Configuration.autoRenameIdentifiers.set(selected);
             mainFrame.getPanel().autoDeobfuscateChanged();
         } else {
             button.setSelected(Configuration.autoRenameIdentifiers.get());
-        }        
+        }
     }
 
     /*protected void cacheOnDiskActionPerformed(ActionEvent evt) {
@@ -966,7 +965,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean abcSelected = openable instanceof ABC;
         boolean isAs3 = false;
         if (swf != null) {
-           isAs3 = swf.isAS3();
+            isAs3 = swf.isAS3();
         }
         if (abcSelected) {
             isAs3 = true;
@@ -1063,7 +1062,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/timeline", swfSelected);
         setMenuEnabled("/tools/abcExplorer", isAs3);
         setMenuEnabled("/tools/showProxy", !isWorking);
-                
+
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
         /*setMenuEnabled("/tools/debugger/debuggerSwitch", hasAbc);
          setMenuChecked("/tools/debugger/debuggerSwitch", hasDebugger);
@@ -1180,7 +1179,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/import/importtab/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importSprites", translate("menu.file.import.sprite"), "importsprite32", this::importSpritesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importMovies", translate("menu.file.import.movie"), "importmovie32", this::importMoviesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/import/importtab/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
+        addMenuItem("/import/importtab/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/import/importtab/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/import/importtab");
         finishMenu("/import");
@@ -1251,7 +1250,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/tools/replace", translate("menu.tools.replace"), "replace32", this::replaceActionPerformed, PRIORITY_TOP, null, true, null, false);
         addToggleMenuItem("/tools/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
 
-        addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abcexplorer32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);        
+        addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abcexplorer32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/tools/showProxy", translate("menu.tools.proxy"), "proxy16", this::showProxyActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
@@ -1361,22 +1360,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.flattenASPackages.addListener(configListenerFlattenASPackages = (Boolean newValue) -> {
             setMenuChecked("/settings/flattenASPackages", newValue);
         });
-
-        /*
-        if (externalFlashPlayerUnavailable) {
-            setMenuEnabled("/settings/internalViewer", false);
-        }
-         */
-
- /*int deobfuscationMode = Configuration.deobfuscationMode.get();
-         switch (deobfuscationMode) {
-         case 0:
-         setGroupSelection("deobfuscation", "/settings/deobfuscation/old");
-         break;
-         case 1:
-         setGroupSelection("deobfuscation", "/settings/deobfuscation/new");
-         break;
-         }*/
+     
         if (Platform.isWindows()) {
             setMenuChecked("/settings/associate", ContextMenuTools.isAddedToContextMenu());
         }
@@ -1439,7 +1423,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
                 sourceInfos[1] = new OpenableSourceInfo(null, path, null);
                 Main.openFile(sourceInfos);
-            }, PRIORITY_MEDIUM, null, true, null, false);            
+            }, PRIORITY_MEDIUM, null, true, null, false);
             finishMenu("/debug");
         }
 
@@ -1453,9 +1437,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public void showTagListView() {
         viewTagListActionPerformed(null);
     }
-    
+
     private void reselectView() {
-        switch(mainFrame.getPanel().getCurrentView()) {
+        switch (mainFrame.getPanel().getCurrentView()) {
             case MainPanel.VIEW_RESOURCES:
                 setMenuChecked("/file/view/viewResources", true);
                 break;
@@ -1477,8 +1461,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
         setMenuChecked("/tools/timeline", false);
-    }   
-    
+    }
+
     private void viewHexActionPerformed(ActionEvent evt) {
         if (mainFrame.getPanel().checkEdited()) {
             reselectView();
@@ -1707,14 +1691,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void abcExplorerActionPerformed(ActionEvent evt) {
-        
+
         if (openable == null) {
             return;
         }
-        
+
         mainFrame.getPanel().showAbcExplorer(openable, null);
     }
-    
+
     public boolean stackActionPerformed(ActionEvent evt) {
         //TODO
         return true;

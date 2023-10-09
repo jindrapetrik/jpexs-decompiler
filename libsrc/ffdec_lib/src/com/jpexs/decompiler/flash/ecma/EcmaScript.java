@@ -92,11 +92,7 @@ public class EcmaScript {
             return object_defaultValue((ObjectType) o, prefferedType);
         }
         return Undefined.INSTANCE; //??
-    }
-
-    public static Object object_defaultValue(ObjectType o) {
-        return object_defaultValue(o, "Number");
-    }
+    }   
 
     public static Object object_get(ObjectType o, String p) {
         //TODO: isDataDesciptor, etc. ECMA 8.12.3
@@ -106,6 +102,10 @@ public class EcmaScript {
     public static Object object_getProperty(ObjectType o, String p) {
         //TODO: getownproperty, etc... ECMA 8.12.2
         return o.getAttribute(p);
+    }
+
+    public static Object object_defaultValue(ObjectType o) {
+        return object_defaultValue(o, "Number");
     }
 
     public static Object object_defaultValue(ObjectType o, String hint) {
@@ -239,7 +239,7 @@ public class EcmaScript {
                 return -1;
             }
             return 1;
-        } else {//Both are STRING
+        } else { //Both are STRING
             String sx = (String) px;
             String sy = (String) py;
 
@@ -281,22 +281,22 @@ public class EcmaScript {
             }
             return 0;
         }
-    }
+    }        
 
     public static boolean strictEquals(Object x, Object y) {
         return strictEquals(false, x, y);
     }
-
-    public static boolean equals(Object x, Object y) {
-        return equals(false, x, y);
-    }
-
+    
     public static boolean strictEquals(boolean as2, Object x, Object y) {
         if (type(x) != type(y)) {
             return false;
         }
 
         return equals(as2, x, y);
+    }
+
+    public static boolean equals(Object x, Object y) {
+        return equals(false, x, y);
     }
 
     public static boolean equals(boolean as2, Object x, Object y) {
@@ -633,7 +633,7 @@ public class EcmaScript {
                 } catch (NumberFormatException nfe) {
                     //throw URIEx
                 } catch (IOException ex) {
-
+                    //ignored
                 }
             }
         }

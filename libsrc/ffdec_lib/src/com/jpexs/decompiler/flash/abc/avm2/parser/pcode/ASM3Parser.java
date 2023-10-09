@@ -101,11 +101,7 @@ public class ASM3Parser {
             return label + " at address " + offset;
         }
 
-    }
-
-    public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
-        return parse(abc, reader, trait, null, body, info);
-    }
+    }   
 
     private static int checkMultinameIndex(AVM2ConstantPool constants, int index, int line) throws AVM2ParseException {
         if ((index < 0) || (index >= constants.getMultinameCount())) {
@@ -113,7 +109,7 @@ public class ASM3Parser {
         }
         return index;
     }
-    
+
     private static void expectEnd(Flasm3Lexer lexer) throws IOException, AVM2ParseException {
         expected(ParsedSymbol.TYPE_KEYWORD_END, "end", lexer);
         ParsedSymbol symb = lexer.lex();
@@ -136,7 +132,7 @@ public class ASM3Parser {
     }
 
     private static void parseTraitParams(ABC abc, Flasm3Lexer lexer, Trait t) throws IOException, AVM2ParseException {
-        ParsedSymbol symb;// = lexer.lex();
+        ParsedSymbol symb;
 
         List<Map.Entry<String, Map<String, String>>> metadata = new ArrayList<>();
 
@@ -190,13 +186,13 @@ public class ASM3Parser {
 
         t.kindFlags = flags;
         if ((flags & Trait.ATTR_Metadata) > 0) {
-            int metadataArray[] = new int[metadata.size()];
+            int[] metadataArray = new int[metadata.size()];
             for (int i = 0; i < metadata.size(); i++) {
                 Map.Entry<String, Map<String, String>> entry = metadata.get(i);
                 int mkey = abc.constants.getStringId(entry.getKey(), true);
                 Map<String, String> items = entry.getValue();
-                int keys[] = new int[items.size()];
-                int vals[] = new int[items.size()];
+                int[] keys = new int[items.size()];
+                int[] vals = new int[items.size()];
 
                 int pos = 0;
                 for (String key : items.keySet()) {
@@ -212,6 +208,86 @@ public class ASM3Parser {
             t.metadata = metadataArray;
         }
 
+    }
+
+    public static boolean parseClass(ABC abc, Reader reader, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
+        Flasm3Lexer lexer = new Flasm3Lexer(reader);
+        return parseClass(abc, lexer, constants, tc);
+    }
+
+    private static boolean parseClass(ABC abc, Flasm3Lexer lexer, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
+        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
+        int name_index = parseMultiName(constants, lexer);
+        parseTraitParams(abc, lexer, tc);
+        expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
+        ParsedSymbol symb;
+        symb = lexer.lex();
+        expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer", lexer.yyline());
+        int slotid = (int) (Integer) symb.value;
+
+        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_INSTANCE, "instance", lexer);
+
+        int instance_name_index = parseMultiName(constants, lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_EXTENDS, "extends", lexer);
+        int super_index = parseMultiName(constants, lexer);
+        symb = lexer.lex();
+        List<Integer> ifacesList = new ArrayList<>();
+        while (symb.type == ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS) {
+            ifacesList.add(parseMultiName(constants, lexer));
+            symb = lexer.lex();
+        }
+        int[] interfaces = new int[ifacesList.size()];
+        for (int i = 0; i < ifacesList.size(); i++) {
+            interfaces[i] = ifacesList.get(i);
+        }
+        int instanceFlags = 0;
+        while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+            symb = lexer.lex();
+            switch (symb.type) {
+                case ParsedSymbol.TYPE_KEYWORD_SEALED:
+                    instanceFlags |= InstanceInfo.CLASS_SEALED;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_FINAL:
+                    instanceFlags |= InstanceInfo.CLASS_FINAL;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_INTERFACE:
+                    instanceFlags |= InstanceInfo.CLASS_INTERFACE;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS:
+                    instanceFlags |= InstanceInfo.CLASS_PROTECTEDNS;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE:
+                    instanceFlags |= InstanceInfo.CLASS_NON_NULLABLE;
+                    break;
+                default:
+                    throw new AVM2ParseException("SEALED,FINAL,INTERFACE,PROTECTEDNS or NON_NULLABLE expected", lexer.yyline());
+            }
+            symb = lexer.lex();
+        }
+        int protectedns = 0;
+        if (symb.type == ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK && ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS)) {
+            protectedns = parseNamespace(constants, lexer);
+        } else {
+            lexer.pushback(symb);
+        }
+        expectEnd(lexer); //instance
+        expectEnd(lexer); //class
+        expectEnd(lexer); //trait
+
+        InstanceInfo ii = abc.instance_info.get(tc.class_info);
+        ii.name_index = instance_name_index;
+        ii.super_index = super_index;
+        ii.interfaces = interfaces;
+        ii.flags = instanceFlags;
+        if ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+            ii.protectedNS = protectedns;
+        }
+
+        tc.slot_id = slotid;
+
+        return true;
     }
 
     private static boolean parseSlotConst(ABC abc, Flasm3Lexer lexer, AVM2ConstantPool constants, TraitSlotConst tsc) throws IOException, AVM2ParseException {
@@ -245,86 +321,6 @@ public class ASM3Parser {
         tsc.slot_id = slotid;
         tsc.type_index = type;
         tsc.name_index = name_index;
-        return true;
-    }
-
-    public static boolean parseClass(ABC abc, Reader reader, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
-        Flasm3Lexer lexer = new Flasm3Lexer(reader);
-        return parseClass(abc, lexer, constants, tc);
-    }
-
-    private static boolean parseClass(ABC abc, Flasm3Lexer lexer, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
-        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
-        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
-        int name_index = parseMultiName(constants, lexer);
-        parseTraitParams(abc, lexer, tc);
-        expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
-        ParsedSymbol symb;
-        symb = lexer.lex();
-        expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer", lexer.yyline());
-        int slotid = (int) (Integer) symb.value;
-
-        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
-        expected(ParsedSymbol.TYPE_KEYWORD_INSTANCE, "instance", lexer);
-
-        int instance_name_index = parseMultiName(constants, lexer);
-        expected(ParsedSymbol.TYPE_KEYWORD_EXTENDS, "extends", lexer);
-        int super_index = parseMultiName(constants, lexer);
-        symb = lexer.lex();
-        List<Integer> ifacesList = new ArrayList<>();
-        while (symb.type == ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS) {
-            ifacesList.add(parseMultiName(constants, lexer));
-            symb = lexer.lex();
-        }
-        int interfaces[] = new int[ifacesList.size()];
-        for(int i = 0; i < ifacesList.size(); i++) {
-            interfaces[i] = ifacesList.get(i);
-        }
-        int instanceFlags = 0;
-        while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
-            symb = lexer.lex();
-            switch (symb.type) {
-                case ParsedSymbol.TYPE_KEYWORD_SEALED:
-                    instanceFlags |= InstanceInfo.CLASS_SEALED;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_FINAL:
-                    instanceFlags |= InstanceInfo.CLASS_FINAL;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_INTERFACE:
-                    instanceFlags |= InstanceInfo.CLASS_INTERFACE;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS:
-                    instanceFlags |= InstanceInfo.CLASS_PROTECTEDNS;
-                    break;
-                case ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE:
-                    instanceFlags |= InstanceInfo.CLASS_NON_NULLABLE;
-                    break;
-                default:
-                    throw new AVM2ParseException("SEALED,FINAL,INTERFACE,PROTECTEDNS or NON_NULLABLE expected", lexer.yyline());
-            }
-            symb = lexer.lex();
-        }
-        int protectedns = 0;
-        if (symb.type == ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK && ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS)==InstanceInfo.CLASS_PROTECTEDNS)) {
-            protectedns = parseNamespace(constants, lexer);
-        } else {
-            lexer.pushback(symb);
-        }        
-        expectEnd(lexer); //instance
-        expectEnd(lexer); //class
-        expectEnd(lexer); //trait
-        
-        InstanceInfo ii = abc.instance_info.get(tc.class_info);
-        ii.name_index = instance_name_index;
-        ii.super_index = super_index;
-        ii.interfaces = interfaces;
-        ii.flags = instanceFlags;                
-        if ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS)==InstanceInfo.CLASS_PROTECTEDNS) {
-            ii.protectedNS = protectedns;
-        }        
-        
-        tc.slot_id = slotid;
-        
         return true;
     }
 
@@ -419,9 +415,9 @@ public class ASM3Parser {
         expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
         ParsedSymbol name = lexer.lex();
         if (name.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
-
+            //empty
         } else if (name.type == ParsedSymbol.TYPE_STRING) {
-
+            //empty
         } else {
             throw new AVM2ParseException("String or null expected", lexer.yyline());
         }
@@ -735,6 +731,10 @@ public class ASM3Parser {
                 }
         }
         return new ValueKind(value_index, value_kind);
+    }
+    
+    public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
+        return parse(abc, reader, trait, null, body, info);
     }
 
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {

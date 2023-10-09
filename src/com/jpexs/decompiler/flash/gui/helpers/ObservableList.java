@@ -61,49 +61,20 @@ public class ObservableList<E> implements List<E> {
     public <T> T[] toArray(T[] a) {
         return list.toArray(a);
     }
-
-    @Override
-    public boolean add(E e) {
-        boolean result = list.add(e);
-        fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.ADD, e, size() - 1));
-        return result;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        int idx = list.indexOf(o);
-        if (idx != -1) {
-            remove(idx);
-            return true;
-        }
-
-        return false;
-    }
-    
-    /** *  Move item to desired position.0 A
-           1 B
-           2 C
-           3 D
-           4 E
-
-
-           move(1, 3)
-
-           0 A
-           1 C
-           2 B
-           3 D
-           4 E
-
-           move(3, 1)
-           0 A
-           1 D
-           2 B
-           3 C
-           4 E
-     * @param oldIndex
-     * @param newIndex 
-     * @return  
+   
+    /**
+     * Move item to desired position.0 A 1 B 2 C 3 D 4 E.
+     * 
+     * <p>move(1, 3)
+     *
+     * <p>0 A
+     * 1 C
+     * 2 B
+     * 3 D
+     * 4 E
+     *
+     * <p>move(3, 1) 0 A 1 D 2 B 3 C 4 E
+     *
      */
     public boolean move(int oldIndex, int newIndex) {
         if (oldIndex == newIndex) {
@@ -120,11 +91,11 @@ public class ObservableList<E> implements List<E> {
             list.add(newIndex - 1, item);
         } else {
             list.add(newIndex, item);
-        }             
+        }
         fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.MOVE, item, item, oldIndex, newIndex));
         return true;
     }
-    
+
     public boolean move(E item, int newIndex) {
         return move(indexOf(item), newIndex);
     }
@@ -132,14 +103,7 @@ public class ObservableList<E> implements List<E> {
     @Override
     public boolean containsAll(Collection<?> c) {
         return list.containsAll(c);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        boolean result = list.addAll(c);
-        fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.RESET));
-        return result;
-    }
+    }  
 
     @Override
     public boolean removeAll(Collection<?> c) {
@@ -162,6 +126,13 @@ public class ObservableList<E> implements List<E> {
     }
 
     @Override
+    public boolean addAll(Collection<? extends E> c) {
+        boolean result = list.addAll(c);
+        fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.RESET));
+        return result;
+    }
+
+    @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         boolean result = list.addAll(index, c);
         fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.RESET));
@@ -181,9 +152,27 @@ public class ObservableList<E> implements List<E> {
     }
 
     @Override
+    public boolean add(E e) {
+        boolean result = list.add(e);
+        fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.ADD, e, size() - 1));
+        return result;
+    }   
+
+    @Override
     public void add(int index, E element) {
         list.add(index, element);
         fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.ADD, element, index));
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        int idx = list.indexOf(o);
+        if (idx != -1) {
+            remove(idx);
+            return true;
+        }
+
+        return false;
     }
 
     @Override

@@ -148,7 +148,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     public void setParentClipActions(CLIPACTIONS parentClipActions) {
         this.parentClipActions = parentClipActions;
     }
-    
+
     @Override
     public void setSourceTag(Tag tag) {
         this.swf = tag.getSwf();
@@ -158,8 +158,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public Tag getTag() {
         return tag;
-    }            
-    
+    }
 
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag, CLIPACTIONS parentClipActions) throws IOException {
         this.swf = swf;
@@ -186,7 +185,6 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     public SWF getSwf() {
         return swf;
     }
-    
 
     /**
      * Events to which this handler applies
@@ -254,7 +252,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
         return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, actions.getCharset());
     }
-    
+
     @Override
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         if (actions == null) {
@@ -364,7 +362,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     public Tag getSourceTag() {
         return tag;
     }
-    
+
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {

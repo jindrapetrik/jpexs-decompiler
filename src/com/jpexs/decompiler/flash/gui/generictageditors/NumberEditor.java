@@ -102,7 +102,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
-            ReflectionTools.setValue(obj, field, index, newValue);            
+            ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
@@ -142,16 +142,15 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
                 m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
                 break;
             case FB:
-            case SB: {
+            case SB:
                 long max = 1;
                 if (swfType.count() > 0) {
                     max <<= (swfType.count() - 1);
                 } else {
                     max <<= 30;
                 }
-                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);
-            }
-            break;
+                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);            
+                break;
             case SI32:
                 m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
                 break;

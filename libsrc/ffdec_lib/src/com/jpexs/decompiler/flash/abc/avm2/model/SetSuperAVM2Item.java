@@ -41,11 +41,11 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
-    
+
     public GraphTargetItem type;
-    
+
     public GraphTargetItem callType;
-    
+
     public boolean isStatic;
 
     @Override

@@ -33,9 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -233,7 +230,7 @@ public class DefineExternalSound extends CharacterTag implements SoundTag {
         final int[] rateMap = {5512, 11025, 22050, 44100};
         this.sampleRate = rateMap[soundRate];
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);

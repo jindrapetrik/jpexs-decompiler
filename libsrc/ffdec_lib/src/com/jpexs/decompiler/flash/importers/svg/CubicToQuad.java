@@ -318,7 +318,10 @@ public class CubicToQuad {
         Point c2 = new Point(c2x, c2y);
         Point p2 = new Point(p2x, p2y);
         Point[] pc = calcPowerCoefficients(p1, c1, c2, p2);
-        Point a = pc[0], b = pc[1], c = pc[2], d = pc[3];
+        Point a = pc[0];
+        Point b = pc[1];
+        Point c = pc[2];
+        Point d = pc[3];
 
         List<Point[]> approximation = new ArrayList<>();
         for (int segmentsCount = 1; segmentsCount <= 8; segmentsCount++) {

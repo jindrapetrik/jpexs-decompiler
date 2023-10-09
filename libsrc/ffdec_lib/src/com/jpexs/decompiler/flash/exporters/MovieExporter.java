@@ -106,7 +106,7 @@ public class MovieExporter {
     public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode) throws IOException {
         return exportMovie(videoStream, mode, false);
     }
-        
+
     public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode, boolean ffdecInternal) throws IOException {
         SWF swf = videoStream.getSwf();
         Map<Integer, VideoFrameTag> frames = new HashMap<>();
@@ -124,7 +124,7 @@ public class MovieExporter {
             numFrames += 2;
         }
         int internalFrameDelaySec = 5;
-        flv.writeTag(new FLVTAG(0, SCRIPTDATA.simpleVideOnMetadata(ffdecInternal ? numFrames * internalFrameDelaySec : numFrames / swf.frameRate, videoStream.width, videoStream.height,ffdecInternal? internalFrameDelaySec : swf.frameRate ,videoStream.codecID)));
+        flv.writeTag(new FLVTAG(0, SCRIPTDATA.simpleVideOnMetadata(ffdecInternal ? numFrames * internalFrameDelaySec : numFrames / swf.frameRate, videoStream.width, videoStream.height, ffdecInternal ? internalFrameDelaySec : swf.frameRate, videoStream.codecID)));
         int horizontalAdjustment = 0;
         int verticalAdjustment = 0;
         int[] frameNumArray = Helper.toIntArray(frames.keySet());
@@ -132,13 +132,13 @@ public class MovieExporter {
         FLVTAG lastTag = null;
         int frameNum = 0;
         int internalFrameDelay = internalFrameDelaySec * 1000;
-                
+
         for (int i = 0; i < frameNumArray.length; i++) {
             VideoFrameTag tag = frames.get(frameNumArray[i]);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             frameNum = frameNumArray[i];
-            
+
             int frameType = 1;
 
             if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
@@ -178,7 +178,7 @@ public class MovieExporter {
             }
             if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
                 SWFInputStream sis = new SWFInputStream(swf, tag.videoData.getRangeData());
-                sis.readUB(17, "pictureStartCode");//pictureStartCode
+                sis.readUB(17, "pictureStartCode"); //pictureStartCode
                 sis.readUB(5, "version"); //version
                 sis.readUB(8, "temporalReference"); //temporalReference
                 int pictureSize = (int) sis.readUB(3, "pictureSize"); //pictureSize
@@ -205,7 +205,7 @@ public class MovieExporter {
             }
 
             baos.write(tag.videoData.getRangeData());
-            flv.writeTag(lastTag = new FLVTAG((long)Math.floor(ffdecInternal ? frameNum * internalFrameDelay : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+            flv.writeTag(lastTag = new FLVTAG((long) Math.floor(ffdecInternal ? frameNum * internalFrameDelay : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
         if (ffdecInternal && lastTag != null) {
             lastTag.timeStamp = frameNum * internalFrameDelay + 2 * internalFrameDelay;

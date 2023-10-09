@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -29,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
+import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
@@ -885,51 +885,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                     g2.draw(pointShape);
                                 }
-
-                                /*DisplayPoint p = closestPoint;
-                                if (p != null) {
-                                    Shape pointShape;
-                                    pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
-                                    g2.setPaint(Color.blue);
-                                    g2.fill(pointShape);
-                                }
-
-                                Integer puc = pathPointUnderCursor;
-                                if (puc != null) {
-                                    p = hilightedPoints.get((int) puc);
-                                    Shape pointShape;
-                                    pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
-                                    g2.setPaint(Color.pink);
-                                    g2.fill(pointShape);
-
-                                    if (puc - 1 >= 0) {
-                                        p = hilightedPoints.get(puc - 1);
-                                        pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
-                                        g2.setPaint(Color.cyan);
-                                        g2.fill(pointShape);
-                                    }
-
-                                }*/
- /*for (int i = 0; i < points.size(); i++) {
-                                    DisplayPoint p = points.get(i);
-                                    if (!p.onPath) {
-                                        DisplayPoint p0 = points.get(i - 1);
-                                        DisplayPoint p1 = points.get(i);
-                                        DisplayPoint p2 = points.get(i + 1);
-
-                                        for (int j = 0; j <= 10; j++) {
-                                            double t = j / 10.0;
-                                            double xt = (1 - t) * (1 - t) * p0.x + 2 * t * (1 - t) * p1.x + t * t * p2.x;
-                                            double yt = (1 - t) * (1 - t) * p0.y + 2 * t * (1 - t) * p1.y + t * t * p2.y;
-                                            //System.out.println("P("+t+") = "+xt+","+yt);
-
-                                            Shape pointShape;
-                                            pointShape = new Ellipse2D.Double(xt - pointSize, yt - pointSize, pointSize * 2, pointSize * 2);
-                                            g2.setPaint(Color.green);
-                                            g2.fill(pointShape);
-                                        }
-                                    }
-                                }*/
                             }
 
                             for (int i = 0; i < showPoints1.size(); i++) {
@@ -2421,12 +2376,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 drawFrame(thisTimer, true);
             }
         }
-    }
-
-    @Override
-    public synchronized void zoom(Zoom zoom) {
-        zoom(zoom, false);
-    }
+    }   
 
     public Timelined getTimelined() {
         return timelined;
@@ -2444,11 +2394,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         /*
         int h_value = horizontalScrollBar.getValue();
         int h_visibleAmount = horizontalScrollBar.getVisibleAmount();
-        */
+         */
         int h_maximum = timRect.Xmax;
-        
+
         if (hilightedPoints != null || freeTransformDepth > -1) {
-            h_maximum += SCROLL_SPACE_BEFORE;            
+            h_maximum += SCROLL_SPACE_BEFORE;
         }
 
         /*if (h_value + h_visibleAmount > h_maximum) {
@@ -2457,16 +2407,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         int h_minimum = timRect.Xmin;
         if (hilightedPoints != null || freeTransformDepth > -1) {
             h_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
-            h_minimum -= SCROLL_SPACE_BEFORE;            
+            h_minimum -= SCROLL_SPACE_BEFORE;
         }
         horizontalScrollBar.setMinimum(h_minimum);
         horizontalScrollBar.setMaximum(h_maximum);
 
         /*int v_value = verticalScrollBar.getValue();
         int v_visibleAmount = verticalScrollBar.getVisibleAmount();
-*/
+         */
         int v_maximum = timRect.Ymax;
-        if (hilightedPoints != null || freeTransformDepth > -1) {            
+        if (hilightedPoints != null || freeTransformDepth > -1) {
             v_maximum += SCROLL_SPACE_BEFORE;
         }
         /*if (v_value + v_visibleAmount > v_maximum) {
@@ -2476,13 +2426,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         int v_minimum = timRect.Ymin;
         if (hilightedPoints != null || freeTransformDepth > -1) {
             v_minimum = timRect.Ymin > 0 ? 0 : timRect.Ymin;
-            v_minimum -= SCROLL_SPACE_BEFORE;                   
+            v_minimum -= SCROLL_SPACE_BEFORE;
         }
 
         verticalScrollBar.setMinimum(v_minimum);
         verticalScrollBar.setMaximum(v_maximum);
-        
-                
+
         horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
         verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());
     }
@@ -2508,16 +2457,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 Point2D leftTop = toTransformPoint(new Point2D.Double(0, 0));
 
                 Point2D rightBottom = toTransformPoint(new Point2D.Double(w, h));
-                /*if (rightBottom.getX() > timRect.Xmax) {
-                    h_visibleAmount = timRect.Xmax - (int)leftTop.getX();
-                }*/
 
-                int h_value = (int) Math.round(leftTop.getX());//timRect.Xmin + (int) Math.round(-offsetPoint.getX() / zoomDouble * SWF.unitDivisor);
+                int h_value = (int) Math.round(leftTop.getX());
                 horizontalScrollBar.setVisibleAmount(h_visibleAmount);
                 horizontalScrollBar.setValue(h_value);
 
                 int v_visibleAmount = (int) Math.round(h * SWF.unitDivisor / zoomDouble);
-                int v_value = (int) Math.round(leftTop.getY()); //timRect.Ymin + (int) Math.round(-offsetPoint.getY() / zoomDouble * SWF.unitDivisor);
+                int v_value = (int) Math.round(leftTop.getY());
 
                 verticalScrollBar.setVisibleAmount(v_visibleAmount);
                 verticalScrollBar.setValue(v_value);
@@ -2547,6 +2493,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         });
     }
 
+    @Override
+    public synchronized void zoom(Zoom zoom) {
+        zoom(zoom, false);
+    }
+    
     private synchronized void zoom(Zoom zoom, boolean useCursor) {
         double zoomDoubleBefore = this.zoom.fit ? getZoomToFit() : this.zoom.value;
 
@@ -2924,10 +2875,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-        //RECT rect = drawable.getRect();
-
-        int width = (int) (viewRect.getWidth() * zoom); //int) (rect.getWidth() * zoom);
-        int height = (int) (viewRect.getHeight() * zoom);//(int) (rect.getHeight() * zoom);(int) (rect.getHeight() * zoom);
+        
+        int width = (int) (viewRect.getWidth() * zoom);
+        int height = (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
             width = 1;
         }
@@ -4006,21 +3956,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         return null;
     }
-}
 
+    class DistanceItem {
 
-class DistanceItem {
+        public double distance;
+        public int pathPoint;
+        public double pathPosition;
+        public DisplayPoint closestPoint;
 
-    public double distance;
-    public int pathPoint;
-    public double pathPosition;
-    public DisplayPoint closestPoint;
-
-    public DistanceItem(double distance, int pathPoint, double pathPosition, DisplayPoint closestPoint) {
-        this.distance = distance;
-        this.pathPoint = pathPoint;
-        this.pathPosition = pathPosition;
-        this.closestPoint = closestPoint;
+        public DistanceItem(double distance, int pathPoint, double pathPosition, DisplayPoint closestPoint) {
+            this.distance = distance;
+            this.pathPoint = pathPoint;
+            this.pathPosition = pathPosition;
+            this.closestPoint = closestPoint;
+        }
     }
-
 }

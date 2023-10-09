@@ -54,9 +54,9 @@ public class TagListTree extends AbstractTagTree {
         setCellRenderer(new TagListTreeCellRenderer());
         setDragEnabled(true);
         setDropMode(DropMode.ON_OR_INSERT);
-        setTransferHandler(new TreeTransferHandler(mainPanel));        
-    }      
-        
+        setTransferHandler(new TreeTransferHandler(mainPanel));
+    }
+
     @Override
     public List<TreeItem> getSelection(Openable openable) {
         return getSelection(openable, getAllSelected());
@@ -82,226 +82,222 @@ public class TagListTree extends AbstractTagTree {
         return "";
     }
 
-}
+    class TreeTransferHandler extends TransferHandler {
 
-class TreeTransferHandler extends TransferHandler {
+        DataFlavor nodesFlavor;
+        DataFlavor[] flavors = new DataFlavor[1];
+        JTree.DropLocation dropLocation = null;
+        MainPanel mainPanel;
 
-    DataFlavor nodesFlavor;
-    DataFlavor[] flavors = new DataFlavor[1];
-    JTree.DropLocation dropLocation = null;
-    MainPanel mainPanel;
+        public TreeTransferHandler(MainPanel mainPanel) {
+            this.mainPanel = mainPanel;
+            try {
+                String mimeType = DataFlavor.javaJVMLocalObjectMimeType
+                        + ";class=\""
+                        + Tag[].class.getName()
+                        + "\"";
+                nodesFlavor = new DataFlavor(mimeType);
+                flavors[0] = nodesFlavor;
+            } catch (ClassNotFoundException e) {
+                System.err.println("ClassNotFound: " + e.getMessage());
+            }
+        }
 
-    public TreeTransferHandler(MainPanel mainPanel) {
-        this.mainPanel = mainPanel;
-        try {
-            String mimeType = DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=\""
-                    + Tag[].class.getName()
-                    + "\"";
-            nodesFlavor = new DataFlavor(mimeType);
-            flavors[0] = nodesFlavor;
-        } catch (ClassNotFoundException e) {
-            System.err.println("ClassNotFound: " + e.getMessage());
-        }
-    }
+        @Override
+        public boolean canImport(TransferHandler.TransferSupport support) {
+            if (!support.isDrop()) {
+                return false;
+            }
+            support.setShowDropLocation(true);
+            if (!support.isDataFlavorSupported(nodesFlavor)) {
+                return false;
+            }
+            // Do not allow a drop on the drag source selections.
+            JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
 
-    @Override
-    public boolean canImport(TransferSupport support) {
-        if (!support.isDrop()) {
-            return false;
-        }
-        support.setShowDropLocation(true);
-        if (!support.isDataFlavorSupported(nodesFlavor)) {
-            return false;
-        }
-        // Do not allow a drop on the drag source selections.
-        JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
-        
-        if (
-                ((dl.getPath().getLastPathComponent() instanceof Tag) && 
-                !(dl.getPath().getLastPathComponent() instanceof DefineSpriteTag)) &&
-                dl.getChildIndex() == -1
-                ) {
-            return false;
-        }
-        
-        //no insert before SWF header
-        if ((dl.getPath().getLastPathComponent() instanceof SWF) && dl.getChildIndex() == 0) {
-            return false;
-        }
-        
-        /*if (dl.getPath().getLastPathComponent() instanceof TagListTreeRoot) {
+            if (((dl.getPath().getLastPathComponent() instanceof Tag)
+                    && !(dl.getPath().getLastPathComponent() instanceof DefineSpriteTag))
+                    && dl.getChildIndex() == -1) {
+                return false;
+            }
+
+            //no insert before SWF header
+            if ((dl.getPath().getLastPathComponent() instanceof SWF) && dl.getChildIndex() == 0) {
+                return false;
+            }
+
+            /*if (dl.getPath().getLastPathComponent() instanceof TagListTreeRoot) {
             return false;
         }*/
-        
-        AbstractTagTree tree = (AbstractTagTree) support.getComponent();       
-        
-        List<TreeItem> selected = tree.getSelected();
-        TreePath destPath = dl.getPath();
-        List<TreeItem> parents = new ArrayList<>();
-        for(int i = 0; i < destPath.getPathCount(); i++) {
-            parents.add((TreeItem) destPath.getPathComponent(i));
-        }
-        for (TreeItem item : selected) {
-            if (parents.contains(item)) {
-                return false;
-            }
-        }
-        
-        int dropRow = tree.getRowForPath(dl.getPath());
-        int[] selRows = tree.getSelectionRows();
-        
-        for (int i = 0; i < selRows.length; i++) {
-            if (selRows[i] == dropRow) {
-                return false;
-            }
-        }        
-        return true;
-    }
+            AbstractTagTree tree = (AbstractTagTree) support.getComponent();
 
-    @Override
-    protected Transferable createTransferable(JComponent c) {
-        AbstractTagTree tree = (AbstractTagTree) c;
-        dropLocation = null;
-        
-        if (!Configuration.allowDragAndDropInTagListTree.get()) {
-            return null;
+            List<TreeItem> selected = tree.getSelected();
+            TreePath destPath = dl.getPath();
+            List<TreeItem> parents = new ArrayList<>();
+            for (int i = 0; i < destPath.getPathCount(); i++) {
+                parents.add((TreeItem) destPath.getPathComponent(i));
+            }
+            for (TreeItem item : selected) {
+                if (parents.contains(item)) {
+                    return false;
+                }
+            }
+
+            int dropRow = tree.getRowForPath(dl.getPath());
+            int[] selRows = tree.getSelectionRows();
+
+            for (int i = 0; i < selRows.length; i++) {
+                if (selRows[i] == dropRow) {
+                    return false;
+                }
+            }
+            return true;
         }
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null) {
-            return null;
-        }
-        List<Tag> tags = new ArrayList<>();
-        for (TreePath path : paths) {
-            if (path.getLastPathComponent() instanceof Tag) {
-                tags.add((Tag) path.getLastPathComponent());
-            } else {
+
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            AbstractTagTree tree = (AbstractTagTree) c;
+            dropLocation = null;
+
+            if (!Configuration.allowDragAndDropInTagListTree.get()) {
                 return null;
             }
-        }
-        Tag tagArr[] = tags.toArray(new Tag[tags.size()]);
-        return new TagsTransferable(tagArr);
-    }
-
-    @Override
-    public int getSourceActions(JComponent c) {
-        return COPY_OR_MOVE;
-    }        
-
-    @Override
-    protected void exportDone(JComponent source, Transferable data, int action) {
-        AbstractTagTree tree = (AbstractTagTree) source;
-        if (dropLocation == null) {
-            return;
-        }
-        int childIndex = dropLocation.getChildIndex();
-        TreeItem dest = (TreeItem) dropLocation.getPath().getLastPathComponent();
-        Set<TreeItem> sourceItems = new LinkedHashSet<>(tree.getSelected());
-        Timelined timelined;
-        Tag position;
-        if (childIndex == -1) {
-            if (dest instanceof DefineSpriteTag) {
-                timelined = (Timelined) dest;
-                position = null;
-            } else if (dest instanceof Tag) {
-                timelined = ((Tag) dest).getTimelined();
-                position = (Tag) dest;
-            } else if (dest instanceof Frame) {
-                Frame frame = (Frame) dest;
-                position = frame.allInnerTags.get(frame.allInnerTags.size() - 1);
-                timelined = frame.timeline.timelined;
-            } else {
-                timelined = (Timelined) dest;
-                position = null;
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths == null) {
+                return null;
             }
-        } else {
-            if (dest instanceof Frame) {
-                Frame frame = (Frame) dest;
-                timelined = frame.timeline.timelined;
-                position = childIndex == frame.allInnerTags.size() ? null : frame.allInnerTags.get(childIndex);
-            } else if (dest instanceof SWF) {                
-                SWF swf = (SWF) dest;
-                timelined = swf;
-                int frameIndex = childIndex - 1/*header*/ - 1;
-                if (frameIndex == -1) {
-                    frameIndex = 0;
-                }
-                Frame frame = swf.getTimeline().getFrame(frameIndex);
-                position = frame.allInnerTags.get(0);                
-            } else if (dest instanceof DefineSpriteTag) {
-                DefineSpriteTag sprite = (DefineSpriteTag) dest;
-                timelined = sprite;
-                int frameIndex = childIndex - 1;
-                if (frameIndex == -1) {
-                    frameIndex = 0;
-                }
-                Frame frame = sprite.getTimeline().getFrame(frameIndex);
-                position = frame.allInnerTags.get(0);
-            } else if (dest instanceof Tag) {
-                timelined = ((Tag) dest).getTimelined();
-                position = (Tag) dest;
-            } else {
-                int childCount = tree.getFullModel().getChildCount(dest);
-                TreeItem child;
-                if (childIndex >= childCount) {
-                    child = tree.getFullModel().getChild(dest, childCount - 1);
+            List<Tag> tags = new ArrayList<>();
+            for (TreePath path : paths) {
+                if (path.getLastPathComponent() instanceof Tag) {
+                    tags.add((Tag) path.getLastPathComponent());
                 } else {
-                    child = tree.getFullModel().getChild(dest, childIndex);                    
+                    return null;
                 }
-                if (child instanceof SWF) {
-                    SWF swf = (SWF) child;
-                    timelined = swf;
+            }
+            Tag[] tagArr = tags.toArray(new Tag[tags.size()]);
+            return new TagsTransferable(tagArr);
+        }
+
+        @Override
+        public int getSourceActions(JComponent c) {
+            return COPY_OR_MOVE;
+        }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            AbstractTagTree tree = (AbstractTagTree) source;
+            if (dropLocation == null) {
+                return;
+            }
+            int childIndex = dropLocation.getChildIndex();
+            TreeItem dest = (TreeItem) dropLocation.getPath().getLastPathComponent();
+            Set<TreeItem> sourceItems = new LinkedHashSet<>(tree.getSelected());
+            Timelined timelined;
+            Tag position;
+            if (childIndex == -1) {
+                if (dest instanceof DefineSpriteTag) {
+                    timelined = (Timelined) dest;
                     position = null;
+                } else if (dest instanceof Tag) {
+                    timelined = ((Tag) dest).getTimelined();
+                    position = (Tag) dest;
+                } else if (dest instanceof Frame) {
+                    Frame frame = (Frame) dest;
+                    position = frame.allInnerTags.get(frame.allInnerTags.size() - 1);
+                    timelined = frame.timeline.timelined;
                 } else {
-                    return;
+                    timelined = (Timelined) dest;
+                    position = null;
                 }
-            } 
-        }
-        mainPanel.getContextPopupMenu().copyOrMoveTags(sourceItems, (action & MOVE) == MOVE, timelined, position);
-    }
-
-    @Override
-    public boolean importData(TransferSupport support) {
-        if (!canImport(support)) {
-            return false;
-        }
-        Transferable t = support.getTransferable();
-        Tag[] tags = null;
-        try {
-            tags = (Tag[]) t.getTransferData(nodesFlavor);
-        } catch (UnsupportedFlavorException | IOException ex) {
-            Logger.getLogger(TreeTransferHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        dropLocation = (JTree.DropLocation) support.getDropLocation();
-        return true;
-    }
-
-    public class TagsTransferable implements Transferable {
-
-        Tag[] nodes;
-
-        public TagsTransferable(Tag[] nodes) {
-            this.nodes = nodes;
-        }
-
-        @Override
-        public Object getTransferData(DataFlavor flavor)
-                throws UnsupportedFlavorException {
-            if (!isDataFlavorSupported(flavor)) {
-                throw new UnsupportedFlavorException(flavor);
+            } else {
+                if (dest instanceof Frame) {
+                    Frame frame = (Frame) dest;
+                    timelined = frame.timeline.timelined;
+                    position = childIndex == frame.allInnerTags.size() ? null : frame.allInnerTags.get(childIndex);
+                } else if (dest instanceof SWF) {
+                    SWF swf = (SWF) dest;
+                    timelined = swf;
+                    int frameIndex = childIndex - 1/*header*/ - 1;
+                    if (frameIndex == -1) {
+                        frameIndex = 0;
+                    }
+                    Frame frame = swf.getTimeline().getFrame(frameIndex);
+                    position = frame.allInnerTags.get(0);
+                } else if (dest instanceof DefineSpriteTag) {
+                    DefineSpriteTag sprite = (DefineSpriteTag) dest;
+                    timelined = sprite;
+                    int frameIndex = childIndex - 1;
+                    if (frameIndex == -1) {
+                        frameIndex = 0;
+                    }
+                    Frame frame = sprite.getTimeline().getFrame(frameIndex);
+                    position = frame.allInnerTags.get(0);
+                } else if (dest instanceof Tag) {
+                    timelined = ((Tag) dest).getTimelined();
+                    position = (Tag) dest;
+                } else {
+                    int childCount = tree.getFullModel().getChildCount(dest);
+                    TreeItem child;
+                    if (childIndex >= childCount) {
+                        child = tree.getFullModel().getChild(dest, childCount - 1);
+                    } else {
+                        child = tree.getFullModel().getChild(dest, childIndex);
+                    }
+                    if (child instanceof SWF) {
+                        SWF swf = (SWF) child;
+                        timelined = swf;
+                        position = null;
+                    } else {
+                        return;
+                    }
+                }
             }
-            return nodes;
+            mainPanel.getContextPopupMenu().copyOrMoveTags(sourceItems, (action & MOVE) == MOVE, timelined, position);
         }
 
         @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            return flavors;
+        public boolean importData(TransferHandler.TransferSupport support) {
+            if (!canImport(support)) {
+                return false;
+            }
+            Transferable t = support.getTransferable();
+            Tag[] tags = null;
+            try {
+                tags = (Tag[]) t.getTransferData(nodesFlavor);
+            } catch (UnsupportedFlavorException | IOException ex) {
+                Logger.getLogger(TreeTransferHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            dropLocation = (JTree.DropLocation) support.getDropLocation();
+            return true;
         }
 
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return nodesFlavor.equals(flavor);
+        public class TagsTransferable implements Transferable {
+
+            Tag[] nodes;
+
+            public TagsTransferable(Tag[] nodes) {
+                this.nodes = nodes;
+            }
+
+            @Override
+            public Object getTransferData(DataFlavor flavor)
+                    throws UnsupportedFlavorException {
+                if (!isDataFlavorSupported(flavor)) {
+                    throw new UnsupportedFlavorException(flavor);
+                }
+                return nodes;
+            }
+
+            @Override
+            public DataFlavor[] getTransferDataFlavors() {
+                return flavors;
+            }
+
+            @Override
+            public boolean isDataFlavorSupported(DataFlavor flavor) {
+                return nodesFlavor.equals(flavor);
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class GraphPartChangeException extends Exception {
+
     private final int ip;
     private final List<GraphTargetItem> output;
 
@@ -38,6 +39,5 @@ public class GraphPartChangeException extends Exception {
     public List<GraphTargetItem> getOutput() {
         return output;
     }
-
 
 }

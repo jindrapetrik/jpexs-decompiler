@@ -85,7 +85,7 @@ public class ImageExporter {
                 ImageFormat originalFormat = fileFormat;
                 boolean hasSeparateAlpha = false;
                 if (imageTag instanceof HasSeparateAlphaChannel) {
-                    HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel)imageTag;
+                    HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel) imageTag;
                     hasSeparateAlpha = hsac.hasAlphaChannel();
                 }
                 if (settings.mode == ImageExportMode.PNG_GIF_JPEG && hasSeparateAlpha) {
@@ -102,53 +102,50 @@ public class ImageExporter {
                 if (settings.mode == ImageExportMode.BMP) {
                     fileFormat = ImageFormat.BMP;
                 }
+                final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
 
-                {
-                    final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
+                final ImageFormat ffileFormat = fileFormat;
 
-                    final ImageFormat ffileFormat = fileFormat;
-
-                    new RetryTask(() -> {
-                        if (ffileFormat == originalFormat) {
-                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                fos.write(Helper.readStream(imageTag.getImageData()));
-                            }
-                        } else if (ffileFormat == ImageFormat.BMP) {
-                            BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
-                        } else {
-                            ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
+                new RetryTask(() -> {
+                    if (ffileFormat == originalFormat) {
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
+                            fos.write(Helper.readStream(imageTag.getImageData()));
                         }
-                    }, handler).run();
-
-                    final File alphaBinFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.bin"));
-                    final File alphaPngFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.png"));
-
-                    if ((imageTag instanceof HasSeparateAlphaChannel)
-                            && (settings.mode == ImageExportMode.PNG_GIF_JPEG_ALPHA)) {
-
-                        HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel) imageTag;
-                        if (hsac.hasAlphaChannel()) {
-                            new RetryTask(() -> {
-                                byte[] alphaChannel = hsac.getImageAlpha();
-                                Dimension dim = imageTag.getImageDimension();
-                                BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
-                                int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-                                for (int i = 0; i < pixels.length; i++) {
-                                    int a = alphaChannel[i] & 0xff;
-                                    int v = 0;
-                                    int r = v;
-                                    int g = v;
-                                    int b = v;
-
-                                    pixels[i] = (a << 24) | (b << 16) | (g << 8) | r;
-                                }
-                                ImageIO.write(img, "PNG", alphaPngFile);
-
-                            }, handler).run();
-                        }
+                    } else if (ffileFormat == ImageFormat.BMP) {
+                        BMPFile.saveBitmap(imageTag.getImageCached().getBufferedImage(), file);
+                    } else {
+                        ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
                     }
-                    ret.add(file);
+                }, handler).run();
+
+                final File alphaBinFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.bin"));
+                final File alphaPngFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.png"));
+
+                if ((imageTag instanceof HasSeparateAlphaChannel)
+                        && (settings.mode == ImageExportMode.PNG_GIF_JPEG_ALPHA)) {
+
+                    HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel) imageTag;
+                    if (hsac.hasAlphaChannel()) {
+                        new RetryTask(() -> {
+                            byte[] alphaChannel = hsac.getImageAlpha();
+                            Dimension dim = imageTag.getImageDimension();
+                            BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+                            int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+                            for (int i = 0; i < pixels.length; i++) {
+                                int a = alphaChannel[i] & 0xff;
+                                int v = 0;
+                                int r = v;
+                                int g = v;
+                                int b = v;
+
+                                pixels[i] = (a << 24) | (b << 16) | (g << 8) | r;
+                            }
+                            ImageIO.write(img, "PNG", alphaPngFile);
+
+                        }, handler).run();
+                    }
                 }
+                ret.add(file);
 
                 if (Thread.currentThread().isInterrupted()) {
                     break;

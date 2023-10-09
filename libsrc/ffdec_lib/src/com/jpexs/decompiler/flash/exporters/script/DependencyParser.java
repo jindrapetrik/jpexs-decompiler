@@ -21,19 +21,8 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -79,10 +68,10 @@ public class DependencyParser {
                 }
             }
         }
-        
+
         if (dependencyType == DependencyType.NAMESPACE) {
             return;
-        }        
+        }
         if (ns.kind != Namespace.KIND_PACKAGE) { // && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
@@ -94,12 +83,8 @@ public class DependencyParser {
             if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
                 return;
             }
-            //if (!pkg.equals(ignorePackage)) 
-            {
-                dependencies.add(dep);
-            }
-        }
-        //}
+            dependencies.add(dep);            
+        }        
     }
 
     public static void parseDependenciesFromMultiname(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {
@@ -166,11 +151,11 @@ public class DependencyParser {
                 }
                 if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
                     if (ins.operands[0] > 0) { //first is global
-                        DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true);                
+                        DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true);
                         AbcIndexing.ClassIndex cls = abcIndex.findClass(new TypeItem(type), abc, scriptIndex);
                         List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
                         cls = cls.parent;
-                        while(cls != null) {
+                        while (cls != null) {
                             clsList.add(0, cls);
                             cls = cls.parent;
                         }
@@ -183,10 +168,10 @@ public class DependencyParser {
                             }
                         }
                     }
-                    
+
                     /*for (AbcIndexing.ClassIndex cls2: clsList) {
                         newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true)));
-                    } */         
+                    } */
                 }
                 for (int k = 0; k < ins.definition.operands.length; k++) {
                     //this should probably handle only some subset of multiname instructions,

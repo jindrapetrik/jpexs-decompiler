@@ -24,6 +24,7 @@ import java.util.Set;
  * @author JPEXS
  */
 public class ThrowState {
+
     public int exceptionId;
     public int state;
 

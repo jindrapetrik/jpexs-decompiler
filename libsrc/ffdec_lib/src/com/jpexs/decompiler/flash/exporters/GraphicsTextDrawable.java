@@ -28,5 +28,6 @@ import java.util.List;
  * @author JPEXS
  */
 public interface GraphicsTextDrawable {
+
     public void drawTextRecords(SWF swf, List<TEXTRECORD> textRecords, int numText, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform);
 }

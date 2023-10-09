@@ -89,8 +89,7 @@ public class IggyIndexParser {
         while ((code = indexStream.readUI8()) > -1) {
             LOGGER.finer(String.format("Code = 0x%02X", code));
 
-            if (code < 0x80) // 0-0x7F
-            {
+            if (code < 0x80) { // 0-0x7F            
                 LOGGER.finest("0-0x7F: code is directly an index to the index_table");
                 // code is directly an index to the index_table
                 if (code >= indexTableSize) {
@@ -101,8 +100,7 @@ public class IggyIndexParser {
                 offset += indexTable[code];
                 LOGGER.finest(String.format("LENGTH = indexTable[%d] = %d", code, indexTable[code]));
 
-            } else if (code < 0xC0) // 0x80-BF
-            {
+            } else if (code < 0xC0) { // 0x80-BF            
                 LOGGER.finest("0x80-BF: table[0..255]*(code-0x7F)");
                 int index;
 
@@ -120,13 +118,11 @@ public class IggyIndexParser {
                 LOGGER.finest(String.format("index = %d, n = code - 0x7F = %d", index, n));
                 LOGGER.finest(String.format("LENGTH = indexTable[index] * n = indexTable[%d] * %d = %d", index, n, indexTable[index] * n));
                 offset += indexTable[index] * n;
-            } else if (code < 0xD0) // 0xC0-0xCF
-            {
+            } else if (code < 0xD0) { // 0xC0-0xCF            
                 LOGGER.finest("0xC0-CF: code*2-0x17E");
                 offset += ((code * 2) - 0x17E);
                 LOGGER.finest(String.format("LENGTH = (code * 2) - 0x17E = (0x%02X * 2) - 0x17E = %d", code, ((code * 2) - 0x17E)));
-            } else if (code < 0xE0) // 0xD0-0xDF
-            {
+            } else if (code < 0xE0) { // 0xD0-0xDF            
                 LOGGER.finest("0xD0-0xDF: platform based");
 
                 // Code here depends on plattform[0], we are assuming it is 1, as we checked in load function
@@ -187,7 +183,8 @@ public class IggyIndexParser {
                 indexStream.seek(1, SeekMode.CUR);
             } else if (code == 0xFD) {
                 LOGGER.finest(String.format("0xFD: 0..255, skip 2 * 0..255 "));
-                int n, m;
+                int n;
+                int m;
 
                 if ((n = indexStream.readUI8()) < 0) {
                     LOGGER.severe(String.format("0xFD: Cannot read n."));

@@ -43,14 +43,14 @@ public class GetOuterScopeIns extends InstructionDefinition {
         int index = ins.operands[0];
         GraphTargetItem item = localData.scopeStack.get(index);
         if (item instanceof ThisAVM2Item) {
-            if (((ThisAVM2Item)item).className.equals(DottedChain.parseNoSuffix("global"))) {
+            if (((ThisAVM2Item) item).className.equals(DottedChain.parseNoSuffix("global"))) {
                 stack.push(new GlobalAVM2Item(null, null));
                 return;
             }
         }
         stack.push(item);
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;

@@ -128,7 +128,7 @@ public class ScrollPosStorage {
                         try {
                             mainPanel.getABCPanel().detailPanel.methodTraitPanel.methodCodePanel.getSourceTextArea().setCaretPosition(sitem.getPcodeCaret());
                         } catch (IllegalArgumentException iex) {
-
+                            //ignored
                         }
 
                         Timer tim = new Timer();
@@ -160,7 +160,7 @@ public class ScrollPosStorage {
                         try {
                             mainPanel.getActionPanel().editor.setCaretPosition(sitem.getPcodeCaret());
                         } catch (IllegalArgumentException iex) {
-
+                            //ignored
                         }
 
                         Timer tim = new Timer();
@@ -192,11 +192,11 @@ public class ScrollPosStorage {
                         @Override
                         public void run() {
                             ((JScrollPane) mainPanel.folderPreviewPanel.getParent().getParent()).getVerticalScrollBar().setValue(sitem.getFolderPreviewScrollVertical());
-                            ((JScrollPane) mainPanel.folderListPanel.getParent().getParent()).getVerticalScrollBar().setValue(sitem.getFolderListScrollVertical());                
-                        }                
+                            ((JScrollPane) mainPanel.folderListPanel.getParent().getParent()).getVerticalScrollBar().setValue(sitem.getFolderListScrollVertical());
+                        }
                     });
-                }                 
-            },10);                        
+                }
+            }, 10);
         }
     }
 
@@ -248,11 +248,11 @@ public class ScrollPosStorage {
         int folderListScrollVertical = 0;
         if (!(item instanceof ScriptPack) && !(item instanceof ASMSource)) {
             folderPreviewScrollVertical = ((JScrollPane) mainPanel.folderPreviewPanel.getParent().getParent()).getVerticalScrollBar().getValue();
-        }        
+        }
         if (!(item instanceof ScriptPack) && !(item instanceof ASMSource)) {
             folderListScrollVertical = ((JScrollPane) mainPanel.folderListPanel.getParent().getParent()).getVerticalScrollBar().getValue();
         }
-                
+
         ScrollPosItem savedItem = new ScrollPosItem(item,
                 actionScriptScrollHorizontal,
                 actionScriptScrollVertical,
@@ -287,163 +287,163 @@ public class ScrollPosStorage {
             }
         }
     }
-}
 
-class ScrollPosItem {
+    class ScrollPosItem {
 
-    private final WeakReference<TreeItem> item;
-    private final int actionScriptScrollHorizontal;
-    private final int actionScriptScrollVertical;
-    private final int actionScriptCaret;
-    private final int pcodeScrollHorizontal;
-    private final int pcodeScrollVertical;
-    private final int pcodeCaret;
-    private final int folderPreviewScrollVertical;
-    private final int folderListScrollVertical;
+        private final WeakReference<TreeItem> item;
+        private final int actionScriptScrollHorizontal;
+        private final int actionScriptScrollVertical;
+        private final int actionScriptCaret;
+        private final int pcodeScrollHorizontal;
+        private final int pcodeScrollVertical;
+        private final int pcodeCaret;
+        private final int folderPreviewScrollVertical;
+        private final int folderListScrollVertical;
 
-    public TreeItem getItem() {
-        return item.get();
-    }
+        public TreeItem getItem() {
+            return item.get();
+        }
 
-    public int getActionScriptScrollHorizontal() {
-        return actionScriptScrollHorizontal;
-    }
+        public int getActionScriptScrollHorizontal() {
+            return actionScriptScrollHorizontal;
+        }
 
-    public int getActionScriptScrollVertical() {
-        return actionScriptScrollVertical;
-    }
+        public int getActionScriptScrollVertical() {
+            return actionScriptScrollVertical;
+        }
 
-    public int getActionScriptCaret() {
-        return actionScriptCaret;
-    }
+        public int getActionScriptCaret() {
+            return actionScriptCaret;
+        }
 
-    public int getPcodeScrollHorizontal() {
-        return pcodeScrollHorizontal;
-    }
+        public int getPcodeScrollHorizontal() {
+            return pcodeScrollHorizontal;
+        }
 
-    public int getPcodeScrollVertical() {
-        return pcodeScrollVertical;
-    }
+        public int getPcodeScrollVertical() {
+            return pcodeScrollVertical;
+        }
 
-    public int getPcodeCaret() {
-        return pcodeCaret;
-    }
+        public int getPcodeCaret() {
+            return pcodeCaret;
+        }
 
-    public int getFolderPreviewScrollVertical() {
-        return folderPreviewScrollVertical;
-    }
+        public int getFolderPreviewScrollVertical() {
+            return folderPreviewScrollVertical;
+        }
 
-    public int getFolderListScrollVertical() {
-        return folderListScrollVertical;
-    }
+        public int getFolderListScrollVertical() {
+            return folderListScrollVertical;
+        }
 
-    public ScrollPosItem(TreeItem item, int actionScriptScrollHorizontal, int actionScriptScrollVertical, int actionScriptCaret, int pcodeScrollHorizontal, int pcodeScrollVertical, int pcodeCaret, int folderPreviewScrollVertical, int folderListScrollVertical) {
-        this.item = new WeakReference<>(item);
-        this.actionScriptScrollHorizontal = actionScriptScrollHorizontal;
-        this.actionScriptScrollVertical = actionScriptScrollVertical;
-        this.actionScriptCaret = actionScriptCaret;
-        this.pcodeScrollHorizontal = pcodeScrollHorizontal;
-        this.pcodeScrollVertical = pcodeScrollVertical;
-        this.pcodeCaret = pcodeCaret;
-        this.folderPreviewScrollVertical = folderPreviewScrollVertical;
-        this.folderListScrollVertical = folderListScrollVertical;
-    }
+        public ScrollPosItem(TreeItem item, int actionScriptScrollHorizontal, int actionScriptScrollVertical, int actionScriptCaret, int pcodeScrollHorizontal, int pcodeScrollVertical, int pcodeCaret, int folderPreviewScrollVertical, int folderListScrollVertical) {
+            this.item = new WeakReference<>(item);
+            this.actionScriptScrollHorizontal = actionScriptScrollHorizontal;
+            this.actionScriptScrollVertical = actionScriptScrollVertical;
+            this.actionScriptCaret = actionScriptCaret;
+            this.pcodeScrollHorizontal = pcodeScrollHorizontal;
+            this.pcodeScrollVertical = pcodeScrollVertical;
+            this.pcodeCaret = pcodeCaret;
+            this.folderPreviewScrollVertical = folderPreviewScrollVertical;
+            this.folderListScrollVertical = folderListScrollVertical;
+        }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.item.get());
-        hash = 79 * hash + this.actionScriptScrollHorizontal;
-        hash = 79 * hash + this.actionScriptScrollVertical;
-        hash = 79 * hash + this.actionScriptCaret;
-        hash = 79 * hash + this.pcodeScrollHorizontal;
-        hash = 79 * hash + this.pcodeScrollVertical;
-        hash = 79 * hash + this.pcodeCaret;
-        hash = 79 * hash + this.folderPreviewScrollVertical;
-        hash = 79 * hash + this.folderListScrollVertical;
-        return hash;
-    }
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 79 * hash + Objects.hashCode(this.item.get());
+            hash = 79 * hash + this.actionScriptScrollHorizontal;
+            hash = 79 * hash + this.actionScriptScrollVertical;
+            hash = 79 * hash + this.actionScriptCaret;
+            hash = 79 * hash + this.pcodeScrollHorizontal;
+            hash = 79 * hash + this.pcodeScrollVertical;
+            hash = 79 * hash + this.pcodeCaret;
+            hash = 79 * hash + this.folderPreviewScrollVertical;
+            hash = 79 * hash + this.folderListScrollVertical;
+            return hash;
+        }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ScrollPosItem other = (ScrollPosItem) obj;
+            if (this.actionScriptScrollHorizontal != other.actionScriptScrollHorizontal) {
+                return false;
+            }
+            if (this.actionScriptScrollVertical != other.actionScriptScrollVertical) {
+                return false;
+            }
+            if (this.actionScriptCaret != other.actionScriptCaret) {
+                return false;
+            }
+            if (this.pcodeScrollHorizontal != other.pcodeScrollHorizontal) {
+                return false;
+            }
+            if (this.pcodeScrollVertical != other.pcodeScrollVertical) {
+                return false;
+            }
+            if (this.pcodeCaret != other.pcodeCaret) {
+                return false;
+            }
+            if (this.folderPreviewScrollVertical != other.folderPreviewScrollVertical) {
+                return false;
+            }
+            if (this.folderListScrollVertical != other.folderListScrollVertical) {
+                return false;
+            }
+            return this.item.get() == other.item.get();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ScrollPosItem{");
+            sb.append("actionScriptScrollHorizontal=").append(actionScriptScrollHorizontal);
+            sb.append(", actionScriptScrollVertical=").append(actionScriptScrollVertical);
+            sb.append(", actionScriptCaret=").append(actionScriptCaret);
+            sb.append(", pcodeScrollHorizontal=").append(pcodeScrollHorizontal);
+            sb.append(", pcodeScrollVertical=").append(pcodeScrollVertical);
+            sb.append(", pcodeCaret=").append(pcodeCaret);
+            sb.append(", folderPreviewScrollVertical=").append(folderPreviewScrollVertical);
+            sb.append(", folderListScrollVertical=").append(folderListScrollVertical);
+            sb.append('}');
+            return sb.toString();
+        }
+
+        public boolean isEmpty() {
+            if (actionScriptScrollHorizontal > 0) {
+                return false;
+            }
+            if (actionScriptScrollVertical > 0) {
+                return false;
+            }
+            if (actionScriptCaret > 0) {
+                return false;
+            }
+            if (pcodeScrollHorizontal > 0) {
+                return false;
+            }
+            if (pcodeScrollVertical > 0) {
+                return false;
+            }
+            if (pcodeCaret > 0) {
+                return false;
+            }
+            if (folderPreviewScrollVertical > 0) {
+                return false;
+            }
+            if (folderListScrollVertical > 0) {
+                return false;
+            }
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ScrollPosItem other = (ScrollPosItem) obj;
-        if (this.actionScriptScrollHorizontal != other.actionScriptScrollHorizontal) {
-            return false;
-        }
-        if (this.actionScriptScrollVertical != other.actionScriptScrollVertical) {
-            return false;
-        }
-        if (this.actionScriptCaret != other.actionScriptCaret) {
-            return false;
-        }
-        if (this.pcodeScrollHorizontal != other.pcodeScrollHorizontal) {
-            return false;
-        }
-        if (this.pcodeScrollVertical != other.pcodeScrollVertical) {
-            return false;
-        }
-        if (this.pcodeCaret != other.pcodeCaret) {
-            return false;
-        }
-        if (this.folderPreviewScrollVertical != other.folderPreviewScrollVertical) {
-            return false;
-        }
-        if (this.folderListScrollVertical != other.folderListScrollVertical) {
-            return false;
-        }
-        return this.item.get() == other.item.get();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("ScrollPosItem{");
-        sb.append("actionScriptScrollHorizontal=").append(actionScriptScrollHorizontal);
-        sb.append(", actionScriptScrollVertical=").append(actionScriptScrollVertical);
-        sb.append(", actionScriptCaret=").append(actionScriptCaret);
-        sb.append(", pcodeScrollHorizontal=").append(pcodeScrollHorizontal);
-        sb.append(", pcodeScrollVertical=").append(pcodeScrollVertical);
-        sb.append(", pcodeCaret=").append(pcodeCaret);
-        sb.append(", folderPreviewScrollVertical=").append(folderPreviewScrollVertical);
-        sb.append(", folderListScrollVertical=").append(folderListScrollVertical);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    public boolean isEmpty() {
-        if (actionScriptScrollHorizontal > 0) {
-            return false;
-        }
-        if (actionScriptScrollVertical > 0) {
-            return false;
-        }
-        if (actionScriptCaret > 0) {
-            return false;
-        }
-        if (pcodeScrollHorizontal > 0) {
-            return false;
-        }
-        if (pcodeScrollVertical > 0) {
-            return false;
-        }
-        if (pcodeCaret > 0) {
-            return false;
-        }
-        if (folderPreviewScrollVertical > 0) {
-            return false;
-        }
-        if (folderListScrollVertical > 0) {
-            return false;
-        }
-        return true;
     }
 }

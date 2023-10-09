@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf3;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.DisplayObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
@@ -31,7 +32,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
 
 /**

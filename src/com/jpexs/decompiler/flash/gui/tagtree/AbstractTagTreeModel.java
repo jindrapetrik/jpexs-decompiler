@@ -39,38 +39,38 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public abstract class AbstractTagTreeModel implements TreeModel {
-    
-    protected final List<TreeModelListener> listeners = new ArrayList<>();   
-    
+
+    protected final List<TreeModelListener> listeners = new ArrayList<>();
+
     public abstract void updateSwfs(CollectionChangedEvent e);
-            
+
     private Map<TreeItem, Integer> indices = new WeakHashMap<>();
-    
+
     public final void calculateCollisions() {
         Map<TreeItem, Integer> indices = new WeakHashMap<>();
         calculateCollisions(getRoot(), indices);
         this.indices = indices;
     }
-    
+
     private void calculateCollisions(Object parent, Map<TreeItem, Integer> indices) {
         List<? extends TreeItem> items = getAllChildren(parent);
         Map<String, Integer> counts = new HashMap<>();
-        for (TreeItem item: items) {
+        for (TreeItem item : items) {
             String str = item.toString();
             int count = counts.containsKey(str) ? counts.get(str) : 0;
             count++;
             counts.put(str, count);
             if (count > 1) {
-                indices.put(item, count);                
+                indices.put(item, count);
                 if (item instanceof TagScript) {
                     Tag tag = ((TagScript) item).getTag();
                     indices.put(tag, count);
                 }
-            }            
+            }
             calculateCollisions(item, indices);
         }
     }
-    
+
     public final int getItemIndex(TreeItem item) {
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
@@ -80,7 +80,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
         }
         return 1;
     }
-    
+
     protected void fireTreeNodesRemoved(TreeModelEvent e) {
         for (TreeModelListener listener : listeners) {
             listener.treeNodesRemoved(e);
@@ -98,7 +98,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
             listener.treeStructureChanged(e);
         }
     }
-    
+
     @Override
     public void addTreeModelListener(TreeModelListener l) {
         listeners.add(l);
@@ -108,7 +108,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     public void removeTreeModelListener(TreeModelListener l) {
         listeners.remove(l);
     }
-    
+
     public boolean treePathExists(TreePath treePath) {
         TreeItem current = null;
         for (Object o : treePath.getPath()) {
@@ -130,20 +130,20 @@ public abstract class AbstractTagTreeModel implements TreeModel {
         }
 
         return true;
-    }   
-    
+    }
+
     public abstract Frame getFrame(SWF swf, Timelined t, int frame);
-    
+
     @Override
     public abstract TreeItem getChild(Object parent, int index);
-    
+
     public abstract List<? extends TreeItem> getAllChildren(Object parent);
-    
+
     @Override
     public abstract TreeItem getRoot();
-       
+
     protected abstract List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path);
-    
+
     public TreePath getTreePath(TreeItem obj) {
         List<TreeItem> path = new ArrayList<>();
         TreeItem root = getRoot();
@@ -158,7 +158,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         return tp;
     }
-    
+
     public void updateNode(TreeItem treeItem) {
         TreePath changedPath = getTreePath(treeItem);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
@@ -167,14 +167,14 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     public void updateNode(TreePath changedPath) {
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath.getParentPath()));
     }
-    
+
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
-    
+
     public abstract void updateOpenable(Openable openable);
-    
+
     public TreeItem getParent(TreeItem obj) {
-        return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
+        return (TreeItem) getTreePath(obj).getParentPath().getLastPathComponent();
     }
 }

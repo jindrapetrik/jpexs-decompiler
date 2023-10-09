@@ -23,6 +23,6 @@ package com.jpexs.helpers;
 public interface ProgressListener {
 
     public void progress(int p);
-    
+
     public void status(String status);
 }

@@ -103,7 +103,7 @@ public class NewTraitDialog extends AppDialog {
             translate("type.getter"),
             translate("type.setter"),
             translate("type.const"),
-            translate("type.slot"),});
+            translate("type.slot")});
         staticCheckbox = new JCheckBox(translate("checkbox.static"));
         optionsPanel.add(staticCheckbox);
         String[] accessStrings = new String[modifiers.length];

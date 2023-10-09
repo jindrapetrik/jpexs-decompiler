@@ -48,7 +48,7 @@ public class MethodCodePanel extends JPanel {
     private final ASMSourceEditorPane sourceTextArea;
 
     private final FasterScrollPane sourceScrollPane;
-    
+
     public JPanel buttonsPanel;
 
     private final JToggleButton hexButton;
@@ -63,8 +63,8 @@ public class MethodCodePanel extends JPanel {
 
     public FasterScrollPane getSourceScrollPane() {
         return sourceScrollPane;
-    }        
-    
+    }
+
     public void refreshMarkers() {
         sourceTextArea.refreshMarkers();
     }
@@ -112,7 +112,7 @@ public class MethodCodePanel extends JPanel {
     public int getBodyIndex() {
         return sourceTextArea.bodyIndex;
     }
-    
+
     public int getMethodIndex() {
         return sourceTextArea.methodIndex;
     }

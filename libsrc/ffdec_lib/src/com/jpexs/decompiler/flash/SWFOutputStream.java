@@ -106,7 +106,7 @@ public class SWFOutputStream extends OutputStream {
     private int bitPos = 0;
 
     private int tempByte = 0;
-    
+
     private String charset;
 
     public long getPos() {
@@ -206,7 +206,7 @@ public class SWFOutputStream extends OutputStream {
         byte[] data = value.getBytes(charset);
         writeUI8(data.length);
         write(data);
-    }   
+    }
 
     /**
      * Writes UI32 (Unsigned 32bit integer) value to the stream
@@ -501,31 +501,7 @@ public class SWFOutputStream extends OutputStream {
         for (Tag tag : tags) {
             tag.writeTag(this);
         }
-    }
-
-    /**
-     * Calculates number of bits needed for representing unsigned value
-     *
-     * @param value Unsigned value
-     * @return Number of bits
-     */
-    public static int getNeededBitsU(int value) {
-        if (value == 0) {
-            return 0;
-        }
-
-        value = Math.abs(value);
-        long x = 1;
-        int nBits;
-
-        for (nBits = 1; nBits <= 64; nBits++) {
-            x <<= 1;
-            if (x > value) {
-                break;
-            }
-        }
-        return nBits;
-    }
+    }   
 
     /**
      * Calculates number of bits needed for representing signed value
@@ -556,6 +532,30 @@ public class SWFOutputStream extends OutputStream {
         nBits = enlargeBitCountS(nBits, first);
         for (int i = 0; i < params.length; i++) {
             nBits = enlargeBitCountS(nBits, params[i]);
+        }
+        return nBits;
+    }
+    
+    /**
+     * Calculates number of bits needed for representing unsigned value
+     *
+     * @param value Unsigned value
+     * @return Number of bits
+     */
+    public static int getNeededBitsU(int value) {
+        if (value == 0) {
+            return 0;
+        }
+
+        value = Math.abs(value);
+        long x = 1;
+        int nBits;
+
+        for (nBits = 1; nBits <= 64; nBits++) {
+            x <<= 1;
+            if (x > value) {
+                break;
+            }
         }
         return nBits;
     }
@@ -1654,9 +1654,9 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes MORPHFOCALGRADIENT value to the stream
+     * Writes MORPHFOCALGRADIENT value to the stream.
      *
-     * Undocumented feature
+     * <p>Undocumented feature
      *
      * @param value MORPHGRADIENT value
      * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...

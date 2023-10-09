@@ -141,7 +141,7 @@ public class UnresolvedConstantActionItem extends ActionItem implements SimpleVa
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         return toSourceMerge(localData, generator, new ActionPush(new ConstantIndex(index), charset));
     }
 

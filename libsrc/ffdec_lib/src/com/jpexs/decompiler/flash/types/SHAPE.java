@@ -80,7 +80,7 @@ public class SHAPE implements NeedsCharacters, Serializable {
         lsa.lineStyles2 = new LINESTYLE2[0];
         return SHAPERECORD.getBounds(shapeRecords, lsa, shapeNum, false);
     }
-    
+
     public RECT getEdgeBounds() {
         return SHAPERECORD.getBounds(shapeRecords, null, 1, true);
     }
@@ -89,14 +89,15 @@ public class SHAPE implements NeedsCharacters, Serializable {
         cachedOutline = null;
         fastCachedOutline = null;
     }
-    
+
     /**
-     * 
-     * @param fast When the shape is large, can approximate to rectangles instead of being slow.
+     *
+     * @param fast When the shape is large, can approximate to rectangles
+     * instead of being slow.
      * @param shapeNum Version of DefineShape, 2 for DefineShape2 etc.
      * @param swf
      * @param stroked
-     * @return 
+     * @return
      */
     public Shape getOutline(boolean fast, int shapeNum, SWF swf, boolean stroked) {
         if (cachedOutline != null) {
@@ -110,12 +111,12 @@ public class SHAPE implements NeedsCharacters, Serializable {
         List<GeneralPath> paths = PathExporter.export(shapeNum, swf, this, strokes);
 
         boolean large = shapeRecords.size() > 500;
-        
+
         if (!large) {
             fast = false;
         }
-        
-        Area area = new Area(); 
+
+        Area area = new Area();
         for (GeneralPath path : paths) {
             area.add(new Area(fast ? path.getBounds2D() : path));
         }
@@ -123,11 +124,11 @@ public class SHAPE implements NeedsCharacters, Serializable {
             for (GeneralPath path : strokes) {
                 area.add(new Area(fast ? path.getBounds2D() : path));
             }
-        }        
+        }
 
         if (fast) {
             fastCachedOutline = area;
-        } else {        
+        } else {
             fastCachedOutline = null;
             cachedOutline = area;
         }

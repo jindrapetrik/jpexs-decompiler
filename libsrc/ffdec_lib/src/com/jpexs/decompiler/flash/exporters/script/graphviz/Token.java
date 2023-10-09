@@ -23,6 +23,7 @@ import java.io.Serializable;
  * @author JPEXS
  */
 public class Token implements Serializable, Comparable {
+
     public final TokenType type;
     public final int start;
     public final int length;

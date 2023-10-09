@@ -123,7 +123,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
 
     @Override
     public Object getResult() {
-        return value;//(Double) (double) (long) value;
+        return value; //(Double) (double) (long) value;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
     }
 
     @Override
-    public GraphTargetItem returnType() {        
+    public GraphTargetItem returnType() {
         return TypeItem.INT;
     }
 

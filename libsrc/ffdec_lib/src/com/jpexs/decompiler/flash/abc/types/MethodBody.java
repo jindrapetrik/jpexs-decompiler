@@ -127,7 +127,7 @@ public final class MethodBody implements Cloneable {
         this.abc = abc;
     }
 
-    public synchronized void setCodeBytes(byte codeBytes[]) {
+    public synchronized void setCodeBytes(byte[] codeBytes) {
         this.codeBytes = codeBytes;
         this.code = null;
     }
@@ -168,15 +168,7 @@ public final class MethodBody implements Cloneable {
 
     public void markOffsets() {
         getCode().markOffsets();
-    }
-
-    @Override
-    public String toString() {
-        String s = "";
-        s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
-        s += "\r\nCode:\r\n" + getCode().toString();
-        return s;
-    }
+    }    
 
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
         return getCode().removeDeadCode(this);
@@ -211,6 +203,12 @@ public final class MethodBody implements Cloneable {
      */
     public void replaceInstruction(int pos, AVM2Instruction instruction) {
         getCode().replaceInstruction(pos, instruction, this);
+    }    
+
+    public void insertAll(int pos, List<AVM2Instruction> list) {
+        for (AVM2Instruction ins : list) {
+            insertInstruction(pos++, ins);
+        }
     }
 
     /**
@@ -223,12 +221,6 @@ public final class MethodBody implements Cloneable {
      */
     public void insertInstruction(int pos, AVM2Instruction instruction) {
         getCode().insertInstruction(pos, instruction, this);
-    }
-
-    public void insertAll(int pos, List<AVM2Instruction> list) {
-        for (AVM2Instruction ins : list) {
-            insertInstruction(pos++, ins);
-        }
     }
 
     /**
@@ -342,6 +334,15 @@ public final class MethodBody implements Cloneable {
             }
         }
     }
+    
+    
+    @Override
+    public String toString() {
+        String s = "";
+        s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
+        s += "\r\nCode:\r\n" + getCode().toString();
+        return s;
+    }
 
     public GraphTextWriter toString(List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         seenMethods.add(method_info);
@@ -369,11 +370,11 @@ public final class MethodBody implements Cloneable {
                         writer.newLine();
                     }
                     List<DottedChain> fullyQualifiedNames2 = new ArrayList<>(fullyQualifiedNames);
-                    for (Trait t:traits.traits) {
+                    for (Trait t : traits.traits) {
                         DottedChain tname = DottedChain.parseWithSuffix(t.getName(abc).getName(abc.constants, new ArrayList<>(), false, true));
                         fullyQualifiedNames2.remove(tname);
                     }
-                    
+
                     Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {

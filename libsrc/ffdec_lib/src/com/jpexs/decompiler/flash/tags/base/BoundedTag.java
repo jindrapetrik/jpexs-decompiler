@@ -27,7 +27,7 @@ public interface BoundedTag {
 
     public RECT getRect();
 
-    public RECT getRectWithStrokes();
-
     public RECT getRect(Set<BoundedTag> added);
+    
+    public RECT getRectWithStrokes();   
 }

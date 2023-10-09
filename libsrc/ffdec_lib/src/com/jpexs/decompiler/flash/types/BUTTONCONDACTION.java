@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,7 +42,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Actions to execute at particular button events
@@ -99,12 +97,11 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
         actionBytes = sis.readByteRangeEx(condActionSize <= 0 ? sis.available() : condActionSize - 4, "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
     }
 
-    
     @Override
     public Openable getOpenable() {
         return swf;
     }
-    
+
     @Override
     public SWF getSwf() {
         return swf;
@@ -175,14 +172,6 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     public ByteArrayRange actionBytes;
 
     /**
-     * Sets actions associated with this object
-     *
-     * @param actions Action list
-     */
-    /*public void setActions(List<Action> actions) {
-     this.actions = actions;
-     }*/
-    /**
      * Returns a string representation of the object
      *
      * @return a string representation of the object.
@@ -217,7 +206,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
 
         return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, actions.getCharset());
     }
-    
+
     @Override
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         if (actions == null) {
@@ -384,7 +373,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     public Tag getTag() {
         return tag;
     }
-    
+
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {

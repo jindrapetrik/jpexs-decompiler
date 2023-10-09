@@ -120,6 +120,7 @@ public class AS2ScriptExporter {
                     logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
                 }
             } catch (InterruptedException ex) {
+                //ignored
             } finally {
                 executor.shutdownNow();
             }
@@ -130,6 +131,7 @@ public class AS2ScriptExporter {
                         ret.add(futureResults.get(f).get());
                     }
                 } catch (InterruptedException ex) {
+                    //ignored
                 } catch (ExecutionException ex) {
                     logger.log(Level.SEVERE, "Error during ABC export", ex);
                 }

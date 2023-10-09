@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 
 public class Amf3OutputStream extends OutputStream {
 
-    public final static Logger LOGGER = Logger.getLogger(Amf3OutputStream.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(Amf3OutputStream.class.getName());
 
     private final OutputStream os;
     private static final int NO_REFERENCE_FLAG = 1;

@@ -50,7 +50,7 @@ public class XmlPrettyFormat {
             + "</xsl:stylesheet>";
 
     public boolean prettyFormat(Source source, Result result, int indent, boolean withXmlDeclaration) {
-        try {            
+        try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setAttribute("indent-number", indent);
             Transformer transformer = transformerFactory.newTransformer(new StreamSource(new StringReader(PRETTY_PRINT_XSLT)));
@@ -65,11 +65,11 @@ public class XmlPrettyFormat {
             return false;
         }
     }
-    
+
     public boolean prettyFormat(File source, File result, int indent, boolean withXmlDeclaration) {
         return prettyFormat(new StreamSource(source), new StreamResult(result), indent, withXmlDeclaration);
     }
-    
+
     public String prettyFormat(String input, int indent, boolean withXmlDeclaration) {
         Source xmlInput = new StreamSource(new StringReader(input));
         StringWriter stringWriter = new StringWriter();

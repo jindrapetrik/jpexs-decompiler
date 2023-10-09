@@ -45,7 +45,7 @@ public class MiterClipBasicStroke implements Stroke {
         public float y1;
         public float x2;
         public float y2;
-        
+
         public int kind;
 
         public Vector(float x1, float y1, float x2, float y2, int kind) {
@@ -107,18 +107,18 @@ public class MiterClipBasicStroke implements Stroke {
         }
         PathIterator pi = p.getPathIterator(new AffineTransform());
         int type;
-        float points[] = new float[6];
+        float[] points = new float[6];
 
         Area area = new Area(stroke.createStrokedShape(p));
 
         List<Vector> vectors = new ArrayList<>();
         float x = 0;
         float y = 0;
-        
+
         final int KIND_MOVETO = 2;
         final int KIND_OFFPATH = 1;
         final int KIND_NORMAL = 0;
-        
+
         while (!pi.isDone()) {
             type = pi.currentSegment(points);
             switch (type) {
@@ -148,15 +148,15 @@ public class MiterClipBasicStroke implements Stroke {
             }
             pi.next();
         }
-        
+
         //FIXME - make this faster!!!
         for (int i = 0; i < vectors.size() - 1; i++) {
-            Vector u = vectors.get(i);            
+            Vector u = vectors.get(i);
             Vector v = vectors.get(i + 1);
             if (u.kind == KIND_OFFPATH || v.kind == KIND_MOVETO) {
                 continue;
             }
-            
+
             float parallelSign = 1;
             float dx = u.x2 - u.x1;
             float dy = u.y2 - u.y1;
@@ -194,15 +194,15 @@ public class MiterClipBasicStroke implements Stroke {
                 intersectX = perp2.x1;
                 float line_a = (perp1.y2 - perp1.y1) / (perp1.x2 - perp1.x1);
                 float line_c = perp1.y1 - line_a * perp1.x1;
-                intersectY = line_a * intersectX + line_c;                                
-            } else {                
+                intersectY = line_a * intersectX + line_c;
+            } else {
                 //y = a x + c                
                 float line_a = (perp1.y2 - perp1.y1) / (perp1.x2 - perp1.x1);
                 float line_c = perp1.y1 - line_a * perp1.x1;
                 //y = b x + d
                 float line_b = (perp2.y2 - perp2.y1) / (perp2.x2 - perp2.x1);
-                float line_d = perp2.y1 - line_b * perp2.x1;               
-                               
+                float line_d = perp2.y1 - line_b * perp2.x1;
+
                 intersectX = (line_d - line_c) / (line_a - line_b);
                 intersectY = line_a * intersectX + line_c;
             }

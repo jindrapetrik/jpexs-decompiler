@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 /**
  *
  * @author JPEXS
- * 
+ *
  * source: ??
  */
 public class DelDescendantsIns extends InstructionDefinition {

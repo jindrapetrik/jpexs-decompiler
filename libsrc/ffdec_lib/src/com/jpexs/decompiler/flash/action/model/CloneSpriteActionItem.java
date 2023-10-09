@@ -83,8 +83,8 @@ public class CloneSpriteActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
-        
+        String charset = asGenerator.getCharset();
+
         return toSourceMerge(localData, generator, source, target, depth, new ActionCloneSprite(), new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}, charset));
     }
 
@@ -92,7 +92,6 @@ public class CloneSpriteActionItem extends ActionItem {
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, source, target, depth, new ActionCloneSprite());
     }
-
 
     @Override
     public boolean hasReturnValue() {

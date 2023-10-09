@@ -51,15 +51,10 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public void delete(ABC abc, boolean d) {
         super.delete(abc, d);
-        
+
         abc.constants.getMultiname(name_index).deleted = d;
         abc.method_info.get(method_info).delete(abc, d);
-    }
-
-    @Override
-    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
-    }
+    }   
 
     @Override
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
@@ -79,10 +74,7 @@ public class TraitMethodGetterSetter extends Trait {
                 customNs = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        //if (method_info != 0)
-        {
-            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, isStatic, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
-        }
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, isStatic, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
     }
 
     @Override
@@ -95,9 +87,9 @@ public class TraitMethodGetterSetter extends Trait {
             addKind = "set ";
         }
         MethodBody body = abc.findBody(method_info);
-        
+
         getModifiers(abc, isStatic, insideInterface, writer, classIndex);
-        
+
         if (abc.method_info.get(method_info).flagNative()) {
             writer.appendNoHilight("native ");
         }
@@ -132,6 +124,11 @@ public class TraitMethodGetterSetter extends Trait {
         writer.endMethod();
     }
 
+    @Override
+    public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+    }
+    
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 

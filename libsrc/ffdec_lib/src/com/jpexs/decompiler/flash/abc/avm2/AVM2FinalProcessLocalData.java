@@ -38,7 +38,7 @@ public class AVM2FinalProcessLocalData extends FinalProcessLocalData {
         this.localRegNames = localRegNames;
         this.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
     }
-    
+
     public Set<Integer> getSetLocalUsages(int setLocalPos) {
         if (setLocalPosToGetLocalPos == null) {
             return new HashSet<>();

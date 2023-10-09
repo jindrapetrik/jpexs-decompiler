@@ -116,21 +116,21 @@ import javax.swing.ToolTipManager;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
  * @author JPEXS
  */
 public abstract class AbstractTagTree extends JTree {
+
     public TagTreeContextMenu contextPopupMenu;
 
     protected final MainPanel mainPanel;
-    
+
     private AbstractTagTreeModel fullModel;
 
     private static final Map<TreeNodeType, Icon> ICONS;
-    
+
     protected Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
 
     static {
@@ -140,37 +140,38 @@ public abstract class AbstractTagTree extends JTree {
                 String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
                 ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
             }
-        }        
+        }
     }
 
     @Override
     public void setModel(TreeModel newModel) {
         super.setModel(newModel);
         if (newModel instanceof AbstractTagTreeModel) {
-            this.fullModel = (AbstractTagTreeModel)newModel;
+            this.fullModel = (AbstractTagTreeModel) newModel;
         }
     }
-        
+
     public MainPanel getMainPanel() {
         return mainPanel;
     }
-        
+
     public Map<TreeItem, Set<Integer>> getMissingNeededCharacters() {
         return missingNeededCharacters;
-    }  
-    
+    }
+
     public void setMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters) {
         this.missingNeededCharacters = missingNeededCharacters;
         repaint();
-    }           
-    
+    }
+
     public static Icon getIconForType(TreeNodeType t) {
         return ICONS.get(t);
     }
-    
+
     public static Icon getIconFor(TreeItem val) {
         return getIconFor(val, false);
     }
+
     public static Icon getIconFor(TreeItem val, boolean folderExpanded) {
         TreeNodeType type = getTreeNodeType(val);
 
@@ -189,7 +190,7 @@ public abstract class AbstractTagTree extends JTree {
         }
         return null;
     }
-    
+
     public AbstractTagTree(AbstractTagTreeModel treeModel, MainPanel mainPanel) {
         super(treeModel);
         this.mainPanel = mainPanel;
@@ -223,11 +224,11 @@ public abstract class AbstractTagTree extends JTree {
                 if (!getModel().isLeaf(item)) { //double click also expands the node so editing should work only for leaf nodes
                     return;
                 }
-                mainPanel.startEdit();                
-            }            
+                mainPanel.startEdit();
+            }
         });
     }
-    
+
     public static TreeNodeType getTreeNodeType(TreeItem t) {
 
         if (t instanceof TagScript) {
@@ -274,7 +275,7 @@ public abstract class AbstractTagTree extends JTree {
         if (t instanceof ButtonTag) {
             return TreeNodeType.BUTTON;
         }
-        
+
         if (t instanceof BUTTONRECORD) {
             return TreeNodeType.BUTTON_RECORD;
         }
@@ -283,11 +284,11 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.MOVIE;
         }
 
-        if ((t instanceof DefineSoundTag) || 
-                (t instanceof SoundStreamHeadTag) || 
-                (t instanceof SoundStreamHead2Tag) || 
-                (t instanceof DefineExternalSound) ||
-                (t instanceof DefineExternalStreamSound)) {
+        if ((t instanceof DefineSoundTag)
+                || (t instanceof SoundStreamHeadTag)
+                || (t instanceof SoundStreamHead2Tag)
+                || (t instanceof DefineExternalSound)
+                || (t instanceof DefineExternalStreamSound)) {
             return TreeNodeType.SOUND;
         }
 
@@ -358,7 +359,7 @@ public abstract class AbstractTagTree extends JTree {
         }
 
         if (t instanceof AS3Package) {
-            AS3Package pkg = (AS3Package)t;
+            AS3Package pkg = (AS3Package) t;
             if (pkg.isCompoundScript()) {
                 return TreeNodeType.AS;
             }
@@ -408,19 +409,19 @@ public abstract class AbstractTagTree extends JTree {
         if (t instanceof RemoveTag) {
             return TreeNodeType.REMOVE_OBJECT;
         }
-        
+
         if (t instanceof DefineScalingGridTag) {
             return TreeNodeType.SCALING_GRID;
         }
-        
+
         if (t instanceof EndTag) {
             return TreeNodeType.END;
-        }                
-        
+        }
+
         if (t instanceof TagStub) {
             return TreeNodeType.ERROR;
         }
-        
+
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
         }
@@ -428,24 +429,24 @@ public abstract class AbstractTagTree extends JTree {
         if (t instanceof FolderItem) {
             return TreeNodeType.FOLDER;
         }
-        
+
         if (t instanceof ABC) {
             return TreeNodeType.ABC;
         }
 
         return TreeNodeType.FOLDER;
-    }             
-    
+    }
+
     public AbstractTagTreeModel getFullModel() {
         return fullModel;
     }
-    
+
     public void expandRoot() {
         TreeModel ttm = getModel();
         Object root = ttm.getRoot();
         expandPath(new TreePath(new Object[]{root}));
     }
-    
+
     public void expandFirstLevelNodes() {
         TreeModel ttm = getModel();
         Object root = ttm.getRoot();
@@ -454,7 +455,7 @@ public abstract class AbstractTagTree extends JTree {
             expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
         }
     }
-    
+
     public void setExpandPathString(String pathStr) {
         if (pathStr != null && pathStr.length() > 0) {
             String[] path = pathStr.split("\\|");
@@ -467,7 +468,7 @@ public abstract class AbstractTagTree extends JTree {
                 }
                 if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
                     mainPanel.tagListTree.expandPath(tp.getParentPath());
-                */               
+                 */
                 expandPath(tp.getParentPath());
             }
         }
@@ -480,7 +481,7 @@ public abstract class AbstractTagTree extends JTree {
         String[] path = pathStr.split("\\|");
         return View.getTreePathByPathStrings(this, Arrays.asList(path));
     }
-    
+
     public TreeItem getTreeItemFromPathString(String pathStr) {
         TreePath path = getTreePathFromString(pathStr);
         if (path == null) {
@@ -488,7 +489,7 @@ public abstract class AbstractTagTree extends JTree {
         }
         return (TreeItem) path.getLastPathComponent();
     }
-    
+
     public void setSelectionPathString(String pathStr) {
         TreeItem item = getTreeItemFromPathString(pathStr);
         if (item != null) {
@@ -496,7 +497,7 @@ public abstract class AbstractTagTree extends JTree {
             mainPanel.setTagTreeSelectedNode(this, item);
         }
     }
-    
+
     public void getAllSubs(TreeItem o, List<TreeItem> ret) {
         AbstractTagTreeModel tm = getFullModel();
         for (TreeItem c : tm.getAllChildren(o)) {
@@ -519,10 +520,10 @@ public abstract class AbstractTagTree extends JTree {
         }
         return ret;
     }
-    
+
     public List<TreeItem> getAllSubsForItems(List<TreeItem> items) {
-        List<TreeItem> ret = new ArrayList<>();        
-        for (TreeItem item:items) {
+        List<TreeItem> ret = new ArrayList<>();
+        for (TreeItem item : items) {
             ret.add(item);
             getAllSubs(item, ret);
         }
@@ -534,15 +535,15 @@ public abstract class AbstractTagTree extends JTree {
         if (paths == null) {
             return null;
         }
-        Arrays.sort(paths, new Comparator<TreePath>(){
+        Arrays.sort(paths, new Comparator<TreePath>() {
             @Override
             public int compare(TreePath o1, TreePath o2) {
                 return getRowForPath(o1) - getRowForPath(o2);
-            }            
+            }
         });
         return paths;
     }
-    
+
     public List<TreeItem> getSelected() {
         if (mainPanel.folderPreviewCard.isVisible() && mainPanel.folderPreviewPanel.isSomethingSelected()) {
             return mainPanel.folderPreviewPanel.getSelectedItemsSorted();
@@ -559,11 +560,11 @@ public abstract class AbstractTagTree extends JTree {
         }
         return ret;
     }
-    
+
     public boolean hasExportableNodes() {
         return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
-   
+
     public List<TreeItem> getSelectionAndAllSubs(Openable openable, List<TreeItem> selection) {
         List<TreeItem> sel = new ArrayList<>();
 
@@ -573,7 +574,7 @@ public abstract class AbstractTagTree extends JTree {
         }
         return getSelection(openable, sel);
     }
-    
+
     public abstract List<TreeItem> getSelection(Openable openable);
 
     public static List<TreeItem> getSelection(Openable openable, List<TreeItem> sel) {
@@ -636,8 +637,8 @@ public abstract class AbstractTagTree extends JTree {
                 }
                 if (nodeType == TreeNodeType.FONT) {
                     ret.add(d);
-                }                
-                
+                }
+
                 if (nodeType == TreeNodeType.OTHER_TAG) {
                     if (d instanceof SymbolClassTypeTag) {
                         ret.add(d);
@@ -652,7 +653,7 @@ public abstract class AbstractTagTree extends JTree {
                 ret.add(d);
             }
             if (d instanceof AS3Package) {
-                AS3Package p = (AS3Package)d;
+                AS3Package p = (AS3Package) d;
                 if (p.isCompoundScript()) {
                     ret.add(d);
                 }
@@ -660,7 +661,7 @@ public abstract class AbstractTagTree extends JTree {
         }
         return ret;
     }
-    
+
     public void updateSwfs(Openable[] openables) {
         AbstractTagTreeModel ttm = getFullModel();
         if (ttm != null) {
@@ -668,34 +669,33 @@ public abstract class AbstractTagTree extends JTree {
             ttm.updateOpenable(null); // todo: honfika: update only the changed swfs, but there was an exception when i tried it
             View.expandTreeNodes(this, expandedNodes);
         }
-    } 
-    
-    
-    public static List<Integer> getFrameNestedTagIds() {        
+    }
+
+    public static List<Integer> getFrameNestedTagIds() {
         return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
-                    RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
-                    StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                    SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID
+                RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
+                StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
+                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID
         );
     }
-    
+
     public TreeItem getCurrentTreeItem() {
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;
     }
-    
+
     public String getItemPathString(TreeItem item) {
         TreePath path = getFullModel().getTreePath(item);
         if (path == null) {
             return null;
         }
-        return pathToString(path);                
+        return pathToString(path);
     }
-    
+
     public final void calculateCollisions() {
         getFullModel().calculateCollisions();
     }
-    
+
     public String pathToString(TreePath path) {
         StringBuilder sb = new StringBuilder();
         AbstractTagTreeModel model = getFullModel();
@@ -716,12 +716,12 @@ public abstract class AbstractTagTree extends JTree {
         }
         return sb.toString();
     }
-    
+
     public String getSelectionPathString() {
         return pathToString(getSelectionPath());
     }
-    
-    public static TreeNodeType getTagNodeTypeFromTagClass(Class<?> cl) {                     
+
+    public static TreeNodeType getTagNodeTypeFromTagClass(Class<?> cl) {
         if ((cl == DefineFontTag.class)
                 || (cl == DefineFont2Tag.class)
                 || (cl == DefineFont3Tag.class)
@@ -763,7 +763,7 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.MOVIE;
         }
 
-        if ((cl == DefineSoundTag.class) || (cl ==  SoundStreamHeadTag.class) || (cl == SoundStreamHead2Tag.class)) {
+        if ((cl == DefineSoundTag.class) || (cl == SoundStreamHeadTag.class) || (cl == SoundStreamHead2Tag.class)) {
             return TreeNodeType.SOUND;
         }
 
@@ -775,16 +775,16 @@ public abstract class AbstractTagTree extends JTree {
             if (cl == DoInitActionTag.class) {
                 return TreeNodeType.AS_INIT;
             }
-            
+
             if (cl == DoActionTag.class) {
                 return TreeNodeType.AS_FRAME;
             }
-        }        
+        }
 
         if (cl == ShowFrameTag.class) {
             return TreeNodeType.SHOW_FRAME;
         }
-       
+
         if (cl == SetBackgroundColorTag.class) {
             return TreeNodeType.SET_BACKGROUNDCOLOR;
         }
@@ -800,22 +800,22 @@ public abstract class AbstractTagTree extends JTree {
         if (RemoveTag.class.isAssignableFrom(cl)) {
             return TreeNodeType.REMOVE_OBJECT;
         }
-        
+
         if (cl == EndTag.class) {
             return TreeNodeType.END;
         }
-        
+
         if (cl == DefineScalingGridTag.class) {
             return TreeNodeType.SCALING_GRID;
         }
-        
+
         if (Tag.class.isAssignableFrom(cl)) {
             return TreeNodeType.OTHER_TAG;
-        }                
-        
+        }
+
         return TreeNodeType.FOLDER;
     }
-    
+
     public static List<Integer> getMappedTagIdsForClass(Class<?> cls) {
         if (cls == DefineSpriteTag.class) {
             return Arrays.asList(DefineScalingGridTag.ID, DoInitActionTag.ID);
@@ -835,7 +835,4 @@ public abstract class AbstractTagTree extends JTree {
         return new ArrayList<>();
     }
 
-    
-    
-    
 }

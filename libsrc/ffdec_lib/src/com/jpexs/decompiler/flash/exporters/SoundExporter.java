@@ -58,7 +58,7 @@ public class SoundExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         if (tags.isEmpty()) {
             return ret;
         }
@@ -143,7 +143,7 @@ public class SoundExporter {
                 fos.write(data.getRangeData());
             }
         } else if ((nativeFormat == SoundExportFormat.FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
-            if ((st instanceof DefineSoundTag)||(st instanceof DefineExternalSound)||(st instanceof DefineExternalStreamSound)){
+            if ((st instanceof DefineSoundTag) || (st instanceof DefineExternalSound) || (st instanceof DefineExternalStreamSound)) {
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
                 List<ByteArrayRange> datas = st.getRawSoundData();

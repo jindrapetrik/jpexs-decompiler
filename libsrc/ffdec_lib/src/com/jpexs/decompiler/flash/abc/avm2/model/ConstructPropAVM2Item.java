@@ -35,7 +35,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
     public GraphTargetItem propertyName;
 
     public List<GraphTargetItem> args;
-    
+
     public GraphTargetItem type;
 
     public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args, GraphTargetItem type) {
@@ -73,7 +73,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
     }
 
     @Override
-    public GraphTargetItem returnType() {        
+    public GraphTargetItem returnType() {
         return type;
     }
 

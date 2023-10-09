@@ -44,7 +44,7 @@ public class BinaryDataExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         if (tags.isEmpty()) {
             return ret;
         }
@@ -84,7 +84,7 @@ public class BinaryDataExporter {
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }
-        
+
                 if (evl != null) {
                     evl.handleExportedEvent("binarydata", currentIndex, count, t.getName());
                 }

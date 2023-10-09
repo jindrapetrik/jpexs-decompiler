@@ -144,7 +144,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             return priority - o.priority;
         }
     }
-//(Map<Integer, TreeSet<LineMarker>>)
 
     private Map<Integer, SortedSet<LineMarker>> lineMarkers = Collections.synchronizedMap(new HashMap<Integer, SortedSet<LineMarker>>());
 
@@ -673,8 +672,6 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 selColor = new Color(cut(c.getRed() * 1.1), cut(c.getGreen() * 1.1), cut(c.getBlue() * 1.1));
             }
         }
-
-
 
         g.fillRect(0, 0, getWidth(), getHeight());
         FontMetrics fontMetrics = g.getFontMetrics();

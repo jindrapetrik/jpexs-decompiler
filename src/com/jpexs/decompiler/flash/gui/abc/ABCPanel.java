@@ -62,14 +62,6 @@ import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.IntTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.MultinameTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
@@ -133,7 +125,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -145,7 +136,6 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Highlighter;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.Token;
@@ -380,7 +370,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             for (int i = 0; i < igv.childs.size(); i++) {
                 if (!isTraits(igv.childs.get(i))) {
                     Long parentObjectId = varToObjectId(var);
-                    childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));//igv.parentId
+                    childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
                 } else {
                     curTrait = igv.childs.get(i);
                 }
@@ -435,8 +425,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     public static Long varToObjectId(Variable var) {
-        if (var != null && (var.vType == VariableType.OBJECT)) //|| var.vType == VariableType.MOVIECLIP)) {
-        {
+        if (var != null && (var.vType == VariableType.OBJECT)) {
             return (Long) var.value;
         } else {
             return 0L;
@@ -573,7 +562,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
          */
         private String flagsToString(int flags) {
 
-            Integer unknownFlags[] = new Integer[]{
+            Integer[] unknownFlags = new Integer[]{
                 2,
                 8,
                 16,
@@ -1054,16 +1043,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         editDecompiledButton.addActionListener(this::editDecompiledButtonActionPerformed);
         cancelDecompiledButton.addActionListener(this::cancelDecompiledButtonActionPerformed);
 
-        /*if (Configuration.editorMode.get()) {
-            editDecompiledButton.setVisible(false);
-            saveDecompiledButton.setEnabled(false);
-            cancelDecompiledButton.setEnabled(false);
-        } else 
-         */
-        {
-            saveDecompiledButton.setVisible(false);
-            cancelDecompiledButton.setVisible(false);
-        }
+        saveDecompiledButton.setVisible(false);
+        cancelDecompiledButton.setVisible(false);
+
         decButtonsPan.setAlignmentX(0);
 
         JPanel decPanel = new JPanel(new BorderLayout());
@@ -1395,7 +1377,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     /**
      * Hilights specific script.
      *
-     * @param openable
+     * @param openable Openable to hilight
      * @param name Full name of the script. It must be printable - deobfuscated,
      * not raw!
      */
@@ -1448,7 +1430,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         AbstractTagTree tree = mainPanel.getCurrentTree();
 
         String pkg = name.contains(".") ? name.substring(0, name.lastIndexOf(".")) : "";
-        String parts[] = name.split("\\.");
+        String[] parts = name.split("\\.");
 
         List<Object> rootNodes = new ArrayList<>();
         rootNodes.add(item);
@@ -1584,23 +1566,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.setText(lastDecompiled);
         }
 
-        /*if (Configuration.editorMode.get()) {
-            decompiledTextArea.setEditable(true);
-            editDecompiledButton.setVisible(false);
-            saveDecompiledButton.setVisible(true);
-            saveDecompiledButton.setEnabled(false);
-            cancelDecompiledButton.setVisible(true);
-            cancelDecompiledButton.setEnabled(false);
-            experimentalLabel.setVisible(false);
-        } else*/
-        {
-            decompiledTextArea.setEditable(val);
-            saveDecompiledButton.setVisible(val);
-            saveDecompiledButton.setEnabled(false);
-            editDecompiledButton.setVisible(!val);
-            experimentalLabel.setVisible(!val);
-            cancelDecompiledButton.setVisible(val);
-        }
+        decompiledTextArea.setEditable(val);
+        saveDecompiledButton.setVisible(val);
+        saveDecompiledButton.setEnabled(false);
+        editDecompiledButton.setVisible(!val);
+        experimentalLabel.setVisible(!val);
+        cancelDecompiledButton.setVisible(val);
 
         decompiledTextArea.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
@@ -1895,8 +1866,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (newTraitDialog == null) {
             newTraitDialog = new NewTraitDialog(Main.getDefaultDialogsOwner());
         }
-        int void_type = abc.constants.getPublicQnameId("void", true);//abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("void"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
-        int int_type = abc.constants.getPublicQnameId("int", true); //abc.constants.forceGetMultinameId(new Multiname(Multiname.QNAME, abc.constants.forceGetStringId("int"), abc.constants.forceGetNamespaceId(new Namespace(Namespace.KIND_PACKAGE, abc.constants.forceGetStringId("")), 0), -1, -1, new ArrayList<Integer>()));
+        int void_type = abc.constants.getPublicQnameId("void", true);
+        int int_type = abc.constants.getPublicQnameId("int", true);
 
         Trait t = null;
         int kind;
@@ -1994,7 +1965,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     decompiledTextArea.gotoTrait(traitId);
                     decompiledTextArea.removeScriptListener(this);
                 }
-            });            
+            });
             reload();
             abc.fireChanged();
         }

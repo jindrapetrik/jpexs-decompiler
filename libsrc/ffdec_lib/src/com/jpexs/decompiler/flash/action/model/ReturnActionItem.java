@@ -71,7 +71,8 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  List<GraphSourceItem> ret = new ArrayList<>();
+        String charset = asGenerator.getCharset();
+        List<GraphSourceItem> ret = new ArrayList<>();
         int forinlevel = asGenerator.getForInLevel(localData);
         for (int i = 0; i < forinlevel; i++) { //Must POP all remaining values from enumerations (for..in)
             List<Action> forinret = new ArrayList<>();

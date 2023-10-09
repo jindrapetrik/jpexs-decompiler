@@ -127,7 +127,7 @@ public class InstanceInfo {
 
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ".ttf\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft.getFontNameIntag()) + "\",").newLine();
-                        writer.appendNoHilight("fontFamily=\"" + Helper.escapeActionScriptString(ft.getFontName())+ "\",").newLine();                        
+                        writer.appendNoHilight("fontFamily=\"" + Helper.escapeActionScriptString(ft.getFontName()) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft.isBold() ? "bold" : "normal") + "\",").newLine();
                         writer.appendNoHilight("fontStyle=\"" + (ft.isItalic() ? "italic" : "normal") + "\",").newLine();
@@ -171,9 +171,9 @@ public class InstanceInfo {
                         writer.appendNoHilight("embedAsCFF=\"false\"").newLine();
                         writer.appendNoHilight(")]").newLine();
                     }
-                    
+
                     if (ct instanceof DefineFont4Tag) {
-                        DefineFont4Tag ft4 = (DefineFont4Tag)ct;
+                        DefineFont4Tag ft4 = (DefineFont4Tag) ct;
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + Helper.makeFileName(ct.getCharacterExportFileName()) + ".cff\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft4.fontName) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();

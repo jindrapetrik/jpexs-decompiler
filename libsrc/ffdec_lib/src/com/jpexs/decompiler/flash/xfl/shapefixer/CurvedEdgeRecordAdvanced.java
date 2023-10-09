@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
  * @author JPEXS
  */
 public class CurvedEdgeRecordAdvanced extends ShapeRecordAdvanced {
+
     public double controlDeltaX;
     public double controlDeltaY;
     public double anchorDeltaX;
@@ -37,7 +38,7 @@ public class CurvedEdgeRecordAdvanced extends ShapeRecordAdvanced {
         this.anchorDeltaX = anchorDeltaX;
         this.anchorDeltaY = anchorDeltaY;
     }
-    
+
     public CurvedEdgeRecordAdvanced(CurvedEdgeRecord cer) {
         this.controlDeltaX = cer.controlDeltaX;
         this.controlDeltaY = cer.controlDeltaY;
@@ -53,23 +54,23 @@ public class CurvedEdgeRecordAdvanced extends ShapeRecordAdvanced {
     @Override
     public double changeY(double y) {
         return y + controlDeltaY + anchorDeltaY;
-    }    
+    }
 
     @Override
     public CurvedEdgeRecord toBasicRecord() {
         CurvedEdgeRecord ret = new CurvedEdgeRecord();
-        ret.controlDeltaX = (int)Math.round(controlDeltaX);
-        ret.controlDeltaY = (int)Math.round(controlDeltaY);
-        ret.anchorDeltaX = (int)Math.round(anchorDeltaX);
-        ret.anchorDeltaY = (int)Math.round(anchorDeltaY);
+        ret.controlDeltaX = (int) Math.round(controlDeltaX);
+        ret.controlDeltaY = (int) Math.round(controlDeltaY);
+        ret.anchorDeltaX = (int) Math.round(anchorDeltaX);
+        ret.anchorDeltaY = (int) Math.round(anchorDeltaY);
         return ret;
     }
-    
+
     @Override
     public void round() {
         controlDeltaX = Math.round(controlDeltaX);
         controlDeltaY = Math.round(controlDeltaY);
         anchorDeltaX = Math.round(anchorDeltaX);
         anchorDeltaY = Math.round(anchorDeltaY);
-    }    
+    }
 }

@@ -68,7 +68,6 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         visitor.visit(expression);
     }
 
-
     public ForEachInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
 
@@ -89,8 +88,6 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
          }
 
 
-         */
- /*
          if (!commands.isEmpty()) {
          GraphTargetItem firstAssign = commands.get(0);
          if (firstAssign instanceof SetTypeAVM2Item) {

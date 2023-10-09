@@ -100,7 +100,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     private JButton resetButton;
 
     private JTabbedPane tabPane = new JTabbedPane();
-    
+
     private String hilightBackgroundColorHex;
     private String hilightForegroundColorHex;
 
@@ -112,11 +112,11 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         //configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
         pack();
-        
+
         Color c;
         c = UIManager.getColor("List.selectionBackground");
         hilightBackgroundColorHex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
-        
+
         c = UIManager.getColor("List.selectionForeground");
         hilightForegroundColorHex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
@@ -308,7 +308,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 }
 
                 initTabPane(val, selCategory);
-            }                          
+            }
         });
 
         JPanel searchPanel = new JPanel(new FlowLayout());
@@ -414,9 +414,9 @@ public class AdvancedSettingsDialog extends AppDialog {
                     if (!filter.trim().equals("")) {
                         locNameHtml = Pattern.compile(Pattern.quote(filter), Pattern.UNICODE_CASE + Pattern.CASE_INSENSITIVE).matcher(locNameHtml).replaceAll("{bold}$0{/bold}");
                     }
-                    locNameHtml = "<html>" + locNameHtml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")+ "</html>";
-                    locNameHtml = locNameHtml.replace("{bold}", "<span style=\"background-color:"+hilightBackgroundColorHex+"; color: " + hilightForegroundColorHex + "\">").replace("{/bold}", "</span>");
-                    
+                    locNameHtml = "<html>" + locNameHtml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + "</html>";
+                    locNameHtml = locNameHtml.replace("{bold}", "<span style=\"background-color:" + hilightBackgroundColorHex + "; color: " + hilightForegroundColorHex + "\">").replace("{/bold}", "</span>");
+
                     if (defaultValue != null) {
                         description += " (" + resourceBundle.getString("default") + ": " + defaultValue + ")";
                     }
@@ -427,7 +427,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     configPanel.add(l);
 
                     Component c = null;
-                    
+
                     if (allComponentsMap.containsKey(name)) {
                         c = allComponentsMap.get(name);
                     } else {
@@ -511,7 +511,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     6, 6);       //xPad, yPad
             if (resourceBundle.containsKey("config.group.tip." + cat)) {
                 String tip = resourceBundle.getString("config.group.tip." + cat);
-                String urls[] = new String[0];
+                String[] urls = new String[0];
                 if (resourceBundle.containsKey("config.group.link." + cat)) {
                     urls = resourceBundle.getString("config.group.link." + cat).split(" ");
                 }

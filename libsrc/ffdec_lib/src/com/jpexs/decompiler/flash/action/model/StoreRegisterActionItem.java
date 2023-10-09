@@ -33,7 +33,6 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  *
@@ -127,7 +126,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         return toSourceMerge(localData, generator, value, new ActionStoreRegister(register.number, charset));
     }
 
@@ -146,8 +145,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         dependencies.add(value);
         return value.isCompileTime(dependencies);
     }
-    */
-
+     */
     @Override
     public Object getResult() {
         return value.getResult();

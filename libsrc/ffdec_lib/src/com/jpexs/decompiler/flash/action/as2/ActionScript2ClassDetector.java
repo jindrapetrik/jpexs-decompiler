@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.as2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -56,7 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -718,11 +716,11 @@ public class ActionScript2ClassDetector {
             } else {
                 //throw new AssertException("No constructor found");
             }
-            
+
             String fullClassName = String.join(".", getMembersPath(classNameTargetPath));
             if (uninitializedClassTraits.containsKey(fullClassName)) {
                 int t = 0;
-                for (String traitName:uninitializedClassTraits.get(fullClassName).keySet()) {
+                for (String traitName : uninitializedClassTraits.get(fullClassName).keySet()) {
                     Trait trait = uninitializedClassTraits.get(fullClassName).get(traitName);
                     traitsStatic.add(t, trait.isStatic());
                     traits.add(t, new MyEntry<>(new DirectValueActionItem(trait.getName()), null));
@@ -741,8 +739,7 @@ public class ActionScript2ClassDetector {
                     commands.remove(commandsStartPos + 1);
                 }
             }
-            
-            
+
             // goto next line and check next classes
             return true;
         } catch (AssertException ex) {
@@ -909,7 +906,7 @@ public class ActionScript2ClassDetector {
                     return true;
                 }
             }
-        }//check_variant2
+        } //check_variant2
 
         return false;
     }

@@ -180,7 +180,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             case "Boolean":
                 r = EcmaScript.toBoolean(r);
                 break;
-            }
+        }
 
         GraphTargetItem it2 = valToItem(r);
         if (it2 == null) {
@@ -287,12 +287,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public boolean needsSemicolon() {
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getName();
-    }
+    }    
 
     public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "Boolean");
@@ -310,6 +305,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return toString(writer, localData, "Number");
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName();
+    }
+
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -323,6 +323,12 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "");
+    }
+
+    public String toString(LocalData localData) throws InterruptedException {
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+        toString(writer, localData);
+        return writer.toString();
     }
 
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
@@ -342,13 +348,12 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             if (localData.abc != null) { //its AS3
                 List<String> numberTypes = Arrays.asList("int", "uint", "Number");
                 String returnTypeStr = t.returnType().toString();
-                
+
                 //To avoid Error: Implicit coercion of a value of type XXX to an unrelated type YYY
-                if (!t.returnType().equals(TypeItem.UNBOUNDED) &&
-                        !implicitCoerce.equals(returnTypeStr) &&
-                        !(numberTypes.contains(implicitCoerce) && numberTypes.contains(returnTypeStr)) &&
-                        !(implicitCoerce.equals("Boolean") && !returnTypeStr.equals("Function"))
-                        ) {
+                if (!t.returnType().equals(TypeItem.UNBOUNDED)
+                        && !implicitCoerce.equals(returnTypeStr)
+                        && !(numberTypes.contains(implicitCoerce) && numberTypes.contains(returnTypeStr))
+                        && !(implicitCoerce.equals("Boolean") && !returnTypeStr.equals("Function"))) {
                     t = new ConvertAVM2Item(null, null, t, new TypeItem(implicitCoerce));
                 }
             }
@@ -360,19 +365,13 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     }
 
-    public String toString(LocalData localData) throws InterruptedException {
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        toString(writer, localData);
-        return writer.toString();
-    }
-
     public int getPrecedence() {
         return precedence;
     }
 
     public boolean isCompileTime() {
         Set<GraphTargetItem> dependencies = new HashSet<>();
-        if (!((this instanceof SimpleValue) && ((SimpleValue)this).isSimpleValue())) {
+        if (!((this instanceof SimpleValue) && ((SimpleValue) this).isSimpleValue())) {
             dependencies.add(this);
         }
         return isCompileTime(dependencies);

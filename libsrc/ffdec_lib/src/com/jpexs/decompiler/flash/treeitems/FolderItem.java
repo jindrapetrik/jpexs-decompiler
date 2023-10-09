@@ -62,7 +62,7 @@ public class FolderItem implements TreeItem {
         }
 
         for (TreeItem ti : subItems) {
-            if ((ti instanceof Tag) && (((Tag)ti).isReadOnly())) {
+            if ((ti instanceof Tag) && (((Tag) ti).isReadOnly())) {
                 continue;
             }
             if (ti.isModified()) {

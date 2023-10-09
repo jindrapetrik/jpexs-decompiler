@@ -60,8 +60,6 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         visitor.visit(frame);
     }
 
-
-
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("ifFrameLoaded");

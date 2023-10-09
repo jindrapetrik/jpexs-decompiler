@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionScriptFunction;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -40,9 +41,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import com.jpexs.decompiler.flash.action.as2.Trait;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -141,7 +141,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             paramStr.append("\"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\" ");
         }
 
-        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");// + "\r\n" +Action.actionsToString(getAddress() + getHeaderLength(),getItems(container) , knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
+        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
     }
 
     @Override

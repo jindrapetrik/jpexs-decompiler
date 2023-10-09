@@ -16,11 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.SWF;
-import static com.jpexs.decompiler.flash.action.Action.adr2ip;
+import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
@@ -104,8 +103,6 @@ public class ActionGraph extends Graph {
         return uninitializedClassTraits;
     }
 
-    
-    
     @Override
     public ActionGraphSource getGraphCode() {
         return (ActionGraphSource) code;
@@ -127,7 +124,7 @@ public class ActionGraph extends Graph {
                         outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
                         continue;
                     }
-                    outs.add(new ActionList(alist.subList(adr2ip(alist, endAddr), adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
+                    outs.add(new ActionList(alist.subList(Action.adr2ip(alist, endAddr), Action.adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
                     endAddr += size;
                 }
 
@@ -152,7 +149,7 @@ public class ActionGraph extends Graph {
     }
 
     public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        ActionGraph g = new ActionGraph(uninitializedClassTraits,path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
+        ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -407,12 +404,12 @@ public class ActionGraph extends Graph {
                                         if (checkedLoop == null) {
                                             checkedLoop = new Loop(localData.loops.size(), null, null);
                                             checkedBody.add(new BreakItem(null, null, checkedLoop.id));
-                                        }                                       
+                                        }
                                         list.remove(t - 1);
                                         t--;
                                         if (eti.object instanceof SetTypeActionItem) {
                                             list.add(t++, eti.object);
-                                            eti.object = ((SetTypeActionItem)eti.object).getObject();
+                                            eti.object = ((SetTypeActionItem) eti.object).getObject();
                                         }
                                         list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) neq.leftSide, eti.object, checkedBody));
                                         if (t + 1 < list.size()) {
@@ -436,8 +433,8 @@ public class ActionGraph extends Graph {
 
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         GraphTargetItem enumerate = null;
-        if(!commands.isEmpty() && (commands.get(commands.size()-1) instanceof EnumerateActionItem)) {
-            enumerate = commands.remove(commands.size() -1 );
+        if (!commands.isEmpty() && (commands.get(commands.size() - 1) instanceof EnumerateActionItem)) {
+            enumerate = commands.remove(commands.size() - 1);
         }
         super.makeAllCommands(commands, stack);
         //ags.getVariables()
@@ -484,7 +481,7 @@ public class ActionGraph extends Graph {
         List<GraphTargetItem> ret = super.translate(localData, staticOperation, path);
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
-            detector.checkClass(uninitializedClassTraits,ret, ((ActionGraphSource) code).getVariables(), path);
+            detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
         }
         makeDefineRegistersUp(ret);
         return ret;

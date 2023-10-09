@@ -46,18 +46,18 @@ public class NameValuePair extends AVM2Item {
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {        
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean needsParents = !((name.getNotCoerced() instanceof NumberValueAVM2Item) || (name.getNotCoerced() instanceof StringAVM2Item)); // special for obfuscated strings
         if (needsParents) {
             writer.append("(");
         }
-        if ((name instanceof ConvertAVM2Item) && ((ConvertAVM2Item)name).type.equals(TypeItem.STRING)) {
+        if ((name instanceof ConvertAVM2Item) && ((ConvertAVM2Item) name).type.equals(TypeItem.STRING)) {
             name = name.value;
         }
         name.toString(writer, localData);
         if (needsParents) {
             writer.append(")");
-        }        
+        }
         writer.append(":");
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"
             writer.append("(");

@@ -40,11 +40,11 @@ public class MethodNameMultinameUsage extends MethodMultinameUsage implements De
             TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
             if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
                 if (other.sameMultinameName(this)) {
-                    
-                    if(other instanceof MethodNameMultinameUsage){
-                        MethodNameMultinameUsage otherM = (MethodNameMultinameUsage)other;
+
+                    if (other instanceof MethodNameMultinameUsage) {
+                        MethodNameMultinameUsage otherM = (MethodNameMultinameUsage) other;
                         //getter/setter/method must match
-                        if(otherM.traits.traits.get(otherM.traitIndex).kindType != traits.traits.get(traitIndex).kindType){
+                        if (otherM.traits.traits.get(otherM.traitIndex).kindType != traits.traits.get(traitIndex).kindType) {
                             return false;
                         }
                     }

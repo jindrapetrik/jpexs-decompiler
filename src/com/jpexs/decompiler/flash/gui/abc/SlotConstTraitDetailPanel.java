@@ -113,7 +113,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
     @Override
     public boolean save() {
-        try {//(slotConstEditor.getText(), trait, abc)
+        try {
             if (!ASM3Parser.parseSlotConst(abc, new StringReader(slotConstEditor.getText()), abc.constants, trait)) {
                 return false;
             }

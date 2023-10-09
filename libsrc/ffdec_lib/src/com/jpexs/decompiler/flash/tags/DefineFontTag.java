@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -36,8 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -276,15 +273,13 @@ public class DefineFontTag extends FontTag {
         }
         return getCharset();
     }
-    
-    
-    
+
     @Override
     public synchronized boolean addCharacter(char character, Font font) {
         SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
         ensureFontInfo();
         int code = (int) Utf8Helper.charToCodePoint(character, getCodesCharset());
-        
+
         if (code == -1) { //Fixme - throw exception, etc.
             code = 0;
         }
@@ -310,7 +305,6 @@ public class DefineFontTag extends FontTag {
             pos = 0;
         }
 
-        
         //Check whether offset is not too large
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos2 = new SWFOutputStream(baos, getVersion(), getCharset());
@@ -326,7 +320,7 @@ public class DefineFontTag extends FontTag {
             }
             int offset = glyphShapeTable.size() * 2 + (int) sos2.getPos();
             if (offset > 0xffff) {
-                return false;                          
+                return false;
             }
             try {
                 sos2.writeSHAPE(shape, 1);
@@ -334,7 +328,7 @@ public class DefineFontTag extends FontTag {
                 //should not happen
             }
         }
-        
+
         if (!exists) {
             shiftGlyphIndices(fontId, pos, true);
             glyphShapeTable.add(pos, shp);
@@ -406,7 +400,7 @@ public class DefineFontTag extends FontTag {
         if (fontInfoTag != null) {
             List<Integer> codeTable = fontInfoTag.getCodeTable();
             StringBuilder ret = new StringBuilder(codeTable.size());
-            for (int i : codeTable) {               
+            for (int i : codeTable) {
                 ret.append(Utf8Helper.codePointToChar(i, getCodesCharset()));
             }
             return ret.toString();

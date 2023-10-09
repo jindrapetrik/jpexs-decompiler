@@ -78,7 +78,7 @@ public class ContourType implements Serializable {
     public ContourType() {
         edges = new EdgeType[0];
     }
-    
+
     public ContourType(GFxInputStream sis, long fontOffset) throws IOException {
         moveToX = sis.readSI15("moveToX");
         moveToY = sis.readSI15("moveToY");

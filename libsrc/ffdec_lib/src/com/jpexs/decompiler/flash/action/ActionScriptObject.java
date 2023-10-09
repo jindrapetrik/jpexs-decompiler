@@ -71,7 +71,7 @@ public class ActionScriptObject implements Cloneable {
     }
 
     public void removeMember(String path) {
-        String pathParts[];
+        String[] pathParts;
         if (path.startsWith("/")) {
             pathParts = path.substring(1).split("/");
         } else {
@@ -107,7 +107,7 @@ public class ActionScriptObject implements Cloneable {
     }
 
     public void setMember(String path, Object value) {
-        String pathParts[];
+        String[] pathParts;
         if (path.startsWith("/")) {
             pathParts = path.substring(1).split("/");
         } else {
@@ -162,7 +162,7 @@ public class ActionScriptObject implements Cloneable {
     }
 
     public Object getMember(String path) {
-        String pathParts[];
+        String[] pathParts;
         if (path.startsWith("/")) {
             pathParts = path.substring(1).split("/");
         } else {

@@ -51,19 +51,19 @@ public class PushScopeIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         GraphTargetItem top = stack.pop();
-        
+
         //Hack for catch inside catch to not detect pushscope register as used
         if (top instanceof LocalRegAVM2Item) {
-            LocalRegAVM2Item getLocal = (LocalRegAVM2Item)top;;
-            if(getLocal.getSrc() != null){
+            LocalRegAVM2Item getLocal = (LocalRegAVM2Item) top;;
+            if (getLocal.getSrc() != null) {
                 int getLocalIp = localData.code.adr2pos(getLocal.getSrc().getAddress());
-                for(int setLocalPos : localData.setLocalPosToGetLocalPos.keySet()){
-                    if (localData.setLocalPosToGetLocalPos.get(setLocalPos).contains(getLocalIp)){
+                for (int setLocalPos : localData.setLocalPosToGetLocalPos.keySet()) {
+                    if (localData.setLocalPosToGetLocalPos.get(setLocalPos).contains(getLocalIp)) {
                         localData.setLocalPosToGetLocalPos.get(setLocalPos).remove(getLocalIp);
                     }
                 }
             }
-            
+
         }
         localData.localScopeStack.push(top);
     }

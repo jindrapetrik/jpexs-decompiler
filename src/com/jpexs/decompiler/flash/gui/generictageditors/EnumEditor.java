@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.gui.ComboBoxItem;
-import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.Component;
@@ -28,8 +27,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import javax.swing.JComboBox;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 
 /**
  *
@@ -96,7 +93,7 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
                 if (item.getValue() == value) {
                     setSelectedItem(item);
                     break;
-                }                   
+                }
             }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
@@ -107,19 +104,19 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
     public boolean save() {
         try {
             Integer oldValue = (Integer) ReflectionTools.getValue(obj, field, index);
-            Integer newValue = (Integer)getChangedValue();
+            Integer newValue = (Integer) getChangedValue();
             if (newValue == null) {
                 return false;
             }
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
-            ReflectionTools.setValue(obj, field, index, newValue);            
+            ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
         return true;
-    }      
+    }
 
     @Override
     public void addChangeListener(final ChangeListener l) {

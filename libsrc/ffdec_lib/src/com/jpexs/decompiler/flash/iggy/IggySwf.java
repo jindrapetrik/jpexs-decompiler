@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class IggySwf implements StructureInterface {
 
-    final static int NO_OFFSET = 1;
+    static final int NO_OFFSET = 1;
 
     @IggyFieldType(value = DataType.wchar_t, count = 48)
     String name;
@@ -40,7 +40,7 @@ public class IggySwf implements StructureInterface {
     private List<IggyFont> fonts = new ArrayList<>();
     // private List<Long> font_data_addresses = new ArrayList<>();
     private List<IggyFont> add_fonts = new ArrayList<>();
-//    private List<Long> add_font_data_addresses = new ArrayList<>();
+    // private List<Long> add_font_data_addresses = new ArrayList<>();
 
     private IggyFlashHeader64 hdr;
 
@@ -55,13 +55,13 @@ public class IggySwf implements StructureInterface {
 
     //private byte font_add_data[];
     //private List<Long> font_additional_size = new ArrayList<>();
-    private IggyFontBinInfo font_bin_info[];
+    private IggyFontBinInfo[] font_bin_info;
     private List<String> sequenceNames = new ArrayList<>();
     //private List<Long> sequenceValues = new ArrayList<>();
 
-    private IggyFontTypeInfo type_info[];
+    private IggyFontTypeInfo[] type_info;
 
-    private String type_info_name[];
+    private String[] type_info_name;
 
     private IggyDeclStrings decl_strings;
 
@@ -176,8 +176,8 @@ public class IggySwf implements StructureInterface {
 
         sequenceNames = new ArrayList<>();
 
-        long seq_addresses[] = new long[]{hdr.getSequenceStartAddress1(), hdr.getSequenceStartAddress2(), hdr.getSequenceStartAddress3()};
-        long seq_name_addresses[] = new long[3];
+        long[] seq_addresses = new long[]{hdr.getSequenceStartAddress1(), hdr.getSequenceStartAddress2(), hdr.getSequenceStartAddress3()};
+        long[] seq_name_addresses = new long[3];
         for (int i = 0; i < 3; i++) {
             if (seq_addresses[i] == 0) {
                 seq_name_addresses[i] = 0;
@@ -299,10 +299,10 @@ public class IggySwf implements StructureInterface {
             font_bin_info[i].writeToDataStream(s);
         }
 
-        long seq_ofs_pos[] = new long[]{hdr.getSequence_start1_ofs_pos(), hdr.getSequence_start2_ofs_pos(), hdr.getSequence_start3_ofs_pos()};
-        long off_seq_expected[] = new long[]{hdr.off_sequence_start1, hdr.off_sequence_start2, hdr.off_sequence_start3};
+        long[] seq_ofs_pos = new long[]{hdr.getSequence_start1_ofs_pos(), hdr.getSequence_start2_ofs_pos(), hdr.getSequence_start3_ofs_pos()};
+        long[] off_seq_expected = new long[]{hdr.off_sequence_start1, hdr.off_sequence_start2, hdr.off_sequence_start3};
 
-        long seq_name_fill_later[] = new long[3];
+        long[] seq_name_fill_later = new long[3];
 
         s.setOlderOffsetToThisPos(seq_ofs_pos[0]);
         s.writeUI64(1);

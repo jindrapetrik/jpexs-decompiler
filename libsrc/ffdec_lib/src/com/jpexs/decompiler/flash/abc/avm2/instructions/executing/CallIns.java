@@ -85,8 +85,7 @@ public class CallIns extends InstructionDefinition {
                 if (getProperty.object.value == receiver) {
                     getProperty.object = receiver;
                 }
-            }
-            else if (getProperty.object instanceof SetLocalAVM2Item) {
+            } else if (getProperty.object instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;
                 if (receiver instanceof LocalRegAVM2Item) {
                     LocalRegAVM2Item getLocal = (LocalRegAVM2Item) receiver;

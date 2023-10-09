@@ -410,6 +410,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                         lineStyleEnd = _lineStylesEnd.get(lineStyleIdx - 1);
                     } catch (Exception ex) {
+                        //ignored
                     }
                     if (lineStyle != null) {
                         String scaleMode = "NORMAL";

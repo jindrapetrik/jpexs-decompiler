@@ -16,10 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-/**
- *
- * @author JPEXS
- */
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -29,9 +25,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 /**
- * FlowLayout subclass that fully supports wrapping of components.
- *
- * Taken from: http://tips4java.wordpress.com/2008/11/06/wrap-layout/
+ * FlowLayout subclass that fully supports wrapping of components. Taken from:
+ * http://tips4java.wordpress.com/2008/11/06/wrap-layout/
  */
 public class WrapLayout extends FlowLayout {
 
@@ -60,8 +55,8 @@ public class WrapLayout extends FlowLayout {
     /**
      * Creates a new flow layout manager with the indicated alignment and the
      * indicated horizontal and vertical gaps.
-     * <p>
-     * The value of the alignment argument must be one of
+     *
+     * <p>The value of the alignment argument must be one of
      * <code>WrapLayout</code>, <code>WrapLayout</code>, or
      * <code>WrapLayout</code>.
      *
@@ -162,7 +157,7 @@ public class WrapLayout extends FlowLayout {
             dim.width += horizontalInsetsAndGap;
             dim.height += insets.top + insets.bottom + vgap * 2;
 
-            //	When using a scroll pane or the DecoratedLookAndFeel we need to
+            //  When using a scroll pane or the DecoratedLookAndFeel we need to
             //  make sure the preferred size is less than the size of the
             //  target containter so shrinking the container size works
             //  correctly. Removing the horizontal gap is an easy way to do this.

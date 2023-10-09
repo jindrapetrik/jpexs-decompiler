@@ -79,7 +79,7 @@ public class PipeInputStream extends InputStream {
         return d[0];
     }
 
-    private int readPipe(byte res[]) throws IOException {
+    private int readPipe(byte[] res) throws IOException {
         final IntByReference ibr = new IntByReference();
         int read = 0;
         while (read < res.length) {

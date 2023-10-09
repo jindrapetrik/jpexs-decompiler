@@ -50,7 +50,7 @@ public class ClipboardPanel extends JPanel {
     private JLabel label;
 
     private MainPanel mainPanel;
-    
+
     private Timer timer = null;
 
     public ClipboardPanel(MainPanel mainPanel) {
@@ -117,7 +117,7 @@ public class ClipboardPanel extends JPanel {
             g2d.setColor(painter.getTopBorderColor(scheme));
             g2d.drawLine(x + width - 1, y, x + width - 1, y + height);
         }
-                
+
     }
 
     public void update() {
@@ -129,15 +129,15 @@ public class ClipboardPanel extends JPanel {
         }
         setVisible(clipboardSize > 0);
     }
-    
+
     public void flash() {
         if (timer != null) {
-            timer.cancel();            
+            timer.cancel();
         }
         label.setFont(label.getFont().deriveFont(Font.BOLD));
         repaint();
-        
-        timer = new Timer();        
+
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

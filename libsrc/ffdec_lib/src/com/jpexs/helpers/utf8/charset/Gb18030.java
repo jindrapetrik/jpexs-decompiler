@@ -20,8 +20,6 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import static com.jpexs.helpers.utf8.charset.AbstractCharsetConverter.readOneDimensionalInt;
-import static com.jpexs.helpers.utf8.charset.AbstractCharsetConverter.readTwoDimensionalInt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -72,7 +70,8 @@ public class Gb18030 extends AbstractCharsetConverter {
     }
 
     public static int gb18030_index_to_cp_len4(int byte1, int byte2, int byte3, int byte4) {
-        int pos_1, pos_2;
+        int pos_1;
+        int pos_2;
         byte1 -= 0x81;
         byte2 -= 0x30;
         byte3 -= 0x81;

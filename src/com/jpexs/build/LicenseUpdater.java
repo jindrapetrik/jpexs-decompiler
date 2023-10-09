@@ -140,11 +140,13 @@ public class LicenseUpdater {
                     }
                     pw.close();
                 } catch (IOException ex) {
+                    //ignore
                 }
 
                 try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                     fos.write(baos.toByteArray());
                 } catch (IOException ex) {
+                    //ignore
                 }
             }
         }

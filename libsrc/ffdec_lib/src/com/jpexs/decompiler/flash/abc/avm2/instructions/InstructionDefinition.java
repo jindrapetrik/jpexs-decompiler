@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import static com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns.handleCompound;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
@@ -401,7 +401,7 @@ public abstract class InstructionDefinition implements Serializable {
 
         return null;
     }
-    
+
     public void handleSetProperty(boolean init, AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
@@ -638,18 +638,17 @@ public abstract class InstructionDefinition implements Serializable {
         Reference<GraphTargetItem> type = new Reference<>(null);
         Reference<GraphTargetItem> callType = new Reference<>(null);
         GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        
-        
+
         SetTypeAVM2Item result;
         if (init) {
             result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
         } else {
             result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
         }
-        handleCompound(localData, obj, multiname, value, output, result);
-        SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem)result, -1, type.getVal());    
+        SetPropertyIns.handleCompound(localData, obj, multiname, value, output, result);
+        SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem) result, -1, type.getVal());
     }
-    
+
     private GraphTargetItem checkIncDec(boolean standalone, int multinameIndex, AVM2Instruction ins, AVM2LocalData localData, GraphTargetItem item,
             LocalRegAVM2Item valueLocalReg, LocalRegAVM2Item nameLocalReg, LocalRegAVM2Item objLocalReg) {
         if (item instanceof SetLocalAVM2Item) {

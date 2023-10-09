@@ -57,7 +57,7 @@ public class GetSlotIns extends InstructionDefinition {
         if (obj instanceof NewActivationAVM2Item) {
             for (Trait t : localData.methodBody.traits.traits) {
                 if (t instanceof TraitSlotConst) {
-                    TraitSlotConst tsc = (TraitSlotConst)t;
+                    TraitSlotConst tsc = (TraitSlotConst) t;
                     if (tsc.slot_id == slotIndex) {
                         slotType = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
                         break;

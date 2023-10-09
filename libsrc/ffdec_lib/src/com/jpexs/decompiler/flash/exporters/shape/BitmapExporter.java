@@ -75,7 +75,7 @@ public class BitmapExporter extends ShapeExporterBase {
     private final SWF swf;
 
     private final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
-    
+
     private Shape aliasedShape;
 
     private Paint fillPaint;
@@ -107,7 +107,7 @@ public class BitmapExporter extends ShapeExporterBase {
     private static boolean linearGradientColorWarnignShown = false;
 
     private boolean scaleStrokes;
-    
+
     private boolean aliasedFill = false;
 
     @Override
@@ -382,7 +382,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     bufImg = new ImageTagBufferedImage(imageTag, bufImg);
                 }
                 fillPaint = new TexturePaint(bufImg, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
-               
+
                 fillTransform = matrix.toTransform();
                 fillRepeat = repeat;
                 fillSmooth = smooth;
@@ -456,14 +456,14 @@ public class BitmapExporter extends ShapeExporterBase {
             /*if (Configuration.allowMiterClipLinestyle.get()) {
                 lineStroke = new MiterClipBasicStroke((BasicStroke) lineStroke);
             }*/
-            lineStroke = new ExtendedBasicStroke((float)thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
+            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
 
         // Do not scale strokes automatically:
         try {
-            AffineTransform t = (AffineTransform) strokeTransformation.toTransform().clone();//(AffineTransform) graphics.getTransform().clone();
+            AffineTransform t = (AffineTransform) strokeTransformation.toTransform().clone();
             lineStroke = new TransformedStroke(lineStroke, t);
         } catch (NoninvertibleTransformException net) {
             // ignore
@@ -610,10 +610,10 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     protected void finalizePath() {
-        if (fillPaint != null) {           
+        if (fillPaint != null) {
             Shape shp = path;
             if (aliasedFill) {
-                aliasedShape = new BasicStroke((float)(SWF.unitDivisor / unzoom / 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
+                aliasedShape = new BasicStroke((float) (SWF.unitDivisor / unzoom / 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
                 return;
             } else if (aliasedShape != null) {
                 Area a = new Area(shp);
@@ -663,22 +663,22 @@ public class BitmapExporter extends ShapeExporterBase {
                 graphics.clip(shp);
                 Matrix inverse = null;
                 //if (fillRepeat) {
-                    try {
-                        double scx = fillTransform.getScaleX();
-                        double scy = fillTransform.getScaleY();
-                        double shx = fillTransform.getShearX();
-                        double shy = fillTransform.getShearY();
-                        double det = scx * scy - shx * shy;
-                        if (Math.abs(det) <= Double.MIN_VALUE) {
-                            // use only the translate values
-                            // todo: make it better
-                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
-                        }
-
-                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
-                    } catch (NoninvertibleTransformException ex) {
-                        // it should never happen as we already checked the determinant of the matrix
+                try {
+                    double scx = fillTransform.getScaleX();
+                    double scy = fillTransform.getScaleY();
+                    double shx = fillTransform.getShearX();
+                    double shy = fillTransform.getShearY();
+                    double det = scx * scy - shx * shy;
+                    if (Math.abs(det) <= Double.MIN_VALUE) {
+                        // use only the translate values
+                        // todo: make it better
+                        fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
                     }
+
+                    inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                } catch (NoninvertibleTransformException ex) {
+                    // it should never happen as we already checked the determinant of the matrix
+                }
                 //}
                 fillTransform.preConcatenate(oldAf);
                 graphics.setTransform(fillTransform);
@@ -698,53 +698,53 @@ public class BitmapExporter extends ShapeExporterBase {
                         double minY = rect.yMin;
                         graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
-                } else {            
+                } else {
                     if (inverse != null) {
                         ExportRectangle rect = inverse.transform(new ExportRectangle(shp.getBounds2D()));
                         //left
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                (int)rect.xMin, 0, 0, ((TexturePaint) fillPaint).getImage().getHeight(),
-                                0,0,1,((TexturePaint) fillPaint).getImage().getHeight(),
-                               null);
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                (int) rect.xMin, 0, 0, ((TexturePaint) fillPaint).getImage().getHeight(),
+                                0, 0, 1, ((TexturePaint) fillPaint).getImage().getHeight(),
+                                null);
                         //top left
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                (int)rect.xMin, (int)rect.yMin, 0, 0,
-                                0,0,1, 1,
-                               null);                        
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                (int) rect.xMin, (int) rect.yMin, 0, 0,
+                                0, 0, 1, 1,
+                                null);
                         //top
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                0, (int)rect.yMin, ((TexturePaint) fillPaint).getImage().getWidth(), 0,
-                                0,0,((TexturePaint) fillPaint).getImage().getWidth(),1,
-                               null);
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                0, (int) rect.yMin, ((TexturePaint) fillPaint).getImage().getWidth(), 0,
+                                0, 0, ((TexturePaint) fillPaint).getImage().getWidth(), 1,
+                                null);
                         //top right
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                ((TexturePaint) fillPaint).getImage().getWidth(), (int)rect.yMin, (int)rect.xMax, 0,
-                                ((TexturePaint) fillPaint).getImage().getWidth() - 1,0,((TexturePaint) fillPaint).getImage().getWidth(), 1,
-                               null);                                               
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                ((TexturePaint) fillPaint).getImage().getWidth(), (int) rect.yMin, (int) rect.xMax, 0,
+                                ((TexturePaint) fillPaint).getImage().getWidth() - 1, 0, ((TexturePaint) fillPaint).getImage().getWidth(), 1,
+                                null);
                         //right
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                ((TexturePaint) fillPaint).getImage().getWidth(), 0, (int)rect.xMax, ((TexturePaint) fillPaint).getImage().getHeight(),
-                                ((TexturePaint) fillPaint).getImage().getWidth() - 1,0,((TexturePaint) fillPaint).getImage().getWidth(),
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                ((TexturePaint) fillPaint).getImage().getWidth(), 0, (int) rect.xMax, ((TexturePaint) fillPaint).getImage().getHeight(),
+                                ((TexturePaint) fillPaint).getImage().getWidth() - 1, 0, ((TexturePaint) fillPaint).getImage().getWidth(),
                                 ((TexturePaint) fillPaint).getImage().getHeight(),
-                               null);
+                                null);
                         //bottom right
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                ((TexturePaint) fillPaint).getImage().getWidth(),((TexturePaint) fillPaint).getImage().getHeight(), (int)rect.xMax, (int)rect.yMax,
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                ((TexturePaint) fillPaint).getImage().getWidth(), ((TexturePaint) fillPaint).getImage().getHeight(), (int) rect.xMax, (int) rect.yMax,
                                 ((TexturePaint) fillPaint).getImage().getWidth() - 1, ((TexturePaint) fillPaint).getImage().getHeight() - 1,
                                 ((TexturePaint) fillPaint).getImage().getWidth(), ((TexturePaint) fillPaint).getImage().getHeight(),
-                               null);                                               
+                                null);
                         //bottom
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                0, ((TexturePaint) fillPaint).getImage().getHeight(), ((TexturePaint) fillPaint).getImage().getWidth(), (int)rect.yMax,
-                                0,((TexturePaint) fillPaint).getImage().getHeight() - 1,((TexturePaint) fillPaint).getImage().getWidth(),((TexturePaint) fillPaint).getImage().getHeight(),
-                               null);
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                0, ((TexturePaint) fillPaint).getImage().getHeight(), ((TexturePaint) fillPaint).getImage().getWidth(), (int) rect.yMax,
+                                0, ((TexturePaint) fillPaint).getImage().getHeight() - 1, ((TexturePaint) fillPaint).getImage().getWidth(), ((TexturePaint) fillPaint).getImage().getHeight(),
+                                null);
                         //bottom left
-                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
-                                (int)rect.xMin,((TexturePaint) fillPaint).getImage().getHeight(), 0, (int)rect.yMax,
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(),
+                                (int) rect.xMin, ((TexturePaint) fillPaint).getImage().getHeight(), 0, (int) rect.yMax,
                                 0, ((TexturePaint) fillPaint).getImage().getHeight() - 1,
                                 1, ((TexturePaint) fillPaint).getImage().getHeight(),
-                               null);                                               
-                        
+                                null);
+
                         //actual central image
                         graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
                     }
@@ -759,7 +759,7 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
         if (linePaint != null && lineStroke != null) {
-            if(true) {
+            if (true) {
                 //return;
             }
             Shape strokedShape = lineStroke.createStrokedShape(path);

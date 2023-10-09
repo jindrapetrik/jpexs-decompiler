@@ -36,11 +36,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
 
     public CoerceAIns() {
         super(0x82, "coerce_a", new int[]{}, true);
-    }
-
-    public String getTargetType() {
-        return "*";
-    }
+    }    
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
@@ -62,6 +58,10 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
+    }
+
+    public String getTargetType() {
+        return "*";
     }
 
     @Override

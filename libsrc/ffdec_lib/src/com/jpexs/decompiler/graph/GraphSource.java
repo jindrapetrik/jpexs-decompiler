@@ -93,7 +93,7 @@ public abstract class GraphSource implements Serializable {
                 break;
             }
             ip++;
-        };
+        }
     }
 
     public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) throws InterruptedException {
@@ -113,9 +113,7 @@ public abstract class GraphSource implements Serializable {
 
     public abstract int adr2pos(long adr);
 
-    public abstract int adr2pos(long adr, boolean nearest);
-
-    public abstract long pos2adr(int pos);
+    public abstract int adr2pos(long adr, boolean nearest);   
 
     public long getAddressAfterCode() {
         if (isEmpty()) {
@@ -124,6 +122,8 @@ public abstract class GraphSource implements Serializable {
         long lastAddr = pos2adr(size() - 1);
         return lastAddr + get(size() - 1).getBytesLength();
     }
+    
+    public abstract long pos2adr(int pos);
 
     public final long pos2adr(int pos, boolean allowPosAfterCode) {
         if (pos == size() && allowPosAfterCode) {
@@ -131,5 +131,4 @@ public abstract class GraphSource implements Serializable {
         }
         return pos2adr(pos);
     }
-;
 }

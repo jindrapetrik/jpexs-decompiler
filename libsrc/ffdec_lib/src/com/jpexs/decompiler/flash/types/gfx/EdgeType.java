@@ -71,9 +71,9 @@ public class EdgeType implements Serializable {
     private static final int Edge_Quad = 3;
 
     public int[] data;
-    
+
     public EdgeType() {
-        data = new int[] {Edge_Line, 0, 0};
+        data = new int[]{Edge_Line, 0, 0};
     }
 
     public EdgeType(boolean vertical, int v) {
@@ -164,7 +164,15 @@ public class EdgeType implements Serializable {
 
     private int[] readEdge(GFxInputStream sis) throws IOException {
         byte firstByte = (byte) sis.readUI8("firstByte");
-        byte raw1, raw2, raw3, raw4, raw5, raw6, raw7, raw8, raw9;
+        byte raw1;
+        byte raw2;
+        byte raw3;
+        byte raw4;
+        byte raw5;
+        byte raw6;
+        byte raw7;
+        byte raw8;
+        byte raw9;
         raw1 = (byte) sis.readUI8("byte1");
         int[] data = new int[5];
 

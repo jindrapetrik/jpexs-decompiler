@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
@@ -33,12 +32,12 @@ import java.util.Objects;
 public class GetLexAVM2Item extends AVM2Item {
 
     public Multiname propertyName;
-    
+
     public GraphTargetItem type;
-    
+
     public GraphTargetItem callType;
-    
-    public boolean isStatic;        
+
+    public boolean isStatic;
 
     private final DottedChain fullPropertyName;
 
@@ -70,7 +69,7 @@ public class GetLexAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
-    } 
+    }
 
     @Override
     public int hashCode() {

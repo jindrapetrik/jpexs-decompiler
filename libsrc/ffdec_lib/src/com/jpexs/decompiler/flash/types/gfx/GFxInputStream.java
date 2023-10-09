@@ -73,11 +73,7 @@ public class GFxInputStream {
 
     public long getPos() {
         return is.getPos();
-    }
-
-    private int read() throws IOException {
-        return is.read();
-    }
+    }    
 
     public int readUI8(String name) throws IOException {
         newDumpLevel(name, "UI8");
@@ -226,8 +222,12 @@ public class GFxInputStream {
         endDumpLevel();
         return ret;
     }
+    
+    private int read() throws IOException {
+        return is.read();
+    }
 
-    void read(byte[] bytes) throws IOException {
+    public void read(byte[] bytes) throws IOException {
         is.read(bytes);
     }
 

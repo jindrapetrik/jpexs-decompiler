@@ -33,7 +33,7 @@ import java.util.Set;
 public class ActionLocalData extends BaseLocalData {
 
     public final Map<String, Map<String, Trait>> uninitializedClassTraits;
-    
+
     public final HashMap<Integer, String> regNames;
 
     public final HashMap<String, GraphTargetItem> variables;
@@ -49,7 +49,7 @@ public class ActionLocalData extends BaseLocalData {
         regNames = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
-        this.insideDoInitAction = insideDoInitAction;  
+        this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
     }
 
@@ -58,7 +58,7 @@ public class ActionLocalData extends BaseLocalData {
         this.secondPassData = secondPassData;
         variables = new HashMap<>();
         functions = new HashMap<>();
-        this.insideDoInitAction = insideDoInitAction;        
+        this.insideDoInitAction = insideDoInitAction;
         this.uninitializedClassTraits = uninitializedClassTraits;
     }
 

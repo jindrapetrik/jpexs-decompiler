@@ -38,7 +38,7 @@ public class PathExporter extends ShapeExporterBase {
     private final List<GeneralPath> strokes = new ArrayList<>();
 
     private double thickness = 0;
-    
+
     private boolean aliasedFill = false;
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);

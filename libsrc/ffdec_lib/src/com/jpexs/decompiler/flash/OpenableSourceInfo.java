@@ -37,9 +37,9 @@ public class OpenableSourceInfo {
     private String fileTitle;
 
     private final boolean detectBundle;
-    
+
     private boolean empty = false;
-    
+
     private OpenableSourceKind kind;
 
     public OpenableSourceInfo(String fileTitle) {
@@ -49,11 +49,12 @@ public class OpenableSourceInfo {
 
     public boolean isEmpty() {
         return empty;
-    }        
-    
+    }
+
     public OpenableSourceInfo(InputStream inputStream, String file, String fileTitle) {
         this(inputStream, file, fileTitle, true);
     }
+
     public OpenableSourceInfo(InputStream inputStream, String file, String fileTitle, boolean detectBundle) {
         this.inputStream = inputStream;
         this.file = file;
@@ -64,7 +65,7 @@ public class OpenableSourceInfo {
 
     public OpenableSourceKind getKind() {
         return kind;
-    }            
+    }
 
     private void detectKind() {
         if (isBundle()) {
@@ -75,7 +76,7 @@ public class OpenableSourceInfo {
             kind = OpenableSourceKind.SWF;
         }
     }
-    
+
     public InputStream getInputStream() {
         return inputStream;
     }
@@ -89,7 +90,7 @@ public class OpenableSourceInfo {
         detectKind();
         empty = false;
     }
-    
+
     public void setFileTitle(String fileTitle) {
         this.fileTitle = fileTitle;
     }
@@ -110,7 +111,7 @@ public class OpenableSourceInfo {
         return file;
     }
 
-    public boolean isBundle() {        
+    public boolean isBundle() {
         if (inputStream == null && file != null) {
             File fileObj = new File(file);
             String fileName = fileObj.getName();

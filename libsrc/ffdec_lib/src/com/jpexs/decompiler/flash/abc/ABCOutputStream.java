@@ -47,14 +47,14 @@ public class ABCOutputStream extends OutputStream {
 
     public long getPosition() {
         return position;
-    }   
-    
+    }
+
     @Override
     public void write(int b) throws IOException {
         os.write(b);
         position++;
     }
-    
+
     @Override
     public void write(byte[] data) throws IOException {
         super.write(data);
@@ -66,7 +66,7 @@ public class ABCOutputStream extends OutputStream {
         super.write(b, off, len);
         position += len;
     }
-        
+
     public void writeU30(long value) throws IOException {
         writeS32(value);
         /*boolean loop = true;

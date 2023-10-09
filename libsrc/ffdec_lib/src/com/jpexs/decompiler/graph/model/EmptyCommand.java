@@ -40,5 +40,5 @@ public class EmptyCommand extends GraphTargetItem {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
-    
+
 }

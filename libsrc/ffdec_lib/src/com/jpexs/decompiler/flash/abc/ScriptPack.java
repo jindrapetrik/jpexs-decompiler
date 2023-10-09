@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
-import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -116,7 +115,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         this.path = path;
         this.allABCs = allAbcs;
     }
-        
+
     public DottedChain getPathPackage() {
         DottedChain packageName = DottedChain.TOPLEVEL;
         for (int t : traitIndices) {
@@ -182,15 +181,14 @@ public class ScriptPack extends AS3ClassTreeItem {
             }*/
             writer.mark();
             List<MethodBody> callStack = new ArrayList<>();
-            callStack.add(abc.bodies.get(sinit_bodyIndex));            
-            abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>());
-            scriptInitializerIsEmpty = !writer.getMark();            
-            
+            callStack.add(abc.bodies.get(sinit_bodyIndex));
+            abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path + "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>());
+            scriptInitializerIsEmpty = !writer.getMark();
+
         }
         ScopeStack scopeStack = new ScopeStack();
         scopeStack.push(new GlobalAVM2Item(null, null));
-            
-        
+
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
@@ -208,8 +206,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
         int bodyIndex = abc.findBodyIndex(script_init);
-        
-        
+
         if (!isSimple && traitIndices.isEmpty()) {
             for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
                 String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
@@ -217,7 +214,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             writer.newLine();
         }
-        
+
         if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             //TODO: handle this better in GUI(?)
@@ -227,8 +224,8 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (!scriptInitializerIsEmpty) {
                     writer.startBlock();
                     List<MethodBody> callStack = new ArrayList<>();
-                    callStack.add(abc.bodies.get(bodyIndex)); 
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path +/*packageName +*/ "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
+                    callStack.add(abc.bodies.get(bodyIndex));
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
                     writer.endBlock();
                 } else {
                     writer.append("");
@@ -239,7 +236,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             if (!scriptInitializerIsEmpty) {
                 writer.newLine();
                 first = false;
-            }            
+            }
         }
 
         for (int t : traitIndices) {
@@ -250,7 +247,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             Trait trait = traits.get(t);
 
             //if (!(trait instanceof TraitClass)) {
-                writer.startTrait(t);
+            writer.startTrait(t);
             //}
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
@@ -259,8 +256,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             } else {
                 trait.toString(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
-            if (!(trait instanceof TraitClass)) 
-            {
+            if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
             }
             first = false;
@@ -367,7 +363,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         return abc.script_info.get(scriptIndex).isModified();
     }
-    
+
     public void clearModified() {
         if (scriptIndex >= abc.script_info.size()) {
             return;
@@ -376,8 +372,9 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     /**
-     * Injects debugfile, debugline instructions into the code
+     * Injects debugfile, debugline instructions into the code.
      *
+     * <p>
      * Based on idea of Jacob Thompson
      * http://securityevaluators.com/knowledge/flash/
      */
@@ -396,7 +393,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
             for (int i = 0; i < txt.length(); i++) {
                 blk:
-                {
+                while (true) {
                     Highlighting sh = Highlighting.searchPos(decompiled.getSpecialHighlights(), i);
 
                     Highlighting cls = Highlighting.searchPos(decompiled.getClassHighlights(), i);
@@ -479,6 +476,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                             bodyToRegToLine.get(bodyIndex).put(regIndex, line);
                         }
                     }
+                    break;
                 }
                 if (txt.charAt(i) == '\n') {
                     line++;
@@ -589,7 +587,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
             for (int i = 0; i < txt.length(); i++) {
                 blk:
-                {
+                while (true) {
                     Highlighting sh = Highlighting.searchPos(decompiled.getSpecialHighlights(), i);
 
                     Highlighting cls = Highlighting.searchPos(decompiled.getClassHighlights(), i);
@@ -618,6 +616,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
                     }
                     bodyToIdentifier.put(bodyIndex, "abc:" + abcIndex + ",script:" + scriptIndex + ",class:" + classIndex + ",trait:" + traitIndex + ",method:" + methodIndex + ",body:" + bodyIndex);
+                    break;
                 }
             }
         } catch (InterruptedException ex) {

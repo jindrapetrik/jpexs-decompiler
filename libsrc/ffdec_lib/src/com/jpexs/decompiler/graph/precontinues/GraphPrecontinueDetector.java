@@ -205,29 +205,7 @@ public class GraphPrecontinueDetector {
         for (Node n : node.next) {
             populateNodes(n, populated);
         }
-    }
-
-    private boolean checkIfs(List<Node> headNodes) {
-        Set<Node> visited = new HashSet<>();
-        Reference<Integer> numChanged = new Reference<>(0);
-        for (int h = 0; h < headNodes.size(); h++) {
-            Node newHeadNode;
-            newHeadNode = checkIfs(headNodes.get(h), visited, numChanged);
-            headNodes.set(h, newHeadNode);
-        }
-        return numChanged.getVal() > 0;
-    }
-
-    private boolean joinNodes(List<Node> headNodes) {
-        Set<Node> visited = new HashSet<>();
-        Reference<Integer> numChanged = new Reference<>(0);
-        for (int h = 0; h < headNodes.size(); h++) {
-            Node newHeadNode;
-            newHeadNode = joinNodes(headNodes.get(h), visited, numChanged);
-            headNodes.set(h, newHeadNode);
-        }
-        return numChanged.getVal() > 0;
-    }
+    }    
 
     private boolean handleWhile(List<Node> headNodes) {
         Set<Node> visited = new HashSet<>();
@@ -312,6 +290,17 @@ public class GraphPrecontinueDetector {
         }
         return result;
     }
+    
+    private boolean joinNodes(List<Node> headNodes) {
+        Set<Node> visited = new HashSet<>();
+        Reference<Integer> numChanged = new Reference<>(0);
+        for (int h = 0; h < headNodes.size(); h++) {
+            Node newHeadNode;
+            newHeadNode = joinNodes(headNodes.get(h), visited, numChanged);
+            headNodes.set(h, newHeadNode);
+        }
+        return numChanged.getVal() > 0;
+    }
 
     private Node joinNodes(Node node, Set<Node> visited, Reference<Integer> numJoined) {
         if (visited.contains(node)) {
@@ -365,6 +354,17 @@ public class GraphPrecontinueDetector {
 
         return result;
     }
+    
+    private boolean checkIfs(List<Node> headNodes) {
+        Set<Node> visited = new HashSet<>();
+        Reference<Integer> numChanged = new Reference<>(0);
+        for (int h = 0; h < headNodes.size(); h++) {
+            Node newHeadNode;
+            newHeadNode = checkIfs(headNodes.get(h), visited, numChanged);
+            headNodes.set(h, newHeadNode);
+        }
+        return numChanged.getVal() > 0;
+    }    
 
     private Node checkIfs(Node node, Set<Node> visited, Reference<Integer> numIfs) {
         if (visited.contains(node)) {

@@ -88,11 +88,10 @@ public class DefineBinaryDataTag extends CharacterTag {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         tag = sis.readUI16("tag");
         reserved = sis.readUI32("reserved");
-        binaryData = sis.readByteRangeEx(sis.available(), "binaryData");        
+        binaryData = sis.readByteRangeEx(sis.available(), "binaryData");
     }
-    
-    public void loadEmbeddedSwf()
-    {
+
+    public void loadEmbeddedSwf() {
         String path = getSwf().getShortPathTitle() + "/DefineBinaryData (" + getCharacterId() + ")";
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
@@ -102,7 +101,7 @@ public class DefineBinaryDataTag extends CharacterTag {
             detectPacker();
             String packerAdd = "";
             if (usedPacker != null) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();                                
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 usedPacker.decrypt(is, baos);
                 is = new ByteArrayInputStream(baos.toByteArray());
                 packerAdd = " - " + usedPacker.getName();
@@ -157,10 +156,11 @@ public class DefineBinaryDataTag extends CharacterTag {
                 }
             }
         } catch (Exception ex) {
+            //ignored
         }
-        
+
         detectPacker();
-        
+
         return usedPacker != null;
     }
 

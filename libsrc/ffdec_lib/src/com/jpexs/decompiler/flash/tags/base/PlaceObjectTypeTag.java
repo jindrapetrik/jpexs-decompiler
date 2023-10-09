@@ -101,11 +101,11 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
             exportName = charClassName;
             CharacterTag ch = swf.getCharacterByClass(charClassName);
             if (ch != null) {
-                charId = ch.getCharacterId();                
-            }                        
+                charId = ch.getCharacterId();
+            }
         } else {
             exportName = swf.getExportName(charId);
-        }        
+        }
         String nameAppend = "";
         if (exportName != null) {
             nameAppend = ": " + exportName;

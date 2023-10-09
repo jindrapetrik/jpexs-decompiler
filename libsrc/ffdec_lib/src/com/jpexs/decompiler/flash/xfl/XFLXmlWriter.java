@@ -131,8 +131,13 @@ public class XFLXmlWriter implements XMLStreamWriter {
         tagsStack.add(localName);
         startElementClosed = false;
         newLineNeeded = false;
-    }
+    }   
 
+    private void writeEmptyElementInternal(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+        writeStartElement(prefix, localName, namespaceURI);
+        writeEndElement();
+    }
+    
     @Override
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
         writeEmptyElementInternal(getPrefix(namespaceURI), localName, namespaceURI);
@@ -142,11 +147,6 @@ public class XFLXmlWriter implements XMLStreamWriter {
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         setPrefix(prefix, namespaceURI);
         writeEmptyElementInternal(prefix, localName, namespaceURI);
-    }
-
-    private void writeEmptyElementInternal(String prefix, String localName, String namespaceURI) throws XMLStreamException {
-        writeStartElement(prefix, localName, namespaceURI);
-        writeEndElement();
     }
 
     @Override
@@ -177,6 +177,13 @@ public class XFLXmlWriter implements XMLStreamWriter {
         newLineNeeded = true;
     }
 
+    public void writeElementValueRaw(String localName, String value) throws XMLStreamException {
+        writeStartElement(localName);
+        writeCharactersRaw(value);
+        writeEndElement();
+    }
+
+    
     public void writeElementValue(String localName, String value) throws XMLStreamException {
         writeStartElement(localName);
         writeCharacters(value);
@@ -197,12 +204,6 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     public void writeElementValue(String localName, long value) throws XMLStreamException {
         writeElementValue(localName, Long.toString(value));
-    }
-
-    public void writeElementValueRaw(String localName, String value) throws XMLStreamException {
-        writeStartElement(localName);
-        writeCharactersRaw(value);
-        writeEndElement();
     }
 
     public void writeElementValue(String localName, String value, String[] attributes) throws XMLStreamException {
@@ -313,6 +314,11 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     @Override
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+    }  
+
+    public void writeCharactersRaw(String text) throws XMLStreamException {
+        closeStartElement();
+        append(text);
     }
 
     @Override
@@ -320,12 +326,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
         closeStartElement();
         append(escapeText(text));
     }
-
-    public void writeCharactersRaw(String text) throws XMLStreamException {
-        closeStartElement();
-        append(text);
-    }
-
+    
     @Override
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
         writeCharacters(new String(text, start, len));

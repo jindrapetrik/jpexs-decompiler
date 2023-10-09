@@ -21,8 +21,9 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public class ValueTooLargeException extends IllegalArgumentException {
+
     private final String type;
-    private final Object value;    
+    private final Object value;
 
     public ValueTooLargeException(String type, Object value) {
         super("Value is too large for " + type + ": " + value);
@@ -37,5 +38,5 @@ public class ValueTooLargeException extends IllegalArgumentException {
     public Object getValue() {
         return value;
     }
-        
+
 }

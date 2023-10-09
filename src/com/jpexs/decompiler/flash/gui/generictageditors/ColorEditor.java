@@ -153,7 +153,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
             if (Objects.equals(oldValue, newValue)) {
                 return false;
             }
-        
+
             ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
@@ -250,8 +250,8 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
                 }
             }, null);
             dialog.setVisible(true);
-        }       
-        
+        }
+
         return col[0];
     }
 

@@ -28,13 +28,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -47,9 +44,9 @@ import javax.swing.JPanel;
 public class BinaryDataEditor extends JPanel implements GenericTagEditor {
 
     private final MainPanel mainPanel;
-    
+
     private final JButton replaceButton;
-    
+
     private final JButton exportButton;
 
     private final Object obj;
@@ -74,12 +71,12 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
         this.fieldName = fieldName;
         exportButton = new JButton(AppStrings.translate("button.export"));
         replaceButton = new JButton(AppStrings.translate("button.replace"));
-        
+
         setLayout(new FlowLayout());
         add(exportButton);
         add(replaceButton);
         exportButton.addActionListener(this::exportActionPerformed);
-        replaceButton.addActionListener(this::replaceActionPerformed);        
+        replaceButton.addActionListener(this::replaceActionPerformed);
         reset();
 
     }
@@ -113,15 +110,15 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
         fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-            ByteArrayRange br = (ByteArrayRange)value;
-            try(FileOutputStream fos = new FileOutputStream(selfile)) {
+            ByteArrayRange br = (ByteArrayRange) value;
+            try (FileOutputStream fos = new FileOutputStream(selfile)) {
                 fos.write(br.getArray(), br.getPos(), br.getLength());
             } catch (IOException ex) {
-                ViewMessages.showMessageDialog(mainPanel, ex.getMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                
-            }            
+                ViewMessages.showMessageDialog(mainPanel, ex.getMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
-    
+
     private void replaceActionPerformed(ActionEvent evt) {
         File selectedFile = mainPanel.showImportFileChooser("", false);
         if (selectedFile != null) {

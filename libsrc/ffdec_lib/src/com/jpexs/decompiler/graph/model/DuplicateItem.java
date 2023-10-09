@@ -82,7 +82,7 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
         if (dependencies.contains(value)) {
             return false;
         }
-        if (!((value instanceof SimpleValue) && ((SimpleValue)value).isSimpleValue())) {
+        if (!((value instanceof SimpleValue) && ((SimpleValue) value).isSimpleValue())) {
             dependencies.add(value);
         }
         return value.isCompileTime(dependencies);

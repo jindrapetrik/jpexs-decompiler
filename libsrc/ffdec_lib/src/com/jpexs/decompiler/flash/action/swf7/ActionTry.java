@@ -269,6 +269,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                 lexer.yypushback(lexer.yylength());
             }
         } catch (IOException | ActionParseException ex) {
+            //ignored
         }
 
         if (finallyBlockFlag) {
@@ -299,8 +300,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                         if (pi.value instanceof CastOpActionItem) {
                             CastOpActionItem co = (CastOpActionItem) pi.value;
                             if (((co.object instanceof DirectValueActionItem) && (((DirectValueActionItem) co.object).value instanceof RegisterNumber))
-                                    || (co.object instanceof TemporaryRegister) //Can be in for in loop
-                                    ) {
+                                    || (co.object instanceof TemporaryRegister)) { //Can be in for in loop
                                 int regNumber;
 
                                 if (co.object instanceof TemporaryRegister) {

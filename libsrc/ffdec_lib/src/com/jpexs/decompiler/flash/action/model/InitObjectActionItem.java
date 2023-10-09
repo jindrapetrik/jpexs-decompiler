@@ -64,9 +64,9 @@ public class InitObjectActionItem extends ActionItem {
                 writer.append(",");
             }
             //AS1/2 does not allow quotes in name here            
-            if ((names.get(i) instanceof DirectValueActionItem) 
-                &&(((DirectValueActionItem)names.get(i)).isSimpleValue())) {
-                writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));           
+            if ((names.get(i) instanceof DirectValueActionItem)
+                    && (((DirectValueActionItem) names.get(i)).isSimpleValue())) {
+                writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));
             } else {
                 writer.append("(");
                 names.get(i).appendTo(writer, localData);
@@ -99,7 +99,7 @@ public class InitObjectActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        String charset = asGenerator.getCharset();  
+        String charset = asGenerator.getCharset();
         List<GraphSourceItem> ret = new ArrayList<>();
         for (int i = values.size() - 1; i >= 0; i--) {
             ret.addAll(names.get(i).toSource(localData, generator));

@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author JPEXS
  */
 public class DepthState {
+
     public int depth = -1;
 
     public int characterId = -1;
@@ -46,7 +47,7 @@ public class DepthState {
     public MATRIX matrix;
 
     public String instanceName;
-    
+
     public String className;
 
     public ColorTransform colorTransForm;
@@ -152,17 +153,17 @@ public class DepthState {
         CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
         return new PlaceObject4Tag(swf, false, depth, className, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null, hasImage);
     }
-    
+
     public CharacterTag getCharacter() {
         if (characterId == -1) {
-            
+
             if (className != null) {
                 return swf.getCharacterByClass(className);
             }
-            
+
             return null;
         }
-        
-        return swf.getCharacter(characterId);       
+
+        return swf.getCharacter(characterId);
     }
 }

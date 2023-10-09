@@ -62,7 +62,7 @@ public class InterfaceActionItem extends ActionItem {
             Action.getWithoutGlobal(ti).toStringNoQuotes(writer, localData);
         }
         writer.startBlock();
-        writer.startClass(name.toStringNoQuotes(localData));        
+        writer.startClass(name.toStringNoQuotes(localData));
         writer.endClass();
         return writer.endBlock();
     }

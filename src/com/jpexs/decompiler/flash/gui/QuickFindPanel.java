@@ -48,9 +48,15 @@ public class QuickFindPanel extends JPanel {
 
     public JTextField findTextField;
 
-    public JButton prevButton, nextButton;
+    public JButton prevButton;
+    
+    public JButton nextButton;
 
-    public JCheckBox ignoreCaseCheckbox, regExpCheckbox, wrapCheckbox;
+    public JCheckBox ignoreCaseCheckbox;
+    
+    public JCheckBox regExpCheckbox;
+    
+    public JCheckBox wrapCheckbox;
 
     public JLabel statusLabel;
 

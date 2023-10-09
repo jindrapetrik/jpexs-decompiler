@@ -138,7 +138,7 @@ public class AVM2Deobfuscation {
                 newName = namesMap.get(sChain);
                 return constants.getStringId(newName.toRawString(), true); //constants.setString(strIndex, newName.toRawString());
             }
-            
+
             List<String> ret = new ArrayList<>();
             for (int p = 0; p < sChain.size(); p++) {
                 String part = sChain.get(p);
@@ -150,7 +150,7 @@ public class AVM2Deobfuscation {
             }
             newName = new DottedChain(ret);
             namesMap.put(sChain, newName);
-            
+
             if (stringUsages.contains(strIndex)) {
                 strIndex = constants.addString(newName.toRawString());
             } else {
@@ -193,15 +193,15 @@ public class AVM2Deobfuscation {
                 newname = namesMap.get(sChain);
                 return constants.getStringId(newname, true);
             }
-            
+
             String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType, false);
             newname = DottedChain.parseNoSuffix(str);
-            
+
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
                 String usageType = stringUsageTypes.get(strIndex);
                 strIndex = constants.addString(s); // add new index
-                stringUsageTypes.put(strIndex, usageType);                
-            }           
+                stringUsageTypes.put(strIndex, usageType);
+            }
             constants.setString(strIndex, newname.toRawString());
             if (!namesMap.containsKey(sChain)) {
                 namesMap.put(sChain, DottedChain.parseNoSuffix(constants.getString(strIndex)));

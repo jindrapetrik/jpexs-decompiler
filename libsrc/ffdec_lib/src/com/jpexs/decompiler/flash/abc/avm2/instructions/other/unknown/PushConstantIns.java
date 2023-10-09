@@ -29,7 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 /**
  *
  * @author JPEXS
- * 
+ *
  * source: ??
  */
 public class PushConstantIns extends InstructionDefinition {
@@ -37,7 +37,7 @@ public class PushConstantIns extends InstructionDefinition {
     public PushConstantIns() {
         super(0x22, "pushconstant", new int[]{AVM2Code.OPT_U30}, false /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }
-    
+
     @Override
     public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
         if (lda.getRuntime() == AVM2Runtime.ADOBE_FLASH) {

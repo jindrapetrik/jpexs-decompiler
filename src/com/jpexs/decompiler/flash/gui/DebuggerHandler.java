@@ -520,7 +520,6 @@ public class DebuggerHandler implements DebugConnectionListener {
         Main.getMainFrame().getPanel().updateMenu();
         boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
 
-
         //enlog(DebuggerConnection.class);
         //enlog(DebuggerCommands.class);
         //enlog(DebuggerHandler.class);
@@ -614,7 +613,6 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setSetterTimeout(5000);
 
             con.isAS3 = isAS3;
-
 
             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines
             if (isAS3) {
@@ -907,7 +905,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
             return icf;
         } catch (IOException e) {
-
+            //ignored
         }
         return null;
     }

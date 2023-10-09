@@ -35,9 +35,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,7 +114,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     public ImageFormat getOriginalImageFormat() {
         return ImageFormat.JPEG;
     }
-    
+
     @Override
     public InputStream getOriginalImageData() {
         if (swf.getJtt() != null) {
@@ -126,7 +123,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
                 if (jttdata.getLength() != 0) {
                     baos.write(jttdata.getRangeData());
                 }
-                baos.write(jpegData.getRangeData());         
+                baos.write(jpegData.getRangeData());
                 JpegFixer fixer = new JpegFixer();
                 ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
                 fixer.fixJpeg(new ByteArrayInputStream(baos.toByteArray()), baos2);

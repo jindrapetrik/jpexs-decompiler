@@ -47,11 +47,7 @@ import org.pushingpixels.substance.internal.animation.StateTransitionTracker;
  * UI for {@link JRibbonApplicationMenuButton} components in <b>Substance</b>
  * look and feel.
  *
- * @author Kirill Grouchnikov
- */
-/**
- *
- * @author JPEXS
+ * @author Kirill Grouchnikov, JPEXS
  */
 public class MyRibbonApplicationMenuButtonUI extends BasicRibbonApplicationMenuButtonUI implements
         ActionPopupTransitionAwareUI {

@@ -74,14 +74,14 @@ public abstract class ImageTag extends DrawableTag {
     public abstract Dimension getImageDimension();
 
     public abstract void setImage(byte[] data) throws IOException;
-
-    public abstract ImageFormat getImageFormat();
-
+    
     public abstract ImageFormat getOriginalImageFormat();
 
     public boolean importSupported() {
         return true;
     }
+
+    public abstract ImageFormat getImageFormat();
 
     public static ImageFormat getImageFormat(byte[] data) {
         return getImageFormat(new ByteArrayRange(data));
@@ -121,8 +121,10 @@ public abstract class ImageTag extends DrawableTag {
     }
 
     /**
-     * Gets converted image data. Converted means for example DefineBitsJPEG3 including alpha channel - PNG images
-     * @return 
+     * Gets converted image data. Converted means for example DefineBitsJPEG3
+     * including alpha channel - PNG images
+     *
+     * @return
      */
     public InputStream getConvertedImageData() {
         if (getImageFormat() == getOriginalImageFormat()) { //no need to convert
@@ -135,10 +137,12 @@ public abstract class ImageTag extends DrawableTag {
         ImageHelper.write(getImage().getBufferedImage(), getImageFormat(), baos);
         return new ByteArrayInputStream(baos.toByteArray());
     }
-    
+
     /**
-     * Gets original image data if available, if not, then converted. Original image data can be for example DefineBitsJPEG3 without transparency.
-     * @return 
+     * Gets original image data if available, if not, then converted. Original
+     * image data can be for example DefineBitsJPEG3 without transparency.
+     *
+     * @return
      */
     public InputStream getImageData() {
         InputStream is = getOriginalImageData();
@@ -306,5 +310,5 @@ public abstract class ImageTag extends DrawableTag {
     @Override
     public RECT getRectWithStrokes() {
         return getRect();
-    }    
+    }
 }

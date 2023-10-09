@@ -45,6 +45,7 @@ public class AS2ScriptImporter {
     public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) throws InterruptedException {
         return importScripts(scriptsFolder, asms, null);
     }
+
     public int importScripts(String scriptsFolder, Map<String, ASMSource> asms, ScriptImporterProgressListener listener) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;

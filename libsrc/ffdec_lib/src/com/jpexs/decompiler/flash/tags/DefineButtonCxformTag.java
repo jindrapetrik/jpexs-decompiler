@@ -93,7 +93,7 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.buttonId = characterId;
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + " (" + buttonId + ")";
@@ -102,5 +102,5 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(buttonId);
-    }       
+    }
 }

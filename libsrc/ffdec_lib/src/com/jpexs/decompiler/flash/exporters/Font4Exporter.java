@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
@@ -105,7 +104,7 @@ public class Font4Exporter {
     public byte[] exportFont(final DefineFont4Tag t, Font4ExportMode mode) {
         try {
             String ext = ".cff";
-           
+
             File f = File.createTempFile("temp", ext);
             exportFont(t, mode, f);
             return Helper.readFile(f.getPath());

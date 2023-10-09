@@ -25,6 +25,7 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class SoundInfoSoundCacheEntry {
+
     public SOUNDINFO soundInfo;
     public SoundTag soundTag;
 

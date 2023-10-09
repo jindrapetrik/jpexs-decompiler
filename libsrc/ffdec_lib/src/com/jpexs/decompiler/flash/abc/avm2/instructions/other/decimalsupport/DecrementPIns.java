@@ -44,7 +44,7 @@ public class DecrementPIns extends InstructionDefinition {
 
         super.verify(lda, constants, ins);
     }
-    
+
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
@@ -53,5 +53,5 @@ public class DecrementPIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
-    }  
+    }
 }

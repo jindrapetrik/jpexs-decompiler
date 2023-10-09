@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.SWF;
-import static com.jpexs.decompiler.flash.action.Action.actionsToSource;
-import static com.jpexs.decompiler.flash.action.Action.actionsToString;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -51,7 +49,7 @@ public class ActionList extends ArrayList<Action> {
     public int deobfuscationMode;
 
     public byte[] fileData;
-    
+
     private String charset;
 
     public ActionList(String charset) {
@@ -60,8 +58,7 @@ public class ActionList extends ArrayList<Action> {
 
     public String getCharset() {
         return charset;
-    }    
-    
+    }
 
     public ActionList(Collection<Action> actions, String charset) {
         super(actions);
@@ -73,12 +70,12 @@ public class ActionList extends ArrayList<Action> {
         addAll(list);
     }
 
-    public void removeAction(int index) {
-        ActionListReader.removeAction(this, index, true);
-    }
-
     public void removeActions(List<Action> actionsToRemove) {
         ActionListReader.removeActions(this, actionsToRemove, true);
+    }
+
+    public void removeAction(int index) {
+        ActionListReader.removeAction(this, index, true);
     }
 
     public void removeAction(int index, int count) {
@@ -558,7 +555,7 @@ public class ActionList extends ArrayList<Action> {
     @Override
     public String toString() {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+        Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
         return writer.toString();
     }
 

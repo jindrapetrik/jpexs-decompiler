@@ -38,8 +38,8 @@ public class FileAttributesTag extends Tag {
     public static final String NAME = "FileAttributes";
 
     @Reserved
-    public boolean reservedA;   
-    
+    public boolean reservedA;
+
     public boolean useDirectBlit;
 
     public boolean useGPU;
@@ -51,9 +51,9 @@ public class FileAttributesTag extends Tag {
     public boolean useNetwork;
 
     public boolean noCrossDomainCache;
-    
+
     public boolean swfRelativeUrls;
-    
+
     @SWFType(value = BasicType.UB, count = 24)
     @Reserved
     public int reservedB;

@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
-import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -116,7 +115,7 @@ public class TraitsListItem {
                 s = writer.toString();
             } else {
                 ConvertData convertData = new ConvertData();
-                List<Trait> traits = abc.instance_info.get(classIndex).instance_traits.traits;                
+                List<Trait> traits = abc.instance_info.get(classIndex).instance_traits.traits;
                 if (index >= traits.size()) {
                     return "";
                 }

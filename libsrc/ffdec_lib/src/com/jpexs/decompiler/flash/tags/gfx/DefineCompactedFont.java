@@ -21,10 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.types.KERNINGRECORD;
-import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.gfx.FontType;
@@ -202,13 +199,13 @@ public final class DefineCompactedFont extends FontTag {
             }
             int glyph1 = charToGlyph(pair.char1);
             if (pair.char1 == character) {
-
+                //empty
             } else if (glyph1 == -1) {
                 continue;
             }
             int glyph2 = charToGlyph(pair.char2);
             if (pair.char2 == character) {
-
+                //empty
             } else if (glyph2 == -1) {
                 continue;
             }

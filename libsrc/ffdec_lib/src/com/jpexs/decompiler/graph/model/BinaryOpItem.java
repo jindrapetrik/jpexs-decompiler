@@ -107,13 +107,13 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         if (dependencies.contains(leftSide)) {
             return false;
         }
-        if (!((leftSide instanceof SimpleValue) && ((SimpleValue)leftSide).isSimpleValue())) {            
+        if (!((leftSide instanceof SimpleValue) && ((SimpleValue) leftSide).isSimpleValue())) {
             dependencies.add(leftSide);
         }
         if (leftSide != rightSide && dependencies.contains(rightSide)) {
             return false;
         }
-        if (!((rightSide instanceof SimpleValue) && ((SimpleValue)rightSide).isSimpleValue())) {
+        if (!((rightSide instanceof SimpleValue) && ((SimpleValue) rightSide).isSimpleValue())) {
             dependencies.add(rightSide);
         }
         return leftSide.isConvertedCompileTime(dependencies) && rightSide.isConvertedCompileTime(dependencies);

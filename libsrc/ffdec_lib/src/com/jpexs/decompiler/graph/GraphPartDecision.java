@@ -23,6 +23,7 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class GraphPartDecision {
+
     public GraphPart part;
     public int way;
 

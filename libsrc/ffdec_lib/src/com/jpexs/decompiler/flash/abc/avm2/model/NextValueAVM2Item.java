@@ -38,7 +38,7 @@ public class NextValueAVM2Item extends AVM2Item {
     public GraphTargetItem index;
 
     public GraphTargetItem obj;
-    
+
     public GraphTargetItem localReg;
 
     public NextValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {

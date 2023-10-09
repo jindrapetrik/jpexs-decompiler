@@ -985,7 +985,7 @@ public class ActionScript2Parser {
         switch (s.type) {
             case WITH:
                 expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem wvar = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);//(variable(inFunction, inMethod, variables, functions));
+                GraphTargetItem wvar = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 expectedType(SymbolType.PARENT_CLOSE);
                 expectedType(SymbolType.CURLY_OPEN);
                 List<GraphTargetItem> wcmd = commands(inFunction, inMethod, forinlevel, inTellTarget, variables, functions, hasEval);
@@ -993,7 +993,7 @@ public class ActionScript2Parser {
                 ret = new WithActionItem(null, null, wvar, wcmd);
                 break;
             case DELETE:
-                GraphTargetItem varDel = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);//variable(inFunction, inMethod, variables, functions);
+                GraphTargetItem varDel = expression(inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, null, gm.object, gm.memberName);
@@ -1021,7 +1021,6 @@ public class ActionScript2Parser {
                 }
                 ret = tt;
                 break;
-
 
             case IFFRAMELOADED:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1114,7 +1113,7 @@ public class ActionScript2Parser {
                     VariableActionItem supItem = new VariableActionItem(s.value.toString(), null, false);
                     variables.add(supItem);
                     ret = new CallMethodActionItem(null, null, supItem, new DirectValueActionItem(null, null, 0, Undefined.INSTANCE, constantPool), args);
-                } else {//no costructor call, but it could be calling parent methods... => handle in expression
+                } else { //no costructor call, but it could be calling parent methods... => handle in expression
                     lexer.pushback(ss2);
                     lexer.pushback(s);
                 }
@@ -1788,7 +1787,7 @@ public class ActionScript2Parser {
                             && (((DirectValueActionItem) num).value instanceof Float)) {
                         ((DirectValueActionItem) num).value = -(Float) ((DirectValueActionItem) num).value;
                         ret = (num);
-                    } else {;
+                    } else {
                         ret = (new SubtractActionItem(null, null, new DirectValueActionItem(null, null, 0, (Long) 0L, new ArrayList<>()), num));
                     }
                 }
@@ -1879,7 +1878,7 @@ public class ActionScript2Parser {
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                GraphTargetItem prevar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);//variable(inFunction, inMethod, variables, functions);
+                GraphTargetItem prevar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
                 if (s.type == SymbolType.INCREMENT) {
                     ret = new PreIncrementActionItem(null, null, prevar);
                 }
@@ -1902,7 +1901,7 @@ public class ActionScript2Parser {
                 allowMemberOrCall = true;
                 break;
             case NEW:
-                GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);//variable(inFunction, inMethod, variables, functions);
+                GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, false, hasEval);
                 if (newvar instanceof ToNumberActionItem) {
                     List<GraphTargetItem> args = new ArrayList<>();
                     if (((ToNumberActionItem) newvar).value != null) {
