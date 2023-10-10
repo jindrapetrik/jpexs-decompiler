@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
@@ -238,7 +239,7 @@ public class SVGExporter {
 
     }
 
-    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName) {
+    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode) {
 
         Element image = _svg.createElement("g");
 
@@ -419,16 +420,17 @@ public class SVGExporter {
         if (characterName != null) {
             image.setAttribute("data-characterName", characterName);
         }
+        setBlendMode(image, blendMode);
         _svgGs.peek().appendChild(image);
     }
 
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
-        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null);
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName) {
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
-            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName);
+            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode);
             return null; //??
         }
         Element image = _svg.createElement("use");
@@ -446,9 +448,46 @@ public class SVGExporter {
         if (characterName != null) {
             image.setAttribute("data-characterName", characterName);
         }
+        
+        setBlendMode(image, blendMode);
+        
         image.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(image);
         return image;
+    }
+    
+    private void setBlendMode(Element element, int blendMode) {
+        switch(blendMode) {
+            case BlendMode.MULTIPLY:
+                element.setAttribute("style", "mix-blend-mode: multiply");
+                break;
+            case BlendMode.SCREEN:
+                element.setAttribute("style", "mix-blend-mode: screen");
+                break;
+            case BlendMode.OVERLAY:
+                element.setAttribute("style", "mix-blend-mode: overlay");
+                break;
+            case BlendMode.DARKEN:
+                element.setAttribute("style", "mix-blend-mode: darken");
+                break;
+            case BlendMode.LIGHTEN:
+                element.setAttribute("style", "mix-blend-mode: lighten");
+                break;
+            case BlendMode.HARDLIGHT:
+                element.setAttribute("style", "mix-blend-mode: hard-light");
+                break;
+            case BlendMode.DIFFERENCE:
+                element.setAttribute("style", "mix-blend-mode: difference");
+                break;
+            case BlendMode.ADD:
+            case BlendMode.ALPHA:
+            case BlendMode.ERASE:
+            case BlendMode.INVERT:
+            case BlendMode.LAYER:
+            case BlendMode.SUBTRACT:
+                //unsupported
+                break;
+        }
     }
 
     public void addStyle(String fontFace, byte[] data, FontExportMode mode) {
