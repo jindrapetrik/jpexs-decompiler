@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#2079] Replace DefineSprite with GIF, Bulk import sprites from GIFs, also from commandline
 - [#116] Show invalid utf-8 bytes in Strings as `{invalid_utf8:xxx}`
 - [#2097] Commandline command `-header` to modify SWF header values
+- SVG Sprite export - blend modes
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
