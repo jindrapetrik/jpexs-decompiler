@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 
 /**
  * Two-dimensional discrete convolution filter.
@@ -33,36 +34,36 @@ public class CONVOLUTIONFILTER extends FILTER {
      * Horizontal matrix size
      */
     @SWFType(BasicType.UI8)
-    public int matrixX;
+    public int matrixX = 3;
 
     /**
      * Vertical matrix size
      */
     @SWFType(BasicType.UI8)
-    public int matrixY;
+    public int matrixY = 3;
 
     /**
      * Divisor applied to the matrix values
      */
     @SWFType(BasicType.FLOAT)
-    public float divisor;
+    public float divisor = 1f;
 
     /**
      * Bias applied to the matrix values
      */
     @SWFType(BasicType.FLOAT)
-    public float bias;
+    public float bias = 0f;
 
     /**
      * Matrix values
      */
     @SWFType(BasicType.FLOAT)
-    public float[][] matrix = new float[0][0];
+    public float[] matrix = new float[9];
 
     /**
      * Default color for pixels outside the image
      */
-    public RGBA defaultColor;
+    public RGBA defaultColor = new RGBA(Color.BLACK);
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 6)
@@ -86,25 +87,17 @@ public class CONVOLUTIONFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
-        int height = matrix.length;
-        int width = matrix[0].length;
-        float[] matrix2 = new float[width * height];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                matrix2[y * width + x] = matrix[x][y] * divisor + bias;
-            }
-        }
-        return Filtering.convolution(src, matrix2, width, height);
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
+        return Filtering.convolution(src, matrix, matrixX, matrixY, divisor, bias, defaultColor.toColor(), clamp, preserveAlpha, srcX, srcY, srcW, srcH);
     }
 
     @Override
     public double getDeltaX() {
-        return 0;
+        return ((matrixX-1)>>1) + 1;
     }
 
     @Override
     public double getDeltaY() {
-        return 0;
+        return ((matrixY-1)>>1) + 1;
     }
 }

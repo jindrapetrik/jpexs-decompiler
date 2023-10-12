@@ -80,7 +80,7 @@ public class GLOWFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         return Filtering.glow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, glowColor.toColor(), innerGlow, knockout, passes);
     }
 

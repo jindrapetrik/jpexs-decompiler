@@ -244,4 +244,9 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     public String getReadOnlyValue() {
         return getChangedValue().toString();
     }
+
+    @Override
+    public Object getObject() {
+        return obj;
+    }        
 }

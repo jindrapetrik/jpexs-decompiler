@@ -114,4 +114,9 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     public String getReadOnlyValue() {
         return getChangedValue().toString();
     }
+    
+    @Override
+    public Object getObject() {
+        return obj;
+    }
 }

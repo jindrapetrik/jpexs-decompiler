@@ -2219,11 +2219,9 @@ public class SWFInputStream implements AutoCloseable {
         ret.matrixY = readUI8("matrixY");
         ret.divisor = readFLOAT("divisor");
         ret.bias = readFLOAT("bias");
-        ret.matrix = new float[ret.matrixX][ret.matrixY];
-        for (int x = 0; x < ret.matrixX; x++) {
-            for (int y = 0; y < ret.matrixY; y++) {
-                ret.matrix[x][y] = readFLOAT("cell");
-            }
+        ret.matrix = new float[ret.matrixX * ret.matrixY];
+        for (int i = 0; i < ret.matrixX * ret.matrixY; i++) {
+            ret.matrix[i] = readFLOAT("cell");
         }
         ret.defaultColor = readRGBA("defaultColor");
         ret.reserved = (int) readUB(6, "reserved");

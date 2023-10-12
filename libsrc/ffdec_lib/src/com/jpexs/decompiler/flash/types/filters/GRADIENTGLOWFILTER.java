@@ -107,7 +107,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
         for (int i = 0; i < gradientColors.length; i++) {

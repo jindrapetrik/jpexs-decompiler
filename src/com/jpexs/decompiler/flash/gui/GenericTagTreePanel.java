@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.EnumEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
@@ -55,6 +56,7 @@ import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.decompiler.flash.types.annotations.UUID;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
+import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.ConcreteClasses;
 import com.jpexs.helpers.ReflectionTools;
@@ -301,7 +303,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 for (int i = 0; i < fnode.fieldSet.size(); i++) {
                     Field field = fnode.fieldSet.get(i);
                     int index = fnode.index;
-                    Object obj = fnode.obj;
+                    final Object obj = fnode.obj;
                     Class<?> type;
                     boolean isByteArray = field.getType().equals(byte[].class);
                     try {
@@ -361,7 +363,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             editors = new ArrayList<>();
                         }
                         editors.add(editor);
-                    }
+                    }                    
                     JPanel pan = new JPanel();
                     FlowLayout fl = new FlowLayout(FlowLayout.LEFT, 0, 0);
                     fl.setAlignOnBaseline(true);
@@ -446,6 +448,24 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     try {
                         editor.validateValue();
                         if (editor.save()) {
+                            
+                            if (editor.getObject() instanceof CONVOLUTIONFILTER) {
+                                String fname = editor.getFieldName();
+                                if ("matrixX".equals(fname) || "matrixY".equals(fname)) {
+                                    CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) editor.getObject();
+                                    if (cf.matrix.length != cf.matrixX * cf.matrixY) {
+                                        float[] newmatrix = new float[cf.matrixX * cf.matrixY];
+                                        int copycount = cf.matrix.length;
+                                        if (copycount > cf.matrixX * cf.matrixY) {
+                                            copycount = cf.matrixX * cf.matrixY;
+                                        }
+                                        System.arraycopy(cf.matrix, 0, newmatrix, 0, copycount);
+                                        cf.matrix = newmatrix;
+                                    }
+                                }
+                            }
+                            
+                            
                             modified = true;
                         }
                     } catch (IllegalArgumentException iex) {

@@ -41,4 +41,6 @@ public interface GenericTagEditor {
     public String getReadOnlyValue();
 
     public void validateValue();
+    
+    public Object getObject();
 }

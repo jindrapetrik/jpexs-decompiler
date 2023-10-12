@@ -896,9 +896,9 @@ public class SWFOutputStream extends OutputStream {
         writeUI8(value.matrixY);
         writeFLOAT(value.divisor);
         writeFLOAT(value.bias);
-        for (int x = 0; x < value.matrixX; x++) {
-            for (int y = 0; y < value.matrixY; y++) {
-                writeFLOAT(value.matrix[x][y]);
+        for (int y = 0; y < value.matrixY; y++) {
+            for (int x = 0; x < value.matrixX; x++) {
+                writeFLOAT(value.matrix[y * value.matrixX + x]);
             }
         }
         writeRGBA(value.defaultColor);
