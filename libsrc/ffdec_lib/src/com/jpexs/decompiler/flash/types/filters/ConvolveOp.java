@@ -30,8 +30,7 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
     private final int srcY;
     private final int srcWidth;
     private final int srcHeight;
-    
-    
+
     public ConvolveOp(Kernel kernel,
             RenderingHints hints,
             float divisor,
@@ -118,7 +117,7 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         int kWidth = kernel.getWidth();
         int kHeight = kernel.getHeight();
         int left = kernel.getXOrigin();
-        int top = kernel.getYOrigin();        
+        int top = kernel.getYOrigin();
 
         int[] maxValue = src.getSampleModel().getSampleSize();
         for (int i = 0; i < maxValue.length; i++) {
@@ -130,16 +129,38 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         for (int x = srcX - left; x < srcX + srcWidth + left + 1; x++) {
             for (int y = srcY - top; y < srcY + srcHeight + top + 1; y++) {
                 float a;
-                if (preserveAlpha && (x < srcX || y < srcY || x >= srcX + srcWidth + 1 || y >= srcY + srcHeight + 1)) {
-                    dest.setSample(x, y, 3, 255);
-                    a = 255;
-                } else {
-                    if (preserveAlpha) {
-                        a = src.getSample(x, y, 3);                       
-                        dest.setSample(x, y, 3, a);
-                    } else {
-                        a = calculateBand(src, dest, maxValue, kvals, kWidth, kHeight, left, top, x, y, 3, 255f, false);
+                if (preserveAlpha) {
+                    boolean outSide = false;
+                    int fsrcX = x;
+                    int fsrcY = y;
+                    if (fsrcX < srcX) {
+                        fsrcX = srcX;
+                        outSide = true;
                     }
+                    if (fsrcY < srcY) {
+                        fsrcY = srcY;
+                        outSide = true;
+                    }
+                    if (fsrcX >= srcX + srcWidth + 1) {
+                        fsrcX = srcX + srcWidth;
+                        outSide = true;
+                    }
+                    if (fsrcY >= srcY + srcHeight + 1) {
+                        fsrcY = srcY + srcHeight;
+                        outSide = true;
+                    }
+                    if (outSide) {
+                        if (clamp) {
+                            a = src.getSample(fsrcX, fsrcY, 3);
+                        } else {
+                            a = defaultColor.getAlpha();
+                        }
+                    } else {
+                        a = src.getSample(x, y, 3);
+                    }
+                    dest.setSample(x, y, 3, a);
+                } else {
+                    a = calculateBand(src, dest, maxValue, kvals, kWidth, kHeight, left, top, x, y, 3, 255f, false);
                 }
 
                 for (int b = 0; b < 3; b++) {
@@ -176,7 +197,7 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                     outSide = true;
                 }
                 if (nSrcX >= srcX + srcWidth + 1) {
-                    nSrcX = srcX + srcWidth - 1;
+                    nSrcX = srcX + srcWidth;
                     outSide = true;
                 }
                 if (nSrcY < srcY) {
@@ -184,9 +205,9 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                     outSide = true;
                 }
                 if (nSrcY >= srcY + srcHeight + 1) {
-                    nSrcY = srcY + srcHeight - 1;
+                    nSrcY = srcY + srcHeight;
                     outSide = true;
-                }                                
+                }
 
                 float v = 0;
                 if (outSide && !clamp) {
@@ -205,10 +226,10 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                             break;
                     }
                 } else {
-                    
+
                     int srcRealX = nSrcX;
                     int srcRealY = nSrcY;
-                
+
                     v = src.getSample(srcRealX, srcRealY, b);
 
                     if (multiply) {
@@ -220,13 +241,13 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
                         }
                     }
                 }
-                
+
                 nv += v * kvals[i * kWidth + j];
             }
-        }       
+        }
         nv /= divisor;
         nv += bias;
-        
+
         if (nv > maxValue[b]) {
             nv = maxValue[b];
         } else if (nv < 0) {
@@ -237,8 +258,8 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         }
         nv = Math.round(nv);
         int destX = x;
-        int destY = y;     
-        
+        int destY = y;
+
         dest.setSample(destX, destY, b, nv);
         return nv;
     }
