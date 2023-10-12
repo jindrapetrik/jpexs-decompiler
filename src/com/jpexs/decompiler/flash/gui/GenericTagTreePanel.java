@@ -552,7 +552,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                         JMenu mBegin = new JMenu(AppStrings.translate("generictag.array.insertbeginning").replace("%item%", itemStr));
                                         p.add(mBegin);
                                         JMenu mBefore = new JMenu(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
-                                        p.add(mBefore);
+                                        if (fnode.index > -1) {
+                                            p.add(mBefore);
+                                        }
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
                                         mi.addActionListener(new ActionListener() {
                                             @Override
@@ -576,9 +578,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                 }
                                             }
                                         });
-                                        p.add(mi);
+                                        
+                                        if (fnode.index > -1) {
+                                            p.add(mi);
+                                        }
                                         JMenu mAfter = new JMenu(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
-                                        p.add(mAfter);
+                                        
+                                        if (fnode.index > -1) {
+                                            p.add(mAfter);
+                                        }
 
                                         JMenu mEnd = new JMenu(AppStrings.translate("generictag.array.insertend").replace("%item%", itemStr));
                                         p.add(mEnd);

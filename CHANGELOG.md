@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - AS2 getters and setters decoding
 - [#116] §§push at the end of switch branches
 - Convolution matrix filter display and editing
+- Generic tag editor - Disallow add before/after or remove on parent field with indices
 
 ## [19.0.0] - 2023-10-01
 ### Added
