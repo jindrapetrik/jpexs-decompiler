@@ -41,7 +41,7 @@ public class COLORMATRIXFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         float[][] matrix2 = new float[4][5];
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 5; x++) {

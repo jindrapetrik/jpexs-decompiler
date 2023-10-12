@@ -261,4 +261,8 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
         return Helper.escapeHTML(getChangedValue().toString());
     }
 
+    @Override
+    public Object getObject() {
+        return obj;
+    }
 }

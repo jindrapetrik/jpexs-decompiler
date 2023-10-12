@@ -55,7 +55,7 @@ public class BLURFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         return Filtering.blur(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), passes);
     }
 

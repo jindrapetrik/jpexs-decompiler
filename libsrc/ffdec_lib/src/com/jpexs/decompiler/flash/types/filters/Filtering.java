@@ -28,7 +28,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ConvolveOp;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Kernel;
 
@@ -559,9 +558,36 @@ public class Filtering {
         return getRGB(retImg);
     }
 
-    public static SerializableImage convolution(SerializableImage src, float[] matrix, int w, int h) {
-        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-        BufferedImageOp op = new ConvolveOp(new Kernel(w, h, matrix), ConvolveOp.EDGE_ZERO_FILL, new RenderingHints(null));
+    public static SerializableImage convolution(
+            SerializableImage src,
+            float[] matrix,
+            int w, 
+            int h,
+            float divisor,
+            float bias,
+            Color defaultColor,
+            boolean clamp, 
+            boolean preserveAlpha,
+            int srcX,
+            int srcY,
+            int srcWidth,
+            int srcHeight
+    ) {
+        Kernel kernel = new Kernel(w, h, matrix);
+        BufferedImage dst = new BufferedImage(src.getWidth() + 1, src.getHeight() + 1, src.getType());
+        BufferedImageOp op = new ConvolveOp(
+                kernel, 
+                 new RenderingHints(null),
+                divisor,
+                bias,
+                defaultColor,
+                clamp,
+                preserveAlpha,
+                srcX,
+                srcY,
+                srcWidth,
+                srcHeight
+        );
         op.filter(src.getBufferedImage(), dst);
         return new SerializableImage(dst);
     }

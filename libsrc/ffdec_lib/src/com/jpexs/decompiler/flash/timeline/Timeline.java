@@ -766,10 +766,11 @@ public class Timeline {
         int dtime = time - dframe;
         ExportRectangle viewRect2 = new ExportRectangle(viewRect);
 
+        double deltaXMax = 0;
+        double deltaYMax = 0;
+            
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
-            double deltaXMax = 0;
-            double deltaYMax = 0;
             for (FILTER filter : filters) {
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
@@ -786,10 +787,8 @@ public class Timeline {
             viewRect2.yMax += deltaYMax * SWF.unitDivisor;
         }
 
-        rect.xMin -= SWF.unitDivisor;
-        rect.yMin -= SWF.unitDivisor;
-        /*rect.xMin = Math.max(0, rect.xMin);
-        rect.yMin = Math.max(0, rect.yMin);*/
+        //rect.xMin -= SWF.unitDivisor;
+        //rect.yMin -= SWF.unitDivisor;
         drawMatrix.translate(rect.xMin, rect.yMin);
         drawMatrix.translateX /= SWF.unitDivisor;
         drawMatrix.translateY /= SWF.unitDivisor;
@@ -800,8 +799,8 @@ public class Timeline {
             int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
             int deltaX = (int) (rect.xMin / SWF.unitDivisor);
             int deltaY = (int) (rect.yMin / SWF.unitDivisor);
-            newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
-            newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
+            newWidth = Math.min(image.getWidth() - deltaX, newWidth);
+            newHeight = Math.min(image.getHeight() - deltaY, newHeight);
 
             if (newWidth <= 0 || newHeight <= 0) {
                 return;
@@ -888,14 +887,8 @@ public class Timeline {
             }
 
             if (filters != null) {
-                /*try {
-                    ImageIO.write(img.getBufferedImage(), "PNG", new File("c:\\FlashRelated\\gwint\\out.png"));
-                } catch (IOException ex) {
-                    Logger.getLogger(Timeline.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                System.exit(0);*/
                 for (FILTER filter : filters) {
-                    img = filter.apply(img, unzoom);
+                    img = filter.apply(img, unzoom, (int)deltaXMax, (int)deltaYMax, (int)Math.round(newWidth - 2 * deltaXMax), (int)Math.round(newHeight - 2 * deltaYMax));
                 }
             }
             if (blendMode > 1) {

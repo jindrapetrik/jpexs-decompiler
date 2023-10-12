@@ -45,7 +45,7 @@ public abstract class FILTER implements Serializable {
         this.id = id;
     }
 
-    public abstract SerializableImage apply(SerializableImage src, double zoom);
+    public abstract SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH);
 
     public abstract double getDeltaX();
 

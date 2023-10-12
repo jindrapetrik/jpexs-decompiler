@@ -155,4 +155,9 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
     public String getReadOnlyValue() {
         return getChangedValue().toString();
     }
+    
+    @Override
+    public Object getObject() {
+        return obj;
+    }
 }

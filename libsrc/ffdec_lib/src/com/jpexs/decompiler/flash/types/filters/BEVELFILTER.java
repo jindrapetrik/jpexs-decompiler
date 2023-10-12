@@ -102,7 +102,7 @@ public class BEVELFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src, double zoom) {
+    public SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH) {
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;

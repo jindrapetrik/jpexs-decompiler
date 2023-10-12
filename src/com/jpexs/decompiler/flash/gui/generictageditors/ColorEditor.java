@@ -280,4 +280,9 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         int h = System.identityHashCode(this);
         return "<cite style=\"background-color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");\">&nbsp;&nbsp;&nbsp;&nbsp;</cite> " + getChangedValue().toString();
     }
+    
+    @Override
+    public Object getObject() {
+        return obj;
+    }
 }

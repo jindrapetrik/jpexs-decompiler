@@ -816,13 +816,11 @@ public class FrameExporter {
                         }
 
                         if (filter instanceof CONVOLUTIONFILTER) {
-                            CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) filter;
-                            int height = cf.matrix.length;
-                            int width = cf.matrix[0].length;
-                            float[] matrix2 = new float[width * height];
-                            for (int y = 0; y < height; y++) {
-                                for (int x = 0; x < width; x++) {
-                                    matrix2[y * width + x] = cf.matrix[x][y] * cf.divisor + cf.bias;
+                            CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) filter;                            
+                            float[] matrix2 = new float[cf.matrixX * cf.matrixY];
+                            for (int y = 0; y < cf.matrixY; y++) {
+                                for (int x = 0; x < cf.matrixX; x++) {
+                                    matrix2[y * cf.matrixX + x] = cf.matrix[y * cf.matrixX + x] / cf.divisor + cf.bias;
                                 }
                             }
                             String mat = "[";
