@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Drop shadow filter based on the same median filter as the blur filter
@@ -104,5 +108,10 @@ public class DROPSHADOWFILTER extends FILTER {
     @Override
     public double getDeltaY() {
         return blurY + Math.abs(distance * Math.sin(angle));
+    }
+
+    @Override
+    public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
+        return dropShadowSvg(distance, angle, dropShadowColor, innerShadow, knockout, compositeSource, blurX, blurY, strength, passes, document, filtersElement, exporter, in);
     }
 }

@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import java.util.ArrayList;
+import java.util.List;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Applies a color transformation on the pixels of a display list object
@@ -60,4 +65,28 @@ public class COLORMATRIXFILTER extends FILTER {
     public double getDeltaY() {
         return 0;
     }
+
+    @Override
+    public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
+        Element element = document.createElement("feColorMatrix");
+        element.setAttribute("type", "matrix");
+        List<String> parts = new ArrayList<>();
+        for (int i = 0; i < matrix.length; i++) {
+            if (i % 5 == 4) {
+                parts.add("" + (matrix[i] / 255f));
+            } else {
+                parts.add("" + matrix[i]);
+            }
+        }
+        element.setAttribute("values", String.join(" ", parts));
+        element.setAttribute("in", in);
+
+        String result = exporter.getUniqueId("filterResult");
+        element.setAttribute("result", result);
+
+        filtersElement.appendChild(element);
+
+        return result;
+    }
+
 }

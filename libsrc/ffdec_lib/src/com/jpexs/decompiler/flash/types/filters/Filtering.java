@@ -382,7 +382,7 @@ public class Filtering {
 
     public static SerializableImage glow(SerializableImage src, int blurX, int blurY, float strength, Color color, boolean inner, boolean knockout, int iterations) {
         return new SerializableImage(dropShadow(src.getBufferedImage(), blurX, blurY, 45, 0, color, inner, iterations, strength, knockout, true));
-    }      
+    }
 
     private static Color over(Color a, Color b) {
         int resultA = a.getAlpha() + b.getAlpha() * (255 - a.getAlpha()) / 255;
@@ -561,12 +561,12 @@ public class Filtering {
     public static SerializableImage convolution(
             SerializableImage src,
             float[] matrix,
-            int w, 
+            int w,
             int h,
             float divisor,
             float bias,
             Color defaultColor,
-            boolean clamp, 
+            boolean clamp,
             boolean preserveAlpha,
             int srcX,
             int srcY,
@@ -576,8 +576,8 @@ public class Filtering {
         Kernel kernel = new Kernel(w, h, matrix);
         BufferedImage dst = new BufferedImage(src.getWidth() + 1, src.getHeight() + 1, src.getType());
         BufferedImageOp op = new ConvolveOp(
-                kernel, 
-                 new RenderingHints(null),
+                kernel,
+                new RenderingHints(null),
                 divisor,
                 bias,
                 defaultColor,

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.io.StringWriter;
@@ -239,7 +240,7 @@ public class SVGExporter {
 
     }
 
-    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode) {
+    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
 
         Element image = _svg.createElement("g");
 
@@ -421,16 +422,41 @@ public class SVGExporter {
             image.setAttribute("data-characterName", characterName);
         }
         setBlendMode(image, blendMode);
+        handleFilters(image, filters);
         _svgGs.peek().appendChild(image);
     }
 
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
-        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL);
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
+    }
+    
+    private void handleFilters(Element image, List<FILTER> filters) {
+        if (filters == null) {
+            return;
+        }
+        Element filtersElement = _svg.createElement("filter");
+        String filterId = getUniqueId("filter");
+        String in = "SourceGraphic";
+        boolean empty = true;
+        for (FILTER filter: filters) {
+           String result = filter.toSvg(_svg, filtersElement, this, in);
+           if (result != null) {
+               empty = false;
+               in = result;
+           }
+        }
+        if (empty) {
+            return;
+        }
+        
+        filtersElement.setAttribute("id", filterId);                
+        image.setAttribute("filter", "url(#" + filterId + ")");
+        _svgGs.peek().appendChild(filtersElement);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode) {
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
-            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode);
+            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode, filters);
             return null; //??
         }
         Element image = _svg.createElement("use");
@@ -451,7 +477,9 @@ public class SVGExporter {
         
         setBlendMode(image, blendMode);
         
-        image.setAttribute("xlink:href", "#" + href);
+        handleFilters(image, filters);
+        
+        image.setAttribute("xlink:href", "#" + href);        
         _svgGs.peek().appendChild(image);
         return image;
     }

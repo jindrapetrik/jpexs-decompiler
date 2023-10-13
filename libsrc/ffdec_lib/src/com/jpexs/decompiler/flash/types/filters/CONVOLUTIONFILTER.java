@@ -16,12 +16,17 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Two-dimensional discrete convolution filter.
@@ -93,11 +98,41 @@ public class CONVOLUTIONFILTER extends FILTER {
 
     @Override
     public double getDeltaX() {
-        return ((matrixX-1)>>1) + 1;
+        return ((matrixX - 1) >> 1) + 1;
     }
 
     @Override
     public double getDeltaY() {
-        return ((matrixY-1)>>1) + 1;
+        return ((matrixY - 1) >> 1) + 1;
+    }
+
+    @Override
+    public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
+        Element element = document.createElement("feConvolveMatrix");
+        element.setAttribute("order", "" + matrixX + " " + matrixY);
+        List<String> parts = new ArrayList<>();
+        for (int i = 0; i < matrix.length; i++) {
+            parts.add("" + matrix[i]);
+        }
+        element.setAttribute("kernelMatrix", String.join(" ", parts));
+        if (clamp) {
+            element.setAttribute("edgeMode", "duplicate");
+        } else {
+            element.setAttribute("edgeMode", "none");
+        }
+
+        element.setAttribute("preserveAlpha", preserveAlpha ? "true" : "false");
+
+        element.setAttribute("divisor", "" + divisor);
+        element.setAttribute("bias", "" + bias);
+
+        element.setAttribute("in", in);
+
+        String result = exporter.getUniqueId("filterResult");
+        element.setAttribute("result", result);
+
+        filtersElement.appendChild(element);
+
+        return result;
     }
 }
