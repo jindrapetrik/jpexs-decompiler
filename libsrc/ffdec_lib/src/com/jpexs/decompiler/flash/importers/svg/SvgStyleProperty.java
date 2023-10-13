@@ -67,6 +67,7 @@ public class SvgStyleProperty {
         p.put("opacity", new SvgStyleProperty("opacity", false, 1.0));
         p.put("stop-color", new SvgStyleProperty("stop-color", false, Color.BLACK));
         p.put("stop-opacity", new SvgStyleProperty("stop-opacity", false, 1.0));
+        p.put("vector-effect", new SvgStyleProperty("vector-effect", false, "none"));
         properties = p;
     }
 

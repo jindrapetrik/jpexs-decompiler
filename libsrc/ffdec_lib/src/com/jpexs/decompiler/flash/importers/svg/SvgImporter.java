@@ -102,6 +102,12 @@ public class SvgImporter {
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
         shapeTag = st;
 
+        if (st instanceof DefineShape4Tag) {
+            DefineShape4Tag shape4 = (DefineShape4Tag) st;
+            shape4.usesNonScalingStrokes = false;
+            shape4.usesScalingStrokes = false;
+        }
+
         SHAPEWITHSTYLE shapes = new SHAPEWITHSTYLE();
         shapes.fillStyles = new FILLSTYLEARRAY();
         shapes.lineStyles = new LINESTYLEARRAY();
@@ -1685,6 +1691,22 @@ public class SvgImporter {
             SvgLineJoin lineJoin = style.getStrokeLineJoin();
             if (lineStyle instanceof LINESTYLE2) {
                 LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
+                
+                String vectorEffect = style.getVectorEffect();
+                if ("non-scaling-stroke".equals(vectorEffect)) {
+                    lineStyle2.noHScaleFlag = true;
+                    lineStyle2.noVScaleFlag = true;
+                    if (shapeTag instanceof DefineShape4Tag) {
+                        DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
+                        shape4.usesNonScalingStrokes = true;
+                    }
+                } else {
+                    if (shapeTag instanceof DefineShape4Tag) {
+                        DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
+                        shape4.usesScalingStrokes = true;
+                    }
+                }
+                
                 int swfCap = lineCap == SvgLineCap.BUTT ? LINESTYLE2.NO_CAP
                         : lineCap == SvgLineCap.ROUND ? LINESTYLE2.ROUND_CAP
                                 : lineCap == SvgLineCap.SQUARE ? LINESTYLE2.SQUARE_CAP : 0;

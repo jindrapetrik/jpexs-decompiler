@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - SVG Frames export - blend modes
 - SVG Frames export - filter
 - SVG Shapes export - non-scaling strokes
+- SVG Shapes import - non-scaling strokes
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
