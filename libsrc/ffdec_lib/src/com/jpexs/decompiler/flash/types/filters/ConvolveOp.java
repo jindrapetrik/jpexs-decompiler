@@ -54,6 +54,27 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         this.srcY = srcY;
         this.srcWidth = srcWidth;
         this.srcHeight = srcHeight;
+    }   
+
+    @Override
+    public BufferedImage createCompatibleDestImage(BufferedImage src,
+            ColorModel dstCM) {
+        if (dstCM != null) {
+            return new BufferedImage(dstCM,
+                    src.getRaster().createCompatibleWritableRaster(),
+                    src.isAlphaPremultiplied(), null);
+        }
+
+        return new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
+    }
+
+    @Override
+    public final RenderingHints getRenderingHints() {
+        return hints;
+    }
+
+    public final Kernel getKernel() {
+        return (Kernel) kernel.clone();
     }
 
     @Override
@@ -80,27 +101,6 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         }
 
         return dst;
-    }
-
-    @Override
-    public BufferedImage createCompatibleDestImage(BufferedImage src,
-            ColorModel dstCM) {
-        if (dstCM != null) {
-            return new BufferedImage(dstCM,
-                    src.getRaster().createCompatibleWritableRaster(),
-                    src.isAlphaPremultiplied(), null);
-        }
-
-        return new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-    }
-
-    @Override
-    public final RenderingHints getRenderingHints() {
-        return hints;
-    }
-
-    public final Kernel getKernel() {
-        return (Kernel) kernel.clone();
     }
 
     @Override
