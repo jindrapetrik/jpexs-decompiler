@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#2097] Commandline command `-header` to modify SWF header values
 - SVG Frames export - blend modes
 - SVG Frames export - filter
+- SVG Shapes export - non-scaling strokes
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
