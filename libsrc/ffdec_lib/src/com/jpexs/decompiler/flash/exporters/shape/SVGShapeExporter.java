@@ -199,6 +199,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 }
                 break;
         }
+        if ("NONE".equals(scaleMode)) {
+            path.setAttribute("vector-effect", "non-scaling-stroke");
+        }
     }
 
     @Override
