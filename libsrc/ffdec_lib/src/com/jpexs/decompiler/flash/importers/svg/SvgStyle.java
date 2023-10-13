@@ -204,6 +204,10 @@ class SvgStyle {
     public double getStopOpacity() {
         return getValue(element, "stop-opacity");
     }
+    
+    public String getVectorEffect() {
+        return getValue(element, "vector-effect");
+    }
 
     public SvgFill getFillWithOpacity() {
         SvgFill fill = getFill();
@@ -703,6 +707,9 @@ class SvgStyle {
                 case "stop-opacity": {
                     double stopOpacity = Double.parseDouble(value);
                     return stopOpacity;
+                }
+                case "vector-effect": {
+                    return value;
                 }
             }
         } catch (NumberFormatException ex) {
