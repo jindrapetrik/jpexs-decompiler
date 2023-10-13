@@ -888,7 +888,7 @@ public class Timeline {
 
             if (filters != null) {
                 for (FILTER filter : filters) {
-                    img = filter.apply(img, unzoom, (int)deltaXMax, (int)deltaYMax, (int)Math.round(newWidth - 2 * deltaXMax), (int)Math.round(newHeight - 2 * deltaYMax));
+                    img = filter.apply(img, unzoom, (int) deltaXMax, (int) deltaYMax, (int) Math.round(newWidth - 2 * deltaXMax), (int) Math.round(newHeight - 2 * deltaYMax));
                 }
             }
             if (blendMode > 1) {

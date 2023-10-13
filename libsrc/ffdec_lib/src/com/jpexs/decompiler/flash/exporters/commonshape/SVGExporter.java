@@ -167,7 +167,7 @@ public class SVGExporter {
 
         return true;
     }
-    
+
     public final Element createClipPath(Matrix transform, String id) {
         Element group = createSubGroup(id, "clipPath");
         if (transform != null) {
@@ -426,10 +426,6 @@ public class SVGExporter {
         _svgGs.peek().appendChild(image);
     }
 
-    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
-        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
-    }
-    
     private void handleFilters(Element image, List<FILTER> filters) {
         if (filters == null) {
             return;
@@ -438,22 +434,26 @@ public class SVGExporter {
         String filterId = getUniqueId("filter");
         String in = "SourceGraphic";
         boolean empty = true;
-        for (FILTER filter: filters) {
-           String result = filter.toSvg(_svg, filtersElement, this, in);
-           if (result != null) {
-               empty = false;
-               in = result;
-           }
+        for (FILTER filter : filters) {
+            String result = filter.toSvg(_svg, filtersElement, this, in);
+            if (result != null) {
+                empty = false;
+                in = result;
+            }
         }
         if (empty) {
             return;
         }
-        
-        filtersElement.setAttribute("id", filterId);                
+
+        filtersElement.setAttribute("id", filterId);
         image.setAttribute("filter", "url(#" + filterId + ")");
         _svgGs.peek().appendChild(filtersElement);
     }
 
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
+    }
+    
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
             addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode, filters);
@@ -474,18 +474,18 @@ public class SVGExporter {
         if (characterName != null) {
             image.setAttribute("data-characterName", characterName);
         }
-        
+
         setBlendMode(image, blendMode);
-        
+
         handleFilters(image, filters);
-        
-        image.setAttribute("xlink:href", "#" + href);        
+
+        image.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(image);
         return image;
     }
-    
+
     private void setBlendMode(Element element, int blendMode) {
-        switch(blendMode) {
+        switch (blendMode) {
             case BlendMode.MULTIPLY:
                 element.setAttribute("style", "mix-blend-mode: multiply");
                 break;
