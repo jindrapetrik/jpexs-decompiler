@@ -539,11 +539,17 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     if (itemStr.isEmpty()) {
                                         itemStr = AppStrings.translate("generictag.array.item");
                                     }
-
+                                    
                                     boolean canAdd = true;
                                     if (!ReflectionTools.canAddToField(fnode.obj, fnode.fieldSet.get(FIELD_INDEX))) {
                                         canAdd = false;
                                     }
+                                    if (swfArray != null) {
+                                        if (swfArray.count() > 0) {
+                                            canAdd = false;
+                                        }
+                                    }
+
                                     JPopupMenu p = new JPopupMenu();
                                     JMenuItem mi;
                                     Class<?> subtype = ReflectionTools.getFieldSubType(fnode.obj, fnode.fieldSet.get(FIELD_INDEX));
@@ -581,7 +587,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                         
                                         if (fnode.index > -1) {
                                             p.add(mi);
-                                        }
+                                        }                                                                               
                                         JMenu mAfter = new JMenu(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
                                         
                                         if (fnode.index > -1) {
@@ -668,6 +674,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                     }
                                                 }
                                             });
+                                            if (!canAdd) {
+                                                mi.setEnabled(false);
+                                            }
                                             p.add(mi);
 
                                             mi = new JMenuItem(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));

@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - Convolution matrix filter display and editing
 - Generic tag editor - Disallow add before/after or remove on parent field with indices
 - Calculating fillBits, lineBits on SHAPE structure (storing morphshapes, fonts)
+- Generic tag editor - COLORMATRIXFILTER has fixed number of float values
 
 ## [19.0.0] - 2023-10-01
 ### Added
