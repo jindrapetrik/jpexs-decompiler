@@ -956,23 +956,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if (swfType.value() != BasicType.OTHER) {
                     typeStr = "" + swfType.value();
                 }
-                if (isArrayParent) {
-                    if (swfType.count() > 0) {
-                        typeStr += "[" + swfType.count();
-                        if (swfType.countAdd() > 0) {
-                            typeStr += " + " + swfType.countAdd();
-                        }
-                        typeStr += "]";
-                        bracketsDetected = true;
-                    } else if (!swfType.countField().isEmpty()) {
-                        typeStr += "[" + swfType.countField();
-                        if (swfType.countAdd() > 0) {
-                            typeStr += " + " + swfType.countAdd();
-                        }
-                        typeStr += "]";
-                        bracketsDetected = true;
+                if (swfType.count() > 0) {
+                    typeStr += "[" + swfType.count();
+                    if (swfType.countAdd() > 0) {
+                        typeStr += " + " + swfType.countAdd();
                     }
-                }
+                    typeStr += "]";
+                    bracketsDetected = true;
+                } else if (!swfType.countField().isEmpty()) {
+                    typeStr += "[" + swfType.countField();
+                    if (swfType.countAdd() > 0) {
+                        typeStr += " + " + swfType.countAdd();
+                    }
+                    typeStr += "]";
+                    bracketsDetected = true;
+                }               
             }
 
             String arrayBrackets = "";
@@ -1516,13 +1514,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void addItem(Object obj, Field field, int index, Class<?> cls) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        SWFType swfType = field.getAnnotation(SWFType.class);
         String countFieldName = null;
         if (swfArray != null && !swfArray.countField().isEmpty()) {
             countFieldName = swfArray.countField();
-        }
-        if (swfType != null && !swfType.countField().isEmpty()) {
-            countFieldName = swfType.countField();
         }
         
         if (countFieldName != null) { //Fields with same countField must be enlarged too
@@ -1530,13 +1524,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             List<Integer> sameFlds = new ArrayList<>();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
-                SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 String fieldCountFieldName = null;
                 if (fieldSwfArray != null && !fieldSwfArray.countField().isEmpty()) {
                     fieldCountFieldName = fieldSwfArray.countField();
-                }
-                if (fieldSwfType != null && !fieldSwfType.countField().isEmpty()) {
-                    fieldCountFieldName = fieldSwfType.countField();
                 }
                 if (fieldCountFieldName != null && fieldCountFieldName.equals(countFieldName)) {
                     sameFlds.add(f);
@@ -1612,25 +1602,17 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void removeItem(Object obj, Field field, int index) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        SWFType swfType = field.getAnnotation(SWFType.class);
         String countFieldName = null;
         if (swfArray != null && !swfArray.countField().isEmpty()) {
             countFieldName = swfArray.countField();
-        }
-        if (swfType != null && !swfType.countField().isEmpty()) {
-            countFieldName = swfType.countField();
         }
         if (countFieldName != null) { //Fields with same countField must be removed from too
             Field[] fields = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
-                SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
                 String fieldCountFieldName = null;
                 if (fieldSwfArray != null && !fieldSwfArray.countField().isEmpty()) {
                     fieldCountFieldName = fieldSwfArray.countField();
-                }
-                if (fieldSwfType != null && !fieldSwfType.countField().isEmpty()) {
-                    fieldCountFieldName = fieldSwfType.countField();
                 }
                 
                 if (fieldCountFieldName != null && fieldCountFieldName.equals(countFieldName)) {

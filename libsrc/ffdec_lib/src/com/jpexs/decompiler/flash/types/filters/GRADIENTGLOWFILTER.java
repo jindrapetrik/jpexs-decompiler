@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types.filters;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -37,7 +38,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient colors
      */
-    @SWFType(countField = "numColors")
+    @SWFArray(value = "color", countField = "numColors")
     public RGBA[] gradientColors = new RGBA[] {
         new RGBA(255, 255, 255, 0),
         new RGBA(Color.BLACK)
@@ -46,7 +47,8 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient ratios
      */
-    @SWFType(value = BasicType.UI8, countField = "numColors")
+    @SWFType(value = BasicType.UI8)
+    @SWFArray(value = "ratio", countField = "numColors")
     public int[] gradientRatio = new int[] {
         0, 255
     };
