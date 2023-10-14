@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
@@ -34,9 +35,15 @@ public class MORPHLINESTYLE2 implements Serializable {
     public int endWidth;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = ROUND_CAP, text = "Round cap")
+    @EnumValue(value = NO_CAP, text = "No cap")
+    @EnumValue(value = SQUARE_CAP, text = "Square cap")
     public int startCapStyle;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = ROUND_JOIN, text = "Round join")
+    @EnumValue(value = BEVEL_JOIN, text = "Bevel join")
+    @EnumValue(value = MITER_JOIN, text = "Miter join")
     public int joinStyle;
 
     public static final int ROUND_JOIN = 0;
@@ -60,6 +67,9 @@ public class MORPHLINESTYLE2 implements Serializable {
     public boolean noClose;
 
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = ROUND_CAP, text = "Round cap")
+    @EnumValue(value = NO_CAP, text = "No cap")
+    @EnumValue(value = SQUARE_CAP, text = "Square cap")
     public int endCapStyle;
 
     public static final int ROUND_CAP = 0;
