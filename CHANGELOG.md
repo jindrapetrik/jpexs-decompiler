@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - COLORMATRIXFILTER has fixed number of float values
 - Filters display - ymin value
 - Box blur display rounding errors
+- Generic tag editor - display of color values in arrays (filters, etc.)
 
 ## [19.0.0] - 2023-10-01
 ### Added
