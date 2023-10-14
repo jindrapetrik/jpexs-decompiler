@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -23,6 +24,8 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Glow filter with gradient instead of single color
@@ -139,5 +142,10 @@ public class GRADIENTGLOWFILTER extends FILTER {
     @Override
     public double getDeltaY() {
         return blurY + Math.abs(distance * Math.sin(angle));
+    }
+    
+    @Override
+    public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
+        return null; //NOT SUPPORTED
     }
 }

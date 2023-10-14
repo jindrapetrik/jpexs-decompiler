@@ -57,9 +57,7 @@ public abstract class FILTER implements Serializable {
 
     public abstract double getDeltaY();
 
-    public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
-        return null;
-    }
+    public abstract String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in);
 
     protected String dropShadowSvg(
             double distance,
