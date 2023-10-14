@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - Box blur display rounding errors
 - Generic tag editor - display of color values in arrays (filters, etc.)
 - Generic tag editor - display of array brackets
+- Generic tag editor - GRADIENT filters fields
 
 ## [19.0.0] - 2023-10-01
 ### Added

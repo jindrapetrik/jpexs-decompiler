@@ -62,7 +62,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Matrix values
      */
-    @SWFType(BasicType.FLOAT)
+    @SWFType(value = BasicType.FLOAT, countField = "matrixX * matrixY", canAdd = false)   
     public float[] matrix = new float[] {
         0, 0, 0,
         0, 1, 0,
