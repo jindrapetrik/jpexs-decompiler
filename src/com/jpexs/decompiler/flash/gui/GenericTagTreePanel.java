@@ -269,6 +269,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 public Class<? extends Annotation> annotationType() {
                     return SWFType.class;
                 }
+
+                @Override
+                public boolean canAdd() {
+                    return swfType.canAdd();
+                }                                
             };
         } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -527,6 +532,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 Field field = fnode.fieldSet.get(FIELD_INDEX);
                                 if (ReflectionTools.needsIndex(field)) {
                                     SWFArray swfArray = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFArray.class);
+                                    SWFType swfType = fnode.fieldSet.get(FIELD_INDEX).getAnnotation(SWFType.class);
 
                                     String itemStr = "";
                                     if (swfArray != null) {
@@ -545,6 +551,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     }
                                     if (swfArray != null) {
                                         if (swfArray.count() > 0) {
+                                            canAdd = false;
+                                        }
+                                    }
+                                    if (swfType != null) {
+                                        if (!swfType.canAdd()) {
                                             canAdd = false;
                                         }
                                     }
@@ -1505,19 +1516,35 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void addItem(Object obj, Field field, int index, Class<?> cls) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be enlarged too
+        SWFType swfType = field.getAnnotation(SWFType.class);
+        String countFieldName = null;
+        if (swfArray != null && !swfArray.countField().isEmpty()) {
+            countFieldName = swfArray.countField();
+        }
+        if (swfType != null && !swfType.countField().isEmpty()) {
+            countFieldName = swfType.countField();
+        }
+        
+        if (countFieldName != null) { //Fields with same countField must be enlarged too
             Field[] fields = obj.getClass().getDeclaredFields();
             List<Integer> sameFlds = new ArrayList<>();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
-                if (fieldSwfArray != null && fieldSwfArray.countField().equals(swfArray.countField())) {
+                SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
+                String fieldCountFieldName = null;
+                if (fieldSwfArray != null && !fieldSwfArray.countField().isEmpty()) {
+                    fieldCountFieldName = fieldSwfArray.countField();
+                }
+                if (fieldSwfType != null && !fieldSwfType.countField().isEmpty()) {
+                    fieldCountFieldName = fieldSwfType.countField();
+                }
+                if (fieldCountFieldName != null && fieldCountFieldName.equals(countFieldName)) {
                     sameFlds.add(f);
                     if (cls == null && !ReflectionTools.canAddToField(obj, fields[f])) {
                         JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
                         return;
                     }
-
-                }
+                }                
             }
             for (int f : sameFlds) {
                 ReflectionTools.addToField(obj, fields[f], index, true, cls);
@@ -1536,7 +1563,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             try {
                 //If countField exists, increment, otherwise do nothing
-                Field countField = obj.getClass().getDeclaredField(swfArray.countField());
+                Field countField = obj.getClass().getDeclaredField(countFieldName);
                 int cnt = countField.getInt(obj);
                 cnt++;
                 countField.setInt(obj, cnt);
@@ -1585,17 +1612,34 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private void removeItem(Object obj, Field field, int index) {
         SWFArray swfArray = field.getAnnotation(SWFArray.class);
-        if (swfArray != null && !swfArray.countField().isEmpty()) { //Fields with same countField must be removed from too
+        SWFType swfType = field.getAnnotation(SWFType.class);
+        String countFieldName = null;
+        if (swfArray != null && !swfArray.countField().isEmpty()) {
+            countFieldName = swfArray.countField();
+        }
+        if (swfType != null && !swfType.countField().isEmpty()) {
+            countFieldName = swfType.countField();
+        }
+        if (countFieldName != null) { //Fields with same countField must be removed from too
             Field[] fields = obj.getClass().getDeclaredFields();
             for (int f = 0; f < fields.length; f++) {
                 SWFArray fieldSwfArray = fields[f].getAnnotation(SWFArray.class);
-                if (fieldSwfArray != null && fieldSwfArray.countField().equals(swfArray.countField())) {
+                SWFType fieldSwfType = fields[f].getAnnotation(SWFType.class);
+                String fieldCountFieldName = null;
+                if (fieldSwfArray != null && !fieldSwfArray.countField().isEmpty()) {
+                    fieldCountFieldName = fieldSwfArray.countField();
+                }
+                if (fieldSwfType != null && !fieldSwfType.countField().isEmpty()) {
+                    fieldCountFieldName = fieldSwfType.countField();
+                }
+                
+                if (fieldCountFieldName != null && fieldCountFieldName.equals(countFieldName)) {
                     ReflectionTools.removeFromField(obj, fields[f], index);
                 }
             }
             try {
                 //If countField exists, decrement, otherwise do nothing
-                Field countField = obj.getClass().getDeclaredField(swfArray.countField());
+                Field countField = obj.getClass().getDeclaredField(countFieldName);
                 int cnt = countField.getInt(obj);
                 cnt--;
                 countField.setInt(obj, cnt);
