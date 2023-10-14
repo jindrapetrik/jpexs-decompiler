@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - Calculating fillBits, lineBits on SHAPE structure (storing morphshapes, fonts)
 - Generic tag editor - COLORMATRIXFILTER has fixed number of float values
 - Filters display - ymin value
+- Box blur display rounding errors
 
 ## [19.0.0] - 2023-10-01
 ### Added

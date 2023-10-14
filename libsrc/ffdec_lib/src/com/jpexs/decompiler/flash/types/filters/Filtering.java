@@ -55,125 +55,66 @@ public class Filtering {
 
     private static final Rectangle RECTANGLE_512_1 = new Rectangle(512, 1);
 
-    private static void boxBlurHorizontal(int[] pixels, int[] mask, int[] newColors, int w, int h, int radius) {
-        int index = 0;
+    private static void boxBlurSingleIteration(int[] pixels, int[] mask, int[] newColors, int w, int h, int radiusX, int radiusY) {
+        int radiusXHalf = radiusX / 2;
+        int radiusYHalf = radiusY / 2;
+        double divisor = radiusX * radiusY;
 
         for (int y = 0; y < h; y++) {
-            int hits = 0;
-            long r = 0;
-            long g = 0;
-            long b = 0;
-            long a = 0;
-            for (int x = -radius; x < w; x++) {
-                int oldPixel = x - radius - 1;
-                if (oldPixel >= 0) {
+            for (int x = 0; x < w; x++) {
+                double sumR = 0;
+                double sumG = 0;
+                double sumB = 0;
+                double sumA = 0;
 
-                    int color = pixels[index + oldPixel];
-                    if ((mask == null) || (((mask[index + oldPixel] >> 24) & 0xff) > 0)) {
-                        if (color != 0) {
-                            a -= (color >> 24) & 0xff;
-                            r -= ((color >> 16) & 0xff);
-                            g -= ((color >> 8) & 0xff);
-                            b -= ((color) & 0xff);
-
-                        }
-                        hits--;
-                    }
-                }
-
-                int newPixel = x + radius;
-                if (newPixel < w) {
-                    int color = pixels[index + newPixel];
-                    if ((mask == null) || (((mask[index + newPixel] >> 24) & 0xff) > 0)) {
-                        if (color != 0) {
-                            a += (color >> 24) & 0xff;
-                            r += ((color >> 16) & 0xff);
-                            g += ((color >> 8) & 0xff);
-                            b += ((color) & 0xff);
-                        }
-                        hits++;
-                    }
-                }
-
-                if (x >= 0) {
-                    if ((mask == null) || (((mask[index + x] >> 24) & 0xff) > 0)) {
-                        if (hits == 0) {
-                            newColors[x] = 0;
+                int index = y * w + x;
+                for (int i = y - radiusYHalf; i < y - radiusYHalf + radiusY; i++) {
+                    for (int j = x - radiusXHalf; j < x - radiusXHalf + radiusX; j++) {
+                        int index2 = i * w + j;
+                        int v;
+                        if (i < 0 || j < 0 || i >= h || j >= w || (mask != null && (((mask[index2] >> 24) & 0xff) == 0))) {
+                            v = 0;
                         } else {
-                            newColors[x] = RGBA.toInt((int) (r / hits) & 0xff, (int) (g / hits) & 0xff, (int) (b / hits) & 0xff, (int) (a / hits));
+                            v = pixels[index2];
                         }
-                    } else {
-                        newColors[x] = 0;
+                        double a = (v >> 24) & 0xff;
+                        double r = ((v >> 16) & 0xff);
+                        double g = ((v >> 8) & 0xff);
+                        double b = ((v) & 0xff);
+
+                        r = r * a / 255.0;
+                        g = g * a / 255.0;
+                        b = b * a / 255.0;
+
+                        sumA += a;
+                        sumR += r;
+                        sumG += g;
+                        sumB += b;
                     }
                 }
+                int da = (int) Math.floor(sumA / divisor);
+                int da_mod = da == 0 ? 255 : da;
+                int dr = (int) Math.floor(sumR / divisor * 255.0 / (double) da_mod);
+                int dg = (int) Math.floor(sumG / divisor * 255.0 / (double) da_mod);
+                int db = (int) Math.floor(sumB / divisor * 255.0 / (double) da_mod);
+
+                if (dr > 255) {
+                    dr = 255;
+                }
+                if (dg > 255) {
+                    dg = 255;
+                }
+                if (db > 255) {
+                    db = 255;
+                }
+
+                newColors[index] = RGBA.toInt(dr, dg, db, da);
             }
-
-            System.arraycopy(newColors, 0, pixels, index, w);
-
-            index += w;
         }
-    }
-
-    private static void boxBlurVertical(int[] pixels, int[] mask, int[] newColors, int w, int h, int radius) {
-        int oldPixelOffset = -(radius + 1) * w;
-        int newPixelOffset = (radius) * w;
-
-        for (int x = 0; x < w; x++) {
-            int hits = 0;
-            long r = 0;
-            long g = 0;
-            long b = 0;
-            long a = 0;
-            int index = -radius * w + x;
-            for (int y = -radius; y < h; y++) {
-                int oldPixel = y - radius - 1;
-                if (oldPixel >= 0) {
-                    int color = pixels[index + oldPixelOffset];
-                    if ((mask == null) || (((mask[index + oldPixelOffset] >> 24) & 0xff) > 0)) {
-                        if (color != 0) {
-                            a -= (color >> 24) & 0xff;
-                            r -= ((color >> 16) & 0xff);
-                            g -= ((color >> 8) & 0xff);
-                            b -= ((color) & 0xff);
-
-                        }
-                        hits--;
-                    }
-
-                }
-
-                int newPixel = y + radius;
-                if (newPixel < h) {
-                    if ((mask == null) || (((mask[index + newPixelOffset] >> 24) & 0xff) > 0)) {
-                        int color = pixels[index + newPixelOffset];
-                        if (color != 0) {
-                            a += (color >> 24) & 0xff;
-                            r += ((color >> 16) & 0xff);
-                            g += ((color >> 8) & 0xff);
-                            b += ((color) & 0xff);
-
-                        }
-                        hits++;
-                    }
-                }
-
-                if (y >= 0) {
-                    if ((mask == null) || (((mask[y * w + x] >> 24) & 0xff) > 0)) {
-                        if (hits == 0) {
-                            newColors[y] = 0;
-                        } else {
-                            newColors[y] = RGBA.toInt((int) (r / hits) & 0xff, (int) (g / hits) & 0xff, (int) (b / hits) & 0xff, (int) (a / hits) & 0xff);
-                        }
-                    } else {
-                        newColors[y] = 0;
-                    }
-                }
-
-                index += w;
-            }
-
-            for (int y = 0; y < h; y++) {
-                pixels[y * w + x] = newColors[y];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int index = y * w + x;
+                pixels[index] = newColors[index];
             }
         }
     }
@@ -238,15 +179,10 @@ public class Filtering {
 
     private static void blur(int[] src, int width, int height, int hRadius, int vRadius, int iterations, int[] mask) {
         int[] inPixels = src;
-        premultiply(inPixels);
-
-        int[] tempRow = new int[width];
-        int[] tempColumn = new int[height];
+        int[] temp = new int[width * height];
         for (int i = 0; i < iterations; i++) {
-            boxBlurHorizontal(inPixels, mask, tempRow, width, height, hRadius / 2);
-            boxBlurVertical(inPixels, mask, tempColumn, width, height, vRadius / 2);
+            boxBlurSingleIteration(inPixels, mask, temp, width, height, hRadius, vRadius);
         }
-        unpremultiply(inPixels);
     }
 
     public static SerializableImage bevel(SerializableImage src, int blurX, int blurY, float strength, int type, int highlightColor, int shadowColor, float angle, float distance, boolean knockout, int iterations) {
