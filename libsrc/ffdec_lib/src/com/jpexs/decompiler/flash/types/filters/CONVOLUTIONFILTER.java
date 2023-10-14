@@ -72,7 +72,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Default color for pixels outside the image
      */
-    public RGBA defaultColor = new RGBA(Color.BLACK);
+    public RGBA defaultColor = new RGBA(0, 0, 0, 0);
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 6)
@@ -81,12 +81,12 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Clamp mode
      */
-    public boolean clamp;
+    public boolean clamp = true;
 
     /**
      * Preserve the alpha
      */
-    public boolean preserveAlpha;
+    public boolean preserveAlpha = false;
 
     /**
      * Constructor
