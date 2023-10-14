@@ -1353,20 +1353,47 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Writes SHAPE value to the stream
      *
-     * @param fillStyleCount
-     * @param lineStyleCount
      * @param value SHAPE value
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
-    public void writeSHAPE(int fillStyleCount, int lineStyleCount, SHAPE value, int shapeNum) throws IOException {
-        value.numFillBits = getNeededBitsU(fillStyleCount);
-        value.numLineBits = getNeededBitsU(lineStyleCount);
+    public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {                        
+        calculateSHAPEFillLineBits(value);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
     }
-
+    
+    private void calculateSHAPEFillLineBits(SHAPE value) {
+        int numFillBits = 0;
+        int numLineBits = 0;
+        
+        for (SHAPERECORD r : value.shapeRecords) {
+            if (r instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) r;
+                if (scr.stateNewStyles) {
+                    break;
+                }
+                if (scr.stateFillStyle0) {
+                    numFillBits = Math.max(numFillBits, getNeededBitsU(scr.fillStyle0));
+                }
+                if (scr.stateFillStyle1) {
+                    numFillBits = Math.max(numFillBits, getNeededBitsU(scr.fillStyle1));
+                }
+                if (scr.stateLineStyle) {
+                    numLineBits = Math.max(numLineBits, getNeededBitsU(scr.lineStyle));                
+                }
+            }
+        }
+        if (Configuration._debugCopy.get()) {
+            numFillBits = Math.max(numFillBits, value.numFillBits);
+            numLineBits = Math.max(numLineBits, value.numLineBits);
+        }
+        
+        value.numFillBits = numFillBits;
+        value.numLineBits = numLineBits;
+    }
+        
     /**
      * Writes SHAPEWITHSTYLE value to the stream
      *
@@ -1377,8 +1404,7 @@ public class SWFOutputStream extends OutputStream {
     public void writeSHAPEWITHSTYLE(SHAPEWITHSTYLE value, int shapeNum) throws IOException {
         writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
         writeLINESTYLEARRAY(value.lineStyles, shapeNum);
-        value.numFillBits = getNeededBitsU(value.fillStyles.fillStyles.length);
-        value.numLineBits = getNeededBitsU(shapeNum <= 3 ? value.lineStyles.lineStyles.length : value.lineStyles.lineStyles2.length);
+        calculateSHAPEFillLineBits(value);        
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
