@@ -127,11 +127,11 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
         SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
         sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 2);
         sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 2);
-        sos2.writeSHAPE(morphFillStyles.fillStyles.length, morphLineStyles.lineStyles2.length, startEdges, 2);
+        sos2.writeSHAPE(startEdges, 2);
         byte[] ba2 = baos2.toByteArray();
         sos.writeUI32(ba2.length);
         sos.write(ba2);
-        sos.writeSHAPE(morphFillStyles.fillStyles.length, morphLineStyles.lineStyles2.length, endEdges, 2);
+        sos.writeSHAPE(endEdges, 2);
     }
 
     @Override

@@ -196,7 +196,7 @@ public class DefineFont3Tag extends FontTag {
                     return;
                 }
                 try {
-                    sos3.writeSHAPE(1, 0, glyphShapeTable.get(i), 1);
+                    sos3.writeSHAPE(glyphShapeTable.get(i), 1);
                 } catch (IOException ex) {
                     //should not happen
                     return;
@@ -239,7 +239,7 @@ public class DefineFont3Tag extends FontTag {
         int numGlyphs = glyphShapeTable.size();
         for (int i = 0; i < numGlyphs; i++) {
             offsetTable.add(sos3.getPos());
-            sos3.writeSHAPE(1, 0, glyphShapeTable.get(i), 1);
+            sos3.writeSHAPE(glyphShapeTable.get(i), 1);
         }
         byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
 
