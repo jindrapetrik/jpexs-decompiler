@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,58 +36,58 @@ public class DROPSHADOWFILTER extends FILTER {
     /**
      * Color of the shadow
      */
-    public RGBA dropShadowColor;
+    public RGBA dropShadowColor = new RGBA(Color.BLACK);
 
     /**
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurX;
+    public double blurX = 5;
 
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurY;
+    public double blurY = 5;
 
     /**
      * Radian angle of the drop shadow
      */
     @SWFType(BasicType.FIXED)
-    public double angle;
+    public double angle = 45  * Math.PI / 180;
 
     /**
      * Distance of the drop shadow
      */
     @SWFType(BasicType.FIXED)
-    public double distance;
+    public double distance = 5;
 
     /**
      * Strength of the drop shadow
      */
     @SWFType(BasicType.FIXED8)
-    public float strength;
+    public float strength = 1f;
 
     /**
      * Inner shadow mode
      */
-    public boolean innerShadow;
+    public boolean innerShadow = false;
 
     /**
      * Knockout mode
      */
-    public boolean knockout;
+    public boolean knockout = false;
 
     /**
      * Composite source
      */
-    public boolean compositeSource;
+    public boolean compositeSource = true;
 
     /**
      * Number of blur passes
      */
     @SWFType(value = BasicType.UB, count = 5)
-    public int passes;
+    public int passes = 1;
 
     /**
      * Constructor

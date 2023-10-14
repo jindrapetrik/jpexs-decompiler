@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,46 +35,46 @@ public class GLOWFILTER extends FILTER {
     /**
      * Color of the shadow
      */
-    public RGBA glowColor;
+    public RGBA glowColor = new RGBA(Color.RED);
 
     /**
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurX;
+    public double blurX = 5;
 
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurY;
+    public double blurY = 5;
 
     /**
      * Strength of the glow
      */
     @SWFType(BasicType.FIXED8)
-    public float strength;
+    public float strength = 1;
 
     /**
      * Inner glow mode
      */
-    public boolean innerGlow;
+    public boolean innerGlow = false;
 
     /**
      * Knockout mode
      */
-    public boolean knockout;
+    public boolean knockout = false;
 
     /**
      * Composite source
      */
-    public boolean compositeSource;
+    public boolean compositeSource = true;
 
     /**
      * Number of blur passes
      */
     @SWFType(value = BasicType.UB, count = 5)
-    public int passes;
+    public int passes = 1;
 
     /**
      * Constructor

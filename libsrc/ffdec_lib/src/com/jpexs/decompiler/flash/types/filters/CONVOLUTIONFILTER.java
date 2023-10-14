@@ -63,7 +63,11 @@ public class CONVOLUTIONFILTER extends FILTER {
      * Matrix values
      */
     @SWFType(BasicType.FLOAT)
-    public float[] matrix = new float[9];
+    public float[] matrix = new float[] {
+        0, 0, 0,
+        0, 1, 0,
+        0, 0, 0
+    };
 
     /**
      * Default color for pixels outside the image

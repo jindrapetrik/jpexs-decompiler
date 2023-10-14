@@ -38,19 +38,19 @@ public class BLURFILTER extends FILTER {
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurX;
+    public double blurX = 5;
 
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurY;
+    public double blurY = 5;
 
     /**
      * Number of blur passes
      */
     @SWFType(value = BasicType.UB, count = 5)
-    public int passes;
+    public int passes = 1;
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 3)
