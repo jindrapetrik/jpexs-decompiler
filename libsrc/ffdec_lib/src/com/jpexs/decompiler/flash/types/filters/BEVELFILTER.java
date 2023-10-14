@@ -36,68 +36,68 @@ public class BEVELFILTER extends FILTER {
     /**
      * Color of the shadow
      */
-    public RGBA shadowColor;
+    public RGBA shadowColor = new RGBA(Color.BLACK);
 
     /**
      * Color of the highlight
      */
-    public RGBA highlightColor;
+    public RGBA highlightColor = new RGBA(Color.WHITE);
 
     /**
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurX;
+    public double blurX = 5;
 
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurY;
+    public double blurY = 5;
 
     /**
      * Radian angle of the drop shadow
      */
     @SWFType(BasicType.FIXED)
-    public double angle;
+    public double angle = 45  * Math.PI / 180;
 
     /**
      * Distance of the drop shadow
      */
     @SWFType(BasicType.FIXED)
-    public double distance;
+    public double distance = 5;
 
     /**
      * Strength of the drop shadow
      */
     @SWFType(BasicType.FIXED8)
-    public float strength;
+    public float strength = 1f;
 
     /**
      * Inner shadow mode
      */
-    public boolean innerShadow;
+    public boolean innerShadow = true;
 
     /**
      * Knockout mode
      */
-    public boolean knockout;
+    public boolean knockout = false;
 
     /**
      * Composite source
      */
-    public boolean compositeSource;
+    public boolean compositeSource = true;
 
     /**
      * OnTop mode
      */
-    public boolean onTop;
+    public boolean onTop = false;
 
     /**
      * Number of blur passes
      */
     @SWFType(value = BasicType.UB, count = 4)
-    public int passes;
+    public int passes = 1;
 
     /**
      * Constructor

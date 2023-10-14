@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - SVG Shapes import - non-scaling strokes
 - Support for DefineShape4 nonzero winding rule - display, svg (import, export), canvas export
 - Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style
+- Generic tag editor - Default values for filters
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData

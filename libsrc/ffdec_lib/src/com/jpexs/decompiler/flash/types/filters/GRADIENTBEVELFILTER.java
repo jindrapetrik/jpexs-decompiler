@@ -38,69 +38,75 @@ public class GRADIENTBEVELFILTER extends FILTER {
      * Gradient colors
      */
     @SWFType(countField = "numColors")
-    public RGBA[] gradientColors = new RGBA[0];
+    public RGBA[] gradientColors = new RGBA[] {
+        new RGBA(Color.WHITE),
+        new RGBA(255, 0, 0, 0),
+        new RGBA(Color.BLACK)
+    };
 
     /**
      * Gradient ratios
      */
     @SWFType(value = BasicType.UI8, countField = "numColors")
-    public int[] gradientRatio = new int[0];
+    public int[] gradientRatio = new int[] {
+        0, 128, 255
+    };
 
     /**
      * Horizontal blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurX;
+    public double blurX = 5;
 
     /**
      * Vertical blur amount
      */
     @SWFType(BasicType.FIXED)
-    public double blurY;
+    public double blurY = 5;
 
     /**
      * Radian angle of the gradient bevel
      */
     @SWFType(BasicType.FIXED)
-    public double angle;
+    public double angle = 45  * Math.PI / 180;
 
     /**
      * Distance of the gradient bevel
      */
     @SWFType(BasicType.FIXED)
-    public double distance;
+    public double distance = 5;
 
     /**
      * Strength of the gradient bevel
      */
     @SWFType(BasicType.FIXED8)
-    public float strength;
+    public float strength = 1;
 
     /**
      * Inner bevel mode
      */
-    public boolean innerShadow;
+    public boolean innerShadow = true;
 
     /**
      * Knockout mode
      */
-    public boolean knockout;
+    public boolean knockout = false;
 
     /**
      * Composite source
      */
-    public boolean compositeSource;
+    public boolean compositeSource = true;
 
     /**
      * OnTop mode
      */
-    public boolean onTop;
+    public boolean onTop = false;
 
     /**
      * Number of blur passes
      */
     @SWFType(value = BasicType.UB, count = 4)
-    public int passes;
+    public int passes = 1;
 
     public GRADIENTBEVELFILTER() {
         super(7);
