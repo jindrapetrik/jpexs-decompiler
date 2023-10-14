@@ -822,6 +822,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                     ret.append(toString(i));
                 }
+                ret.insert(0, "<html>").append("</html>");
                 return ret.toString();
             }
 
