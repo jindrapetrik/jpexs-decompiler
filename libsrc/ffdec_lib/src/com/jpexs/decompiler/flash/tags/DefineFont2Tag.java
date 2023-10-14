@@ -209,7 +209,7 @@ public class DefineFont2Tag extends FontTag {
                     return;
                 }
                 try {
-                    sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+                    sos3.writeSHAPE(1, 0, glyphShapeTable.get(i), 1);
                 } catch (IOException ex) {
                     //should not happen
                     return;
@@ -266,7 +266,7 @@ public class DefineFont2Tag extends FontTag {
         SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
         for (int i = 0; i < numGlyphs; i++) {
             offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
-            sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+            sos3.writeSHAPE(1, 0, glyphShapeTable.get(i), 1);
         }
         byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
         for (Long offset : offsetTable) {

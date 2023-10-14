@@ -104,6 +104,7 @@ public class SvgImporter {
 
         if (st instanceof DefineShape4Tag) {
             DefineShape4Tag shape4 = (DefineShape4Tag) st;
+            shape4.usesFillWindingRule = false;
             shape4.usesNonScalingStrokes = false;
             shape4.usesScalingStrokes = false;
         }
@@ -371,6 +372,14 @@ public class SvgImporter {
     }
 
     private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style) {
+        
+        if ("nonzero".equals(style.getFillRule())) {
+            if (shapeTag instanceof DefineShape4Tag) {
+                DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
+                shape4.usesFillWindingRule = true;
+            }
+        }
+        
         Matrix transform2 = transform.preConcatenate(Matrix.getScaleInstance(SWF.unitDivisor));
         Point prevPoint = new Point(0, 0);
         Point startPoint = prevPoint;
@@ -1192,7 +1201,7 @@ public class SvgImporter {
         st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS, false));
         swf.addTag(st);
         SerializableImage si = new SerializableImage(480, 360, BufferedImage.TYPE_4BYTE_ABGR);
-        BitmapExporter.export(st.getShapeNum(), swf, st.shapes, Color.yellow, si, 1, new Matrix(), new Matrix(), null, true, true);
+        BitmapExporter.export(st.getWindingRule(), st.getShapeNum(), swf, st.shapes, Color.yellow, si, 1, new Matrix(), new Matrix(), null, true, true);
         List<Tag> li = new ArrayList<>();
         li.add(st);
         ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));

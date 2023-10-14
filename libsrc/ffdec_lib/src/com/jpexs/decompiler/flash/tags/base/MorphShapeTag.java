@@ -323,7 +323,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         // todo: Currently the generated image is not cached, because the cache
         // key contains the hashCode of the finalRecord object, and it is always
         // recreated
-        BitmapExporter.export(getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing);
+        BitmapExporter.export(ShapeTag.WIND_EVEN_ODD /*??? FIXME*/, getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing);
     }
 
     @Override
@@ -335,7 +335,7 @@ public abstract class MorphShapeTag extends DrawableTag {
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter shapeExporter = new SVGShapeExporter(getShapeNum() == 2 ? 4 : 1, swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(ShapeTag.WIND_EVEN_ODD /*??? FIXME*/, getShapeNum() == 2 ? 4 : 1, swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
             shapeExporter.export();
         }
     }

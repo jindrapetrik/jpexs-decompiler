@@ -43,19 +43,19 @@ public class PathExporter extends ShapeExporterBase {
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
-    public static List<GeneralPath> export(int shapeNum, SWF swf, SHAPE shape) {
-        return export(shapeNum, swf, shape, new ArrayList<>());
+    public static List<GeneralPath> export(int windingRule, int shapeNum, SWF swf, SHAPE shape) {
+        return export(windingRule, shapeNum, swf, shape, new ArrayList<>());
     }
 
-    public static List<GeneralPath> export(int shapeNum, SWF swf, SHAPE shape, List<GeneralPath> strokes) {
-        PathExporter exporter = new PathExporter(shapeNum, swf, shape, null);
+    public static List<GeneralPath> export(int windingRule, int shapeNum, SWF swf, SHAPE shape, List<GeneralPath> strokes) {
+        PathExporter exporter = new PathExporter(windingRule, shapeNum, swf, shape, null);
         exporter.export();
         strokes.addAll(exporter.strokes);
         return exporter.paths;
     }
 
-    protected PathExporter(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
-        super(shapeNum, swf, shape, colorTransform);
+    protected PathExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
+        super(windingRule, shapeNum, swf, shape, colorTransform);
     }
 
     @Override

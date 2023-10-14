@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
@@ -108,7 +109,7 @@ public class SHAPE implements NeedsCharacters, Serializable {
         }
 
         List<GeneralPath> strokes = new ArrayList<>();
-        List<GeneralPath> paths = PathExporter.export(shapeNum, swf, this, strokes);
+        List<GeneralPath> paths = PathExporter.export(ShapeTag.WIND_EVEN_ODD, shapeNum, swf, this, strokes);
 
         boolean large = shapeRecords.size() > 500;
 

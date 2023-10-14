@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
@@ -150,8 +151,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         return shapeData.toString();
     }
 
-    public CanvasShapeExporter(int shapeNum, RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
-        super(shapeNum, swf, shape, colorTransform);
+    public CanvasShapeExporter(int windingRule, int shapeNum, RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
+        super(windingRule, shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.unitDivisor = unitDivisor;
         this.basicFill = basicFill;
@@ -437,7 +438,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 preLineFillData.append("\tlfctx.applyTransforms(ctx._matrix);\r\n");
                 preLineFillData.append("\tctx = lfctx;");
                 if (lineLastRadColor != null) {
-                    preLineFillData.append("\tctx.fillStyle=").append(lineLastRadColor).append(";\r\n\tctx.fill(\"evenodd\");\r\n");
+                    preLineFillData.append("\tctx.fillStyle=").append(lineLastRadColor).append(";\r\n\tctx.fill(\"").append(windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd").append("\");\r\n");
                 }
 
                 if (lineFillMatrix != null) {
@@ -474,7 +475,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             if (fillMatrix != null) {
                 pathData.append(drawFill);
                 if (lastRadColor != null) {
-                    pathData.append("\tctx.fillStyle=").append(lastRadColor).append(";\r\n\tctx.fill(\"evenodd\");\r\n");
+                    pathData.append("\tctx.fillStyle=").append(lastRadColor).append(";\r\n\tctx.fill(\"").append(windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd").append("\");\r\n");
                 }
                 pathData.append("\tctx.save();\r\n");
                 pathData.append("\tctx.clip();\r\n");
@@ -497,7 +498,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
                 shapeData.append(pathData);
             } else {
                 if (fillData != null && fillData.length() > 0) {
-                    pathData.append(drawFill).append("\tctx.fill(\"evenodd\");\r\n");
+                    pathData.append(drawFill).append("\tctx.fill(\"").append(windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd").append("\");\r\n");
                 }
                 shapeData.append(fillData).append(pathData);
             }

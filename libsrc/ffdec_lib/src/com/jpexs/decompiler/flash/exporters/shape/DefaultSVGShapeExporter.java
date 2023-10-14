@@ -41,8 +41,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected boolean aliasedFill;
 
-    public DefaultSVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
-        super(shapeNum, swf, shape, colorTransform);
+    public DefaultSVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
+        super(windingRule, shapeNum, swf, shape, colorTransform);
         this.zoom = zoom;
     }
 

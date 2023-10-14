@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - SVG Frames export - filter
 - SVG Shapes export - non-scaling strokes
 - SVG Shapes import - non-scaling strokes
+- Support for DefineShape4 nonzero winding rule - display, svg (import, export), canvas export
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
@@ -34,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - [#116] §§push at the end of switch branches
 - Convolution matrix filter display and editing
 - Generic tag editor - Disallow add before/after or remove on parent field with indices
+- Calculating fillBits, lineBits on SHAPE structure (storing morphshapes, fonts)
 
 ## [19.0.0] - 2023-10-01
 ### Added

@@ -117,4 +117,11 @@ public class DefineShape4Tag extends ShapeTag {
         edgeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, null, 4, true);
     }
 
+    @Override
+    public int getWindingRule() {
+        if (usesFillWindingRule) {
+            return WIND_NONZERO;
+        }
+        return WIND_EVEN_ODD;
+    }
 }
