@@ -1353,11 +1353,15 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Writes SHAPE value to the stream
      *
+     * @param fillStyleCount
+     * @param lineStyleCount
      * @param value SHAPE value
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
-    public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {
+    public void writeSHAPE(int fillStyleCount, int lineStyleCount, SHAPE value, int shapeNum) throws IOException {
+        value.numFillBits = getNeededBitsU(fillStyleCount);
+        value.numLineBits = getNeededBitsU(lineStyleCount);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);

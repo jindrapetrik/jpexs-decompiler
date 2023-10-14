@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
@@ -74,7 +75,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private final SWF swf;
 
-    private final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
+    private final GeneralPath path;
 
     private Shape aliasedShape;
 
@@ -166,16 +167,17 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing) {
-        BitmapExporter exporter = new BitmapExporter(shapeNum, swf, shape, defaultColor, colorTransform);
+    public static void export(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing) {
+        BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
         exporter.setCanUseSmoothing(canUseSmoothing);
         exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes);
     }
 
-    private BitmapExporter(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
-        super(shapeNum, swf, shape, colorTransform);
+    private BitmapExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
+        super(windingRule, shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
+        path = new GeneralPath(windingRule == ShapeTag.WIND_NONZERO ? GeneralPath.WIND_NON_ZERO : GeneralPath.WIND_EVEN_ODD);
     }
 
     private void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {

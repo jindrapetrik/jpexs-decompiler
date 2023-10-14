@@ -114,7 +114,7 @@ public class DefineFontTag extends FontTag {
         SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
         for (SHAPE shape : glyphShapeTable) {
             offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
-            sos2.writeSHAPE(shape, 1);
+            sos2.writeSHAPE(1, 0, shape, 1);
         }
         for (int offset : offsetTable) {
             sos.writeUI16(offset);
@@ -323,7 +323,7 @@ public class DefineFontTag extends FontTag {
                 return false;
             }
             try {
-                sos2.writeSHAPE(shape, 1);
+                sos2.writeSHAPE(1, 0, shape, 1);
             } catch (IOException ex) {
                 //should not happen
             }

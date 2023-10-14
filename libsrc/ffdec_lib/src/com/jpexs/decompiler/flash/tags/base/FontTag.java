@@ -440,7 +440,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     @Override
     public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        SHAPERECORD.shapeListToImage(1, swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
+        SHAPERECORD.shapeListToImage(ShapeTag.WIND_EVEN_ODD, 1, swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 
     @Override
@@ -457,7 +457,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             String cs = "" + c;
             cs = cs.replace("\\", "\\\\").replace("\"", "\\\"");
             result.append("\t\tcase \"").append(cs).append("\":\r\n");
-            CanvasShapeExporter exporter = new CanvasShapeExporter(1, null, unitDivisor, swf, shapes.get(i), null, 0, 0);
+            CanvasShapeExporter exporter = new CanvasShapeExporter(ShapeTag.WIND_EVEN_ODD, 1, null, unitDivisor, swf, shapes.get(i), null, 0, 0);
             exporter.export();
             result.append("\t\t").append(exporter.getShapeData().replaceAll("\r\n", "\r\n\t\t"));
             result.append("\tbreak;\r\n");

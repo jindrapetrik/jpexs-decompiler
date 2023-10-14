@@ -139,7 +139,7 @@ public class ShapeExporter {
                                 SHAPE shp = st.getShapes();
                                 int deltaX = -shp.getBounds(1).Xmin;
                                 int deltaY = -shp.getBounds(1).Ymin;
-                                CanvasShapeExporter cse = new CanvasShapeExporter(st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
+                                CanvasShapeExporter cse = new CanvasShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                                 cse.export();
                                 Set<Integer> needed = new HashSet<>();
                                 needed.add(st.getCharacterId());

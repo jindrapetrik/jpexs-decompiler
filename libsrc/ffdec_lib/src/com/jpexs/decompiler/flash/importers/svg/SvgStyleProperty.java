@@ -58,6 +58,7 @@ public class SvgStyleProperty {
         p.put("color", new SvgStyleProperty("color", true, Color.BLACK /* depends on user agent */));
         p.put("fill", new SvgStyleProperty("fill", true, new SvgColor(Color.BLACK)));
         p.put("fill-opacity", new SvgStyleProperty("fill-opacity", true, 1.0));
+        p.put("fill-rule", new SvgStyleProperty("fill-rule", true, "nonzero"));
         p.put("stroke", new SvgStyleProperty("stroke", true, null));
         p.put("stroke-width", new SvgStyleProperty("stroke-width", true, 1.0));
         p.put("stroke-opacity", new SvgStyleProperty("stroke-opacity", true, 1.0));

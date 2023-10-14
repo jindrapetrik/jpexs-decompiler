@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -52,8 +53,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     private final SVGExporter exporter;
 
-    public SVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
-        super(shapeNum, swf, shape, colorTransform, zoom);
+    public SVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
+        super(windingRule, shapeNum, swf, shape, colorTransform, zoom);
         this.swf = swf;
         this.id = id;
         this.defaultColor = defaultColor;
@@ -73,7 +74,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (color != null) {
             path.setAttribute("fill", color.toHexRGB());
         }
-        path.setAttribute("fill-rule", "evenodd");
+        path.setAttribute("fill-rule", windingRule == ShapeTag.WIND_NONZERO ? "nonzero" : "evenodd");
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             if (colorA.alpha != 255) {

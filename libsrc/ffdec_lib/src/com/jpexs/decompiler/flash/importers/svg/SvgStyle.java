@@ -168,6 +168,10 @@ class SvgStyle {
     public double getFillOpacity() {
         return getValue(element, "fill-opacity");
     }
+    
+    public String getFillRule() {
+        return getValue(element, "fill-rule");
+    }
 
     public SvgFill getStroke() {
         return getValue(element, "stroke");
@@ -647,6 +651,9 @@ class SvgStyle {
                 case "fill-opacity": {
                     double opacity = Double.parseDouble(value);
                     return opacity;
+                }
+                case "fill-rule": {
+                    return value;
                 }
                 case "stroke": {
                     if ("currentColor".equals(value)) {

@@ -66,6 +66,10 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     protected ByteArrayRange shapeData;
 
     private final int markerSize = 10;
+    
+    public static final int WIND_EVEN_ODD = 0;
+    
+    public static final int WIND_NONZERO = 1;
 
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
@@ -75,6 +79,8 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     public void load() {
         getShapes();
     }
+    
+    public abstract int getWindingRule();
 
     public abstract int getShapeNum();
 
@@ -189,9 +195,9 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        BitmapExporter.export(getShapeNum(), swf, getShapes(), null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing);
+        BitmapExporter.export(getWindingRule(), getShapeNum(), swf, getShapes(), null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing);
         if (Configuration._debugMode.get()) { // show control points
-            List<GeneralPath> paths = PathExporter.export(getShapeNum(), swf, getShapes());
+            List<GeneralPath> paths = PathExporter.export(getWindingRule(), getShapeNum(), swf, getShapes());
             double[] coords = new double[6];
             AffineTransform at = transformation.toTransform();
             at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
@@ -233,13 +239,13 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(getShapeNum(), swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(getWindingRule(), getShapeNum(), swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasShapeExporter cse = new CanvasShapeExporter(getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(getWindingRule(), getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
     }

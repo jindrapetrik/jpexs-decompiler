@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -197,7 +198,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static void shapeListToImage(int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
+    public static void shapeListToImage(int windingRule, int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             return;
         }
@@ -281,7 +282,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
                 Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
-                BitmapExporter.export(shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
+                BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
 
                 // draw bounding boxes
                 if (DRAW_BOUNDING_BOX) {

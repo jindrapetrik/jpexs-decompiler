@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -202,7 +203,7 @@ public class FontExporter {
             char c = t.glyphToChar(i);
             SHAPE s = shapes.get(i);
             final List<FPoint[]> contours = new ArrayList<>();
-            PathExporter seb = new PathExporter(1, swf, s, null) {
+            PathExporter seb = new PathExporter(ShapeTag.WIND_EVEN_ODD, 1, swf, s, null) {
 
                 private double transformX(double x) {
                     return Math.ceil((double) (x / divider));
