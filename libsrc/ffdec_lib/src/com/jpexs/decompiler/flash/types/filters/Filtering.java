@@ -56,10 +56,17 @@ public class Filtering {
     private static final Rectangle RECTANGLE_512_1 = new Rectangle(512, 1);
 
     private static void boxBlurSingleIteration(int[] pixels, int[] mask, int[] newColors, int w, int h, int radiusX, int radiusY) {
+        if (radiusX == 0) {
+            radiusX = 1;
+        }
+        if (radiusY == 0) {
+            radiusY = 1;
+        }
+                
         int radiusXHalf = radiusX / 2;
         int radiusYHalf = radiusY / 2;
         double divisor = radiusX * radiusY;
-
+                
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 double sumR = 0;
