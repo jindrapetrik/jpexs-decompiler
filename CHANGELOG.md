@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
 - Filters display - ymin value
 - Box blur display rounding errors
 - Generic tag editor - display of color values in arrays (filters, etc.)
+- Generic tag editor - display of array brackets
 
 ## [19.0.0] - 2023-10-01
 ### Added
