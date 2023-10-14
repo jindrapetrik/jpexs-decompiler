@@ -779,7 +779,7 @@ public class Timeline {
             }
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
-            rect.yMin -= deltaXMax * unzoom * SWF.unitDivisor;
+            rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
             rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
