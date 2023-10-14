@@ -363,7 +363,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                             editors = new ArrayList<>();
                         }
                         editors.add(editor);
-                    }                    
+                    }
                     JPanel pan = new JPanel();
                     FlowLayout fl = new FlowLayout(FlowLayout.LEFT, 0, 0);
                     fl.setAlignOnBaseline(true);
@@ -448,7 +448,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     try {
                         editor.validateValue();
                         if (editor.save()) {
-                            
+
                             if (editor.getObject() instanceof CONVOLUTIONFILTER) {
                                 String fname = editor.getFieldName();
                                 if ("matrixX".equals(fname) || "matrixY".equals(fname)) {
@@ -464,8 +464,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     }
                                 }
                             }
-                            
-                            
+
                             modified = true;
                         }
                     } catch (IllegalArgumentException iex) {
@@ -539,7 +538,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     if (itemStr.isEmpty()) {
                                         itemStr = AppStrings.translate("generictag.array.item");
                                     }
-                                    
+
                                     boolean canAdd = true;
                                     if (!ReflectionTools.canAddToField(fnode.obj, fnode.fieldSet.get(FIELD_INDEX))) {
                                         canAdd = false;
@@ -584,12 +583,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                 }
                                             }
                                         });
-                                        
+
                                         if (fnode.index > -1) {
                                             p.add(mi);
-                                        }                                                                               
+                                        }
                                         JMenu mAfter = new JMenu(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
-                                        
+
                                         if (fnode.index > -1) {
                                             p.add(mAfter);
                                         }
@@ -830,12 +829,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 ret.append(toString(0));
             } else {
                 ret.append(fieldSet.name);
-                SWFArray t = fieldSet.get(0).getAnnotation(SWFArray.class);
-                if (t != null) {
+                /*SWFArray a = fieldSet.get(0).getAnnotation(SWFArray.class);
+                SWFType t = fieldSet.get(0).getAnnotation(SWFType.class);
+                if (t != null && !"".equals(t.countField())) {
                     ret.append(" [").append(t.countField()).append("]");
+                } else if (a != null) {
+                    ret.append(" [").append(a.countField()).append("]");
                 } else {
                     ret.append(" []");
-                }
+                }*/
             }
 
             ret.insert(0, "<html>").append("</html>");
@@ -938,25 +940,32 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
             String typeStr = type.getSimpleName();
 
-            if (swfType != null && swfType.value() != BasicType.OTHER) {
-                typeStr = "" + swfType.value();
-                if (swfType.count() > 0) {
-                    typeStr += "[" + swfType.count();
-                    if (swfType.countAdd() > 0) {
-                        typeStr += " + " + swfType.countAdd();
+            boolean bracketsDetected = false;
+            if (swfType != null) {
+                if (swfType.value() != BasicType.OTHER) {
+                    typeStr = "" + swfType.value();
+                }
+                if (isArrayParent) {
+                    if (swfType.count() > 0) {
+                        typeStr += "[" + swfType.count();
+                        if (swfType.countAdd() > 0) {
+                            typeStr += " + " + swfType.countAdd();
+                        }
+                        typeStr += "]";
+                        bracketsDetected = true;
+                    } else if (!swfType.countField().isEmpty()) {
+                        typeStr += "[" + swfType.countField();
+                        if (swfType.countAdd() > 0) {
+                            typeStr += " + " + swfType.countAdd();
+                        }
+                        typeStr += "]";
+                        bracketsDetected = true;
                     }
-                    typeStr += "]";
-                } else if (!swfType.countField().isEmpty()) {
-                    typeStr += "[" + swfType.countField();
-                    if (swfType.countAdd() > 0) {
-                        typeStr += " + " + swfType.countAdd();
-                    }
-                    typeStr += "]";
                 }
             }
 
             String arrayBrackets = "";
-            if (isArrayParent) {
+            if (isArrayParent && !bracketsDetected) {
                 if (swfArray != null) {
                     if (swfArray.count() > 0) {
                         arrayBrackets = "[" + swfArray.count() + "]";
