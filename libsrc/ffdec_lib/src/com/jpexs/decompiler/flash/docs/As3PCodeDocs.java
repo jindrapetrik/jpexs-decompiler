@@ -83,18 +83,18 @@ public class As3PCodeDocs extends AbstractDocs {
         return identName.toString();
     }
 
-    public static String getDocsForIns(String insName, boolean showDataSize, boolean ui, boolean withStyle, boolean nightMode) {
+    public static String getDocsForIns(String insName, boolean showDataSize, boolean ui, boolean withStyle, boolean nightMode, int argumentToHilight) {
         if (!nameToDef.containsKey(insName)) {
             return null;
         }
-        return getDocsForIns(nameToDef.get(insName), showDataSize, ui, withStyle, nightMode);
+        return getDocsForIns(nameToDef.get(insName), showDataSize, ui, withStyle, nightMode, argumentToHilight);
     }
 
-    public static String getDocsForIns(InstructionDefinition def, boolean showDataSize, boolean ui, boolean standalone, boolean nightMode) {
+    public static String getDocsForIns(InstructionDefinition def, boolean showDataSize, boolean ui, boolean standalone, boolean nightMode, int argumentToHilight) {
         final String cacheKey = def.instructionName + "|" + (showDataSize ? 1 : 0) + "|" + (ui ? 1 : 0) + "|" + (standalone ? 1 : 0);
         String v = docsCache.get(cacheKey);
         if (v != null) {
-            return v;
+            return hilightArgument(v, argumentToHilight);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -122,7 +122,7 @@ public class As3PCodeDocs extends AbstractDocs {
 
         String stack = def.hasFlag(AVM2InstructionFlag.UNKNOWN_STACK) ? getProperty("ui.unknown") : stackBefore + "<span class=\"stack-to\">" + getProperty("ui.stack.to") + "</span>" + stackAfter;
         String operandsDoc = def.hasFlag(AVM2InstructionFlag.UNKNOWN_OPERANDS) ? getProperty("ui.unknown") : getProperty("instruction." + insName + ".operands");
-
+        
         if (standalone) {
             sb.append("<body class=\"");
             if (nightMode) {
@@ -144,12 +144,18 @@ public class As3PCodeDocs extends AbstractDocs {
 
         if (def.hasFlag(AVM2InstructionFlag.UNKNOWN_OPERANDS)) {
             sb.append(" ").append(getProperty("ui.unknown")).append(NEWLINE);
+        } else if (ui && insName.equals("lookupswitch")) {
+            sb.append(" ");
+            sb.append("<span class=\"instruction-operands\">"); 
+            sb.append(getProperty("instruction.lookupswitch.operands.ui"));
+            sb.append("</span>");
         } else {
             String[] operandsDocs = operandsDoc.split(", ?");
             boolean first = true;
             if (def.operands.length > 0) {
                 sb.append(" ");
             }
+            sb.append("<span class=\"instruction-operands\">");            
             for (int i = 0; i < def.operands.length; i++) {
                 int op = def.operands[i];
                 String opDoc = operandsDocs[i];
@@ -191,6 +197,7 @@ public class As3PCodeDocs extends AbstractDocs {
                     }
                 }
             }
+            sb.append("</span>");
         }
         sb.append("</div>").append(NEWLINE);
 
@@ -229,7 +236,7 @@ public class As3PCodeDocs extends AbstractDocs {
         }
         String r = sb.toString();
         docsCache.put(cacheKey, r);
-        return r;
+        return hilightArgument(r, argumentToHilight);
     }
 
     public static String getJs() {
@@ -288,7 +295,7 @@ public class As3PCodeDocs extends AbstractDocs {
                 continue;
             }
             sb.append("\t\t\t<li class=\"instruction-item\">").append(NEWLINE);
-            sb.append("\t\t\t\t").append(getDocsForIns(def, true, false, false, nightMode).trim().replace(NEWLINE, NEWLINE + "\t\t\t\t")).append(NEWLINE);
+            sb.append("\t\t\t\t").append(getDocsForIns(def, true, false, false, nightMode, -1).trim().replace(NEWLINE, NEWLINE + "\t\t\t\t")).append(NEWLINE);
             sb.append("\t\t\t</li>").append(NEWLINE);
         }
         sb.append("\t\t</ul>").append(NEWLINE);
