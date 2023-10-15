@@ -2998,11 +2998,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void autoDeobfuscateChanged() {
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
         clearAllScriptCache();
-        if (abcPanel != null) {
-            abcPanel.reload();
-        }
-        reload(true);
         updateClassesList();
+        reload(true);        
     }
 
     public void renameColliding(final Openable openable) {
