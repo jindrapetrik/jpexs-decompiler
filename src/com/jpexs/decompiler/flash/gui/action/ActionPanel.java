@@ -801,7 +801,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                                 symb = lexer.lex();
                                 if (symb.pos <= column) {                                                              
                                     argumentToHilight++;
-                                    while(symb.type != ASMParsedSymbol.TYPE_EOL && symb.type != ASMParsedSymbol.TYPE_EOF) {
+                                    while (symb.type != ASMParsedSymbol.TYPE_EOL && symb.type != ASMParsedSymbol.TYPE_EOF) {
                                         if (symb.pos >= column) {
                                             break;
                                         }
