@@ -118,4 +118,10 @@ public class StraightEdgeRecord extends SHAPERECORD {
             }
         }
     }
+    
+    @Override
+    public boolean isTooLarge() {
+        calculateBits();
+        return !SWFOutputStream.fitsInUB(4, numBits);
+    }
 }

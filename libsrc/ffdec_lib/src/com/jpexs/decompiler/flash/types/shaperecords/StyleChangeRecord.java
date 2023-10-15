@@ -148,4 +148,13 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public void calculateBits() {
         moveBits = SWFOutputStream.getNeededBitsS(moveDeltaX, moveDeltaY);
     }
+    
+    @Override
+    public boolean isTooLarge() {
+        if (!stateMoveTo) {
+            return false;
+        }
+        calculateBits();
+        return !SWFOutputStream.fitsInUB(5, moveBits);
+    }
 }

@@ -57,4 +57,9 @@ public class EndShapeRecord extends SHAPERECORD {
     @Override
     public void calculateBits() {
     }
+
+    @Override
+    public boolean isTooLarge() {
+        return false;
+    }        
 }

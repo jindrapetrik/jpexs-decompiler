@@ -409,6 +409,25 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeUB(int nBits, long value) throws IOException {
+        if (!fitsInUB(nBits, value)) {
+            throw new ValueTooLargeException("UB[" + nBits + "]", value);
+        }
+        writeNBInternal(nBits, value, "UB");                
+    }
+    
+    public static boolean fitsInSB(int nBits, long value) {
+        long min = -1L << (nBits - 1);
+        long max = (1L << (nBits - 1)) - 1;
+        return value >= min && value <= max;
+    }
+    
+    public static boolean fitsInUB(int nBits, long value) {
+        long min = 0;
+        long max = (1L << nBits) - 1;
+        return value >= min && value <= max;
+    }
+
+    private void writeNBInternal(int nBits, long value, String type) throws IOException {
         for (int bit = 0; bit < nBits; bit++) {
             int nb = (int) ((value >> (nBits - 1 - bit)) & 1);
             tempByte += nb * (1 << (7 - bitPos));
@@ -428,8 +447,11 @@ public class SWFOutputStream extends OutputStream {
      * @param value Signed value to write
      * @throws IOException
      */
-    public void writeSB(int nBits, long value) throws IOException {
-        writeUB(nBits, value);
+    public void writeSB(int nBits, long value) throws IOException {        
+        if (!fitsInSB(nBits, value)) {
+            throw new ValueTooLargeException("SB[" + nBits + "]", value);
+        }
+        writeNBInternal(nBits, value, "SB");
     }
 
     /**
@@ -1371,9 +1393,6 @@ public class SWFOutputStream extends OutputStream {
         for (SHAPERECORD r : value.shapeRecords) {
             if (r instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) r;
-                if (scr.stateNewStyles) {
-                    break;
-                }
                 if (scr.stateFillStyle0) {
                     numFillBits = Math.max(numFillBits, getNeededBitsU(scr.fillStyle0));
                 }
@@ -1383,6 +1402,9 @@ public class SWFOutputStream extends OutputStream {
                 if (scr.stateLineStyle) {
                     numLineBits = Math.max(numLineBits, getNeededBitsU(scr.lineStyle));                
                 }
+                if (scr.stateNewStyles) {
+                    break;
+                }                
             }
         }
         if (Configuration._debugCopy.get()) {

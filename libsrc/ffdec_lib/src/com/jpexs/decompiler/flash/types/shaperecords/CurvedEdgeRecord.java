@@ -86,4 +86,10 @@ public class CurvedEdgeRecord extends SHAPERECORD {
             numBits = 0;
         }
     }
+    
+    @Override
+    public boolean isTooLarge() {
+        calculateBits();
+        return !SWFOutputStream.fitsInUB(4, numBits);
+    }
 }
