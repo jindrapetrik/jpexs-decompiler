@@ -63,6 +63,7 @@ public class CurvedEdgeRecordAdvanced extends ShapeRecordAdvanced {
         ret.controlDeltaY = (int) Math.round(controlDeltaY);
         ret.anchorDeltaX = (int) Math.round(anchorDeltaX);
         ret.anchorDeltaY = (int) Math.round(anchorDeltaY);
+        ret.calculateBits();
         return ret;
     }
 

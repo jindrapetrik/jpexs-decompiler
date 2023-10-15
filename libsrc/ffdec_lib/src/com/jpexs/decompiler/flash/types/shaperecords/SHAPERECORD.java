@@ -195,6 +195,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         ret.controlDeltaY = ser.deltaY / 2;
         ret.anchorDeltaX = ser.deltaX - ret.controlDeltaX;
         ret.anchorDeltaY = ser.deltaY - ret.controlDeltaY;
+        ret.calculateBits();
         return ret;
     }
 
@@ -345,14 +346,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     ser.deltaX = multiplier * (((int) Math.round(points[0])) - lastX);
                     ser.deltaY = multiplier * (((int) Math.round(points[1])) - lastY);
 
-                    ser.generalLineFlag = ser.deltaX != 0 && ser.deltaY != 0;
-                    if (ser.deltaX == 0) {
-                        ser.vertLineFlag = true;
-                    }
-                    ser.numBits = SWFOutputStream.getNeededBitsS(ser.deltaX, ser.deltaY) - 2;
-                    if (ser.numBits < 0) {
-                        ser.numBits = 0;
-                    }
+                    ser.generalLineFlag = true;
+                    ser.simplify();
+                    ser.calculateBits();
                     retList.add(ser);
                     lastX = (int) Math.round(points[0]);
                     lastY = (int) Math.round(points[1]);
@@ -371,10 +367,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         cer.controlDeltaY = multiplier * (((int) Math.round(quadCoords[i][1])) - lastY);
                         cer.anchorDeltaX = multiplier * (((int) Math.round(quadCoords[i][2])) - ((int) Math.round(quadCoords[i][0])));
                         cer.anchorDeltaY = multiplier * (((int) Math.round(quadCoords[i][3])) - ((int) Math.round(quadCoords[i][1])));
-                        cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
-                        if (cer.numBits < 0) {
-                            cer.numBits = 0;
-                        }
+                        cer.calculateBits();
                         lastX = (int) Math.round(quadCoords[i][2]);
                         lastY = (int) Math.round(quadCoords[i][3]);
                         retList.add(cer);
@@ -386,10 +379,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     cer.controlDeltaY = multiplier * (((int) Math.round(points[1])) - lastY);
                     cer.anchorDeltaX = multiplier * (((int) Math.round(points[2])) - (int) Math.round(points[0]));
                     cer.anchorDeltaY = multiplier * (((int) Math.round(points[3])) - (int) Math.round(points[1]));
-                    cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
-                    if (cer.numBits < 0) {
-                        cer.numBits = 0;
-                    }
+                    cer.calculateBits();
                     retList.add(cer);
                     lastX = (int) Math.round(points[2]);
                     lastY = (int) Math.round(points[3]);
@@ -402,10 +392,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     closeSer.generalLineFlag = true;
                     closeSer.deltaX = multiplier * ((int) Math.round((startX - lastX)));
                     closeSer.deltaY = multiplier * ((int) Math.round((startY - lastY)));
-                    closeSer.numBits = SWFOutputStream.getNeededBitsS(closeSer.deltaX, closeSer.deltaY) - 2;
-                    if (closeSer.numBits < 0) {
-                        closeSer.numBits = 0;
-                    }
+                    closeSer.simplify();
+                    closeSer.calculateBits();
                     retList.add(closeSer);
                     lastX = startX;
                     lastY = startY;
@@ -515,6 +503,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             StraightEdgeRecord ser = (StraightEdgeRecord) c;
             ser.deltaX = (int) (multiplierX * ser.deltaX);
             ser.deltaY = (int) (multiplierY * ser.deltaY);
+            ser.generalLineFlag = true;
+            ser.simplify();
             ser.calculateBits();
         }
 

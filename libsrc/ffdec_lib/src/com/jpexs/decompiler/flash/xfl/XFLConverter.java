@@ -611,6 +611,7 @@ public class XFLConverter {
 
                 cer.anchorDeltaX = anchorShouldBeX - (hintedX + cer.controlDeltaX);
                 cer.anchorDeltaY = anchorShouldBeY - (hintedY + cer.controlDeltaY);
+                cer.calculateBits();
                 hintedX = anchorShouldBeX;
                 hintedY = anchorShouldBeY;
             }

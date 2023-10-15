@@ -426,6 +426,7 @@ public final class DefineCompactedFont extends FontTag {
                 StraightEdgeRecord ser = (StraightEdgeRecord) c;
                 ser.deltaX = resize(ser.deltaX);
                 ser.deltaY = resize(ser.deltaY);
+                ser.simplify();
                 ser.calculateBits();
             }
             recs.add(c);

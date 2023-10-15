@@ -812,6 +812,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         if (scr.stateMoveTo) {
                             scr.moveDeltaX = points.get(pointsPos).x;
                             scr.moveDeltaY = points.get(pointsPos).y;
+                            scr.calculateBits();
                             pointsPos++;
                         }
                     }
@@ -820,8 +821,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         ser.generalLineFlag = true;
                         ser.deltaX = points.get(pointsPos).x - x;
                         ser.deltaY = points.get(pointsPos).y - y;
-                        pointsPos += 1;
                         ser.simplify();
+                        ser.calculateBits();
+                        pointsPos += 1;                        
                     }
                     if (rec instanceof CurvedEdgeRecord) {
                         CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
@@ -829,6 +831,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         cer.controlDeltaY = points.get(pointsPos).y - y;
                         cer.anchorDeltaX = points.get(pointsPos + 1).x - points.get(pointsPos).x;
                         cer.anchorDeltaY = points.get(pointsPos + 1).y - points.get(pointsPos).y;
+                        cer.calculateBits();
                         pointsPos += 2;
                     }
                     x = rec.changeX(x);
@@ -962,6 +965,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             cer.anchorDeltaX = (int) Math.round(left.get(2).getX() - left.get(1).getX());
                             cer.anchorDeltaY = (int) Math.round(left.get(2).getY() - left.get(1).getY());
 
+                            cer.calculateBits();
+                            
                             CurvedEdgeRecord newCer = new CurvedEdgeRecord();
                             newCer.controlDeltaX = (int) Math.round(right.get(1).getX() - right.get(0).getX());
                             newCer.controlDeltaY = (int) Math.round(right.get(1).getY() - right.get(0).getY());
@@ -969,6 +974,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             newCer.anchorDeltaY = (int) Math.round(right.get(2).getY() - right.get(1).getY());
                             selectedRecords.add(i + 1, newCer);
                             importantRecordPosRef.setVal(importantRecordPos);
+                            newCer.calculateBits();
                             return true;
                         }
                         pointsPos += 2;
@@ -2075,6 +2081,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 cer.controlDeltaY = controlPoint2.y - currentPoint2.y;
                 cer.anchorDeltaX = anchorPoint2.x - controlPoint2.x;
                 cer.anchorDeltaY = anchorPoint2.y - controlPoint2.y;
+                cer.calculateBits();
             }
         }
     }

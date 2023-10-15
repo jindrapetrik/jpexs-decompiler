@@ -134,6 +134,7 @@ public class EdgeType implements Serializable {
                 ser = new StraightEdgeRecord();
                 ser.generalLineFlag = false;
                 ser.deltaX = data[1] * multiplier;
+                ser.simplify();
                 ser.calculateBits();
                 return ser;
             case Edge_VLine:
@@ -148,6 +149,7 @@ public class EdgeType implements Serializable {
                 ser.generalLineFlag = true;
                 ser.deltaX = data[1] * multiplier;
                 ser.deltaY = data[2] * multiplier;
+                ser.simplify();
                 ser.calculateBits();
                 return ser;
             case Edge_Quad:
