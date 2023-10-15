@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import java.util.Stack;
 
 %%
 
@@ -55,6 +56,24 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 
     public int yyline() {
         return yyline + 1;
+    }
+
+    private Stack<ASMParsedSymbol> pushedBack = new Stack<>();
+
+    public void pushback(ASMParsedSymbol symb) {
+        pushedBack.push(symb);
+        last = null;
+    }
+
+    ASMParsedSymbol last;
+    public ASMParsedSymbol lex() throws java.io.IOException, ActionParseException{
+        ASMParsedSymbol ret = null;
+        if (!pushedBack.isEmpty()){
+            ret = last = pushedBack.pop();
+        } else {
+            ret = last = yylex();
+        }
+        return ret;
     }
 
 %}
@@ -138,6 +157,9 @@ Constant= constant{PositiveNumberLiteral}
                                     yybegin(STRING);
                                     string.setLength(0);
                                  }
+
+  ","                            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMA);  }
+  
 
   /* numeric literals */
 

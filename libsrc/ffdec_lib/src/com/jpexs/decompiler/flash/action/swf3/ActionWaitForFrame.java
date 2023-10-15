@@ -77,7 +77,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
 
     @Override
     public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
-        String ret = "WaitForFrame " + frame + " " + skipCount;
+        String ret = "WaitForFrame " + frame + ", " + skipCount;
         return ret;
     }
 
@@ -100,7 +100,8 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     public ActionWaitForFrame(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8A, -1, charset);
         frame = (int) lexLong(lexer);
-        skipCount = (int) lexLong(lexer);
+        lexOptionalComma(lexer);        
+        skipCount = (int) lexLong(lexer);        
         skipped = new ArrayList<>();
     }
 

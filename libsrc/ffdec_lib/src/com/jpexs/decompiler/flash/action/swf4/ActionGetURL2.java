@@ -86,7 +86,7 @@ public class ActionGetURL2 extends Action {
 
     @Override
     public String toString() {
-        return "GetURL2 " + loadVariablesFlag + " " + loadTargetFlag + " " + sendVarsMethod;
+        return "GetURL2 " + loadVariablesFlag + ", " + loadTargetFlag + ", " + sendVarsMethod;
     }
 
     @Override
@@ -110,7 +110,9 @@ public class ActionGetURL2 extends Action {
     public ActionGetURL2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9A, -1, charset);
         loadVariablesFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         loadTargetFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         sendVarsMethod = (int) lexLong(lexer);
     }
 

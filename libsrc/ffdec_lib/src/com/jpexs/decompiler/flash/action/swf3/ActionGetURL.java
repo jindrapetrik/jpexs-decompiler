@@ -76,6 +76,7 @@ public class ActionGetURL extends Action {
     public ActionGetURL(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x83, 0, charset);
         urlString = lexString(lexer);
+        lexOptionalComma(lexer);
         targetString = lexString(lexer);
     }
 
@@ -97,7 +98,7 @@ public class ActionGetURL extends Action {
 
     @Override
     public String toString() {
-        return "GetUrl \"" + Helper.escapeActionScriptString(urlString) + "\" \"" + Helper.escapeActionScriptString(targetString) + "\"";
+        return "GetUrl \"" + Helper.escapeActionScriptString(urlString) + "\", \"" + Helper.escapeActionScriptString(targetString) + "\"";
     }
 
     @Override

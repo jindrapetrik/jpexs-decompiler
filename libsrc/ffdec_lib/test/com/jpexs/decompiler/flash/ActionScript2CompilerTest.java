@@ -106,16 +106,16 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
                 + "			var v5 = a + 3;\n"
                 + "		}\n"
                 + "	}\n"
-                + "}", "ConstantPool \"v1\" \"a\"\n"
-                + "DefineFunction \"outfunc\" 0 {\n"
+                + "}", "ConstantPool \"v1\", \"a\"\n"
+                + "DefineFunction \"outfunc\", 0 {\n"
                 + "Push \"v1\"\n"
-                + "DefineFunction2 \"\" 0 3 false false true false true false true false false {\n"
-                + "Push \"a\" 1\n"
+                + "DefineFunction2 \"\", 0, 3, false, false, true, false, true, false, true, false, false {\n"
+                + "Push \"a\", 1\n"
                 + "DefineLocal\n" //critical
                 + "Push 2\n"
                 + "StoreRegister 1\n"
                 + "Pop\n"
-                + "DefineFunction2 \"\" 0 2 false false true false true false true false false {\n"
+                + "DefineFunction2 \"\", 0, 2, false, false, true, false, true, false, true, false, false {\n"
                 + "Push \"a\"\n"
                 + "GetVariable\n"
                 + "Push 3\n"
@@ -140,10 +140,10 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
                 + "			var v2 = a + 2;\n"
                 + "		}\n"
                 + "	}\n"
-                + "}", "ConstantPool \"g\" \"a\"\n"
-                + "DefineFunction \"outfunc\" 0 {\n"
+                + "}", "ConstantPool \"g\", \"a\"\n"
+                + "DefineFunction \"outfunc\", 0 {\n"
                 + "Push \"g\"\n"
-                + "DefineFunction2 \"\" 2 4 false false true false true false true false false 0 \"a\" 1 \"p2\" {\n"
+                + "DefineFunction2 \"\", 2, 4, false, false, true, false, true, false, true, false, false, 0, \"a\", 1, \"p2\" {\n"
                 + "Push \"a\"\n"
                 + "GetVariable\n" //critical
                 + "Push 1\n"
@@ -152,7 +152,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
                 + "Add2\n"
                 + "StoreRegister 2\n"
                 + "Pop\n"
-                + "DefineFunction2 \"\" 0 2 false false true false true false true false false {\n"
+                + "DefineFunction2 \"\", 0, 2, false, false, true, false, true, false, true, false, false {\n"
                 + "Push \"a\"\n"
                 + "GetVariable\n"
                 + "Push 2\n"
@@ -171,7 +171,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
     public void stopUndefined() {
         testCompilation("trace(stop());", "ConstantPool\n"
                 + "Stop\n"
-                + "Push undefined undefined\n"
+                + "Push undefined, undefined\n"
                 + "Trace");
     }
 }

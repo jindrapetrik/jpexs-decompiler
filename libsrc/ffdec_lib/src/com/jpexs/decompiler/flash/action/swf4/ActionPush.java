@@ -265,10 +265,15 @@ public class ActionPush extends Action {
         super(0x96, 0, charset);
         this.constantPool = constantPool;
         values = new ArrayList<>();
-        int count = 0;
+        int count = 0;        
         loop:
         while (true) {
-            ASMParsedSymbol symb = lexer.yylex();
+            boolean valueExpected = false;
+            ASMParsedSymbol symb = lexer.lex();
+            if (symb.type == ASMParsedSymbol.TYPE_COMMA) {
+                symb = lexer.lex();
+                valueExpected = true;
+            }
             switch (symb.type) {
                 case ASMParsedSymbol.TYPE_STRING:
                     count++;
@@ -290,7 +295,9 @@ public class ActionPush extends Action {
                     break;
                 case ASMParsedSymbol.TYPE_EOL:
                 case ASMParsedSymbol.TYPE_EOF:
-                    if (count == 0) {
+                    if (valueExpected) {
+                        throw new ActionParseException("Value expected", lexer.yyline());
+                    } else if (count == 0) {
                         throw new ActionParseException("Arguments expected", lexer.yyline());
                     } else {
                         break loop;
@@ -342,13 +349,11 @@ public class ActionPush extends Action {
     }    
 
     public GraphTextWriter paramsToString(GraphTextWriter writer) {
-        int pos = 0;
         for (int i = 0; i < values.size(); i++) {
-            if (pos > 0) {
-                writer.appendNoHilight(" ");
+            if (i > 0) {
+                writer.appendNoHilight(", ");
             }
-            writer.append(toString(i), getAddress() + pos + 1, getFileOffset());
-            pos++;
+            writer.append(toString(i), getAddress() + i + 1, getFileOffset());           
         }
         return writer;
     }

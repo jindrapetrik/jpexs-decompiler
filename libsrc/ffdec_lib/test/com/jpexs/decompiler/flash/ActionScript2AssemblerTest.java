@@ -132,7 +132,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             String decompiled = writer.toString();
 
             assertEquals(actualResult.trim(), "ok = false;");
-            assertTrue(decompiled.contains("Push \"ok\" false") || decompiled.contains("Push constant0 false"));
+            assertTrue(decompiled.contains("Push \"ok\", false") || decompiled.contains("Push constant0, false"));
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }

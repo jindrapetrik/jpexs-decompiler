@@ -145,19 +145,32 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public ActionDefineFunction2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8E, -1, charset);
         functionName = lexString(lexer);
+        lexOptionalComma(lexer);        
         int numParams = (int) lexLong(lexer);
+        lexOptionalComma(lexer);        
         registerCount = (int) lexLong(lexer);
+        lexOptionalComma(lexer);        
         preloadParentFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         preloadRootFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         suppressSuperFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         preloadSuperFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         suppressArgumentsFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         preloadArgumentsFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         suppressThisFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         preloadThisFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         preloadGlobalFlag = lexBoolean(lexer);
         for (int i = 0; i < numParams; i++) {
+            lexOptionalComma(lexer);        
             paramRegisters.add((int) lexLong(lexer));
+            lexOptionalComma(lexer);        
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);
@@ -227,19 +240,20 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
         StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
-            paramStr.append(paramRegisters.get(i)).append(" \"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\" ");
+            paramStr.append(", ");
+            paramStr.append(paramRegisters.get(i)).append(", \"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\"");
         }
 
-        return ("DefineFunction2 \"" + Helper.escapeActionScriptString(functionName) + "\" " + paramRegisters.size() + " " + registerCount
-                + " " + preloadParentFlag
-                + " " + preloadRootFlag
-                + " " + suppressSuperFlag
-                + " " + preloadSuperFlag
-                + " " + suppressArgumentsFlag
-                + " " + preloadArgumentsFlag
-                + " " + suppressThisFlag
-                + " " + preloadThisFlag
-                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
+        return ("DefineFunction2 \"" + Helper.escapeActionScriptString(functionName) + "\", " + paramRegisters.size() + ", " + registerCount
+                + ", " + preloadParentFlag
+                + ", " + preloadRootFlag
+                + ", " + suppressSuperFlag
+                + ", " + preloadSuperFlag
+                + ", " + suppressArgumentsFlag
+                + ", " + preloadArgumentsFlag
+                + ", " + suppressThisFlag
+                + ", " + preloadThisFlag
+                + ", " + preloadGlobalFlag).trim() + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
     }
 
     @Override

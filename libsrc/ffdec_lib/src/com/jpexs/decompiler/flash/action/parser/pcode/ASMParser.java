@@ -373,7 +373,7 @@ public class ASMParser {
         Stack<GraphSourceItemContainer> containers = new Stack<>();
         List<String> emptyList = new ArrayList<>();
         while (true) {
-            ASMParsedSymbol symb = lexer.yylex();
+            ASMParsedSymbol symb = lexer.lex();
             if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
                 if (containers.isEmpty()) {
                     throw new ActionParseException("Block end without start", lexer.yyline());
@@ -407,7 +407,7 @@ public class ASMParser {
         list.add(cpool);
 
         while (true) {
-            ASMParsedSymbol symb = lexer.yylex();
+            ASMParsedSymbol symb = lexer.lex();
             if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
                 labels.add(new Label((String) symb.value, address));
             } else if (symb.type == ASMParsedSymbol.TYPE_COMMENT) {

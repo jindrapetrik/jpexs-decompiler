@@ -171,7 +171,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testRemoveJumpAction() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "Return\n"
                 + "}\n"
@@ -181,11 +181,11 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 "label_1:Push 3";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "Return\n"
                 + "}\n"
-                + "Push 2 3";
+                + "Push 2, 3";
         testRemoveAction(actionsString, expectedResult, new int[]{5});
     }
 
@@ -193,7 +193,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testRemoveActionFromContainer() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n" // remove this action
                 + "Return\n"
                 + "}\n"
@@ -202,7 +202,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 3";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Return\n"
                 + "}\n"
                 + "Push 2\n"
@@ -215,7 +215,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testRemoveLastActionFromContainer() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n" // remove this action
                 + "}\n"
@@ -224,7 +224,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 3";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "}\n"
                 + "Push 2\n"
@@ -237,7 +237,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testRemoveIfTargetAction() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -248,7 +248,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "Push 5"; // after removing the previous action the if action should jump here
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -263,7 +263,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testRemoveIfTargetLastAction() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -273,7 +273,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 4"; // remove this action
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -288,7 +288,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testAddAtionFirst() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -299,7 +299,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
         String expectedResult
                 = "GetMember\n"
                 + "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -315,7 +315,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testAddAtion1() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -326,7 +326,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
         String expectedResult
                 = "ConstantPool\n"
                 + "GetMember\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -342,7 +342,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testAddAtionToContainer() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -352,7 +352,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 4";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "GetMember\n"
                 + "Push 1\n"
                 + "GetVariable\n"
@@ -369,7 +369,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testAddActionIf() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -379,7 +379,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 4";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -396,7 +396,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     public void testAddActionAfterContainer() {
         String actionsString
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
@@ -406,7 +406,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_1:Push 4";
         String expectedResult
                 = "ConstantPool\n"
-                + "DefineFunction \"test\" 1 \"p1\" {\n"
+                + "DefineFunction \"test\", 1, \"p1\" {\n"
                 + "Push 1\n"
                 + "GetVariable\n"
                 + "}\n"
