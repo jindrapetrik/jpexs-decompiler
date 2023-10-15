@@ -63,6 +63,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Utilities;
 
 /**
  *
@@ -633,33 +635,77 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             if (curLine == null) {
                 return;
             }
-            curLine = curLine.trim();
-            //strip labels, e.g. ofs123:pushint 25
-            if (curLine.matches("\\p{L}[\\p{L}0-9]*:.*")) {
-                curLine = curLine.substring(curLine.indexOf(':') + 1).trim();
-            }
-
-            //strip instruction arguments, we want only its name
-            if (curLine.contains(" ")) {
-                curLine = curLine.substring(0, curLine.indexOf(' '));
-            }
-            //strip comments, e.g. pushnull;comment
-            if (curLine.contains(";")) {
-                curLine = curLine.substring(0, curLine.indexOf(';'));
-            }
-            String insName = curLine.toLowerCase();
-            if (AVM2Code.instructionAliases.containsKey(insName)) {
-                insName = AVM2Code.instructionAliases.get(insName);
-            }
-            Point loc = getLineLocation(getLine() + 1);
-            if (loc != null) {
-                SwingUtilities.convertPointToScreen(loc, this);
-            }
-            if (insNameToDef.containsKey(insName)) {
-
-                fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true, nightMode), loc);
-                return;
-            }
+            try {
+                Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(curLine));
+                ParsedSymbol symb = lexer.lex();
+                while (symb.type == ParsedSymbol.TYPE_LABEL) {
+                    symb = lexer.lex();                                
+                }
+                if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                    String insName = (String) symb.value;                                
+                    int argumentToHilight = -1;
+                    int column = 0;
+                    try {
+                        int caretPosition = getCaretPosition();
+                        int rowStart = Utilities.getRowStart(this, caretPosition);
+                        column = caretPosition - rowStart;
+                    } catch (BadLocationException ex) {
+                        //ignore
+                    }            
+                    symb = lexer.lex();
+                    if (symb.pos <= column) {                                                              
+                        argumentToHilight++;
+                        int parentLevel = 0;
+                        Stack<Integer> parentsStack = new Stack<>();
+                        while (symb.type != ParsedSymbol.TYPE_EOF) {
+                            if (symb.pos >= column) {
+                                break;
+                            }
+                            if (symb.type == ParsedSymbol.TYPE_PARENT_OPEN
+                                    || symb.type == ParsedSymbol.TYPE_BRACKET_OPEN
+                                ) {
+                                parentsStack.push(symb.type);
+                                parentLevel++;
+                            }
+                            if (symb.type == ParsedSymbol.TYPE_PARENT_CLOSE) {
+                                if (parentsStack.isEmpty()) {
+                                    throw new IOException("parent stack empty");
+                                }
+                                if (parentsStack.pop() != ParsedSymbol.TYPE_PARENT_OPEN) {
+                                    throw new IOException("invalid parent");
+                                }
+                                parentLevel--;
+                            }
+                            if (symb.type == ParsedSymbol.TYPE_BRACKET_CLOSE) {
+                                if (parentsStack.isEmpty()) {
+                                    throw new IOException("parent stack empty");
+                                }
+                                if (parentsStack.pop() != ParsedSymbol.TYPE_BRACKET_OPEN) {
+                                    throw new IOException("invalid parent");
+                                }
+                                parentLevel--;
+                            }
+                            if (parentLevel == 0 && symb.type == ParsedSymbol.TYPE_COMMA) {
+                                argumentToHilight++;
+                            }
+                            symb = lexer.lex();
+                        }                                
+                    }
+                    if (AVM2Code.instructionAliases.containsKey(insName)) {
+                        insName = AVM2Code.instructionAliases.get(insName);
+                    }
+                    Point loc = getLineLocation(getLine() + 1);
+                    if (loc != null) {
+                        SwingUtilities.convertPointToScreen(loc, this);
+                    }
+                    if (insNameToDef.containsKey(insName)) {
+                        fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true, nightMode, argumentToHilight), loc);
+                        return;
+                    }
+                }
+            } catch (IOException | AVM2ParseException iex) {
+                //ignore
+            }            
         }
         String pathDocs = As3PCodeOtherDocs.getDocsForPath(pathNoTrait, nightMode);
         if (pathDocs == null) {

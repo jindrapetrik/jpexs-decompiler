@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style
 - Generic tag editor - Default values for filters
 - AS1/2 P-code actions inline documentation
-- AS1/2 P-code hilight currently selected action argument in action documentation
+- P-code hilight currently selected instruction argument in the documentation (both AS1/2 and AS3)
 - [#2098] Shape points editation, transform - Protection against saving too large edges/rects
 
 ### Fixed

@@ -39,6 +39,7 @@ import java.util.Stack;
     long multinameId = 0;
 
     private int repeatNum = 1;
+    private int stringPos = 0;
 
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
@@ -131,169 +132,171 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
 
   {ExceptionStart}              {
                                    String s=yytext();
-                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_START, Integer.parseInt(s.substring(15, s.length() - 1)));
+                                   return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_EXCEPTION_START, Integer.parseInt(s.substring(15, s.length() - 1)));
                                 }
   {ExceptionEnd}              {
                                    String s=yytext();
-                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_END, Integer.parseInt(s.substring(13, s.length() - 1)));
+                                   return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_EXCEPTION_END, Integer.parseInt(s.substring(13, s.length() - 1)));
                                 }
   {ExceptionTarget}              {
                                    String s=yytext();
-                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_TARGET,Integer.parseInt(s.substring(16, s.length() - 1)));
+                                   return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_EXCEPTION_TARGET,Integer.parseInt(s.substring(16, s.length() - 1)));
                                 }
   {Label}                        {
                                     String s = yytext();
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
+                                    return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
                                 }
-  "name"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}  
-  "try"                         {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRY, yytext());}
-  "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
-  "param"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PARAM, yytext());}
-  "paramname"                   {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PARAMNAME, yytext());}
-  "optional"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_OPTIONAL, yytext());}
-  "returns"                     {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RETURNS, yytext());}
-  "body"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_BODY, yytext());}
-  "maxstack"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MAXSTACK, yytext());}
-  "localcount"                  {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_LOCALCOUNT, yytext());}
-  "initscopedepth"              {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INITSCOPEDEPTH, yytext());}
-  "maxscopedepth"               {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH, yytext());}
-  "code"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CODE, yytext());}
-  "trait"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRAIT, yytext());}
-  "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}
-  "metadata"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK, yytext());}
-  "item"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_ITEM, yytext());}
-  "instance"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INSTANCE, yytext());}
-  "extends"                     {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_EXTENDS, yytext());}
-  "implements"                  {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS, yytext());}
-  "protectedns"                 {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK, yytext());}
-  "end"                         {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_END, yytext());}
+  "name"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}  
+  "try"                         {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TRY, yytext());}
+  "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
+  "param"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PARAM, yytext());}
+  "paramname"                   {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PARAMNAME, yytext());}
+  "optional"                    {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_OPTIONAL, yytext());}
+  "returns"                     {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_RETURNS, yytext());}
+  "body"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_BODY, yytext());}
+  "maxstack"                    {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MAXSTACK, yytext());}
+  "localcount"                  {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_LOCALCOUNT, yytext());}
+  "initscopedepth"              {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_INITSCOPEDEPTH, yytext());}
+  "maxscopedepth"               {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH, yytext());}
+  "code"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_CODE, yytext());}
+  "trait"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TRAIT, yytext());}
+  "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}
+  "metadata"                    {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK, yytext());}
+  "item"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_ITEM, yytext());}
+  "instance"                    {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_INSTANCE, yytext());}
+  "extends"                     {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_EXTENDS, yytext());}
+  "implements"                  {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS, yytext());}
+  "protectedns"                 {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK, yytext());}
+  "end"                         {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_END, yytext());}
   
 /*in params too:*/
-  "class"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CLASS, yytext());}
-  "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
-  "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
-  "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
-  "type"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
+  "class"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_CLASS, yytext());}
+  "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
+  "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
+  "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
+  "type"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
   
 
   
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
+                                        return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
                                       }
-  {Comment}                     {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
+  {Comment}                     {return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
 }
 
 <PARAMETERS> {
   /* string literal */
   \"                             {
                                     isMultiname = false;
+                                    stringPos = yychar();
                                     yybegin(STRING);
                                     string.setLength(0);
                                  }
   {Multiname}\"                   {
                                     isMultiname = true;
                                     String s = yytext();
+                                    stringPos = yychar();
                                     multinameId = Long.parseLong(s.substring(2, s.length() - 2));
                                     yybegin(STRING);
                                     string.setLength(0);
                                   }
   /* multinames */
-  "QName"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_QNAME, yytext());}
-  "QNameA"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_QNAMEA, yytext());}
-  "RTQName"                    {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAME, yytext());}
-  "RTQNameA"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAMEA, yytext());}
-  "RTQNameL"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAMEL, yytext());}
-  "RTQNameLA"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_RTQNAMELA, yytext());}
-  "Multiname"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAME, yytext());}
-  "MultinameA"                 {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMEA, yytext());}
-  "MultinameL"                 {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMEL, yytext());}
-  "MultinameLA"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMELA, yytext());}
-  "TypeName"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPENAME, yytext());}
-  "Unknown"                    {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UNKNOWN, yytext()); }
-  "null"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NULL, yytext());}
-  "("                          {  return new ParsedSymbol(ParsedSymbol.TYPE_PARENT_OPEN, yytext());}
-  ")"                          {  return new ParsedSymbol(ParsedSymbol.TYPE_PARENT_CLOSE, yytext());}
-  "["                          {  return new ParsedSymbol(ParsedSymbol.TYPE_BRACKET_OPEN, yytext());}
-  "]"                          {  return new ParsedSymbol(ParsedSymbol.TYPE_BRACKET_CLOSE, yytext());}
-  "<"                          {  return new ParsedSymbol(ParsedSymbol.TYPE_LOWERTHAN, yytext());}
-  ">"                          {  return new ParsedSymbol(ParsedSymbol.TYPE_GREATERTHAN, yytext());}
-  "Namespace"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NAMESPACE, yytext());}
-  "PrivateNamespace"           {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PRIVATENAMESPACE, yytext());}
-  "PackageNamespace"           {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PACKAGENAMESPACE, yytext());}
-  "PackageInternalNs"          {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS, yytext());}
-  "ProtectedNamespace"         {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PROTECTEDNAMESPACE, yytext());}
-  "ExplicitNamespace"          {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_EXPLICITNAMESPACE, yytext());}
-  "StaticProtectedNs"          {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_STATICPROTECTEDNS, yytext());}
-  ","                          {  return new ParsedSymbol(ParsedSymbol.TYPE_COMMA, yytext());}
+  "QName"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_QNAME, yytext());}
+  "QNameA"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_QNAMEA, yytext());}
+  "RTQName"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_RTQNAME, yytext());}
+  "RTQNameA"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_RTQNAMEA, yytext());}
+  "RTQNameL"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_RTQNAMEL, yytext());}
+  "RTQNameLA"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_RTQNAMELA, yytext());}
+  "Multiname"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MULTINAME, yytext());}
+  "MultinameA"                 {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MULTINAMEA, yytext());}
+  "MultinameL"                 {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MULTINAMEL, yytext());}
+  "MultinameLA"                {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_MULTINAMELA, yytext());}
+  "TypeName"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TYPENAME, yytext());}
+  "Unknown"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UNKNOWN, yytext()); }
+  "null"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NULL, yytext());}
+  "("                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_PARENT_OPEN, yytext());}
+  ")"                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_PARENT_CLOSE, yytext());}
+  "["                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_BRACKET_OPEN, yytext());}
+  "]"                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_BRACKET_CLOSE, yytext());}
+  "<"                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_LOWERTHAN, yytext());}
+  ">"                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_GREATERTHAN, yytext());}
+  "Namespace"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NAMESPACE, yytext());}
+  "PrivateNamespace"           {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PRIVATENAMESPACE, yytext());}
+  "PackageNamespace"           {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PACKAGENAMESPACE, yytext());}
+  "PackageInternalNs"          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS, yytext());}
+  "ProtectedNamespace"         {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PROTECTEDNAMESPACE, yytext());}
+  "ExplicitNamespace"          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_EXPLICITNAMESPACE, yytext());}
+  "StaticProtectedNs"          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_STATICPROTECTEDNS, yytext());}
+  ","                          {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_COMMA, yytext());}
 
   /*Try*/
-  "from"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FROM, yytext());}
-  "to"                         {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TO, yytext());}
-  "target"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TARGET, yytext());}
-  "name"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}
-  "type"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
-  "end"                        {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_END, yytext());} 
+  "from"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FROM, yytext());}
+  "to"                         {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TO, yytext());}
+  "target"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TARGET, yytext());}
+  "name"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}
+  "type"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
+  "end"                        {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_END, yytext());} 
   
-  "slot"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOT, yytext());}
-  "const"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CONST, yytext());}
-  "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}  
-  "getter"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_GETTER, yytext());}
-  "setter"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SETTER, yytext());}
-  "class"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CLASS, yytext());}
-  "function"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FUNCTION, yytext());}
-  "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
-  "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
-  "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
-  "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
+  "slot"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SLOT, yytext());}
+  "const"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_CONST, yytext());}
+  "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}  
+  "getter"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_GETTER, yytext());}
+  "setter"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SETTER, yytext());}
+  "class"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_CLASS, yytext());}
+  "function"                    {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FUNCTION, yytext());}
+  "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
+  "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
+  "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
+  "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
   
 
   /* Flag - old alias for "NATIVE" */
-  "EXPLICIT"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
+  "EXPLICIT"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
 
    /*Flags*/
-  "NATIVE"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
-  "HAS_OPTIONAL"               {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL, yytext());}
-  "HAS_PARAM_NAMES"            {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_HAS_PARAM_NAMES, yytext());}
-  "IGNORE_REST"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_IGNORE_REST, yytext());}
-  "NEED_ACTIVATION"            {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NEED_ACTIVATION, yytext());}
-  "NEED_ARGUMENTS"             {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NEED_ARGUMENTS, yytext());}
-  "NEED_REST"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NEED_REST, yytext());}
-  "SET_DXNS"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SET_DXNS, yytext());}
+  "NATIVE"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
+  "HAS_OPTIONAL"               {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL, yytext());}
+  "HAS_PARAM_NAMES"            {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_HAS_PARAM_NAMES, yytext());}
+  "IGNORE_REST"                {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_IGNORE_REST, yytext());}
+  "NEED_ACTIVATION"            {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NEED_ACTIVATION, yytext());}
+  "NEED_ARGUMENTS"             {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NEED_ARGUMENTS, yytext());}
+  "NEED_REST"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NEED_REST, yytext());}
+  "SET_DXNS"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SET_DXNS, yytext());}
 
   /* Value types*/
-  "Integer"                    {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INTEGER, yytext());}
-  "UInteger"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UINTEGER, yytext());}
-  "Double"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DOUBLE, yytext());}
-  "Decimal"                    {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DECIMAL, yytext());}
-  "Utf8"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UTF8, yytext());}
-  "True"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRUE, yytext());}
-  "False"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FALSE, yytext());}
-  "Void"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
-  "Undefined"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
+  "Integer"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_INTEGER, yytext());}
+  "UInteger"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UINTEGER, yytext());}
+  "Double"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DOUBLE, yytext());}
+  "Decimal"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DECIMAL, yytext());}
+  "Utf8"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UTF8, yytext());}
+  "True"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TRUE, yytext());}
+  "False"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FALSE, yytext());}
+  "Void"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
+  "Undefined"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
    
 
-  "FINAL"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FINAL, yytext());}
-  "OVERRIDE"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_OVERRIDE, yytext());}
-  "METADATA"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METADATA, yytext());}
-  "SEALED"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SEALED, yytext());}
-  "INTERFACE"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INTERFACE, yytext());}
-  "PROTECTEDNS"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS, yytext());}
-  "NON_NULLABLE"               {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE, yytext());}
+  "FINAL"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FINAL, yytext());}
+  "OVERRIDE"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_OVERRIDE, yytext());}
+  "METADATA"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_METADATA, yytext());}
+  "SEALED"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_SEALED, yytext());}
+  "INTERFACE"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_INTERFACE, yytext());}
+  "PROTECTEDNS"                {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS, yytext());}
+  "NON_NULLABLE"               {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE, yytext());}
   
   /* numeric literals */
 
   {NumberLiteral}            { 
                                 try {
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Integer.parseInt((yytext())));  
+                                    return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_INTEGER, Integer.parseInt((yytext())));  
                                 } catch(NumberFormatException nfe) {
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
+                                    return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
                                 }
                              }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
-  {Identifier}            { return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
+  {FloatLiteral}                 { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
+  {Identifier}            { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
   {LineTerminator}      {yybegin(YYINITIAL);}
-  {Comment}             {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
+  {Comment}             {return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}
 }
 
 <STRING> {
@@ -302,9 +305,9 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                      repeatNum = 1;
                                      // length also includes the trailing quote
                                      if (isMultiname){
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_MULTINAME, multinameId);
+                                        return new ParsedSymbol(stringPos, ParsedSymbol.TYPE_MULTINAME, multinameId);
                                      } else {
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_STRING, string.toString());
+                                        return new ParsedSymbol(stringPos, ParsedSymbol.TYPE_STRING, string.toString());
                                      }
                                  }
 
@@ -335,4 +338,4 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
 
 /* error fallback */
 [^]                              { }
-<<EOF>>                          { return new ParsedSymbol(ParsedSymbol.TYPE_EOF); }
+<<EOF>>                          { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_EOF); }

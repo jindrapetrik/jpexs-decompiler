@@ -22,6 +22,8 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
  */
 public class ParsedSymbol {
 
+    public int pos;
+    
     public int type;
 
     public Object value;
@@ -218,12 +220,14 @@ public class ParsedSymbol {
 
     public static final int TYPE_KEYWORD_PROTECTEDNS_BLOCK = 97;
 
-    public ParsedSymbol(int type, Object value) {
+    public ParsedSymbol(int pos, int type, Object value) {
+        this.pos = pos;
         this.type = type;
         this.value = value;
     }
 
-    public ParsedSymbol(int type) {
+    public ParsedSymbol(int pos, int type) {
+        this.pos = pos;
         this.type = type;
     }
 }
