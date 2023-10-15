@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - display of array brackets
 - Generic tag editor - GRADIENT filters fields
 - [#2099] Smart number formatting precedence
+- AS3 Direct editation - Cannot save code after switching deobfuscation
 
 ### Changed
 - AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted
