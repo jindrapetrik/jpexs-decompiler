@@ -22,6 +22,8 @@ package com.jpexs.decompiler.flash.action.parser.pcode;
  */
 public class ASMParsedSymbol {
 
+    public int pos;
+    
     public int type;
 
     public Object value;
@@ -62,12 +64,14 @@ public class ASMParsedSymbol {
     
     public static final int TYPE_COMMA = 18;
 
-    public ASMParsedSymbol(int type, Object value) {
+    public ASMParsedSymbol(int pos, int type, Object value) {
+        this.pos = pos;
         this.type = type;
         this.value = value;
     }
 
-    public ASMParsedSymbol(int type) {
+    public ASMParsedSymbol(int pos, int type) {
+        this.pos = pos;
         this.type = type;
     }
 

@@ -106,8 +106,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Utilities;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
@@ -787,7 +789,32 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                                 Color c = UIManager.getColor("EditorPane.background");
                                 int light = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
                                 boolean nightMode = light <= 128;
-                                String docs = As12PCodeDocs.getDocsForIns(actionName, true, true, nightMode);
+                                
+                                int argumentToHilight = -1;
+                                int column = 0;
+                                try {
+                                    int rowStart = Utilities.getRowStart(editor, e.getDot());
+                                    column = e.getDot() - rowStart;
+                                } catch (BadLocationException ex) {
+                                    //ignore
+                                }            
+                                symb = lexer.lex();
+                                if (symb.pos <= column) {                                                              
+                                    argumentToHilight++;
+                                    while(symb.type != ASMParsedSymbol.TYPE_EOL && symb.type != ASMParsedSymbol.TYPE_EOF) {
+                                        if (symb.pos >= column) {
+                                            break;
+                                        }
+                                        if (symb.type == ASMParsedSymbol.TYPE_COMMA) {
+                                            argumentToHilight++;
+                                        }
+                                        symb = lexer.lex();
+                                    }                                
+                                }
+                                
+                                
+                                
+                                String docs = As12PCodeDocs.getDocsForIns(actionName, true, true, nightMode, argumentToHilight);
                                 Point loc = editor.getLineLocation(editor.getLine() + 1);
                                 if (loc != null) {
                                     SwingUtilities.convertPointToScreen(loc, editor);

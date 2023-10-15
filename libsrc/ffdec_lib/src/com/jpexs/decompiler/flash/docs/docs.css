@@ -26,6 +26,11 @@ strong.instruction-name {
     font-weight: bold;
     color: blue;
 }
+
+strong.selected-operand {
+    font-weight: bold;
+    color: #800;
+}
 strong.stack-title {
     font-weight: bold;
 }

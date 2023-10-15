@@ -609,6 +609,8 @@ public final class FlasmLexer {
 
     private int repeatNum = 1;
 
+    private int stringStartPos = -1;
+
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -1017,11 +1019,11 @@ public final class FlasmLexer {
         case 34: break;
         case 2: 
           { yybegin(PARAMETERS);
-                                        return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
+                                        return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_INSTRUCTION_NAME, yytext());
           }
         case 35: break;
         case 3: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_END);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_BLOCK_END);
           }
         case 36: break;
         case 4: 
@@ -1036,41 +1038,42 @@ public final class FlasmLexer {
           { yybegin(PARAMETERS);
                                      repeatNum = 1;
                                      // length also includes the trailing quote
-                                     return new ASMParsedSymbol(ASMParsedSymbol.TYPE_STRING, string.toString());
+                                     return new ASMParsedSymbol(stringStartPos, ASMParsedSymbol.TYPE_STRING, string.toString());
           }
         case 39: break;
         case 7: 
-          { yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOL);
+          { yybegin(YYINITIAL); return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_EOL);
           }
         case 40: break;
         case 8: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMENT, yytext().substring(1));
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_COMMENT, yytext().substring(1));
           }
         case 41: break;
         case 9: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_IDENTIFIER, yytext());
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_IDENTIFIER, yytext());
           }
         case 42: break;
         case 10: 
-          { yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_START);
+          { yybegin(YYINITIAL); return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_BLOCK_START);
           }
         case 43: break;
         case 11: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
           }
         case 44: break;
         case 12: 
-          { yybegin(STRING);
+          { stringStartPos = yychar();
+                                    yybegin(STRING);
                                     string.setLength(0);
           }
         case 45: break;
         case 13: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMA);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_COMMA);
           }
         case 46: break;
         case 14: 
           { String s=yytext();
-                                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
+                                    return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_LABEL, s.substring(0, s.length() - 1));
           }
         case 47: break;
         case 15: 
@@ -1114,7 +1117,7 @@ public final class FlasmLexer {
           }
         case 57: break;
         case 25: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
           }
         case 58: break;
         case 26: 
@@ -1127,34 +1130,34 @@ public final class FlasmLexer {
           }
         case 60: break;
         case 28: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);
           }
         case 61: break;
         case 29: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL, Null.INSTANCE);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_NULL, Null.INSTANCE);
           }
         case 62: break;
         case 30: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);
           }
         case 63: break;
         case 31: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER, new RegisterNumber(Integer.parseInt(yytext().substring(8))));
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_REGISTER, new RegisterNumber(Integer.parseInt(yytext().substring(8))));
           }
         case 64: break;
         case 32: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED, Undefined.INSTANCE);
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_UNDEFINED, Undefined.INSTANCE);
           }
         case 65: break;
         case 33: 
-          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT, new ConstantIndex(Integer.parseInt(yytext().substring(8))));
+          { return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_CONSTANT, new ConstantIndex(Integer.parseInt(yytext().substring(8))));
           }
         case 66: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
               {
-                return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOF);
+                return new ASMParsedSymbol(yychar(), ASMParsedSymbol.TYPE_EOF);
               }
           } 
           else {
