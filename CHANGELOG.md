@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style
 - Generic tag editor - Default values for filters
 - AS1/2 P-code actions inline documentation
+- AS1/2 P-code hilight currently selected action argument in action documentation
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
