@@ -2097,6 +2097,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         );
     }
 
+    private boolean checkShapeLarge(List<SHAPERECORD> shapeRecords) {
+        for (SHAPERECORD rec : shapeRecords) {
+            if (rec.isTooLarge()) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.shapeTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean checkRectLarge(RECT rect) {
+        if (rect.isTooLarge()) {
+            ViewMessages.showMessageDialog(this, AppStrings.translate("error.shapeTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;
+    }
+    
     private void saveDisplayEditTag(boolean refreshTree) {
         if (displayEditMode == EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
@@ -2108,13 +2125,33 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
 
-                transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
-                transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
-
-                shape.shapeBounds = transformRECT(matrix, shape.shapeBounds);
+                
+                RECT newShapeBounds = transformRECT(matrix, shape.shapeBounds);
+                if (checkRectLarge(newShapeBounds)) {
+                    return;
+                }
+                RECT newEdgeBounds = null;
                 if (shape instanceof DefineShape4Tag) {
                     DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                    shape4.edgeBounds = transformRECT(matrix, shape4.edgeBounds);
+                    newEdgeBounds = transformRECT(matrix, shape4.edgeBounds);
+                    if (checkRectLarge(newEdgeBounds)) {
+                        return;
+                    }
+                }
+                
+                oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);         
+                transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
+                if (checkShapeLarge(shape.shapes.shapeRecords)) {
+                    shape.shapes.shapeRecords = oldShapeRecords;
+                    return;
+                }
+                oldShapeRecords = null;
+                transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
+
+                shape.shapeBounds = newShapeBounds;
+                if (shape instanceof DefineShape4Tag) {
+                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                    shape4.edgeBounds = newEdgeBounds;
                 }
                 shape.shapes.clearCachedOutline();
                 shape.getSwf().clearShapeCache();
@@ -2124,21 +2161,53 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
 
                 if (morphDisplayMode == MORPH_START) {
-                    transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
-                    morphShape.startBounds = transformRECT(matrix, morphShape.startBounds);
+                    RECT newShapeBounds = transformRECT(matrix, morphShape.startBounds);
+                    if (checkRectLarge(newShapeBounds)) {
+                        return;
+                    }
+                    RECT newEdgeBounds = null;
                     if (morphShape instanceof DefineMorphShape2Tag) {
                         DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        morphShape2.startEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
+                        newEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
+                    }
+                    
+                    oldShapeRecords = Helper.deepCopy(morphShape.startEdges.shapeRecords); 
+                    transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    if (checkShapeLarge(morphShape.startEdges.shapeRecords)) {
+                        morphShape.startEdges.shapeRecords = oldShapeRecords;
+                        return;
+                    }
+                    oldShapeRecords = null;
+                    morphShape.startBounds = newShapeBounds;
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        morphShape2.startEdgeBounds = newEdgeBounds;
                     }
                     transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
                 }
 
                 if (morphDisplayMode == MORPH_END) {
-                    transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
-                    morphShape.endBounds = transformRECT(matrix, morphShape.endBounds);
+                    RECT newShapeBounds = transformRECT(matrix, morphShape.endBounds);
+                    if (checkRectLarge(newShapeBounds)) {
+                        return;
+                    }
+                    RECT newEdgeBounds = null;
                     if (morphShape instanceof DefineMorphShape2Tag) {
                         DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        morphShape2.endEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
+                        newEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
+                    }
+                    
+                    oldShapeRecords = Helper.deepCopy(morphShape.endEdges.shapeRecords); 
+                    transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    if (checkShapeLarge(morphShape.endEdges.shapeRecords)) {
+                        morphShape.endEdges.shapeRecords = oldShapeRecords;
+                        return;
+                    }
+                    oldShapeRecords = null;
+                    morphShape.endBounds = newShapeBounds;
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        morphShape2.endEdgeBounds = newEdgeBounds;
                     }
                     transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
                 }
@@ -2158,38 +2227,63 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             List<SHAPERECORD> shapeRecords = null;
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
-                shapeRecords = shape.shapes.shapeRecords;
+                if (checkShapeLarge(shape.shapes.shapeRecords)) {
+                    return;
+                }
             }
             if (displayEditTag instanceof MorphShapeTag) {
                 MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
                 if (morphDisplayMode == MORPH_START) {
-                    shapeRecords = morphShape.getStartEdges().shapeRecords;
-                }
-                if (morphDisplayMode == MORPH_END) {
-                    shapeRecords = morphShape.getEndEdges().shapeRecords;
-                }
-            }
-            if (shapeRecords != null) {
-                for (SHAPERECORD rec : shapeRecords) {
-                    if (rec.isTooLarge()) {
-                        ViewMessages.showMessageDialog(this, AppStrings.translate("error.shapeTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    if (checkShapeLarge(morphShape.getStartEdges().shapeRecords)) {
                         return;
                     }
                 }
-            }
+                if (morphDisplayMode == MORPH_END) {
+                    if (checkShapeLarge(morphShape.getEndEdges().shapeRecords)) {
+                        return;
+                    }
+                }
+            }            
             displayEditImagePanel.setHilightedPoints(null);
             displayEditTag.setModified(true);
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
                 shape.updateBounds();
+                if (checkRectLarge(shape.shapeBounds)) {
+                    return;
+                }
+                if (shape instanceof DefineShape4Tag) {
+                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                    if (checkRectLarge(shape4.edgeBounds)) {
+                        return;
+                    }
+                }
             }
             if (displayEditTag instanceof MorphShapeTag) {
                 MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
                 if (morphDisplayMode == MORPH_START) {
                     morphShape.updateStartBounds();
+                    if (checkRectLarge(morphShape.endBounds)) {
+                        return;
+                    }   
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        if (checkRectLarge(morphShape2.endEdgeBounds)) {
+                            return;
+                        }                    
+                    }
                 }
                 if (morphDisplayMode == MORPH_END) {
                     morphShape.updateEndBounds();
+                    if (checkRectLarge(morphShape.startBounds)) {
+                        return;
+                    }
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        if (checkRectLarge(morphShape2.startEdgeBounds)) {
+                            return;
+                        }                    
+                    }
                 }
             }
             oldShapeRecords = null;
