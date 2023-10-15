@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - Default values for filters
 - AS1/2 P-code actions inline documentation
 - AS1/2 P-code hilight currently selected action argument in action documentation
-- [#2098] Shape points editation - Protection against saving too large edges
+- [#2098] Shape points editation, transform - Protection against saving too large edges/rects
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
