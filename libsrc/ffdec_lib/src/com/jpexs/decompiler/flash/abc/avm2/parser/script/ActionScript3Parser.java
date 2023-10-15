@@ -2333,6 +2333,7 @@ public class ActionScript3Parser {
                     GraphTargetItem num = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
                     if (num instanceof IntegerValueAVM2Item) {
                         ((IntegerValueAVM2Item) num).value = -((IntegerValueAVM2Item) num).value;
+                        ((IntegerValueAVM2Item) num).detectFormat();
                         ret = num;
                     } else if (num instanceof FloatValueAVM2Item) {
                         Double d = ((FloatValueAVM2Item) num).value;

@@ -47,6 +47,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - display of color values in arrays (filters, etc.)
 - Generic tag editor - display of array brackets
 - Generic tag editor - GRADIENT filters fields
+- [#2099] Smart number formatting precedence
 
 ### Changed
 - AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted
@@ -3177,6 +3178,7 @@ Major version of SWF to XML export changed to 2.
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
 [#2095]: https://www.free-decompiler.com/flash/issues/2095
 [#223]: https://www.free-decompiler.com/flash/issues/223
+[#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
