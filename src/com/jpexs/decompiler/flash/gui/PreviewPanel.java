@@ -2106,6 +2106,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         return false;
     }
+
     private boolean checkRectLarge(RECT rect) {
         if (rect.isTooLarge()) {
             ViewMessages.showMessageDialog(this, AppStrings.translate("error.shapeTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
