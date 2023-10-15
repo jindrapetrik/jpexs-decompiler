@@ -927,6 +927,15 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportSpriteInfo = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> displayAs12PCodeDocsPanel = null;
+    
+    @ConfigurationDefaultDouble(0.85)
+    @ConfigurationName("gui.action.splitPane.docs.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiActionDocsSplitPaneDividerLocationPercent = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

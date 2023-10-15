@@ -73,6 +73,6 @@ public class ASMParsedSymbol {
 
     @Override
     public String toString() {
-        return "symbol[type="+type+", value="+value+"]";
+        return "symbol[type=" + type + ", value=" + value + "]";
     }        
 }

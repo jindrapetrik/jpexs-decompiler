@@ -25,7 +25,9 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
@@ -34,15 +36,18 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
+import com.jpexs.decompiler.flash.docs.As12PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.DocsPanel;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.ScrollablePanel;
 import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
@@ -72,6 +77,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
@@ -94,6 +100,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
@@ -751,7 +759,53 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
 
         JPanel panCode = new JPanel(new BorderLayout());
-        panCode.add(new FasterScrollPane(editor), BorderLayout.CENTER);
+        
+        //sourceTextArea.addDocsListener(docsPanel);
+        
+        if (Configuration.displayAs12PCodeDocsPanel.get()) {
+            final DocsPanel docsPanel = new DocsPanel();     
+            ScrollablePanel scrollablePanel = new ScrollablePanel(new BorderLayout());
+            scrollablePanel.setScrollableWidth(ScrollablePanel.ScrollableSizeHint.FIT);
+            scrollablePanel.setScrollableHeight(ScrollablePanel.ScrollableSizeHint.STRETCH);
+            scrollablePanel.add(docsPanel, BorderLayout.CENTER);
+            panCode.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new FasterScrollPane(editor), new FasterScrollPane(scrollablePanel), Configuration.guiActionDocsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+            
+            
+            editor.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    String lineText = editor.getCurrentLineText();
+                    if (lineText != null) {
+                        FlasmLexer lexer = new FlasmLexer(new StringReader(lineText));
+                        try {
+                            ASMParsedSymbol symb = lexer.lex();
+                            while (symb.type == ASMParsedSymbol.TYPE_LABEL) {
+                                symb = lexer.lex();                                
+                            }
+                            if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                                String actionName = (String) symb.value;
+                                Color c = UIManager.getColor("EditorPane.background");
+                                int light = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
+                                boolean nightMode = light <= 128;
+                                String docs = As12PCodeDocs.getDocsForIns(actionName, true, true, nightMode);
+                                Point loc = editor.getLineLocation(editor.getLine() + 1);
+                                if (loc != null) {
+                                    SwingUtilities.convertPointToScreen(loc, editor);
+                                }
+                                
+                                docsPanel.docs("action." + actionName, docs, loc);
+                            } else {
+                                docsPanel.noDocs();
+                            }
+                        } catch (IOException | ActionParseException ex) {
+                            //ignore
+                        }
+                    }
+                }                
+            });
+        } else {
+            panCode.add(new FasterScrollPane(editor), BorderLayout.CENTER);
+        }
         panCode.add(topButtonsPan, BorderLayout.NORTH);
 
         JPanel panB = new JPanel();

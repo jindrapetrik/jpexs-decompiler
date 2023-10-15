@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -86,7 +87,7 @@ public class ActionGetURL2 extends Action {
 
     @Override
     public String toString() {
-        return "GetURL2 " + loadVariablesFlag + ", " + loadTargetFlag + ", " + sendVarsMethod;
+        return "GetURL2 " + sendVarsMethod + ", " + loadVariablesFlag + ", " + loadTargetFlag;
     }
 
     @Override
@@ -109,11 +110,24 @@ public class ActionGetURL2 extends Action {
 
     public ActionGetURL2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9A, -1, charset);
+        
+        ASMParsedSymbol symb = lexer.lex();
+        boolean sendVarsMethodLast = false;
+        if (symb.type == ASMParsedSymbol.TYPE_BOOLEAN) { //backwards compatibility
+            sendVarsMethodLast = true;            
+        }
+        lexer.pushback(symb);
+        if (!sendVarsMethodLast) {
+            sendVarsMethod = (int) lexLong(lexer);
+            lexOptionalComma(lexer);        
+        }
         loadVariablesFlag = lexBoolean(lexer);
         lexOptionalComma(lexer);        
-        loadTargetFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
-        sendVarsMethod = (int) lexLong(lexer);
+        loadTargetFlag = lexBoolean(lexer);                
+        if (sendVarsMethodLast) {
+            lexOptionalComma(lexer);        
+            sendVarsMethod = (int) lexLong(lexer);
+        }        
     }
 
     @Override
