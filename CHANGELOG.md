@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Support for DefineShape4 nonzero winding rule - display, svg (import, export), canvas export
 - Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style
 - Generic tag editor - Default values for filters
+- AS1/2 P-code actions inline documentation
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
@@ -47,6 +48,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted
+- AS1/2 P-code Action GetURL2 as swithed parameters - sendVarsMethod is first, older code is still accepted
 
 ## [19.0.0] - 2023-10-01
 ### Added
