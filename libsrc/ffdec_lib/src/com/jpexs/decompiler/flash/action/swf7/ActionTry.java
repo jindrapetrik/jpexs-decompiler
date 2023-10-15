@@ -151,7 +151,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         super(0x8F, 0, charset);
         this.version = version;
 
-        ASMParsedSymbol symb = lexer.yylex();
+        ASMParsedSymbol symb = lexer.lex();
         if (symb.type == ASMParsedSymbol.TYPE_STRING) {
             catchInRegisterFlag = false;
             catchName = (String) symb.value;
@@ -238,7 +238,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     @Override
     public boolean parseDivision(long size, FlasmLexer lexer) {
         try {
-            ASMParsedSymbol symb = lexer.yylex();
+            ASMParsedSymbol symb = lexer.lex();
             //catchBlockFlag = false;
             if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 if (((String) symb.value).toLowerCase().equals("catch")) {
@@ -259,14 +259,14 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                         return true;
                     } else {
                         //finallyBlockFlag = false;
-                        lexer.yypushback(lexer.yylength());
+                        lexer.pushback(symb);
                     }
                 } else {
                     //finallyBlockFlag = false;
-                    lexer.yypushback(lexer.yylength());
+                    lexer.pushback(symb);
                 }
             } else {
-                lexer.yypushback(lexer.yylength());
+                lexer.pushback(symb);
             }
         } catch (IOException | ActionParseException ex) {
             //ignored
@@ -277,7 +277,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         } else if (catchBlockFlag) {
             catchSize = size - getHeaderSize() - trySize;
         }
-        lexer.yybegin(0);
         return false;
     }
 

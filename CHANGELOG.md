@@ -45,6 +45,9 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - display of array brackets
 - Generic tag editor - GRADIENT filters fields
 
+### Changed
+- AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted
+
 ## [19.0.0] - 2023-10-01
 ### Added
 - [#1449] Updated Turkish translation

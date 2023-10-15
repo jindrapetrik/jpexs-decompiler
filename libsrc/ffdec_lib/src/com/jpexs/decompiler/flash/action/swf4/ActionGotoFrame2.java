@@ -98,14 +98,16 @@ public class ActionGotoFrame2 extends Action {
 
     @Override
     public String toString() {
-        return "GotoFrame2 " + sceneBiasFlag + " " + playFlag + " " + (sceneBiasFlag ? " " + sceneBias : "");
+        return "GotoFrame2 " + sceneBiasFlag + ", " + playFlag + ", " + (sceneBiasFlag ? ", " + sceneBias : "");
     }
 
     public ActionGotoFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9F, -1, charset);
         sceneBiasFlag = lexBoolean(lexer);
+        lexOptionalComma(lexer);        
         playFlag = lexBoolean(lexer);
         if (sceneBiasFlag) {
+            lexOptionalComma(lexer);        
             sceneBias = (int) lexLong(lexer);
         }
     }

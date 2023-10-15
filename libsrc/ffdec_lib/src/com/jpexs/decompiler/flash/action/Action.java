@@ -265,7 +265,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws ActionParseException When read object is not String
      */
     protected String lexString(FlasmLexer lex) throws IOException, ActionParseException {
-        ASMParsedSymbol symb = lex.yylex();
+        ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_STRING) {
             throw new ActionParseException("String expected", lex.yyline());
         }
@@ -280,7 +280,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws ActionParseException When read object is not Block startServer
      */
     protected void lexBlockOpen(FlasmLexer lex) throws IOException, ActionParseException {
-        ASMParsedSymbol symb = lex.yylex();
+        ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_BLOCK_START) {
             throw new ActionParseException("Block startServer ", lex.yyline());
         }
@@ -295,7 +295,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws ActionParseException When read object is not Identifier
      */
     protected String lexIdentifier(FlasmLexer lex) throws IOException, ActionParseException {
-        ASMParsedSymbol symb = lex.yylex();
+        ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_IDENTIFIER) {
             throw new ActionParseException("Identifier expected", lex.yyline());
         }
@@ -311,7 +311,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws ActionParseException When read object is not long value
      */
     protected long lexLong(FlasmLexer lex) throws IOException, ActionParseException {
-        ASMParsedSymbol symb = lex.yylex();
+        ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_INTEGER) {
             throw new ActionParseException("Integer expected", lex.yyline());
         }
@@ -327,11 +327,18 @@ public abstract class Action implements GraphSourceItem {
      * @throws ActionParseException When read object is not boolean value
      */
     protected boolean lexBoolean(FlasmLexer lex) throws IOException, ActionParseException {
-        ASMParsedSymbol symb = lex.yylex();
+        ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_BOOLEAN) {
             throw new ActionParseException("Boolean expected", lex.yyline());
-        }
+        }        
         return (Boolean) symb.value;
+    }
+    
+    protected void lexOptionalComma(FlasmLexer lex) throws IOException, ActionParseException {
+        ASMParsedSymbol symb = lex.lex();
+        if (symb.type != ASMParsedSymbol.TYPE_COMMA) {
+            lex.pushback(symb);
+        }
     }
 
     /**
@@ -646,7 +653,7 @@ public abstract class Action implements GraphSourceItem {
                  add = "; ofs" + Helper.formatAddress(offset) + add;
                  add = "";*/
                 if ((a instanceof ActionPush) && lastPush) {
-                    writer.appendNoHilight(" ");
+                    writer.appendNoHilight(", ");
                     ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, exportMode, writer);
                 } else {
                     if (lastPush) {

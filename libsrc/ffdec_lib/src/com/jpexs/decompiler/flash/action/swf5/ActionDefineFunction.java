@@ -97,8 +97,10 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public ActionDefineFunction(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9B, -1, charset);
         functionName = lexString(lexer);
+        lexOptionalComma(lexer);
         int numParams = (int) lexLong(lexer);
         for (int i = 0; i < numParams; i++) {
+            lexOptionalComma(lexer);        
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);
@@ -138,10 +140,11 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
         StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
+            paramStr.append(", ");
             paramStr.append("\"").append(Helper.escapeActionScriptString(paramNames.get(i))).append("\" ");
         }
 
-        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
+        return "DefineFunction \"" + Helper.escapeActionScriptString(functionName) + "\", " + paramNames.size() + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");
     }
 
     @Override

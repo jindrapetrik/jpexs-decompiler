@@ -62,14 +62,24 @@ public class ActionConstantPool extends Action {
 
     public ActionConstantPool(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x88, 0, charset);
+        boolean first = true;
         while (true) {
-            ASMParsedSymbol symb = lexer.yylex();
+            boolean valueRequired = false;        
+            ASMParsedSymbol symb = lexer.lex();
+            if (!first && symb.type == ASMParsedSymbol.TYPE_COMMA) {
+                symb = lexer.lex();
+                valueRequired = true;
+            }
             if (symb.type == ASMParsedSymbol.TYPE_STRING) {
                 constantPool.add((String) symb.value);
             } else {
-                lexer.yypushback(lexer.yylength());
+                if (valueRequired) {
+                    throw new ActionParseException("String expected", lexer.yyline());
+                }
+                lexer.pushback(symb);
                 break;
-            }
+            }                 
+            first = false;
         }
     }
 
@@ -109,6 +119,9 @@ public class ActionConstantPool extends Action {
         StringBuilder ret = new StringBuilder();
         ret.append("ConstantPool");
         for (int i = 0; i < constantPool.size(); i++) {
+            if (i > 0) {
+                ret.append(",");
+            }
             ret.append(" \"").append(Helper.escapeActionScriptString(constantPool.get(i))).append("\"");
         }
         return ret.toString();
