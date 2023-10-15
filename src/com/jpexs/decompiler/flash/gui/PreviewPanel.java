@@ -114,6 +114,7 @@ import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
@@ -2154,6 +2155,28 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditGenericPanel.setVisible(true);
         }
         if (displayEditMode == EDIT_POINTS) {
+            List<SHAPERECORD> shapeRecords = null;
+            if (displayEditTag instanceof ShapeTag) {
+                ShapeTag shape = (ShapeTag) displayEditTag;
+                shapeRecords = shape.shapes.shapeRecords;
+            }
+            if (displayEditTag instanceof MorphShapeTag) {
+                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+                if (morphDisplayMode == MORPH_START) {
+                    shapeRecords = morphShape.getStartEdges().shapeRecords;
+                }
+                if (morphDisplayMode == MORPH_END) {
+                    shapeRecords = morphShape.getEndEdges().shapeRecords;
+                }
+            }
+            if (shapeRecords != null) {
+                for (SHAPERECORD rec : shapeRecords) {
+                    if (rec.isTooLarge()) {
+                        ViewMessages.showMessageDialog(this, AppStrings.translate("error.shapeTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            }
             displayEditImagePanel.setHilightedPoints(null);
             displayEditTag.setModified(true);
             if (displayEditTag instanceof ShapeTag) {

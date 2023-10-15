@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - Default values for filters
 - AS1/2 P-code actions inline documentation
 - AS1/2 P-code hilight currently selected action argument in action documentation
+- [#2098] Shape points editation - Protection against saving too large edges
 
 ### Fixed
 - Close action on SWF inside DefineBinaryData
@@ -3170,6 +3171,7 @@ Major version of SWF to XML export changed to 2.
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
 [#116]: https://www.free-decompiler.com/flash/issues/116
 [#2097]: https://www.free-decompiler.com/flash/issues/2097
+[#2098]: https://www.free-decompiler.com/flash/issues/2098
 [#2093]: https://www.free-decompiler.com/flash/issues/2093
 [#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
