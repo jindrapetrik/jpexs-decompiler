@@ -2844,7 +2844,7 @@ public class SWFInputStream implements AutoCloseable {
                 cer.controlDeltaX = (int) readSB(cer.numBits + 2, "controlDeltaX");
                 cer.controlDeltaY = (int) readSB(cer.numBits + 2, "controlDeltaY");
                 cer.anchorDeltaX = (int) readSB(cer.numBits + 2, "anchorDeltaX");
-                cer.anchorDeltaY = (int) readSB(cer.numBits + 2, "anchorDeltaY");
+                cer.anchorDeltaY = (int) readSB(cer.numBits + 2, "anchorDeltaY");               
                 ret = cer;
             }
         }

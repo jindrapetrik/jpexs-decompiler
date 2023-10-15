@@ -71,6 +71,7 @@ public class CurvedEdgeRecord extends SHAPERECORD {
         tmp = controlDeltaY;
         controlDeltaY = -anchorDeltaY;
         anchorDeltaY = -tmp;
+        calculateBits();
     }
 
     @Override

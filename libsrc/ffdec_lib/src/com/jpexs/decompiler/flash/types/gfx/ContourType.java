@@ -129,6 +129,7 @@ public class ContourType implements Serializable {
         closeSer.generalLineFlag = true;
         closeSer.deltaX = (src.moveDeltaX - x);
         closeSer.deltaY = (src.moveDeltaY - y);
+        closeSer.simplify();
         closeSer.calculateBits();
         recs.add(closeSer);
 

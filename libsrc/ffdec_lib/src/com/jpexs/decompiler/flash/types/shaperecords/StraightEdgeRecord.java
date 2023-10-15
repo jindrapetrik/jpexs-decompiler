@@ -91,6 +91,7 @@ public class StraightEdgeRecord extends SHAPERECORD {
     public void flip() {
         deltaX = -deltaX;
         deltaY = -deltaY;
+        calculateBits();
     }
 
     @Override

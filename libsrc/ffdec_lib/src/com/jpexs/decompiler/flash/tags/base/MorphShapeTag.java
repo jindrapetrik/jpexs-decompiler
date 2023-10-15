@@ -277,6 +277,7 @@ public abstract class MorphShapeTag extends DrawableTag {
                 endPosY += cer2.controlDeltaY + cer2.anchorDeltaY;
                 posX += cer.controlDeltaX + cer.anchorDeltaX;
                 posY += cer.controlDeltaY + cer.anchorDeltaY;
+                cer.calculateBits();
                 finalRecords.add(cer);
             } else {
                 StraightEdgeRecord ser1 = null;
@@ -301,6 +302,8 @@ public abstract class MorphShapeTag extends DrawableTag {
                 endPosY += ser2.deltaY;
                 posX += ser.deltaX;
                 posY += ser.deltaX;
+                ser.simplify();
+                ser.calculateBits();
                 finalRecords.add(ser);
             }
         }

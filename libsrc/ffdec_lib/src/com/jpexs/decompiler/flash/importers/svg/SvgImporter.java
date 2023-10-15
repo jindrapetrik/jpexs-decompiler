@@ -358,6 +358,7 @@ public class SvgImporter {
                     serclose.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serclose.deltaY = (int) Math.round(p.y - prevPoint.y);
                     serclose.generalLineFlag = true;
+                    serclose.calculateBits();
                     newRecords.add(serclose);
 
                     if (lineStyle != 0) {
@@ -455,6 +456,8 @@ public class SvgImporter {
                     serz.deltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = new Point(prevPoint.x + serz.deltaX, prevPoint.y + serz.deltaY);
                     serz.generalLineFlag = true;
+                    serz.simplify();
+                    serz.calculateBits();
                     newRecords.add(serz);
                     if (lineStyle2Obj != null) {
                         lineStyle2Obj.noClose = false;
@@ -472,6 +475,7 @@ public class SvgImporter {
                     prevPoint = new Point(prevPoint.x + serl.deltaX, prevPoint.y + serl.deltaY);
                     serl.generalLineFlag = true;
                     serl.simplify();
+                    serl.calculateBits();
                     newRecords.add(serl);
                     empty = false;
                     break;
@@ -486,6 +490,7 @@ public class SvgImporter {
                     prevPoint = new Point(prevPoint.x + serh.deltaX, prevPoint.y + serh.deltaY);
                     serh.generalLineFlag = true;
                     serh.simplify();
+                    serh.calculateBits();
                     newRecords.add(serh);
                     empty = false;
                     break;
@@ -501,6 +506,7 @@ public class SvgImporter {
                     prevPoint = new Point(prevPoint.x + serv.deltaX, prevPoint.y + serv.deltaY);
                     serv.generalLineFlag = true;
                     serv.simplify();
+                    serv.calculateBits();
                     newRecords.add(serv);
                     empty = false;
                     break;
@@ -521,6 +527,7 @@ public class SvgImporter {
                     cer.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                     cer.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                     prevPoint = new Point(prevPoint.x + cer.anchorDeltaX, prevPoint.y + cer.anchorDeltaY);
+                    cer.calculateBits();
                     newRecords.add(cer);
                     empty = false;
                     break;
@@ -558,6 +565,7 @@ public class SvgImporter {
                         cerc.anchorDeltaX = (int) Math.round(p.x - prevPoint.x);
                         cerc.anchorDeltaY = (int) Math.round(p.y - prevPoint.y);
                         prevPoint = new Point(prevPoint.x + cerc.anchorDeltaX, prevPoint.y + cerc.anchorDeltaY);
+                        cerc.calculateBits();
                         newRecords.add(cerc);
                     }
 
