@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Linux/Mac script (ffdec.sh) incorrect quotes avoiding FFDec to start
 
 ## [19.1.0] - 2023-10-16
 ### Added
