@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [19.1.1] - 2023-10-16
 ### Fixed
 - Linux/Mac script (ffdec.sh) incorrect quotes avoiding FFDec to start
@@ -3023,6 +3025,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.1...dev
 [19.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.0...version19.1.1
 [19.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.0.0...version19.1.0
 [19.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.5.0...version19.0.0
