@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#2099] Smart number formatting always on
 
 ## [19.1.1] - 2023-10-16
 ### Fixed

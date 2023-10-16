@@ -56,74 +56,77 @@ public class IntegerValueAVM2Item extends NumberValueAVM2Item implements Integer
      */
     public void detectFormat() {
         precedence = PRECEDENCE_PRIMARY;
-        if (value >= 256 && value <= 0xffffffffL) {
-            int intVal = (int) (long) (value & 0xffffff);
-            int r = (intVal >> 16) & 0xff;
-            int g = (intVal >> 8) & 0xff;
-            int b = intVal & 0xff;
-            if ((r == b && b == g) // gray
-                    || (((intVal & 0x0f0000) == 0 || (intVal & 0x0f0000) == 0x0f0000) // a(0/F)b(0/F)c(0/F)
-                    && ((intVal & 0x000f00) == 0 || (intVal & 0x000f00) == 0x000f00)
-                    && ((intVal & 0x00000f) == 0 || (intVal & 0x00000f) == 0x00000f))
-                    || ((((intVal & 0xf00000) >> 20) == ((intVal & 0x0f0000) >> 16)) // aabbcc
-                    && (((intVal & 0x00f000) >> 12) == ((intVal & 0x000f00) >> 8))
-                    && (((intVal & 0x0000f0) >> 4) == ((intVal & 0x00000f))))) {
-                this.formatted = "0x" + Long.toHexString(value);
-                return;
-            }
-        }
 
-        long value2 = (long) value;
-        if (value2 > 0 && value2 % 60 == 0) {
-            int thousandCount = 0;
-            value2 /= 60;
-            boolean isHour = false;
-            boolean isDay = false;
-            if (value2 % 60 == 0) {
+        if (Configuration.smartNumberFormatting.get()) {
+            if (value >= 256 && value <= 0xffffffffL) {
+                int intVal = (int) (long) (value & 0xffffff);
+                int r = (intVal >> 16) & 0xff;
+                int g = (intVal >> 8) & 0xff;
+                int b = intVal & 0xff;
+                if ((r == b && b == g) // gray
+                        || (((intVal & 0x0f0000) == 0 || (intVal & 0x0f0000) == 0x0f0000) // a(0/F)b(0/F)c(0/F)
+                        && ((intVal & 0x000f00) == 0 || (intVal & 0x000f00) == 0x000f00)
+                        && ((intVal & 0x00000f) == 0 || (intVal & 0x00000f) == 0x00000f))
+                        || ((((intVal & 0xf00000) >> 20) == ((intVal & 0x0f0000) >> 16)) // aabbcc
+                        && (((intVal & 0x00f000) >> 12) == ((intVal & 0x000f00) >> 8))
+                        && (((intVal & 0x0000f0) >> 4) == ((intVal & 0x00000f))))) {
+                    this.formatted = "0x" + Long.toHexString(value);
+                    return;
+                }
+            }
+
+            long value2 = (long) value;
+            if (value2 > 0 && value2 % 60 == 0) {
+                int thousandCount = 0;
                 value2 /= 60;
-                isHour = true;
-                if (value2 % 24 == 0) {
-                    value2 /= 24;
-                    isDay = true;
-                }
-            }
-
-            // check milli, micro and nanoseconds
-            while (thousandCount < 3) {
-                if (value2 % 1000 == 0) {
-                    thousandCount++;
-                    value2 /= 1000;
-                } else {
-                    break;
-                }
-            }
-
-            if (value2 < 1000) {
-                List<Integer> factors = new ArrayList<>();
-                if (value2 > 1) {
-                    factors.add((int) value2);
-                }
-                if (isDay) {
-                    factors.add(24);
-                }
-                if (isHour) {
-                    factors.add(60);
-                }
-                factors.add(60);
-                for (int i = 0; i < thousandCount; i++) {
-                    factors.add(1000);
-                }
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < factors.size(); i++) {
-                    if (i != 0) {
-                        sb.append(" * ");
+                boolean isHour = false;
+                boolean isDay = false;
+                if (value2 % 60 == 0) {
+                    value2 /= 60;
+                    isHour = true;
+                    if (value2 % 24 == 0) {
+                        value2 /= 24;
+                        isDay = true;
                     }
-                    sb.append(factors.get(i));
                 }
-                precedence = PRECEDENCE_MULTIPLICATIVE;
 
-                this.formatted = sb.toString();
-                return;
+                // check milli, micro and nanoseconds
+                while (thousandCount < 3) {
+                    if (value2 % 1000 == 0) {
+                        thousandCount++;
+                        value2 /= 1000;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (value2 < 1000) {
+                    List<Integer> factors = new ArrayList<>();
+                    if (value2 > 1) {
+                        factors.add((int) value2);
+                    }
+                    if (isDay) {
+                        factors.add(24);
+                    }
+                    if (isHour) {
+                        factors.add(60);
+                    }
+                    factors.add(60);
+                    for (int i = 0; i < thousandCount; i++) {
+                        factors.add(1000);
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < factors.size(); i++) {
+                        if (i != 0) {
+                            sb.append(" * ");
+                        }
+                        sb.append(factors.get(i));
+                    }
+                    precedence = PRECEDENCE_MULTIPLICATIVE;
+
+                    this.formatted = sb.toString();
+                    return;
+                }
             }
         }
         this.formatted = EcmaScript.toString(value);
