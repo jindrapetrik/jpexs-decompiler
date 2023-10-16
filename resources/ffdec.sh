@@ -70,7 +70,7 @@ PROGRAM="$0"
 while [ -L "$PROGRAM" ]; do
 	PROGRAM=$(readlink -f "$PROGRAM")
 done
-pushd "$(dirname \"$PROGRAM\")" > /dev/null
+pushd "$(dirname "$PROGRAM")" > /dev/null
 
 search_jar_file || exit 1
 
