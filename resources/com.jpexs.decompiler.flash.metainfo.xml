@@ -63,6 +63,65 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="19.1.0" date="2023-10-16">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2090 Support for Mochicrypt packed binarydata tags - loading SWF as subtree</li>
+					<li>#2079 Replace DefineSprite with GIF, Bulk import sprites from GIFs, also from commandline</li>
+					<li>#116 Show invalid utf-8 bytes in Strings as `{invalid_utf8:xxx}`</li>
+					<li>#2097 Commandline command `-header` to modify SWF header values</li>
+					<li>SVG Frames export - blend modes</li>
+					<li>SVG Frames export - filter</li>
+					<li>SVG Shapes export - non-scaling strokes</li>
+					<li>SVG Shapes import - non-scaling strokes</li>
+					<li>Support for DefineShape4 nonzero winding rule - display, svg (import, export), canvas export</li>
+					<li>Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style</li>
+					<li>Generic tag editor - Default values for filters</li>
+					<li>AS1/2 P-code actions inline documentation</li>
+					<li>P-code hilight currently selected instruction argument in the documentation (both AS1/2 and AS3)</li>
+					<li>#2098 Shape points editation, transform - Protection against saving too large edges/rects</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Close action on SWF inside DefineBinaryData</li>
+					<li>#2093 AS3 Unnecessary use of fully qualified names for classes in same package</li>
+					<li>#1678 Shapes - Miter clip join style</li>
+					<li>#2094 AS3 do not show body trait variables as FQN</li>
+					<li>#2094 AS3 Missing use namespace</li>
+					<li>#2094 AS3 missing star type on var and const</li>
+					<li>#2094 AS3 Getting register names from debug info - do not allow assigning `_locX_` name to other register than X</li>
+					<li>#2094 Embed font name taken from the fontTag, not DefineFontName</li>
+					<li>AS3 Simplify expressions - Do not convert this to {} when coerced</li>
+					<li>AS3 incorrect private modifier on internal namespaced traits of private class inside script</li>
+					<li>#2095 AS3 Changing script when debugging</li>
+					<li>#223 AS2 Detecting uninitialized class fields</li>
+					<li>Embed tag not properly escaped on obfuscated files</li>
+					<li>#116 AS3 Cyclic typenames</li>
+					<li>#116 AS3 Do not parse DoABC tags inside sprites</li>
+					<li>#116 Cyclic buttons</li>
+					<li>AS1/2 new keyword on empty method name</li>
+					<li>AS2 getters and setters decoding</li>
+					<li>#116 §§push at the end of switch branches</li>
+					<li>Convolution matrix filter display and editing</li>
+					<li>Generic tag editor - Disallow add before/after or remove on parent field with indices</li>
+					<li>Calculating fillBits, lineBits on SHAPE structure (storing morphshapes, fonts)</li>
+					<li>Generic tag editor - COLORMATRIXFILTER has fixed number of float values</li>
+					<li>Filters display - ymin value</li>
+					<li>Box blur display rounding errors</li>
+					<li>Generic tag editor - display of color values in arrays (filters, etc.)</li>
+					<li>Generic tag editor - display of array brackets</li>
+					<li>Generic tag editor - GRADIENT filters fields</li>
+					<li>#2099 Smart number formatting precedence</li>
+					<li>AS3 Direct editation - Cannot save code after switching deobfuscation</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted</li>
+					<li>AS1/2 P-code Action GetURL2 has switched parameters - sendVarsMethod is first, older code is still accepted</li>
+				</ul>
+			</description>
+		</release>
 		<release version="19.0.0" date="2023-10-01">
 			<description>
 				<p>Added</p>
