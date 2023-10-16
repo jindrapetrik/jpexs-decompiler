@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [19.1.2] - 2023-10-16
 ### Fixed
 - [#2099] Smart number formatting always on
 
@@ -3027,7 +3027,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.1...dev
+[19.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.1...version19.1.2
 [19.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.0...version19.1.1
 [19.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.0.0...version19.1.0
 [19.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.5.0...version19.0.0
@@ -3179,6 +3179,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
 [#116]: https://www.free-decompiler.com/flash/issues/116
@@ -3189,7 +3190,6 @@ Major version of SWF to XML export changed to 2.
 [#2094]: https://www.free-decompiler.com/flash/issues/2094
 [#2095]: https://www.free-decompiler.com/flash/issues/2095
 [#223]: https://www.free-decompiler.com/flash/issues/223
-[#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
