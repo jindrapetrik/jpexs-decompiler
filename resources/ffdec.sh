@@ -107,7 +107,7 @@ for JRE_PATH in $LOOKUP_JRE_DIRS; do
 		JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
 		check_java_version && {
 			export JRE_PATH
-			exec "$JRE_PATH"/bin/java "${args[@]}"
+			exec "$JRE_PATH/bin/java" "${args[@]}"
 		}
 	fi
 done
@@ -116,11 +116,11 @@ done
 if [ -x "$(which xmessage)" ]; then
 	xmessage -nearmouse -file - <<EOF
 Failed to find a suitable java version.
-Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3$REQ_JVER4 or newer.
+Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3.$REQ_JVER4 or newer.
 EOF
 else
 	echo Failed to find a suitable java version.
-	echo Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3$REQ_JVER4 or newer.
+	echo Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3.$REQ_JVER4 or newer.
 fi
 
 exit 1
