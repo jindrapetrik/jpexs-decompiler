@@ -2935,6 +2935,7 @@ public class Main {
     }
 
     public static void exit() {
+        View.saveScreen();
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().scrollPosStorage.saveScrollPos(mainFrame.getPanel().getCurrentTree().getCurrentTreeItem());
             mainFrame.getPanel().savePins();

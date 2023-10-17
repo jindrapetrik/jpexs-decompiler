@@ -46,6 +46,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -339,51 +340,130 @@ public class View {
         }
     }
 
+    public static void centerScreenMain(Window f) {
+        centerScreen(f, true);
+    }
+
     /**
      * Centers specified frame on the screen
      *
      * @param f Frame to center on the screen
      */
     public static void centerScreen(Window f) {
-        centerScreen(f, 0); // todo, set screen to the currently active screen instead of the first screen in a multi screen setup, (maybe by using the screen where the main window is now classic or ribbon?)
+        centerScreen(f, false);
     }
-
-    public static void centerScreen(Window f, int screen) {
-
-        GraphicsDevice[] allDevices = getEnv().getScreenDevices();
+    
+    public static void centerScreen(Window f, boolean mainWindow) {
         int topLeftX;
         int topLeftY;
         int screenX;
         int screenY;
         int windowPosX;
         int windowPosY;
+        GraphicsDevice device;
 
-        if (screen < allDevices.length && screen > -1) {
-            topLeftX = allDevices[screen].getDefaultConfiguration().getBounds().x;
-            topLeftY = allDevices[screen].getDefaultConfiguration().getBounds().y;
-
-            screenX = allDevices[screen].getDefaultConfiguration().getBounds().width;
-            screenY = allDevices[screen].getDefaultConfiguration().getBounds().height;
-
-            Insets bounds = Toolkit.getDefaultToolkit().getScreenInsets(allDevices[screen].getDefaultConfiguration());
-            screenX = screenX - bounds.right;
-            screenY = screenY - bounds.bottom;
+        if (mainWindow || Main.getMainFrame() == null) {
+            device = getMainDefaultScreenDevice();
         } else {
-            topLeftX = allDevices[0].getDefaultConfiguration().getBounds().x;
-            topLeftY = allDevices[0].getDefaultConfiguration().getBounds().y;
-
-            screenX = allDevices[0].getDefaultConfiguration().getBounds().width;
-            screenY = allDevices[0].getDefaultConfiguration().getBounds().height;
-
-            Insets bounds = Toolkit.getDefaultToolkit().getScreenInsets(allDevices[0].getDefaultConfiguration());
-            screenX = screenX - bounds.right;
-            screenY = screenY - bounds.bottom;
+            device = getWindowDevice(Main.getMainFrame().getWindow());
         }
+
+        topLeftX = device.getDefaultConfiguration().getBounds().x;
+        topLeftY = device.getDefaultConfiguration().getBounds().y;
+
+        screenX = device.getDefaultConfiguration().getBounds().width;
+        screenY = device.getDefaultConfiguration().getBounds().height;
+
+        Insets bounds = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
+        screenX = screenX - bounds.right;
+        screenY = screenY - bounds.bottom;
 
         windowPosX = ((screenX - f.getWidth()) / 2) + topLeftX;
         windowPosY = ((screenY - f.getHeight()) / 2) + topLeftY;
 
         f.setLocation(windowPosX, windowPosY);
+    }
+
+    public static void saveScreen() {
+        MainFrame mainFrame = Main.getMainFrame();
+        if (mainFrame == null) {
+            return;
+        }
+        Window w = mainFrame.getWindow();
+        if (w == null) {
+            return;
+        }
+        GraphicsDevice device = getWindowDevice(w);
+
+        GraphicsDevice[] allDevices = getEnv().getScreenDevices();
+        int deviceIndex = -1;
+        for (int i = 0; i < allDevices.length; i++) {
+            if (allDevices[i] == device) {
+                deviceIndex = i;
+                break;
+            }
+        }
+        if (deviceIndex != -1) {
+            Configuration.lastMainWindowScreenIndex.set(deviceIndex);
+            Rectangle bounds = device.getDefaultConfiguration().getBounds();
+            Configuration.lastMainWindowScreenX.set(bounds.x);
+            Configuration.lastMainWindowScreenY.set(bounds.y);
+            Configuration.lastMainWindowScreenWidth.set(bounds.width);
+            Configuration.lastMainWindowScreenHeight.set(bounds.height);
+        }
+    }
+
+    public static GraphicsDevice getMainDefaultScreenDevice() {
+        if (!Configuration.rememberLastScreen.get()) {
+            return getEnv().getDefaultScreenDevice();
+        }
+
+        int deviceIndex = Configuration.lastMainWindowScreenIndex.get();
+        GraphicsDevice[] allDevices = getEnv().getScreenDevices();
+
+        if (deviceIndex >= allDevices.length || deviceIndex == -1) {
+            return getEnv().getDefaultScreenDevice();
+        }
+
+        Rectangle expectedBounds = allDevices[deviceIndex].getDefaultConfiguration().getBounds();
+        if (Configuration.lastMainWindowScreenX.get() != expectedBounds.x
+                || Configuration.lastMainWindowScreenY.get() != expectedBounds.y
+                || Configuration.lastMainWindowScreenWidth.get() != expectedBounds.width
+                || Configuration.lastMainWindowScreenHeight.get() != expectedBounds.height) {
+            return getEnv().getDefaultScreenDevice();
+        }
+        return allDevices[deviceIndex];
+    }
+
+    public static int getWindowDeviceIndex(Window window) {
+        GraphicsDevice device = getWindowDevice(window);
+        GraphicsDevice[] allDevices = getEnv().getScreenDevices();
+        for (int i = 0; i < allDevices.length; i++) {
+            if (allDevices[i] == device) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static GraphicsDevice getWindowDevice(Window window) {
+        Rectangle bounds = window.getBounds();
+        return Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()).stream()
+                // pick devices where window located
+                .filter(d -> d.getDefaultConfiguration().getBounds().intersects(bounds))
+                // sort by biggest intersection square
+                .sorted((f, s) -> Long.compare(//
+                square(f.getDefaultConfiguration().getBounds().intersection(bounds)),
+                square(s.getDefaultConfiguration().getBounds().intersection(bounds))))
+                // use one with the biggest part of the window
+                .reduce((f, s) -> s) //
+
+                // fallback to default device
+                .orElse(window.getGraphicsConfiguration().getDevice());
+    }
+
+    private static long square(Rectangle rec) {
+        return Math.abs(rec.width * rec.height);
     }
 
     public static ImageIcon getIcon(String name, int size) {
@@ -512,8 +592,6 @@ public class View {
         return expandedNodes;
     }
 
-    
-
     private static TreePath expandTreeNode(JTree tree, List<String> pathAsStringList) {
         TreePath tp = getTreePathByPathStrings(tree, pathAsStringList);
         tree.expandPath(tp);
@@ -563,7 +641,7 @@ public class View {
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
         return tp;
     }
-    
+
     public static void expandTreeNodes(JTree tree, List<List<String>> pathsToExpand) {
         for (List<String> pathAsStringList : pathsToExpand) {
             expandTreeNode(tree, pathAsStringList);
