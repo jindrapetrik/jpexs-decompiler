@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1130], [#1220] Remembering last used screen (monitor), 
+ opening dialogs on same screen as the main window,
+ do not restore window size to larger value that actual screen size
+
+### Fixed
+- [#1768], [#1768] Maximizing window on other than main monitor
 
 ## [19.1.2] - 2023-10-16
 ### Fixed
@@ -3182,6 +3189,9 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1130]: https://www.free-decompiler.com/flash/issues/1130
+[#1220]: https://www.free-decompiler.com/flash/issues/1220
+[#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079

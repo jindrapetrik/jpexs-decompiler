@@ -109,7 +109,7 @@ public class LoadingDialog extends AppDialog {
         pack();
         Dimension siz = getSize();
         setSize(Math.max(300, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), siz.height);
-        View.centerScreen(this);
+        View.centerScreenMain(this);
     }
 
     @Override

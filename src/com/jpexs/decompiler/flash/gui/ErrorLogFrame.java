@@ -116,7 +116,7 @@ public class ErrorLogFrame extends AppFrame {
         if (View.isOceanic()) {
             setBackground(Color.white);
         }
-        View.centerScreen(this);
+        View.centerScreenMain(this);
         View.setWindowIcon(this);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();

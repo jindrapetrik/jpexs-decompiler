@@ -936,6 +936,30 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiActionDocsSplitPaneDividerLocationPercent = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> rememberLastScreen = null;
+    
+    @ConfigurationDefaultInt(-1)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastMainWindowScreenIndex = null;
+    
+    @ConfigurationDefaultInt(-1)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastMainWindowScreenX = null;
+    
+    @ConfigurationDefaultInt(-1)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastMainWindowScreenY = null;
+    
+    @ConfigurationDefaultInt(-1)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastMainWindowScreenWidth = null;
+    
+    @ConfigurationDefaultInt(-1)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastMainWindowScreenHeight = null;
+                
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
