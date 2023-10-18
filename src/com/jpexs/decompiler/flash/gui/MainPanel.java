@@ -1807,15 +1807,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void renameMultiname(List<ABCContainerTag> abcList, int multiNameIndex) {
+        SWF swf = getABCPanel().getSwf();
         String oldName = "";
         AVM2ConstantPool constants = getABCPanel().abc.constants;
         if (constants.getMultiname(multiNameIndex).name_index > 0) {
             oldName = constants.getString(constants.getMultiname(multiNameIndex).name_index);
         }
+        
+        String scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString();                
 
         String newName = ViewMessages.showInputDialog(this, translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
+                
+                if (oldName.equals(abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().className)) {
+                    scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().packageStr.add(newName, "").toPrintableString(true);
+                }
+        
+                final String fScriptName = scriptName;
+                
                 int mulCount = 0;
                 for (ABCContainerTag cnt : abcList) {
                     ABC abc = cnt.getABC();
@@ -1835,14 +1845,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 int fmulCount = mulCount;
                 View.execInEventDispatch(() -> {
                     ViewMessages.showMessageDialog(this, translate("rename.finished.multiname").replace("%count%", Integer.toString(fmulCount)));
-                    if (abcPanel != null) {
-                        abcPanel.reload();
-                    }
-
+                    swf.clearScriptCache();
                     updateClassesList();
-                    reload(true);
-                    ABCPanel abcPanel = getABCPanel();
-                    abcPanel.hilightScript(abcPanel.getSwf(), abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString());
+                    Main.stopWork();
+                    abcPanel.hilightScript(abcPanel.getSwf(), fScriptName);
                 });
             }
         }
@@ -3079,7 +3085,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     @Override
                     protected void done() {
-                        Main.stopWork();
+                        
                     }
                 }.execute();
 
