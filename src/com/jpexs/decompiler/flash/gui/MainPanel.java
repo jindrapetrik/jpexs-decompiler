@@ -1850,7 +1850,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public List<TreeItem> getASTreeNodes(TagTree tree) {
         List<TreeItem> result = new ArrayList<>();
-        TagTreeModel tm = (TagTreeModel) tree.getModel();
+        TagTreeModel tm = (TagTreeModel) tree.getFullModel();
         if (tm == null) {
             return result;
         }
