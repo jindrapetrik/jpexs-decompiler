@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
  opening dialogs on same screen as the main window,
  do not restore window size to larger value that actual screen size
 - [#1717] AS1/2/3 Option to hide P-code panel
+- [#2005] Export files to directories by bundle names on multiple bundle (zips, etc.) selection
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -3195,6 +3196,7 @@ Major version of SWF to XML export changed to 2.
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
+[#2005]: https://www.free-decompiler.com/flash/issues/2005
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
