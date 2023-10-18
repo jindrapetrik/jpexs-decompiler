@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
 - AS3 Cast exception when used tree filter and then direct editing
+- [#2013] AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception
 
 ## [19.1.2] - 2023-10-16
 ### Fixed
@@ -3196,6 +3197,7 @@ Major version of SWF to XML export changed to 2.
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
+[#2013]: https://www.free-decompiler.com/flash/issues/2013
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079

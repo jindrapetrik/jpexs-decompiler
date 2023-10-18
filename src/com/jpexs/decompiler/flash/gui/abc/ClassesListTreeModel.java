@@ -90,6 +90,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             allAbcs.add(abc);
             this.list = abc.getScriptPacks(null, allAbcs);
         }
+        setFilter(null);
         TreeModelEvent event = new TreeModelEvent(this, new TreePath(root));
         for (TreeModelListener listener : listeners) {
             listener.treeStructureChanged(event);
