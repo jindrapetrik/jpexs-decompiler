@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1130], [#1220] Remembering last used screen (monitor), 
  opening dialogs on same screen as the main window,
  do not restore window size to larger value that actual screen size
+- [#1717] AS1/2/3 Option to hide P-code panel
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -3191,6 +3192,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
+[#1717]: https://www.free-decompiler.com/flash/issues/1717
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2099]: https://www.free-decompiler.com/flash/issues/2099

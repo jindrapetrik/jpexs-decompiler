@@ -1080,9 +1080,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
-        splitPane.setContinuousLayout(true);
-
+        
         decompiledTextArea.changeContentType("text/actionscript3");
         decompiledTextArea.setFont(Configuration.getSourceFont());
 
@@ -1130,7 +1128,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
         });
 
-        add(splitPane, BorderLayout.CENTER);
+        if (Configuration.displayAs3PCodePanel.get()) {
+            splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
+            splitPane.setContinuousLayout(true);
+            add(splitPane, BorderLayout.CENTER);
+        } else {
+            splitPane = null;
+            add(panB, BorderLayout.CENTER);
+        }
     }
 
     private void decompiledTextAreaTextChanged() {

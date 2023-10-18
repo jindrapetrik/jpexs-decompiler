@@ -950,19 +950,18 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         });
 
-        //new JSplitPane(JSplitPane.VERTICAL_SPLIT, decompiledEditor, debugPanel)
-        //decPanel.add(decButtonsPan, BorderLayout.SOUTH);
-        //JPanel panBot = new JPanel(new BorderLayout());
-        //panBot.add(decButtonsPan, BorderLayout.NORTH);
-        //panBot.add(debugPanel, BorderLayout.CENTER);
-        //panA.add(decButtonsPan, BorderLayout.SOUTH);
         debugPanel.setVisible(false);
 
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
+        
         setLayout(new BorderLayout());
-        add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        
+        if (Configuration.displayAs12PCodePanel.get()) {
+            add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        } else {
+            splitPane = null;
+            add(panA, BorderLayout.CENTER);
+        }
 
         editor.setFont(Configuration.getSourceFont());
         decompiledEditor.setFont(Configuration.getSourceFont());

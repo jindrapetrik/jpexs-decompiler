@@ -960,6 +960,14 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenHeight = null;
                 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> displayAs12PCodePanel = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> displayAs3PCodePanel = null;
+        
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
