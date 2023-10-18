@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
+- AS3 Cast exception when used tree filter and then direct editing
 
 ## [19.1.2] - 2023-10-16
 ### Fixed
