@@ -45,7 +45,7 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     @Override
     public Openable getOpenable() {
-        throw new UnsupportedOperationException("Not supported.");
+        return null;
     }
 
     @Override

@@ -1899,11 +1899,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> sel = getSelection(null, selection);
 
         Set<Openable> usedOpenables = new HashSet<>();
+        Set<OpenableList> usedOpenableLists = new HashSet<>();
+        
+        Map<OpenableList, Map<String, Integer>> usedSwfIdsInBundles = new HashMap<>();
+        
         for (TreeItem d : sel) {
             Openable selectedNodeOpenable = d.getOpenable();
-            if (!usedOpenables.contains(selectedNodeOpenable)) {
-                usedOpenables.add(selectedNodeOpenable);
-            }
+            usedOpenables.add(selectedNodeOpenable);
+            
+            OpenableList list = selectedNodeOpenable.getOpenableList();
+            if (list != null) {
+                usedOpenableLists.add(list);
+            }   
         }
 
         Map<String, Integer> usedSwfsIds = new HashMap<>();
@@ -2026,8 +2033,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             String selFile2;
-            if (usedOpenables.size() > 1) {
-                selFile2 = selFile + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfsIds);
+            if (usedOpenables.size() > 1) {                
+                if (usedOpenableLists.size() > 1 && openable.getOpenableList() != null && openable.getOpenableList().isBundle()) {
+                    if (!usedSwfIdsInBundles.containsKey(openable.getOpenableList())) {
+                        usedSwfIdsInBundles.put(openable.getOpenableList(), new HashMap<>());
+                    }
+                    selFile2 = selFile + File.separator + openable.getOpenableList().name + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfIdsInBundles.get(openable.getOpenableList()));                    
+                } else {                
+                    selFile2 = selFile + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfsIds);
+                }
             } else {
                 selFile2 = selFile;
             }
