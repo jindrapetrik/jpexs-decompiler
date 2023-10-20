@@ -218,6 +218,17 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         int pos = ActionUtils.getDocumentPosition(this, line, 0);
         if (pos != -1) {
             setCaretPosition(pos);
+            com.jpexs.decompiler.flash.gui.View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Rectangle r = modelToView(pos);
+                        scrollRectToVisible(r);
+                    } catch (BadLocationException ex) {
+                        //ignore
+                    }
+                }                
+            });            
         }
     }
 

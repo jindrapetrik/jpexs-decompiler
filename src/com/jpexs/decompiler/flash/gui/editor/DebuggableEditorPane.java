@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.List;
 import java.util.Set;
 import javax.swing.UIManager;
 import jsyntaxpane.components.BreakPointListener;
@@ -39,6 +40,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     private static final Color BG_RULER_COLOR = new Color(0xe9, 0xe8, 0xe2);
 
     private static Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
+    
+    private static final Color BG_STACK_COLOR = new Color(0xe7, 0xe1, 0xef);
 
     private static final Color FG_BREAKPOINT_COLOR = null;
 
@@ -47,6 +50,10 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     private static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
 
     private static final Color FG_IP_COLOR = null;
+    
+    private static final Color FG_STACK_COLOR = null;
+    
+    private static final int PRIORITY_STACK = 30;
 
     private static final int PRIORITY_IP = 0;
 
@@ -61,6 +68,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     public static final LineMarker IP_MARKER = new LineMarker(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
 
     public static final LineMarker INVALID_BREAKPOINT_MARKER = new LineMarker(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
+    
+    public static final LineMarker STACK_MARKER = new LineMarker(FG_STACK_COLOR, BG_STACK_COLOR, PRIORITY_STACK);
 
     protected String scriptName = null;
 
@@ -122,6 +131,15 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         if (ip > 0 && ipPath != null && ipPath.equals(scriptName)) {
             addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }
+        List<Integer> stackLines = Main.getStackLines();
+        List<String> stackClasses = Main.getStackClasses();
+        for (int i = 1; i < stackClasses.size(); i++) {
+            String cls = stackClasses.get(i);
+            int line = stackLines.get(i);
+            if (cls.equals(scriptName)) {
+                addColorMarker(line + firstLineOffset(), STACK_MARKER);
+            }
+        }
     }
 
     @Override
@@ -161,6 +179,13 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         ((Graphics2D) g).setStroke(new BasicStroke(0.5f));
 
         boolean drawText = true;
+        if (hasColorMarker(line, STACK_MARKER)) {
+            g.setColor(BG_STACK_COLOR);
+            g.fillPolygon(new int[]{x + 5, x + 15, x + 15}, new int[]{textY, textY, textY - 10}, 3);
+            g.setColor(Color.black);
+            g.drawPolygon(new int[]{x + 5, x + 15, x + 15}, new int[]{textY, textY, textY - 10}, 3);
+            drawText = false;
+        }
         if (hasColorMarker(line, INVALID_BREAKPOINT_MARKER)) {
             g.setColor(BG_INVALID_BREAKPOINT_COLOR);
             g.fillOval(x + 5, textY - 10, 10, 10);

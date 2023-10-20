@@ -8,11 +8,16 @@ All notable changes to this project will be documented in this file.
  do not restore window size to larger value that actual screen size
 - [#1717] AS1/2/3 Option to hide P-code panel
 - [#2005] Export files to directories by bundle names on multiple bundle (zips, etc.) selection
+- ActionScript Debugger - Call stack frames switching - view variables around call stack
+- ActionScript Debugger - Highlight lines of callstack
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
 - AS3 Cast exception when used tree filter and then direct editing
 - [#2013] AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception
+
+### Changed
+- Basic tag info panel always visible even when nothing to display (to avoid flickering)
 
 ## [19.1.2] - 2023-10-16
 ### Fixed

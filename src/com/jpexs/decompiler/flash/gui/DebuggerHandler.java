@@ -103,6 +103,10 @@ public class DebuggerHandler implements DebugConnectionListener {
     private int breakIp = -1;
 
     private String breakScriptName = null;
+    
+    private List<String> stackScriptNames = new ArrayList<>();
+    
+    private List<Integer> stackLines = new ArrayList<>();
 
     public static class ActionScriptException extends Exception {
 
@@ -129,12 +133,30 @@ public class DebuggerHandler implements DebugConnectionListener {
         return breakIp;
     }
 
+    public int getDepth() {
+        return depth;
+    }        
+
     public String getBreakScriptName() {
         if (!isPaused()) {
             return "-";
         }
         return breakScriptName;
     }
+    
+    public synchronized List<String> getStackScripts() {
+        if (!isPaused()) {
+            return new ArrayList<>();
+        }
+        return stackScriptNames;
+    }
+
+    public synchronized List<Integer> getStackLines() {
+        if (!isPaused()) {
+            return new ArrayList<>();
+        }
+        return stackLines;
+    }        
 
     public InGetVariable getVariable(long parentId, String varName, boolean children) {
         try {
@@ -324,6 +346,8 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     private InFrame frame;
+    
+    private int depth;
 
     private InConstantPool pool;
 
@@ -334,9 +358,16 @@ public class DebuggerHandler implements DebugConnectionListener {
     private final List<BreakListener> breakListeners = new CopyOnWriteArrayList<>();
 
     private final List<TraceListener> traceListeners = new ArrayList<>();
+    
+    private final List<FrameChangeListener> frameChangeListeners = new ArrayList<>();
 
     private final List<ConnectionListener> clisteners = new ArrayList<>();
 
+    public void setDepth(int depth) {
+        this.depth = depth;
+        refreshFrame();
+    }
+        
     public String moduleToString(int file) {
         if (!modulePaths.containsKey(file)) {
             return "unknown";
@@ -369,6 +400,11 @@ public class DebuggerHandler implements DebugConnectionListener {
 
         public void trace(String... val);
     }
+    
+    public static interface FrameChangeListener {
+
+        public void frameChanged();
+    }
 
     public static interface BreakListener {
 
@@ -379,6 +415,14 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public void addBreakListener(BreakListener l) {
         breakListeners.add(l);
+    }
+    
+    public void addFrameChangeListener(FrameChangeListener l) {
+        frameChangeListeners.add(l);
+    }
+    
+    public void removeFrameChangeListener(FrameChangeListener l) {
+        frameChangeListeners.remove(l);
     }
 
     public void addTraceListener(TraceListener l) {
@@ -406,10 +450,13 @@ public class DebuggerHandler implements DebugConnectionListener {
             return;
         }
         try {
-            frame = commands.getFrame(0);
+            frame = commands.getFrame(depth);
             pool = commands.getConstantPool(0);
         } catch (IOException ex) {
             //ignore
+        }
+        for (FrameChangeListener l : frameChangeListeners) {
+            l.frameChanged();
         }
     }
 
@@ -438,8 +485,8 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public List<InSwfInfo.SwfInfo> getSwfs() {
         return swfs;
-    }
-
+    }  
+    
     public void disconnect() {
         frame = null;
         pool = null;
@@ -586,6 +633,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
                         }
                     }
+                    Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "Script added - index {0} name: {1}", new Object[]{file, name});
                     modulePaths.put(file, name);
                     scriptToModule.put(name, file);
                     con.dropMessage(sc);
@@ -714,6 +762,16 @@ public class DebuggerHandler implements DebugConnectionListener {
                         synchronized (DebuggerHandler.this) {
                             breakScriptName = newBreakScriptName;
                             breakIp = message.line;
+                            
+                            if (breakInfo != null) {
+                                List<String> files = new ArrayList<>();
+                                for (int i = 0; i < breakInfo.files.size(); i++) {
+                                    files.add(Main.getDebugHandler().moduleToString(breakInfo.files.get(i)));
+                                }
+                                stackScriptNames = files;
+                                List<Integer> lines = new ArrayList<>(breakInfo.lines);                                
+                                stackLines = lines;
+                            }
                         }
 
                         if (reasonInt == InBreakReason.REASON_SCRIPT_LOADED) {
@@ -725,9 +783,8 @@ public class DebuggerHandler implements DebugConnectionListener {
                         } else {
                             Main.startWork(AppStrings.translate("work.breakat") + newBreakScriptName + ":" + message.line + " " + AppStrings.translate("debug.break.reason." + reason), null);
                         }
-                        frame = commands.getFrame(0);
-                        pool = commands.getConstantPool(0);
-
+                        depth = 0;
+                        refreshFrame();                       
                         for (BreakListener l : breakListeners) {
                             l.breakAt(newBreakScriptName, message.line,
                                     moduleToClassIndex.containsKey(message.file) ? moduleToClassIndex.get(message.file) : -1,
@@ -746,13 +803,13 @@ public class DebuggerHandler implements DebugConnectionListener {
             synchronized (this) {
                 connected = true;
             }
-            if (!isAS3) {
+            /*if (!isAS3) {
                 try {
                     commands.getConnection().writeMessage(new OutRewind(commands.getConnection()));
                 } catch (IOException ex) {
                     Logger.getLogger(DebuggerHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
+            }*/
 
             for (ConnectionListener l : clisteners) {
                 l.connected();
