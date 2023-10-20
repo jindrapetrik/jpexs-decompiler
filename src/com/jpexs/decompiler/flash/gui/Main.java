@@ -22,6 +22,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
+import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InCallFunction;
@@ -681,6 +682,14 @@ public class Main {
 
     public static synchronized String getIpClass() {
         return getDebugHandler().getBreakScriptName();
+    }
+    
+    public static synchronized List<Integer> getStackLines() {
+        return getDebugHandler().getStackLines();
+    }
+    
+    public static synchronized List<String> getStackClasses() {
+        return getDebugHandler().getStackScripts();
     }
 
     public static synchronized boolean isBreakPointValid(String scriptName, int line) {
@@ -3201,6 +3210,6 @@ public class Main {
 
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
-        }
+        }        
     }
 }

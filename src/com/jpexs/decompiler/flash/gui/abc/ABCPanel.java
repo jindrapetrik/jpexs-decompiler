@@ -1116,8 +1116,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         final JToggleButton sortButton = new JToggleButton(View.getIcon("sort16"));
         sortButton.setMargin(new Insets(3, 3, 3, 3));
         navIconsPanel.add(sortButton);
-        JLabel navigatorLabel = new JLabel(AppStrings.translate("traits"), JLabel.CENTER);
-        navigatorPanel.add(navigatorLabel, BorderLayout.NORTH);
+        //JLabel navigatorLabel = new JLabel(AppStrings.translate("traits"), JLabel.CENTER);
+        //navigatorPanel.add(navigatorLabel, BorderLayout.NORTH);
         navigatorPanel.add(navIconsPanel, BorderLayout.SOUTH);
         navigatorPanel.add(new FasterScrollPane(navigator), BorderLayout.CENTER);
         sortButton.addActionListener(new ActionListener() {

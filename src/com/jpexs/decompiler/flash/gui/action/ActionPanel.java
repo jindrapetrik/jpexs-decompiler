@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
+import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
@@ -86,7 +87,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;

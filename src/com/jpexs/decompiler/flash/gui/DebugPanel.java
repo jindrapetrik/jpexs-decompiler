@@ -61,18 +61,16 @@ public class DebugPanel extends JPanel {
 
     private MyTreeTable debugLocalsTable; //JTable debugLocalsTable;
 
-    private MyTreeTable debugScopeTable;
-
-    private JTable callStackTable;
-
-    private JTable stackTable;
+    private MyTreeTable debugScopeTable;  
 
     private JTable constantPoolTable;
 
     private JTabbedPane varTabs;
 
-    private BreakListener listener;
+    private BreakListener breakListener;
 
+    private DebuggerHandler.FrameChangeListener frameChangeListener;
+    
     private JTextArea traceLogTextarea;
 
     private int logLength = 0;
@@ -215,8 +213,6 @@ public class DebugPanel extends JPanel {
         //debugScopeTable.addMouseListener(watchHandler);                           
         debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()), false);
 
-        callStackTable = new JTable();
-        stackTable = new JTable();
         constantPoolTable = new JTable();
         traceLogTextarea = new JTextArea();
         traceLogTextarea.setEditable(false);
@@ -258,30 +254,33 @@ public class DebugPanel extends JPanel {
                 refresh();
             }
         });
+        
+        Main.getDebugHandler().addFrameChangeListener(frameChangeListener = new DebuggerHandler.FrameChangeListener() {
+            @Override
+            public void frameChanged() {
+                 View.execInEventDispatchLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }            
+        });
 
-        Main.getDebugHandler().addBreakListener(listener = new DebuggerHandler.BreakListener() {
+        Main.getDebugHandler().addBreakListener(breakListener = new DebuggerHandler.BreakListener() {
 
             @Override
             public void doContinue() {
                 View.execInEventDispatch(new Runnable() {
-
                     @Override
                     public void run() {
                         refresh();
                     }
-
                 });
             }
 
             @Override
-            public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
-                View.execInEventDispatch(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                });
+            public void breakAt(String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {               
 
             }
         });
@@ -406,52 +405,6 @@ public class DebugPanel extends JPanel {
                         debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()));
                         debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()));
                     }
-                    InBreakAtExt info = Main.getDebugHandler().getBreakInfo();
-                    if (info != null) {
-                        //InBreakReason reason = Main.getDebugHandler().getBreakReason();
-                        List<String> callStackFiles = new ArrayList<>();
-                        List<Integer> callStackLines = new ArrayList<>();
-
-                        callStackFiles.add(Main.getDebugHandler().moduleToString(info.file));
-                        callStackLines.add(info.line);
-
-                        for (int i = 0; i < info.files.size(); i++) {
-                            callStackFiles.add(Main.getDebugHandler().moduleToString(info.files.get(i)));
-                            callStackLines.add(info.lines.get(i));
-                        }
-                        Object[][] data = new Object[callStackFiles.size()][2];
-                        for (int i = 0; i < callStackFiles.size(); i++) {
-                            data[i][0] = callStackFiles.get(i);
-                            data[i][1] = callStackLines.get(i);
-                        }
-
-                        DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
-                            AppStrings.translate("callStack.header.file"),
-                            AppStrings.translate("callStack.header.line")
-                        }) {
-                            @Override
-                            public boolean isCellEditable(int row, int column) {
-                                return false;
-                            }
-
-                        };
-                        callStackTable.setModel(tm);
-
-                        Object[][] data2 = new Object[info.stacks.size()][1];
-                        for (int i = 0; i < info.stacks.size(); i++) {
-                            data2[i][0] = info.stacks.get(i);
-                        }
-                        stackTable.setModel(new DefaultTableModel(data2, new Object[]{AppStrings.translate("stack.header.item")}) {
-                            @Override
-                            public boolean isCellEditable(int row, int column) {
-                                return false;
-                            }
-
-                        });
-                    } else {
-                        callStackTable.setModel(new DefaultTableModel());
-                        stackTable.setModel(new DefaultTableModel());
-                    }
                     InConstantPool cpool = Main.getDebugHandler().getConstantPool();
                     if (cpool != null) {
                         Object[][] data2 = new Object[cpool.vars.size()][2];
@@ -469,6 +422,8 @@ public class DebugPanel extends JPanel {
                             }
 
                         });
+                    } else {
+                        constantPoolTable.setModel(new DefaultTableModel());
                     }
 
                     varTabs.removeAll();
@@ -503,21 +458,7 @@ public class DebugPanel extends JPanel {
                         pa.add(new FasterScrollPane(constantPoolTable), BorderLayout.CENTER);
                         varTabs.addTab(AppStrings.translate("constantpool.header"), pa);
                     }
-
-                    if (callStackTable.getRowCount() > 0) {
-                        tabTypes.add(SelectedTab.CALLSTACK);
-
-                        pa = new JPanel(new BorderLayout());
-                        pa.add(new FasterScrollPane(callStackTable), BorderLayout.CENTER);
-                        varTabs.addTab(AppStrings.translate("callStack.header"), pa);
-                    }
-                    if (stackTable.getRowCount() > 0) {
-                        tabTypes.add(SelectedTab.STACK);
-
-                        pa = new JPanel(new BorderLayout());
-                        pa.add(new FasterScrollPane(stackTable), BorderLayout.CENTER);
-                        varTabs.addTab(AppStrings.translate("stack.header"), pa);
-                    }
+                    
                     if (logLength > 0) {
                         tabTypes.add(SelectedTab.LOG);
 
@@ -560,6 +501,7 @@ public class DebugPanel extends JPanel {
     }
 
     public void dispose() {
-        Main.getDebugHandler().removeBreakListener(listener);
+        Main.getDebugHandler().removeBreakListener(breakListener);
+        Main.getDebugHandler().removeFrameChangeListener(frameChangeListener);
     }
 }
