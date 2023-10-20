@@ -1075,7 +1075,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 });                
             }            
         });
-        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener(){
+        Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
             public void connected() {
             

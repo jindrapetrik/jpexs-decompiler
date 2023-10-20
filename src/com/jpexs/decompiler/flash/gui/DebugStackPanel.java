@@ -88,7 +88,7 @@ public class DebugStackPanel extends JPanel {
                     int row = stackTable.rowAtPoint(e.getPoint());
                     if (row >= 0) {
                         String scriptName = (String) stackTable.getModel().getValueAt(row, 0);
-                        int line = (int)(Integer) stackTable.getModel().getValueAt(row, 1);
+                        int line = (int) (Integer) stackTable.getModel().getValueAt(row, 1);
                         Main.getMainFrame().getPanel().gotoScriptLine(Main.getMainFrame().getPanel().getCurrentSwf(),
                                 scriptName, line, -1, -1, -1);
                         Main.getDebugHandler().setDepth(row);

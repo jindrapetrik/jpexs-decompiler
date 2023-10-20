@@ -258,7 +258,7 @@ public class DebugPanel extends JPanel {
         Main.getDebugHandler().addFrameChangeListener(frameChangeListener = new DebuggerHandler.FrameChangeListener() {
             @Override
             public void frameChanged() {
-                 View.execInEventDispatchLater(new Runnable() {
+                View.execInEventDispatchLater(new Runnable() {
                     @Override
                     public void run() {
                         refresh();
