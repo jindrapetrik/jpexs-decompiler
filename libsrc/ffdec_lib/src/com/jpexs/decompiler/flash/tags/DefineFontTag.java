@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -50,10 +51,17 @@ public class DefineFontTag extends FontTag {
     @SWFType(BasicType.UI16)
     public int fontId;
 
+    @Conditional("!strippedShapes")
     public List<SHAPE> glyphShapeTable;
 
     @Internal
     private FontInfoTag fontInfoTag = null;
+    
+    @Internal
+    public long unknownGfx;
+    
+    @Internal
+    public boolean strippedShapes = false;
 
     /**
      * Constructor
@@ -83,7 +91,9 @@ public class DefineFontTag extends FontTag {
         fontId = sis.readUI16("fontId");
         glyphShapeTable = new ArrayList<>();
 
-        if (sis.available() > 0) {
+        strippedShapes = swf.hasStrippedShapesFromFonts();
+        
+        if (!strippedShapes && sis.available() > 0) {
             long pos = sis.getPos();
             int firstOffset = sis.readUI16("firstOffset");
             int nGlyphs = firstOffset / 2;
@@ -98,6 +108,9 @@ public class DefineFontTag extends FontTag {
                 glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
             }
         }
+        if (strippedShapes) {
+            unknownGfx = sis.readUI32("unknownGfx");
+        }
     }
 
     /**
@@ -109,17 +122,21 @@ public class DefineFontTag extends FontTag {
     @Override
     public synchronized void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(fontId);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        List<Integer> offsetTable = new ArrayList<>();
-        SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
-        for (SHAPE shape : glyphShapeTable) {
-            offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
-            sos2.writeSHAPE(shape, 1);
-        }
-        for (int offset : offsetTable) {
-            sos.writeUI16(offset);
-        }
-        sos.write(baos2.toByteArray());
+        if (!swf.hasStrippedShapesFromFonts()) {
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            List<Integer> offsetTable = new ArrayList<>();
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
+            for (SHAPE shape : glyphShapeTable) {
+                offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
+                sos2.writeSHAPE(shape, 1);
+            }
+            for (int offset : offsetTable) {
+                sos.writeUI16(offset);
+            }
+            sos.write(baos2.toByteArray());
+        } else {
+            sos.writeUI32(unknownGfx);
+        }        
     }
 
     @Override

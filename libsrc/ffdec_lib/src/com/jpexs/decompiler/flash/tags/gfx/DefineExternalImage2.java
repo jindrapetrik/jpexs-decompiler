@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
@@ -267,5 +268,39 @@ public class DefineExternalImage2 extends ImageTag {
     @Override
     public void setCharacterId(int characterId) {
 
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        
+        tagInfo.addInfo("general", "exportName", exportName);
+        tagInfo.addInfo("general", "fileName", fileName);
+        String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
+        switch (bitmapFormat) {
+            case BITMAP_FORMAT_DEFAULT:
+                bitmapFormatStr = "default (0)";
+                break;
+            case BITMAP_FORMAT_TGA:
+                bitmapFormatStr = "TGA (1)";
+                break;
+            case BITMAP_FORMAT_DDS:
+                bitmapFormatStr = "DDS (2)";
+                break;
+            case BITMAP_FORMAT2_JPEG:
+                bitmapFormatStr = "JPEG (10)";
+                break;
+            case BITMAP_FORMAT2_TGA:
+                bitmapFormatStr = "TGA (13)";
+                break;
+            case BITMAP_FORMAT2_DDS:
+                bitmapFormatStr = "DDS (14)";
+                break;
+        }
+        tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
+        
+        if (unknownID != 0) {
+            tagInfo.addInfo("general", "imageId", imageID);
+        }
     }
 }

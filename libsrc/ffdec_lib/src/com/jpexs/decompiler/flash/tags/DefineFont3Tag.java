@@ -21,12 +21,14 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -72,6 +74,7 @@ public class DefineFont3Tag extends FontTag {
 
     public String fontName;
 
+    @Conditional("!strippedShapes")
     public List<SHAPE> glyphShapeTable;
 
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
@@ -99,6 +102,12 @@ public class DefineFont3Tag extends FontTag {
 
     @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
+    
+    @Internal
+    public long unknownGfx;
+    
+    @Internal
+    public boolean strippedShapes = false;
 
     /**
      * Constructor
@@ -133,26 +142,38 @@ public class DefineFont3Tag extends FontTag {
         languageCode = sis.readLANGCODE("languageCode");
         fontName = sis.readNetString("fontName");
         int numGlyphs = sis.readUI16("numGlyphs");
-        long[] offsetTable = new long[numGlyphs];
-        long pos = sis.getPos();
-        for (int i = 0; i < numGlyphs; i++) { //offsetTable
-            if (fontFlagsWideOffsets) {
-                offsetTable[i] = sis.readUI32("offset");
-            } else {
-                offsetTable[i] = sis.readUI16("offset");
+        strippedShapes = swf.hasStrippedShapesFromFonts();
+        
+        if (!strippedShapes) {
+            long[] offsetTable = new long[numGlyphs];
+            long pos = sis.getPos();
+            for (int i = 0; i < numGlyphs; i++) { //offsetTable
+                if (fontFlagsWideOffsets) {
+                    offsetTable[i] = sis.readUI32("offset");
+                } else {
+                    offsetTable[i] = sis.readUI16("offset");
+                }
             }
-        }
-        if (numGlyphs > 0 || fontFlagsHasLayout) {
-            if (fontFlagsWideOffsets) {
-                sis.readUI32("codeTableOffset");
-            } else {
-                sis.readUI16("codeTableOffset");
+            if (numGlyphs > 0 || fontFlagsHasLayout) {
+                if (fontFlagsWideOffsets) {
+                    sis.readUI32("codeTableOffset");
+                } else {
+                    sis.readUI16("codeTableOffset");
+                }
             }
-        }
-        glyphShapeTable = new ArrayList<>();
-        for (int i = 0; i < numGlyphs; i++) {
-            sis.seek(pos + offsetTable[i]);
-            glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
+            glyphShapeTable = new ArrayList<>();
+            for (int i = 0; i < numGlyphs; i++) {
+                sis.seek(pos + offsetTable[i]);
+                glyphShapeTable.add(sis.readSHAPE(1, false, "shape"));
+            }
+        } else {
+            if (numGlyphs > 0 || fontFlagsHasLayout) {
+                unknownGfx = sis.readUI32("unknownGfx");
+            }
+            glyphShapeTable = new ArrayList<>();
+            for (int i = 0; i < numGlyphs; i++) {
+                glyphShapeTable.add(new SHAPE());
+            }
         }
         codeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
@@ -237,11 +258,14 @@ public class DefineFont3Tag extends FontTag {
         ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
         SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
         int numGlyphs = glyphShapeTable.size();
-        for (int i = 0; i < numGlyphs; i++) {
-            offsetTable.add(sos3.getPos());
-            sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+        byte[] baGlyphShapes = null;
+        if (!swf.hasStrippedShapesFromFonts()) {
+            for (int i = 0; i < numGlyphs; i++) {
+                offsetTable.add(sos3.getPos());
+                sos3.writeSHAPE(glyphShapeTable.get(i), 1);
+            }
+            baGlyphShapes = baosGlyphShapes.toByteArray();
         }
-        byte[] baGlyphShapes = baosGlyphShapes.toByteArray();
 
         sos.writeUI16(fontID);
         sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
@@ -256,24 +280,28 @@ public class DefineFont3Tag extends FontTag {
         sos.writeNetString(fontName);
         sos.writeUI16(numGlyphs);
 
-        for (long offset : offsetTable) {
-            long offset2 = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + offset;
-            if (fontFlagsWideOffsets) {
-                sos.writeUI32(offset2);
-            } else {
-                sos.writeUI16((int) offset2);
+        if (!swf.hasStrippedShapesFromFonts()) {
+            for (long offset : offsetTable) {
+                long offset2 = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + offset;
+                if (fontFlagsWideOffsets) {
+                    sos.writeUI32(offset2);
+                } else {
+                    sos.writeUI16((int) offset2);
+                }
             }
-        }
-        if (numGlyphs > 0 || fontFlagsHasLayout) {
-            long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
-            if (fontFlagsWideOffsets) {
-                sos.writeUI32(offset);
-            } else {
-                sos.writeUI16((int) offset);
+            if (numGlyphs > 0 || fontFlagsHasLayout) {
+                long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
+                if (fontFlagsWideOffsets) {
+                    sos.writeUI32(offset);
+                } else {
+                    sos.writeUI16((int) offset);
+                }
             }
-        }
-        if (numGlyphs > 0) {
-            sos.write(baGlyphShapes);
+            if (numGlyphs > 0) {
+                sos.write(baGlyphShapes);
+            }
+        } else {
+            sos.writeUI32(unknownGfx);
         }
 
         for (int i = 0; i < numGlyphs; i++) {

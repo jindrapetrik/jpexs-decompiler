@@ -10,11 +10,14 @@ All notable changes to this project will be documented in this file.
 - [#2005] Export files to directories by bundle names on multiple bundle (zips, etc.) selection
 - ActionScript Debugger - Call stack frames switching - view variables around call stack
 - ActionScript Debugger - Highlight lines of callstack
+- [#2105] GFX - Basic tag info
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
 - AS3 Cast exception when used tree filter and then direct editing
 - [#2013] AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception
+- GFX - FontTextureInfo tag reading
+- GFX - Fonts with stripped shapes
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3202,6 +3205,7 @@ Major version of SWF to XML export changed to 2.
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
 [#2005]: https://www.free-decompiler.com/flash/issues/2005
+[#2105]: https://www.free-decompiler.com/flash/issues/2105
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
