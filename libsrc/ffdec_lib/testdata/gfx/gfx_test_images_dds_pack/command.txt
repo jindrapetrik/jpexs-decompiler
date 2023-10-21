@@ -1,0 +1,1 @@
+gfxexport.exe -d0 -pack -i DDS test_images.swf

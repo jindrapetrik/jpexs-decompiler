@@ -1,0 +1,1 @@
+gfxexport.exe -s wav test_sounds.swf

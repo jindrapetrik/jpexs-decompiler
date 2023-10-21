@@ -1,0 +1,33 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <media>
+          <DOMSoundItem name="Banana_Slap-AngryFlash-2001109808.wav" itemID="6533a018-00000208" sourceExternalFilepath="./LIBRARY/Banana_Slap-AngryFlash-2001109808.wav" sourceLastImported="1515345555" externalFileSize="147466" href="Banana_Slap-AngryFlash-2001109808.wav" soundDataHRef="M 4 1697882113.dat" format="44kHz 16bit Stereo" sampleCount="36335"/>
+          <DOMSoundItem name="POOL-Pool_Shot-709343898.wav" itemID="65337d8b-000001ff" sourceExternalFilepath="./LIBRARY/POOL-Pool_Shot-709343898.wav" sourceLastImported="1672169118" externalFileSize="207370" href="POOL-Pool_Shot-709343898.wav" soundDataHRef="M 1 1697873184.dat" format="44kHz 16bit Stereo" sampleCount="51311"/>
+     </media>
+     <symbols/>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="38">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="28" keyMode="9728" soundName="POOL-Pool_Shot-709343898.wav" soundSync="stream">
+                                   <SoundEnvelope>
+                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
+                                   </SoundEnvelope>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="28" duration="20" keyMode="9728" soundName="Banana_Slap-AngryFlash-2001109808.wav">
+                                   <SoundEnvelope>
+                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
+                                   </SoundEnvelope>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="320783" publishTime="1697873294"/>
+     </publishHistory>
+</DOMDocument>
