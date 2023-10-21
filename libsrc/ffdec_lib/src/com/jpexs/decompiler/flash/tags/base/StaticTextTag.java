@@ -472,11 +472,11 @@ public abstract class StaticTextTag extends TextTag {
                             throw new TextParseException("Font not defined", lexer.yyline());
                         }
 
-                        while (txt.charAt(0) == '\r' || txt.charAt(0) == '\n') {
+                        while (!txt.isEmpty() && (txt.charAt(0) == '\r' || txt.charAt(0) == '\n')) {
                             txt = txt.substring(1);
                         }
 
-                        while (txt.charAt(txt.length() - 1) == '\r' || txt.charAt(txt.length() - 1) == '\n') {
+                        while (!txt.isEmpty() && (txt.charAt(txt.length() - 1) == '\r' || txt.charAt(txt.length() - 1) == '\n')) {
                             txt = txt.substring(0, txt.length() - 1);
                         }
 
@@ -586,9 +586,14 @@ public abstract class StaticTextTag extends TextTag {
         return advance;
     }
 
-    public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
+    public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {                
         int totalLetterSpacing = 0;
         List<GLYPHENTRY> glyphEntries = textRecord.glyphEntries;
+        
+        if (glyphEntries.isEmpty()) {
+            return 0;
+        }
+        
         for (int i = 0; i < glyphEntries.size(); i++) {
             GLYPHENTRY glyph = glyphEntries.get(i);
             GLYPHENTRY nextGlyph = null;
