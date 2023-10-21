@@ -1,0 +1,34 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <media>
+          <DOMBitmapItem name="bitmapfill.png" itemID="6533797b-000001e1" sourceExternalFilepath="./LIBRARY/bitmapfill.png" sourceLastImported="1617551431" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 1 1697872226.dat" frameRight="640" frameBottom="1280"/>
+          <DOMBitmapItem name="pony_small.jpg" itemID="65337a84-000001e8" sourceExternalFilepath="./LIBRARY/pony_small.jpg" sourceLastImported="1697872429" externalFileSize="39441" quality="50" href="pony_small.jpg" bitmapDataHRef="M 3 1697872498.dat" frameRight="4000" frameBottom="2680" isJPEG="true"/>
+     </media>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMBitmapInstance libraryItemName="bitmapfill.png">
+                                             <matrix>
+                                                  <Matrix tx="134" ty="168.5"/>
+                                             </matrix>
+                                        </DOMBitmapInstance>
+                                        <DOMBitmapInstance libraryItemName="pony_small.jpg">
+                                             <matrix>
+                                                  <Matrix tx="245" ty="133.5"/>
+                                             </matrix>
+                                        </DOMBitmapInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="74283" publishTime="1697872254"/>
+     </publishHistory>
+</DOMDocument>

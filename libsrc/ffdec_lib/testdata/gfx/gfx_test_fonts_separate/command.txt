@@ -1,0 +1,1 @@
+gfxexport.exe -fonts -fs test_fonts.swf

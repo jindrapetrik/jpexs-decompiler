@@ -1,0 +1,1 @@
+gfxexport.exe -pack -i TGA test_images.swf
