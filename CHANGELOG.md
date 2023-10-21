@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2013] AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception
 - GFX - FontTextureInfo tag reading
 - GFX - Fonts with stripped shapes
+- [#2104] Empty texts import
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3209,6 +3210,7 @@ Major version of SWF to XML export changed to 2.
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
+[#2104]: https://www.free-decompiler.com/flash/issues/2104
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
