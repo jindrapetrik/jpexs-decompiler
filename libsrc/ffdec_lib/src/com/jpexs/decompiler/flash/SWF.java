@@ -139,6 +139,7 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
@@ -412,9 +413,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Internal
     private AbcIndexing abcIndex;
 
+    @Internal
     private int numAbcIndexDependencies = 0;
 
     private volatile Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
+    
+    @Internal
+    private ExporterInfo exporterInfo = null;
 
     private static AbcIndexing playerGlobalAbcIndex;
 
@@ -442,6 +447,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static final int LIBRARY_AIR = 0;
     public static final int LIBRARY_FLASH = 1;
 
+    public void setExporterInfo(ExporterInfo exporterInfo) {
+        this.exporterInfo = exporterInfo;
+    }
+
+    public ExporterInfo getExporterInfo() {
+        return exporterInfo;
+    }
+
+    public boolean hasStrippedShapesFromFonts() {
+        if (exporterInfo == null) {
+            return false;
+        }
+        if (exporterInfo.hasFlagShapesStrippedFromDefineFont()) {
+            return true;
+        }
+        return false;
+    }
+    
     public static AbcIndexing getPlayerGlobalAbcIndex() {
         return playerGlobalAbcIndex;
     }

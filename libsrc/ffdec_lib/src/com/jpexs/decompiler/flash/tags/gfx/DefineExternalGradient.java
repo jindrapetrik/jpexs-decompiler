@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -89,5 +90,26 @@ public class DefineExternalGradient extends Tag {
     @Override
     public String toString() {
         return tagName + " (g" + gradientId + ")";
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        
+        tagInfo.addInfo("general", "fileName", fileName);        
+        String bitmapFormatStr = "0x" + Integer.toHexString(bitmapsFormat);
+        switch (bitmapsFormat) {
+            case BITMAP_FORMAT_DEFAULT:
+                bitmapFormatStr = "default (0)";
+                break;
+            case BITMAP_FORMAT_TGA:
+                bitmapFormatStr = "TGA (1)";
+                break;
+            case BITMAP_FORMAT_DDS:
+                bitmapFormatStr = "DDS (2)";
+                break;
+        }
+        tagInfo.addInfo("general", "bitmapsFormat", bitmapFormatStr);
+        tagInfo.addInfo("general", "gradientSize", gradientSize);
     }
 }

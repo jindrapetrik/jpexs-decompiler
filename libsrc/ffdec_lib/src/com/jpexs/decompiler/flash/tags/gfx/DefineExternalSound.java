@@ -235,6 +235,8 @@ public class DefineExternalSound extends CharacterTag implements SoundTag {
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
         SoundFormat soundFormat = getSoundFormat();
+        tagInfo.addInfo("general", "exportName", exportName);
+        tagInfo.addInfo("general", "fileName", fileName);
         tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
         tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
         tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);

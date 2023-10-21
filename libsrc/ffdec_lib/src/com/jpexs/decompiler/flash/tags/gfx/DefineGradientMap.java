@@ -20,8 +20,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -73,5 +76,17 @@ public class DefineGradientMap extends Tag {
         for (int i = 0; i < numGradients; i++) {
             indices[i] = sis.readUI16("index");
         }
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        
+        List<String> indicesStr = new ArrayList<>();
+        for (int index : indices) {
+            indicesStr.add("" + index);
+        }
+        
+        tagInfo.addInfo("general", "indices", String.join(", ", indicesStr));
     }
 }

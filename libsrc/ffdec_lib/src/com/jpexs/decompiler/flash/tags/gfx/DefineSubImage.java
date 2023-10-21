@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
@@ -218,5 +219,16 @@ public class DefineSubImage extends ImageTag {
                 createFailedImage();
             }
         }
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        
+        tagInfo.addInfo("general", "imageId", imageId);
+        tagInfo.addInfo("general", "x1", x1);
+        tagInfo.addInfo("general", "y1", y1);
+        tagInfo.addInfo("general", "x2", x2);
+        tagInfo.addInfo("general", "y2", y2);
     }
 }
