@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - GFX - FontTextureInfo tag reading
 - GFX - Fonts with stripped shapes
 - [#2104] Empty texts import
+- Centered start playing triangle (Playing on demand)
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
