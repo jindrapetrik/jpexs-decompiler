@@ -261,9 +261,13 @@ public class MovieImporter {
             if (timelined != null) {
                 timelined.resetTimeline();
             }
+            if (timelined == null) {
+                timelined = movie.getTimelined();
+            }
 
             int startFrame = 0;
             int placeDepth = -1;
+            int maxPlaceDepth = 0;
             if (timelined != null) {
                 for (Tag t : timelined.getTags()) {
                     if (t instanceof ShowFrameTag) {
@@ -275,13 +279,47 @@ public class MovieImporter {
                             placeDepth = pt.getDepth();
                             break;
                         }
+                        if (pt.getDepth() > -1) {
+                            if (pt.getDepth() > maxPlaceDepth) {
+                                maxPlaceDepth = pt.getDepth();
+                            }
+                        }
                     }
                 }
+            }
+            if (placeDepth == -1) {
+                placeDepth = maxPlaceDepth + 1;                
+                startFrame = 0;
             }
             int numTimelineFrames = timelined == null ? 0 : timelined.getFrameCount();
 
             int importLastFrame = -1;
             if (timelined != null) {
+                
+                boolean placeWithCharacterIdFound = false;
+                ReadOnlyTagList tagList1 = timelined.getTags();                
+                for (int p = 0; p < tagList1.size(); p++) {
+                    Tag t = tagList1.get(p);
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
+                        if (place.getCharacterId() == movie.characterID) {
+                            placeWithCharacterIdFound = true;
+                        }
+                    }
+                    if (t instanceof ShowFrameTag) {
+                        if (!placeWithCharacterIdFound) {
+                            PlaceObject2Tag placeObject = new PlaceObject2Tag(swf);
+                            placeObject.setTimelined(timelined);
+                            placeObject.placeFlagHasCharacter = true;
+                            placeObject.characterId = movie.characterID;
+                            placeObject.depth = placeDepth;
+                            placeObject.placeFlagMove = false;
+                            timelined.addTag(p, placeObject);
+                            break;
+                        }                        
+                    }
+                }
+                
                 VideoFrameTag lastVideoFrame = null;
                 for (FLVTAG ftag : videoTags) {
                     videoData = ((VIDEODATA) ftag.data);
@@ -322,10 +360,28 @@ public class MovieImporter {
                     ReadOnlyTagList tagList = timelined.getTags();
                     int p = 0;
                     boolean found = false;
+                    boolean placeFound = false;
                     for (; p < tagList.size(); p++) {
                         Tag t = tagList.get(p);
-                        if (t instanceof ShowFrameTag) {
+                        if (t instanceof PlaceObjectTypeTag) {
+                            PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
+                            if (place.getDepth() == placeDepth) {
+                                placeFound = true;
+                            }                            
+                        }
+                        if (t instanceof ShowFrameTag) {                            
                             swfFrameNum++;
+                            if (!placeFound) {
+                                PlaceObject2Tag placeObject = new PlaceObject2Tag(swf);
+                                placeObject.setTimelined(timelined);
+                                placeObject.depth = placeDepth;
+                                placeObject.placeFlagMove = true;
+                                placeObject.placeFlagHasRatio = true;
+                                placeObject.ratio = swfFrameNum - startFrame;
+                                timelined.addTag(p, placeObject);
+                                p++;
+                            }
+                            placeFound = false;
                             if (swfFrameNum == idealFrame) {
                                 found = true;
                                 break;

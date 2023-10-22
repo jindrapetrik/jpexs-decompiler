@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - ActionScript Debugger - Call stack frames switching - view variables around call stack
 - ActionScript Debugger - Highlight lines of callstack
 - [#2105] GFX - Basic tag info
+- Context menu items to create new tags (shape, sprite, image, movie, sound, binaryData) from files
+  and using font embed dialog for fonts
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor

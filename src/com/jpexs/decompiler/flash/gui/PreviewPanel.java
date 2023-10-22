@@ -317,8 +317,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (readOnly) {
             parametersPanel.setVisible(false);
         }
-    }
-
+    }   
+    
     public PreviewPanel(MainPanel mainPanel, FlashPlayerPanel flashPanel) {
         super(JSplitPane.HORIZONTAL_SPLIT, Configuration.guiPreviewSplitPaneDividerLocationPercent);
         this.mainPanel = mainPanel;
@@ -351,6 +351,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return ret;
     }
 
+    public FontPanel getFontPanel() {
+        return fontPanel;
+    }
+    
     private void createParametersPanel() {
         displayWithPreview = new JPanel(new CardLayout());
 
