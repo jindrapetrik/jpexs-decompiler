@@ -152,4 +152,23 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
             }
         }
     }
+    
+    public MORPHFILLSTYLE toMorphStyle() {
+        MORPHFILLSTYLE morphFillStyle = new MORPHFILLSTYLE();
+        morphFillStyle.bitmapId = bitmapId;
+        if (bitmapMatrix != null) {
+            morphFillStyle.startBitmapMatrix = new MATRIX(bitmapMatrix);
+            morphFillStyle.endBitmapMatrix = new MATRIX(bitmapMatrix);
+        }
+        if (color != null) {
+            morphFillStyle.startColor = new RGBA(color);
+            morphFillStyle.endColor = new RGBA(color);
+        }
+        morphFillStyle.fillStyleType = fillStyleType;
+        if (gradient != null) {
+            morphFillStyle.gradient = gradient.toMorphGradient();
+        }        
+        
+        return morphFillStyle;
+    }
 }

@@ -28,9 +28,11 @@ import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.svg.css.CssParseException;
 import com.jpexs.decompiler.flash.importers.svg.css.CssParser;
 import com.jpexs.decompiler.flash.importers.svg.css.CssSelectorToXPath;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -91,16 +93,33 @@ public class SvgImporter {
 
     private final Set<String> shownWarnings = new HashSet<>();
 
-    ShapeTag shapeTag;
-
+    /**
+     * Shape or morphshape tag
+     */
+    Tag shapeTag;
+    
     private Rectangle2D.Double viewBox;
-
+    
     public Tag importSvg(ShapeTag st, String svgXml) {
-        return importSvg(st, svgXml, true);
+        return importSvg((Tag) st, svgXml, true);
     }
 
+    public Tag importSvg(MorphShapeTag mst, String svgXml) {
+        return importSvg((Tag) mst, svgXml, true);
+    }
+   
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
+        return importSvg((Tag) st, svgXml, fill);
+    }
+    
+    public Tag importSvg(MorphShapeTag mst, String svgXml, boolean fill) {
+        return importSvg((Tag) mst, svgXml, fill);
+    }
+    
+    private Tag importSvg(Tag st, String svgXml, boolean fill) {
         shapeTag = st;
+        
+        boolean morphShape = st instanceof MorphShapeTag;
 
         if (st instanceof DefineShape4Tag) {
             DefineShape4Tag shape4 = (DefineShape4Tag) st;
@@ -115,8 +134,23 @@ public class SvgImporter {
         shapes.fillStyles.fillStyles = new FILLSTYLE[0];
         shapes.lineStyles.lineStyles = new LINESTYLE[0];
 
-        int shapeNum = st.getShapeNum();
-        RECT rect = st.getRect();
+        int shapeNum = 0;
+        RECT rect = null;
+        
+        if (st instanceof ShapeTag) {            
+            shapeNum = ((ShapeTag) st).getShapeNum();
+            rect = ((ShapeTag) st).getRect();
+        }
+        if (st instanceof MorphShapeTag) {
+            int morphShapeNum = ((MorphShapeTag) st).getShapeNum();
+            if (morphShapeNum == 2) {
+                shapeNum = 4;
+            } else {
+                shapeNum = 3;
+            }
+            rect = ((MorphShapeTag) st).getRect();
+        }
+         
         int origXmin = rect.Xmin;
         int origYmin = rect.Ymin;
 
@@ -193,17 +227,24 @@ public class SvgImporter {
                 transform.translate(origXmin / SWF.unitDivisor / ratioX, origYmin / SWF.unitDivisor / ratioY);
             }
 
-            processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style);
+            processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         shapes.shapeRecords.add(new EndShapeRecord());
 
-        st.shapes = shapes;
-        if (!fill) {
-            st.updateBounds();
+        if (st instanceof ShapeTag) {
+            ShapeTag shape = (ShapeTag) st;
+            shape.shapes = shapes;
+            if (!fill) {
+                shape.updateBounds();
+            }
         }
+        if (st instanceof MorphShapeTag) {
+            shapes.updateMorphShapeTag((MorphShapeTag) st, fill);
+        }
+        
         st.setModified(true);
 
         return (Tag) st;
@@ -272,7 +313,7 @@ public class SvgImporter {
         }
     }
 
-    private void processSwitch(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style) {
+    private void processSwitch(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
@@ -283,18 +324,18 @@ public class SvgImporter {
                 if (childElement.hasAttribute("systemLanguage")) {
                     String systemLanguage = childElement.getAttribute("systemLanguage");
                     if (systemLanguage.equals("en-us") || systemLanguage.equals("en")) {
-                        processElement(childElement, idMap, shapeNum, shapes, transform, style);
+                        processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
                         return;
                     }
                     continue;
                 }
-                processElement(childElement, idMap, shapeNum, shapes, transform, style);
+                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
                 return;
             }
         }
     }
 
-    private void processElement(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style) {
+    private void processElement(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape) {
         if (element.hasAttribute("requiredExtensions") && !element.getAttribute("requiredExtensions").isEmpty()) {
             return;
         }
@@ -303,25 +344,25 @@ public class SvgImporter {
         Matrix m = Matrix.parseSvgMatrix(element.getAttribute("transform"), 1, 1);
         Matrix m2 = m == null ? transform : transform.concatenate(m);
         if ("switch".equals(tagName)) {
-            processSwitch(element, idMap, shapeNum, shapes, transform, style);
+            processSwitch(element, idMap, shapeNum, shapes, transform, style, morphShape);
         } else if ("style".equals(tagName)) {
             processStyle(element);
         } else if ("g".equals(tagName)) {
-            processSvgObject(idMap, shapeNum, shapes, element, m2, newStyle);
+            processSvgObject(idMap, shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("path".equals(tagName)) {
-            processPath(shapeNum, shapes, element, m2, newStyle);
+            processPath(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("circle".equals(tagName)) {
-            processCircle(shapeNum, shapes, element, m2, newStyle);
+            processCircle(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("ellipse".equals(tagName)) {
-            processEllipse(shapeNum, shapes, element, m2, newStyle);
+            processEllipse(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("rect".equals(tagName)) {
-            processRect(shapeNum, shapes, element, m2, newStyle);
+            processRect(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("line".equals(tagName)) {
-            processLine(shapeNum, shapes, element, m2, newStyle);
+            processLine(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("polyline".equals(tagName)) {
-            processPolyline(shapeNum, shapes, element, m2, newStyle);
+            processPolyline(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("polygon".equals(tagName)) {
-            processPolygon(shapeNum, shapes, element, m2, newStyle);
+            processPolygon(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("defs".equals(tagName)) {
             processDefs(element);
         } else if ("title".equals(tagName) || "desc".equals(tagName)
@@ -332,12 +373,12 @@ public class SvgImporter {
         }
     }
 
-    private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
+    private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style, boolean morphShape) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
                 Element childElement = (Element) childNode;
-                processElement(childElement, idMap, shapeNum, shapes, transform, style);
+                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
             }
         }
     }
@@ -372,7 +413,7 @@ public class SvgImporter {
         }
     }
 
-    private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style) {
+    private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style, boolean morphShape) {
         
         if ("nonzero".equals(style.getFillRule())) {
             if (shapeTag instanceof DefineShape4Tag) {
@@ -387,14 +428,18 @@ public class SvgImporter {
         double x0 = 0;
         double y0 = 0;
 
-        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style);
-        int fillStyle = scrStyle.fillStyle1;
+        StyleChangeRecord scrStyle = getStyleChangeRecord(shapeNum, style, morphShape);
+        int fillStyle = morphShape ? scrStyle.fillStyle0 : scrStyle.fillStyle1;
         int lineStyle = scrStyle.lineStyle;
         scrStyle.stateFillStyle0 = true;
-        scrStyle.stateFillStyle1 = true;
+        if (!morphShape) {
+            scrStyle.stateFillStyle1 = true;
+        }
         scrStyle.stateLineStyle = true;
         scrStyle.fillStyle0 = 0;
-        scrStyle.fillStyle1 = 0;
+        if (!morphShape) {
+            scrStyle.fillStyle1 = 0;
+        }
         scrStyle.lineStyle = 0;
 
         List<SHAPERECORD> newRecords = new ArrayList<>();
@@ -428,8 +473,13 @@ public class SvgImporter {
 
                     StyleChangeRecord scr = new StyleChangeRecord();
                     if (fillStyle != 0) {
-                        scr.stateFillStyle1 = true;
-                        scr.fillStyle1 = fillStyle;
+                        if (morphShape) {
+                            scr.stateFillStyle0 = true;
+                            scr.fillStyle0 = fillStyle;
+                        } else {
+                            scr.stateFillStyle1 = true;
+                            scr.fillStyle1 = fillStyle;                                                    
+                        }
                     }
                     if (lineStyle != 0) {
                         scr.lineStyle = lineStyle;
@@ -584,7 +634,7 @@ public class SvgImporter {
         shapes.shapeRecords.addAll(newRecords);
     }
 
-    private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+    private void processPath(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
         String data = childElement.getAttribute("d");
 
         char command = 0;
@@ -889,7 +939,7 @@ public class SvgImporter {
             // ignore remaining data as specified in SVG Specification F.2 Error processing
         }
 
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape);
     }
 
     private double calcAngle(double ux, double uy, double vx, double vy) {
@@ -903,7 +953,7 @@ public class SvgImporter {
         return sign * Math.acos(ux * vx + uy * vy / (lu * lv));
     }
 
-    private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+    private void processCircle(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
         String attr = childElement.getAttribute("cx");
         double cx = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
@@ -913,10 +963,10 @@ public class SvgImporter {
         attr = childElement.getAttribute("r");
         double r = attr.length() > 0 ? parseLength(attr, (viewBox.width + viewBox.height) / 2) : 0;
 
-        processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r);
+        processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r, morphShape);
     }
 
-    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
         String attr = childElement.getAttribute("cx");
         double cx = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
@@ -929,10 +979,10 @@ public class SvgImporter {
         attr = childElement.getAttribute("ry");
         double ry = attr.length() > 0 ? parseLength(attr, viewBox.height) : 0;
 
-        processEllipse(shapeNum, shapes, transform, style, cx, cy, rx, ry);
+        processEllipse(shapeNum, shapes, transform, style, cx, cy, rx, ry, morphShape);
     }
 
-    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, double cx, double cy, double rx, double ry) {
+    private void processEllipse(int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, double cx, double cy, double rx, double ry, boolean morphShape) {
         double sqrt2RXHalf = Math.sqrt(2) * rx / 2;
         double sqrt2Minus1RX = (Math.sqrt(2) - 1) * rx;
         double sqrt2RYHalf = Math.sqrt(2) * ry / 2;
@@ -987,10 +1037,10 @@ public class SvgImporter {
         serz.command = 'Z';
         pathCommands.add(serz);
 
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape);
     }
 
-    private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+    private void processRect(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
         String attr = childElement.getAttribute("x");
         double x = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
@@ -1098,10 +1148,10 @@ public class SvgImporter {
         serz.command = 'Z';
         pathCommands.add(serz);
 
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape);
     }
 
-    private void processLine(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
+    private void processLine(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
         String attr = childElement.getAttribute("x1");
         double x1 = attr.length() > 0 ? parseCoordinate(attr, viewBox.width) : 0;
 
@@ -1126,18 +1176,18 @@ public class SvgImporter {
 
         pathCommands.add(cer);
 
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape);
     }   
 
-    private void processPolygon(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
-        processPolyline(shapeNum, shapes, childElement, transform, style, true);
+    private void processPolygon(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
+        processPolyline(shapeNum, shapes, childElement, transform, style, true, morphShape);
     }
 
-    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style) {
-        processPolyline(shapeNum, shapes, childElement, transform, style, false);
+    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean morphShape) {
+        processPolyline(shapeNum, shapes, childElement, transform, style, false, morphShape);
     }
 
-    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean close) {
+    private void processPolyline(int shapeNum, SHAPEWITHSTYLE shapes, Element childElement, Matrix transform, SvgStyle style, boolean close, boolean morphShape) {
         String data = childElement.getAttribute("points");
 
         char command = 'M';
@@ -1187,7 +1237,7 @@ public class SvgImporter {
             pathCommands.add(serz);
         }
 
-        processCommands(shapeNum, shapes, pathCommands, transform, style);
+        processCommands(shapeNum, shapes, pathCommands, transform, style, morphShape);
     }
 
     //Stub for w3 test. TODO: refactor and move to test directory. It's here because of easy access - compiling single file
@@ -1671,12 +1721,16 @@ public class SvgImporter {
         }
     }
 
-    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style) {
+    private StyleChangeRecord getStyleChangeRecord(int shapeNum, SvgStyle style, boolean morphShape) {
         StyleChangeRecord scr = new StyleChangeRecord();
 
         scr.stateNewStyles = true;
         scr.fillStyles = new FILLSTYLEARRAY();
-        scr.stateFillStyle1 = true;
+        if (morphShape) {
+            scr.stateFillStyle0 = true;
+        } else {
+            scr.stateFillStyle1 = true;
+        }
         scr.stateLineStyle = true;
         SvgFill fill = style.getFillWithOpacity();
         if (fill != null && fill != SvgTransparentFill.INSTANCE) {
@@ -1690,10 +1744,18 @@ public class SvgImporter {
                 //...apply in second step - applyStyleGradients
             }
 
-            scr.fillStyle1 = 1;
+            if (morphShape) {
+                scr.fillStyle0 = 1;
+            } else {
+                scr.fillStyle1 = 1;
+            }
         } else {
             scr.fillStyles.fillStyles = new FILLSTYLE[0];
-            scr.fillStyle1 = 0;
+            if (morphShape) {
+                scr.fillStyle0 = 0;
+            } else {
+                scr.fillStyle1 = 0;
+            }
         }
 
         scr.lineStyles = new LINESTYLEARRAY();
@@ -1717,10 +1779,18 @@ public class SvgImporter {
                         DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
                         shape4.usesNonScalingStrokes = true;
                     }
+                    if (shapeTag instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morph2 = (DefineMorphShape2Tag) shapeTag;
+                        morph2.usesNonScalingStrokes = true;
+                    }
                 } else {
                     if (shapeTag instanceof DefineShape4Tag) {
                         DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
                         shape4.usesScalingStrokes = true;
+                    }
+                    if (shapeTag instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morph2 = (DefineMorphShape2Tag) shapeTag;
+                        morph2.usesScalingStrokes = true;
                     }
                 }
                 

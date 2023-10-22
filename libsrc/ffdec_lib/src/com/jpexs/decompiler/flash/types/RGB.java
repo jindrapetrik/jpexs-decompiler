@@ -46,6 +46,12 @@ public class RGB implements Serializable {
     @SWFType(BasicType.UI8)
     public int blue;
 
+    public RGB(RGB color) {
+        this.red = color.red;
+        this.green = color.green;
+        this.blue = color.blue;
+    }
+    
     public RGB(int red, int green, int blue) {
         this.red = red;
         this.green = green;

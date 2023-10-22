@@ -142,4 +142,27 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     public void setWidth(int width) {
         this.width = width;
     }
+    
+    public MORPHLINESTYLE2 toMorphLineStyle2() {
+        MORPHLINESTYLE2 morphLineStyle2 = new MORPHLINESTYLE2();
+        morphLineStyle2.startWidth = width;
+        morphLineStyle2.endWidth = width;
+        morphLineStyle2.startCapStyle = startCapStyle;
+        morphLineStyle2.joinStyle = joinStyle;
+        morphLineStyle2.hasFillFlag = hasFillFlag;
+        morphLineStyle2.noHScaleFlag = noHScaleFlag;
+        morphLineStyle2.noVScaleFlag = noVScaleFlag;
+        morphLineStyle2.pixelHintingFlag = pixelHintingFlag;
+        morphLineStyle2.noClose = noClose;
+        morphLineStyle2.endCapStyle = endCapStyle;
+        morphLineStyle2.miterLimitFactor = miterLimitFactor;
+        if (color != null) {
+            morphLineStyle2.startColor = new RGBA(color);
+            morphLineStyle2.endColor = new RGBA(color);
+        }
+        if (fillType != null) {
+            morphLineStyle2.fillType = fillType.toMorphStyle();
+        }
+        return morphLineStyle2;
+    }
 }

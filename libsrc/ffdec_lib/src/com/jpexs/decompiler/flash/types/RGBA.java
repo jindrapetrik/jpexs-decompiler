@@ -72,6 +72,15 @@ public class RGBA extends RGB implements Serializable {
         super(rgb);
         alpha = (rgb >> 24) & 0xFF;
     }
+    
+    public RGBA(RGB color) {
+        super(color);
+        if (color instanceof RGBA) {
+            alpha = ((RGBA) color).alpha;
+        } else {
+            alpha = 255;
+        }        
+    }
 
     public RGBA() {
     }

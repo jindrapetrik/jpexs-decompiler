@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -57,22 +58,55 @@ import java.util.logging.Logger;
 public class ShapeImporter {
 
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
-        return importImage(st, newData, 0, true);
+        return importImage((Tag) st, newData, 0, true);
     }
 
+    public Tag importImage(MorphShapeTag mst, byte[] newData) throws IOException {
+        return importImage((Tag) mst, newData, 0, true);
+    }
+  
+    public Tag importImage(MorphShapeTag mst, byte[] newData, int tagType, boolean fill) throws IOException {
+        return importImage((Tag) mst, newData, tagType, fill);
+    }
+        
     public Tag importImage(ShapeTag st, byte[] newData, int tagType, boolean fill) throws IOException {
+        return importImage((Tag) st, newData, tagType, fill);
+    }
+    
+    private Tag importImage(Tag st, byte[] newData, int tagType, boolean fill) throws IOException {
         ImageTag imageTag = addImage(st, newData, tagType);
         st.setModified(true);
 
-        RECT rect = st.getRect();
+        RECT rect = null;
+        int shapeNum = 0;
+        if (st instanceof ShapeTag) {
+            rect = ((ShapeTag) st).getRect();
+            shapeNum = ((ShapeTag) st).getShapeNum();
+        }
+        if (st instanceof MorphShapeTag) {
+            rect = ((MorphShapeTag) st).getRect();
+            int morphShapeNum = ((MorphShapeTag) st).getShapeNum();
+            if (morphShapeNum == 2) {
+                shapeNum = 4;
+            } else {
+                shapeNum = 3;
+            }
+        }
         if (!fill) {
             Dimension dimension = imageTag.getImageDimension();
             rect.Xmax = rect.Xmin + (int) (SWF.unitDivisor * dimension.getWidth());
             rect.Ymax = rect.Ymin + (int) (SWF.unitDivisor * dimension.getHeight());
         }
 
-        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill, st.getShapeNum());
-        st.shapes = shapes;
+        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill, shapeNum);
+        if (st instanceof ShapeTag) {
+            ShapeTag shapeTag = (ShapeTag) st;
+            shapeTag.shapes = shapes;
+        }
+        if (st instanceof MorphShapeTag) {
+            MorphShapeTag morphShapeTag = (MorphShapeTag) st;
+            shapes.updateMorphShapeTag(morphShapeTag, fill);
+        }
         return (Tag) st;
     }
 

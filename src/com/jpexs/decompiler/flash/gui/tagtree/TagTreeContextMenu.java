@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -71,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -1037,7 +1039,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             replaceMenuItem.setVisible(true);
         }
 
-        if (canReplace.test(it -> it instanceof ShapeTag)) {
+        if (canReplace.test(it -> (it instanceof ShapeTag) || (it instanceof MorphShapeTag))) {
             replaceMenuItem.setVisible(true);
             replaceNoFillMenuItem.setVisible(true);
         }
@@ -1654,6 +1656,15 @@ public class TagTreeContextMenu extends JPopupMenu {
                     listener.call(ae, item, DefineBinaryDataTag.class, TreeNodeType.BINARY_DATA);
                 });
                 addTagMenu.add(createBinaryDataItem);
+                break;
+            case TagTreeModel.FOLDER_MORPHSHAPES:
+                addTagMenu.addSeparator();
+                JMenuItem createMorphShapeItem = new JMenuItem(AppStrings.translate("tag.morphshape.create"));
+                createMorphShapeItem.setIcon(View.getIcon("importshape16"));
+                createMorphShapeItem.addActionListener((ActionEvent ae) -> {
+                    listener.call(ae, item, DefineMorphShape2Tag.class, TreeNodeType.MORPH_SHAPE);
+                });
+                addTagMenu.add(createMorphShapeItem);
                 break;
         }
     }
@@ -3812,6 +3823,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 remove = !mainPanel.replaceSpriteWithGif(tag);
                 break;
             case SHAPE:
+            case MORPH_SHAPE:    
                 remove = !mainPanel.replaceNoFill(tag);
                 break;
             case FONT:
