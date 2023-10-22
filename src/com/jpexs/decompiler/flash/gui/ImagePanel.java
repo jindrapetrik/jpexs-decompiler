@@ -803,7 +803,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (img != null) {
                         int x = 0;
                         int y = 0;
-                        if (timelined == null) {
+                        if (timelined == null || !autoPlayed) {
                             x = (int) offsetPoint.getX();
                             y = (int) offsetPoint.getY();
                         }
