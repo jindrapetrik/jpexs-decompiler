@@ -4441,6 +4441,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (ti0 instanceof ShapeTag) {
             file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
         }
+        if (ti0 instanceof MorphShapeTag) {
+            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.replace.morphshape"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, JOptionPane.WARNING_MESSAGE, Configuration.warningReplaceMorphShape, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+                return false;
+            }
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
+        }
         if (ti0 instanceof DefineVideoStreamTag) {
             file = showImportFileChooser("filter.movies|*.flv", false);
         }
@@ -4520,8 +4526,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
             }
         }
-        if (item instanceof ShapeTag) {
-            ShapeTag st = (ShapeTag) item;
+        if ((item instanceof ShapeTag) || (item instanceof MorphShapeTag)) {
+            Tag st = (Tag) item;
             File selfile = Helper.fixDialogFile(selectedFile);
             byte[] data = null;
             String svgText = null;
@@ -4532,7 +4538,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 data = Helper.readFile(selfile.getAbsolutePath());
             }
             try {
-                Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText) : new ShapeImporter().importImage(st, data);
+                Tag newTag = null;
+                if (st instanceof ShapeTag) {
+                    if (svgText != null) {
+                        newTag = new SvgImporter().importSvg((ShapeTag) st, svgText);
+                    } else {
+                        newTag = new ShapeImporter().importImage((ShapeTag) st, data);                
+                    }
+                }
+                if (st instanceof MorphShapeTag) {
+                    if (svgText != null) {
+                        newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText);
+                    } else {
+                        newTag = new ShapeImporter().importImage((MorphShapeTag) st, data);                
+                    }
+                }
                 SWF swf = st.getSwf();
                 if (newTag != null) {
                     refreshTree(swf);
@@ -4622,8 +4642,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return false;
         }
 
-        if (item instanceof ShapeTag) {
-            ShapeTag st = (ShapeTag) item;
+        if ((item instanceof ShapeTag) || (item instanceof MorphShapeTag)) {
+            Tag st = (Tag) item;
             String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
             File selectedFile = showImportFileChooser(filter, true);
             if (selectedFile != null) {
@@ -4637,7 +4657,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     data = Helper.readFile(selfile.getAbsolutePath());
                 }
                 try {
-                    Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText, false) : new ShapeImporter().importImage(st, data, 0, false);
+                    Tag newTag = null;
+                    if (st instanceof ShapeTag) {
+                        if (svgText != null) {
+                            newTag = new SvgImporter().importSvg((ShapeTag) st, svgText, false);                        
+                        } else {
+                            newTag = new ShapeImporter().importImage((ShapeTag) st, data, 0, false);
+                        }
+                    }
+                    if (st instanceof MorphShapeTag) {
+                        if (svgText != null) {
+                            newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText, false);                        
+                        } else {
+                            newTag = new ShapeImporter().importImage((MorphShapeTag) st, data, 0, false);
+                        }
+                    }
                     SWF swf = st.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);

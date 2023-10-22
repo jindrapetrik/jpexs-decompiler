@@ -55,4 +55,13 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return modified;
     }
+    
+    public MORPHFILLSTYLEARRAY toMorphFillStyleArray() {
+        MORPHFILLSTYLEARRAY morphFillStyleArray = new MORPHFILLSTYLEARRAY();
+        morphFillStyleArray.fillStyles = new MORPHFILLSTYLE[fillStyles.length];
+        for (int i = 0; i < fillStyles.length; i++) {
+            morphFillStyleArray.fillStyles[i] = fillStyles[i].toMorphStyle();
+        }
+        return morphFillStyleArray;
+    }
 }

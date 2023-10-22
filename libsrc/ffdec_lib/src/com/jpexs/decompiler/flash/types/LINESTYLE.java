@@ -75,4 +75,13 @@ public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
     public void setWidth(int width) {
         this.width = width;
     }
+    
+    public MORPHLINESTYLE toMorphLineStyle() {
+        MORPHLINESTYLE morphLineStyle = new MORPHLINESTYLE();
+        morphLineStyle.startColor = new RGBA(color);
+        morphLineStyle.endColor = new RGBA(color);
+        morphLineStyle.startWidth = width;
+        morphLineStyle.endWidth = width;
+        return morphLineStyle;
+    }
 }

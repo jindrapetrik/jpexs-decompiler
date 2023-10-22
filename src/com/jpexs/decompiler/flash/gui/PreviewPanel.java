@@ -1718,14 +1718,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             showSound = false;
             showMovie = false;
             showSprite = false;
+            showMorphShape = false;
         }
         replaceImageButton.setVisible(showImage);
         replaceImageAlphaButton.setVisible(showAlpha);
         replaceSpriteButton.setVisible(showSprite);
-        replaceShapeButton.setVisible(showShape);
+        replaceShapeButton.setVisible(showShape || showMorphShape);
         morphShowPanel.setVisible(showMorphShape);
         displayEditEditPointsButton.setVisible(showShape || showMorphShape);
-        replaceShapeUpdateBoundsButton.setVisible(showShape);
+        replaceShapeUpdateBoundsButton.setVisible(showShape || showMorphShape);
         replaceSoundButton.setVisible(showSound);
         replaceMovieButton.setVisible(showMovie);
         prevFontsButton.setVisible(false);

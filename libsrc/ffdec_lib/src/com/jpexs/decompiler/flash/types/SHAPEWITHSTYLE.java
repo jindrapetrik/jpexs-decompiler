@@ -17,9 +17,13 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,4 +108,129 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum, false);
     }
 
+    public void updateMorphShapeTag(MorphShapeTag morphShapeTag, boolean fill) {
+        morphShapeTag.startEdges.shapeRecords.clear();
+        morphShapeTag.endEdges.shapeRecords.clear();
+                
+        FILLSTYLEARRAY mergedFillStyles = new FILLSTYLEARRAY();        
+        LINESTYLEARRAY mergedLineStyles = new LINESTYLEARRAY();
+        
+        List<FILLSTYLE> mergedFillStyleList = new ArrayList<>();
+        List<LINESTYLE> mergedLineStyleList = new ArrayList<>();
+        List<LINESTYLE2> mergedLineStyle2List = new ArrayList<>();
+        
+        int lastFillCount = fillStyles.fillStyles.length;
+        
+        for (int i = 0; i < fillStyles.fillStyles.length; i++) {
+            mergedFillStyleList.add(fillStyles.fillStyles[i]);
+        }
+        
+        int lastLineCount = 0;
+        
+        if (lineStyles.lineStyles != null) {
+            lastLineCount = lineStyles.lineStyles.length;
+            for (int i = 0; i < lineStyles.lineStyles.length; i++) {
+                mergedLineStyleList.add(lineStyles.lineStyles[i]);
+            }
+        }
+        if (lineStyles.lineStyles2 != null) {
+            lastLineCount = lineStyles.lineStyles2.length;
+            for (int i = 0; i < lineStyles.lineStyles2.length; i++) {
+                mergedLineStyle2List.add(lineStyles.lineStyles2[i]);
+            }
+        }
+        
+        int fillOffset = 0;
+        int lineOffset = 0;
+        List<SHAPERECORD> newShapeRecords = new ArrayList<>();
+        for (int r = 0; r < shapeRecords.size(); r++) {
+            SHAPERECORD rec = shapeRecords.get(r);
+            rec = Helper.deepCopy(rec);
+            if (rec instanceof StyleChangeRecord) {                
+                StyleChangeRecord scr = (StyleChangeRecord) rec;                
+                if (scr.stateNewStyles) {
+                    for (int i = 0; i < scr.fillStyles.fillStyles.length; i++) {
+                        mergedFillStyleList.add(scr.fillStyles.fillStyles[i]);
+                    }
+                    fillOffset += lastFillCount;
+                    lastFillCount = scr.fillStyles.fillStyles.length;
+                    if (scr.lineStyles.lineStyles != null) {                        
+                        for (int i = 0; i < scr.lineStyles.lineStyles.length; i++) {
+                            mergedLineStyleList.add(scr.lineStyles.lineStyles[i]);
+                        }
+                        lineOffset += lastLineCount;
+                        lastLineCount = scr.lineStyles.lineStyles.length;
+                    }
+                    if (scr.lineStyles.lineStyles2 != null) {
+                        for (int i = 0; i < scr.lineStyles.lineStyles2.length; i++) {
+                            mergedLineStyle2List.add(scr.lineStyles.lineStyles2[i]);
+                        }
+                        lineOffset += lastLineCount;
+                        lastLineCount = scr.lineStyles.lineStyles2.length;
+                    }                    
+                    scr.stateNewStyles = false;
+                }
+                if (scr.stateFillStyle0) {
+                    scr.fillStyle0 += fillOffset;
+                }
+                if (scr.stateFillStyle1) {
+                    scr.fillStyle1 += fillOffset;
+                }
+                if (scr.stateLineStyle) {
+                    scr.lineStyle += lineOffset;
+                }
+            }
+            newShapeRecords.add(rec);
+        }
+        
+        mergedFillStyles.fillStyles = new FILLSTYLE[mergedFillStyleList.size()];
+        for (int i = 0; i < mergedFillStyleList.size(); i++) {
+            mergedFillStyles.fillStyles[i] = mergedFillStyleList.get(i);
+        }
+        mergedLineStyles.lineStyles = new LINESTYLE[mergedLineStyleList.size()];
+        for (int i = 0; i < mergedLineStyleList.size(); i++) {
+            mergedLineStyles.lineStyles[i] = mergedLineStyleList.get(i);
+        }
+        mergedLineStyles.lineStyles2 = new LINESTYLE2[mergedLineStyle2List.size()];
+        for (int i = 0; i < mergedLineStyle2List.size(); i++) {
+            mergedLineStyles.lineStyles2[i] = mergedLineStyle2List.get(i);
+        }
+        
+        
+        morphShapeTag.morphFillStyles = mergedFillStyles.toMorphFillStyleArray();
+        morphShapeTag.morphLineStyles = mergedLineStyles.toMorphLineStyleArray();                                                
+        SHAPE startShapes = new SHAPE();
+        startShapes.numFillBits = SWFOutputStream.getNeededBitsU(mergedFillStyleList.size());
+        startShapes.numLineBits = SWFOutputStream.getNeededBitsU(mergedLineStyleList.size() + mergedLineStyle2List.size());
+        startShapes.shapeRecords = newShapeRecords;            
+        morphShapeTag.startEdges = startShapes;
+
+        SHAPE endShapes = new SHAPE();
+        endShapes.numFillBits = 0;
+        endShapes.numLineBits = 0;
+        List<SHAPERECORD> endRecords = new ArrayList<>();
+        for (int i = 0; i < newShapeRecords.size(); i++) {
+            SHAPERECORD rec = newShapeRecords.get(i);
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateMoveTo) {
+                    StyleChangeRecord nscr = new StyleChangeRecord();
+                    nscr.stateMoveTo = true;
+                    nscr.moveDeltaX = scr.moveDeltaX;
+                    nscr.moveDeltaY = scr.moveDeltaY;
+                    nscr.calculateBits();
+                    endRecords.add(nscr);
+                }
+            } else {
+                endRecords.add(Helper.deepCopy(rec));
+            }
+        }
+        endShapes.shapeRecords = endRecords;
+        morphShapeTag.endEdges = endShapes;
+
+        if (!fill) {
+            morphShapeTag.updateBounds();
+        }
+    }
+    
 }

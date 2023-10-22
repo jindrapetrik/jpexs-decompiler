@@ -78,9 +78,9 @@ public class MORPHLINESTYLE2 implements Serializable {
 
     public static final int SQUARE_CAP = 2;
 
-    @SWFType(value = BasicType.UI16)
+    @SWFType(value = BasicType.FIXED8)
     @Conditional(value = "joinStyle", options = {MITER_JOIN})
-    public int miterLimitFactor;
+    public float miterLimitFactor;
 
     @Conditional("!hasFillFlag")
     public RGBA startColor;

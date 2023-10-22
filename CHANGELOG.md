@@ -11,8 +11,9 @@ All notable changes to this project will be documented in this file.
 - ActionScript Debugger - Call stack frames switching - view variables around call stack
 - ActionScript Debugger - Highlight lines of callstack
 - [#2105] GFX - Basic tag info
-- Context menu items to create new tags (shape, sprite, image, movie, sound, binaryData) from files
+- Context menu items to create new tags (shape, morphshape, sprite, image, movie, sound, binaryData) from files
   and using font embed dialog for fonts
+- Replacing morphshapes (currently only same shape for start/end)
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -22,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - GFX - Fonts with stripped shapes
 - [#2104] Empty texts import
 - Centered start playing triangle (Playing on demand)
+- miterLimitFactor is FIXED8 value in MORPHLINESTYLE2
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)

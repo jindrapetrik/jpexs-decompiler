@@ -826,7 +826,11 @@ public class Main {
         statusTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (mainFrame != null && mainFrame.getPanel().getStatusPanel().isStatusHidden()) {
+                if (mainFrame == null) {
+                    return;
+                }
+                MainFrameStatusPanel sp = mainFrame.getPanel().getStatusPanel();
+                if (sp != null && sp.isStatusHidden()) {
                     long nowTime = System.currentTimeMillis();
                     if (nowTime > lastTimeStartWork + 5000) {
                         mainFrame.getPanel().showOldStatus();

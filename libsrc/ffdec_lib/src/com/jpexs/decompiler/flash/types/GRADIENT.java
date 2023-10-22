@@ -62,4 +62,15 @@ public class GRADIENT implements Serializable {
 
     @SWFArray(value = "record")
     public GRADRECORD[] gradientRecords = new GRADRECORD[0];
+    
+    public MORPHGRADIENT toMorphGradient() {
+        MORPHGRADIENT morphGradient = new MORPHGRADIENT();
+        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.spreadMode = spreadMode;
+        morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
+        for (int i = 0; i < gradientRecords.length; i++) {
+            morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord();
+        }
+        return morphGradient;
+    }
 }

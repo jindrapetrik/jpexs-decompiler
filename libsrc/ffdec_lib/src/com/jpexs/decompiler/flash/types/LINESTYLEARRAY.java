@@ -87,4 +87,21 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return modified;
     }
+    
+    public MORPHLINESTYLEARRAY toMorphLineStyleArray() {
+        MORPHLINESTYLEARRAY morphLineStyleArray = new MORPHLINESTYLEARRAY();
+        if (lineStyles != null) {
+            morphLineStyleArray.lineStyles = new MORPHLINESTYLE[lineStyles.length];
+            for (int i = 0; i < lineStyles.length; i++) {
+                morphLineStyleArray.lineStyles[i] = lineStyles[i].toMorphLineStyle();
+            }
+        }
+        if (lineStyles2 != null) {
+            morphLineStyleArray.lineStyles2 = new MORPHLINESTYLE2[lineStyles2.length];
+            for (int i = 0; i < lineStyles2.length; i++) {
+                morphLineStyleArray.lineStyles2[i] = lineStyles2[i].toMorphLineStyle2();
+            }
+        }
+        return morphLineStyleArray;
+    }
 }

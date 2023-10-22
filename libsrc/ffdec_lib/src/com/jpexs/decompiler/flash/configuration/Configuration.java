@@ -967,6 +967,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> displayAs3PCodePanel = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.replace.morphshape")
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> warningReplaceMorphShape = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX
