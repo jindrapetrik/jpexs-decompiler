@@ -4422,8 +4422,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceButtonActionPerformed(List<TreeItem> items) {
-        if (items.size() == 0) {
-            return;
+        replace(items, false);
+    }
+
+    public boolean replace(List<TreeItem> items, boolean create) {            
+        if (items.isEmpty()) {
+            return false;
         }
 
         TreeItem ti0 = items.get(0);
@@ -4446,12 +4450,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (ti0 instanceof UnknownTag) {
             file = showImportFileChooser("", false);
         }
-        for (TreeItem ti : items) {
-            doReplaceAction(ti, file);
+        if (file == null) {
+            return false;
         }
+        for (TreeItem ti : items) {
+            doReplaceAction(ti, file, create);
+        }
+        return true;
     }
 
-    private void doReplaceAction(TreeItem item, File selectedFile) {
+    private void doReplaceAction(TreeItem item, File selectedFile, boolean create) {
         if (selectedFile == null) {
             return;
         }
@@ -4496,7 +4504,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 File selfile = Helper.fixDialogFile(selectedFile);
                 byte[] data = Helper.readFile(selfile.getAbsolutePath());
                 try {
-                    Tag newTag = new ImageImporter().importImage(it, data);
+                    Tag newTag = new ImageImporter().importImage(it, data, create ? -1 : 0);
                     SWF swf = it.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
@@ -4572,9 +4580,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void replaceSpriteWithGifButtonActionPerformed(TreeItem item) {
+    public boolean replaceSpriteWithGif(TreeItem item) {
         if (item == null) {
-            return;
+            return false;
         }
         if (item instanceof DefineSpriteTag) {
             String filter = "filter.images|*.gif";
@@ -4595,13 +4603,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 reload(true);
                 refreshTree(swf);
+                return true;
             }
         }
+        return false;
+    }
+    
+    public void replaceSpriteWithGifButtonActionPerformed(TreeItem item) {
+        replaceSpriteWithGif(item);
     }
 
     public void replaceNoFillButtonActionPerformed(TreeItem item) {
+        replaceNoFill(item);
+    }
+
+    public boolean replaceNoFill(TreeItem item) {
         if (item == null) {
-            return;
+            return false;
         }
 
         if (item instanceof ShapeTag) {
@@ -4633,8 +4651,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 reload(true);
+                return true;
             }
         }
+        return false;
     }
 
     private void showSvgImportWarning() {
@@ -6249,5 +6269,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             dialog.setVisible(true);
         }
         return dialog;
+    }
+    
+    public boolean fontEmbed(TreeItem item, boolean create) {
+        return previewPanel.getFontPanel().fontEmbed(item, create);
     }
 }

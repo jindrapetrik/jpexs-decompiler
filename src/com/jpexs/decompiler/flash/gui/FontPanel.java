@@ -615,37 +615,51 @@ public class FontPanel extends JPanel implements TagEditorPanel {
             }
         }
     }
+    
+    public boolean fontEmbed(TreeItem item, boolean create) {
+        if (item == null) {
+            return false;
+        }
+        FontTag ft = (FontTag) item;
+        FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText(), create);
+        if (fed.showDialog() == AppDialog.OK_OPTION) {
+            Set<Integer> selChars = fed.getSelectedChars();
+            if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
+                if (ft.getCharacterCount() == 0) {
+                    ft.setHasLayout(true);
+                }
+                Font selFont = fed.getSelectedFont();
+                fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
+                fontFaceSelection.setSelectedItem(new FontFace(selFont));
+                fontAddChars(ft, selChars, selFont);
+                if (fed.isImportAscentDescentLeading()) {
+                    Font adlFont = selFont;
+                    if (selFont.getSize() != 1024) {
+                        adlFont = selFont.deriveFont(1024f);
+                    }
+                    ft.setAscent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getAscent()));
+                    ft.setDescent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getDescent()));
+                    int leading = this.getFontMetrics(adlFont).getAscent() + this.getFontMetrics(adlFont).getDescent() - 1024;
+                    ft.setLeading((int) (ft.getDivider() * leading));
+                }
+                if (create) {
+                    ft.setFontNameIntag(fed.getCreateFontName());
+                    ft.setBold(fed.isBold());
+                    ft.setItalic(fed.isItalic());
+                }
+                fontAddCharactersField.setText("");
+                ft.setModified(true);
+                mainPanel.reload(true);
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void fontEmbedButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
-            FontTag ft = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
-            if (fed.showDialog() == AppDialog.OK_OPTION) {
-                Set<Integer> selChars = fed.getSelectedChars();
-                if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
-                    if (ft.getCharacterCount() == 0) {
-                        ft.setHasLayout(true);
-                    }
-                    Font selFont = fed.getSelectedFont();
-                    fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
-                    fontFaceSelection.setSelectedItem(new FontFace(selFont));
-                    fontAddChars(ft, selChars, selFont);
-                    if (fed.isImportAscentDescentLeading()) {
-                        Font adlFont = selFont;
-                        if (selFont.getSize() != 1024) {
-                            adlFont = selFont.deriveFont(1024f);
-                        }
-                        ft.setAscent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getAscent()));
-                        ft.setDescent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getDescent()));
-                        int leading = this.getFontMetrics(adlFont).getAscent() + this.getFontMetrics(adlFont).getDescent() - 1024;
-                        ft.setLeading((int) (ft.getDivider() * leading));
-                    }
-                    fontAddCharactersField.setText("");
-                    ft.setModified(true);
-                    mainPanel.reload(true);
-                }
-            }
+            fontEmbed(item, false);
         }
     }
 
