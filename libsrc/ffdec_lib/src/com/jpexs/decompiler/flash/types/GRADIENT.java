@@ -61,9 +61,36 @@ public class GRADIENT implements Serializable {
     public static final int INTERPOLATION_RESERVED2 = 3;
 
     @SWFArray(value = "record")
-    public GRADRECORD[] gradientRecords = new GRADRECORD[0];
+    public GRADRECORD[] gradientRecords = new GRADRECORD[0];        
+    
+    public boolean isCompatibleGradient(GRADIENT otherGradient) {
+        if (interpolationMode != otherGradient.interpolationMode) {
+            return false;
+        }
+        if (spreadMode != otherGradient.spreadMode) {
+            return false;
+        }
+        if (gradientRecords.length != otherGradient.gradientRecords.length) {
+            return false;
+        }
+        return true;
+    }
     
     public MORPHGRADIENT toMorphGradient() {
+        MORPHGRADIENT morphGradient = new MORPHGRADIENT();
+        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.spreadMode = spreadMode;
+        morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
+        for (int i = 0; i < gradientRecords.length; i++) {
+            morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord();
+        }
+        return morphGradient;
+    }
+    
+    public MORPHGRADIENT toMorphGradient(GRADIENT endGradient) {
+        if (!isCompatibleGradient(endGradient)) {
+            return null;
+        }
         MORPHGRADIENT morphGradient = new MORPHGRADIENT();
         morphGradient.interPolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;

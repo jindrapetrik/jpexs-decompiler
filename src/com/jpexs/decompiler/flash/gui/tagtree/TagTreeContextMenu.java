@@ -1039,11 +1039,15 @@ public class TagTreeContextMenu extends JPopupMenu {
             replaceMenuItem.setVisible(true);
         }
 
-        if (canReplace.test(it -> (it instanceof ShapeTag) || (it instanceof MorphShapeTag))) {
+        if (canReplace.test(it -> it instanceof ShapeTag)) {
             replaceMenuItem.setVisible(true);
             replaceNoFillMenuItem.setVisible(true);
         }
-
+        
+        if (canReplace.test(it -> it instanceof MorphShapeTag)) {
+            replaceMenuItem.setVisible(true);
+        }
+        
         if (canReplace.test(it -> it instanceof DefineBinaryDataTag)) {
             replaceMenuItem.setVisible(true);
         }
@@ -1660,11 +1664,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             case TagTreeModel.FOLDER_MORPHSHAPES:
                 addTagMenu.addSeparator();
                 JMenuItem createMorphShapeItem = new JMenuItem(AppStrings.translate("tag.morphshape.create"));
-                createMorphShapeItem.setIcon(View.getIcon("importshape16"));
+                createMorphShapeItem.setIcon(View.getIcon("importmorphshape16"));
                 createMorphShapeItem.addActionListener((ActionEvent ae) -> {
                     listener.call(ae, item, DefineMorphShape2Tag.class, TreeNodeType.MORPH_SHAPE);
                 });
-                addTagMenu.add(createMorphShapeItem);
+                addTagMenu.add(createMorphShapeItem);                                
                 break;
         }
     }
@@ -3822,9 +3826,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             case SPRITE:
                 remove = !mainPanel.replaceSpriteWithGif(tag);
                 break;
-            case SHAPE:
-            case MORPH_SHAPE:    
+            case SHAPE:               
                 remove = !mainPanel.replaceNoFill(tag);
+                break;
+            case MORPH_SHAPE:
+                remove = !mainPanel.replaceMorphShape((MorphShapeTag) tag, true);
                 break;
             case FONT:
                 remove = !mainPanel.fontEmbed(tag, true);

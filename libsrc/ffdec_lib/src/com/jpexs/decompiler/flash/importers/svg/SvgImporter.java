@@ -226,6 +226,11 @@ public class SvgImporter {
                 transform = Matrix.getScaleInstance(ratioX, ratioY);
                 transform.translate(origXmin / SWF.unitDivisor / ratioX, origYmin / SWF.unitDivisor / ratioY);
             }
+            
+            transform = transform.preConcatenate(Matrix.getTranslateInstance(-viewBox.x, -viewBox.y));                
+            if (viewBox.height != 0 && viewBox.width != 0) {
+                transform = transform.preConcatenate(Matrix.getScaleInstance(width / viewBox.width, height / viewBox.height));
+            }
 
             processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape);
         } catch (SAXException | IOException | ParserConfigurationException ex) {

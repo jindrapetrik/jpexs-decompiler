@@ -141,6 +141,44 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     @Override
     public void setWidth(int width) {
         this.width = width;
+    }        
+    
+    public boolean isCompatibleLineStyle(LINESTYLE2 otherLineStyle) {
+        if (startCapStyle != otherLineStyle.startCapStyle) {
+            return false;
+        }
+        if (endCapStyle != otherLineStyle.endCapStyle) {
+            return false;
+        }
+        
+        if (joinStyle != otherLineStyle.joinStyle) {
+            return false;
+        }
+        
+        if (hasFillFlag != otherLineStyle.hasFillFlag) {
+            return false;
+        }
+        
+        if (noVScaleFlag != otherLineStyle.noVScaleFlag) {
+            return false;
+        }
+        if (pixelHintingFlag != otherLineStyle.pixelHintingFlag) {
+            return false;
+        }
+        if (noClose != otherLineStyle.noClose) {
+            return false;
+        }
+        if (miterLimitFactor != otherLineStyle.miterLimitFactor) {
+            return false;
+        }
+        
+        if (hasFillFlag) {
+            if (!fillType.isCompatibleFillStyle(otherLineStyle.fillType)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     public MORPHLINESTYLE2 toMorphLineStyle2() {
@@ -162,6 +200,35 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         }
         if (fillType != null) {
             morphLineStyle2.fillType = fillType.toMorphStyle();
+        }
+        return morphLineStyle2;
+    }
+
+    public MORPHLINESTYLE2 toMorphLineStyle2(LINESTYLE2 endLineStyle) {
+        if (!isCompatibleLineStyle(endLineStyle)) {
+            return null;
+        }
+        
+        MORPHLINESTYLE2 morphLineStyle2 = new MORPHLINESTYLE2();
+        morphLineStyle2.startWidth = width;
+        morphLineStyle2.endWidth = endLineStyle.width;
+        morphLineStyle2.startCapStyle = startCapStyle;        
+        morphLineStyle2.joinStyle = joinStyle;
+        morphLineStyle2.hasFillFlag = hasFillFlag;
+        morphLineStyle2.noHScaleFlag = noHScaleFlag;
+        morphLineStyle2.noVScaleFlag = noVScaleFlag;
+        morphLineStyle2.pixelHintingFlag = pixelHintingFlag;
+        morphLineStyle2.noClose = noClose;
+        morphLineStyle2.endCapStyle = endCapStyle;
+        morphLineStyle2.miterLimitFactor = miterLimitFactor;
+        if (color != null) {
+            morphLineStyle2.startColor = new RGBA(color);
+        }
+        if (endLineStyle.color != null) {
+            morphLineStyle2.endColor = new RGBA(endLineStyle.color);
+        }
+        if (hasFillFlag) {
+            morphLineStyle2.fillType = fillType.toMorphStyle(endLineStyle.fillType);
         }
         return morphLineStyle2;
     }

@@ -46,4 +46,13 @@ public class GRADRECORD implements Serializable {
         morphGradRecord.endRatio = ratio;
         return morphGradRecord;
     }
+    
+    public MORPHGRADRECORD toMorphGradRecord(GRADRECORD endGradRecord) {
+        MORPHGRADRECORD morphGradRecord = new MORPHGRADRECORD();
+        morphGradRecord.startColor = new RGBA(color);
+        morphGradRecord.endColor = new RGBA(endGradRecord.color);
+        morphGradRecord.startRatio = ratio;
+        morphGradRecord.endRatio = endGradRecord.ratio;
+        return morphGradRecord;
+    }
 }

@@ -84,7 +84,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     public abstract int getShapeNum();
 
-    public SHAPEWITHSTYLE getShapes() {
+    public synchronized SHAPEWITHSTYLE getShapes() {
         if (shapes == null && shapeData != null) {
             try {
                 SWFInputStream sis = new SWFInputStream(swf, shapeData.getArray(), 0, shapeData.getPos() + shapeData.getLength());

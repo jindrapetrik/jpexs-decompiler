@@ -64,10 +64,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private final ColorTransform colorTransform;
 
     private boolean canUseSmoothing = true;
-    
+
     protected int windingRule;
-    
-    
 
     public ShapeExporterBase(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;

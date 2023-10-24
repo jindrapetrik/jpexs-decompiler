@@ -19,14 +19,16 @@ package com.jpexs.decompiler.flash.math;
 import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public class BezierEdge {
+public class BezierEdge implements Serializable {
 
     public List<Point2D> points = new ArrayList<>();
 
@@ -45,6 +47,14 @@ public class BezierEdge {
         points.add(new Point2D.Double(x1, y1));
     }
 
+    public Point2D getBeginPoint() {
+        return points.get(0);
+    }
+    
+    public Point2D getEndPoint() {
+        return points.get(points.size() - 1);
+    }
+    
     public Point2D pointAt(double t) {
         if (points.size() == 2) {
             double x = (1 - t) * points.get(0).getX() + t * points.get(1).getX();
@@ -189,6 +199,30 @@ public class BezierEdge {
         }
         return ok;
     }
+    
+
+    public double length() {
+        double distance = 0;
+        double epsilon = 1;
+        
+        Stack<BezierEdge> parts = new Stack<BezierEdge>();
+        parts.push(this);
+
+        while (!parts.isEmpty()) {
+            BezierEdge curve = parts.pop();
+            double d = curve.points.get(0).distance(curve.points.get(curve.points.size() - 1));
+            if (d < epsilon) {
+                distance += d;
+            } else {
+                Reference<BezierEdge> leftRef = new Reference<>(null);
+                Reference<BezierEdge> rightRef = new Reference<>(null);
+                curve.split(0.5, leftRef, rightRef);
+                parts.add(leftRef.getVal());
+                parts.add(rightRef.getVal());
+            }
+        }
+        return distance;
+    }
 
     @Override
     public String toString() {
@@ -206,6 +240,14 @@ public class BezierEdge {
         bu.subdivide(points, t, leftPoints, rightPoints);
         left.setVal(new BezierEdge(leftPoints));
         right.setVal(new BezierEdge(rightPoints));
+    }
+    
+    public BezierEdge reverse() {
+        List<Point2D> revPoints = new ArrayList<>();
+        for (int i = points.size() - 1; i >= 0; i--) {
+            revPoints.add(points.get(i));
+        }
+        return new BezierEdge(revPoints);
     }
 
     public static void main(String[] args) {
@@ -245,6 +287,10 @@ public class BezierEdge {
         );
 
         System.out.println("Intersection point: " + c);
+        
+        BezierEdge be = new BezierEdge(0, 0, 100, 50, 0, 100);
+        
+        System.out.println("be5.dist: " + be.length());
 
         //Rectangle2D out = new Rectangle2D.Double();
         //rectIntersection(new Rectangle2D.Double(0,0,50,50), new Rectangle2D.Double(0,50,50,50), out);
