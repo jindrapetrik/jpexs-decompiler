@@ -151,6 +151,30 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
                 gradient = g;
             }
         }
+    }        
+    
+    public boolean isCompatibleFillStyle(FILLSTYLE otherFillStyle) {
+        if (fillStyleType != otherFillStyle.fillStyleType) {
+            return false;
+        }
+        switch (fillStyleType) {
+            case CLIPPED_BITMAP:
+            case NON_SMOOTHED_CLIPPED_BITMAP:
+            case NON_SMOOTHED_REPEATING_BITMAP:
+            case REPEATING_BITMAP:
+                if (bitmapId != otherFillStyle.bitmapId) {
+                    return false;
+                }
+                break;
+            case LINEAR_GRADIENT:
+            case RADIAL_GRADIENT:
+            case FOCAL_RADIAL_GRADIENT:
+                if (!gradient.isCompatibleGradient(otherFillStyle.gradient)) {
+                    return false;
+                }
+                break;
+        }
+        return true;
     }
     
     public MORPHFILLSTYLE toMorphStyle() {
@@ -167,6 +191,32 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         morphFillStyle.fillStyleType = fillStyleType;
         if (gradient != null) {
             morphFillStyle.gradient = gradient.toMorphGradient();
+        }        
+        
+        return morphFillStyle;
+    }
+    
+    public MORPHFILLSTYLE toMorphStyle(FILLSTYLE endFillStyle) {
+        if (!isCompatibleFillStyle(endFillStyle)) {
+            return null;
+        }
+        MORPHFILLSTYLE morphFillStyle = new MORPHFILLSTYLE();
+        morphFillStyle.bitmapId = bitmapId;
+        if (bitmapMatrix != null) {
+            morphFillStyle.startBitmapMatrix = new MATRIX(bitmapMatrix);            
+        }
+        if (endFillStyle.bitmapMatrix != null) {
+            morphFillStyle.endBitmapMatrix = new MATRIX(endFillStyle.bitmapMatrix);
+        }
+        if (color != null) {
+            morphFillStyle.startColor = new RGBA(color);
+        }
+        if (endFillStyle.color != null) {
+            morphFillStyle.endColor = new RGBA(endFillStyle.color);
+        }
+        morphFillStyle.fillStyleType = fillStyleType;
+        if (gradient != null) {
+            morphFillStyle.gradient = gradient.toMorphGradient(endFillStyle.gradient);
         }        
         
         return morphFillStyle;

@@ -46,8 +46,18 @@ public class CurvedEdge extends StraightEdge implements IEdge {
     }
 
     @Override
+    public IEdge sameWithNewFillStyle(int newFillStyleIdx) {
+        return new CurvedEdge(fromX, fromY, controlX, controlY, toX, toY, lineStyleIdx, newFillStyleIdx);
+    }    
+    
+
+    @Override
     public String toString() {
         return "curved[" + fromX / 20f + "," + fromY / 20f + " -> " + toX / 20f + "," + toY / 20f + " control:" + controlX / 20f + "," + controlY / 20f + "]";
     }
 
+    @Override
+    public IEdge reverse() {
+        return new CurvedEdge(toX, toY, controlX, controlY, fromX, fromY, lineStyleIdx, getFillStyleIdx());
+    }       
 }

@@ -14,29 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.exporters.shape;
+package com.jpexs.decompiler.flash.importers.morphshape;
 
 /**
  *
  * @author JPEXS
  */
-public interface IEdge {
-
-    public int getFromX();
-
-    public int getFromY();
-
-    public int getToX();
-
-    public int getToY();
-
-    public int getLineStyleIdx();
-
-    public int getFillStyleIdx();
-
-    public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
+public class StyleMismatchException extends Exception {
     
-    public IEdge reverse();
-    
-    public IEdge sameWithNewFillStyle(int newFillStyleIdx);
 }

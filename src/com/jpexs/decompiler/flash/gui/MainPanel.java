@@ -132,6 +132,8 @@ import com.jpexs.decompiler.flash.importers.SpriteImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
+import com.jpexs.decompiler.flash.importers.morphshape.MorphShapeGenerator;
+import com.jpexs.decompiler.flash.importers.morphshape.StyleMismatchException;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
@@ -142,7 +144,10 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
@@ -371,8 +376,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private static final int DETAILCARDTAGINFO = 0;
 
     private static final int DETAILCARDEMPTYPANEL = -1;
-    
-    private static final int DETAILCARDDEBUGSTACKFRAME = 2;    
+
+    private static final int DETAILCARDDEBUGSTACKFRAME = 2;
 
     private static final String SPLIT_PANE1 = "SPLITPANE1";
 
@@ -413,7 +418,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final PreviewPanel dumpPreviewPanel;
 
     private final TagInfoPanel tagInfoPanel;
-    
+
     private final DebugStackPanel debugStackPanel;
 
     private TreePanelMode treePanelMode;
@@ -1028,7 +1033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public String translate(String key) {
         return mainFrame.translate(key);
     }
-        
+
     public MainPanel(MainFrame mainFrame, MainFrameMenu mainMenu, FlashPlayerPanel flashPanel, FlashPlayerPanel previewFlashPanel) {
         super();
 
@@ -1050,9 +1055,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             whitePanel.setBackground(Color.white);
         }
         detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
-*/
+         */
         tagInfoPanel = new TagInfoPanel(this);
-        
+
         debugStackPanel = new DebugStackPanel();
         Main.getDebugHandler().addBreakListener(new DebuggerHandler.BreakListener() {
             @Override
@@ -1061,8 +1066,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     @Override
                     public void run() {
                         showDetail(DETAILCARDDEBUGSTACKFRAME);
-                    }                    
-                });                
+                    }
+                });
             }
 
             @Override
@@ -1071,14 +1076,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     @Override
                     public void run() {
                         showDetail(DETAILCARDEMPTYPANEL);
-                    }                    
-                });                
-            }            
+                    }
+                });
+            }
         });
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {
             @Override
             public void connected() {
-            
+
             }
 
             @Override
@@ -1087,11 +1092,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     @Override
                     public void run() {
                         reload(true);
-                    }                    
+                    }
                 });
-            }            
+            }
         });
-                
+
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
         tagTree = new TagTree(null, this);
         tagTree.addTreeSelectionListener(this);
@@ -1454,7 +1459,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public ABCPanel getABCPanel() {
         if (abcPanel == null) {
             abcPanel = new ABCPanel(this);
-            displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);            
+            displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
         }
 
         return abcPanel;
@@ -1854,19 +1859,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (constants.getMultiname(multiNameIndex).name_index > 0) {
             oldName = constants.getString(constants.getMultiname(multiNameIndex).name_index);
         }
-        
-        String scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString();                
+
+        String scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().toString();
 
         String newName = ViewMessages.showInputDialog(this, translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
-                
+
                 if (oldName.equals(abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().className)) {
                     scriptName = abcPanel.decompiledTextArea.getScriptLeaf().getClassPath().packageStr.add(newName, "").toPrintableString(true);
                 }
-        
+
                 final String fScriptName = scriptName;
-                
+
                 int mulCount = 0;
                 for (ABCContainerTag cnt : abcList) {
                     ABC abc = cnt.getABC();
@@ -1941,17 +1946,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         Set<Openable> usedOpenables = new HashSet<>();
         Set<OpenableList> usedOpenableLists = new HashSet<>();
-        
+
         Map<OpenableList, Map<String, Integer>> usedSwfIdsInBundles = new HashMap<>();
-        
+
         for (TreeItem d : sel) {
             Openable selectedNodeOpenable = d.getOpenable();
             usedOpenables.add(selectedNodeOpenable);
-            
+
             OpenableList list = selectedNodeOpenable.getOpenableList();
             if (list != null) {
                 usedOpenableLists.add(list);
-            }   
+            }
         }
 
         Map<String, Integer> usedSwfsIds = new HashMap<>();
@@ -2074,13 +2079,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             String selFile2;
-            if (usedOpenables.size() > 1) {                
+            if (usedOpenables.size() > 1) {
                 if (usedOpenableLists.size() > 1 && openable.getOpenableList() != null && openable.getOpenableList().isBundle()) {
                     if (!usedSwfIdsInBundles.containsKey(openable.getOpenableList())) {
                         usedSwfIdsInBundles.put(openable.getOpenableList(), new HashMap<>());
                     }
-                    selFile2 = selFile + File.separator + openable.getOpenableList().name + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfIdsInBundles.get(openable.getOpenableList()));                    
-                } else {                
+                    selFile2 = selFile + File.separator + openable.getOpenableList().name + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfIdsInBundles.get(openable.getOpenableList()));
+                } else {
                     selFile2 = selFile + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfsIds);
                 }
             } else {
@@ -2547,16 +2552,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     }
                                 }
                                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.gotoInstrLine(line);
-                            } else {                                
+                            } else {
                                 abcPanel.decompiledTextArea.gotoLine(line);
                             }
                             scrollPosStorage.saveScrollPos(oldItem);
                             refreshBreakPoints();
-                        }                        
-                    });                    
-                }                
+                        }
+                    });
+                }
             });
-            
+
         } else if (actionPanel != null && !swf.isAS3()) {
             actionPanel.addScriptListener(new Runnable() {
                 @Override
@@ -2571,11 +2576,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 actionPanel.decompiledEditor.gotoLine(line);
                             }
                             scrollPosStorage.saveScrollPos(oldItem);
-                            refreshBreakPoints();  
+                            refreshBreakPoints();
                         }
                     });
-                }                
-            });            
+                }
+            });
         }
         gotoScriptName(swf, scriptName);
     }
@@ -2627,12 +2632,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             String rawScriptName = scriptName;
             if (rawScriptName.startsWith("#PCODE ")) {
                 rawScriptName = rawScriptName.substring("#PCODE ".length());
-            }           
+            }
             Map<String, ASMSource> asms = swf.getASMs(true);
             if (asms.containsKey(rawScriptName)) {
                 oldItem = null;
                 getCurrentTree().setSelectionPath(null);
-                setTagTreeSelectedNode(getCurrentTree(), asms.get(rawScriptName));                
+                setTagTreeSelectedNode(getCurrentTree(), asms.get(rawScriptName));
             }
             /*if (actionPanel != null && asms.containsKey(rawScriptName)) {
                 actionPanel.setSource(asms.get(rawScriptName), true);                
@@ -3090,7 +3095,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Helper.decompilationErrorAdd = AppStrings.translate(Configuration.autoDeobfuscate.get() ? "deobfuscation.comment.failed" : "deobfuscation.comment.tryenable");
         clearAllScriptCache();
         updateClassesList();
-        reload(true);        
+        reload(true);
     }
 
     public void renameColliding(final Openable openable) {
@@ -3170,7 +3175,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     @Override
                     protected void done() {
-                        
+
                     }
                 }.execute();
 
@@ -4275,7 +4280,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(true);
         pinsPanel.refresh();
     }
-    
+
     public void refreshTree() {
         refreshTree(new SWF[0]);
     }
@@ -4425,7 +4430,99 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         replace(items, false);
     }
 
-    public boolean replace(List<TreeItem> items, boolean create) {            
+    public boolean replaceMorphShape(MorphShapeTag morphShape, boolean create) {
+        File fileStart = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.startShape"));
+        if (fileStart == null) {
+            return false;
+        }
+        
+        File fileEnd = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.endShape"));
+
+        if (fileEnd == null) {
+            fileEnd = fileStart;
+        }
+        
+        DefineShape4Tag shapeStart = new DefineShape4Tag(morphShape.getSwf());
+        SWF.addTagBefore(shapeStart, morphShape);
+        
+        DefineShape4Tag shapeEnd = new DefineShape4Tag(morphShape.getSwf());
+        SWF.addTagBefore(shapeEnd, morphShape);
+
+        File selfileStart = Helper.fixDialogFile(fileStart);
+        byte[] dataStart = null;
+        String svgTextStart = null;
+        boolean svgWarningShown = false;
+        if (".svg".equals(Path.getExtension(selfileStart))) {
+            svgTextStart = Helper.readTextFile(selfileStart.getAbsolutePath());
+            showSvgImportWarning();
+            svgWarningShown = true;
+        } else {
+            dataStart = Helper.readFile(selfileStart.getAbsolutePath());
+        }
+        
+        File selfileEnd = Helper.fixDialogFile(fileEnd);        
+        byte[] dataEnd = null;
+        String svgTextEnd = null;
+        if (".svg".equals(Path.getExtension(selfileEnd))) {
+            svgTextEnd = Helper.readTextFile(selfileEnd.getAbsolutePath());
+            if (!svgWarningShown) {
+                showSvgImportWarning();
+            }
+        } else {
+            dataEnd = Helper.readFile(selfileEnd.getAbsolutePath());
+        }
+        
+        try {
+            Tag newStartTag;
+            if (svgTextStart != null) {
+                newStartTag = new SvgImporter().importSvg(shapeStart, svgTextStart, false);
+            } else {
+                newStartTag = new ShapeImporter().importImage(shapeStart, dataStart, 0, false);
+            }
+            newStartTag.getTimelined().removeTag(newStartTag);
+                        
+            Tag newEndTag;
+            if (svgTextStart != null) {
+                newEndTag = new SvgImporter().importSvg(shapeEnd, svgTextEnd, false);
+            } else {
+                newEndTag = new ShapeImporter().importImage(shapeEnd, dataEnd, 0, false);
+            }
+            newEndTag.getTimelined().removeTag(newEndTag);
+            
+            if (morphShape instanceof DefineMorphShapeTag) {
+                DefineMorphShape2Tag morphShape2 = new DefineMorphShape2Tag(morphShape.getSwf());
+                morphShape.getTimelined().replaceTag(morphShape, morphShape2);
+                morphShape2.setTimelined(morphShape.getTimelined());
+                morphShape = morphShape2;
+            }
+            
+            MorphShapeGenerator gen = new MorphShapeGenerator();
+            try {
+                gen.generate((DefineMorphShape2Tag) morphShape, shapeStart, shapeEnd);                
+            } catch (StyleMismatchException sme) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.morphshape.incompatible"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            
+            SWF swf = morphShape.getSwf();            
+            swf.resetTimeline();
+            refreshTree(swf);
+            /*if (newTag != null) {
+                
+                setTagTreeSelectedNode(getCurrentTree(), newTag);
+            }*/
+
+            swf.clearImageCache();
+            swf.clearShapeCache();
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Invalid image", ex);
+            ViewMessages.showMessageDialog(MainPanel.this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
+        reload(true);
+        return true;
+    }
+
+    public boolean replace(List<TreeItem> items, boolean create) {
         if (items.isEmpty()) {
             return false;
         }
@@ -4442,10 +4539,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
         }
         if (ti0 instanceof MorphShapeTag) {
-            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.replace.morphshape"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, JOptionPane.WARNING_MESSAGE, Configuration.warningReplaceMorphShape, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
-                return false;
-            }
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
+            return replaceMorphShape((MorphShapeTag) ti0, create);
         }
         if (ti0 instanceof DefineVideoStreamTag) {
             file = showImportFileChooser("filter.movies|*.flv", false);
@@ -4543,14 +4637,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (svgText != null) {
                         newTag = new SvgImporter().importSvg((ShapeTag) st, svgText);
                     } else {
-                        newTag = new ShapeImporter().importImage((ShapeTag) st, data);                
+                        newTag = new ShapeImporter().importImage((ShapeTag) st, data);
                     }
                 }
                 if (st instanceof MorphShapeTag) {
                     if (svgText != null) {
                         newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText);
                     } else {
-                        newTag = new ShapeImporter().importImage((MorphShapeTag) st, data);                
+                        newTag = new ShapeImporter().importImage((MorphShapeTag) st, data);
                     }
                 }
                 SWF swf = st.getSwf();
@@ -4628,7 +4722,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return false;
     }
-    
+
     public void replaceSpriteWithGifButtonActionPerformed(TreeItem item) {
         replaceSpriteWithGif(item);
     }
@@ -4660,14 +4754,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     Tag newTag = null;
                     if (st instanceof ShapeTag) {
                         if (svgText != null) {
-                            newTag = new SvgImporter().importSvg((ShapeTag) st, svgText, false);                        
+                            newTag = new SvgImporter().importSvg((ShapeTag) st, svgText, false);
                         } else {
                             newTag = new ShapeImporter().importImage((ShapeTag) st, data, 0, false);
                         }
                     }
                     if (st instanceof MorphShapeTag) {
                         if (svgText != null) {
-                            newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText, false);                        
+                            newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText, false);
                         } else {
                             newTag = new ShapeImporter().importImage((MorphShapeTag) st, data, 0, false);
                         }
@@ -4757,6 +4851,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public File showImportFileChooser(String filter, boolean imagePreview) {
+        return showImportFileChooser(filter, imagePreview, null);
+    }
+
+    public File showImportFileChooser(String filter, boolean imagePreview, String title) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
         JFileChooser fc = new JFileChooser();
@@ -4816,6 +4914,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             first = false;
         }
 
+        if (title != null) {
+            fc.setDialogTitle(title);
+        }
+        
         if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File result = fc.getSelectedFile();
             Configuration.lastOpenDir.set(Helper.fixDialogFile(result).getParentFile().getAbsolutePath());
@@ -4823,7 +4925,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         return null;
-    }        
+    }
 
     private void showDetail(int card) {
         if (debugStackPanel.isActive() && card != DETAILCARDDEBUGSTACKFRAME) {
@@ -4832,9 +4934,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         detailPanel.removeAll();
         int pos = 0;
-        
+
         if (card == DETAILCARDTAGINFO) {
-            detailPanel.addTab(AppStrings.translate("taginfo.header"), tagInfoPanel);        
+            detailPanel.addTab(AppStrings.translate("taginfo.header"), tagInfoPanel);
             if (card == DETAILCARDTAGINFO) {
                 detailPanel.setSelectedIndex(pos);
             }
@@ -4845,15 +4947,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 detailPanel.addTab(AppStrings.translate("traits"), abcPanel.navigatorPanel);
                 if (card == DETAILCARDAS3NAVIGATOR) {
                     detailPanel.setSelectedIndex(pos);
-                }        
+                }
                 pos++;
-            }        
+            }
         }
         if (debugStackPanel.isActive()) {
             detailPanel.addTab(AppStrings.translate("callStack.header"), debugStackPanel);
             if (card == DETAILCARDDEBUGSTACKFRAME) {
                 detailPanel.setSelectedIndex(pos);
-            }        
+            }
             pos++;
         }
         if (currentView != VIEW_DUMP) {
@@ -5121,10 +5223,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 showTreePanelCard(DUMP_VIEW);
                 treePanelMode = TreePanelMode.DUMP_TREE;
                 //showDetail(DETAILCARDEMPTYPANEL);
-                showDetail(DETAILCARDEMPTYPANEL);                
+                showDetail(DETAILCARDEMPTYPANEL);
                 reload(true);
                 updateUiWithCurrentOpenable();
-                detailPanel.setVisible(false);                
+                detailPanel.setVisible(false);
                 return true;
             case VIEW_RESOURCES:
                 pinsPanel.setVisible(true);
@@ -5181,7 +5283,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 showTreePanelCard(TAGLIST_VIEW);
                 treePanelMode = TreePanelMode.TAGLIST_TREE;
-                detailPanel.setVisible(true);                
+                detailPanel.setVisible(true);
                 refreshPins();
                 reload(true);
                 updateUiWithCurrentOpenable();
@@ -5971,7 +6073,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         return new Timelined() {
             private Timeline tim;
-
+                        
             @Override
             public Timeline getTimeline() {
                 if (tim == null) {
@@ -5991,6 +6093,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
 
+            
+            
             private void initTimeline(Timeline timeline) {
                 if (tag instanceof MorphShapeTag) {
                     timeline.frameRate = PreviewExporter.MORPH_SHAPE_ANIMATION_FRAME_RATE;
@@ -6005,6 +6109,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         f.layersChanged = true;
                         timeline.addFrame(f);
                     }
+                    Frame f = new Frame(timeline, framesCnt);
+                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    ds.characterId = ((CharacterTag) tag).getCharacterId();
+                    ds.matrix = new MATRIX();
+                    ds.ratio = 65535;
+                    f.layers.put(1, ds);
+                    f.layersChanged = true;
+                    timeline.addFrame(f);
                 } else if (tag instanceof FontTag) {
                     int pageCount = PreviewPanel.getFontPageCount((FontTag) tag);
                     int frame = fontFrameNum;
@@ -6129,7 +6241,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         setDropTarget(null);
         disposeInner(this);
         Helper.emptyObject(this);
-    }   
+    }
 
     public void updateMissingNeededCharacters() {
         if (calculateMissingNeededThread != null) {
@@ -6179,7 +6291,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }*/
         }
     }
-    
+
     private void calculateMissingNeededCharacters() {
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
         Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
@@ -6304,7 +6416,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return dialog;
     }
-    
+
     public boolean fontEmbed(TreeItem item, boolean create) {
         return previewPanel.getFontPanel().fontEmbed(item, create);
     }
