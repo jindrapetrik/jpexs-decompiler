@@ -4489,29 +4489,29 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             newEndTag.getTimelined().removeTag(newEndTag);
             
-            if (morphShape instanceof DefineMorphShapeTag) {
-                DefineMorphShape2Tag morphShape2 = new DefineMorphShape2Tag(morphShape.getSwf());
-                morphShape.getTimelined().replaceTag(morphShape, morphShape2);
-                morphShape2.setTimelined(morphShape.getTimelined());
-                morphShape = morphShape2;
-            }
+            DefineMorphShape2Tag newMorphShape = new DefineMorphShape2Tag(morphShape.getSwf());
+            newMorphShape.setTimelined(morphShape.getTimelined());
+            SWF.addTagBefore(newMorphShape, morphShape);
             
             MorphShapeGenerator gen = new MorphShapeGenerator();
             try {
-                gen.generate((DefineMorphShape2Tag) morphShape, shapeStart, shapeEnd);                
+                gen.generate(newMorphShape, shapeStart, shapeEnd);                
             } catch (StyleMismatchException sme) {
+                newMorphShape.getTimelined().removeTag(newMorphShape);
+                SWF swf = morphShape.getSwf();            
+                swf.resetTimeline();
+                refreshTree(swf);
                 ViewMessages.showMessageDialog(this, AppStrings.translate("error.morphshape.incompatible"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
+            SWF swf = newMorphShape.getSwf();            
             
-            SWF swf = morphShape.getSwf();            
+            morphShape.getTimelined().removeTag(morphShape);
+            newMorphShape.setCharacterId(morphShape.getCharacterId());
+            swf.updateCharacters();            
             swf.resetTimeline();
             refreshTree(swf);
-            /*if (newTag != null) {
-                
-                setTagTreeSelectedNode(getCurrentTree(), newTag);
-            }*/
-
+            setTagTreeSelectedNode(getCurrentTree(), newMorphShape);           
             swf.clearImageCache();
             swf.clearShapeCache();
         } catch (IOException ex) {
