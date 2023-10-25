@@ -151,9 +151,30 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
                 gradient = g;
             }
         }
-    }        
-    
-    public boolean isCompatibleFillStyle(FILLSTYLE otherFillStyle) {
+    }
+
+    public boolean hasBitmap() {
+        switch (fillStyleType) {
+            case CLIPPED_BITMAP:
+            case NON_SMOOTHED_CLIPPED_BITMAP:
+            case NON_SMOOTHED_REPEATING_BITMAP:
+            case REPEATING_BITMAP:
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasGradient() {
+        switch (fillStyleType) {
+            case LINEAR_GRADIENT:
+            case RADIAL_GRADIENT:
+            case FOCAL_RADIAL_GRADIENT:
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isCompatibleFillStyle(FILLSTYLE otherFillStyle, SWF swf) {
         if (fillStyleType != otherFillStyle.fillStyleType) {
             return false;
         }
@@ -163,7 +184,9 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
             case NON_SMOOTHED_REPEATING_BITMAP:
             case REPEATING_BITMAP:
                 if (bitmapId != otherFillStyle.bitmapId) {
-                    return false;
+                    ImageTag imgThis = swf.getImage(bitmapId);
+                    ImageTag imgOther = swf.getImage(otherFillStyle.bitmapId);
+                    return imgThis.isSameImage(imgOther);
                 }
                 break;
             case LINEAR_GRADIENT:
@@ -176,7 +199,7 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
         return true;
     }
-    
+
     public MORPHFILLSTYLE toMorphStyle() {
         MORPHFILLSTYLE morphFillStyle = new MORPHFILLSTYLE();
         morphFillStyle.bitmapId = bitmapId;
@@ -191,19 +214,19 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         morphFillStyle.fillStyleType = fillStyleType;
         if (gradient != null) {
             morphFillStyle.gradient = gradient.toMorphGradient();
-        }        
-        
+        }
+
         return morphFillStyle;
     }
-    
-    public MORPHFILLSTYLE toMorphStyle(FILLSTYLE endFillStyle) {
-        if (!isCompatibleFillStyle(endFillStyle)) {
+
+    public MORPHFILLSTYLE toMorphStyle(FILLSTYLE endFillStyle, SWF swf) {
+        if (!isCompatibleFillStyle(endFillStyle, swf)) {
             return null;
         }
         MORPHFILLSTYLE morphFillStyle = new MORPHFILLSTYLE();
         morphFillStyle.bitmapId = bitmapId;
         if (bitmapMatrix != null) {
-            morphFillStyle.startBitmapMatrix = new MATRIX(bitmapMatrix);            
+            morphFillStyle.startBitmapMatrix = new MATRIX(bitmapMatrix);
         }
         if (endFillStyle.bitmapMatrix != null) {
             morphFillStyle.endBitmapMatrix = new MATRIX(endFillStyle.bitmapMatrix);
@@ -217,8 +240,8 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         morphFillStyle.fillStyleType = fillStyleType;
         if (gradient != null) {
             morphFillStyle.gradient = gradient.toMorphGradient(endFillStyle.gradient);
-        }        
-        
+        }
+
         return morphFillStyle;
     }
 }

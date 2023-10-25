@@ -46,15 +46,18 @@ class SvgStyle {
     private final SvgImporter importer;
 
     private final Map<String, Element> idMap;
+    
+    private final Map<String, SvgFill> cachedFills;
 
     private final double epsilon = 0.001;
 
     private final Random random = new Random();
 
-    public SvgStyle(SvgImporter importer, Map<String, Element> idMap, Element element) {
+    public SvgStyle(SvgImporter importer, Map<String, Element> idMap, Element element, Map<String, SvgFill> cachedFills) {
         this.importer = importer;
         this.idMap = idMap;
         this.element = element;
+        this.cachedFills = cachedFills;
     }
 
     private Map<String, String> getStyleAttributeValues(Element element) {
@@ -467,7 +470,7 @@ class SvgStyle {
             Node node = stopNodes.item(i);
             if (node instanceof Element) {
                 Element stopEl = (Element) node;
-                SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl);
+                SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl, cachedFills);
 
                 String offsetStr = stopEl.getAttribute("offset");
                 double offset = importer.parseNumberOrPercent(offsetStr);
@@ -560,15 +563,22 @@ class SvgStyle {
 
         if (mPat.matches()) {
             String elementId = mPat.group(1);
+            if (cachedFills.containsKey(elementId)) {
+                return cachedFills.get(elementId);
+            }
             Element e = idMap.get(elementId);
             if (e != null) {
                 String tagName = e.getTagName();
                 if ("linearGradient".equals(tagName)) {
-                    return parseGradient(idMap, e);
+                    SvgFill ret = parseGradient(idMap, e);
+                    cachedFills.put(elementId, ret);
+                    return ret;
                 }
 
                 if ("radialGradient".equals(tagName)) {
-                    return parseGradient(idMap, e);
+                    SvgFill ret = parseGradient(idMap, e);
+                    cachedFills.put(elementId, ret);
+                    return ret;
                 }
 
                 if ("pattern".equals(tagName)) {
@@ -599,6 +609,7 @@ class SvgStyle {
                                     bitmapFill.patternTransform = e.getAttribute("patternTransform");
                                 }
 
+                                cachedFills.put(elementId, bitmapFill);
                                 return bitmapFill;
                             } catch (IOException ex) {
                                 Logger.getLogger(SvgStyle.class.getName()).log(Level.SEVERE, null, ex);

@@ -217,7 +217,8 @@ public class SvgImporter {
 
             this.viewBox = viewBox;
 
-            SvgStyle style = new SvgStyle(this, idMap, rootElement);
+            Map<String, SvgFill> cachedFills = new HashMap<>();
+            SvgStyle style = new SvgStyle(this, idMap, rootElement, cachedFills);
             Matrix transform = new Matrix();
 
             if (fill) {
@@ -232,7 +233,7 @@ public class SvgImporter {
                 transform = transform.preConcatenate(Matrix.getScaleInstance(width / viewBox.width, height / viewBox.height));
             }
 
-            processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape);
+            processSvgObject(idMap, shapeNum, shapes, rootElement, transform, style, morphShape, cachedFills);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
             Logger.getLogger(ShapeImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -318,7 +319,7 @@ public class SvgImporter {
         }
     }
 
-    private void processSwitch(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape) {
+    private void processSwitch(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape, Map<String, SvgFill> cachedFills) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
@@ -329,31 +330,31 @@ public class SvgImporter {
                 if (childElement.hasAttribute("systemLanguage")) {
                     String systemLanguage = childElement.getAttribute("systemLanguage");
                     if (systemLanguage.equals("en-us") || systemLanguage.equals("en")) {
-                        processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
+                        processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape, cachedFills);
                         return;
                     }
                     continue;
                 }
-                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
+                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape, cachedFills);
                 return;
             }
         }
     }
 
-    private void processElement(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape) {
+    private void processElement(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style, boolean morphShape, Map<String, SvgFill> cachedFills) {
         if (element.hasAttribute("requiredExtensions") && !element.getAttribute("requiredExtensions").isEmpty()) {
             return;
         }
         String tagName = element.getTagName();
-        SvgStyle newStyle = new SvgStyle(this, idMap, element);
+        SvgStyle newStyle = new SvgStyle(this, idMap, element, cachedFills);
         Matrix m = Matrix.parseSvgMatrix(element.getAttribute("transform"), 1, 1);
         Matrix m2 = m == null ? transform : transform.concatenate(m);
         if ("switch".equals(tagName)) {
-            processSwitch(element, idMap, shapeNum, shapes, transform, style, morphShape);
+            processSwitch(element, idMap, shapeNum, shapes, transform, style, morphShape, cachedFills);
         } else if ("style".equals(tagName)) {
             processStyle(element);
         } else if ("g".equals(tagName)) {
-            processSvgObject(idMap, shapeNum, shapes, element, m2, newStyle, morphShape);
+            processSvgObject(idMap, shapeNum, shapes, element, m2, newStyle, morphShape, cachedFills);
         } else if ("path".equals(tagName)) {
             processPath(shapeNum, shapes, element, m2, newStyle, morphShape);
         } else if ("circle".equals(tagName)) {
@@ -378,12 +379,12 @@ public class SvgImporter {
         }
     }
 
-    private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style, boolean morphShape) {
+    private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style, boolean morphShape, Map<String, SvgFill> cachedFills) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
                 Element childElement = (Element) childNode;
-                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape);
+                processElement(childElement, idMap, shapeNum, shapes, transform, style, morphShape, cachedFills);
             }
         }
     }

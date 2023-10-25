@@ -74,7 +74,7 @@ public abstract class ImageTag extends DrawableTag {
     public abstract Dimension getImageDimension();
 
     public abstract void setImage(byte[] data) throws IOException;
-    
+
     public abstract ImageFormat getOriginalImageFormat();
 
     public boolean importSupported() {
@@ -314,5 +314,26 @@ public abstract class ImageTag extends DrawableTag {
     @Override
     public RECT getRectWithStrokes() {
         return getRect();
+    }
+
+    public boolean isSameImage(ImageTag otherImage) {
+        SerializableImage imgA = getImageCached();
+        SerializableImage imgB = otherImage.getImageCached();
+        if (imgA.getWidth() != imgB.getWidth() || imgA.getHeight() != imgB.getHeight()) {
+            return false;
+        }
+
+        int width = imgA.getWidth();
+        int height = imgA.getHeight();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (imgA.getRGB(x, y) != imgB.getRGB(x, y)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
