@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.importers.morphshape;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
@@ -46,6 +47,9 @@ import java.util.Set;
 public class MorphShapeGenerator {
 
     public void generate(DefineMorphShape2Tag morphShape, ShapeTag startShape, ShapeTag endShape) throws StyleMismatchException {
+        
+        SWF swf = morphShape.getSwf();
+        
         ShapeForMorphExporter startExport = new ShapeForMorphExporter(startShape);
         startExport.export();
         ShapeForMorphExporter endExport = new ShapeForMorphExporter(endShape);
@@ -86,11 +90,11 @@ public class MorphShapeGenerator {
                 if (((endFillStyle == null && startFillStyle == null)
                         || (startFillStyle != null
                         && endFillStyle != null
-                        && startFillStyle.isCompatibleFillStyle(endFillStyle)))
+                        && startFillStyle.isCompatibleFillStyle(endFillStyle, swf)))
                         && ((endLineStyle == null && startLineStyle == null)
                         || (startLineStyle != null
                         && endLineStyle != null
-                        && startLineStyle.isCompatibleLineStyle(endLineStyle)))) {
+                        && startLineStyle.isCompatibleLineStyle(endLineStyle, swf)))) {
                     double distance = startExport.centralPos.get(a).distance(endExport.centralPos.get(b));
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -135,11 +139,11 @@ public class MorphShapeGenerator {
                         if (((endFillStyle == null && startFillStyle == null)
                                 || (startFillStyle != null
                                 && endFillStyle != null
-                                && startFillStyle.isCompatibleFillStyle(endFillStyle)))
+                                && startFillStyle.isCompatibleFillStyle(endFillStyle, swf)))
                                 && ((endLineStyle == null && startLineStyle == null)
                                 || (startLineStyle != null
                                 && endLineStyle != null
-                                && startLineStyle.isCompatibleLineStyle(endLineStyle)))) {
+                                && startLineStyle.isCompatibleLineStyle(endLineStyle, swf)))) {
                             double distance = startExport.centralPos.get(a).distance(endExport.centralPos.get(b));
                             if (distance < minDistance) {
                                 minDistance = distance;
@@ -199,17 +203,24 @@ public class MorphShapeGenerator {
         for (int i = 0; i < startFillStyles.size(); i++) {
             FILLSTYLE fsStart = startFillStyles.get(i);
             FILLSTYLE fsEnd = endFillStyles.get(i);
-            MORPHFILLSTYLE morphFillStyle = fsStart.toMorphStyle(fsEnd);
+            MORPHFILLSTYLE morphFillStyle = fsStart.toMorphStyle(fsEnd, swf);
             if (morphFillStyle == null) {
                 throw new StyleMismatchException();
             }
             morphFillStyleArray.fillStyles[i] = morphFillStyle;
         }
+        
+        for (int i = 0; i < endFillStyles.size(); i++) {
+            FILLSTYLE fsEnd = endFillStyles.get(i);
+            if (fsEnd.hasBitmap()) {
+                swf.removeTag(swf.getImage(fsEnd.bitmapId));
+            }
+        }
 
         for (int i = 0; i < startLineStyles.size(); i++) {
             LINESTYLE2 lsStart = startLineStyles.get(i);
             LINESTYLE2 lsEnd = endLineStyles.get(i);
-            MORPHLINESTYLE2 morphLineStyle = lsStart.toMorphLineStyle2(lsEnd);
+            MORPHLINESTYLE2 morphLineStyle = lsStart.toMorphLineStyle2(lsEnd, swf);
             if (morphLineStyle == null) {
                 throw new StyleMismatchException();
             }
@@ -219,6 +230,13 @@ public class MorphShapeGenerator {
             }
             if (!morphLineStyle.noHScaleFlag && !morphLineStyle.noVScaleFlag) {
                 morphShape.usesScalingStrokes = true;
+            }
+        }
+        
+        for (int i = 0; i < startLineStyles.size(); i++) {
+            LINESTYLE2 lsEnd = endLineStyles.get(i);
+            if (lsEnd.hasFillFlag && lsEnd.fillType.hasBitmap()) {
+                swf.removeTag(swf.getImage(lsEnd.fillType.bitmapId));
             }
         }
 

@@ -143,7 +143,7 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         this.width = width;
     }        
     
-    public boolean isCompatibleLineStyle(LINESTYLE2 otherLineStyle) {
+    public boolean isCompatibleLineStyle(LINESTYLE2 otherLineStyle, SWF swf) {
         if (startCapStyle != otherLineStyle.startCapStyle) {
             return false;
         }
@@ -173,7 +173,7 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         }
         
         if (hasFillFlag) {
-            if (!fillType.isCompatibleFillStyle(otherLineStyle.fillType)) {
+            if (!fillType.isCompatibleFillStyle(otherLineStyle.fillType, swf)) {
                 return false;
             }
         }
@@ -204,8 +204,8 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         return morphLineStyle2;
     }
 
-    public MORPHLINESTYLE2 toMorphLineStyle2(LINESTYLE2 endLineStyle) {
-        if (!isCompatibleLineStyle(endLineStyle)) {
+    public MORPHLINESTYLE2 toMorphLineStyle2(LINESTYLE2 endLineStyle, SWF swf) {
+        if (!isCompatibleLineStyle(endLineStyle, swf)) {
             return null;
         }
         
@@ -228,7 +228,7 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
             morphLineStyle2.endColor = new RGBA(endLineStyle.color);
         }
         if (hasFillFlag) {
-            morphLineStyle2.fillType = fillType.toMorphStyle(endLineStyle.fillType);
+            morphLineStyle2.fillType = fillType.toMorphStyle(endLineStyle.fillType, swf);
         }
         return morphLineStyle2;
     }

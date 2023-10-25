@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - Centered start playing triangle (Playing on demand)
 - miterLimitFactor is FIXED8 value in MORPHLINESTYLE2
 - Display of morphshape end shape to be exactly at 65535 ratio
+- SVG import - duplicated image on bitmap fill style
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
