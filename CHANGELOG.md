@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Context menu items to create new tags (shape, morphshape, sprite, image, movie, sound, binaryData) from files
   and using font embed dialog for fonts
 - Replacing morphshapes
+- SVG Export - stroke-bitmapId, fill-bitmapId attribute
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -26,9 +27,11 @@ All notable changes to this project will be documented in this file.
 - miterLimitFactor is FIXED8 value in MORPHLINESTYLE2
 - Display of morphshape end shape to be exactly at 65535 ratio
 - SVG import - duplicated image on bitmap fill style
+- Generic tag editor - morphshape fill - show bitmapId for repeating bitmap fill, gradient matrix for focal gradient
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
+- SVG export - attributes like data-characterId and data-characterName moved under `ffdec:` namespace
 
 ## [19.1.2] - 2023-10-16
 ### Fixed

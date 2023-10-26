@@ -61,6 +61,8 @@ public class SVGExporter {
     protected static final String sNamespace = "http://www.w3.org/2000/svg";
 
     protected static final String xlinkNamespace = "http://www.w3.org/1999/xlink";
+    
+    protected static final String ffdecNamespace = "https://www.free-decompiler.com/flash";
 
     protected Document _svg;
 
@@ -97,6 +99,7 @@ public class SVGExporter {
             _svg = impl.createDocument(sNamespace, "svg", svgDocType);
             Element svgRoot = _svg.getDocumentElement();
             svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
+            svgRoot.setAttribute("xmlns:ffdec", ffdecNamespace);
             if (bounds != null) {
                 if (Configuration.svgRetainBounds.get()) {
                     svgRoot.setAttribute("width", (bounds.xMax / SWF.unitDivisor) + "px");
@@ -416,10 +419,10 @@ public class SVGExporter {
             image.setAttribute("id", instanceName);
         }
         if (characterId != null) {
-            image.setAttribute("data-characterId", characterId);
+            image.setAttribute("ffdec:characterId", characterId);
         }
-        if (characterName != null) {
-            image.setAttribute("data-characterName", characterName);
+        if (characterName != null && !characterName.isEmpty()) {
+            image.setAttribute("ffdec:characterName", characterName);
         }
         setBlendMode(image, blendMode);
         handleFilters(image, filters);
@@ -469,10 +472,10 @@ public class SVGExporter {
             image.setAttribute("id", instanceName);
         }
         if (characterId != null) {
-            image.setAttribute("data-characterId", characterId);
+            image.setAttribute("ffdec:characterId", characterId);
         }
-        if (characterName != null) {
-            image.setAttribute("data-characterName", characterName);
+        if (characterName != null && !characterName.isEmpty()) {
+            image.setAttribute("ffdec:characterName", characterName);
         }
 
         setBlendMode(image, blendMode);
