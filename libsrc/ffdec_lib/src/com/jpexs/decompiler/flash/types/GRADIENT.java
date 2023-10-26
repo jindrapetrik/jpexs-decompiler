@@ -63,7 +63,7 @@ public class GRADIENT implements Serializable {
     @SWFArray(value = "record")
     public GRADRECORD[] gradientRecords = new GRADRECORD[0];        
     
-    public boolean isCompatibleGradient(GRADIENT otherGradient) {
+    public boolean isCompatibleGradient(GRADIENT otherGradient) {                
         if (interpolationMode != otherGradient.interpolationMode) {
             return false;
         }
@@ -91,12 +91,21 @@ public class GRADIENT implements Serializable {
         if (!isCompatibleGradient(endGradient)) {
             return null;
         }
-        MORPHGRADIENT morphGradient = new MORPHGRADIENT();
+        MORPHGRADIENT morphGradient;
+        if (endGradient instanceof FOCALGRADIENT) {
+            morphGradient = new MORPHFOCALGRADIENT();
+        } else {
+            morphGradient = new MORPHGRADIENT();
+        }
         morphGradient.interPolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
             morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord();
+        }
+        if (endGradient instanceof FOCALGRADIENT) {
+            ((MORPHFOCALGRADIENT)morphGradient).startFocalPoint = 0;
+            ((MORPHFOCALGRADIENT)morphGradient).endFocalPoint = ((FOCALGRADIENT)endGradient).focalPoint;
         }
         return morphGradient;
     }

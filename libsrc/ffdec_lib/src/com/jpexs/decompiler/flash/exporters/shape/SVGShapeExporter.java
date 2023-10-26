@@ -158,6 +158,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             return;
         }
         path.setAttribute("fill", "#ff0000");
+        path.setAttribute("ffdec:fill-bitmapId", "" + bitmapId);
     }
 
     @Override
@@ -229,7 +230,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         String patternId = getPattern(bitmapId, matrix, colorTransform);
         if (patternId != null) {
             path.setAttribute("stroke", "url(#" + patternId + ")");
-            return;
+            path.setAttribute("ffdec:stroke-bitmapId", "" + bitmapId);            
         }
     }
 
