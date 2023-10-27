@@ -162,7 +162,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             path.setAttribute("stroke", color.toHexRGB());
             path.appendChild(createAnimateElement("stroke", color.toHexRGB(), colorEnd.toHexRGB()));
         }
-        path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
+        path.setAttribute("stroke-width", Double.toString(thickness));
         path.appendChild(createAnimateElement("stroke-width", thickness, thicknessEnd));
 
         if (color instanceof RGBA) {
