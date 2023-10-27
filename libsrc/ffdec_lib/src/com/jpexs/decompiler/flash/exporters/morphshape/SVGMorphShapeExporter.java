@@ -89,7 +89,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? exporter.createElement("linearGradient")
                 : exporter.createElement("radialGradient");
-        populateGradientElement(gradient, type, gradientRecords, gradientRecordsEnd, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, gradientRecordsEnd, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio, focalPointRatioEnd);
         int id = exporter.gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -206,7 +206,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? exporter.createElement("linearGradient")
                 : exporter.createElement("radialGradient");
-        populateGradientElement(gradient, type, gradientRecords, gradientRecordsEnd, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio);
+        populateGradientElement(gradient, type, gradientRecords, gradientRecordsEnd, matrix, matrixEnd, spreadMethod, interpolationMethod, focalPointRatio, focalPointRatioEnd);
         int id = exporter.gradients.indexOf(gradient);
         if (id < 0) {
             // todo: filter same gradients
@@ -247,7 +247,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
         // QR decomposition
         double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
-        double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);
+        double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);       
         double a = matrix.scaleX;
         double b = matrix.rotateSkew0;
         double c = matrix.rotateSkew1;
@@ -402,7 +402,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
          element.appendChild(animateSkewX);*/
     }
 
-    protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+    protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
             gradient.setAttribute("x1", "-819.2");
@@ -414,6 +414,9 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
             if (focalPointRatio != 0) {
                 gradient.setAttribute("fx", Double.toString(819.2 * focalPointRatio));
                 gradient.setAttribute("fy", "0");
+            }
+            if (focalPointRatio != 0 || focalPointRatioEnd != 0) {
+                gradient.appendChild(createAnimateElement("fx", Double.toString(819.2 * focalPointRatio), Double.toString(819.2 * focalPointRatioEnd)));
             }
         }
         switch (spreadMethod) {

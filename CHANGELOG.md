@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Display of morphshape end shape to be exactly at 65535 ratio
 - SVG import - duplicated image on bitmap fill style
 - Generic tag editor - morphshape fill - show bitmapId for repeating bitmap fill, gradient matrix for focal gradient
+- Morphshape SVG export - focalPoint animation
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
