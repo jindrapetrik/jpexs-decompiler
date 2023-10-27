@@ -592,7 +592,7 @@ class SvgStyle {
                     for (int i = 0; i < childNodes.getLength(); i++) {
                         if (childNodes.item(i) instanceof Element) {
                             
-                            if ("animateTransform".equals(((Element)childNodes.item(i)).getTagName())) {
+                            if ("animateTransform".equals(((Element) childNodes.item(i)).getTagName())) {
                                 continue;
                             }
                             

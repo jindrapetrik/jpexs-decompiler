@@ -253,7 +253,7 @@ public class SvgImporter {
                     rootElement.hasAttribute("ffdec:objectType")
                     && "morphshape".equals(rootElement.getAttribute("ffdec:objectType"))
                     && applyAnimation(rootElement)
-                    ) {
+            ) {
                 processSvgObject(idMap, shapeNum, shapes2, rootElement, transform, style, morphShape, cachedBitmaps, true);
             }
         } catch (SAXException | IOException | ParserConfigurationException ex) {
@@ -299,7 +299,7 @@ public class SvgImporter {
                         String values = childElement.getAttribute("values");
                         String attributeName = childElement.getAttribute("attributeName");
                         if (values.contains(";")) {
-                            String parts[] = values.split(";");
+                            String[] parts = values.split(";");
                             if (parts.length >= 2) {
                                 element.setAttribute(attributeName, parts[1]);
                                 result = true;
@@ -310,7 +310,7 @@ public class SvgImporter {
                     if (childElement.hasAttribute("attributeName") 
                             && childElement.hasAttribute("type")
                             && (childElement.hasAttribute("to") || childElement.hasAttribute("values"))
-                            ) {
+                    ) {
                         String type = childElement.getAttribute("type");
                         String additive = childElement.hasAttribute("additive") ? childElement.getAttribute("additive") : "replace";
                         String attributeName = childElement.getAttribute("attributeName");                        
@@ -321,7 +321,7 @@ public class SvgImporter {
                         } else if (childElement.hasAttribute("to")) {
                             to = childElement.getAttribute("to");
                         }
-                        String toParts[] = Matrix.parseSvgNumberList(to);
+                        String[] toParts = Matrix.parseSvgNumberList(to);
                                 
                         Matrix newMatrix = null;
                         switch (type) {

@@ -71,7 +71,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
         }        
         morphGradient.startFocalPoint = focalPoint;
         if (endGradient instanceof FOCALGRADIENT) {
-            morphGradient.endFocalPoint = ((FOCALGRADIENT)endGradient).focalPoint;
+            morphGradient.endFocalPoint = ((FOCALGRADIENT) endGradient).focalPoint;
         } else {
             morphGradient.endFocalPoint = 0;
         }
