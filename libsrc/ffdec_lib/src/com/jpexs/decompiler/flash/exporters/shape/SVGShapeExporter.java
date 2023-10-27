@@ -169,7 +169,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         if (color != null) {
             path.setAttribute("stroke", color.toHexRGB());
         }
-        path.setAttribute("stroke-width", Double.toString(thickness == 0 ? 1 : thickness));
+        path.setAttribute("stroke-width", Double.toString(thickness));
         if (color instanceof RGBA) {
             RGBA colorA = (RGBA) color;
             if (colorA.alpha != 255) {

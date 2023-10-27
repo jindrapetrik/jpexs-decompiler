@@ -407,6 +407,12 @@ public class BitmapExporter extends ShapeExporterBase {
         finalizePath();
         linePaint = null;
         lineTransform = null;
+        
+        if (thickness == 0) {
+            lineColor = null;
+            return;
+        }
+        
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
