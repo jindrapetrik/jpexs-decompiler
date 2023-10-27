@@ -104,8 +104,8 @@ public class GRADIENT implements Serializable {
             morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord(endGradient.gradientRecords[i]);
         }
         if (endGradient instanceof FOCALGRADIENT) {
-            ((MORPHFOCALGRADIENT)morphGradient).startFocalPoint = 0;
-            ((MORPHFOCALGRADIENT)morphGradient).endFocalPoint = ((FOCALGRADIENT)endGradient).focalPoint;
+            ((MORPHFOCALGRADIENT) morphGradient).startFocalPoint = 0;
+            ((MORPHFOCALGRADIENT) morphGradient).endFocalPoint = ((FOCALGRADIENT) endGradient).focalPoint;
         }
         return morphGradient;
     }
