@@ -88,7 +88,7 @@ public class SVGExporter {
 
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
-    public SVGExporter(ExportRectangle bounds, double zoom) {
+    public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -110,11 +110,12 @@ public class SVGExporter {
                 }
                 createDefGroup(bounds, null, zoom);
             }
+            svgRoot.setAttribute("ffdec:objectType", objectType);
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         gradients = new ArrayList<>();
-    }
+    }        
 
     private Element getDefs() {
         if (_svgDefs == null) {

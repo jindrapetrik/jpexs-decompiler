@@ -47,17 +47,17 @@ class SvgStyle {
 
     private final Map<String, Element> idMap;
     
-    private final Map<String, SvgFill> cachedFills;
+    private final Map<String, Integer> cachedBitmaps;
 
     private final double epsilon = 0.001;
 
     private final Random random = new Random();
 
-    public SvgStyle(SvgImporter importer, Map<String, Element> idMap, Element element, Map<String, SvgFill> cachedFills) {
+    public SvgStyle(SvgImporter importer, Map<String, Element> idMap, Element element, Map<String, Integer> cachedBitmaps) {
         this.importer = importer;
         this.idMap = idMap;
         this.element = element;
-        this.cachedFills = cachedFills;
+        this.cachedBitmaps = cachedBitmaps;
     }
 
     private Map<String, String> getStyleAttributeValues(Element element) {
@@ -470,7 +470,7 @@ class SvgStyle {
             Node node = stopNodes.item(i);
             if (node instanceof Element) {
                 Element stopEl = (Element) node;
-                SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl, cachedFills);
+                SvgStyle newStyle = new SvgStyle(importer, idMap, stopEl, cachedBitmaps);
 
                 String offsetStr = stopEl.getAttribute("offset");
                 double offset = importer.parseNumberOrPercent(offsetStr);
@@ -563,21 +563,26 @@ class SvgStyle {
 
         if (mPat.matches()) {
             String elementId = mPat.group(1);
-            if (cachedFills.containsKey(elementId)) {
-                return cachedFills.get(elementId);
-            }
-            Element e = idMap.get(elementId);
+            Element e = idMap.get(elementId);            
             if (e != null) {
+                if (cachedBitmaps.containsKey(elementId)) {
+                    SvgBitmapFill bitmapFill = new SvgBitmapFill();
+                    int bitmapId = cachedBitmaps.get(elementId);
+                    bitmapFill.characterId = bitmapId;
+                    if (e.hasAttribute("patternTransform")) {
+                        bitmapFill.patternTransform = e.getAttribute("patternTransform");
+                    }
+                    return bitmapFill;                    
+                }
+            
                 String tagName = e.getTagName();
                 if ("linearGradient".equals(tagName)) {
                     SvgFill ret = parseGradient(idMap, e);
-                    cachedFills.put(elementId, ret);
                     return ret;
                 }
 
                 if ("radialGradient".equals(tagName)) {
                     SvgFill ret = parseGradient(idMap, e);
-                    cachedFills.put(elementId, ret);
                     return ret;
                 }
 
@@ -586,9 +591,14 @@ class SvgStyle {
                     NodeList childNodes = e.getChildNodes();
                     for (int i = 0; i < childNodes.getLength(); i++) {
                         if (childNodes.item(i) instanceof Element) {
-                            if (element != null) {
+                            
+                            if ("animateTransform".equals(((Element)childNodes.item(i)).getTagName())) {
+                                continue;
+                            }
+                            
+                            if (element != null) {                                
                                 element = null;
-                                break;
+                                break;                                
                             }
 
                             element = (Element) childNodes.item(i);
@@ -609,7 +619,7 @@ class SvgStyle {
                                     bitmapFill.patternTransform = e.getAttribute("patternTransform");
                                 }
 
-                                cachedFills.put(elementId, bitmapFill);
+                                cachedBitmaps.put(elementId, imageTag.characterID);
                                 return bitmapFill;
                             } catch (IOException ex) {
                                 Logger.getLogger(SvgStyle.class.getName()).log(Level.SEVERE, null, ex);

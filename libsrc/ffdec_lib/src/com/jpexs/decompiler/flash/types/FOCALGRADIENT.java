@@ -67,8 +67,8 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
-            morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord();
-        }
+            morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord(endGradient.gradientRecords[i]);
+        }        
         morphGradient.startFocalPoint = focalPoint;
         if (endGradient instanceof FOCALGRADIENT) {
             morphGradient.endFocalPoint = ((FOCALGRADIENT)endGradient).focalPoint;

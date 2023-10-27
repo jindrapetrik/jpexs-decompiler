@@ -211,8 +211,9 @@ public class MorphShapeGenerator {
         }
         
         for (int i = 0; i < endFillStyles.size(); i++) {
+            FILLSTYLE fsStart = startFillStyles.get(i);
             FILLSTYLE fsEnd = endFillStyles.get(i);
-            if (fsEnd.hasBitmap()) {
+            if (fsEnd.hasBitmap() && fsEnd.bitmapId != fsStart.bitmapId) {
                 swf.removeTag(swf.getImage(fsEnd.bitmapId));
             }
         }

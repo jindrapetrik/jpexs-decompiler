@@ -213,6 +213,8 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
         morphFillStyle.fillStyleType = fillStyleType;
         if (gradient != null) {
+            morphFillStyle.startGradientMatrix = gradientMatrix;
+            morphFillStyle.endGradientMatrix = gradientMatrix;
             morphFillStyle.gradient = gradient.toMorphGradient();
         }
 
@@ -239,6 +241,8 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
         morphFillStyle.fillStyleType = fillStyleType;
         if (gradient != null) {
+            morphFillStyle.startGradientMatrix = gradientMatrix;
+            morphFillStyle.endGradientMatrix = endFillStyle.gradientMatrix;
             morphFillStyle.gradient = gradient.toMorphGradient(endFillStyle.gradient);
         }
 

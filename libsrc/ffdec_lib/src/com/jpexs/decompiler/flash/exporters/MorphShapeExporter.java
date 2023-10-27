@@ -102,7 +102,7 @@ public class MorphShapeExporter {
                                 rect.yMax *= settings.zoom;
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
-                                SVGExporter exporter = new SVGExporter(rect, settings.zoom);
+                                SVGExporter exporter = new SVGExporter(rect, settings.zoom, "morphshape");
                                 mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }

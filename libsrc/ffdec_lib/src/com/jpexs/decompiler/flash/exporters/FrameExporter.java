@@ -224,7 +224,7 @@ public class FrameExporter {
                         rect.yMax *= settings.zoom;
                         rect.xMin *= settings.zoom;
                         rect.yMin *= settings.zoom;
-                        SVGExporter exporter = new SVGExporter(rect, settings.zoom);
+                        SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame");
                         if (fbackgroundColor != null) {
                             exporter.setBackGroundColor(fbackgroundColor);
                         }

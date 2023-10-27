@@ -245,7 +245,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
         currentFillStyle = fillStyles.size();
         FILLSTYLE fillStyle = new FILLSTYLE();
         fillStyle.fillStyleType = type;
-        fillStyle.gradient = focalPointRatio == 0 ? new FOCALGRADIENT() : new GRADIENT();
+        fillStyle.gradient = focalPointRatio == 0 ? new GRADIENT() : new FOCALGRADIENT();
         fillStyle.gradient.gradientRecords = Helper.deepCopy(gradientRecords);
         fillStyle.gradientMatrix = matrix.toMATRIX();
         fillStyle.gradient.spreadMode = spreadMethod;

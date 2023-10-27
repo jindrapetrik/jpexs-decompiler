@@ -4436,11 +4436,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return false;
         }
         
-        File fileEnd = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.endShape"));
-
-        if (fileEnd == null) {
-            fileEnd = fileStart;
-        }
+        
         
         DefineShape4Tag shapeStart = new DefineShape4Tag(morphShape.getSwf());
         SWF.addTagBefore(shapeStart, morphShape);
@@ -4459,36 +4455,45 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             dataStart = Helper.readFile(selfileStart.getAbsolutePath());
         }
-        
-        File selfileEnd = Helper.fixDialogFile(fileEnd);        
-        byte[] dataEnd = null;
-        String svgTextEnd = null;
-        if (".svg".equals(Path.getExtension(selfileEnd))) {
-            svgTextEnd = Helper.readTextFile(selfileEnd.getAbsolutePath());
-            if (!svgWarningShown) {
-                showSvgImportWarning();
-            }
-        } else {
-            dataEnd = Helper.readFile(selfileEnd.getAbsolutePath());
-        }
+                
         
         try {
             Tag newStartTag;
             if (svgTextStart != null) {
-                newStartTag = new SvgImporter().importSvg(shapeStart, svgTextStart, false);
+                newStartTag = new SvgImporter().importSvg(shapeStart, shapeEnd, svgTextStart, false);
             } else {
                 newStartTag = new ShapeImporter().importImage(shapeStart, dataStart, 0, false);
             }
             newStartTag.getTimelined().removeTag(newStartTag);
                         
-            Tag newEndTag;
-            if (svgTextStart != null) {
-                newEndTag = new SvgImporter().importSvg(shapeEnd, svgTextEnd, false);
-            } else {
-                newEndTag = new ShapeImporter().importImage(shapeEnd, dataEnd, 0, false);
+            if (shapeEnd.shapes.shapeRecords.size() <= 1) {
+                File fileEnd = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, AppStrings.translate("dialog.morphshape.endShape"));
+
+                if (fileEnd == null) {
+                    fileEnd = fileStart;
+                }
+                
+                File selfileEnd = Helper.fixDialogFile(fileEnd);        
+                byte[] dataEnd = null;
+                String svgTextEnd = null;
+                if (".svg".equals(Path.getExtension(selfileEnd))) {
+                    svgTextEnd = Helper.readTextFile(selfileEnd.getAbsolutePath());
+                    if (!svgWarningShown) {
+                        showSvgImportWarning();
+                    }
+                } else {
+                    dataEnd = Helper.readFile(selfileEnd.getAbsolutePath());
+                }
+                
+                Tag newEndTag;
+                if (svgTextEnd != null) {
+                    newEndTag = new SvgImporter().importSvg(shapeEnd, svgTextEnd, false);
+                } else {
+                    newEndTag = new ShapeImporter().importImage(shapeEnd, dataEnd, 0, false);
+                }
+                newEndTag.getTimelined().removeTag(newEndTag);
             }
-            newEndTag.getTimelined().removeTag(newEndTag);
-            
+                                    
             DefineMorphShape2Tag newMorphShape = new DefineMorphShape2Tag(morphShape.getSwf());
             newMorphShape.setTimelined(morphShape.getTimelined());
             SWF.addTagBefore(newMorphShape, morphShape);
