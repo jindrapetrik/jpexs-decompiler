@@ -165,7 +165,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     }
 
     @Override
-    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         finalizePath();
         thickness *= zoom / SWF.unitDivisor;
         thicknessEnd *= zoom / SWF.unitDivisor;

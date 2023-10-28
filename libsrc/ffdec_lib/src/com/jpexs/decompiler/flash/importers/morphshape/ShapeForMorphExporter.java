@@ -304,7 +304,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
+    public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         endCurrent();
         currentLineStyle = lineStyles.size();
         LINESTYLE2 lineStyle = new LINESTYLE2();
@@ -327,6 +327,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
         lineStyle.endCapStyle = endCaps;
         lineStyle.joinStyle = joints;
         lineStyle.miterLimitFactor = miterLimit;
+        lineStyle.noClose = noClose;
         lineStyles.add(lineStyle);
     }
 

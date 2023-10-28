@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - Not updating Morphshape end bounds
 - SVG import - linear gradients
 - SVG import - Do not use fill winding nonzero when only stroking
+- Morphshape SVG export - closing the stroke
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)

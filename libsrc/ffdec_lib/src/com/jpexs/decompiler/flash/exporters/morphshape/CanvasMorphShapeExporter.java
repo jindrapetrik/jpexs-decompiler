@@ -45,6 +45,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     protected static final String DRAW_COMMAND_L = "L";
 
     protected static final String DRAW_COMMAND_Q = "Q";
+    
+    protected static final String DRAW_COMMAND_Z = "Z";
 
     protected String currentDrawCommand = "";
 
@@ -151,7 +153,10 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     @Override
-    public void endLines() {
+    public void endLines(boolean close) {
+        if (close) {
+            pathData.append(DRAW_COMMAND_Z).append(" ");
+        }
         finalizePath();
     }
 
@@ -248,7 +253,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     }
 
     @Override
-    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit) {
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         finalizePath();
         thickness /= SWF.unitDivisor;
         thicknessEnd /= SWF.unitDivisor;
