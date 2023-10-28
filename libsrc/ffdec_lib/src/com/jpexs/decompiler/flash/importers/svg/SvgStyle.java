@@ -572,6 +572,17 @@ class SvgStyle {
                     if (e.hasAttribute("patternTransform")) {
                         bitmapFill.patternTransform = e.getAttribute("patternTransform");
                     }
+                    if (e.hasAttribute("ffdec:smoothed")) {
+                        String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
+                        if ("true".equals(smoothedValue)) {
+                            bitmapFill.smoothed = true;
+                        }
+                        if ("false".equals(smoothedValue)) {
+                            bitmapFill.smoothed = false;
+                        }
+                    } else {
+                        bitmapFill.smoothed = true;
+                    }
                     return bitmapFill;                    
                 }
             
@@ -617,6 +628,17 @@ class SvgStyle {
                                 bitmapFill.characterId = imageTag.characterID;
                                 if (e.hasAttribute("patternTransform")) {
                                     bitmapFill.patternTransform = e.getAttribute("patternTransform");
+                                }
+                                if (e.hasAttribute("ffdec:smoothed")) {
+                                    String smoothedValue = e.getAttribute("ffdec:smoothed").trim();
+                                    if ("true".equals(smoothedValue)) {
+                                        bitmapFill.smoothed = true;
+                                    }
+                                    if ("false".equals(smoothedValue)) {
+                                        bitmapFill.smoothed = false;
+                                    }
+                                } else {
+                                    bitmapFill.smoothed = true;
                                 }
 
                                 cachedBitmaps.put(elementId, imageTag.characterID);

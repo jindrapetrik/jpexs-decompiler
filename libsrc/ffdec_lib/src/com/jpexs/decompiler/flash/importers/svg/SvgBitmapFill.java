@@ -27,6 +27,8 @@ class SvgBitmapFill extends SvgFill {
     public String patternTransform;
 
     public int characterId;
+    
+    public boolean smoothed = true;
 
     @Override
     public Color toColor() {

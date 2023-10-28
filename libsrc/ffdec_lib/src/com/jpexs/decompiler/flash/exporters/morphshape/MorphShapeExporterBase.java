@@ -472,6 +472,19 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                             (fillStyleEnd.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyleEnd.gradient).focalPoint : 0
                                     );
                                     break;
+                                case FILLSTYLE.CLIPPED_BITMAP:
+                                case FILLSTYLE.REPEATING_BITMAP:
+                                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
+                                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+                                    Matrix bmatrix = new Matrix(fillStyle.bitmapMatrix);
+                                    Matrix bmatrixEnd = new Matrix(fillStyleEnd.bitmapMatrix);
+                                    lineBitmapStyle(fillStyle.bitmapId,
+                                            bmatrix,
+                                            bmatrixEnd,
+                                            (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
+                                            (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
+                                            colorTransform);
+                                    break;
                             }
                         }
                     } else {

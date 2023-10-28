@@ -1892,7 +1892,7 @@ public class SvgImporter {
             }
         } else if (fill instanceof SvgBitmapFill) {
             SvgBitmapFill bfill = (SvgBitmapFill) fill;
-            fillStyle.fillStyleType = FILLSTYLE.REPEATING_BITMAP;
+            fillStyle.fillStyleType = bfill.smoothed ? FILLSTYLE.REPEATING_BITMAP : FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP;
             fillStyle.bitmapId = bfill.characterId;
             Matrix fillMatrix = Matrix.parseSvgMatrix(bfill.patternTransform, SWF.unitDivisor, SWF.unitDivisor);
             fillMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(fillMatrix);
