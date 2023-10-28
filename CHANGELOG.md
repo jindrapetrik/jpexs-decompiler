@@ -30,6 +30,8 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - morphshape fill - show bitmapId for repeating bitmap fill, gradient matrix for focal gradient
 - Morphshape SVG export - focalPoint animation
 - Do not display lines with zero width
+- Not updating Morphshape end bounds
+- SVG import - linear gradients
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)

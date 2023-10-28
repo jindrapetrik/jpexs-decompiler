@@ -353,7 +353,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceNoFillMenuItem = new JMenuItem(mainPanel.translate("button.replaceNoFill"));
         replaceNoFillMenuItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {                
                 mainPanel.replaceNoFillButtonActionPerformed(getCurrentItem());
             }
         });
@@ -1046,6 +1046,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         
         if (canReplace.test(it -> it instanceof MorphShapeTag)) {
             replaceMenuItem.setVisible(true);
+            replaceNoFillMenuItem.setVisible(true);
         }
         
         if (canReplace.test(it -> it instanceof DefineBinaryDataTag)) {
@@ -3830,7 +3831,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 remove = !mainPanel.replaceNoFill(tag);
                 break;
             case MORPH_SHAPE:
-                remove = !mainPanel.replaceMorphShape((MorphShapeTag) tag, true);
+                remove = !mainPanel.replaceMorphShape((MorphShapeTag) tag, true, false);
                 break;
             case FONT:
                 remove = !mainPanel.fontEmbed(tag, true);
