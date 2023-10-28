@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Do not display lines with zero width
 - Not updating Morphshape end bounds
 - SVG import - linear gradients
+- SVG import - Do not use fill winding nonzero when only stroking
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
