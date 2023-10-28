@@ -371,7 +371,7 @@ public abstract class MorphShapeTag extends DrawableTag {
     }
 
     public void updateEndBounds() {
-        startBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, morphLineStyles.getEndLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
+        endBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, morphLineStyles.getEndLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
     }
 
     public void updateBounds() {

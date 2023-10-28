@@ -192,6 +192,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton replaceShapeButton;
     
     private JButton replaceMorphShapeButton;
+    
+    private JButton replaceMorphShapeUpdateBoundsButton;
 
     private JButton replaceShapeUpdateBoundsButton;
 
@@ -1310,10 +1312,20 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceMorphShapeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceMorphShape((MorphShapeTag) mainPanel.getCurrentTree().getCurrentTreeItem(), false);
+                mainPanel.replaceMorphShape((MorphShapeTag) mainPanel.getCurrentTree().getCurrentTreeItem(), false, true);
             }
         });
         replaceMorphShapeButton.setVisible(false);
+        
+        replaceMorphShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importmorphshape16"));
+        replaceMorphShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceMorphShapeUpdateBoundsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceMorphShape((MorphShapeTag) mainPanel.getCurrentTree().getCurrentTreeItem(), false, false);
+            }
+        });
+        replaceMorphShapeUpdateBoundsButton.setVisible(false);
 
         replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshape16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
@@ -1375,8 +1387,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditButtonsPanel.add(displayEditEditPointsButton);
         //displayEditButtonsPanel.add(fixPathsButton);
         displayEditButtonsPanel.add(replaceShapeButton);
-        displayEditButtonsPanel.add(replaceMorphShapeButton);
         displayEditButtonsPanel.add(replaceShapeUpdateBoundsButton);
+        displayEditButtonsPanel.add(replaceMorphShapeButton);
+        displayEditButtonsPanel.add(replaceMorphShapeUpdateBoundsButton);
         displayEditButtonsPanel.add(morphShowPanel);
         return displayEditButtonsPanel;
     }
@@ -1737,10 +1750,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageAlphaButton.setVisible(showAlpha);
         replaceSpriteButton.setVisible(showSprite);
         replaceShapeButton.setVisible(showShape);
-        replaceMorphShapeButton.setVisible(showMorphShape);
+        replaceMorphShapeButton.setVisible(showMorphShape);        
         morphShowPanel.setVisible(showMorphShape);
         displayEditEditPointsButton.setVisible(showShape || showMorphShape);
         replaceShapeUpdateBoundsButton.setVisible(showShape);
+        replaceMorphShapeUpdateBoundsButton.setVisible(showMorphShape);
         replaceSoundButton.setVisible(showSound);
         replaceMovieButton.setVisible(showMovie);
         prevFontsButton.setVisible(false);
@@ -2333,6 +2347,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         
         if (displayEditTag instanceof MorphShapeTag) {
             replaceMorphShapeButton.setVisible(true);
+            replaceMorphShapeUpdateBoundsButton.setVisible(true);
             displayEditEditPointsButton.setVisible(true);
         }
 
@@ -2384,8 +2399,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
         replaceShapeButton.setVisible(false);
-        replaceMorphShapeButton.setVisible(false);
+        replaceMorphShapeButton.setVisible(false);        
         replaceShapeUpdateBoundsButton.setVisible(false);
+        replaceMorphShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
         mainPanel.setEditingStatus();
     }
@@ -2418,6 +2434,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
+        replaceMorphShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
 
         if ((displayEditTag instanceof MorphShapeTag) && (morphDisplayMode == MORPH_ANIMATE)) {
@@ -2519,6 +2536,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
+        replaceMorphShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
 
         morphShowPanel.setVisible(false);
@@ -2815,6 +2833,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (displayEditTag instanceof MorphShapeTag) {
             morphShowPanel.setVisible(true);
             replaceMorphShapeButton.setVisible(true);
+            replaceMorphShapeUpdateBoundsButton.setVisible(true);
             displayEditEditPointsButton.setVisible(true);
         }
 

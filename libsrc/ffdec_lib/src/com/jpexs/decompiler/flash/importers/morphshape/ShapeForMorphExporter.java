@@ -309,7 +309,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
         currentLineStyle = lineStyles.size();
         LINESTYLE2 lineStyle = new LINESTYLE2();
         lineStyle.width = (int) thickness;
-        lineStyle.color = new RGBA(color);
+        lineStyle.color = color == null ? null : new RGBA(color);
         lineStyle.pixelHintingFlag = pixelHinting;
         switch (scaleMode) {
             case "NONE":
