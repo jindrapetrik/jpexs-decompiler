@@ -242,22 +242,18 @@ public class XFLConverter {
         return "" + strValue;
     }
 
-    private static void convertShapeEdge(MATRIX mat, ShapeRecordAdvanced record, double x, double y, StringBuilder ret) {
+    private static String convertShapeEdge(ShapeRecordAdvanced record, double x, double y) {
         if (record instanceof StyleChangeRecordAdvanced) {
             StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) record;
             Point2D p = new Point2D.Double(scr.moveDeltaX, scr.moveDeltaY);
             if (scr.stateMoveTo) {
-                ret.append("! ").append(formatEdgeDouble(p.getX(), false)).append(" ").append(formatEdgeDouble(p.getY(), false));
+                return "! " + formatEdgeDouble(p.getX(), false) + " " + formatEdgeDouble(p.getY(), false);
             }
         } else if (record instanceof StraightEdgeRecordAdvanced) {
             StraightEdgeRecordAdvanced ser = (StraightEdgeRecordAdvanced) record;
-            y += ser.deltaY;
-            x += ser.deltaX;
-            Point2D p = new Point2D.Double(x, y);
-            ret.append("| ");
-            ret.append(formatEdgeDouble(p.getX(), false));
-            ret.append(" ");
-            ret.append(formatEdgeDouble(p.getY(), false));
+            Point2D p = new Point2D.Double(x + ser.deltaX, y + ser.deltaY);
+            return "! " + formatEdgeDouble(x, false) + " " + formatEdgeDouble(y, false)
+                    + "| " + formatEdgeDouble(p.getX(), false) + " " + formatEdgeDouble(p.getY(), false);
         } else if (record instanceof CurvedEdgeRecordAdvanced) {
             CurvedEdgeRecordAdvanced cer = (CurvedEdgeRecordAdvanced) record;
             double controlX = cer.controlDeltaX + x;
@@ -266,8 +262,10 @@ public class XFLConverter {
             double anchorY = cer.anchorDeltaY + controlY;
             Point2D control = new Point2D.Double(controlX, controlY);
             Point2D anchor = new Point.Double(anchorX, anchorY);
-            ret.append("[ ").append(formatEdgeDouble(control.getX(), true)).append(" ").append(formatEdgeDouble(control.getY(), true)).append(" ").append(formatEdgeDouble(anchor.getX(), true)).append(" ").append(formatEdgeDouble(anchor.getY(), true));
+            return "! " + formatEdgeDouble(x, false) + " " + formatEdgeDouble(y, false)
+                    + "[ " + formatEdgeDouble(control.getX(), true) + " " + formatEdgeDouble(control.getY(), true) + " " + formatEdgeDouble(anchor.getX(), true) + " " + formatEdgeDouble(anchor.getY(), true);
         }
+        return "";
     }
 
     private static void convertShapeEdges(boolean close, double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {
@@ -289,6 +287,10 @@ public class XFLConverter {
         double lastMoveToX = startX;
         double lastMoveToY = startY;
 
+        int fillStyle0 = 0;
+        int fillStyle1 = 0;
+        int lineStyle = 0;
+        List<String> edges = new ArrayList<>();
         for (ShapeRecordAdvanced rec : recordsAdvanced) {
             if (rec instanceof StyleChangeRecordAdvanced) {
                 StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) rec;
@@ -296,15 +298,43 @@ public class XFLConverter {
                     lastMoveToX = scr.moveDeltaX;
                     lastMoveToY = scr.moveDeltaY;
                 }
+                if (scr.stateNewStyles) {
+                    fillStyle0 = 0;
+                    fillStyle1 = 0;
+                    lineStyle = 0;
+                }
+                if (scr.stateLineStyle) {
+                    lineStyle = scr.lineStyle;                    
+                }
+                if (scr.stateFillStyle0) {
+                    fillStyle0 = scr.fillStyle0;
+                }
+                if (scr.stateFillStyle1) {
+                    fillStyle1 = scr.fillStyle1;
+                }
             }
-            convertShapeEdge(mat, rec, x, y, ret);
+            
+            
+            String edge = convertShapeEdge(rec, x, y);
+            
+            //ignore duplicated edges with only strokes #2031
+            if (fillStyle0 == 0 && fillStyle1 == 0 && lineStyle != 0) {
+                if (!edges.contains(edge)) {
+                    edges.add(edge);
+                    ret.append(edge);
+                }
+            } else {
+                edges.add(edge);
+                ret.append(edge);
+            }
+            
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
         //hack for morphshapes. TODO: make this better
         if (close && (Double.compare(lastMoveToX, x) != 0 || Double.compare(lastMoveToY, y) != 0)) {
             StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced(lastMoveToX - x, lastMoveToY - y);
-            convertShapeEdge(mat, ser, x, y, ret);
+            ret.append(convertShapeEdge(ser, x, y));
         }
     }
 
@@ -2370,6 +2400,14 @@ public class XFLConverter {
                     if (newCharId == -1) {
                         newCharId = characterId;
                     }
+                    if (characterId != -1 && newCharId != characterId) {
+                        if (shapeTween && character != null) {
+                            MorphShapeTag m = (MorphShapeTag) character;
+                            shapeTweener = m;
+                            shapeTween = false;
+                            lastTweenRatio = ratio;
+                        }
+                    }
                     characterId = newCharId;
                     if (characters.containsKey(characterId)) {
                         character = characters.get(characterId);
@@ -2460,7 +2498,7 @@ public class XFLConverter {
                         if (shapeTweener != null) {
                             MorphShapeTag m = shapeTweener;
                             XFLXmlWriter addLastWriter = new XFLXmlWriter();
-                            SHAPEWITHSTYLE endShape = m.getShapeAtRatio(lastTweenRatio);
+                            SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);
                             convertShape(characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter);
                             duration--;
                             convertFrame(true, null, null, frame - duration, duration, "", lastElements, files, writer2);
