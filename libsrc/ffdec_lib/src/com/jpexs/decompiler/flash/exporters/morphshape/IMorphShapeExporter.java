@@ -51,6 +51,8 @@ public interface IMorphShapeExporter {
 
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd);
 
+    public void lineBitmapStyle(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform);
+    
     public void moveTo(double x, double y, double x2, double y2);
 
     public void lineTo(double x, double y, double x2, double y2);

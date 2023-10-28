@@ -106,6 +106,16 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform) {
         finalizePath();
+        String patternId = getPattern(bitmapId, matrix, matrixEnd, smooth);
+        path.setAttribute("ffdec:fill-bitmapId", "" + bitmapId);
+        if (patternId != null) {
+            path.setAttribute("style", "fill:url(#" + patternId + ")");
+            return;
+        }
+        path.setAttribute("fill", "#ff0000");
+    }
+    
+    public String getPattern(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean smooth) {
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
             SerializableImage img = image.getImageCached();
@@ -121,7 +131,6 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getConvertedImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
-                path.setAttribute("style", "fill:url(#" + patternId + ")");
                 Element pattern = exporter.createElement("pattern");
                 pattern.setAttribute("id", patternId);
                 pattern.setAttribute("patternUnits", "userSpaceOnUse");
@@ -129,6 +138,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
+                pattern.setAttribute("ffdec:smoothed", smooth ? "true" : "false");                
                 if (matrix != null) {
                     matrix = matrix.clone();
                     matrix.rotateSkew0 *= zoom / SWF.unitDivisor;
@@ -148,8 +158,10 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
                 pattern.appendChild(imageElement);
                 exporter.addToGroup(pattern);
+                return patternId;
             }
         }
+        return null;
     }
 
     @Override
@@ -460,6 +472,20 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         }
     }
 
+    @Override
+    public void lineBitmapStyle(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        path.removeAttribute("stroke-opacity");       
+        
+        String patternId = getPattern(bitmapId, matrix, matrixEnd, smooth);        
+        path.setAttribute("ffdec:stroke-bitmapId", "" + bitmapId);
+        
+        if (patternId != null) {
+            path.setAttribute("style", "stroke:url(#" + patternId + ")");
+            return;
+        }
+        path.setAttribute("stroke", "#ff0000");
+    }
+    
     protected double roundPixels400(double pixels) {
         return Math.round(pixels * 10000) / 10000.0;
     }

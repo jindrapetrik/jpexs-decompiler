@@ -107,7 +107,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         exporter.addToDefs(gradient);
     }
 
-    private String getPattern(int bitmapId, Matrix matrix, ColorTransform colorTransform) {
+    private String getPattern(int bitmapId, Matrix matrix, ColorTransform colorTransform, boolean smoothed) {
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
             SerializableImage img = image.getImageCached();
@@ -131,6 +131,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
+                pattern.setAttribute("ffdec:smoothed", smoothed ? "true" : "false");
                 if (matrix != null) {
                     pattern.setAttribute("patternTransform", matrix.getSvgTransformationString(SWF.unitDivisor / zoom, SWF.unitDivisor / zoom));
                 }
@@ -152,13 +153,13 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
             return;
         }
         finalizePath();
-        String patternId = getPattern(bitmapId, matrix, colorTransform);
+        String patternId = getPattern(bitmapId, matrix, colorTransform, smooth);
+        path.setAttribute("ffdec:fill-bitmapId", "" + bitmapId);
         if (patternId != null) {
             path.setAttribute("style", "fill:url(#" + patternId + ")");
             return;
         }
         path.setAttribute("fill", "#ff0000");
-        path.setAttribute("ffdec:fill-bitmapId", "" + bitmapId);
     }
 
     @Override
@@ -227,11 +228,13 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void lineBitmapStyle(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
-        String patternId = getPattern(bitmapId, matrix, colorTransform);
+        String patternId = getPattern(bitmapId, matrix, colorTransform, smooth);
+        path.setAttribute("ffdec:stroke-bitmapId", "" + bitmapId);
         if (patternId != null) {
             path.setAttribute("stroke", "url(#" + patternId + ")");
-            path.setAttribute("ffdec:stroke-bitmapId", "" + bitmapId);            
+            return;
         }
+        path.setAttribute("stroke", "#ff0000");
     }
 
     @Override
