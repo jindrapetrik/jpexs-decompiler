@@ -557,13 +557,16 @@ public class SvgImporter {
     private void processCommands(int shapeNum, SHAPEWITHSTYLE shapes, List<PathCommand> commands, Matrix transform, SvgStyle style, boolean morphShape, boolean shape2) {
 
         if ("nonzero".equals(style.getFillRule())) {
-            if (!shape2 && (shapeTag instanceof DefineShape4Tag)) {
-                DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
-                shape4.usesFillWindingRule = true;
-            }
-            if (shape2 && (endShape instanceof DefineShape4Tag)) {
-                DefineShape4Tag shape4 = (DefineShape4Tag) endShape;
-                shape4.usesFillWindingRule = true;
+            SvgFill fill = style.getFill();            
+            if (fill != null && !(fill instanceof SvgTransparentFill)) {
+                if (!shape2 && (shapeTag instanceof DefineShape4Tag)) {
+                    DefineShape4Tag shape4 = (DefineShape4Tag) shapeTag;
+                    shape4.usesFillWindingRule = true;
+                }
+                if (shape2 && (endShape instanceof DefineShape4Tag)) {
+                    DefineShape4Tag shape4 = (DefineShape4Tag) endShape;
+                    shape4.usesFillWindingRule = true;
+                }
             }
         }
 
