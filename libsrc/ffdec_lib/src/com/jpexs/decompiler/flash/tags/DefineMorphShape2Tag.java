@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
@@ -151,4 +152,14 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
         endEdgeBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, null, 4, true);
     }
 
+    @Override
+    public ShapeTag getShapeTagAtRatio(int ratio) {
+        DefineShape4Tag ret = new DefineShape4Tag(swf);
+        ret.usesNonScalingStrokes = usesNonScalingStrokes;
+        ret.usesScalingStrokes = usesScalingStrokes;
+        ret.shapes = getShapeAtRatio(ratio);
+        ret.updateBounds();
+        ret.setTimelined(swf);
+        return ret;
+    }
 }

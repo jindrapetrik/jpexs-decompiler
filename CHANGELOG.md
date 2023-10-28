@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - SVG Export - stroke-bitmapId, fill-bitmapId attribute
 - Morphshape SVG Export - bitmap fill strokes
 - SVG Export/Import - retain bitmap fill smoothed attribute
+- Export Morphshape as start and end shape (SVG, PNG, BMP)
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor

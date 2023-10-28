@@ -23,18 +23,30 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
+import com.jpexs.decompiler.flash.helpers.BMPFile;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -92,9 +104,33 @@ public class MorphShapeExporter {
                 }
 
                 final File file = new File(outdir + File.separator + characterID + settings.getFileExtension());
+                final File fileStart = new File(outdir + File.separator + characterID + ".start" + settings.getFileExtension());
+                final File fileEnd = new File(outdir + File.separator + characterID + ".end" + settings.getFileExtension());
                 new RetryTask(() -> {
                     MorphShapeTag mst = (MorphShapeTag) t;
                     switch (settings.mode) {
+                        case SVG_START_END:
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileStart))) {
+                                ExportRectangle rect = new ExportRectangle(mst.getStartBounds());
+                                rect.xMax *= settings.zoom;
+                                rect.yMax *= settings.zoom;
+                                rect.xMin *= settings.zoom;
+                                rect.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
+                                mst.getStartShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileEnd))) {
+                                ExportRectangle rect = new ExportRectangle(mst.getStartBounds());
+                                rect.xMax *= settings.zoom;
+                                rect.yMax *= settings.zoom;
+                                rect.xMin *= settings.zoom;
+                                rect.yMin *= settings.zoom;
+                                SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
+                                mst.getEndShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                            }
+                            break;
                         case SVG:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 ExportRectangle rect = new ExportRectangle(mst.getRect());
@@ -107,6 +143,55 @@ public class MorphShapeExporter {
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
+                        case PNG_START_END:
+                        case BMP_START_END:
+                            double unzoom = settings.zoom;
+                            ShapeTag st = mst.getStartShapeTag();
+                            RECT rect = st.getRect();
+                            int newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
+                            int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
+                            img.fillTransparent();
+                            if (settings.mode == MorphShapeExportMode.BMP_START_END) {
+                                RGB backColor = t.getSwf().getBackgroundColor().backgroundColor;
+                                if (backColor != null) {
+                                    Graphics2D g = (Graphics2D) img.getGraphics();
+                                    g.setColor(backColor.toColor());
+                                    g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                                }
+                            }
+                            Matrix m = Matrix.getScaleInstance(settings.zoom);
+                            m.translate(-rect.Xmin, -rect.Ymin);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            if (settings.mode == MorphShapeExportMode.PNG_START_END) {
+                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileStart);
+                            } else {
+                                BMPFile.saveBitmap(img.getBufferedImage(), fileStart);
+                            }
+                            
+                            st = mst.getEndShapeTag();
+                            rect = st.getRect();
+                            newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
+                            newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
+                            img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
+                            img.fillTransparent();
+                            if (settings.mode == MorphShapeExportMode.BMP_START_END) {
+                                RGB backColor = t.getSwf().getBackgroundColor().backgroundColor;
+                                if (backColor != null) {
+                                    Graphics2D g = (Graphics2D) img.getGraphics();
+                                    g.setColor(backColor.toColor());
+                                    g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                                }
+                            }
+                            m = Matrix.getScaleInstance(settings.zoom);
+                            m.translate(-rect.Xmin, -rect.Ymin);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            if (settings.mode == MorphShapeExportMode.PNG_START_END) {
+                                ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
+                            } else {
+                                BMPFile.saveBitmap(img.getBufferedImage(), fileEnd);
+                            }
+                            break;                            
                         case CANVAS:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);

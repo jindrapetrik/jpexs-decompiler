@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
@@ -109,5 +110,14 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     @Override
     public int getShapeNum() {
         return 1;
+    }
+    
+    @Override
+    public ShapeTag getShapeTagAtRatio(int ratio) {
+        DefineShape3Tag ret = new DefineShape3Tag(swf);
+        ret.shapes = getShapeAtRatio(ratio);
+        ret.updateBounds();
+        ret.setTimelined(swf);
+        return ret;
     }
 }
