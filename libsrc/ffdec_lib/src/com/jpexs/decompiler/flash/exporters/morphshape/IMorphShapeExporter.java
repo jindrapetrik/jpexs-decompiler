@@ -37,7 +37,7 @@ public interface IMorphShapeExporter {
 
     public void beginLines();
 
-    public void endLines();
+    public void endLines(boolean close);
 
     public void beginFill(RGB color, RGB colorEnd);
 
@@ -47,7 +47,7 @@ public interface IMorphShapeExporter {
 
     public void endFill();
 
-    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit);
+    public void lineStyle(double thickness, double thicknessEnd, RGB color, RGB colorEnd, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose);
 
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd);
 

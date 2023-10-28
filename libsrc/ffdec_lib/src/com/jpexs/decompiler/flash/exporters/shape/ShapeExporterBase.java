@@ -453,7 +453,9 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 startCapStyle,
                                 endCapStyle,
                                 joinStyle,
-                                miterLimitFactor);
+                                miterLimitFactor,
+                                !autoClose
+                        );
 
                         if (hasFillFlag) {
                             FillStyle fillStyle = lineStyle.fillType;
@@ -485,7 +487,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                         }
                     } else {
                         // We should never get here
-                        lineStyle(1, new RGB(Color.black), false, "NORMAL", 0, 0, 0, 3);
+                        lineStyle(1, new RGB(Color.black), false, "NORMAL", 0, 0, 0, 3, false);
                     }
                 }
                 if (posX != e.getFromX() || posY != e.getFromY()) {

@@ -395,7 +395,10 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         List<IMorphEdge> path = createPathFromEdgeMap(_lineEdgeMaps.get(groupIndex));
         int posX = Integer.MAX_VALUE;
         int posY = Integer.MAX_VALUE;
+        int lastMoveToX = posX;
+        int lastMoveToY = posY;
         int lineStyleIdx = Integer.MAX_VALUE;
+        boolean autoClose = true;
         if (path.size() > 0) {
             beginLines();
             for (int i = 0; i < path.size(); i++) {
@@ -420,8 +423,13 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         int joinStyle = LINESTYLE2.ROUND_JOIN;
                         float miterLimitFactor = 3f;
                         boolean hasFillFlag = false;
+                        autoClose = true;
                         if (lineStyle instanceof LINESTYLE2) {
                             LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
+                            
+                            if (lineStyle2.noClose) {
+                                autoClose = false;
+                            }
                             if (lineStyle2.noHScaleFlag && lineStyle2.noVScaleFlag) {
                                 scaleMode = "NONE";
                             } else if (lineStyle2.noHScaleFlag) {
@@ -446,7 +454,9 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                                 startCapStyle,
                                 endCapStyle,
                                 joinStyle,
-                                miterLimitFactor);
+                                miterLimitFactor,
+                                !autoClose
+                        );
 
                         if (hasFillFlag) {
                             LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
@@ -489,11 +499,13 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         }
                     } else {
                         // We should never get here
-                        lineStyle(1, 1, new RGB(Color.black), new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3);
+                        lineStyle(1, 1, new RGB(Color.black), new RGB(Color.BLACK), false, "NORMAL", 0, 0, 0, 3, false);
                     }
                 }
                 if (posX != e.getFromX() || posY != e.getFromY()) {
                     moveTo(e.getFromX(), e.getFromY(), e.getFromEndX(), e.getFromEndY());
+                    lastMoveToX = e.getFromX();
+                    lastMoveToY = e.getFromY();
                 }
                 if (e instanceof CurvedMorphEdge) {
                     CurvedMorphEdge c = (CurvedMorphEdge) e;
@@ -504,7 +516,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                 posX = e.getToX();
                 posY = e.getToY();
             }
-            endLines();
+            endLines(autoClose && lastMoveToX == posX && lastMoveToY == posY);
         }
     }
 
