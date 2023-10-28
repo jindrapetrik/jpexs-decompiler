@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2105] GFX - Basic tag info
 - Context menu items to create new tags (shape, morphshape, sprite, image, movie, sound, binaryData) from files
   and using font embed dialog for fonts
-- Replacing morphshapes
+- Replacing morphshapes (either from previously exported animated SVG or from two shape files)
 - SVG Export - stroke-bitmapId, fill-bitmapId attribute
 - Morphshape SVG Export - bitmap fill strokes
 - SVG Export/Import - retain bitmap fill smoothed attribute
