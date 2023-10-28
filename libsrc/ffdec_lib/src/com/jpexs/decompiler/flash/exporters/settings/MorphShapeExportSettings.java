@@ -37,7 +37,12 @@ public class MorphShapeExportSettings {
 
     public String getFileExtension() {
         switch (mode) {
+            case PNG_START_END:
+                return ".png";
+            case BMP_START_END:
+                return ".bmp";
             case SVG:
+            case SVG_START_END:
                 return ".svg";
             case CANVAS:
                 return ".html";

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.morphshape.SVGMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -188,8 +189,18 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     public SHAPE getEndEdges() {
         return endEdges;
+    }   
+    
+    public abstract ShapeTag getShapeTagAtRatio(int ratio);
+    
+    public ShapeTag getStartShapeTag() {
+        return getShapeTagAtRatio(0);
     }
-
+    
+    public ShapeTag getEndShapeTag() {
+        return getShapeTagAtRatio(65535);
+    }
+    
     public SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
