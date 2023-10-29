@@ -1,0 +1,146 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true">
+     <symbols>
+          <Include href="Rectangles.xml" itemIcon="1" loadImmediate="false" itemID="653d38ae-000001d5" lastModified="1698561460"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="11">
+               <layers>
+                    <DOMLayer name="Layer 4" color="#FF4FFF">
+                         <frames>
+                              <DOMFrame index="0" duration="12" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#999999"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="!1819 5421|4078 5421!4078 5421|4078 7680!4078 7680|1819 7680!1819 7680|1819 5421"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 2" color="#9933CC" locked="true" layerType="mask">
+                         <frames>
+                              <DOMFrame index="0" duration="12" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="!7618 6595.5[#1ACC.A6 #1CB5.3F 5411 7104.5!5411 7104.5[#F79.1C #1ACB.EB 3100 6214!3100 6214[2239 5571 2239 4660!2239 4660[2239 3749 3100 3103!3100 3103[#F78.E8 #99C.06 5516.5 2150.5!5516.5 2150.5[#1BA0.48 #730.EE 7738 2664.5!7738 2664.5
+[#20D3.A8 #DA0.23 8389.5 4665!8389.5 4665[#20B7.72 #16D1.BB 7618 6595.5"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 5" color="#4FFFFF" parentLayerIndex="1" locked="true">
+                         <frames>
+                              <DOMFrame index="0" duration="12" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#99FF66"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!5499 2520|5499 4040!5499 4040|2579 4040!2579 4040|2579 2520!2579 2520|5499 2520"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" parentLayerIndex="1" locked="true" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Rectangles" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="149.95" ty="100"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="108.5" y="88.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="1" duration="11" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Rectangles" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="128.95" ty="100"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="108.5" y="88.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 6" color="#808080" parentLayerIndex="1" locked="true">
+                         <frames>
+                              <DOMFrame index="0" duration="12" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#99FFFF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!8049 5660|8049 6890!8049 6890|6819 6890!6819 6890|6819 5660!6819 5660|8049 5660"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 3" color="#FF800A">
+                         <frames>
+                              <DOMFrame index="0" duration="12" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#0000FF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!9319 2460|9319 4640!9319 4640|7139 4640!7139 4640|7139 2460!7139 2460|9319 2460"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1659" publishTime="1698561475"/>
+          <PublishItem publishSize="1671" publishTime="1698553381"/>
+          <PublishItem publishSize="1673" publishTime="1698535285"/>
+          <PublishItem publishSize="1472" publishTime="1698534831"/>
+          <PublishItem publishSize="1342" publishTime="1698527844"/>
+          <PublishItem publishSize="1338" publishTime="1698523920"/>
+          <PublishItem publishSize="1261" publishTime="1698514052"/>
+          <PublishItem publishSize="1183" publishTime="1698513796"/>
+          <PublishItem publishSize="1098" publishTime="1698511659"/>
+          <PublishItem publishSize="723" publishTime="1698511153"/>
+     </publishHistory>
+</DOMDocument>

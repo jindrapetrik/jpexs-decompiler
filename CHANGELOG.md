@@ -38,6 +38,8 @@ All notable changes to this project will be documented in this file.
 - SVG import - Do not use fill winding nonzero when only stroking
 - Morphshape SVG export - closing the stroke
 - [#2031] FLA export - morphshapes with duplicated strokes, timelines with multiple shape tweens
+- [#1866] FLA export - multilevel clipping handling
+- [#1866] FLA export - morphshape rounding fix
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3232,6 +3234,7 @@ Major version of SWF to XML export changed to 2.
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
 [#2104]: https://www.free-decompiler.com/flash/issues/2104
 [#2031]: https://www.free-decompiler.com/flash/issues/2031
+[#1866]: https://www.free-decompiler.com/flash/issues/1866
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
