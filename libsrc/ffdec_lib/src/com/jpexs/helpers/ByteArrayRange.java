@@ -17,12 +17,13 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import java.io.Serializable;
 
 /**
  *
  * @author JPEXS
  */
-public class ByteArrayRange {
+public class ByteArrayRange implements Serializable {
 
     public static final ByteArrayRange EMPTY = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
 

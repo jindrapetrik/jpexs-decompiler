@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 /**
  *
@@ -162,6 +163,11 @@ public final class Matrix implements Cloneable {
     public java.awt.Point transform(java.awt.Point point) {
         Point p = transform(point.x, point.y);
         return new java.awt.Point((int) p.x, (int) p.y);
+    }
+    
+    public Point2D transform(Point2D point) {
+        Point p = transform(point.getX(), point.getY());
+        return new Point2D.Double(p.x, p.y);
     }
 
     public ExportRectangle transform(ExportRectangle rect) {

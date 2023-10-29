@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -90,6 +91,51 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
     public abstract void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions);
 
     public abstract void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix);
+    
+    public abstract void setPlaceFlagMove(boolean placeFlagMove);
+    
+    public boolean placeEquals(PlaceObjectTypeTag other) {
+        if (getDepth() != other.getDepth()) {
+            return false;
+        }
+        if (!Objects.equals(getMatrix(), other.getMatrix())) {
+            return false;
+        }
+        if (!Objects.equals(getInstanceName(), other.getInstanceName())) {
+            return false;
+        }
+        if (!Objects.equals(getClassName(), other.getClassName())) {
+            return false;
+        }
+        if (cacheAsBitmap() != other.cacheAsBitmap()) {
+            return false;
+        }
+        if (hasImage() != other.hasImage()) {
+            return false;
+        }
+        if (isVisible() != other.isVisible()) {
+            return false;
+        }
+        if (!Objects.equals(getVisible(), other.getVisible())) {
+            return false;
+        }
+        if (!Objects.equals(getBackgroundColor(), other.getBackgroundColor())) {
+            return false;
+        }
+        if (flagMove() != other.flagMove()) {
+            return false;
+        }
+        if (getRatio() != other.getRatio()) {
+            return false;
+        }
+        if (!Objects.equals(getClipActions(), other.getClipActions())) { //?
+            return false;
+        }
+        if (!Objects.equals(getAmfData(), other.getAmfData())) { //?
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public String getName() {

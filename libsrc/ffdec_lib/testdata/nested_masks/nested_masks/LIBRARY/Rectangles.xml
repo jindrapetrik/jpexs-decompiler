@@ -1,0 +1,197 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Rectangles" itemID="653d38ae-000001d5" symbolType="graphic" lastModified="1698561460">
+  <timeline>
+    <DOMTimeline name="Rectangles" currentFrame="3">
+      <layers>
+        <DOMLayer name="Layer 7" color="#4F80FF">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="15872">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#9900FF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!3860 -700|3860 600!3860 600|1960 600!1960 600|1960 -700!1960 -700|3860 -700"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 4" color="#FF4FFF" locked="true" layerType="mask">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!3400 2240S2|3400 5859!3400 5859|680 5859!680 5859|680 2240!680 2240|3400 2240"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 3" color="#FF800A" parentLayerIndex="1" locked="true" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="3" tweenType="shape" keyMode="17922">
+              <MorphShape>
+                <morphSegments>
+                  <MorphSegment startPointA="-2.109375, #10.0E" startPointB="-4.765625, #11.B2" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="0">
+                    <MorphCurves controlPointA="-2.109375, #E.19" anchorPointA="#FFFFFF.9B, #C.B6" controlPointB="-4.765625, #F.BD" anchorPointB="#FFFFFC.F3, #E.5A"/>
+                    <MorphCurves controlPointA="#1.53, #B.54" anchorPointA="3.75, #B.54" controlPointB="#FFFFFE.AB, #C.F8" anchorPointB="#1.18, #C.F8"/>
+                    <MorphCurves controlPointA="#6.2D, #B.54" anchorPointA="#7.E4, #C.B6" controlPointB="#3.85, #C.F8" anchorPointB="#5.3C, #E.5A"/>
+                    <MorphCurves controlPointA="#8.3C, #C.FD" anchorPointA="#8.83, #D.4A" controlPointB="#5.94, #E.A1" anchorPointB="#5.DB, #E.EE"/>
+                    <MorphCurves controlPointA="#8.72, #D.58" anchorPointA="#8.62, #D.66" controlPointB="#5.CA, #E.FC" anchorPointB="#5.BA, #F.0A"/>
+                    <MorphCurves controlPointA="#6.E1, #E.C1" anchorPointA="#6.E1, #10.AB" controlPointB="#4.39, #10.65" anchorPointB="#4.39, #12.4F"/>
+                    <MorphCurves controlPointA="#6.E1, #12.39" anchorPointA="#7.DF, #13.69" controlPointB="#4.39, #13.DD" anchorPointB="#5.37, #15.0D"/>
+                    <MorphCurves controlPointA="#6.2A, #14.C8" anchorPointA="3.75, #14.C8" controlPointB="#3.82, #16.6C" anchorPointB="#1.18, #16.6C"/>
+                    <MorphCurves controlPointA="#1.53, #14.C8" anchorPointA="#FFFFFF.9B, #13.65" controlPointB="#FFFFFE.AB, #16.6C" anchorPointB="#FFFFFC.F3, #15.09"/>
+                    <MorphCurves controlPointA="-2.109375, #12.03" anchorPointA="-2.109375, #10.0E" controlPointB="-4.765625, #13.A7" anchorPointB="-4.765625, #11.B2"/>
+                  </MorphSegment>
+                  <MorphSegment startPointA="#6.E1, #10.AB" startPointB="#4.39, #12.4F" strokeIndex1="0" strokeIndex2="0" fillIndex1="1" fillIndex2="1">
+                    <MorphCurves controlPointA="#6.E1, #E.C1" anchorPointA="#8.62, #D.66" controlPointB="#4.39, #10.65" anchorPointB="#5.BA, #F.0A"/>
+                    <MorphCurves controlPointA="#9.FB, #C.0B" anchorPointA="#C.05, #C.0B" controlPointB="#7.53, #D.AF" anchorPointB="#9.5D, #D.AF"/>
+                    <MorphCurves controlPointA="#E.26, #C.0B" anchorPointA="#F.A7, #D.66" controlPointB="#B.7E, #D.AF" anchorPointB="#C.FF, #F.0A"/>
+                    <MorphCurves controlPointA="#11.29, #E.C1" anchorPointA="#11.29, #10.AB" controlPointB="#E.81, #10.65" anchorPointB="#E.81, #12.4F"/>
+                    <MorphCurves controlPointA="#11.29, #12.95" anchorPointA="#F.A7, #13.F" controlPointB="#E.81, #14.39" anchorPointB="#C.FF, #15.94"/>
+                    <MorphCurves controlPointA="#E.26, #15.4B" anchorPointA="#C.05, #15.4B" controlPointB="#B.7E, #16.EF" anchorPointB="#9.5D, #16.EF"/>
+                    <MorphCurves controlPointA="#9.E4, #15.4B" anchorPointA="#8.62, #13.F" controlPointB="#7.3C, #16.EF" anchorPointB="#5.BA, #15.94"/>
+                    <MorphCurves controlPointA="#8.1A, #13.AF" anchorPointA="#7.DF, #13.69" controlPointB="#5.72, #15.53" anchorPointB="#5.37, #15.0D"/>
+                    <MorphCurves controlPointA="#6.E1, #12.39" anchorPointA="#6.E1, #10.AB" controlPointB="#4.39, #13.DD" anchorPointB="#4.39, #12.4F"/>
+                  </MorphSegment>
+                </morphSegments>
+                <morphHintsList/>
+              </MorphShape>
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFF00"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#FF00FF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!2178.5 3402S1[#83B.F5 #CFC.F7 2020 3254!2020 3254[1581 2900 960 2900!960 2900[339 2900 -101 3254!-101 3254[-540 3609 -540 4110!-540 4110[-540 4611 -101 4965!-101 4965[339 5320 960 5320!960 5320[#629.99 5320 2015 4969"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!2015 4969S3[1761 #1239.24 1761 4267!1761 4267[1761 3777 2146 3430!2146 3430[#872.08 #D57.96 2178.5 3402"/>
+                    <Edge fillStyle1="2" edges="!2178.5 3402S2[#9FA.A3 3083 3077 3083!3077 3083[3622 3083 4007 3430!4007 3430[4393 3777 4393 4267!4393 4267[4393 4757 4007 5104!4007 5104[3622 5451 3077 5451!3077 5451[2532 5451 2146 5104!2146 5104[#819.D3 #13AE.F3 2015 4969"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFF00"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#FF00FF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1499 3822[1428 3745 1340 3674!1340 3674[901 3320 280 3320!280 3320[-341 3320 -781 3674!-781 3674[-1220 4029 -1220 4530!-1220 4530[-1220 5031 -781 5385!-781 5385[-341 5740 280 5740!280 5740[898 5740 1335 5389"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!1335 5389[1081 5085 1081 4687!1081 4687[1081 4197 1466 3850!1466 3850[1482 3836 1499 3822"/>
+                    <Edge fillStyle1="2" edges="!1499 3822[1875 3503 2397 3503!2397 3503[2942 3503 3327 3850!3327 3850[3713 4197 3713 4687!3713 4687[3713 5177 3327 5524!3327 5524[2942 5871 2397 5871!2397 5871[1852 5871 1466 5524!1466 5524[1394 5459 1335 5389"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 6" color="#808080">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#660000"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!4053 3585[3852 3731 3567 3731!3567 3731[3282 3731 3081 3585!3081 3585[2880 3440 2880 3235!2880 3235[2880 3030 3081 2884!3081 2884[3282 2739 3567 2739!3567 2739[3852 2739 4053 2884!4053 2884[4254 3030 4254 3235!4254 3235[4254 3440 4053
+ 3585"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 2" color="#9933CC" locked="true" layerType="mask">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!3361 3708S2[2843 4420 2110 4420!2110 4420[1377 4420 858 3708!858 3708[340 2997 340 1990!340 1990[340 983 858 271!858 271[1377 -440 2110 -440!2110 -440[2843 -440 3361 271!3361 271[3880 983 3880 1990!3880 1990[3880 2997 3361 3708"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F" parentLayerIndex="4" locked="true">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FF00"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#FF0000"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!2940 1020|4340 1020!4340 1020|4340 3540!4340 3540|1280 3540!1280 3540|1280 2440"/>
+                    <Edge fillStyle1="2" edges="
+!1280 2440|0 2440!0 2440|0 0!0 0|2940 0!2940 0|2940 1020"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="
+!1280 2440|1280 1020!1280 1020|2940 1020"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 5" color="#4FFFFF">
+          <frames>
+            <DOMFrame index="0" duration="4" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!5440 2420|5440 4240!5440 4240|2880 4240!2880 4240|2880 2420!2880 2420|5440 2420"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
