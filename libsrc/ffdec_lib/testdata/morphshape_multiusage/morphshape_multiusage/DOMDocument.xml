@@ -1,0 +1,61 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true">
+     <symbols>
+          <Include href="MyShape.xml" itemIcon="1" loadImmediate="false" itemID="653e4225-000091c7" lastModified="1698579291"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="11">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#0000FF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="!5939 5100|2639 5100!2639 5100|2639 2640!2639 2640|5939 2640!5939 2640|5939 5100"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="1" duration="24" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="MyShape" selected="true" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="205.95" ty="137.85"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="117" y="83"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="25" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#FF00FF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="!9789 3040|9789 5470!9789 5470|7359 5470!7359 5470|7359 3040!7359 3040|9789 3040"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="996" publishTime="1698585481"/>
+          <PublishItem publishSize="999" publishTime="1698579384"/>
+          <PublishItem publishSize="949" publishTime="1698579124"/>
+     </publishHistory>
+</DOMDocument>

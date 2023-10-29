@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - [#2031] FLA export - morphshapes with duplicated strokes, timelines with multiple shape tweens
 - [#1866] FLA export - multilevel clipping handling
 - [#1866] FLA export - morphshape rounding fix
+- [#1866] FLA export - multiple usage of morphshapes
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
