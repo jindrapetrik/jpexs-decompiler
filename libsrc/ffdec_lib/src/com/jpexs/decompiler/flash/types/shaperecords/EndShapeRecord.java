@@ -62,4 +62,28 @@ public class EndShapeRecord extends SHAPERECORD {
     public boolean isTooLarge() {
         return false;
     }        
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + this.endOfShape;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final EndShapeRecord other = (EndShapeRecord) obj;
+        return this.endOfShape == other.endOfShape;
+    }
+    
+    
 }

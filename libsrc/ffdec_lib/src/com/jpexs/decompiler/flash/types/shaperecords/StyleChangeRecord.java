@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -157,4 +158,73 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
         calculateBits();
         return !SWFOutputStream.fitsInUB(5, moveBits);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.stateNewStyles ? 1 : 0);
+        hash = 59 * hash + (this.stateLineStyle ? 1 : 0);
+        hash = 59 * hash + (this.stateFillStyle1 ? 1 : 0);
+        hash = 59 * hash + (this.stateFillStyle0 ? 1 : 0);
+        hash = 59 * hash + (this.stateMoveTo ? 1 : 0);
+        hash = 59 * hash + this.moveDeltaX;
+        hash = 59 * hash + this.moveDeltaY;
+        hash = 59 * hash + this.fillStyle0;
+        hash = 59 * hash + this.fillStyle1;
+        hash = 59 * hash + this.lineStyle;
+        /*hash = 59 * hash + Objects.hashCode(this.fillStyles);
+        hash = 59 * hash + Objects.hashCode(this.lineStyles);*/
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StyleChangeRecord other = (StyleChangeRecord) obj;
+        if (this.stateNewStyles != other.stateNewStyles) {
+            return false;
+        }
+        if (this.stateLineStyle != other.stateLineStyle) {
+            return false;
+        }
+        if (this.stateFillStyle1 != other.stateFillStyle1) {
+            return false;
+        }
+        if (this.stateFillStyle0 != other.stateFillStyle0) {
+            return false;
+        }
+        if (this.stateMoveTo != other.stateMoveTo) {
+            return false;
+        }
+        if (this.moveDeltaX != other.moveDeltaX) {
+            return false;
+        }
+        if (this.moveDeltaY != other.moveDeltaY) {
+            return false;
+        }
+        if (this.fillStyle0 != other.fillStyle0) {
+            return false;
+        }
+        if (this.fillStyle1 != other.fillStyle1) {
+            return false;
+        }
+        if (this.lineStyle != other.lineStyle) {
+            return false;
+        }
+        /*if (!Objects.equals(this.fillStyles, other.fillStyles)) {
+            return false;
+        }
+        return Objects.equals(this.lineStyles, other.lineStyles);*/
+        return true;
+    }
+    
+    
 }

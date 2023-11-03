@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - [#1866] FLA export - multilevel clipping handling
 - [#1866] FLA export - morphshape rounding fix
 - [#1866] FLA export - multiple usage of morphshapes
+- [#503], [#1011], [#1257], [#1902], [#1903], [#2048] FLA export - shapes with overlapping edges
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3236,6 +3237,12 @@ Major version of SWF to XML export changed to 2.
 [#2104]: https://www.free-decompiler.com/flash/issues/2104
 [#2031]: https://www.free-decompiler.com/flash/issues/2031
 [#1866]: https://www.free-decompiler.com/flash/issues/1866
+[#503]: https://www.free-decompiler.com/flash/issues/503
+[#1011]: https://www.free-decompiler.com/flash/issues/1011
+[#1257]: https://www.free-decompiler.com/flash/issues/1257
+[#1902]: https://www.free-decompiler.com/flash/issues/1902
+[#1903]: https://www.free-decompiler.com/flash/issues/1903
+[#2048]: https://www.free-decompiler.com/flash/issues/2048
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
@@ -3895,7 +3902,6 @@ Major version of SWF to XML export changed to 2.
 [#508]: https://www.free-decompiler.com/flash/issues/508
 [#305]: https://www.free-decompiler.com/flash/issues/305
 [#312]: https://www.free-decompiler.com/flash/issues/312
-[#503]: https://www.free-decompiler.com/flash/issues/503
 [#304]: https://www.free-decompiler.com/flash/issues/304
 [#306]: https://www.free-decompiler.com/flash/issues/306
 [#507]: https://www.free-decompiler.com/flash/issues/507

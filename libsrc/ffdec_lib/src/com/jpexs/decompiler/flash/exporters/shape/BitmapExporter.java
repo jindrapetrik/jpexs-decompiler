@@ -249,7 +249,7 @@ public class BitmapExporter extends ShapeExporterBase {
         finalizePath();
         if (color == null) {
             fillPaint = defaultColor;
-        } else {
+        } else {            
             fillPaint = color.toColor();
         }
     }

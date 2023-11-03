@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +54,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
     private int currentSegmentCount = 0;
     private int currentLineStyle = -1;
     private int currentFillStyle = -1;
-
-    double currentShapeLen = 0;
-
+    
     public List<FILLSTYLE> fillStyles = new ArrayList<>();
     public List<LINESTYLE2> lineStyles = new ArrayList<>();
 
@@ -294,7 +291,6 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
             fillStyleIndices.add(currentFillStyle);
             lineStyleIndices.add(currentLineStyle);
         }
-        currentShapeLen = 0;
         currentShape = new ArrayList<>();
         currentBezierLengths = new ArrayList<>();
         currentPointsSum = new Point2D.Double();
@@ -397,7 +393,6 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
         lastX = x;
         lastY = y;
         currentBezierLengths.add(be.length());
-        currentShapeLen += be.length();
 
         currentSegmentCount++;
     }
@@ -419,7 +414,6 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
         lastX = anchorX;
         lastY = anchorY;
         currentBezierLengths.add(be.length());
-        currentShapeLen += be.length();
      
         currentSegmentCount++;
     }

@@ -92,4 +92,40 @@ public class CurvedEdgeRecord extends SHAPERECORD {
         calculateBits();
         return !SWFOutputStream.fitsInUB(4, numBits);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.controlDeltaX;
+        hash = 97 * hash + this.controlDeltaY;
+        hash = 97 * hash + this.anchorDeltaX;
+        hash = 97 * hash + this.anchorDeltaY;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CurvedEdgeRecord other = (CurvedEdgeRecord) obj;
+        if (this.controlDeltaX != other.controlDeltaX) {
+            return false;
+        }
+        if (this.controlDeltaY != other.controlDeltaY) {
+            return false;
+        }
+        if (this.anchorDeltaX != other.anchorDeltaX) {
+            return false;
+        }
+        return this.anchorDeltaY == other.anchorDeltaY;
+    }
+    
+    
 }
