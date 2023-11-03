@@ -20,8 +20,12 @@ import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -34,6 +38,21 @@ public class BezierEdge implements Serializable {
 
     public BezierEdge(List<Point2D> points) {
         this.points = points;
+    }
+
+    @Override
+    public BezierEdge clone() {
+        return new BezierEdge(new ArrayList<>(points));
+    }
+
+    public boolean isEmpty() {
+        Point2D p1 = getBeginPoint();
+        for (int i = 1; i < points.size(); i++) {
+            if (!points.get(i).equals(p1)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public BezierEdge(double x0, double y0, double x1, double y1) {
@@ -50,11 +69,19 @@ public class BezierEdge implements Serializable {
     public Point2D getBeginPoint() {
         return points.get(0);
     }
-    
+
     public Point2D getEndPoint() {
         return points.get(points.size() - 1);
     }
-    
+
+    public void setBeginPoint(Point2D p) {
+        points.set(0, p);
+    }
+
+    public void setEndPoint(Point2D p) {
+        points.set(points.size() - 1, p);
+    }
+
     public Point2D pointAt(double t) {
         if (points.size() == 2) {
             double x = (1 - t) * points.get(0).getX() + t * points.get(1).getX();
@@ -100,7 +127,7 @@ public class BezierEdge implements Serializable {
         return b;
     }
 
-    private final double MIN_SIZE = 1.0;
+    private final double MIN_SIZE = 0.5;
 
     public double area() {
         Rectangle2D rect = bbox();
@@ -134,12 +161,82 @@ public class BezierEdge implements Serializable {
         return false;
     }
 
-    public boolean intersects(BezierEdge b2, List<Double> t1Ref, List<Double> t2Ref) {
-        return intersects(b2,
+    public List<Point2D> getIntersections(BezierEdge b2) {
+        if (points.size() == 2) {
+            if (b2.points.size() == 2) {
+                return Intersections.intersectLineLine(points.get(0), points.get(1), b2.points.get(0), b2.points.get(1), true);
+            } else {
+                return Intersections.intersectBezier2Line(b2.points.get(0), b2.points.get(1), b2.points.get(2), points.get(0), points.get(1));
+            }
+        } else {
+            if (b2.points.size() == 2) {
+                return Intersections.intersectBezier2Line(points.get(0), points.get(1), points.get(2), b2.points.get(0), b2.points.get(1));
+            } else {
+                return Intersections.intersectBezier2Bezier2(points.get(0), points.get(1), points.get(2), b2.points.get(0), b2.points.get(1), b2.points.get(2));
+            }
+        }
+    }
+
+    public boolean intersectsOld(BezierEdge b2, List<Double> t1Ref, List<Double> t2Ref) {
+        List<Point2D> interPoints = new ArrayList<>();
+        List<Double> t1RefA = new ArrayList<>();
+        List<Double> t2RefA = new ArrayList<>();
+        boolean ret = intersects(b2,
                 0,
                 1,
                 0,
-                1, t1Ref, t2Ref);
+                1, t1RefA, t2RefA, interPoints);
+        Point2D last = new Point2D.Double(Double.MAX_VALUE, Double.MAX_VALUE);
+        int numSame = 0;
+        double sumT1 = 0;
+        double sumT2 = 0;
+        for (int i = 0; i < interPoints.size(); i++) {
+            double dist = interPoints.get(i).distance(last);
+            System.err.println("dist=" + dist);
+            if (dist <= 5.0) {
+                numSame++;
+                sumT1 += t1RefA.get(i);
+                sumT2 += t2RefA.get(i);
+                last = interPoints.get(i);
+            } else {
+                if (numSame > 0) {
+                    t1Ref.add(sumT1 / numSame);
+                    t2Ref.add(sumT2 / numSame);
+                }
+                numSame = 1;
+                last = interPoints.get(i);
+                sumT1 = t1RefA.get(i);
+                sumT2 = t2RefA.get(i);
+            }
+        }
+        if (numSame > 0) {
+            t1Ref.add(sumT1 / numSame);
+            t2Ref.add(sumT2 / numSame);
+        }
+
+        return ret;
+    }
+
+    public boolean intersects(BezierEdge b2, List<Double> t1Ref, List<Double> t2Ref, List<Point2D> intPoints) {
+        List<Point2D> inter = getIntersections(b2);
+        BezierUtils utils = new BezierUtils();
+        for (Point2D p : inter) {
+            Point2D p1;
+            Point2D p3;
+            Point2D p2;
+            p1 = this.points.get(0);
+            p3 = this.points.get(this.points.size() - 1);
+            p2 = this.points.size() == 3 ? this.points.get(1) : new Point2D.Double((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
+
+            t1Ref.add(utils.closestPointToBezier(p, p1, p2, p3));
+
+            p1 = b2.points.get(0);
+            p3 = b2.points.get(b2.points.size() - 1);
+            p2 = b2.points.size() == 3 ? b2.points.get(1) : new Point2D.Double((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
+            t2Ref.add(utils.closestPointToBezier(p, p1, p2, p3));
+        }
+        intPoints.addAll(inter);
+        return !inter.isEmpty();
     }
 
     private boolean intersects(
@@ -149,7 +246,9 @@ public class BezierEdge implements Serializable {
             double start2,
             double end2,
             List<Double> t1Ref,
-            List<Double> t2Ref) {
+            List<Double> t2Ref,
+            List<Point2D> interPoints
+    ) {
         final double threshold = MIN_SIZE * 2.0; //?
         Rectangle2D bb1 = bbox();
         Rectangle2D bb2 = b2.bbox();
@@ -161,7 +260,8 @@ public class BezierEdge implements Serializable {
         if (Double.compare(sumAreas, threshold) <= 0) {
             double t1 = (start1 + end1) / 2;
             double t2 = (start2 + end2) / 2;
-
+            Point2D selPoint = getBeginPoint();
+            interPoints.add(selPoint);
             t1Ref.add(t1);
             t2Ref.add(t2);
             return true;
@@ -185,26 +285,25 @@ public class BezierEdge implements Serializable {
         double half2 = start2 + (end2 - start2) / 2.0;
 
         boolean ok = false;
-        if (b1a.intersects(b2a, start1, half1, start2, half2, t1Ref, t2Ref)) {
+        if (b1a.intersects(b2a, start1, half1, start2, half2, t1Ref, t2Ref, interPoints)) {
             ok = true;
         }
-        if (b1a.intersects(b2b, start1, half1, half2, end2, t1Ref, t2Ref)) {
+        if (b1a.intersects(b2b, start1, half1, half2, end2, t1Ref, t2Ref, interPoints)) {
             ok = true;
         }
-        if (b1b.intersects(b2a, half1, end1, start2, half2, t1Ref, t2Ref)) {
+        if (b1b.intersects(b2a, half1, end1, start2, half2, t1Ref, t2Ref, interPoints)) {
             ok = true;
         }
-        if (b1b.intersects(b2b, half1, end1, half2, end2, t1Ref, t2Ref)) {
+        if (b1b.intersects(b2b, half1, end1, half2, end2, t1Ref, t2Ref, interPoints)) {
             ok = true;
         }
         return ok;
     }
-    
 
     public double length() {
         double distance = 0;
         double epsilon = 1;
-        
+
         Stack<BezierEdge> parts = new Stack<BezierEdge>();
         parts.push(this);
 
@@ -233,21 +332,90 @@ public class BezierEdge implements Serializable {
         return "{" + String.join("-", list) + "}";
     }
 
+    public String toSvg() {
+
+        DecimalFormat df = new DecimalFormat("0.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        df.setGroupingUsed(false);
+
+        String ret = "";
+        ret += "M ";
+        ret += df.format(points.get(0).getX());
+        ret += " ";
+        ret += df.format(points.get(0).getY());
+        ret += " ";
+        if (points.size() == 3) {
+            ret += "Q ";
+        } else {
+            ret += "L ";
+        }
+        ret += df.format(points.get(1).getX());
+        ret += " ";
+        ret += df.format(points.get(1).getY());
+        if (points.size() == 3) {
+            ret += " ";
+            ret += df.format(points.get(2).getX());
+            ret += " ";
+            ret += df.format(points.get(2).getY());
+        }
+        return ret;
+    }
+
     public void split(double t, Reference<BezierEdge> left, Reference<BezierEdge> right) {
         List<Point2D> leftPoints = new ArrayList<>();
         List<Point2D> rightPoints = new ArrayList<>();
         BezierUtils bu = new BezierUtils();
         bu.subdivide(points, t, leftPoints, rightPoints);
         left.setVal(new BezierEdge(leftPoints));
+        rightPoints.set(0, leftPoints.get(leftPoints.size() - 1));
         right.setVal(new BezierEdge(rightPoints));
     }
-    
+
     public BezierEdge reverse() {
         List<Point2D> revPoints = new ArrayList<>();
         for (int i = points.size() - 1; i >= 0; i--) {
             revPoints.add(points.get(i));
         }
         return new BezierEdge(revPoints);
+    }
+
+    public void round() {
+        for (int i = 0; i < this.points.size(); i++) {
+            this.points.set(i, new Point2D.Double(
+                    Math.round(this.points.get(i).getX()),
+                    Math.round(this.points.get(i).getY())
+            ));
+        }
+    }
+
+    public void roundHalf() {
+        for (int i = 0; i < this.points.size(); i++) {
+            this.points.set(i, new Point2D.Double(
+                    Math.round(this.points.get(i).getX() * 2.0) / 2.0,
+                    Math.round(this.points.get(i).getY() * 2.0) / 2.0
+            ));
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + Objects.hashCode(this.points);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BezierEdge other = (BezierEdge) obj;
+        return Objects.equals(this.points, other.points);
     }
 
     public static void main(String[] args) {
@@ -276,12 +444,48 @@ public class BezierEdge implements Serializable {
         BezierEdge be5 = new BezierEdge(25, 0, 25, 100);
         BezierEdge be6 = new BezierEdge(0, 50, 100, 50);
 
-        System.out.println("lines " + be5 + " and " + be6);
+        //System.err.println("lines " + be5 + " and " + be6);
+        BezierEdge q1 = new BezierEdge(3469, 3124, 3320, 3148, 3355, 3215);
+        BezierEdge q2 = new BezierEdge(3442, 3191, 3316, 3146, 3317, 3071);
+        BezierEdge q3 = new BezierEdge(3310, 3222, 3450, 3172, 3300, 3181);
+        BezierEdge li = new BezierEdge(3423, 3040, 3277, 3164);
+        BezierEdge li2 = new BezierEdge(3399, 3095, 3365, 3039);
 
-        System.out.println("hasIntersection = " + be5.intersects(be6, t1, t2));
-        System.out.println("intersection ts: " + t1 + ", " + t2);
+        List<Point2D> ints;
+        /*ints = q2.getIntersections(q1);
+        System.err.println("intersections is "+ints);
+        ints = q2.getIntersections(li);
+        System.err.println("intersections is "+ints);
+        ints = li2.getIntersections(li);
+        System.err.println("intersections is "+ints);
+        ints = q1.getIntersections(q3);        
+        System.err.println("intersections is "+ints);*/
 
-        Point2D c = new Point2D.Double(
+        BezierEdge qa = new BezierEdge(-81.0, -78.0, -85.0, -76.0, -86.0, -66.0);
+        BezierEdge qb = new BezierEdge(-166.0, 37.0, -172.0, -21.0, -81.0, -78.0);
+        /*ints = qa.getIntersections(qb);
+        System.err.println("intersections is " + ints);        
+        BezierEdge qc = new BezierEdge(-106.0,39.0, -104.0,33.0);
+        BezierEdge qd = new BezierEdge(-104.0,33.0,-105.0,36.0,-102.0,26.0);
+        ints = qc.getIntersections(qd);
+        System.err.println("intersections is " + ints);
+        
+        ints = Intersections.intersectLineLine(new Point2D.Double(0,0), new Point2D.Double(10,0), new Point2D.Double(2,0), new Point2D.Double(5,0), true); 
+        System.err.println("intersections is " + ints);       
+        BezierEdge qe = new BezierEdge(-104,33,-104.5,35,-104,32);
+        BezierEdge qf = new BezierEdge(-106,39 ,-104,33);
+        ints = qe.getIntersections(qf);*/
+        BezierEdge qg = new BezierEdge(-66, 139, -67, 140, -61, 135);
+        BezierEdge qh = new BezierEdge(-64, 169, -66.5, 139.5, -66, 139);
+
+        List<Point2D> ps = new ArrayList<>();
+        qg.intersects(qh, t1, t2, ps);
+        System.err.println("t1 is " + t1);
+        System.err.println("t2 is " + t2);
+        System.err.println("intersections is " + ps);
+
+
+        /*Point2D c = new Point2D.Double(
                 (1 - t1.get(0)) * be5.points.get(0).getX() + t1.get(0) * be5.points.get(1).getX(),
                 (1 - t1.get(0)) * be5.points.get(0).getY() + t1.get(0) * be5.points.get(1).getY()
         );
@@ -290,8 +494,7 @@ public class BezierEdge implements Serializable {
         
         BezierEdge be = new BezierEdge(0, 0, 100, 50, 0, 100);
         
-        System.out.println("be5.dist: " + be.length());
-
+        System.out.println("be5.dist: " + be.length());*/
         //Rectangle2D out = new Rectangle2D.Double();
         //rectIntersection(new Rectangle2D.Double(0,0,50,50), new Rectangle2D.Double(0,50,50,50), out);
         //System.out.println("out = "+out);

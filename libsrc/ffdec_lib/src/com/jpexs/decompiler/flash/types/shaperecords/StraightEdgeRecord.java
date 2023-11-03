@@ -124,4 +124,40 @@ public class StraightEdgeRecord extends SHAPERECORD {
         calculateBits();
         return !SWFOutputStream.fitsInUB(4, numBits);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + (this.generalLineFlag ? 1 : 0);
+        hash = 29 * hash + (this.vertLineFlag ? 1 : 0);
+        hash = 29 * hash + this.deltaX;
+        hash = 29 * hash + this.deltaY;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StraightEdgeRecord other = (StraightEdgeRecord) obj;
+        if (this.generalLineFlag != other.generalLineFlag) {
+            return false;
+        }
+        if (this.vertLineFlag != other.vertLineFlag) {
+            return false;
+        }
+        if (this.deltaX != other.deltaX) {
+            return false;
+        }
+        return this.deltaY == other.deltaY;
+    }
+    
+    
 }
