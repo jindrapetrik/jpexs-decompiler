@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -32,16 +31,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Shape fixer.
+ * This will walk a shape and split crossed edges so FLA editor can properly load it.
  * @author JPEXS
  */
 public class ShapeFixer {
     
     final boolean DEBUG_PRINT = false;
-
-    private boolean isOnRight(Point2D a, Point2D b, Point2D c) {
-        return ((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX())) > 0;
-    }
 
     private class BezierPair {
 
@@ -223,7 +219,6 @@ public class ShapeFixer {
                                     System.err.println("xxx");
                                 }
                             }
-                            //List<Point2D> inters = be.getIntersections(be2);
 
                             if (!t1Ref.isEmpty()) {
 
