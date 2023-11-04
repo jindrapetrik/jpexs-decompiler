@@ -1,13 +1,13 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" timelineLabelWidth="236" viewAngle3D="50.6510299754819" nextSceneIdentifier="87" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
+          <DOMFontItem name="MyFont" itemID="6546c026-00000d2d" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
-          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
           <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1678292098" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
           <DOMVideoItem name="Cute Cat - 3092.flv" itemID="60671758-000001ff" sourceExternalFilepath="C:/Dropbox/Programovani/JavaSE/FFDec/libsrc/ffdec_lib/testdata/graphics/Cute Cat - 3092.flv" sourceLastImported="1617368859" videoDataHRef="M 6 1617368920.dat" videoType="h263 media" fps="24" channels="0" width="640" height="360" length="29.25"/>
-          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1615718230" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
+          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1699135424" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
      </media>
      <symbols>
           <Include href="BlueSquare.xml" itemIcon="1" loadImmediate="false" itemID="604e0a22-000002e1" lastModified="1615730090"/>
@@ -36,9 +36,9 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1">
+          <DOMTimeline name="Scene 1" currentFrame="65">
                <layers>
-                    <DOMLayer name="Scripts layer" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <Actionscript>
@@ -64,7 +64,7 @@ stop();]]></script>
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="65" keyMode="9728">
+                              <DOMFrame index="0" duration="66" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -253,7 +253,7 @@ stop();]]></script>
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Graphics layer" color="#4FFF4F" autoNamed="false">
+                    <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -333,10 +333,10 @@ stop();]]></script>
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
-                                                  <Edge fillStyle1="1" edges="
-!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
                                                   <Edge fillStyle0="1" fillStyle1="2" edges="
 !3500 4001|3500 2500!3500 2500|5000 2500"/>
+                                                  <Edge fillStyle0="1" edges="
+!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -865,10 +865,10 @@ stop();]]></script>
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="6" edges="
-!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="7" edges="
 !1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
+                                                  <Edge strokeStyle="6" edges="
+!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1467,18 +1467,18 @@ stop();]]></script>
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="5" edges="
-!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
+                                                  <Edge strokeStyle="5" edges="
+!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="4" edges="
-!1000 3660/1295 4670!1295 4670/1372 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="6" edges="
 !4647 3660/4942 4670!4942 4670/5019 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="4" edges="
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2502,6 +2502,114 @@ stop();]]></script>
                                         </DOMShape>
                                    </elements>
                               </DOMFrame>
+                              <DOMFrame index="65" keyMode="9728">
+                                   <elements>
+                                        <DOMInputText width="72" height="44.3">
+                                             <matrix>
+                                                  <Matrix tx="97.95" ty="31.25"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>AV</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMInputText>
+                                        <DOMInputText width="72" height="44.3">
+                                             <matrix>
+                                                  <Matrix tx="97.95" ty="93.8"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>AV</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMInputText>
+                                        <DOMStaticText width="64.75" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="194.35" ty="40.65"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>kerning on</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText width="67" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="194.35" ty="105.65"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>kerning off</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMInputText width="154.95" height="44.3">
+                                             <matrix>
+                                                  <Matrix tx="75" ty="171.8"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>ABCD</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" letterSpacing="10" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMInputText>
+                                        <DOMStaticText width="127.95" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="249.95" ty="188.65"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>letterspacing positive</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMInputText width="91.95" height="44.3">
+                                             <matrix>
+                                                  <Matrix tx="75" ty="244.8"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>ABCD</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" autoKern="false" letterSpacing="-10" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMInputText>
+                                        <DOMStaticText width="131.25" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="199.5" ty="257.65"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>letterspacing negative</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
                     <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
@@ -3129,7 +3237,7 @@ stop();]]></script>
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Frame description layer" color="#9933CC" locked="true" autoNamed="false">
+                    <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -3796,7 +3904,7 @@ stop();]]></script>
                               </DOMFrame>
                               <DOMFrame index="57" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -3871,6 +3979,23 @@ stop();]]></script>
                                              <textRuns>
                                                   <DOMTextRun>
                                                        <characters>062-065 radial/focal tween</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="65" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>066 EditTexts</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>

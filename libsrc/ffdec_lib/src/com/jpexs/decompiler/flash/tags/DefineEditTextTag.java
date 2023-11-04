@@ -438,11 +438,16 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
-                                        style.fontLeading = leading;
+                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);                                        
                                     } else {
-                                        // todo: parse relative sizes
+                                        int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
+                                        if (firstChar == '+') {
+                                            style.fontHeight = style.fontHeight + fontSizeDelta;
+                                        } else {
+                                            style.fontHeight = style.fontHeight - fontSizeDelta;
+                                        }                                        
                                     }
+                                    style.fontLeading = leading;
                                 }
                                 String face = unescape(attributes.getValue("face"));
                                  
@@ -455,7 +460,16 @@ public class DefineEditTextTag extends TextTag {
                                     }
                                 }
                                 
-                                // todo: parse the following attributes: letterSpacing, kerning
+                                String letterspacing = unescape(attributes.getValue("letterSpacing"));
+                                if (letterspacing != null && letterspacing.length() > 0) {
+                                    style.letterSpacing = Double.parseDouble(letterspacing);
+                                }
+                                
+                                String kerning = unescape(attributes.getValue("kerning"));
+                                if (kerning != null && kerning.length() > 0) {
+                                    style.kerning = kerning.equals("1");
+                                }
+                                                                
                                 styles.add(style);
                                 break;
                             case "br":
@@ -1077,9 +1091,14 @@ public class DefineEditTextTag extends TextTag {
 
                 String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
                 int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                ge.glyphAdvance = ge.glyphIndex == -1 ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar))
+                ge.glyphAdvance = ge.glyphIndex == -1 ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, lastStyle.kerning ? nextChar : null))
                         : (int) Math.round(font.getGlyphAdvance(ge.glyphIndex) / font.getDivider() * lastStyle.fontHeight / 1024);
-
+                ge.glyphAdvance += lastStyle.letterSpacing * SWF.unitDivisor;
+                if (lastStyle.kerning) {
+                    if (nextChar != null) {
+                        ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider();
+                    }
+                }
                 textModel.addGlyph(c, ge);
                 if (Character.isWhitespace(c)) {
                     lastWasWhiteSpace = true;

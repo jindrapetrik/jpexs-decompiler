@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Status bar with info about edges on walking shaperecords
 - [#1799] Text tags editor has new parameter `[space xxx]` specifying exact letter
  advance value (add to the font advance + calculated letterspacing)
+- DefineEditText display - letterspacing, kerning, relative font size
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
