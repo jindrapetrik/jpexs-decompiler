@@ -570,8 +570,15 @@ public class XFLConverter {
     }
 
     private static boolean shapeHasMultiLayers(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) throws XMLStreamException {
-        List<String> layers = getShapeLayers(swf, characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, false);
-        return layers.size() > 1;
+        for (SHAPERECORD rec: shapeRecords) {
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateNewStyles) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static void convertShape(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer) throws XMLStreamException {
@@ -1636,6 +1643,7 @@ public class XFLConverter {
         Reference<Integer> nextClipId = new Reference<>(-1);
         writer.writeStartElement("symbols");
         for (int ch : characters.keySet()) {
+            //System.err.println("converting " + ch);
             CharacterTag symbol = characters.get(ch);
             if ((symbol instanceof ShapeTag) && nonLibraryShapes.contains(symbol.getCharacterId())) {
                 continue; //shapes with 1 ocurrence and single layer are not added to library

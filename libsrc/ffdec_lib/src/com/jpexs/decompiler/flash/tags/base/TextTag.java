@@ -346,17 +346,22 @@ public abstract class TextTag extends DrawableTag {
                     if (nextEntry != null) {
                         kerningAdjustment = font.getGlyphKerningAdjustment(entry.glyphIndex, nextEntry.glyphIndex);
                     }
-                    defaultAdvance = (int) (Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (1024.0 * font.getDivider())));
+                    defaultAdvance = (int) (Math.round(textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (1024.0 * font.getDivider())));                    
+                    
                 } else {
                     defaultAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex)));
                 }
-                int newLetterSpacing = adv - defaultAdvance;
-                if (e == 0 || e == rec.glyphEntries.size() - 1) {
-                    if (rec.glyphEntries.size() == 1) {
-                        letterSpacing = 0;
+                if (!font.hasLayout() && !Configuration.flaExportUseMappedFontLayout.get()) {
+                    letterSpacing = 0;
+                } else {
+                    int newLetterSpacing = adv - defaultAdvance;
+                    if (e == 0 || e == rec.glyphEntries.size() - 1) {
+                        if (rec.glyphEntries.size() == 1) {
+                            letterSpacing = 0;
+                        }
+                    } else if (newLetterSpacing < letterSpacing) {
+                        letterSpacing = newLetterSpacing;
                     }
-                } else if (newLetterSpacing < letterSpacing) {
-                    letterSpacing = newLetterSpacing;
                 }
                 x += adv;
             }

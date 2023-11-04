@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 - Export Morphshape as start and end shape (SVG, PNG, BMP)
 - Directory selection dialog in directory configs in advanced settings
 - Status bar with info about edges on walking shaperecords
+- [#1799] Text tags editor has new parameter `[space xxx]` specifying exact letter
+ advance value (add to the font advance + calculated letterspacing)
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -50,6 +52,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
 - SVG export - attributes like data-characterId and data-characterName moved under `ffdec:` namespace
+- [#802] - FLA export - calculating letterspacing on text with fonts without layout is now optional 
+ and turned off by default
 
 ## [19.1.2] - 2023-10-16
 ### Fixed
@@ -3235,6 +3239,7 @@ Major version of SWF to XML export changed to 2.
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
 [#2005]: https://www.free-decompiler.com/flash/issues/2005
 [#2105]: https://www.free-decompiler.com/flash/issues/2105
+[#1799]: https://www.free-decompiler.com/flash/issues/1799
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
@@ -3249,6 +3254,7 @@ Major version of SWF to XML export changed to 2.
 [#2048]: https://www.free-decompiler.com/flash/issues/2048
 [#2108]: https://www.free-decompiler.com/flash/issues/2108
 [#2074]: https://www.free-decompiler.com/flash/issues/2074
+[#802]: https://www.free-decompiler.com/flash/issues/802
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
