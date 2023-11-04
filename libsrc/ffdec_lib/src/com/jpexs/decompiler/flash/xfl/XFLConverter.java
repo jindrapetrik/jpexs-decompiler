@@ -878,7 +878,7 @@ public class XFLConverter {
                             currentLayer.writeAttribute("edges", edgesSb.toString());
                             currentLayer.writeEndElement();
                             hasEdge = true;
-                            //edges.clear();
+                            edges.clear();
                         }
                     }
                     if (currentLayer.length() > 0) {
