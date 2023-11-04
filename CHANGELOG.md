@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#1799] Text tags editor has new parameter `[space xxx]` specifying exact letter
  advance value (add to the font advance + calculated letterspacing)
 - DefineEditText display - letterspacing, kerning, relative font size
+- FLA export - DefineEditText autokern attribute
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -49,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - [#503], [#1011], [#1257], [#1902], [#1903], [#2048] FLA export - shapes with overlapping edges
 - [#2108] Cannot change text when ShiftJIS flag is set on font
 - [#2074], [#2074] Use mxmlc.bat file when exe not available for Flex SDK compilation
+- FLA export - DefineEditText - allow negative letterspacing
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)

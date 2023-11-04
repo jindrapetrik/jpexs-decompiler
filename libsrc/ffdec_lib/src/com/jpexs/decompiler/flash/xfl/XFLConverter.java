@@ -175,6 +175,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -4450,6 +4451,8 @@ public class XFLConverter {
                 if (rightMargin > -1) {
                     writer.writeAttribute("rightMargin", twipToPixel(rightMargin));
                 }
+                
+                writer.writeAttribute("autoKern", "false");
                 if (size > -1) {
                     writer.writeAttribute("size", twipToPixel(size));
                     writer.writeAttribute("bitmapSize", size);
@@ -5103,6 +5106,8 @@ public class XFLConverter {
 
         private String color = "";
 
+        private boolean autoKern = false;
+        
         private int size = -1;
 
         private int indent = -1;
@@ -5113,7 +5118,7 @@ public class XFLConverter {
 
         private int lineSpacing = -1;
 
-        private double letterSpacing = -1;
+        private double letterSpacing = 0;
 
         private String alignment = null;
 
@@ -5130,6 +5135,13 @@ public class XFLConverter {
         private String url = null;
 
         private String target = null;
+        
+        private Stack<Double> fontLetterSpacingStack = new Stack<>();
+        private Stack<Integer> fontSizeStack = new Stack<>();
+        private Stack<String> fontFaceStack = new Stack<>();
+        private Stack<String> fontColorStack = new Stack<>();
+        private Stack<Boolean> fontKerningStack = new Stack<>();
+        
 
         @Override
         public void error(SAXParseException e) throws SAXException {
@@ -5173,6 +5185,8 @@ public class XFLConverter {
                     bold = ft.isBold();
                     size = (int) (det.fontHeight / SWF.unitDivisor);
                     fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                    fontFaceStack.push(fontFace);
+                    fontSizeStack.push(size);
                 }
             }
             if (det.hasLayout) {
@@ -5230,7 +5244,10 @@ public class XFLConverter {
                     }
                     break;
                 case "font":
-                    //kerning  ?
+                    String k = attributes.getValue("kerning");
+                    if (k != null) {
+                        autoKern = k.equals("1");
+                    }
                     String ls = attributes.getValue("letterSpacing");
                     if (ls != null) {
                         try {
@@ -5241,8 +5258,15 @@ public class XFLConverter {
                     }
                     String s = attributes.getValue("size");
                     if (s != null) {
+                        
                         try {
-                            size = Integer.parseInt(s);
+                            if (s.startsWith("+")) {
+                                size += Integer.parseInt(s.substring(1));
+                            } else if (s.startsWith("-")) {
+                                size -= Integer.parseInt(s.substring(1));
+                            } else {
+                                size = Integer.parseInt(s);
+                            }
                         } catch (NumberFormatException ex) {
                             logger.log(Level.WARNING, "Invalid font size: {0}", s);
                         }
@@ -5279,6 +5303,11 @@ public class XFLConverter {
                             }
                         }
                     }
+                    fontColorStack.push(color);
+                    fontFaceStack.push(fontFace);
+                    fontSizeStack.push(size);
+                    fontLetterSpacingStack.push(letterSpacing);
+                    fontKerningStack.push(autoKern);
                     break;
             }
         }
@@ -5302,6 +5331,33 @@ public class XFLConverter {
             if (qName.equals("li")) {
                 li = false;
             }
+            if (qName.equals("font")) {
+                fontColorStack.pop();
+                fontFaceStack.pop();
+                fontKerningStack.pop();
+                fontLetterSpacingStack.pop();
+                fontSizeStack.pop();           
+                color = null;
+                if (!fontColorStack.isEmpty()) {
+                    color = fontColorStack.peek();
+                }
+                fontFace = null;
+                if (!fontFaceStack.isEmpty()) {
+                    fontFace = fontFaceStack.peek();
+                }
+                autoKern = false;
+                if (!fontKerningStack.isEmpty()) {
+                    autoKern = fontKerningStack.peek();
+                }
+                letterSpacing = 0;
+                if (!fontLetterSpacingStack.isEmpty()) {
+                    letterSpacing = fontLetterSpacingStack.peek();
+                }
+                size = 10; //??
+                if (!fontSizeStack.isEmpty()) {
+                    size = fontSizeStack.peek();
+                }
+            }
         }
 
         private void putText(String txt) {
@@ -5320,7 +5376,8 @@ public class XFLConverter {
                 if (leftMargin > -1) {
                     result.writeAttribute("leftMargin", twipToPixel(leftMargin));
                 }
-                if (letterSpacing > -1) {
+                result.writeAttribute("autoKern", autoKern ? "true" : "false");
+                if (letterSpacing != 0) {
                     result.writeAttribute("letterSpacing", letterSpacing);
                 }
                 if (lineSpacing > -1) {

@@ -333,10 +333,10 @@ stop();]]></script>
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
+                                                  <Edge fillStyle1="1" edges="
+!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
                                                   <Edge fillStyle0="1" fillStyle1="2" edges="
 !3500 4001|3500 2500!3500 2500|5000 2500"/>
-                                                  <Edge fillStyle0="1" edges="
-!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -2562,7 +2562,7 @@ stop();]]></script>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>ABCD</characters>
+                                                       <characters>ABC1</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" autoKern="false" letterSpacing="10" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
                                                        </textAttrs>
@@ -2588,7 +2588,7 @@ stop();]]></script>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>ABCD</characters>
+                                                       <characters>ABC2</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" autoKern="false" letterSpacing="-10" size="40" bitmapSize="800" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
                                                        </textAttrs>
@@ -4011,6 +4011,7 @@ stop();]]></script>
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1432137" publishTime="1699135786"/>
           <PublishItem publishSize="1431729" publishTime="1697292442"/>
           <PublishItem publishSize="1431716" publishTime="1697292302"/>
           <PublishItem publishSize="1431768" publishTime="1697292246" publishDebug="true"/>
@@ -4029,7 +4030,6 @@ stop();]]></script>
           <PublishItem publishSize="3657436" publishTime="1666587404"/>
           <PublishItem publishSize="3657380" publishTime="1666587105"/>
           <PublishItem publishSize="3657403" publishTime="1666586960" publishDebug="true"/>
-          <PublishItem publishSize="1609" publishTime="1666586837"/>
           <PublishItem publishSize="1609" publishTime="1666586837"/>
      </publishHistory>
 </DOMDocument>
