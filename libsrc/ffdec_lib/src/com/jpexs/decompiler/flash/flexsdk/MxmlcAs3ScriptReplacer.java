@@ -235,6 +235,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
                 pack.abc.reorganizeClasses(classesRemap);
             }
             ((Tag) pack.abc.parentTag).setModified(true);
+            pack.abc.getSwf().getAbcIndex().refreshAbc(pack.abc);
             deinitReplacement(pack); //successfull finish
         }
 
@@ -243,7 +244,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
     @Override
     public boolean isAvailable() {
         String flexLocation = Configuration.flexSdkLocation.get();
-        return !(flexLocation.isEmpty() || (!new File(MxmlcRunner.getMxmlcPath(flexLocation)).exists()));
+        return !(flexLocation.isEmpty() || MxmlcRunner.getMxmlcPath(flexLocation) == null);
     }
 
     @Override
