@@ -248,7 +248,7 @@ public class SwfToSwcExporter {
             printDelay("swc.documentTag", t2, t3);
 
             if (!documentClassSet) {
-                throw new IOException("Original document class not found!");
+                //throw new IOException("Original document class not found!");
             }
             swf = recompileSWF(swf);
             t4 = System.currentTimeMillis();

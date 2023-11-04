@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - [#1866] FLA export - multiple usage of morphshapes
 - [#503], [#1011], [#1257], [#1902], [#1903], [#2048] FLA export - shapes with overlapping edges
 - [#2108] Cannot change text when ShiftJIS flag is set on font
+- [#2074], [#2074] Use mxmlc.bat file when exe not available for Flex SDK compilation
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3245,6 +3246,7 @@ Major version of SWF to XML export changed to 2.
 [#1903]: https://www.free-decompiler.com/flash/issues/1903
 [#2048]: https://www.free-decompiler.com/flash/issues/2048
 [#2108]: https://www.free-decompiler.com/flash/issues/2108
+[#2074]: https://www.free-decompiler.com/flash/issues/2074
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079
