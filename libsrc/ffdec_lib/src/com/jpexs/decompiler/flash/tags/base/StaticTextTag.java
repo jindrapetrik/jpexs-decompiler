@@ -252,6 +252,7 @@ public abstract class StaticTextTag extends TextTag {
         writer.append("]");
         int textHeight = 12;
         for (TEXTRECORD rec : textRecords) {
+            int letterSpacing = 0;
             if (rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
                 writer.append("[").newLine();
                 if (rec.styleFlagsHasFont) {
@@ -264,7 +265,7 @@ public abstract class StaticTextTag extends TextTag {
                     textHeight = rec.textHeight;
                 }
                 if (fnt != null && !ignoreLetterSpacing) {
-                    int letterSpacing = detectLetterSpacing(rec, fnt, textHeight);
+                    letterSpacing = detectLetterSpacing(rec, fnt, textHeight);
                     if (letterSpacing != 0) {
                         writer.append("letterspacing ").append(letterSpacing).newLine();
                     }
@@ -288,7 +289,24 @@ public abstract class StaticTextTag extends TextTag {
             if (fnt == null) {
                 writer.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
             } else {
-                writer.hilightSpecial(Helper.escapeActionScriptString(rec.getText(fnt)).replace("[", "\\[").replace("]", "\\]"), HighlightSpecialType.TEXT);
+                for (int i = 0; i < rec.glyphEntries.size(); i++) {
+                    GLYPHENTRY ge = rec.glyphEntries.get(i);
+                    char c = fnt.glyphToChar(ge.glyphIndex);
+                    String sc = ("" + c).replace("[", "\\[").replace("]", "\\]");
+                    writer.hilightSpecial(sc, HighlightSpecialType.TEXT);
+
+                    if (!ignoreLetterSpacing) {
+                        Character nextChar = null;
+                        if (i + 1 < rec.glyphEntries.size()) {
+                            nextChar = fnt.glyphToChar(ge.glyphIndex);
+                        }
+                        int advance = getAdvance(fnt, ge.glyphIndex, textHeight, c, nextChar);
+                        int delta = ge.glyphAdvance - advance;
+                        if (delta != letterSpacing) {
+                            writer.append("[space " + (delta - letterSpacing) + "]");
+                        }
+                    }
+                }
             }
         }
         return new HighlightedText(writer);
@@ -458,6 +476,20 @@ public abstract class StaticTextTag extends TextTag {
                                     throw new TextParseException("Invalid translatey value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
+                            case "space":
+                                try {
+                                    int space = Integer.parseInt(paramValue);
+                                    if (textRecords.isEmpty()) {
+                                        throw new TextParseException("space parameter must be placed after some text", lexer.yyline());
+                                    }
+                                    TEXTRECORD lastRecord = textRecords.get(textRecords.size() - 1);
+                                    if (!lastRecord.glyphEntries.isEmpty()) {
+                                        lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).glyphAdvance += space;
+                                    }
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid space value - number expected. Found: " + paramValue, lexer.yyline());
+                                }                                
+                                break;
                             default:
                                 throw new TextParseException("Unrecognized parameter name: " + paramName, lexer.yyline());
                         }
@@ -580,35 +612,54 @@ public abstract class StaticTextTag extends TextTag {
             advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
         } else {
             String fontName = font.getSystemFontName();
-            advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
+            advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));            
         }
 
         return advance;
     }
 
-    public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {                
-        int totalLetterSpacing = 0;
+    public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
+        int minLetterSpacing = Integer.MAX_VALUE;
+        int numNegatives = 0;
         List<GLYPHENTRY> glyphEntries = textRecord.glyphEntries;
-        
-        if (glyphEntries.isEmpty()) {
+
+        if (glyphEntries.size() < 2) {
             return 0;
         }
         
-        for (int i = 0; i < glyphEntries.size(); i++) {
+        int numMin = 0;
+        for (int i = 0; i < glyphEntries.size() - 1; i++) {
             GLYPHENTRY glyph = glyphEntries.get(i);
-            GLYPHENTRY nextGlyph = null;
+            /*GLYPHENTRY nextGlyph = null;
             if (i + 1 < glyphEntries.size()) {
                 nextGlyph = glyphEntries.get(i + 1);
-            }
-
+            }*/
+            GLYPHENTRY nextGlyph = glyphEntries.get(i + 1);
             char c = font.glyphToChar(glyph.glyphIndex);
-            Character nextChar = nextGlyph == null ? null : font.glyphToChar(nextGlyph.glyphIndex);
+            //Character nextChar = nextGlyph == null ? null : font.glyphToChar(nextGlyph.glyphIndex);
+            Character nextChar = font.glyphToChar(nextGlyph.glyphIndex);
             int advance = getAdvance(font, glyph.glyphIndex, textHeight, c, nextChar);
             int letterSpacing = glyph.glyphAdvance - advance;
-            totalLetterSpacing += letterSpacing;
+            //System.err.println("advance between char "+c+" and "+nextChar+": advance = " + advance + " glyphAdvance="+glyph.glyphAdvance+" delta:"+letterSpacing);
+            if (letterSpacing < 0) {
+                numNegatives++;
+            }
+            if (letterSpacing == minLetterSpacing) {
+                numMin++;
+            }
+            if (letterSpacing < minLetterSpacing) {
+                minLetterSpacing = letterSpacing;
+                numMin = 1;
+            }            
+        }
+        if (minLetterSpacing < 0 && numNegatives < glyphEntries.size() / 2) { //a hack, use negative letterspacing only when 50% letters use it
+            minLetterSpacing = 0;
+        }
+        if (numMin == 1) {
+            return 0;
         }
 
-        return (int) Math.round(totalLetterSpacing / glyphEntries.size());
+        return minLetterSpacing;
     }
 
     @Override

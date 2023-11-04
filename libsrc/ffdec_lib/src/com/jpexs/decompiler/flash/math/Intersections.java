@@ -207,7 +207,13 @@ public class Intersections {
         )
         );
 
-        List<Double> roots = poly.getRoots();
+        List<Double> roots;
+        try {
+            roots = poly.getRoots();
+        } catch (RuntimeException rex) {
+            //Y values of bounds must be of opposite sign.  ??fixme??
+            return result;
+        }
         for (double s : roots) {
             if (0 <= s && s <= 1) {
                 Polynomial xp = new Polynomial(Arrays.asList(

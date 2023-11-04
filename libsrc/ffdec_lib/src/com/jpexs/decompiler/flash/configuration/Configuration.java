@@ -966,7 +966,11 @@ public final class Configuration {
     
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static ConfigurationItem<Boolean> displayAs3PCodePanel = null;       
+    public static ConfigurationItem<Boolean> displayAs3PCodePanel = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> flaExportUseMappedFontLayout = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX
