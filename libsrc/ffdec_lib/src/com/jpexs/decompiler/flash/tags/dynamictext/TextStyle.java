@@ -40,6 +40,10 @@ public final class TextStyle implements Cloneable {
     public boolean underlined;
 
     public RGBA textColor;
+    
+    public double letterSpacing;
+    
+    public boolean kerning;
 
     @Override
     public TextStyle clone() {
