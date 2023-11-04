@@ -454,8 +454,11 @@ public class AdvancedSettingsDialog extends AppDialog {
                             tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
 
                             c = tf;
-                            if (confFile != null) { //|| confDirectory != null) {                            
+                            if (confFile != null) {
                                 c = new ConfigurationFileSelection(item, confFile, val.toString(), description);
+                            }
+                            if (confDirectory != null) {
+                                c = new ConfigurationDirectorySelection(item, val.toString(), description);
                             }
                         } else if (itemType == Boolean.class) {
                             JCheckBox cb = new JCheckBox();
@@ -492,6 +495,9 @@ public class AdvancedSettingsDialog extends AppDialog {
                     Component toLabelComponent = c;
                     if (toLabelComponent instanceof ConfigurationFileSelection) {
                         toLabelComponent = ((ConfigurationFileSelection) toLabelComponent).getTextField();
+                    }
+                    if (toLabelComponent instanceof ConfigurationDirectorySelection) {
+                        toLabelComponent = ((ConfigurationDirectorySelection) toLabelComponent).getTextField();
                     }
                     l.setLabelFor(toLabelComponent);
                     configPanel.add(c);
@@ -560,6 +566,8 @@ public class AdvancedSettingsDialog extends AppDialog {
             Class itemType = (Class<?>) itemType2;
             if (c instanceof ConfigurationFileSelection) {
                 value = ((ConfigurationFileSelection) c).getValue();
+            } else if (c instanceof ConfigurationDirectorySelection) {
+                value = ((ConfigurationDirectorySelection) c).getValue();
             } else if (name.equals("gui.skin")) {
                 value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
             } else if (itemType == String.class) {

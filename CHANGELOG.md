@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Morphshape SVG Export - bitmap fill strokes
 - SVG Export/Import - retain bitmap fill smoothed attribute
 - Export Morphshape as start and end shape (SVG, PNG, BMP)
+- Directory selection dialog in directory configs in advanced settings
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
