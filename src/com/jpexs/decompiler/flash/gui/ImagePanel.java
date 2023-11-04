@@ -345,6 +345,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             listener.pointsUpdated(points);
         }
     }
+    
+    private void fireStatusChanged(String status) {
+        for (MediaDisplayListener listener : listeners) {
+            listener.statusChanged(status);
+        }
+    }
 
     private boolean fireEdgeSplit(int position, double splitPoint) {
         boolean result = true;
@@ -428,6 +434,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         hilightEdgeColor = 255;
         pointEditPanel.setVisible(false);
         redraw();
+    }
+    
+    public void setStatus(String status) {
+        fireStatusChanged(status);
+    }
+    
+    public void setNoStatus() {
+        fireStatusChanged("");
     }
 
     public void addBoundsChangeListener(BoundsChangeListener listener) {
@@ -2809,6 +2823,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         rewind();
         redraw();
         fireMediaDisplayStateChanged();
+        fireStatusChanged("");
     }
 
     @Override
@@ -3500,6 +3515,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         sp.close();
                         soundPlayers.remove(sp);
                     }
+                }
+
+                @Override
+                public void statusChanged(String status) {                    
                 }
             });
 

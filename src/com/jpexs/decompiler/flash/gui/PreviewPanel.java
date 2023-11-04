@@ -580,6 +580,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         createAndRunTempSwf(currentItem);
     }
 
+    private void setStatus(String status) {
+        imagePlayControls.setStatus(status);        
+    }
+    
+    private void setNoStatus() {
+        setStatus("");
+    }
+    
     private JPanel createImagesCard() {
         JPanel shapesCard = new JPanel(new BorderLayout());
         JPanel previewPanel = new JPanel(new BorderLayout());
@@ -1180,10 +1188,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         //placeSplitPane.setDividerLocation(800);
         displayEditTagCard.add(createDisplayEditTagButtonsPanel(), BorderLayout.SOUTH);
 
-        ((GenericTagTreePanel) displayEditGenericPanel).addTreeSelectionListener(new TreeSelectionListener() {
+        ((GenericTagTreePanel) displayEditGenericPanel).addTreeSelectionListener(new TreeSelectionListener() {           
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                JTree tree = (JTree) e.getSource();
+                if (e.getNewLeadSelectionPath() == null) {
+                    displayEditImagePanel.setStatus("");
+                    displayEditImagePanel.setHilightedEdge(null);
+                    return;
+                }
+                JTree tree = (JTree) e.getSource();                
                 Object obj = e.getPath().getLastPathComponent();
                 if (obj instanceof GenericTagTreePanel.FieldNode) {
                     GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) obj;
@@ -1196,17 +1209,45 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         int x = 0;
                         int y = 0;
                         TreeModel model = tree.getModel();
+                        int fillStyle0 = 0;
+                        int fillStyle1 = 0;
+                        int lineStyle = 0;
+                        int stylesIndex = -1;
                         for (int i = 0; i < model.getChildCount(parent); i++) {
                             Object child = model.getChild(parent, i);
                             GenericTagTreePanel.FieldNode childFN = (GenericTagTreePanel.FieldNode) child;
                             SHAPERECORD rec = (SHAPERECORD) childFN.getValue(0);
+                            if (rec instanceof StyleChangeRecord) {
+                                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                                if (scr.stateNewStyles) {
+                                    fillStyle0 = 0;
+                                    fillStyle1 = 0;
+                                    lineStyle = 0;
+                                    stylesIndex++;
+                                }
+                                if (scr.stateFillStyle0) {
+                                    fillStyle0 = scr.fillStyle0;
+                                }
+                                if (scr.stateFillStyle1) {
+                                    fillStyle1 = scr.fillStyle1;
+                                }
+                                if (scr.stateLineStyle) {
+                                    lineStyle = scr.lineStyle;
+                                }
+                            }
                             if (rec == val) {
+                                String edgeStatus = "";
                                 if (rec instanceof StraightEdgeRecord) {
                                     StraightEdgeRecord ser = (StraightEdgeRecord) rec;
                                     Point point1 = new Point(x, y);
                                     Point point2 = new Point(x + ser.deltaX, y + ser.deltaY);
                                     Point[] hilightedPoint = new Point[]{point1, point2};
                                     displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                    edgeStatus = AppStrings.translate("shaperecords.edge.straight")
+                                            .replace("%x1%", "" + point1.x)
+                                            .replace("%y1%", "" + point1.y)
+                                            .replace("%x2%", "" + point2.x)
+                                            .replace("%y2%", "" + point2.y);
                                 } else if (rec instanceof CurvedEdgeRecord) {
                                     CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
                                     Point point1 = new Point(x, y);
@@ -1214,34 +1255,86 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                     Point point3 = new Point(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
                                     Point[] hilightedPoint = new Point[]{point1, point2, point3};
                                     displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                    edgeStatus = AppStrings.translate("shaperecords.edge.curved")
+                                            .replace("%x1%", "" + point1.x)
+                                            .replace("%y1%", "" + point1.y)
+                                            .replace("%x2%", "" + point2.x)
+                                            .replace("%y2%", "" + point2.y)
+                                            .replace("%x3%", "" + point3.x)
+                                            .replace("%y3%", "" + point3.y);
                                 } else if (rec instanceof StyleChangeRecord) {
-                                    StyleChangeRecord scr = (StyleChangeRecord) rec;
+                                    StyleChangeRecord scr = (StyleChangeRecord) rec;                                                                       
+                                    List<String> styleStatusParts = new ArrayList<>();
                                     if (scr.stateMoveTo) {
                                         Point point1 = new Point(scr.moveDeltaX, scr.moveDeltaY);
                                         Point[] hilightedPoint = new Point[]{point1};
                                         displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                        styleStatusParts.add(AppStrings.translate("shaperecords.edge.style.move")
+                                                .replace("%x%", "" + point1.x)
+                                                .replace("%y%", "" + point1.y));
                                     } else {
                                         Point point1 = new Point(x, y);
                                         Point[] hilightedPoint = new Point[]{point1};
-                                        displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                        displayEditImagePanel.setHilightedEdge(hilightedPoint);                                        
                                     }
+                                    if (scr.stateNewStyles) {
+                                        int shapeNum = 0;
+                                        if (displayEditTag instanceof ShapeTag) {
+                                            shapeNum = ((ShapeTag) displayEditTag).getShapeNum();
+                                        }
+                                        if (displayEditTag instanceof MorphShapeTag) {
+                                            shapeNum = ((MorphShapeTag) displayEditTag).getShapeNum();
+                                            if (shapeNum == 2) {
+                                                shapeNum = 3;
+                                            } else {
+                                                shapeNum = 1;
+                                            }
+                                        }
+                                        styleStatusParts.add(AppStrings.translate("shaperecords.edge.style.newstyles")
+                                                .replace("%numfillstyles%", "" + scr.fillStyles.fillStyles.length)
+                                                .replace("%numlinestyles%", "" + (shapeNum < 3 ? scr.lineStyles.lineStyles.length : scr.lineStyles.lineStyles2.length))
+                                            );
+                                    }
+                                    if (scr.stateFillStyle0) {
+                                        styleStatusParts.add(AppStrings.translate("shaperecords.edge.style.fillstyle0")
+                                                .replace("%value%", "" + scr.fillStyle0));
+                                    }
+                                    if (scr.stateFillStyle1) {
+                                        styleStatusParts.add(AppStrings.translate("shaperecords.edge.style.fillstyle1")
+                                                .replace("%value%", "" + scr.fillStyle1));
+                                    }                                    
+                                    String styleDetails = String.join(", ", styleStatusParts);
+                                    edgeStatus = AppStrings.translate("shaperecords.edge.style").replace("%details%", styleDetails);
                                 } else if (rec instanceof EndShapeRecord) {
                                     Point point1 = new Point(x, y);
                                     Point[] hilightedPoint = new Point[]{point1};
                                     displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                    edgeStatus = AppStrings.translate("shaperecords.edge.end");
                                 } else {
                                     displayEditImagePanel.setHilightedEdge(null);
+                                    displayEditImagePanel.setStatus("");
+                                    break;
                                 }
+                                
+                                String status = AppStrings.translate("shaperecords.status")
+                                        .replace("%fillstyle0%", "" + fillStyle0)
+                                        .replace("%fillstyle1%", "" + fillStyle1)
+                                        .replace("%linestyle%", "" + lineStyle)
+                                        .replace("%stylesindex%", "" + stylesIndex)
+                                        .replace("%edge%", edgeStatus);                                        
+                                displayEditImagePanel.setStatus(status);
                                 break;
                             }
                             x = rec.changeX(x);
                             y = rec.changeY(y);
                         }
                     } else {
+                        displayEditImagePanel.setStatus("");
                         displayEditImagePanel.setHilightedEdge(null);
                     }
 
                 } else {
+                    displayEditImagePanel.setStatus("");
                     displayEditImagePanel.setHilightedEdge(null);
                 }
             }

@@ -22,7 +22,9 @@ package com.jpexs.decompiler.flash.gui.player;
  */
 public interface MediaDisplayListener {
 
-    void mediaDisplayStateChanged(MediaDisplay source);
+    public void mediaDisplayStateChanged(MediaDisplay source);
 
-    void playingFinished(MediaDisplay source);
+    public void playingFinished(MediaDisplay source);
+    
+    public void statusChanged(String status);
 }

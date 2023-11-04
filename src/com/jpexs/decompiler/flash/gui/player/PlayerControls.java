@@ -116,6 +116,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private final JToggleButton freezeButton;
 
     private final JToggleButton muteButton;
+    
+    private final JTextField statusTextField;
 
     public static final int ZOOM_DECADE_STEPS = 10;
 
@@ -131,7 +133,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final int zeroCharacterWidth;
 
-    private final double MAX_ZOOM = 1.0e6; //in larger zooms, flash viewer stops working
+    private final double MAX_ZOOM = 1.0e6; //in larger zooms, flash viewer stops working        
 
     static {
         Font font = new JLabel().getFont();
@@ -144,7 +146,15 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     public PlayerControls(final MainPanel mainPanel, MediaDisplay display, JPanel middleButtonsPanel) {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+        
+        statusTextField = new JTextField(50);
+        statusTextField.setEditable(false);
+        statusTextField.setBorder(null);
+        statusTextField.setBackground(null);
+        //statusTextField.setVisible(true);
+        statusTextField.setOpaque(false);
+        add(statusTextField);
+        
         graphicControls = new JPanel(new BorderLayout());
         JPanel graphicButtonsPanel = new JPanel(new FlowLayout());
         JButton selectColorButton = new JButton(View.getIcon("color16"));
@@ -330,11 +340,16 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         });
         playbackControls.add(progress);
         playbackControls.add(controlPanel);
-
-        add(playbackControls);
+        
+        add(playbackControls);                        
         this.display.addEventListener(this);
     }
 
+    public void setStatus(String status) {
+        statusTextField.setText(status);
+        //statusTextField.setVisible(!status.isEmpty());
+    }
+    
     private String formatMs(long ms) {
         long s = ms / 1000;
         ms %= 1000;
@@ -627,6 +642,11 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     @Override
     public void playingFinished(MediaDisplay source) {
+    }
+
+    @Override
+    public void statusChanged(String status) {
+        setStatus(status);
     }
 
     private class TransferableImage implements Transferable {

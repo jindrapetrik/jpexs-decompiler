@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - SVG Export/Import - retain bitmap fill smoothed attribute
 - Export Morphshape as start and end shape (SVG, PNG, BMP)
 - Directory selection dialog in directory configs in advanced settings
+- Status bar with info about edges on walking shaperecords
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
