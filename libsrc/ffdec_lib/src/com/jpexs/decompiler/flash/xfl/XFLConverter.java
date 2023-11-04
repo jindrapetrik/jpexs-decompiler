@@ -570,7 +570,7 @@ public class XFLConverter {
     }
 
     private static boolean shapeHasMultiLayers(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) throws XMLStreamException {
-        for (SHAPERECORD rec: shapeRecords) {
+        for (SHAPERECORD rec : shapeRecords) {
             if (rec instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) rec;
                 if (scr.stateNewStyles) {
