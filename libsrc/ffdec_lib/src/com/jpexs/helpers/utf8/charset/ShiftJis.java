@@ -16,92 +16,34 @@
  */
 package com.jpexs.helpers.utf8.charset;
 
-import com.jpexs.decompiler.flash.action.parser.ActionParseException;
-import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
-import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
-import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.charset.Charset;
 
-/**
- * ShiftJis to unicode and back conversion. Based on
- * https://github.com/MoarVM/MoarVM/blob/master/src/strings/shiftjis_codeindex.h
- */
 public class ShiftJis extends AbstractCharsetConverter {
 
-    public static final int[][] shiftjis_offset_values = {
-        {107, 11},
-        {126, 8},
-        {141, 11},
-        {167, 7},
-        {182, 4},
-        {187, 15},
-        {212, 7},
-        {245, 6},
-        {277, 4},
-        {364, 11},
-        {461, 8},
-        {493, 8},
-        {525, 38},
-        {596, 15},
-        {644, 13},
-        {689, 438},
-        {1157, 1},
-        {1181, 8},
-        {1219, 190},
-        {4374, 43},
-        {7807, 2908}
-    };
-
-    public static final int SHIFTJIS_OFFSET_VALUES_ELEMS = 21;
-    public static final int SHIFTJIS_INDEX_TO_CP_CODEPOINTS_ELEMS = 7350;
-    public static final int SHIFTJIS_MAX_INDEX = 11103;
-
-    private static final int SHIFTJIS_NULL = -1;
-
-    private static int[] shiftjis_index_to_cp_codepoints = new int[7350];
-    private static Map<Integer, Integer> shiftjis_cp_to_index = new HashMap<>();
-
-    static {
-        //Since data is too long to save it directly into Java source, load it from bin
-
-        InputStream is = Gb2312.class.getResourceAsStream("/com/jpexs/helpers/utf8/charset/ShiftJisdata.bin");
-        if (is == null) {
-            System.exit(0);
-        }
-        ActionScriptLexer lexer = new ActionScriptLexer(new InputStreamReader(is, Utf8Helper.charset));
-        try {
-            ParsedSymbol s;
-            readOneDimensionalInt(shiftjis_index_to_cp_codepoints, lexer);
-            readMap(shiftjis_cp_to_index, lexer);
-
-        } catch (IOException | ActionParseException ex) {
-            Logger.getLogger(ShiftJis.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+    private static final Charset SHIFT_JIS_ENCODING = Charset.forName("Shift_JIS");
+    
     @Override
     public int toUnicode(int codePoint) {
-        if (codePoint < 128) {
-            return codePoint;
+        byte[] b;
+        if (codePoint > 0xff) {
+            b = new byte[]{(byte) ((codePoint >> 8) & 0xff), (byte) (codePoint & 0xff)};
+        } else {
+            b = new byte[]{(byte) codePoint};
         }
 
-        if (shiftjis_cp_to_index.containsKey(codePoint)) {
-            return shiftjis_cp_to_index.get(codePoint);
-        }
-        return SHIFTJIS_NULL;
+        
+        return new String(b, SHIFT_JIS_ENCODING).charAt(0);
     }
 
     @Override
-    public int fromUnicode(int codePoint) {
-        if (codePoint < shiftjis_index_to_cp_codepoints.length) {
-            return shiftjis_index_to_cp_codepoints[codePoint];
+    public int fromUnicode(int codePoint) {        
+        byte[] b = ("" + (char) codePoint).getBytes(SHIFT_JIS_ENCODING);
+        int r = 0;
+        for (int i = 0; i < b.length; i++) {
+            int v = b[b.length - 1 - i] & 0xff;
+            r = r + (v << (8 * i));
         }
-        return SHIFTJIS_NULL;
+        return r;        
     }
+
 }
