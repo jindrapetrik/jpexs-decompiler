@@ -54,6 +54,7 @@ All notable changes to this project will be documented in this file.
 - [#2112] GFX - new image types in DefineExternalImage
 - [#1193] FLA export - DefineEditText position and size
 - FLA export - allow float frame rate
+- FLA export - font export - allow dot as character
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
