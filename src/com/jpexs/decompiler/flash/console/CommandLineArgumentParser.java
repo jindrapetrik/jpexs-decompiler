@@ -4234,7 +4234,7 @@ public class CommandLineArgumentParser {
 
                     @Override
                     public void scriptImportError() {
-                        if (errorHandler != null && ((ConsoleAbortRetryIgnoreHandler) errorHandler).errorMode == AbortRetryIgnoreHandler.ABORT) {
+                        if (errorHandler == null || ((ConsoleAbortRetryIgnoreHandler) errorHandler).errorMode == AbortRetryIgnoreHandler.ABORT) {
                             System.exit(1);
                         }                        
                     }
