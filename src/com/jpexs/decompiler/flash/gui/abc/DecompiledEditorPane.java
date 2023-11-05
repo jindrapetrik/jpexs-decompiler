@@ -274,7 +274,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public int getMultinameUnderMouseCursor(Point pt, Reference<ABC> abcUsed) {
-        return getMultinameAtPos(viewToModel(pt), abcUsed);
+        return getMultinameAtPos(View.textComponentViewToModel(this, pt), abcUsed);
     }
 
     public int getMultinameUnderCaret(Reference<ABC> abcUsed) {
@@ -1039,7 +1039,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         final Point point = new Point(e.getX(), e.getY());
-        final int pos = abcPanel.decompiledTextArea.viewToModel(point);
+        final int pos = View.textComponentViewToModel(abcPanel.decompiledTextArea,point);
         final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
 
         if (identifier != null && !identifier.isEmpty()) {

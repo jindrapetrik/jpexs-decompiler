@@ -51,6 +51,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -1239,10 +1240,13 @@ public class Translator extends JFrame implements ItemListener {
         public String toString() {
             String[] parts = locale.split("_");
             Locale loc;
-            if (parts.length == 2) {
-                loc = new Locale(parts[0], parts[1]);
+            
+            
+            
+            if (parts.length == 2) {                                
+                loc = View.createLocale(parts[0], parts[1]);
             } else {
-                loc = new Locale(parts[0]);
+                loc = View.createLocale(parts[0]);
             }
 
             String ret = loc.getDisplayName() + " [" + locale + "]";

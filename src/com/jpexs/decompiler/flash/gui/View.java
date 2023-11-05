@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
+import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +31,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.TexturePaint;
@@ -38,6 +40,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
@@ -48,6 +52,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -77,13 +82,16 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.TextUI;
 import javax.swing.plaf.basic.BasicColorChooserUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
@@ -793,5 +801,124 @@ public class View {
 
     public static boolean isOceanic() {
         return SubstanceLookAndFeel.getCurrentSkin() instanceof OceanicSkin;
+    }
+    
+    /**
+     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java 8.
+     * @param editor
+     * @param pt
+     * @return 
+     */
+    public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {        
+        try {        
+            return (int)(Integer)JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            //method does not exist, we must be on Java8
+        }
+        
+        //Try older method
+        Point p = new Point((int) Math.round(pt.getX()), (int) Math.round(pt.getY()));
+        try {        
+            return (int)(Integer)JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
+        }
+    }
+    
+    /**
+     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java 8.
+     * @param editor
+     * @param pt
+     * @return 
+     */
+    public static int textComponentViewToModel(JTextComponent editor, Point pt) {
+        Point2D p2d = new Point2D.Double(pt.x, pt.y);
+        return textComponentViewToModel(editor, p2d);
+    }
+    
+    /**
+     * This calls JTextComponent.modelToView2D on Java 9+ or modelToView on Java 8.
+     * @param editor
+     * @param pos
+     * @return 
+     * @throws javax.swing.text.BadLocationException 
+     */
+    public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {                
+        try {        
+            return (Rectangle2D)JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            //method does not exist, we must be on Java8
+        }
+        
+        //Try older method
+        try {        
+            return (Rectangle)JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);            
+            return null;
+        }
+    }
+    
+    /**
+     * This calls TextUI.modelToView2D on Java 9+ or modelToView on Java 8.
+     * @param textUi
+     * @param t
+     * @param pos
+     * @param bias
+     * @return 
+     * @throws javax.swing.text.BadLocationException 
+     */
+    public static Rectangle2D textUIModelToView(TextUI textUi, JTextComponent t, int pos, Position.Bias bias) throws BadLocationException {
+        try {        
+            return (Rectangle2D) TextUI.class.getDeclaredMethod("modelToView2D", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            //method does not exist, we must be on Java8
+        }
+        
+        //Try older method
+        try {
+            return (Rectangle) TextUI.class.getDeclaredMethod("modelToView", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }        
+    }
+    
+    /**
+     * Creates locale using Locale.of on Java19, using constructor on older Javas.
+     * @param language
+     * @param country
+     * @return 
+     */
+    public static Locale createLocale(String language, String country) {
+        try {
+            return (Locale) Locale.class.getDeclaredMethod("of", String.class, String.class).invoke(null, language, country);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            try {
+                return Locale.class.getDeclaredConstructor(String.class, String.class).newInstance(language, country);
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
+                Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex1);
+                return null;
+            }
+        }
+    }
+    
+    /**
+     * Creates locale using Locale.of on Java19, using constructor on older Javas.
+     * @param language
+     * @return 
+     */
+    public static Locale createLocale(String language) {
+        try {
+            return (Locale) Locale.class.getDeclaredMethod("of", String.class).invoke(null, language);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
+            try {
+                return Locale.class.getDeclaredConstructor(String.class).newInstance(language);
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
+                Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex1);
+                return null;
+            }
+        }
     }
 }

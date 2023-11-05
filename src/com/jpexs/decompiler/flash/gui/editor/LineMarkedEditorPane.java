@@ -33,6 +33,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -222,8 +223,9 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 @Override
                 public void run() {
                     try {
-                        Rectangle r = modelToView(pos);
-                        scrollRectToVisible(r);
+                        Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textComponentModelToView(LineMarkedEditorPane.this, pos);
+                        Rectangle r2 = new Rectangle((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
+                        scrollRectToVisible(r2);
                     } catch (BadLocationException ex) {
                         //ignore
                     }
@@ -245,8 +247,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             return null;
         }
         try {
-            Rectangle r = modelToView(pos);
-            return new Point(r.x, r.y);
+            Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textComponentModelToView(this, pos);
+            return new Point((int) r.getX(), (int) r.getY());
         } catch (BadLocationException ex) {
             return null;
         }
@@ -354,12 +356,12 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             SyntaxDocument sd = (SyntaxDocument) d;
 
             //correction of token last character
-            int pos = viewToModel(lastPos);
-            Rectangle r;
+            int pos = com.jpexs.decompiler.flash.gui.View.textComponentViewToModel(this, lastPos);
+            Rectangle2D r;
             try {
-                r = modelToView(pos);
+                r = com.jpexs.decompiler.flash.gui.View.textComponentModelToView(this, pos);
                 if (r != null) {
-                    if (lastPos.x < r.x) {
+                    if (lastPos.x < r.getX()) {
                         pos--;
                     }
                 }
@@ -519,20 +521,9 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 Segment seg = new Segment();
                 ((SyntaxDocument) c.getDocument()).getText(offs0, offs1 - offs0, seg);
 
-                Rectangle r = mapper.modelToView(c, offs0, Position.Bias.Forward);
+                Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, offs0, Position.Bias.Forward);
                 FontMetrics fm = g.getFontMetrics();
-                //int fh = fm.getHeight();
-                fgStyle.drawText(seg, r.x, r.y + fm.getAscent(), g, null, offs0);
-                /*for (int i = offs0; i < offs1; i++) {
-
-                 Rectangle r = mapper.modelToView(c, i, Position.Bias.Forward);
-                 Rectangle r1 = mapper.modelToView(c, i + 1, Position.Bias.Forward);
-                 if (r1.y == r.y) {
-                 ((SyntaxDocument) c.getDocument()).getText(i, 1, seg);
-                 fgStyle.drawText(seg, r.x, r.y, g, null, i);
-                 //g.drawLine(r.x, r.y + r.height - 3, r1.x, r.y + r.height - 3);
-                 }
-                 }*/
+                fgStyle.drawText(seg, (int) r.getX(), (int) r.getY() + fm.getAscent(), g, null, offs0);               
 
             } catch (BadLocationException e) {
                 // can't render
@@ -599,10 +590,10 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                 g.setColor(col);
                 for (int i = offs0; i < offs1; i++) {
 
-                    Rectangle r = mapper.modelToView(c, i, Position.Bias.Forward);
-                    Rectangle r1 = mapper.modelToView(c, i + 1, Position.Bias.Forward);
-                    if (r1.y == r.y) {
-                        g.drawLine(r.x, r.y + r.height - 3, r1.x, r.y + r.height - 3);
+                    Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i, Position.Bias.Forward);
+                    Rectangle2D r1 = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, i + 1, Position.Bias.Forward);
+                    if (r1.getY() == r.getY()) {
+                        g.drawLine((int) r.getX(), (int) (r.getY() + r.getHeight() - 3), (int) r1.getX(), (int) (r.getY() + r.getHeight() - 3));
                     }
                 }
 
