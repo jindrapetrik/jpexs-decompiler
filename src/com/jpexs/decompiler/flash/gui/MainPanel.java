@@ -2542,16 +2542,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         public void run() {
                             if (Main.isDebugPCode()) {
                                 if (classIndex != -1) {
-                                    boolean classChanged = false;
                                     if (abcPanel.decompiledTextArea.getClassIndex() != classIndex) {
                                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                                        classChanged = true;
-                                    }
-                                    if (traitIndex != -10 && (classChanged || abcPanel.decompiledTextArea.lastTraitIndex != traitIndex)) {
-                                        abcPanel.decompiledTextArea.gotoTrait(traitIndex);
                                     }
                                 }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.gotoInstrLine(line);
+                                abcPanel.decompiledTextArea.gotoMethod(methodIndex, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.gotoInstrLine(line);
+                                    }                                    
+                                });
+                                
                             } else {
                                 abcPanel.decompiledTextArea.gotoLine(line);
                             }

@@ -55,6 +55,8 @@ All notable changes to this project will be documented in this file.
 - [#1193] FLA export - DefineEditText position and size
 - FLA export - allow float frame rate
 - FLA export - font export - allow dot as character
+- AS3 Debugging P-code inside nested functions
+- AS3 Debugging - show (and click through) proper call stack
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)

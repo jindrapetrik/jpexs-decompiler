@@ -43,6 +43,11 @@ public class DebugStackPanel extends JPanel {
 
     private int depth = 0;
 
+    private int[] classIndices = new int[0];
+    private int[] methodIndices = new int[0];
+    private int[] traitIndices = new int[0];
+    
+    
     public DebugStackPanel() {
         stackTable = new JTable();
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
@@ -90,7 +95,7 @@ public class DebugStackPanel extends JPanel {
                         String scriptName = (String) stackTable.getModel().getValueAt(row, 0);
                         int line = (int) (Integer) stackTable.getModel().getValueAt(row, 1);
                         Main.getMainFrame().getPanel().gotoScriptLine(Main.getMainFrame().getPanel().getCurrentSwf(),
-                                scriptName, line, -1, -1, -1);
+                                scriptName, line, classIndices[row], traitIndices[row], methodIndices[row]);
                         Main.getDebugHandler().setDepth(row);
                     }
                 }
@@ -115,11 +120,22 @@ public class DebugStackPanel extends JPanel {
         }
         active = true;
         Object[][] data = new Object[info.files.size()][3];
+        int[] newClassIndices = new int[info.files.size()];
+        int[] newMethodIndices = new int[info.files.size()];
+        int[] newTraitIndices = new int[info.files.size()];
         for (int i = 0; i < info.files.size(); i++) {
-            data[i][0] = Main.getDebugHandler().moduleToString(info.files.get(i));
+            int f = info.files.get(i);
+            data[i][0] = Main.getDebugHandler().moduleToString(f);
             data[i][1] = info.lines.get(i);
-            data[i][2] = info.stacks.get(i);            
+            data[i][2] = info.stacks.get(i);      
+            Integer newClassIndex = Main.getDebugHandler().moduleToClassIndex(f);
+            newClassIndices[i] = newClassIndex == null ? -1 : newClassIndex;
+            Integer newMethodIndex = Main.getDebugHandler().moduleToMethodIndex(f);
+            newMethodIndices[i] = newMethodIndex == null ? -1 : newMethodIndex;
+            Integer newTraitIndex = Main.getDebugHandler().moduleToTraitIndex(f);;
+            newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
+        
 
         DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
             AppStrings.translate("callStack.header.file"),
@@ -133,6 +149,9 @@ public class DebugStackPanel extends JPanel {
 
         };
         stackTable.setModel(tm);
+        this.classIndices = newClassIndices;
+        this.methodIndices = newMethodIndices;
+        this.traitIndices = newTraitIndices;
 
         View.execInEventDispatchLater(new Runnable() {
             @Override

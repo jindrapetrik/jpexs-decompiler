@@ -596,13 +596,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     Trait trait;
                     int traitIndex = -10;
                     if (trt != null && cls != null) {
-                        traitIndex = (int) trt.getProperties().index;
-
-                        trait = abc.findTraitByTraitId(classIndex, traitIndex);
-                        if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
-                                || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
-                            continue; //inner anonymous function - ignore. TODO: make work
-                        }
+                        traitIndex = (int) trt.getProperties().index;                       
                     }
                     bodyToIdentifier.put(bodyIndex, "abc:" + abcIndex + ",script:" + scriptIndex + ",class:" + classIndex + ",trait:" + traitIndex + ",method:" + methodIndex + ",body:" + bodyIndex);
                     break;

@@ -772,6 +772,10 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void gotoMethod(int methodId) {
+        gotoMethod(methodId, null);
+    }
+
+    public void gotoMethod(int methodId, Runnable afterHandler) {
         Highlighting tm = Highlighting.searchIndex(highlightedText.getMethodHighlights(), methodId);
         if (tm != null) {
             int pos = 0;
@@ -791,6 +795,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 public void run() {
                     if (fpos <= getDocument().getLength()) {
                         setCaretPosition(fpos);
+                    }
+                    if (afterHandler != null) {
+                        afterHandler.run();
                     }
                 }
             }, 100);
