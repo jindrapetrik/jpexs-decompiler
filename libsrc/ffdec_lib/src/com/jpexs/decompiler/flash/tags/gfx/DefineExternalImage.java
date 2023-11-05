@@ -65,6 +65,14 @@ public class DefineExternalImage extends ImageTag {
     public static final int BITMAP_FORMAT_TGA = 1;
 
     public static final int BITMAP_FORMAT_DDS = 2;
+    
+    //It looks like gfxexport produces BITMAP_FORMAT2_* values for format,
+    //but BITMAP_FORMAT_* works the same way
+    public static final int BITMAP_FORMAT2_JPEG = 10;
+
+    public static final int BITMAP_FORMAT2_TGA = 13;
+
+    public static final int BITMAP_FORMAT2_DDS = 14;
 
     @HideInRawEdit
     private SerializableImage serImage;
@@ -174,14 +182,13 @@ public class DefineExternalImage extends ImageTag {
             if (targetWidth <= 0 || targetHeight <= 0) {
                 serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
                 serImage.fillTransparent();
-                return;
-            }
-
-            if (bitmapFormat == BITMAP_FORMAT_TGA) {
+            } else if (bitmapFormat == BITMAP_FORMAT2_JPEG || bitmapFormat == BITMAP_FORMAT2_TGA || bitmapFormat == BITMAP_FORMAT_TGA) {
                 Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
                 if (imagePath != null && imagePath.toFile().exists()) {
                     try {
-                        TgaSupport.init();
+                        if (bitmapFormat == BITMAP_FORMAT2_TGA || bitmapFormat == BITMAP_FORMAT_TGA) {
+                            TgaSupport.init();
+                        }
                         BufferedImage bufImage = ImageIO.read(imagePath.toFile());
                         Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
                         bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
@@ -194,7 +201,7 @@ public class DefineExternalImage extends ImageTag {
                 } else {
                     createFailedImage();
                 }
-            } else {
+            } else if (bitmapFormat == BITMAP_FORMAT2_DDS || bitmapFormat == BITMAP_FORMAT2_DDS) {
                 Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
                 if (imagePath != null && imagePath.toFile().exists()) {
                     try {
@@ -206,12 +213,15 @@ public class DefineExternalImage extends ImageTag {
                         bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
                         bufImage.getGraphics().drawImage(scaled, 0, 0, null);
                         serImage = new SerializableImage(bufImage);
+                        cachedImageFilename = fileName;
                     } catch (IOException ex) {
                         createFailedImage();
                     }
                 } else {
                     createFailedImage();
                 }
+            } else {
+                createFailedImage();
             }
         }
     }
@@ -237,6 +247,15 @@ public class DefineExternalImage extends ImageTag {
                 break;
             case BITMAP_FORMAT_DDS:
                 bitmapFormatStr = "DDS (2)";
+                break;
+            case BITMAP_FORMAT2_JPEG:
+                bitmapFormatStr = "JPEG (10)";
+                break;
+            case BITMAP_FORMAT2_TGA:
+                bitmapFormatStr = "TGA (13)";
+                break;
+            case BITMAP_FORMAT2_DDS:
+                bitmapFormatStr = "DDS (14)";
                 break;
         }
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);

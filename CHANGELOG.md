@@ -51,6 +51,7 @@ All notable changes to this project will be documented in this file.
 - [#2108] Cannot change text when ShiftJIS flag is set on font
 - [#2074], [#2074] Use mxmlc.bat file when exe not available for Flex SDK compilation
 - FLA export - DefineEditText - allow negative letterspacing
+- [#2112] GFX - new image types in DefineExternalImage
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3257,6 +3258,7 @@ Major version of SWF to XML export changed to 2.
 [#2048]: https://www.free-decompiler.com/flash/issues/2048
 [#2108]: https://www.free-decompiler.com/flash/issues/2108
 [#2074]: https://www.free-decompiler.com/flash/issues/2074
+[#2112]: https://www.free-decompiler.com/flash/issues/2112
 [#802]: https://www.free-decompiler.com/flash/issues/802
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
