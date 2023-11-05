@@ -1589,6 +1589,7 @@ Major version of SWF to XML export changed to 2.
 - [#1265] Error during export
 - [#1268] Font export - Using second glyph when two glyphs for one character found
 - [#1268] GFX compacted font - fixed advance values on export
+- FLA export - allow to rename target file instead of same name as swf file
 
 ## [8.0.1] - 2016-02-20
 ### Changed
