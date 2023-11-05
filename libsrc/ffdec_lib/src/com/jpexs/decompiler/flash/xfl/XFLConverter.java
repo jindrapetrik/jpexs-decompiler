@@ -4516,9 +4516,7 @@ public class XFLConverter {
             throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
         }
         File flaFile = new File(outfile);  //c:/mydir/myfile.fla                      
-        String baseName = swfFileName;
-        File f = new File(baseName); //myfile.swf
-        baseName = f.getName();
+        String baseName = flaFile.getName();
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf('.')); //myfile
         }
