@@ -811,7 +811,7 @@ public class View {
      */
     public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {        
         try {        
-            return (int)(Integer)JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
+            return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             //method does not exist, we must be on Java8
         }
@@ -819,7 +819,7 @@ public class View {
         //Try older method
         Point p = new Point((int) Math.round(pt.getX()), (int) Math.round(pt.getY()));
         try {        
-            return (int)(Integer)JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
+            return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             return 0;
@@ -846,14 +846,14 @@ public class View {
      */
     public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {                
         try {        
-            return (Rectangle2D)JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
+            return (Rectangle2D) JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             //method does not exist, we must be on Java8
         }
         
         //Try older method
         try {        
-            return (Rectangle)JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
+            return (Rectangle) JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);            
             return null;
