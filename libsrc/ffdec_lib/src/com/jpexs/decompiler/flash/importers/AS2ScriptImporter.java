@@ -83,26 +83,38 @@ public class AS2ScriptImporter {
                 String txt = Helper.readTextFile(fileName);
 
                 ActionScript2Parser par = new ActionScript2Parser(asm.getSwf(), asm);
+                boolean errored = false;
                 try {
                     asm.setActions(par.actionsFromString(txt, asm.getSwf().getCharset()));
                 } catch (ValueTooLargeException ex) {
                     logger.log(Level.SEVERE, "Script or some of its functions are too large, file: {0}", fileName);
+                    errored = true;                    
                 } catch (ActionParseException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
+                    errored = true;                    
                 } catch (CompilationException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
+                    errored = true;                    
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                    errored = true;                    
                 } catch (InterruptedException ex) {
                     return importCount;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                    errored = true;
                 }
 
-                asm.setModified();
-                importCount++;
-                if (listener != null) {
-                    listener.scriptImported();
+                if (!errored) {
+                    asm.setModified();
+                    importCount++;
+                    if (listener != null) {
+                        listener.scriptImported();
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.scriptImportError();
+                    }
                 }
             }
 
@@ -111,18 +123,27 @@ public class AS2ScriptImporter {
                 asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
+                boolean errored = false;
                 try {
                     asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false, asm.getSwf().getCharset()));
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                    errored = true;
                 } catch (ActionParseException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
+                    errored = true;
                 }
 
-                asm.setModified();
-                importCount++;
-                if (listener != null) {
-                    listener.scriptImported();
+                if (!errored) {
+                    asm.setModified();
+                    importCount++;
+                    if (listener != null) {
+                        listener.scriptImported();
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.scriptImportError();
+                    }
                 }
             }
 
@@ -144,15 +165,24 @@ public class AS2ScriptImporter {
                 asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
+                boolean errored = false;
                 try {
                     asm.setConstantPools(Helper.getConstantPoolsFromText(txt));
                 } catch (ConstantPoolTooBigException ex) {
                     logger.log(Level.SEVERE, null, ex);
+                    errored = true;
                 }
-                asm.setModified();
-                importCount++;
-                if (listener != null) {
-                    listener.scriptImported();
+                
+                if (!errored) {
+                    asm.setModified();
+                    importCount++;
+                    if (listener != null) {
+                        listener.scriptImported();
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.scriptImportError();
+                    }
                 }
             }
         }

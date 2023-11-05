@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
  advance value (add to the font advance + calculated letterspacing)
 - DefineEditText display - letterspacing, kerning, indent, relative font size
 - FLA export - DefineEditText autokern attribute
+- [#2113] Commandline - allow `-onerror abort` argument on `-importScript`
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -3250,6 +3251,7 @@ Major version of SWF to XML export changed to 2.
 [#2005]: https://www.free-decompiler.com/flash/issues/2005
 [#2105]: https://www.free-decompiler.com/flash/issues/2105
 [#1799]: https://www.free-decompiler.com/flash/issues/1799
+[#2113]: https://www.free-decompiler.com/flash/issues/2113
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013

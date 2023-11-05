@@ -69,6 +69,9 @@ public class AS3ScriptImporter {
                         for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
                             logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", fileName).replace("%col%", "" + item.getCol()));
                         }
+                        if (listener != null) {
+                            listener.scriptImportError();
+                        }
                     } catch (InterruptedException ex) {
                         return importCount;
                     }

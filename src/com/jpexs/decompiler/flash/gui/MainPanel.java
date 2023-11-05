@@ -3774,6 +3774,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         public void scriptImported() {
                             countAs2++;
                         }
+
+                        @Override
+                        public void scriptImportError() {
+                            
+                        }                                                
                     });
 
                     List<ScriptPack> packs;
@@ -3791,6 +3796,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         public void scriptImported() {
                             countAs3++;
                         }
+
+                        @Override
+                        public void scriptImportError() {
+                        }                                                
                     }
                     );
 

@@ -122,6 +122,7 @@ import com.jpexs.decompiler.flash.importers.FontImporter;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.MorphShapeImporter;
 import com.jpexs.decompiler.flash.importers.MovieImporter;
+import com.jpexs.decompiler.flash.importers.ScriptImporterProgressListener;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SoundImporter;
 import com.jpexs.decompiler.flash.importers.SpriteImporter;
@@ -1140,7 +1141,7 @@ public class CommandLineArgumentParser {
             parseImportText(args, charset);
             System.exit(0);
         } else if (command.equals("importscript")) {
-            parseImportScript(args, charset, air);
+            parseImportScript(args, charset, air, handler);
             System.exit(0);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
@@ -4202,7 +4203,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportScript(Stack<String> args, String charset, boolean air) {
+    private static void parseImportScript(Stack<String> args, String charset, boolean air, AbortRetryIgnoreHandler errorHandler) {
 
         String flexLocation = Configuration.flexSdkLocation.get();
         if (Configuration.useFlexAs3Compiler.get() && (flexLocation.isEmpty() || (!new File(flexLocation).exists()))) {
@@ -4226,8 +4227,20 @@ public class CommandLineArgumentParser {
                 } else {
                     scriptsFolder = baseFolder;
                 }
-                new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs());
+                ScriptImporterProgressListener listener = new ScriptImporterProgressListener() {
+                    @Override
+                    public void scriptImported() {
+                    }
+
+                    @Override
+                    public void scriptImportError() {
+                        if (errorHandler != null && ((ConsoleAbortRetryIgnoreHandler)errorHandler).errorMode == AbortRetryIgnoreHandler.ABORT) {
+                            System.exit(1);
+                        }                        
+                    }
+                };                       
+                new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), listener);
+                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs(), listener);
 
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
