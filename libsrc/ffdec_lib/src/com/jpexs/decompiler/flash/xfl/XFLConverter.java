@@ -4333,10 +4333,6 @@ public class XFLConverter {
             double padding = 2;
             width -= 2 * padding;
             height -= 2 * padding;
-            if (det.hasLayout) {
-                width -= twipToPixel(det.rightMargin);
-                width -= twipToPixel(det.leftMargin);
-            }
             writer.writeAttribute("width", width);
             writer.writeAttribute("height", height);
             if (det.border) {
