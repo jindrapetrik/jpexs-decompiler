@@ -211,8 +211,14 @@ public class Intersections {
         try {
             roots = poly.getRoots();
         } catch (RuntimeException rex) {
-            //Y values of bounds must be of opposite sign.  ??fixme??
-            return result;
+            /*
+            Y values of bounds must be of opposite sign.  ??fixme??
+            
+            Samples where this happens:
+            M 6369  13040 Q 6380 13030 6427 13018 and M 6338 13099 Q 6358 13050 6369 13040
+            M 6369 13040 Q 6380 13030 6427 13018 and M 6338 13099 Q 6358 13050 6369 13040
+            */
+            roots = new ArrayList<>();
         }
         for (double s : roots) {
             if (0 <= s && s <= 1) {
