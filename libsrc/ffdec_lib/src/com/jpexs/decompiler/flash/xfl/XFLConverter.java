@@ -4362,7 +4362,9 @@ public class XFLConverter {
                 writer.writeAttribute("variableName", det.variableName);
             }
             writer.writeStartElement("matrix");
-            convertMatrix(matrix, writer);
+            Matrix matrix2 = new Matrix(matrix);
+            matrix2 = matrix2.preConcatenate(Matrix.getTranslateInstance(det.bounds.Xmin + 40, det.bounds.Ymin + 40)); // 40 is magic value, I don't know why but it's there
+            convertMatrix(matrix2.toMATRIX(), writer);
             writer.writeEndElement();
             writer.writeStartElement("textRuns");
             String txt = "";
