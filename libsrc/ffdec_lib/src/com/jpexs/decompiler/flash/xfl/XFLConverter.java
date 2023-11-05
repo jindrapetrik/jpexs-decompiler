@@ -4568,7 +4568,7 @@ public class XFLConverter {
                 "playOptionsPlayFrameActions", "false",
                 "autoSaveHasPrompted", "true",
                 "backgroundColor", backgroundColor,
-                "frameRate", Integer.toString((int) swf.frameRate) // todo: is the cast to int needed?
+                "frameRate", doubleToString(swf.frameRate)
             });
 
             if (Double.compare(width, 550) != 0) {
