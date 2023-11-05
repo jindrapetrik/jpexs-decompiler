@@ -66,6 +66,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -390,6 +391,7 @@ public class DefineEditTextTag extends TextTag {
         if (hasText) {
             str = initialText;
         }
+        style.leftMargin = leftMargin;
         final List<CharacterWithStyle> ret = new ArrayList<>();
         if (html) {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -1166,11 +1168,46 @@ public class DefineEditTextTag extends TextTag {
 
         textModel.calculateTextWidths();
 
+        Set<Integer> noIndentLineIndices = new HashSet<>();
+        
+        for (int k = 0; k < lines.size(); k++) {
+            List<SameStyleTextRecord> line = lines.get(k);
+            int width = leftMargin;
+            if (!noIndentLineIndices.contains(k)) {
+                width += indent;
+            }
+            for (int i = 0; i < line.size(); i++) {
+                SameStyleTextRecord tr = line.get(i);
+                for (int g = 0; g < tr.glyphEntries.size(); g++) {
+                    GlyphCharacter gc = tr.glyphEntries.get(g);
+                    int advance = gc.glyphEntry.glyphAdvance;
+                    if (width + advance > bounds.getWidth()) {
+                        SameStyleTextRecord newTr = new SameStyleTextRecord();
+                        newTr.glyphEntries = new ArrayList<>();
+                        newTr.style = tr.style.clone();
+                        int gsize = tr.glyphEntries.size();
+                        for (int g2 = g; g2 < gsize; g2++) {
+                            newTr.glyphEntries.add(tr.glyphEntries.remove(g));
+                        }
+                        List<SameStyleTextRecord> newLine = new ArrayList<>();
+                        newLine.add(newTr);
+                        int lsize = line.size();
+                        for (int i2 = i + 1; i2 < lsize; i2++) {
+                            newLine.add(line.remove(i));
+                        }
+                        lines.add(k + 1, newLine);
+                        noIndentLineIndices.add(k + 1);
+                    }
+                    width += advance;
+                }
+            }
+        }
         List<TEXTRECORD> allTextRecords = new ArrayList<>();
         int lastHeight = 0;
         int yOffset = 0;
         boolean firstLine = true;
-        for (List<SameStyleTextRecord> line : lines) {
+        for (int k = 0; k < lines.size(); k++) {
+            List<SameStyleTextRecord> line = lines.get(k);
             int width = 0;
             int currentOffset = 0;
             if (line.isEmpty()) {
@@ -1193,23 +1230,33 @@ public class DefineEditTextTag extends TextTag {
             firstLine = false;
             yOffset += currentOffset;
             int alignOffset = 0;
+            
+            int currentIndent = 0;
+            if (!noIndentLineIndices.contains(k)) {
+                currentIndent = indent;
+            }
+            
             switch (align) {
                 case ALIGN_LEFT:
                     alignOffset = 0;
                     break;
                 case ALIGN_RIGHT:
-                    alignOffset = bounds.getWidth() - width;
+                    alignOffset = bounds.getWidth() - width - leftMargin - currentIndent;
                     break;
                 case ALIGN_CENTER:
-                    alignOffset = (bounds.getWidth() - width) / 2;
+                    alignOffset = (bounds.getWidth() - width - leftMargin - currentIndent) / 2;
                     break;
                 case ALIGN_JUSTIFY:
                     // todo;
                     break;
-            }
+            }            
             for (SameStyleTextRecord tr : line) {
                 tr.xOffset = alignOffset;
                 alignOffset += tr.width;
+            }
+            for (SameStyleTextRecord tr : line) {
+                tr.xOffset += tr.style.leftMargin;
+                tr.xOffset += currentIndent;
             }
             for (SameStyleTextRecord tr : line) {
                 TEXTRECORD tr2 = new TEXTRECORD();

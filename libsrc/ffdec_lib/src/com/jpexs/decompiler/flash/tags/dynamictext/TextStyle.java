@@ -44,6 +44,8 @@ public final class TextStyle implements Cloneable {
     public double letterSpacing;
     
     public boolean kerning;
+    
+    public double leftMargin;
 
     @Override
     public TextStyle clone() {
