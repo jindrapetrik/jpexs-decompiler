@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [20.0.0] - 2023-11-05
 ### Added
 - [#1130], [#1220] Remembering last used screen (monitor), 
  opening dialogs on same screen as the main window,
@@ -3093,7 +3093,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.2...dev
+[20.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.2...version20.0.0
 [19.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.1...version19.1.2
 [19.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.0...version19.1.1
 [19.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.0.0...version19.1.0
@@ -3252,7 +3252,6 @@ Major version of SWF to XML export changed to 2.
 [#2005]: https://www.free-decompiler.com/flash/issues/2005
 [#2105]: https://www.free-decompiler.com/flash/issues/2105
 [#1799]: https://www.free-decompiler.com/flash/issues/1799
-[#2113]: https://www.free-decompiler.com/flash/issues/2113
 [#1306]: https://www.free-decompiler.com/flash/issues/1306
 [#1768]: https://www.free-decompiler.com/flash/issues/1768
 [#2013]: https://www.free-decompiler.com/flash/issues/2013
@@ -3270,6 +3269,7 @@ Major version of SWF to XML export changed to 2.
 [#2112]: https://www.free-decompiler.com/flash/issues/2112
 [#1193]: https://www.free-decompiler.com/flash/issues/1193
 [#802]: https://www.free-decompiler.com/flash/issues/802
+[#2113]: https://www.free-decompiler.com/flash/issues/2113
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
 [#2079]: https://www.free-decompiler.com/flash/issues/2079

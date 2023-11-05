@@ -63,6 +63,71 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="20.0.0" date="2023-11-05">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1130, #1220 Remembering last used screen (monitor), opening dialogs on same screen as the main window, do not restore window size to larger value that actual screen size</li>
+					<li>#1717 AS1/2/3 Option to hide P-code panel</li>
+					<li>#2005 Export files to directories by bundle names on multiple bundle (zips, etc.) selection</li>
+					<li>ActionScript Debugger - Call stack frames switching - view variables around call stack</li>
+					<li>ActionScript Debugger - Highlight lines of callstack</li>
+					<li>#2105 GFX - Basic tag info</li>
+					<li>Context menu items to create new tags (shape, morphshape, sprite, image, movie, sound, binaryData) from files and using font embed dialog for fonts</li>
+					<li>Replacing morphshapes (either from previously exported animated SVG or from two shape files)</li>
+					<li>SVG Export - stroke-bitmapId, fill-bitmapId attribute</li>
+					<li>Morphshape SVG Export - bitmap fill strokes</li>
+					<li>SVG Export/Import - retain bitmap fill smoothed attribute</li>
+					<li>Export Morphshape as start and end shape (SVG, PNG, BMP)</li>
+					<li>Directory selection dialog in directory configs in advanced settings</li>
+					<li>Status bar with info about edges on walking shaperecords</li>
+					<li>#1799 Text tags editor has new parameter `[space xxx]` specifying exact letter advance value (add to the font advance + calculated letterspacing)</li>
+					<li>DefineEditText display - letterspacing, kerning, indent, relative font size</li>
+					<li>FLA export - DefineEditText autokern attribute</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1306, #1768 Maximizing window on other than main monitor</li>
+					<li>AS3 Cast exception when used tree filter and then direct editing</li>
+					<li>#2013 AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception</li>
+					<li>GFX - FontTextureInfo tag reading</li>
+					<li>GFX - Fonts with stripped shapes</li>
+					<li>#2104 Empty texts import</li>
+					<li>Centered start playing triangle (Playing on demand)</li>
+					<li>miterLimitFactor is FIXED8 value in MORPHLINESTYLE2</li>
+					<li>Display of morphshape end shape to be exactly at 65535 ratio</li>
+					<li>SVG import - duplicated image on bitmap fill style</li>
+					<li>Generic tag editor - morphshape fill - show bitmapId for repeating bitmap fill, gradient matrix for focal gradient</li>
+					<li>Morphshape SVG export - focalPoint animation</li>
+					<li>Do not display lines with zero width</li>
+					<li>Not updating Morphshape end bounds</li>
+					<li>SVG import - linear gradients</li>
+					<li>SVG import - Do not use fill winding nonzero when only stroking</li>
+					<li>Morphshape SVG export - closing the stroke</li>
+					<li>#2031 FLA export - morphshapes with duplicated strokes, timelines with multiple shape tweens</li>
+					<li>#1866 FLA export - multilevel clipping handling</li>
+					<li>#1866 FLA export - morphshape rounding fix</li>
+					<li>#1866 FLA export - multiple usage of morphshapes</li>
+					<li>#503, #1011, #1257, #1902, #1903, #2048 FLA export - shapes with overlapping edges</li>
+					<li>#2108 Cannot change text when ShiftJIS flag is set on font</li>
+					<li>#2074, #2074 Use mxmlc.bat file when exe not available for Flex SDK compilation</li>
+					<li>FLA export - DefineEditText - allow negative letterspacing</li>
+					<li>#2112 GFX - new image types in DefineExternalImage</li>
+					<li>#1193 FLA export - DefineEditText position and size</li>
+					<li>FLA export - allow float frame rate</li>
+					<li>FLA export - font export - allow dot as character</li>
+					<li>AS3 Debugging P-code inside nested functions</li>
+					<li>AS3 Debugging - show (and click through) proper call stack</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Basic tag info panel always visible even when nothing to display (to avoid flickering)</li>
+					<li>SVG export - attributes like data-characterId and data-characterName moved under `ffdec:` namespace</li>
+					<li>#802 - FLA export - calculating letterspacing on text with fonts without layout is now optional and turned off by default</li>
+					<li>#2113 Commandline `-importScript` command aborts import on first error, can be changed with `-onerror ignore` argument</li>
+				</ul>
+			</description>
+		</release>
 		<release version="19.1.2" date="2023-10-16">
 			<description>
 				<p>Fixed</p>
