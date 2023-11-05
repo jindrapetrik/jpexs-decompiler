@@ -1039,7 +1039,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         final Point point = new Point(e.getX(), e.getY());
-        final int pos = View.textComponentViewToModel(abcPanel.decompiledTextArea,point);
+        final int pos = View.textComponentViewToModel(abcPanel.decompiledTextArea, point);
         final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
 
         if (identifier != null && !identifier.isEmpty()) {
