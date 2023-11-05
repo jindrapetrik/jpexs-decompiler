@@ -217,7 +217,6 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
-            //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
             writer.startMethod(script_init);
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
