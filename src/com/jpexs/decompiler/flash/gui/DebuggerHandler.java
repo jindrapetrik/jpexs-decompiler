@@ -374,6 +374,18 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         return modulePaths.get(file);
     }
+    
+    public Integer moduleToMethodIndex(int file) {
+        return moduleToMethodIndex.get(file);        
+    }
+    
+    public Integer moduleToClassIndex(int file) {
+        return moduleToClassIndex.get(file);        
+    }
+    
+    public Integer moduleToTraitIndex(int file) {
+        return moduleToTraitIndex.get(file);        
+    }
 
     public synchronized InBreakAtExt getBreakInfo() {
         if (!paused) {
