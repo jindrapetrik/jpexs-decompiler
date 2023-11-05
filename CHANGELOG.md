@@ -52,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - [#2074], [#2074] Use mxmlc.bat file when exe not available for Flex SDK compilation
 - FLA export - DefineEditText - allow negative letterspacing
 - [#2112] GFX - new image types in DefineExternalImage
+- [#1193] FLA export - DefineEditText position
 
 ### Changed
 - Basic tag info panel always visible even when nothing to display (to avoid flickering)
@@ -3260,6 +3261,7 @@ Major version of SWF to XML export changed to 2.
 [#2108]: https://www.free-decompiler.com/flash/issues/2108
 [#2074]: https://www.free-decompiler.com/flash/issues/2074
 [#2112]: https://www.free-decompiler.com/flash/issues/2112
+[#1193]: https://www.free-decompiler.com/flash/issues/1193
 [#802]: https://www.free-decompiler.com/flash/issues/802
 [#2099]: https://www.free-decompiler.com/flash/issues/2099
 [#2090]: https://www.free-decompiler.com/flash/issues/2090
@@ -3663,7 +3665,6 @@ Major version of SWF to XML export changed to 2.
 [#1172]: https://www.free-decompiler.com/flash/issues/1172
 [#1174]: https://www.free-decompiler.com/flash/issues/1174
 [#1183]: https://www.free-decompiler.com/flash/issues/1183
-[#1193]: https://www.free-decompiler.com/flash/issues/1193
 [#1200]: https://www.free-decompiler.com/flash/issues/1200
 [#1198]: https://www.free-decompiler.com/flash/issues/1198
 [#1205]: https://www.free-decompiler.com/flash/issues/1205
