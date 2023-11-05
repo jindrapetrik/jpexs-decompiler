@@ -431,16 +431,6 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
 
                         long instrOffset = instr.getProperties().firstLineOffset;
-                        if (trt != null && cls != null) {
-                            int traitIndex = (int) trt.getProperties().index;
-
-                            Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
-                            if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
-                                    || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
-                                //continue; //inner anonymous function - ignore. TODO: make work
-                            }
-                        }
-
                         if (instrOffset == -1) {
                             lonelyBody.add(bodyIndex);
                             break blk;
