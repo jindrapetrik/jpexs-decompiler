@@ -24,7 +24,6 @@ All notable changes to this project will be documented in this file.
  advance value (add to the font advance + calculated letterspacing)
 - DefineEditText display - letterspacing, kerning, indent, relative font size
 - FLA export - DefineEditText autokern attribute
-- [#2113] Commandline - allow `-onerror abort` argument on `-importScript`
 
 ### Fixed
 - [#1306], [#1768] Maximizing window on other than main monitor
@@ -64,6 +63,8 @@ All notable changes to this project will be documented in this file.
 - SVG export - attributes like data-characterId and data-characterName moved under `ffdec:` namespace
 - [#802] - FLA export - calculating letterspacing on text with fonts without layout is now optional 
  and turned off by default
+- [#2113] Commandline `-importScript` command aborts import on first error,
+ can be changed with `-onerror ignore` argument
 
 ## [19.1.2] - 2023-10-16
 ### Fixed
