@@ -851,13 +851,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return null;
     }
 
-    public FontTag getFontByNameInTag(String fontName) {
+    public FontTag getFontByNameInTag(String fontName, boolean bold, boolean italic) {
         if (fontName == null) {
             return null;
         }
         for (Tag t : getTags()) {
             if (t instanceof FontTag) {
-                if (fontName.equals(((FontTag) t).getFontNameIntag())) {
+                FontTag ft = (FontTag) t;
+                if (fontName.equals(ft.getFontNameIntag()) && ft.isBold() == bold && ft.isItalic() == italic) {
                     return (FontTag) t;
                 }
             }

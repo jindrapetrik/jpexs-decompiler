@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
 - [#2021] Indent continuation when using tabs
+- [#2116] DefineEditText display - correct getting fonts
+- [#2116] DefineEditText display - apostroph decoding
+
 
 ## [20.0.0] - 2023-11-05
 ### Added
@@ -3257,6 +3260,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
+[#2116]: https://www.free-decompiler.com/flash/issues/2116
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
