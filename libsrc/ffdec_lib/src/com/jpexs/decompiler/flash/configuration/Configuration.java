@@ -971,6 +971,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> flaExportUseMappedFontLayout = null;
+    
+    @ConfigurationDefaultInt(3)
+    @ConfigurationName("formatting.tab.size")
+    @ConfigurationCategory("format")
+    public static ConfigurationItem<Integer> tabSize = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

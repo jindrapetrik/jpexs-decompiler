@@ -2,9 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3
+
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
-- Script editors - tab size now matches indent size
+- [#2021] Indent continuation when using tabs
 
 ## [20.0.0] - 2023-11-05
 ### Added
