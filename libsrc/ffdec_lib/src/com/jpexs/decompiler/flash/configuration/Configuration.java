@@ -977,7 +977,7 @@ public final class Configuration {
     @ConfigurationCategory("format")
     public static ConfigurationItem<Integer> tabSize = null;
     
-    @ConfigurationDefaultInt(1000000)
+    @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> boxBlurPixelsLimit = null;
         
