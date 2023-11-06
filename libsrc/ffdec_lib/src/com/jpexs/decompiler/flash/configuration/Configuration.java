@@ -976,6 +976,10 @@ public final class Configuration {
     @ConfigurationName("formatting.tab.size")
     @ConfigurationCategory("format")
     public static ConfigurationItem<Integer> tabSize = null;
+    
+    @ConfigurationDefaultInt(1000000)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> boxBlurPixelsLimit = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

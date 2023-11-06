@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
@@ -66,7 +67,22 @@ public class Filtering {
         int radiusXHalf = radiusX / 2;
         int radiusYHalf = radiusY / 2;
         double divisor = radiusX * radiusY;
-                
+        
+        
+        if ((long) w * (long) h > Configuration.boxBlurPixelsLimit.get()) {
+            return;
+        }
+        
+        while (((long) radiusY * (long) radiusX * (long) w *  (long) h) > Configuration.boxBlurPixelsLimit.get()) {
+            // decrease radius
+            if (radiusY > 1) {
+                radiusY--;
+            }
+            if (radiusX > 1) {
+                radiusX--;
+            }            
+        }
+
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 double sumR = 0;
@@ -96,7 +112,7 @@ public class Filtering {
                         sumA += a;
                         sumR += r;
                         sumG += g;
-                        sumB += b;
+                        sumB += b;                                              
                     }
                 }
                 int da = (int) Math.floor(sumA / divisor);
@@ -115,7 +131,7 @@ public class Filtering {
                     db = 255;
                 }
 
-                newColors[index] = RGBA.toInt(dr, dg, db, da);
+                newColors[index] = RGBA.toInt(dr, dg, db, da);                
             }
         }
         for (int y = 0; y < h; y++) {
