@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#2021] Indent continuation when using tabs
 - [#2116] DefineEditText display - correct getting fonts
 - [#2116] DefineEditText display - apostroph decoding
+- [#2116] Apply colortransform after filters
 
 
 ## [20.0.0] - 2023-11-05

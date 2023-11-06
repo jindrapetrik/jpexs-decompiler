@@ -867,6 +867,10 @@ public class Timeline {
             if (blendMode > 1) {
                 clrTrans2 = null;
             }
+            
+            if (filters != null && !filters.isEmpty()) {
+                clrTrans2 = null;
+            }
 
             if (clipDepth > -1) {
                 //Make transparent colors opaque, mask should be only made by shapes
@@ -997,7 +1001,7 @@ public class Timeline {
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
 
-                if (blendMode > 1 && clrTrans != null) {
+                if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && clrTrans != null) {
                     img = clrTrans.apply(img);
                 }
 
