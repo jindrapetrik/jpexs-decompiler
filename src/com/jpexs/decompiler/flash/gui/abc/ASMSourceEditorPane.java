@@ -376,7 +376,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
 
         super.setText(highlightedText.text);
-        setCaretPosition(0);
+        setCaretPosition(0);        
     }
 
     @Override

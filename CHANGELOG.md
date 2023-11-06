@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
+- Script editors - tab size now matches indent size
 
 ## [20.0.0] - 2023-11-05
 ### Added
