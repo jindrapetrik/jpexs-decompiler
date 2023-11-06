@@ -36,6 +36,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 import jsyntaxpane.SyntaxDocument;
 
 /**
@@ -162,6 +163,8 @@ public class UndoFixedEditorPane extends JEditorPane {
                         ((SyntaxDocument) doc).setIgnoreUpdate(false);
                     }
 
+                    doc.putProperty(PlainDocument.tabSizeAttribute, Configuration.indentSize.get());                    
+                    
                     setDocument(doc);
                 } catch (BadLocationException | IOException ex) {
                     Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);
