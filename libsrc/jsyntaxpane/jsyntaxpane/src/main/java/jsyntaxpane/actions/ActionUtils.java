@@ -73,7 +73,7 @@ public class ActionUtils {
 			return "";
 		}
 		int i = 0;
-		while (i < line.length() && line.charAt(i) == ' ') {
+		while (i < line.length() && (line.charAt(i) == ' ' || line.charAt(i) == '\t')) { //JPEXS: added '\t'
 			i++;
 		}
 		return line.substring(0, i);
@@ -553,12 +553,24 @@ public class ActionUtils {
 		target.setCaretPosition(p);
 	}
 
+        //JPEXS
+        public static boolean usesTabs(JTextComponent target) {
+            Object prop = target.getDocument().getProperty("jpexs:useTabs");
+            if (prop != null) {
+                return (Boolean) prop;
+            }        
+            return false;
+        }
+        
 	/**
 	 * Return a string with number of spaces equal to the tab-stop of the TextComponent
 	 * @param target
 	 * @return
 	 */
 	public static String getTab(JTextComponent target) {
+                if (usesTabs(target)) { //JPEXS
+                        return "\t";
+                }                
 		return SPACES.substring(0, getTabSize(target));
 	}
 

@@ -55,7 +55,11 @@ public class IndentAction extends DefaultSyntaxAction {
 			int column = dot - lineStart;
 			int needed = tabStop - (column % tabStop);
 			if (abbrvs == null || abbrToken == null) {
-				target.replaceSelection(ActionUtils.SPACES.substring(0, needed));
+                                if (ActionUtils.usesTabs(target)) { //JPEXS
+                                    target.replaceSelection("\t");
+                                } else {
+                                    target.replaceSelection(ActionUtils.SPACES.substring(0, needed));
+                                }
 			} else {
 				String abbr = abbrToken.getString(sDoc);
 				if (abbrvs.containsKey(abbr)) {
@@ -68,7 +72,11 @@ public class IndentAction extends DefaultSyntaxAction {
 						ActionUtils.insertSimpleTemplate(target, abbr);
 					}
 				} else {
-					target.replaceSelection(ActionUtils.SPACES.substring(0, needed));
+                                        if (ActionUtils.usesTabs(target)) { //JPEXS
+                                            target.replaceSelection("\t");
+                                        } else {
+                                            target.replaceSelection(ActionUtils.SPACES.substring(0, needed));
+                                        }
 				}
 			}
 		} else {
