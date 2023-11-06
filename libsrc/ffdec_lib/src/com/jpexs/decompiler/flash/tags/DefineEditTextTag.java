@@ -415,7 +415,7 @@ public class DefineEditTextTag extends TextTag {
                             case "b":
                                 style = style.clone();
                                 style.bold = true;
-                                styles.add(style);
+                                styles.add(style);                                
                                 break;
                             case "i":
                                 style = style.clone();
@@ -454,12 +454,7 @@ public class DefineEditTextTag extends TextTag {
                                 String face = unescape(attributes.getValue("face"));
                                  
                                 if (face != null && face.length() > 0) {
-                                    style.fontFace = face;
-                                    FontTag insideFont = swf.getFontByNameInTag(face);
-                                    style.font = insideFont;
-                                    if (insideFont != null) {
-                                        style.fontFace = null;
-                                    }
+                                    style.fontFace = face;                                    
                                 }
                                 
                                 String letterspacing = unescape(attributes.getValue("letterSpacing"));
@@ -512,6 +507,7 @@ public class DefineEditTextTag extends TextTag {
                         txt = txt.replace("/{entity-gt}", ">");
                         txt = txt.replace("/{entity-quot}", "\"");
                         txt = txt.replace("/{entity-amp}", "&");
+                        txt = txt.replace("/{entity-apos}", "'");
                         return txt;
                     }
 
@@ -519,6 +515,12 @@ public class DefineEditTextTag extends TextTag {
                     public void characters(char[] ch, int start, int length) throws SAXException {
                         String txt = unescape(new String(ch, start, length));
                         TextStyle style = styles.peek();
+                        if (style.fontFace != null) {
+                            style.font = swf.getFontByNameInTag(style.fontFace, style.bold, style.italic);
+                            if (style.font == null) {
+                                style.fontFace = null;
+                            }
+                        }
                         addCharacters(ret, txt, style);
                     }
                 };
@@ -528,6 +530,7 @@ public class DefineEditTextTag extends TextTag {
                 str = str.replace("&gt;", "/{entity-gt}");
                 str = str.replace("&quot;", "/{entity-quot}");
                 str = str.replace("&amp;", "/{entity-amp}");
+                str = str.replace("&apos;", "/{entity-apos}");
                 str = str.replace("&", "&amp;");
 
                 str = "<!DOCTYPE html [\n"
@@ -1096,7 +1099,7 @@ public class DefineEditTextTag extends TextTag {
                 ge.glyphAdvance = ge.glyphIndex == -1 ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, lastStyle.kerning ? nextChar : null))
                         : (int) Math.round(font.getGlyphAdvance(ge.glyphIndex) / font.getDivider() * lastStyle.fontHeight / 1024);
                 ge.glyphAdvance += lastStyle.letterSpacing * SWF.unitDivisor;
-                if (lastStyle.kerning) {
+                if (lastStyle.kerning && font != null && font.hasLayout()) {
                     if (nextChar != null) {
                         ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider();
                     }
