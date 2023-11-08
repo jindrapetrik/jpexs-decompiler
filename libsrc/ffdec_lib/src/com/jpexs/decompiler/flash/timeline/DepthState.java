@@ -31,7 +31,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -77,6 +79,8 @@ public class DepthState {
     private final SWF swf;
 
     public Frame frame;
+    
+    public Frame placeFrame;
 
     public PlaceObjectTypeTag placeObjectTag;
 
@@ -94,14 +98,16 @@ public class DepthState {
         return lastInstanceId.addAndGet(1);
     }
 
-    public DepthState(SWF swf, Frame frame) {
+    public DepthState(SWF swf, Frame frame, Frame placeFrame) {
         this.swf = swf;
         this.frame = frame;
+        this.placeFrame = placeFrame;
         this.instanceId = getNewInstanceId();
     }
 
-    public DepthState(DepthState obj, Frame frame, boolean sameInstance) {
+    public DepthState(DepthState obj, Frame frame, Frame placeFrame, boolean sameInstance) {
         this.frame = frame;
+        this.placeFrame = placeFrame;
         swf = obj.swf;
         characterId = obj.characterId;
         matrix = obj.matrix;
@@ -166,4 +172,87 @@ public class DepthState {
 
         return swf.getCharacter(characterId);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + this.depth;
+        hash = 29 * hash + this.characterId;
+        hash = 29 * hash + Objects.hashCode(this.matrix);
+        hash = 29 * hash + Objects.hashCode(this.instanceName);
+        hash = 29 * hash + Objects.hashCode(this.className);
+        hash = 29 * hash + Objects.hashCode(this.colorTransForm);
+        hash = 29 * hash + (this.cacheAsBitmap ? 1 : 0);
+        hash = 29 * hash + this.blendMode;
+        hash = 29 * hash + Objects.hashCode(this.filters);
+        hash = 29 * hash + (this.isVisible ? 1 : 0);
+        hash = 29 * hash + Objects.hashCode(this.backGroundColor);
+        hash = 29 * hash + Objects.hashCode(this.clipActions);
+        hash = 29 * hash + Arrays.hashCode(this.amfData);
+        hash = 29 * hash + this.ratio;
+        hash = 29 * hash + this.clipDepth;
+        hash = 29 * hash + this.time;
+        hash = 29 * hash + (this.hasImage ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DepthState other = (DepthState) obj;
+        if (this.depth != other.depth) {
+            return false;
+        }
+        if (this.characterId != other.characterId) {
+            return false;
+        }
+        if (this.cacheAsBitmap != other.cacheAsBitmap) {
+            return false;
+        }
+        if (this.blendMode != other.blendMode) {
+            return false;
+        }
+        if (this.isVisible != other.isVisible) {
+            return false;
+        }
+        if (this.ratio != other.ratio) {
+            return false;
+        }
+        if (this.clipDepth != other.clipDepth) {
+            return false;
+        }
+        if (this.hasImage != other.hasImage) {
+            return false;
+        }
+        if (!Objects.equals(this.instanceName, other.instanceName)) {
+            return false;
+        }
+        if (!Objects.equals(this.className, other.className)) {
+            return false;
+        }
+        if (!Objects.equals(this.matrix, other.matrix)) {
+            return false;
+        }
+        if (!Objects.equals(this.colorTransForm, other.colorTransForm)) {
+            return false;
+        }
+        if (!Objects.equals(this.filters, other.filters)) {
+            return false;
+        }
+        if (!Objects.equals(this.backGroundColor, other.backGroundColor)) {
+            return false;
+        }
+        if (!Objects.equals(this.clipActions, other.clipActions)) {
+            return false;
+        }
+        return Arrays.equals(this.amfData, other.amfData);        
+    }        
 }

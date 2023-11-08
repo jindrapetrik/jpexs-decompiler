@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 
@@ -26,6 +27,8 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
  */
 public interface Timelined extends BoundedTag {
 
+    public SWF getSwf();
+    
     public Timeline getTimeline();
 
     public void resetTimeline();
