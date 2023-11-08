@@ -4574,4 +4574,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         return uninitializedAs2ClassTraits;
     }
+
+    @Override
+    public SWF getSwf() {
+        return this;
+    }    
 }

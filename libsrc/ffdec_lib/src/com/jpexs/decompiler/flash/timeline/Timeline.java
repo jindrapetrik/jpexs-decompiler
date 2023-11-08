@@ -144,6 +144,11 @@ public class Timeline {
         return frames;
     }
 
+    /**
+     * 
+     * @param index 0-based frame index
+     * @return 
+     */
     public synchronized Frame getFrame(int index) {
         ensureInitialized();
         if (index >= frames.size()) {
@@ -296,9 +301,10 @@ public class Timeline {
             }
 
             if (t instanceof FrameLabelTag) {
-                frame.label = ((FrameLabelTag) t).getLabelName();
-                frame.namedAnchor = ((FrameLabelTag) t).isNamedAnchor();
-                labelToFrame.put(frame.label, frames.size());
+                String labelName = ((FrameLabelTag) t).getLabelName();
+                frame.labels.add(labelName);
+                frame.namedAnchors.add(((FrameLabelTag) t).isNamedAnchor());
+                labelToFrame.put(labelName, frames.size());
             } else if (t instanceof StartSoundTag) {
                 frame.sounds.add(((StartSoundTag) t).soundId);
                 frame.soundClasses.add(null);
@@ -314,11 +320,12 @@ public class Timeline {
                 int depth = po.getDepth();
                 DepthState fl = frame.layers.get(depth);
                 if (fl == null) {
-                    frame.layers.put(depth, fl = new DepthState(swf, frame));
+                    frame.layers.put(depth, fl = new DepthState(swf, frame, frame));
                     fl.depth = depth;
                 }
                 frame.layersChanged = true;
                 fl.placeObjectTag = po;
+                fl.placeFrame = frame;
                 fl.minPlaceObjectNum = Math.max(fl.minPlaceObjectNum, po.getPlaceObjectNum());
 
                 boolean wasEmpty = fl.characterId == -1 && fl.className == null;

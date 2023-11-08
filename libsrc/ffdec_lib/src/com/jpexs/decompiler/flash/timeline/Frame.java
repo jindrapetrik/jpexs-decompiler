@@ -41,6 +41,9 @@ import java.util.TreeMap;
  */
 public class Frame implements TreeItem, Exportable {
 
+    /**
+     * Zero based frame index
+     */
     public final int frame;
 
     public TreeMap<Integer, DepthState> layers = new TreeMap<>();
@@ -67,9 +70,9 @@ public class Frame implements TreeItem, Exportable {
 
     public boolean layersChanged;
 
-    public String label = null;
+    public List<String> labels = new ArrayList<>();
 
-    public boolean namedAnchor = false;
+    public List<Boolean> namedAnchors = new ArrayList<>();
 
     public Frame(Timeline timeline, int frame) {
         this.timeline = timeline;
@@ -82,7 +85,7 @@ public class Frame implements TreeItem, Exportable {
         backgroundColor = obj.backgroundColor;
         timeline = obj.timeline;
         for (int depth : obj.layers.keySet()) {
-            layers.put(depth, new DepthState(obj.layers.get(depth), this, true));
+            layers.put(depth, new DepthState(obj.layers.get(depth), this, obj.layers.get(depth).placeFrame, true));
         }
         //Do not copy sounds
     }

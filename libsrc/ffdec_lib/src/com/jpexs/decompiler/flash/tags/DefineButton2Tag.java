@@ -261,7 +261,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             if (swf.getCyclicCharacters().contains(r.characterId)) {
                 continue;
             }
-            DepthState layer = new DepthState(swf, null);
+            DepthState layer = new DepthState(swf, null, null);
             layer.colorTransForm = r.colorTransform;
             layer.blendMode = r.blendMode;
             layer.filters = r.filterList;
@@ -272,16 +272,16 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
             }
 
             if (r.buttonStateUp) {
-                frameUp.layers.put(r.placeDepth, new DepthState(layer, frameUp, false));
+                frameUp.layers.put(r.placeDepth, new DepthState(layer, frameUp, frameUp, false));
             }
             if (r.buttonStateDown) {
-                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, false));
+                frameDown.layers.put(r.placeDepth, new DepthState(layer, frameDown, frameDown, false));
             }
             if (r.buttonStateOver) {
-                frameOver.layers.put(r.placeDepth, new DepthState(layer, frameOver, false));
+                frameOver.layers.put(r.placeDepth, new DepthState(layer, frameOver, frameOver, false));
             }
             if (r.buttonStateHitTest) {
-                frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, false));
+                frameHit.layers.put(r.placeDepth, new DepthState(layer, frameHit, frameHit, false));
             }
         }
 

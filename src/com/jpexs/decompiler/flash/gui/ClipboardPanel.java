@@ -48,6 +48,7 @@ import org.pushingpixels.substance.internal.utils.SubstanceSizeUtils;
 public class ClipboardPanel extends JPanel {
 
     private JLabel label;
+    private JLabel clearButton;
 
     private MainPanel mainPanel;
 
@@ -56,14 +57,12 @@ public class ClipboardPanel extends JPanel {
     public ClipboardPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         label = new JLabel("", View.getIcon("clipboard16"), JLabel.CENTER);
-        label.setToolTipText(AppStrings.translate("clipboard.hint"));
         label.setBorder(new EmptyBorder(0, 0, 0, 10));
         int scrollBarSize = ((Integer) UIManager.get("ScrollBar.width")).intValue();
         setBorder(new EmptyBorder(0, 0, 0, scrollBarSize));
         setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-        JLabel clearButton = new JLabel(View.getIcon("cancel16"));
-        clearButton.setToolTipText(AppStrings.translate("clipboard.clear"));
+        clearButton = new JLabel(View.getIcon("cancel16"));
         clearButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         clearButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -126,6 +125,13 @@ public class ClipboardPanel extends JPanel {
             label.setText(AppStrings.translate("clipboard.item"));
         } else {
             label.setText(AppStrings.translate("clipboard.items").replace("%count%", "" + clipboardSize));
+        }
+        if (mainPanel.getClipboardType() == ClipboardType.FRAME) {
+            label.setToolTipText(AppStrings.translate("clipboard.hint.frame"));
+            clearButton.setToolTipText(AppStrings.translate("clipboard.clear.frame"));
+        } else {
+            label.setToolTipText(AppStrings.translate("clipboard.hint"));
+            clearButton.setToolTipText(AppStrings.translate("clipboard.clear"));  
         }
         setVisible(clipboardSize > 0);
     }

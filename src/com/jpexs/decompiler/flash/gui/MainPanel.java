@@ -654,11 +654,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
             List<TreeItem> tagItems = new ArrayList<>();
+            List<TreeItem> frameItems = new ArrayList<>();
+            Timelined frameTimelined = null;
             for (TreeItem item : items) {
                 if (item instanceof TagScript) {
                     tagItems.add(((TagScript) item).getTag());
                 } else if (item instanceof Tag) {
                     tagItems.add((Tag) item);
+                }
+                if (item instanceof Frame) {
+                    frameItems.add(item);
+                    Frame frame = (Frame) item;
+                    if (frameTimelined != null && frameTimelined != frame.timeline.timelined) {
+                        tagItems.clear();
+                        frameItems.clear();
+                        break;
+                    }
+                    frameTimelined = frame.timeline.timelined;
                 }
             }
             boolean allWritable = true;
@@ -670,18 +682,27 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (e.getKeyCode() == 'C') {
-                if (e.isShiftDown()) {
-                    contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
-                } else {
-                    contextPopupMenu.copyTagToClipboardActionPerformed(null, tagItems);
+                if (!frameItems.isEmpty()) {
+                    contextPopupMenu.copyTagOrFrameToClipboardActionPerformed(null, frameItems);
+                } else {                
+                    if (e.isShiftDown()) {
+                        contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
+                    } else {
+                        contextPopupMenu.copyTagOrFrameToClipboardActionPerformed(null, tagItems);
+                    }
                 }
             }
             if (e.getKeyCode() == 'X' && allWritable) {
-                contextPopupMenu.update(tagItems);
-                if (e.isShiftDown()) {
-                    contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
+                if (!frameItems.isEmpty()) {
+                    contextPopupMenu.update(frameItems);
+                    contextPopupMenu.cutTagOrFrameToClipboardActionPerformed(null);
                 } else {
-                    contextPopupMenu.cutTagToClipboardActionPerformed(null);
+                    contextPopupMenu.update(tagItems);
+                    if (e.isShiftDown()) {
+                        contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
+                    } else {
+                        contextPopupMenu.cutTagOrFrameToClipboardActionPerformed(null);
+                    }
                 }
             }
             repaintTree();
@@ -691,8 +712,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return;
             }
             TreeItem firstItem = items.get(0);
-            if (!((firstItem instanceof Tag) || (firstItem instanceof Frame))) {
-                return;
+            if (getClipboardType() == ClipboardType.FRAME) {
+                if (!(firstItem instanceof Frame)) {
+                    return;
+                }
+                if (firstItem.getOpenable() != getClipboardContents().iterator().next().getOpenable()) {
+                    return;
+                }
+            } else {      
+                if (!((firstItem instanceof Tag) || (firstItem instanceof Frame))) {
+                    return;
+                }
             }
             contextPopupMenu.update(items);
             if (e.isShiftDown()) {
@@ -750,6 +780,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean clipboardEmpty() {
         return clipboard.isEmpty();
+    }
+    
+    public ClipboardType getClipboardType() {
+        if (clipboard.isEmpty()) {
+            return ClipboardType.NONE;
+        }
+        TreeItem item = clipboard.keySet().iterator().next();
+        if (item instanceof Frame) {
+            return ClipboardType.FRAME;
+        }
+        return ClipboardType.TAG;
     }
 
     public int getClipboardSize() {
@@ -6117,7 +6158,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     int framesCnt = (int) (timeline.frameRate * PreviewExporter.MORPH_SHAPE_ANIMATION_LENGTH);
                     for (int i = 0; i < framesCnt; i++) {
                         Frame f = new Frame(timeline, i);
-                        DepthState ds = new DepthState(tag.getSwf(), f);
+                        DepthState ds = new DepthState(tag.getSwf(), f, f);
                         ds.characterId = ((CharacterTag) tag).getCharacterId();
                         ds.matrix = new MATRIX();
                         ds.ratio = i * 65535 / framesCnt;
@@ -6126,7 +6167,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         timeline.addFrame(f);
                     }
                     Frame f = new Frame(timeline, framesCnt);
-                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    DepthState ds = new DepthState(tag.getSwf(), f, f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
                     ds.matrix = new MATRIX();
                     ds.ratio = 65535;
@@ -6143,7 +6184,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     //We do not want to draw fonts directly added to stage as
                     //Fonts are really added to stage in some corner cases like for vertical text.
                     Frame f = new Frame(timeline, 0);
-                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    DepthState ds = new DepthState(tag.getSwf(), f, f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
@@ -6152,7 +6193,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     timeline.fontFrameNum = frame;
                 } else {
                     Frame f = new Frame(timeline, 0);
-                    DepthState ds = new DepthState(tag.getSwf(), f);
+                    DepthState ds = new DepthState(tag.getSwf(), f, f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
                     ds.matrix = new MATRIX();
                     f.layers.put(1, ds);
@@ -6231,6 +6272,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             public int getFrameCount() {
                 return getTimeline().getFrameCount();
+            }
+
+            @Override
+            public SWF getSwf() {
+                return tag.getSwf();
             }
         };
     }
