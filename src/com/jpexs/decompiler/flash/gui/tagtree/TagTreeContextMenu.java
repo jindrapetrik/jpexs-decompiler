@@ -3743,47 +3743,78 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }                
         
-        final boolean USE_REMOVE_TAG = false;
+        Timelined sourceTimelined = ((Frame) items.iterator().next()).timeline.timelined;
         
-        Frame targetFrame = targetTimelined.getTimeline().getFrame(position - 1);
+        final boolean USE_REMOVE_TAG = false;
+                                
+        int positionMinus = 0;
+        
+        
+        int posPrevFrame = position - 1;
+        
+        int posTargetFrame = position;
+        if (move && sourceTimelined == targetTimelined) {
+            Set<Integer> removedFrames = new LinkedHashSet<>();            
+            for (TreeItem item : items) {
+                Frame frame = (Frame) item;
+                int removedFrameNum = frame.frame + 1;
+                removedFrames.add(removedFrameNum);
+                if (removedFrameNum < position) {
+                    positionMinus++;
+                }                
+            }            
+            while (removedFrames.contains(posPrevFrame)) {
+                posPrevFrame--;
+            }
+            while (removedFrames.contains(posTargetFrame)) {
+                posTargetFrame++;
+            }
+        }
+        
+        Frame targetFrame = targetTimelined.getTimeline().getFrame(posTargetFrame - 1);
+        
         Frame prevTargetFrame;
-        if (position == 1) {
+        if (posPrevFrame == 0) {
             prevTargetFrame = null;
         } else {
-            prevTargetFrame = targetTimelined.getTimeline().getFrame(position - 2);
+            prevTargetFrame = targetTimelined.getTimeline().getFrame(posPrevFrame - 1);
         }
-        int f = 1;
-        int fc = 0;
+                        
+        int positionAfterDelete = position - positionMinus;
+                                        
+        if (move) {
+            removeFrames(items);
+        }
         boolean endsWithShowframe = false;
-        int prevShowFrameIndex = -1;
-        ShowFrameTag prevShowFrame = null;
+        ShowFrameTag prevShowFrame = null;                
+        int f = 1;        
         for (int i = 0; i < targetTimelined.getTags().size(); i++) {
             Tag t = targetTimelined.getTags().get(i);
             endsWithShowframe = false;
             if (t instanceof ShowFrameTag) {
                 f++;
                 endsWithShowframe = true;
-                if (f == position) {
-                    prevShowFrameIndex = i;
+                if (f == positionAfterDelete) {
                     prevShowFrame = (ShowFrameTag) t;
                 }
             }
         }
-
                 
-        if (move) {
-            removeFrames(items);
-        }
+        SWF swf = targetTimelined.getSwf();
+        
+        List<Tag> newFrameTags = new ArrayList<>();
+        
+        int prevShowFrameIndex;        
         if (targetFrame == null) {
+            if (!endsWithShowframe) {
+                ShowFrameTag showFrame = new ShowFrameTag(swf);
+                newFrameTags.add(showFrame);
+            }
             prevShowFrameIndex = targetTimelined.getTags().size() - 1;
         } else {
             prevShowFrameIndex = targetTimelined.getTags().indexOf(prevShowFrame);
-        }       
+        }
         
-        
-
-        SWF swf = targetTimelined.getSwf();
-        List<Tag> newFrameTags = new ArrayList<>();
         Frame frame = null;
         for (TreeItem item : items) {
             frame = (Frame) item;
@@ -3842,11 +3873,6 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (sourceState == null && targetState == null) {
                     continue;
                 }
-                boolean changed = false;
-                if (sourceState != null && !sourceState.equals(targetState)
-                        || (targetState.placeFrame.frame < targetFrame.frame)) {
-                    changed = true;
-                }
                 if (sourceState != null && targetState != null 
                         && sourceState.equals(targetState)
                         && targetState.placeFrame.frame == targetFrame.frame
@@ -3861,40 +3887,23 @@ public class TagTreeContextMenu extends JPopupMenu {
                         && !sourceState.equals(targetState)
                 ) {
                     PlaceObjectTypeTag fullPlace = targetState.toPlaceObjectTag(depth);                    
-                    if (changed) {
-                        if (USE_REMOVE_TAG) {
-                            RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                            rem.depth = depth;
-                            newFrameTags.add(rem);
-                        } else {
-                            fullPlace.setPlaceFlagMove(true);
-                        }
+                    if (USE_REMOVE_TAG) {
+                        RemoveObject2Tag rem = new RemoveObject2Tag(swf);
+                        rem.depth = depth;
+                        newFrameTags.add(rem);
+                    } else {
+                        fullPlace.setPlaceFlagMove(true);
                     }
                     newFrameTags.add(fullPlace);
                 } else if (targetState.placeFrame.frame == targetFrame.frame) {
                     if (targetState.placeObjectTag.flagMove()) {
                         PlaceObjectTypeTag fullPlace = targetState.toPlaceObjectTag(depth);
                         fullPlace.setTimelined(targetTimelined);
-                        if (changed) {
-                            if (USE_REMOVE_TAG) {
-                                RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                                rem.depth = depth;
-                                newFrameTags.add(rem);
-                            } else {
-                                fullPlace.setPlaceFlagMove(true);
-                            }
-                        }
+                        fullPlace.setPlaceFlagMove(true);
+                        
                         targetTimelined.replaceTag(targetState.placeObjectTag, fullPlace);
                     } else {
-                        if (changed) {
-                            if (USE_REMOVE_TAG) {
-                                RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                                rem.depth = depth;
-                                newFrameTags.add(rem);
-                            } else {
-                                targetState.placeObjectTag.setPlaceFlagMove(true);
-                            }
-                        }
+                        targetState.placeObjectTag.setPlaceFlagMove(true);
                     }
                 }
             }
@@ -3922,8 +3931,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         fixDefineBeforeUsage(swf);
         fixHeaderTags(swf);
         swf.resetTimelines(targetTimelined);
-        
-        Timelined sourceTimelined = ((Frame) items.iterator().next()).timeline.timelined;
+        targetTimelined.setFrameCount(targetTimelined.getTimeline().getFrameCount());
         swf.resetTimelines(sourceTimelined);
         sourceTimelined.setFrameCount(sourceTimelined.getTimeline().getFrameCount());
                 
