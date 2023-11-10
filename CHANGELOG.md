@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3
 - [#2100] Copy/paste frames (same SWF only)
+- Updated portugese-brasil translation
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
