@@ -668,6 +668,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     ns = genNs(importedClasses, pkg, ((ConstAVM2Item) ti).pkg, openedNamespaces, localData, ((ConstAVM2Item) ti).line);
                     tname = ((ConstAVM2Item) ti).var;
                     isConst = true;
+                    if (((ConstAVM2Item) ti).type.toString().equals("Namespace")) {
+                        continue;
+                    }
                 }
                 if (isStatic && val != null) {
                     sinitcode.add(ins(AVM2Instructions.FindProperty, traitName(ns, tname)));
