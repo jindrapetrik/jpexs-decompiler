@@ -22,7 +22,6 @@ import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
-import static com.jpexs.decompiler.flash.gui.Main.getDefaultMessagesComponent;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
@@ -197,7 +196,7 @@ public class DebugPanel extends JPanel {
                                 Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
                             } catch (IOException ex) {
                                 Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
-                                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
                             }
                         }                                                
                     });
@@ -217,7 +216,7 @@ public class DebugPanel extends JPanel {
                                 Main.debugImportByteArray(v, fis);
                             } catch (IOException ex) {
                                 Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
-                                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
                             }
                         }                                                
                     });
