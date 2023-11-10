@@ -289,6 +289,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         public long traitId;
 
         private List<VariableNode> childs;
+        
+        public List<Variable> traits = new ArrayList<>();
 
         @Override
         public int hashCode() {
@@ -347,17 +349,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         private void reloadChildren() {
             childs = new ArrayList<>();
+            traits = new ArrayList<>();
 
             if ("".equals(var.name)) {
                 return;
             }            
             InGetVariable igv;
 
-            Long objectId = varToObjectId(varInsideGetter);
+            Long objectId = varToObjectId(var);
             
-            boolean useGetter = (var.flags & VariableFlags.HAS_GETTER) > 0;
-
-            if (parentObjectId == 0 && objectId != 0) {
+            boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
+            
+            if (objectId != 0) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
             } else {
                 igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
@@ -371,10 +374,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             Variable curTrait = null;
             for (int i = 0; i < igv.childs.size(); i++) {
                 if (!isTraits(igv.childs.get(i))) {
-                    Long parentObjectId = varToObjectId(var);
+                    Long parentObjectId = varToObjectId(varInsideGetter);
                     childs.add(new VariableNode(path, level + 1, igv.childs.get(i), parentObjectId, curTrait));
                 } else {
                     curTrait = igv.childs.get(i);
+                    traits.add(curTrait);
                 }
             }
         }
@@ -427,11 +431,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     public static Long varToObjectId(Variable var) {
-        if (var != null && (var.vType == VariableType.OBJECT)) {
-            return (Long) var.value;
-        } else {
+        if (var == null) {
             return 0L;
         }
+        if (var.vType == VariableType.OBJECT) {
+            return (Long) var.value;
+        } 
+        return 0L;        
     }
 
     public static class VariablesTableModel implements MyTreeTableModel {

@@ -20,8 +20,11 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
+import static com.jpexs.decompiler.flash.gui.Main.getDefaultMessagesComponent;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
 import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
@@ -31,9 +34,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -161,23 +171,60 @@ public class DebugPanel extends JPanel {
                 ABCPanel.VariableNode vn;
                 if (node instanceof ABCPanel.VariableNode) {
                     vn = ((ABCPanel.VariableNode) node);
-                    v = vn.var;
+                    v = vn.varInsideGetter != null ? vn.varInsideGetter : vn.var;
                 } else {
                     return;
                 }
 
                 JPopupMenu pm = new JPopupMenu();
-                //TODO!!
-                /*if (v.typeName != null && v.typeName.startsWith("flash.utils::ByteArray")) {
-                    JMenu exportMenu = new JMenu("Export %name%".replace("%name%", v.name));
-                    JMenuItem exportByteArray = new JMenuItem("Export bytearray");
-                    exportByteArray.addActionListener((ActionEvent e1) -> {
-                        Main.dumpBytes(v);
+                boolean isByteArray = false;
+                for (Variable t : vn.traits) {
+                    if ("flash.utils::ByteArray".equals(t.name)) {
+                        isByteArray = true;
+                        break;
+                    }
+                }
+                if (isByteArray) {
+                    JMenu exportMenu = new JMenu(AppStrings.translate("debug.export").replace("%name%", v.name));
+                    JMenuItem exportByteArrayMenuItem = new JMenuItem(AppStrings.translate("debug.export.bytearray"));
+                    exportByteArrayMenuItem.addActionListener((ActionEvent e1) -> {
+                        JFileChooser fc = new JFileChooser();
+                        fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+                        if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
+                            File file = Helper.fixDialogFile(fc.getSelectedFile());
+                            try (FileOutputStream fos = new FileOutputStream(file)) {
+                                Main.debugExportByteArray(v, fos);
+                                Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
+                            } catch (IOException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                            }
+                        }                                                
                     });
 
-                    exportMenu.add(exportByteArray);
+                    exportMenu.add(exportByteArrayMenuItem);
                     pm.add(exportMenu);
-                }*/
+                    
+                    JMenu importMenu = new JMenu(AppStrings.translate("debug.import").replace("%name%", v.name));
+                    JMenuItem importByteArrayMenuItem = new JMenuItem(AppStrings.translate("debug.import.bytearray"));
+                    importByteArrayMenuItem.addActionListener((ActionEvent e1) -> {
+                        JFileChooser fc = new JFileChooser();
+                        fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+                        if (fc.showOpenDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
+                            File file = Helper.fixDialogFile(fc.getSelectedFile());
+                            Configuration.lastOpenDir.set(file.getParentFile().getAbsolutePath());
+                            try (FileInputStream fis = new FileInputStream(file)) {
+                                Main.debugImportByteArray(v, fis);
+                            } catch (IOException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                            }
+                        }                                                
+                    });
+
+                    importMenu.add(importByteArrayMenuItem);
+                    pm.add(importMenu);
+                }
                 long watchParentId = vn.parentObjectId;
 
                 JMenu addWatchMenu = new JMenu(AppStrings.translate("debug.watch.add").replace("%name%", v.name));
