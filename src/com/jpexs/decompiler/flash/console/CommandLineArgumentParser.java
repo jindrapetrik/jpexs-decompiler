@@ -4740,7 +4740,7 @@ public class CommandLineArgumentParser {
         Boolean gfx = null;
         Integer version = null;
         
-        Pattern displayRectPattern = Pattern.compile("\\[(?<x1>[0-9.]+)(?<x1px>px)?,(?<y1>[0-9.]+)(?<y1px>px)?,(?<x2>[0-9.]+)(?<x2px>px)?,(?<y2>[0-9.]+)(?<y2px>px)?\\]");
+        Pattern displayRectPattern = Pattern.compile("\\[(?<x1>-?[0-9.]+)(?<x1px>px)?,(?<y1>-?[0-9.]+)(?<y1px>px)?,(?<x2>-?[0-9.]+)(?<x2px>px)?,(?<y2>-?[0-9.]+)(?<y2px>px)?\\]");
                         
         boolean printOnly = args.size() == 1;
         
