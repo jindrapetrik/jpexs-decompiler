@@ -158,9 +158,9 @@ public class DebuggerHandler implements DebugConnectionListener {
         return stackLines;
     }        
 
-    public InGetVariable getVariable(long parentId, String varName, boolean children) {
+    public InGetVariable getVariable(long parentId, String varName, boolean children, boolean useGetter) {
         try {
-            return commands.getVariable(parentId, varName, true, children);
+            return commands.getVariable(parentId, varName, useGetter, children);
         } catch (IOException ex) {
             return null;
         }
@@ -913,7 +913,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     }
 
     public synchronized InCallFunction callMethod(String object, String methodName, List<Object> args) throws ActionScriptException {
-        InGetVariable igv = getVariable(0, object, false);
+        InGetVariable igv = getVariable(0, object, false, false);
         return callMethod(igv.parent, methodName, args);
     }
 

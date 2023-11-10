@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#2116] Limit maximum number of box blur pixels
 - [#2122] `-header` command did not support negative integers for displayrect
 - AS3 direct editation - namespaces were initialized in class initializers
+- Debugging - do not invoke getter when there is none - avoid freezing
 
 
 ## [20.0.0] - 2023-11-05
