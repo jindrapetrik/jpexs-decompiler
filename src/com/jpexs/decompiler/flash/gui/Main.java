@@ -291,25 +291,50 @@ public class Main {
         return runProcess != null && !runProcessDebug;
     }
 
-    /*
-     * FIXME!          
-     */
-    public static synchronized void dumpBytes(Variable v) {
-        InCallFunction icf;
+   
+    public static synchronized void debugExportByteArray(Variable v, OutputStream os) throws IOException {
         try {
             long objectId = 0L;
             if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
                 objectId = (Long) v.value;
             }
-            Object oldPos = getDebugHandler().getVariable(objectId, "position", true, true).parent.value;
+            Object oldPos = getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
-            icf = getDebugHandler().callFunction(false, "readUTF", v, new ArrayList<>());
-            System.out.println("Result=" + icf.variables.get(0).value);
+            int length = (int)(double)(Double)getDebugHandler().getVariable(objectId, "length", false, true).parent.value;
+            
+            for (int i = 0; i < length; i++) {
+                int b = (int)(double)(Double)getDebugHandler().callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
+                os.write(b);
+            }
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
         } catch (DebuggerHandler.ActionScriptException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+    }
+    
+    public static synchronized void debugImportByteArray(Variable v, InputStream is) throws IOException {
+        try {
+            long objectId = 0L;
+            if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
+                objectId = (Long) v.value;
+            }
+            Double oldPos = (Double) getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
+            getDebugHandler().setVariable(objectId, "length", VariableType.NUMBER, 0);
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
+            
+            int length = 0;
+            int b;
+            while ((b = is.read()) > -1) {
+                getDebugHandler().callFunction(false, "writeByte", v, Arrays.asList((Double)(double) b));
+                length++;
+            }
+            if (oldPos > length) {
+                oldPos = (Double) (double) length;
+            }
+            getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
+        } catch (DebuggerHandler.ActionScriptException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static synchronized boolean addWatch(Variable v, long v_id, boolean watchRead, boolean watchWrite) {

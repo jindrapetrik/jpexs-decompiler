@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3
 - [#2100] Copy/paste frames (same SWF only)
 - Updated portugese-brasil translation
+- AS3 Debugging - export/import ByteArray variable data
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -17,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2122] `-header` command did not support negative integers for displayrect
 - AS3 direct editation - namespaces were initialized in class initializers
 - Debugging - do not invoke getter when there is none - avoid freezing
+- Debugging - properly getting variable value through getter
 
 
 ## [20.0.0] - 2023-11-05
