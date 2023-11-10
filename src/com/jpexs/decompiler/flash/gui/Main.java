@@ -301,7 +301,7 @@ public class Main {
             if ((v.vType == VariableType.OBJECT || v.vType == VariableType.MOVIECLIP)) {
                 objectId = (Long) v.value;
             }
-            Object oldPos = getDebugHandler().getVariable(objectId, "position", true).parent.value;
+            Object oldPos = getDebugHandler().getVariable(objectId, "position", true, true).parent.value;
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
             icf = getDebugHandler().callFunction(false, "readUTF", v, new ArrayList<>());
             System.out.println("Result=" + icf.variables.get(0).value);
