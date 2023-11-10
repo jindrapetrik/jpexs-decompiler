@@ -115,7 +115,7 @@ The application was made in Czech Republic.
 ### Translators
 * **Jaume Badiella Aguilera** - catalan translation
 * **Capasha** - swedish translation
-* **王晨旭** (Chenxu Wang) - chinese translation
+* **王晨旭** (Chenxu Wang), **晓之车**, **安安** - chinese translation
 * **focus** - russian translation
 * **honfika** - hungarian translation
 * **kalip** - italian translation
@@ -126,7 +126,7 @@ The application was made in Czech Republic.
 * **Osman ÖZ** - turkish translation
 * **pepka** - ukrainian and dutch translation
 * **poxyran** - spanish translation
-* **realmaster42** - portuguese-brasil translation
+* **realmaster42**, **alimsoftware** - portuguese-brasil translation
 * **Rtsjx** - chinese translation
 * **koiru** - japanese translation
 
