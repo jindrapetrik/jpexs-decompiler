@@ -300,10 +300,10 @@ public class Main {
             }
             Object oldPos = getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
-            int length = (int)(double)(Double)getDebugHandler().getVariable(objectId, "length", false, true).parent.value;
+            int length = (int) (double) (Double) getDebugHandler().getVariable(objectId, "length", false, true).parent.value;
             
             for (int i = 0; i < length; i++) {
-                int b = (int)(double)(Double)getDebugHandler().callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
+                int b = (int) (double) (Double) getDebugHandler().callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
                 os.write(b);
             }
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, oldPos);
@@ -325,7 +325,7 @@ public class Main {
             int length = 0;
             int b;
             while ((b = is.read()) > -1) {
-                getDebugHandler().callFunction(false, "writeByte", v, Arrays.asList((Double)(double) b));
+                getDebugHandler().callFunction(false, "writeByte", v, Arrays.asList((Double) (double) b));
                 length++;
             }
             if (oldPos > length) {
