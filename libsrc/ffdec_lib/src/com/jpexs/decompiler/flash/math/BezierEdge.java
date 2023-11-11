@@ -481,14 +481,16 @@ public class BezierEdge implements Serializable {
         //Error Y values of bounds must be of opposite sign
         BezierEdge qi = new BezierEdge(6369.0, 13040.0, 6380.0, 13030.0, 6427.0, 13018.0);
         BezierEdge qj = new BezierEdge(6338.0, 13099.0, 6358.0, 13050.0, 6369.0, 13040.0);
-        
-        
+
         //Error Y values of bounds must be of opposite sign
         BezierEdge qk = new BezierEdge(45334.0, 2421.0, 45348.0, 2373.0, 45348.0, 2330.0);
         BezierEdge ql = new BezierEdge(45348.0, 2330.0, 45348.0, 2263.0, 45314.0, 2223.0);
-        
+
+        BezierEdge qm = new BezierEdge(-1957, 2676, -1957, 2676.5, -1957.5, 2676.5);
+        BezierEdge qn = new BezierEdge(-1957, 2675.5, -1957, 2676, -1957, 2676);
+
         List<Point2D> ps = new ArrayList<>();
-        qk.intersects(ql, t1, t2, ps);
+        qm.intersects(qn, t1, t2, ps);
         System.err.println("t1 is " + t1);
         System.err.println("t2 is " + t2);
         System.err.println("intersections is " + ps);

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#2100] Copy/paste frames (same SWF only)
 - Updated portugese-brasil translation
 - AS3 Debugging - export/import ByteArray variable data
+- [#2123] FLA export - show some progress info (which symbols are exported)
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -19,7 +20,10 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - namespaces were initialized in class initializers
 - Debugging - do not invoke getter when there is none - avoid freezing
 - Debugging - properly getting variable value through getter
+- [#2123] FLA export - IndexOutOfBounds in shape fixer
 
+### Removed
+- [#2123] FLA export - Using shape fixer for morphshapes (needs something better)
 
 ## [20.0.0] - 2023-11-05
 ### Added
@@ -3268,6 +3272,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
+[#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116

@@ -3152,20 +3152,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return deobfuscation;
     }
 
-    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
+    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, ProgressListener progressListener) throws IOException, InterruptedException {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = true;
-        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings);
+        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings, progressListener);
     }
 
-    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version) throws IOException, InterruptedException {
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, ProgressListener progressListener) throws IOException, InterruptedException {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = false;
-        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings);
+        exportXfl(handler, outfile, swfName, generator, generatorVerName, generatorVersion, parallel, version, settings, progressListener);
     }
 
-    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, XFLExportSettings settings) throws IOException, InterruptedException {
-        new XFLConverter().convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version);
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, XFLExportSettings settings, ProgressListener progressListener) throws IOException, InterruptedException {
+        new XFLConverter().convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version, progressListener);
         clearAllCache();
     }
 

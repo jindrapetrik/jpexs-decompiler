@@ -3350,17 +3350,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             path += compressed ? ".fla" : ".xfl";
             final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(selectedFilter) : xflFilters.indexOf(selectedFilter));
-            final File selfile = new File(path);
+            final File selfile = new File(path);           
             new CancellableWorker() {
                 @Override
                 protected Void doInBackground() throws Exception {
                     Helper.freeMem();
+                    
+                    CancellableWorker w = this;
+                    
+                    ProgressListener prog = new ProgressListener() {
+                        @Override
+                        public void progress(int p) {
+                        }
+
+                        @Override
+                        public void status(String status) {
+                            Main.startWork(translate("work.exporting.fla") + "..." + status, w);
+                        }
+                    };
+                    
                     try {
                         AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
                         if (compressed) {
-                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion, prog);
                         } else {
-                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion, prog);
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "FLA export error", ex);

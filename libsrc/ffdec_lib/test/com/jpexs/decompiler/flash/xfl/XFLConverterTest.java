@@ -63,7 +63,8 @@ public class XFLConverterTest {
             }, 
             outputDir + "/" + ( new File(fileName).getName().replace(".swf", ".fla")),
             new File(fileName).getName(),
-            ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, true, FLAVersion.CS6);            
+            ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, true, FLAVersion.CS6,
+            null);            
             
             //TODO: Actually do some tests - asserts. Without them it is not much useful - it just tests that no exception is thrown.
             

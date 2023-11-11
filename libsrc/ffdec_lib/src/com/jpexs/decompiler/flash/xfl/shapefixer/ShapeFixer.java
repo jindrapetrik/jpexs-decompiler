@@ -37,26 +37,32 @@ import java.util.Objects;
  */
 public class ShapeFixer {
     
-    final boolean DEBUG_PRINT = false;
+    boolean DEBUG_PRINT = false;
 
     private class BezierPair {
 
         BezierEdge be1;
         BezierEdge be2;
+        private Integer hash;
 
         public BezierPair(BezierEdge be1, BezierEdge be2) {
             this.be1 = be1;
-            this.be2 = be2;
+            this.be2 = be2;            
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(this.be1) + Objects.hashCode(this.be2);
+            if (hash != null) {
+                return hash;
+            }
+            return hash = Objects.hashCode(this.be1) + Objects.hashCode(this.be2);
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
+            //simplifyed to be fast, not so neccessarily accurate
+            return hashCode() == obj.hashCode();
+            /*if (this == obj) {
                 return true;
             }
             if (obj == null) {
@@ -70,7 +76,7 @@ public class ShapeFixer {
                     || (Objects.equals(this.be1, other.be2) && Objects.equals(this.be2, other.be1))) {
                 return true;
             }
-            return false;
+            return false;*/
         }
 
     }
@@ -175,16 +181,20 @@ public class ShapeFixer {
                             if (i1 == i2 && j1 == j2) {
                                 continue;
                             }
-
-                            
-
+                                                        
                             if (be1.isEmpty()) {
                                 shapes.get(i1).remove(j1);
+                                if (i1 == i2 && j2 > j1) {
+                                    j2--;
+                                }
                                 j1--;
                                 continue loopj1;
                             }
                             if (be2.isEmpty()) {
                                 shapes.get(i2).remove(j2);
+                                if (i1 == i2 && j1 > j2) {
+                                    j1--;
+                                }
                                 j2--;
                                 continue loopj2;
                             }
@@ -192,6 +202,9 @@ public class ShapeFixer {
                             //duplicated edge
                             if (be1.equals(be2) || be1.equals(be2.reverse())) {
                                 shapes.get(i2).remove(j2);
+                                if (i1 == i2 && j1 > j2) {
+                                    j1--;
+                                }
                                 j2--;
                                 if (DEBUG_PRINT) {
                                     System.err.println("removing duplicate " + be1.toSvg() + " and " + be2.toSvg());
