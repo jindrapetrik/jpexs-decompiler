@@ -247,7 +247,10 @@ public class Intersections {
                         if (0 <= xRoot && xRoot <= 1) {
                             for (int k = 0; k < yRoots.size(); k++) {
                                 if (Math.abs(xRoot - yRoots.get(k)) < TOLERANCE) {
-                                    result.add(add(multiply(c22, s * s), (add(multiply(c21, s), c20))));
+                                    Point2D res = add(multiply(c22, s * s), (add(multiply(c21, s), c20)));
+                                    if (!result.contains(res)) {
+                                        result.add(res);
+                                    }
                                     break checkRoots;
                                 }
                             }
