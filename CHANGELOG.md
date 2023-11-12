@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#2100] Copy/paste frames (same SWF only)
 - Updated portugese-brasil translation
 - AS3 Debugging - export/import ByteArray variable data
-- [#2123] FLA export - show some progress info (which symbols are exported)
+- [#2123] FLA export - show some progress info
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Debugging - do not invoke getter when there is none - avoid freezing
 - Debugging - properly getting variable value through getter
 - [#2123] FLA export - IndexOutOfBounds in shape fixer
+- [#2123] FLA export - morphshapes fixer
 
 ### Removed
 - [#2123] FLA export - Using shape fixer for morphshapes (needs something better)

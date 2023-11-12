@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -55,4 +56,36 @@ public class GRADRECORD implements Serializable {
         morphGradRecord.endRatio = endGradRecord.ratio;
         return morphGradRecord;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 19 * hash + this.ratio;
+        hash = 19 * hash + (this.inShape3 ? 1 : 0);
+        hash = 19 * hash + Objects.hashCode(this.color);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GRADRECORD other = (GRADRECORD) obj;
+        if (this.ratio != other.ratio) {
+            return false;
+        }
+        if (this.inShape3 != other.inShape3) {
+            return false;
+        }
+        return Objects.equals(this.color, other.color);
+    }
+    
+    
 }

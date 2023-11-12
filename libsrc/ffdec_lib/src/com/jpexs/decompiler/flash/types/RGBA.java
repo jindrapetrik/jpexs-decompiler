@@ -110,4 +110,54 @@ public class RGBA extends RGB implements Serializable {
             return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + ", alpha:" + alpha + "]";
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.red;
+        hash = 97 * hash + this.green;
+        hash = 97 * hash + this.blue;
+        hash = 97 * hash + this.alpha;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof RGB) {
+            final RGB other = (RGBA) obj;
+            if (this.alpha != 255) {
+                return false;
+            }
+            if (this.red != other.red) {
+                return false;
+            }
+            if (this.green != other.green) {
+                return false;
+            }
+            if (this.blue != other.blue) {
+                return false;
+            }
+            return true;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RGBA other = (RGBA) obj;
+        if (this.red != other.red) {
+            return false;
+        }
+        if (this.green != other.green) {
+            return false;
+        }
+        if (this.blue != other.blue) {
+            return false;
+        }
+        return this.alpha == other.alpha;
+    }       
 }

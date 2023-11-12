@@ -241,6 +241,34 @@ public class XFLConverter {
         EDGE_DECIMAL_FORMAT.setGroupingUsed(false);
     }
 
+    
+    private static class StatusStack {
+        private Stack<String> statuses = new Stack<>();
+        private ProgressListener progressListener;
+
+        public StatusStack(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+        }                
+        
+        private void update() {
+            if (progressListener == null) {
+                return;
+            }
+            String status = String.join(", ", statuses);
+            progressListener.status(status);
+        }
+        
+        public void pushStatus(String status) {
+            statuses.push(status);
+            update();
+        }
+        
+        public void popStatus() {
+            statuses.pop();
+            update();
+        }
+    }
+    
     private static String formatEdgeDouble(double value, boolean curved, boolean morphshape) {
         if (value % 1 == 0) {
             return "" + (int) value;
@@ -783,9 +811,10 @@ public class XFLConverter {
         }
       
         List<ShapeRecordAdvanced> shapeRecordsAdvanced;
+        useFixer = true;
         if (useFixer) {
             ShapeFixer fixer = new ShapeFixer();
-            shapeRecordsAdvanced = fixer.fix(shapeRecords);
+            shapeRecordsAdvanced = fixer.fix(shapeRecords, morphshape, shapeNum, fillStyles, lineStyles);
         } else {
             shapeRecordsAdvanced = new ArrayList<>();
             for (SHAPERECORD rec : shapeRecords) {
@@ -1029,6 +1058,10 @@ public class XFLConverter {
      * @return
      */
     private static String removeOnlyStrokeEdgesBeforeSameFilled(String layer) {
+        if (true) {
+            //This is moved to ShapeFixer
+            return layer;
+        }
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
         dbf.setNamespaceAware(false);
@@ -1061,6 +1094,16 @@ public class XFLConverter {
                     String fillStyle0 = fillStyle0Node != null ? fillStyle0Node.getNodeValue() : null;
                     String fillStyle1 = fillStyle1Node != null ? fillStyle1Node.getNodeValue() : null;
 
+                    if ("0".equals(fillStyle0)) {
+                        fillStyle0 = null;
+                    }
+                    if ("0".equals(fillStyle1)) {
+                        fillStyle1 = null;
+                    }
+                    if ("0".equals(strokeStyle)) {
+                        strokeStyle = null;
+                    }
+                    
                     if (prevStrokeOnly != null
                             && strokeStyle != null
                             && strokeStyle.equals(prevStrokeOnly)
@@ -1631,29 +1674,33 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, ProgressListener progressListener) throws XMLStreamException {
-
+    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
-        convertMedia(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer, progressListener);
-        convertSymbols(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer, placeToMaskedSymbol, multiUsageMorphShapes, progressListener);
+        statusStack.pushStatus("media");
+        convertMedia(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer, statusStack);
+        statusStack.popStatus();
+        statusStack.pushStatus("symbols");
+        convertSymbols(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+        statusStack.popStatus();
     }
 
-    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, ProgressListener progressListener) throws XMLStreamException {
+    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         //boolean hasSymbol = false;
         Reference<Integer> nextClipId = new Reference<>(-1);
         writer.writeStartElement("symbols");
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
-            if (progressListener != null && symbol != null) {
-                progressListener.status(symbol.toString());
-            }            
+            if (symbol == null) {
+                continue;
+            }
             
             if ((symbol instanceof ShapeTag) && nonLibraryShapes.contains(symbol.getCharacterId())) {
                 continue; //shapes with 1 ocurrence and single layer are not added to library
-            }
-
+            }           
+            
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
+                statusStack.pushStatus(symbol.toString());
                 XFLXmlWriter symbolStr = new XFLXmlWriter();
 
                 symbolStr.writeStartElement("DOMSymbolItem", new String[]{
@@ -1848,13 +1895,14 @@ public class XFLConverter {
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
                     if (sprite.getTags().isEmpty()) { //probably AS2 class
+                        statusStack.popStatus();
                         continue;
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite.spriteId) ? characterScriptPacks.get(sprite.spriteId) : null;
 
-                    extractMultilevelClips(sprite.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes);
+                    extractMultilevelClips(sprite.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
-                    convertTimeline(swf, swf.getAbcIndex(), sprite.spriteId, characterVariables.get(sprite.spriteId), nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes);
+                    convertTimeline(swf, swf.getAbcIndex(), sprite.spriteId, characterVariables.get(sprite.spriteId), nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
                 } else if (symbol instanceof ShapeTag) {
                     symbolStr.writeStartElement("timeline");
@@ -1888,19 +1936,25 @@ public class XFLConverter {
                     //TODO: itemID="518de416-00000341"
                 }
                 writer.writeEndElement();
-                //hasSymbol = true;
-            }
+                //hasSymbol = true;                
+                statusStack.popStatus();
+            }            
         }
 
-        extractMultilevelClips(swf.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes);
-        extractMultiUsageMorphShapes(writer, swf, nonLibraryShapes, backgroundColor, characters, flaVersion, files, multiUsageMorphShapes);
+        statusStack.pushStatus("extracting multilevel clips");
+        extractMultilevelClips(swf.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+        statusStack.popStatus();
+        
+        statusStack.pushStatus("converting multiusage morphshapes");
+        extractMultiUsageMorphShapes(writer, swf, nonLibraryShapes, backgroundColor, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
+        statusStack.popStatus();
         /*if (hasSymbol) {
             
         }*/
         writer.writeEndElement();
     }
 
-    private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, ProgressListener progressListener) throws XMLStreamException {
+    private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException {
         boolean hasMedia = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
@@ -1923,10 +1977,7 @@ public class XFLConverter {
             CharacterTag symbol = characters.get(ch);
             if (symbol instanceof ImageTag) {
                 
-                if (progressListener != null) {
-                    progressListener.status(symbol.toString());                    
-                }
-                
+                statusStack.pushStatus(symbol.toString());
                 ImageTag imageTag = (ImageTag) symbol;
                 boolean allowSmoothing = false;
 
@@ -2013,7 +2064,9 @@ public class XFLConverter {
                 writer.writeAttribute("frameBottom", image.getHeight());
                 writer.writeEndElement();
                 mediaCount++;
+                statusStack.popStatus();
             } else if (/*(symbol instanceof SoundStreamHeadTypeTag) || FIXME */(symbol instanceof DefineSoundTag)) {
+                statusStack.pushStatus(symbol.toString());
                 int soundFormat = 0;
                 int soundRate = 0;
                 boolean soundType = false;
@@ -2180,7 +2233,9 @@ public class XFLConverter {
 
                 writer.writeEndElement();
                 mediaCount++;
+                statusStack.popStatus();
             } else if (symbol instanceof DefineVideoStreamTag) {
+                statusStack.pushStatus(symbol.toString());
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
                 String videoType = "no media";
                 switch (video.codecID) {
@@ -2260,6 +2315,7 @@ public class XFLConverter {
                 }
 
                 mediaCount++;
+                statusStack.popStatus();
             }
         }
 
@@ -2446,7 +2502,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes) throws XMLStreamException {
+    private static void convertFrames(SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         boolean lastIn = true;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
@@ -2648,8 +2704,10 @@ public class XFLConverter {
                                     } else {
                                         if (lastCharacter == m && Objects.equals(matrix, lastMatrix)) {
                                             elementsWriter.writeCharactersRaw(lastElements);
-                                        } else {
+                                        } else {       
+                                            statusStack.pushStatus(m.toString());
                                             convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter, false);
+                                            statusStack.popStatus();
                                         }
                                        
                                         lastCharacter = m;
@@ -2659,7 +2717,9 @@ public class XFLConverter {
                                 } else {
                                     shapeTween = false;
                                     if (character instanceof TextTag) {
+                                        statusStack.pushStatus(character.toString());
                                         convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
+                                        statusStack.popStatus();
                                     } else if (character instanceof DefineVideoStreamTag) {
                                         convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
                                     } else if (character instanceof ImageTag) {
@@ -2724,7 +2784,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFonts(Map<Integer, String> characterClasses, ReadOnlyTagList tags, XFLXmlWriter writer, ProgressListener progressListener) throws XMLStreamException {
+    private static void convertFonts(Map<Integer, String> characterClasses, ReadOnlyTagList tags, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException {
         boolean hasFont = false;
         for (Tag t : tags) {
             if (t instanceof FontTag) {
@@ -2744,9 +2804,7 @@ public class XFLConverter {
 
         for (Tag t : tags) {
             if (t instanceof FontTag) {
-                if (progressListener != null) {
-                    progressListener.status(t.toString());
-                }
+                statusStack.pushStatus(t.toString());
                 SWF swf = t.getSwf();
                 FontTag font = (FontTag) t;
                 int fontId = font.getFontId();
@@ -2767,6 +2825,7 @@ public class XFLConverter {
 
                 String fontChars = font.getCharacters();
                 if ("".equals(fontChars)) {
+                    statusStack.popStatus();
                     continue;
                 }
                 String embeddedCharacters = fontChars;
@@ -2827,6 +2886,7 @@ public class XFLConverter {
                 }
 
                 writer.writeEndElement();
+                statusStack.popStatus();
             }
         }
 
@@ -3214,7 +3274,8 @@ public class XFLConverter {
             FLAVersion flaVersion,
             HashMap<String, byte[]> files,
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol,
-            List<Integer> multiUsageMorphShapes
+            List<Integer> multiUsageMorphShapes,
+            StatusStack statusStack
     ) throws XMLStreamException {
         XFLXmlWriter symbolStr = new XFLXmlWriter();
 
@@ -3233,7 +3294,7 @@ public class XFLConverter {
             "lastModified", Long.toString(getTimestamp(swf))});
         symbolStr.writeAttribute("symbolType", "graphic");
 
-        convertTimeline(swf, swf.getAbcIndex(), objectId, "", nonLibraryShapes, backgroundColor, timelineTags, timelineTags, characters, generateMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes);
+        convertTimeline(swf, swf.getAbcIndex(), objectId, "", nonLibraryShapes, backgroundColor, timelineTags, timelineTags, characters, generateMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
         symbolStr.writeEndElement(); // DOMSymbolItem
         String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3249,7 +3310,7 @@ public class XFLConverter {
         }
         writer.writeEndElement();
 
-        extractMultilevelClips(timelineTags, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes);
+        extractMultilevelClips(timelineTags, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
     }
 
     private String generateMaskedSymbolName(int symbolId) {
@@ -3320,10 +3381,13 @@ public class XFLConverter {
             HashMap<Integer, CharacterTag> characters,
             FLAVersion flaVersion,
             HashMap<String, byte[]> files,
-            List<Integer> multiUsageMorphShapes
+            List<Integer> multiUsageMorphShapes,
+            StatusStack statusStack
     ) throws XMLStreamException {
 
         for (int objectId : multiUsageMorphShapes) {
+            statusStack.pushStatus(characters.get(objectId).toString());            
+            
             XFLXmlWriter symbolStr = new XFLXmlWriter();
             symbolStr.writeStartElement("DOMSymbolItem", new String[]{
                 "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
@@ -3348,7 +3412,7 @@ public class XFLConverter {
                 }
             }
 
-            convertTimeline(swf, swf.getAbcIndex(), objectId, "", nonLibraryShapes, backgroundColor, swf.getTags(), new ReadOnlyTagList(timelineTags), characters, "Symbol " + objectId, flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>());
+            convertTimeline(swf, swf.getAbcIndex(), objectId, "", nonLibraryShapes, backgroundColor, swf.getTags(), new ReadOnlyTagList(timelineTags), characters, "Symbol " + objectId, flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>(), statusStack);
 
             symbolStr.writeEndElement(); // DOMSymbolItem
             String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3363,6 +3427,7 @@ public class XFLConverter {
                 //TODO: itemID="518de416-00000341"
             }
             writer.writeEndElement();
+            statusStack.popStatus();
         }
     }
 
@@ -3376,7 +3441,8 @@ public class XFLConverter {
             FLAVersion flaVersion,
             HashMap<String, byte[]> files,
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol,
-            List<Integer> multiUsageMorphShapes
+            List<Integer> multiUsageMorphShapes,
+            StatusStack statusStack
     ) throws XMLStreamException {
         int f = 0;
 
@@ -3642,14 +3708,14 @@ public class XFLConverter {
                         }
                     }
                     System.err.println("clip repeats in " + found);*/
-                    addExtractedClip(new ReadOnlyTagList(delegatedTimeline), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes);
+                    addExtractedClip(new ReadOnlyTagList(delegatedTimeline), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
                     placeToMaskedSymbol.put(secondPlace, new MultiLevelClip(secondPlace, nextClipId.getVal(), numFrames));
                 }
             }
         }
     }
 
-    private void convertTimeline(SWF swf, AbcIndexing abcIndex, int spriteId, String linkageIdentifier, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes) throws XMLStreamException {
+    private void convertTimeline(SWF swf, AbcIndexing abcIndex, int spriteId, String linkageIdentifier, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
 
         List<String> classNames = new ArrayList<>();
         //Searches for Object.registerClass("linkageIdentifier",mypkg.MyClass);        
@@ -3918,7 +3984,7 @@ public class XFLConverter {
                         "color", randomOutlineColor(),
                         "layerType", "mask",
                         "locked", "true"});
-                    convertFrames(swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, writer, multiUsageMorphShapes);
+                    convertFrames(swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, writer, multiUsageMorphShapes, statusStack);
                     writer.writeEndElement();
 
                     int parentIndex = index;
@@ -4007,7 +4073,7 @@ public class XFLConverter {
                     }
 
                     for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                        boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files, multiUsageMorphShapes);
+                        boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
                         for (int i = clipFrame; i <= lastFrame; i++) {
                             depthToFramesList.get(nd).remove((Integer) i);
                         }
@@ -4021,7 +4087,7 @@ public class XFLConverter {
                 }
             }
 
-            boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files, multiUsageMorphShapes);
+            boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
             if (nonEmpty) {
                 index++;
             }
@@ -4059,8 +4125,9 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files, List<Integer> multiUsageMorphShapes) throws XMLStreamException {
+    private boolean writeLayer(SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
+        statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
         layerPrev.writeStartElement("DOMLayer", new String[]{
             "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + d + ")" : ""),
@@ -4077,7 +4144,8 @@ public class XFLConverter {
         layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
         String layerAfter = "</DOMLayer>";
         int prevLength = writer.length();
-        convertFrames(swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer, multiUsageMorphShapes);
+        convertFrames(swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer, multiUsageMorphShapes, statusStack);
+        statusStack.popStatus();
         return writer.length() != prevLength;
     }
 
@@ -4608,16 +4676,17 @@ public class XFLConverter {
             }
 
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol = new HashMap<>();
+            
+            StatusStack statusStack = new StatusStack(progressListener);
 
-            convertFonts(characterClasses, swf.getTags(), domDocument, progressListener);
-            convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument, placeToMaskedSymbol, multiUsageMorphShapes, progressListener);
+            convertFonts(characterClasses, swf.getTags(), domDocument, statusStack);
+            convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
             //domDocument.writeStartElement("timelines");
             ScriptPack documentScriptPack = characterScriptPacks.containsKey(0) ? characterScriptPacks.get(0) : null;
-            if (progressListener != null) {
-                progressListener.status("main timeline");
-            }
-            convertTimeline(swf, swf.getAbcIndex(), -1, null, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes);
+            statusStack.pushStatus("main timeline");
+            convertTimeline(swf, swf.getAbcIndex(), -1, null, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+            statusStack.popStatus();
             //domDocument.writeEndElement();
 
             if (hasAmfMetadata) {

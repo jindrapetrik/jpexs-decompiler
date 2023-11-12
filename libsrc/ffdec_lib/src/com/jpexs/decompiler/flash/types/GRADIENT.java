@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  *
@@ -109,4 +110,36 @@ public class GRADIENT implements Serializable {
         }
         return morphGradient;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + this.spreadMode;
+        hash = 97 * hash + this.interpolationMode;
+        hash = 97 * hash + Arrays.deepHashCode(this.gradientRecords);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GRADIENT other = (GRADIENT) obj;
+        if (this.spreadMode != other.spreadMode) {
+            return false;
+        }
+        if (this.interpolationMode != other.interpolationMode) {
+            return false;
+        }
+        return Arrays.deepEquals(this.gradientRecords, other.gradientRecords);
+    }
+    
+    
 }

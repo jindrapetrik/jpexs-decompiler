@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -248,4 +249,52 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
 
         return morphFillStyle;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.fillStyleType;
+        hash = 23 * hash + (this.inShape3 ? 1 : 0);
+        hash = 23 * hash + Objects.hashCode(this.color);
+        hash = 23 * hash + Objects.hashCode(this.gradientMatrix);
+        hash = 23 * hash + Objects.hashCode(this.gradient);
+        hash = 23 * hash + this.bitmapId;
+        hash = 23 * hash + Objects.hashCode(this.bitmapMatrix);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FILLSTYLE other = (FILLSTYLE) obj;
+        if (this.fillStyleType != other.fillStyleType) {
+            return false;
+        }
+        if (this.inShape3 != other.inShape3) {
+            return false;
+        }
+        if (this.bitmapId != other.bitmapId) {
+            return false;
+        }
+        if (!Objects.equals(this.color, other.color)) {
+            return false;
+        }
+        if (!Objects.equals(this.gradientMatrix, other.gradientMatrix)) {
+            return false;
+        }
+        if (!Objects.equals(this.gradient, other.gradient)) {
+            return false;
+        }
+        return Objects.equals(this.bitmapMatrix, other.bitmapMatrix);
+    }
+    
+    
 }
