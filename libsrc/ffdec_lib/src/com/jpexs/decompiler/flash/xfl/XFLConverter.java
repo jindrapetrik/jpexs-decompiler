@@ -141,6 +141,7 @@ import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.MorphShapeFixer;
 import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer;
 import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
 import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
@@ -612,8 +613,8 @@ public class XFLConverter {
         return false;
     }
 
-    private static void convertShape(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer, boolean useFixer) throws XMLStreamException {
-        List<String> layers = getShapeLayers(swf, characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape, useFixer);
+    private static void convertShape(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer) throws XMLStreamException {
+        List<String> layers = getShapeLayers(swf, characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (!useLayers) {
             for (int l = layers.size() - 1; l >= 0; l--) {
                 writer.writeCharactersRaw(layers.get(l));
@@ -805,25 +806,16 @@ public class XFLConverter {
         return ret;
     }
 
-    private static List<String> getShapeLayers(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useFixer) throws XMLStreamException {
+    private static List<String> getShapeLayers(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
       
         List<ShapeRecordAdvanced> shapeRecordsAdvanced;
-        useFixer = true;
-        if (useFixer) {
-            ShapeFixer fixer = new ShapeFixer();
-            shapeRecordsAdvanced = fixer.fix(shapeRecords, morphshape, shapeNum, fillStyles, lineStyles);
-        } else {
-            shapeRecordsAdvanced = new ArrayList<>();
-            for (SHAPERECORD rec : shapeRecords) {
-                ShapeRecordAdvanced arec = ShapeRecordAdvanced.createFromSHAPERECORD(rec);
-                if (arec != null) {
-                    shapeRecordsAdvanced.add(arec);
-                }
-            }
-        }
+        
+        ShapeFixer fixer = morphshape ? new MorphShapeFixer() : new ShapeFixer();
+        shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles);
+        
 
         List<ShapeRecordAdvanced> edges = new ArrayList<>();
         int lineStyleCount = 0;
@@ -1850,7 +1842,7 @@ public class XFLConverter {
                                         int characterId = character.getCharacterId();
                                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
                                             ShapeTag shape = (ShapeTag) character;
-                                            convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter, true);
+                                            convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
                                         } else if (character instanceof TextTag) {
                                             convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
                                         } else if (character instanceof DefineVideoStreamTag) {
@@ -1912,7 +1904,7 @@ public class XFLConverter {
                     symbolStr.writeStartElement("layers");
                     SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
                     if (shapeWithStyle != null) {
-                        convertShape(swf, characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, symbolStr, true);
+                        convertShape(swf, characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, symbolStr);
                     }
 
                     symbolStr.writeEndElement(); // layers
@@ -2672,7 +2664,7 @@ public class XFLConverter {
                             MorphShapeTag m = shapeTweener;
                             XFLXmlWriter addLastWriter = new XFLXmlWriter();
                             SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);
-                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter, false);
+                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter);
                             //duration--;
                             convertFrame(true, null, null, frame - duration, duration, "", lastElements, files, writer2);
                             duration = 1;
@@ -2688,7 +2680,7 @@ public class XFLConverter {
                                 standaloneShapeTweener = null;
                             } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) { // || shapeTweener != null)) {
                                 ShapeTag shape = (ShapeTag) character;
-                                convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter, true);
+                                convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
 
                                 shapeTween = false;
                                 shapeTweener = null;
@@ -2706,7 +2698,7 @@ public class XFLConverter {
                                             elementsWriter.writeCharactersRaw(lastElements);
                                         } else {       
                                             statusStack.pushStatus(m.toString());
-                                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter, false);
+                                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
                                             statusStack.popStatus();
                                         }
                                        
