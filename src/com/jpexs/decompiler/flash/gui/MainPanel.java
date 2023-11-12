@@ -1072,6 +1072,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public String translate(String key) {
+        if (mainFrame == null) {
+            return "";
+        }                
         return mainFrame.translate(key);
     }
 

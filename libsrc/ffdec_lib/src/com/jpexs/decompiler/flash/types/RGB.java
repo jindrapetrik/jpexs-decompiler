@@ -112,4 +112,36 @@ public class RGB implements Serializable {
             return "[RGB red:" + red + ", green:" + green + ", blue:" + blue + "]";
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.red;
+        hash = 97 * hash + this.green;
+        hash = 97 * hash + this.blue;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RGB other = (RGB) obj;
+        if (this.red != other.red) {
+            return false;
+        }
+        if (this.green != other.green) {
+            return false;
+        }
+        return this.blue == other.blue;
+    }
+    
+    
 }

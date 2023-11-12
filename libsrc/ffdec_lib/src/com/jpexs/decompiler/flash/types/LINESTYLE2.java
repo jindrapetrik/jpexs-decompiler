@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -232,4 +233,76 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         }
         return morphLineStyle2;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.width;
+        hash = 83 * hash + this.startCapStyle;
+        hash = 83 * hash + this.joinStyle;
+        hash = 83 * hash + (this.hasFillFlag ? 1 : 0);
+        hash = 83 * hash + (this.noHScaleFlag ? 1 : 0);
+        hash = 83 * hash + (this.noVScaleFlag ? 1 : 0);
+        hash = 83 * hash + (this.pixelHintingFlag ? 1 : 0);
+        hash = 83 * hash + this.reserved;
+        hash = 83 * hash + (this.noClose ? 1 : 0);
+        hash = 83 * hash + this.endCapStyle;
+        hash = 83 * hash + Float.floatToIntBits(this.miterLimitFactor);
+        hash = 83 * hash + Objects.hashCode(this.color);
+        hash = 83 * hash + Objects.hashCode(this.fillType);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LINESTYLE2 other = (LINESTYLE2) obj;
+        if (this.width != other.width) {
+            return false;
+        }
+        if (this.startCapStyle != other.startCapStyle) {
+            return false;
+        }
+        if (this.joinStyle != other.joinStyle) {
+            return false;
+        }
+        if (this.hasFillFlag != other.hasFillFlag) {
+            return false;
+        }
+        if (this.noHScaleFlag != other.noHScaleFlag) {
+            return false;
+        }
+        if (this.noVScaleFlag != other.noVScaleFlag) {
+            return false;
+        }
+        if (this.pixelHintingFlag != other.pixelHintingFlag) {
+            return false;
+        }
+        if (this.reserved != other.reserved) {
+            return false;
+        }
+        if (this.noClose != other.noClose) {
+            return false;
+        }
+        if (this.endCapStyle != other.endCapStyle) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.miterLimitFactor) != Float.floatToIntBits(other.miterLimitFactor)) {
+            return false;
+        }
+        if (!Objects.equals(this.color, other.color)) {
+            return false;
+        }
+        return Objects.equals(this.fillType, other.fillType);
+    }
+    
+    
 }

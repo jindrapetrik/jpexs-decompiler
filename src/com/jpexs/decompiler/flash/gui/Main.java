@@ -854,7 +854,11 @@ public class Main {
                 if (mainFrame == null) {
                     return;
                 }
-                MainFrameStatusPanel sp = mainFrame.getPanel().getStatusPanel();
+                MainPanel mainPanel = mainFrame.getPanel();
+                if (mainPanel == null) {
+                    return;
+                }
+                MainFrameStatusPanel sp = mainPanel.getStatusPanel();
                 if (sp != null && sp.isStatusHidden()) {
                     long nowTime = System.currentTimeMillis();
                     if (nowTime > lastTimeStartWork + 5000) {

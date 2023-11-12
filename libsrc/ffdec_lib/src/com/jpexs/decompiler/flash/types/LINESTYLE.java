@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -84,4 +85,32 @@ public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
         morphLineStyle.endWidth = width;
         return morphLineStyle;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + this.width;
+        hash = 53 * hash + Objects.hashCode(this.color);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LINESTYLE other = (LINESTYLE) obj;
+        if (this.width != other.width) {
+            return false;
+        }
+        return Objects.equals(this.color, other.color);
+    }
+    
+    
 }

@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.math;
 
 import com.jpexs.helpers.Reference;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
@@ -489,12 +493,68 @@ public class BezierEdge implements Serializable {
         BezierEdge qm = new BezierEdge(-1957, 2676, -1957, 2676.5, -1957.5, 2676.5);
         BezierEdge qn = new BezierEdge(-1957, 2675.5, -1957, 2676, -1957, 2676);
 
-        List<Point2D> ps = new ArrayList<>();
+        /*List<Point2D> ps = new ArrayList<>();
         qm.intersects(qn, t1, t2, ps);
         System.err.println("t1 is " + t1);
         System.err.println("t2 is " + t2);
         System.err.println("intersections is " + ps);
+*/
+        /*Shape r1 = new Rectangle2D.Double(0, 0, 200, 100);
+        GeneralPath r2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        r2.moveTo(0, 0);
+        r2.lineTo(100, 0);
+        r2.lineTo(150, 0);
+        r2.lineTo(200, 0);
+        r2.lineTo(200, 100);
+        r2.lineTo(0, 100);
+        r2.closePath();
+        
+        GeneralPath sh1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        sh1.moveTo(0, 0);
+        sh1.quadTo(100, 100, 0, 100);
+        sh1.lineTo(0, 0);
+        sh1.closePath();
+        
+        BezierEdge bex = new BezierEdge(0, 0, 100, 100, 0, 100);
+        Reference<BezierEdge> bex1Ref = new Reference<>(null);
+        Reference<BezierEdge> bex2Ref = new Reference<>(null);
+        bex.split(0.2, bex1Ref, bex2Ref);
+        BezierEdge bex1 = bex1Ref.getVal();
+        BezierEdge bex2 = bex2Ref.getVal();
+        GeneralPath sh2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        sh2.moveTo(bex1.getBeginPoint().getX(), bex1.getBeginPoint().getY());
+        sh2.quadTo(10+bex1.points.get(1).getX(), bex1.points.get(1).getY(), bex1.getEndPoint().getX(), bex1.getEndPoint().getY());
+        sh2.quadTo(bex2.points.get(1).getX(), bex2.points.get(1).getY(), bex2.getEndPoint().getX(), bex2.getEndPoint().getY());
+        sh2.lineTo(0, 0);
+        sh2.closePath();
+        
+        Area a1 = new Area(r1);
+        Area a2 = new Area(r2);
+        //a1.exclusiveOr(a2);
+                
+        
+        */
+        
+        /*GeneralPath p1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        p1.moveTo(0, 0);
+        p1.lineTo(200, 0);
+        p1.lineTo(200, 200);
+        p1.lineTo(0, 200);
+        p1.lineTo(0, 0);
+        p1.closePath();
+        p1.moveTo(50, 50);
+        p1.lineTo(150, 50);
+        p1.lineTo(150, 150);
+        p1.lineTo(50, 150);
+        p1.lineTo(50, 50);
+        p1.closePath();
 
+        System.err.println("cont:" + p1.contains(100, 100));
+        System.err.println("cont:" + p1.contains(150, 150));  */                       
+        
+        //System.err.println("minDist = " + minDist+", maxDist = "+ maxDist);
+        
+        //System.err.println("eArea = " + Areas.calcArea(a1));
 
         /*Point2D c = new Point2D.Double(
                 (1 - t1.get(0)) * be5.points.get(0).getX() + t1.get(0) * be5.points.get(1).getX(),
