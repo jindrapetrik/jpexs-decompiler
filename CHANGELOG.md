@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Debugging - properly getting variable value through getter
 - [#2123] FLA export - IndexOutOfBounds in shape fixer
 - [#2123] FLA export - morphshapes fixer
+- [#2111] AS3 direct editation - access class in class initializer
 
 ### Removed
 - [#2123] FLA export - Using shape fixer for morphshapes (needs something better)
@@ -3278,6 +3279,7 @@ Major version of SWF to XML export changed to 2.
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
 [#2122]: https://www.free-decompiler.com/flash/issues/2122
+[#2111]: https://www.free-decompiler.com/flash/issues/2111
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
