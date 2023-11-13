@@ -2909,7 +2909,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
         }
-        if (globalSlotId > 0) {
+        if (localData.isStatic && item.toString().equals(currentFullClassName)) {
+            return Arrays.asList(ins(AVM2Instructions.GetLocal0));   
+        } else if (globalSlotId > 0) {
             return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetGlobalScope), ins(AVM2Instructions.GetSlot, globalSlotId));
         } else {
             return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetLex, resolveType(localData, item, abcIndex)));
