@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Updated portugese-brasil translation
 - AS3 Debugging - export/import ByteArray variable data
 - [#2123] FLA export - show some progress info
+- Label that flex compiler is used (when it's enabled in settings)
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -23,6 +24,8 @@ All notable changes to this project will be documented in this file.
 - [#2123] FLA export - IndexOutOfBounds in shape fixer
 - [#2123] FLA export - morphshapes fixer
 - [#2111] AS3 direct editation - access class in class initializer
+- [#2111] Flex AS3 editation - use SWF dependencies defined in GUI
+- SWF dependencies label was not updated on startup
 
 ### Removed
 - [#2123] FLA export - Using shape fixer for morphshapes (needs something better)

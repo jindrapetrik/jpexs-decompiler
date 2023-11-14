@@ -41,7 +41,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
     }
 
     @Override
-    public void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException {
+    public void replaceScript(ScriptPack pack, String text, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException {
         ABC abc = pack.abc;
         SWF swf = pack.abc.getSwf();
         String scriptName = pack.getPathScriptName() + ".as";
@@ -103,7 +103,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
     }
 
     @Override
-    public void initReplacement(ScriptPack pack) {
+    public void initReplacement(ScriptPack pack, List<SWF> dependencies) {
         //empty
     }
 

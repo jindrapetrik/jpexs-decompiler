@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -43,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +59,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
     private File tempDir;
     private File pkgDir;
     private File swcFile;
+    private List<File> dependenciesSwcFiles = new ArrayList<>();
 
     public MxmlcAs3ScriptReplacer(String flexSdkPath) {
         super(flexSdkPath);
@@ -115,13 +119,13 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
     }
 
     @Override
-    public synchronized void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException {
+    public synchronized void replaceScript(ScriptPack pack, String text, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException {
         if (!pack.isSimple) {
             throw new IOException("Cannot compile such file"); //Alchemy, etc.  TODO: handle better            
         }
 
         if (!isInited(pack)) {
-            initReplacement(pack);
+            initReplacement(pack, dependencies);
         }
 
         File scriptFileToCompile = new File(pkgDir, pack.getClassPath().className + ".as");
@@ -131,7 +135,21 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
 
         try {
             //Compile it (and subclasses stubs)
-            mxmlc("-strict=false", "-include-inheritance-dependencies-only", "-warnings=false", "-library-path", swcFile.getAbsolutePath(), "-source-path", tempDir.getAbsolutePath(), "-output", compiledSwfFile.getAbsolutePath(), "-debug=true", scriptFileToCompile.getAbsolutePath());
+            List<String> args = new ArrayList<>(Arrays.asList("-strict=false", 
+                    "-include-inheritance-dependencies-only",
+                    "-warnings=false",
+                    "-library-path", swcFile.getAbsolutePath()));
+            
+            for (File depSwcFile : dependenciesSwcFiles) {
+                args.add("-library-path");
+                args.add(depSwcFile.getAbsolutePath());
+            }
+
+            args.addAll(Arrays.asList("-source-path", tempDir.getAbsolutePath(),
+                    "-output", compiledSwfFile.getAbsolutePath(), 
+                    "-debug=true", 
+                    scriptFileToCompile.getAbsolutePath()));
+            mxmlc(args);
         } catch (MxmlcException ex1) {
             //String compiledFilePath = scriptFileToCompile.getAbsolutePath();
             Pattern errPattern = Pattern.compile("^" + Pattern.quote(tempDir.getAbsolutePath()) + "(?<file>.*)\\((?<line>[0-9]+)\\): col: (?<col>[0-9]+) (?<message>.*)$");
@@ -149,7 +167,13 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
                     errorItems.add(new As3ScriptReplaceExceptionItem(errFile, errMsg, errLine, errCol));
                 }
             }
-            throw new As3ScriptReplaceException(errorItems);
+            As3ScriptReplaceException ex;
+            if (errorItems.isEmpty()) {
+                ex = new As3ScriptReplaceException(err);
+            } else {
+                ex = new As3ScriptReplaceException(errorItems);
+            }
+            throw ex;
         }
 
         try (FileInputStream fis = new FileInputStream(compiledSwfFile)) {
@@ -248,7 +272,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
     }
 
     @Override
-    public synchronized void initReplacement(ScriptPack pack) {
+    public synchronized void initReplacement(ScriptPack pack, List<SWF> dependencies) {
         if (tempDir != null) {
             deinitReplacement(pack);
         }
@@ -262,11 +286,11 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             }
             pkgDir.mkdirs();
 
-            swcFile = new File(pkgDir, "out.swc");
+            swcFile = new File(tempDir, "out.swc");
 
             //Make copy without the old script
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();                                                
             SWF swfCopy = recompileSWF(swf);
 
             List<ABC> modAbcs = new ArrayList<>();
@@ -309,7 +333,15 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             //Flex then uses the code already present in the SWC, no need to decompile it (hurray!)
             SwfToSwcExporter swcExport = new SwfToSwcExporter();
             swcExport.exportSwf(swfCopy, swcFile, true);
-
+            
+            dependenciesSwcFiles = new ArrayList<>();
+            int i = 0;
+            for (SWF depSwf : dependencies) {
+                i++;
+                File depSwcFile = new File(tempDir, "dep" + i + ".swc");
+                swcExport.exportSwf(depSwf, depSwcFile, false);
+                dependenciesSwcFiles.add(depSwcFile);
+            }            
         } catch (IOException iex) {
             //ignore
         } catch (InterruptedException ex) {

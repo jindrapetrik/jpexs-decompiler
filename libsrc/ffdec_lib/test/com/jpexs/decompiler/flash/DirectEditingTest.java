@@ -93,7 +93,7 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             en.toSource(swf.getAbcIndex(), htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
                             String original = htw.toString();
-                            abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original);
+                            abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original, new ArrayList<>());
                         } catch (As3ScriptReplaceException ex) {
                             fail("Exception during decompilation - file: " + filePath + " class: " + classPathString + " msg:" + ex.getMessage(), ex);
                         } catch (Exception ex) {

@@ -16,16 +16,18 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import java.io.IOException;
+import java.util.List;
 
 public interface As3ScriptReplacerInterface {
 
     public boolean isAvailable();
 
-    public void initReplacement(ScriptPack pack);
+    public void initReplacement(ScriptPack pack, List<SWF> dependencies);
 
-    public void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException;
+    public void replaceScript(ScriptPack pack, String text, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException;
 
     public void deinitReplacement(ScriptPack pack);
 }

@@ -20,6 +20,7 @@ import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class MxmlcRunner {
 
@@ -51,10 +52,12 @@ public class MxmlcRunner {
         return null;
     }
 
-    public void mxmlc(String... arguments) throws MxmlcException, InterruptedException, IOException {
-        String[] runArgs = new String[arguments.length + 1];
+    public void mxmlc(List<String> arguments) throws MxmlcException, InterruptedException, IOException {
+        String[] runArgs = new String[arguments.size() + 1];
         runArgs[0] = getMxmlcPath(flexSdkPath);
-        System.arraycopy(arguments, 0, runArgs, 1, arguments.length);
+        for (int i = 0; i < arguments.size(); i++) {
+            runArgs[i + 1] = arguments.get(i);
+        }
         //System.out.println("" + String.join(" ", runArgs));
         Process proc = null;
         try {

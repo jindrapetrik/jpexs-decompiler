@@ -37,11 +37,11 @@ public class AS3ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptImporter.class.getName());
 
-    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs) throws InterruptedException {
-        return importScripts(scriptReplacer, scriptsFolder, packs, null);
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, List<SWF> dependencies) throws InterruptedException {
+        return importScripts(scriptReplacer, scriptsFolder, packs, null, dependencies);
     }
 
-    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, ScriptImporterProgressListener listener) throws InterruptedException {
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, ScriptImporterProgressListener listener, List<SWF> dependencies) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
@@ -64,7 +64,7 @@ public class AS3ScriptImporter {
                     String txt = Helper.readTextFile(fileName);
 
                     try {
-                        pack.abc.replaceScriptPack(scriptReplacer, pack, txt);
+                        pack.abc.replaceScriptPack(scriptReplacer, pack, txt, dependencies);
                     } catch (As3ScriptReplaceException asre) {
                         for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
                             logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", fileName).replace("%col%", "" + item.getCol()));

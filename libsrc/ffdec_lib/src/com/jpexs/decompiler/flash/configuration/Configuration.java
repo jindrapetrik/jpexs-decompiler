@@ -66,6 +66,8 @@ public final class Configuration {
     public static final Level logLevel;
 
     public static boolean showStat;
+    
+    public static final String ABC_DEPS_SEPARATOR = "{*sep*}";
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")

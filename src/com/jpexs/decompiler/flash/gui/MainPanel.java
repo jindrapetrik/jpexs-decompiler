@@ -3858,7 +3858,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         @Override
                         public void scriptImportError() {
                         }                                                
-                    }
+                    },
+                    Main.getDependencies(swf)
                     );
 
                     if (countAs3 > 0) {

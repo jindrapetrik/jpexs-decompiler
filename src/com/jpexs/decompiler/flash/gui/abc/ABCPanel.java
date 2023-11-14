@@ -112,6 +112,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -188,6 +189,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final DebugPanel debugPanel;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
+    
+    private final JLabel flexLabel = new JLabel(AppStrings.translate("action.edit.flex"));
 
     private final JLabel infoNotEditableLabel;
 
@@ -244,7 +247,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_AIR);
         } else {
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
-        }
+        }        
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -1037,9 +1040,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
         decButtonsPan.add(experimentalLabel);
+        decButtonsPan.add(flexLabel);
         decButtonsPan.add(infoNotEditableLabel);
         decButtonsPan.add(saveDecompiledButton);
         decButtonsPan.add(cancelDecompiledButton);
+
+        if (Configuration.useFlexAs3Compiler.get()) {
+            experimentalLabel.setVisible(false);
+        } else {
+            flexLabel.setVisible(false);
+        }
 
         infoNotEditableLabel.setVisible(false);
 
@@ -1355,7 +1365,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         updateLinksLabel();
     }
 
-    private void updateLinksLabel() {
+    public void updateLinksLabel() {
         SWF swf = getSwf();
         if (swf == null) {
             linksLabel.setText("");
@@ -1583,7 +1593,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         saveDecompiledButton.setVisible(val);
         saveDecompiledButton.setEnabled(false);
         editDecompiledButton.setVisible(!val);
-        experimentalLabel.setVisible(!val);
+        
+        boolean useFlex = Configuration.useFlexAs3Compiler.get();
+        
+        experimentalLabel.setVisible(!useFlex && !val);
+        flexLabel.setVisible(useFlex && !val);
         cancelDecompiledButton.setVisible(val);
 
         decompiledTextArea.getCaret().setVisible(true);
@@ -1610,7 +1624,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             SwingWorker initReplaceWorker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    scriptReplacer.initReplacement(pack);
+                    scriptReplacer.initReplacement(pack, Main.getDependencies(pack.abc.getSwf()));
                     return null;
                 }
             };
@@ -1636,6 +1650,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         return (TreeItem) scriptsPath.getLastPathComponent();
     }
 
+    
+    
     private void saveDecompiled(boolean refreshTree) {
         final ABC localAbc = abc;
         int oldIndex = pack.scriptIndex;
@@ -1646,7 +1662,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             TreeItem scriptNode = getScriptNodeForPack(pack);
 
             String as = decompiledTextArea.getText();
-            localAbc.replaceScriptPack(scriptReplacer, pack, as);
+            
+            
+            localAbc.replaceScriptPack(scriptReplacer, pack, as, Main.getDependencies(pack.abc.getSwf()));
             scriptReplacer.deinitReplacement(pack);
             lastDecompiled = as;
             setDecompiledEditMode(false);
@@ -2013,7 +2031,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public void setCompound(boolean value) {
         infoNotEditableLabel.setVisible(value);
-        experimentalLabel.setVisible(!value);
+        boolean useFlex = Configuration.useFlexAs3Compiler.get();
+        experimentalLabel.setVisible(!useFlex && !value);
+        flexLabel.setVisible(useFlex && !value);
         editDecompiledButton.setEnabled(!value);
     }
 }
