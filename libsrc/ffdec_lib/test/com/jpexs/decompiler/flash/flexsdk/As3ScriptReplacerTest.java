@@ -56,7 +56,7 @@ public class As3ScriptReplacerTest {
         classNames.add("classes.TestClass1");
         List<ScriptPack> packs = swf.getScriptPacksByClassNames(classNames);
         for (ScriptPack sp : packs) {
-            replacer.replaceScript(sp, replacement);
+            replacer.replaceScript(sp, replacement, new ArrayList<>());
             return;
         }
     }

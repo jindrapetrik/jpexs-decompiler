@@ -1855,8 +1855,8 @@ public class ABC implements Openable {
         method_info.remove(index);
     }
 
-    public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as) throws As3ScriptReplaceException, IOException, InterruptedException {
-        replacer.replaceScript(pack, as);
+    public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException {
+        replacer.replaceScript(pack, as, dependencies);
         ((Tag) parentTag).setModified(true);
         return pack.isSimple;
     }

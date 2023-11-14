@@ -4240,7 +4240,7 @@ public class CommandLineArgumentParser {
                     }
                 };                       
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), listener);
-                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs(), listener);
+                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs(), listener, Main.getDependencies(swf));
 
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -4395,7 +4395,7 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            pack.abc.replaceScriptPack(scriptReplacer, pack, as);
+            pack.abc.replaceScriptPack(scriptReplacer, pack, as, Main.getDependencies(pack.abc.getSwf()));
         } catch (As3ScriptReplaceException asre) {
             for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
                 String r = "%error% on line %line%, column %col%, file: %file%".replace("%error%", "" + item.getMessage());

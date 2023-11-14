@@ -255,8 +255,6 @@ public class SwfToSwcExporter {
             printDelay("swc.recompile2", t3, t4);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(0);
             throw new RuntimeException(ex);
         }
 

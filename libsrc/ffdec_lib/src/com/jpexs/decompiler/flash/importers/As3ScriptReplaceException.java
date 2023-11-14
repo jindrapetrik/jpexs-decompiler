@@ -27,12 +27,25 @@ public class As3ScriptReplaceException extends Exception {
 
     private List<As3ScriptReplaceExceptionItem> exceptionItems;
 
+    public As3ScriptReplaceException(String message) {
+        super(message);
+    }
+    
     public As3ScriptReplaceException(List<As3ScriptReplaceExceptionItem> exceptionItems) {
+        super("Script replace exception");
         this.exceptionItems = exceptionItems;
+    }
+    
+    public As3ScriptReplaceException(As3ScriptReplaceExceptionItem exceptionItem) {
+        this.exceptionItems = new ArrayList<>();
+        this.exceptionItems.add(exceptionItem);
     }
 
     @Override
     public String getMessage() {
+        if (exceptionItems.isEmpty()) {
+            return super.getMessage();
+        }
         StringBuilder sb = new StringBuilder();
         for (As3ScriptReplaceExceptionItem item : exceptionItems) {
             sb.append(item.toString()).append("\r\n");
@@ -43,15 +56,9 @@ public class As3ScriptReplaceException extends Exception {
     @Override
     public String getLocalizedMessage() {
         return getMessage();
-    }
-
-    public As3ScriptReplaceException(As3ScriptReplaceExceptionItem exceptionItem) {
-        this.exceptionItems = new ArrayList<>();
-        this.exceptionItems.add(exceptionItem);
-    }
+    }   
 
     public List<As3ScriptReplaceExceptionItem> getExceptionItems() {
         return exceptionItems;
     }
-
 }

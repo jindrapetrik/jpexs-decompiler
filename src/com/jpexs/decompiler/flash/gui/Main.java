@@ -1634,7 +1634,7 @@ public class Main {
                             if (conf != null) {
                                 String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
                                 if (!abcDependencies.isEmpty()) {
-                                    String[] parts = (abcDependencies + LinkDialog.ABC_DEPS_SEPARATOR).split(Pattern.quote(LinkDialog.ABC_DEPS_SEPARATOR));
+                                    String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
                                     List<String> preselectedNames = new ArrayList<>();
                                     for (String part : parts) {
                                         if (!part.isEmpty()) {
@@ -1642,6 +1642,9 @@ public class Main {
                                         }
                                     }
                                     swf.setAbcIndexDependencies(namesToSwfs(preselectedNames));
+                                    if (mainFrame != null && mainFrame.getPanel() != null && mainFrame.getPanel().getABCPanel() != null) {
+                                        mainFrame.getPanel().getABCPanel().updateLinksLabel();
+                                    }
                                 }
                             }
                         }
@@ -3244,5 +3247,24 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }        
+    }
+    
+    public static List<SWF> getDependencies(SWF swf) {
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+        List<SWF> dependencies = new ArrayList<>();
+        if (conf != null) {
+            String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
+            if (!abcDependencies.isEmpty()) {
+                String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
+                List<String> preselectedNames = new ArrayList<>();
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        preselectedNames.add(part);
+                    }
+                }
+                dependencies = Main.namesToSwfs(preselectedNames);
+            }
+        }
+        return dependencies;
     }
 }

@@ -52,9 +52,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class LinkDialog extends JDialog {
-
-    public static final String ABC_DEPS_SEPARATOR = "{*sep*}";
+public class LinkDialog extends JDialog {  
 
     private MainPanel mainPanel;
 
@@ -122,7 +120,7 @@ public class LinkDialog extends JDialog {
         if (conf != null) {
             String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
             if (!abcDependencies.isEmpty()) {
-                String[] parts = (abcDependencies + ABC_DEPS_SEPARATOR).split(Pattern.quote(ABC_DEPS_SEPARATOR));
+                String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
                 List<String> preselectedNames = new ArrayList<>();
                 for (String part : parts) {
                     if (!part.isEmpty()) {
@@ -145,7 +143,7 @@ public class LinkDialog extends JDialog {
         Map<String, SWF> map = getSelectedSwfs();
         SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
         String oldValue = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
-        String newValue = String.join(ABC_DEPS_SEPARATOR, map.keySet());
+        String newValue = String.join(Configuration.ABC_DEPS_SEPARATOR, map.keySet());
         conf.setCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, newValue);
         List<SWF> swfs = new ArrayList<>(map.values());
         if (!Objects.equals(oldValue, newValue) || force) {
