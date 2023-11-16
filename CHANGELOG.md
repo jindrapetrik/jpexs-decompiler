@@ -30,6 +30,9 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - [#2123] FLA export - Using shape fixer for morphshapes (needs something better)
 
+### Changed
+- [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
+
 ## [20.0.0] - 2023-11-05
 ### Added
 - [#1130], [#1220] Remembering last used screen (monitor), 
@@ -3283,6 +3286,7 @@ Major version of SWF to XML export changed to 2.
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
 [#2122]: https://www.free-decompiler.com/flash/issues/2122
 [#2111]: https://www.free-decompiler.com/flash/issues/2111
+[#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717

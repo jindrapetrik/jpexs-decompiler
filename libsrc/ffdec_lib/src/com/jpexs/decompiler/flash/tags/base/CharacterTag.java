@@ -62,11 +62,25 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     @Override
     public String getExportFileName() {
         String result = super.getExportFileName();
-        return result + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___", classNames) : "");
+        result += "_" + getCharacterId();
+        if (exportName != null) {
+            result += "_" + exportName;
+        }
+        if (classNames.size() == 1) {
+            result += "_" + classNames.iterator().next();
+        }
+        return result;
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___", classNames) : "");
+        String result = "" + getCharacterId();
+        if (exportName != null) {
+            result += "_" + exportName;
+        }
+        if (classNames.size() == 1) {
+            result += "_" + classNames.iterator().next();
+        }
+        return result;
     }
 
     protected String exportName;
