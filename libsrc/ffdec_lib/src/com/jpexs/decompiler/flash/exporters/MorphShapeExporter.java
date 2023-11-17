@@ -231,19 +231,19 @@ public class MorphShapeExporter {
                         File classFileEnd = new File(outdir + File.separator + Helper.makeFileName(className + ".end" + settings.getFileExtension()));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        },handler).run();
+                        }, handler).run();
                         ret.add(classFile);
                         
                         if (fileStart.exists()) {
                             new RetryTask(() -> {
                                 Files.copy(fileStart.toPath(), classFileStart.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            },handler).run();                           
+                            }, handler).run();                           
                         }
                         
                         if (fileEnd.exists()) {
                             new RetryTask(() -> {
                                 Files.copy(fileEnd.toPath(), classFileEnd.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            },handler).run();                            
+                            }, handler).run();                            
                         }
                     }
                     file.delete();

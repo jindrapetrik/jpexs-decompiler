@@ -117,13 +117,13 @@ public class SoundExporter {
                     }
                 }, handler).run();
 
-                Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag)st).getClassNames() : new HashSet<>();
+                Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag) st).getClassNames() : new HashSet<>();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        },handler).run();
+                        }, handler).run();
                         ret.add(classFile);
                     }
                     file.delete();

@@ -184,7 +184,7 @@ public class FrameExporter {
                 boolean usesTransparency,
                 Color backgroundColor,
                 FrameExportSettings settings
-                ) {
+        ) {
             this.tim = tim;
             this.fframes = fframes;
             this.evl = evl;

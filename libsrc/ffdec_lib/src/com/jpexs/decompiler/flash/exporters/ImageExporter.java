@@ -156,7 +156,7 @@ public class ImageExporter {
                         File classAlphaPngFile = new File(outdir + File.separator + Helper.makeFileName(className + ".alpha.png"));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        },handler).run();
+                        }, handler).run();
                         if (alphaPngFile.exists()) {
                             Files.copy(alphaPngFile.toPath(), classAlphaPngFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         }
