@@ -29,9 +29,6 @@ All notable changes to this project will be documented in this file.
 - [#2111] Flex AS3 editation - use SWF dependencies defined in GUI
 - SWF dependencies label was not updated on startup
 
-### Removed
-- [#2123] FLA export - Using shape fixer for morphshapes (needs something better)
-
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
 
