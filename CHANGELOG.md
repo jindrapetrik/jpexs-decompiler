@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Debugging - export/import ByteArray variable data
 - [#2123] FLA export - show some progress info
 - Label that flex compiler is used (when it's enabled in settings)
+- [#2119] Option to export assets with names like their assigned classes via SymbolClass, without character id
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -3281,6 +3282,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
+[#2119]: https://www.free-decompiler.com/flash/issues/2119
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116

@@ -22,11 +22,11 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
-import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.morphshape.CanvasMorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.settings.MorphShapeExportSettings;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
@@ -53,6 +53,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -106,8 +108,9 @@ public class MorphShapeExporter {
                 final File file = new File(outdir + File.separator + characterID + settings.getFileExtension());
                 final File fileStart = new File(outdir + File.separator + characterID + ".start" + settings.getFileExtension());
                 final File fileEnd = new File(outdir + File.separator + characterID + ".end" + settings.getFileExtension());
+                MorphShapeTag mst = (MorphShapeTag) t;
+                    
                 new RetryTask(() -> {
-                    MorphShapeTag mst = (MorphShapeTag) t;
                     switch (settings.mode) {
                         case SVG_START_END:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileStart))) {
@@ -218,8 +221,42 @@ public class MorphShapeExporter {
                             break;
                     }
                 }, handler).run();
-                ret.add(file);
-
+                
+                
+                Set<String> classNames = mst.getClassNames();                    
+                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                    for (String className : classNames) {
+                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
+                        File classFileStart = new File(outdir + File.separator + Helper.makeFileName(className + ".start" + settings.getFileExtension()));
+                        File classFileEnd = new File(outdir + File.separator + Helper.makeFileName(className + ".end" + settings.getFileExtension()));
+                        new RetryTask(() -> {
+                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        },handler).run();
+                        ret.add(classFile);
+                        
+                        if (fileStart.exists()) {
+                            new RetryTask(() -> {
+                                Files.copy(fileStart.toPath(), classFileStart.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            },handler).run();                           
+                        }
+                        
+                        if (fileEnd.exists()) {
+                            new RetryTask(() -> {
+                                Files.copy(fileEnd.toPath(), classFileEnd.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            },handler).run();                            
+                        }
+                    }
+                    file.delete();
+                    if (fileStart.exists()) {
+                        fileStart.delete();
+                    }
+                    if (fileEnd.exists()) {
+                        fileEnd.delete();
+                    }
+                } else {                
+                    ret.add(file);
+                }
+                
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }

@@ -982,6 +982,10 @@ public final class Configuration {
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> boxBlurPixelsLimit = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> as3ExportNamesUseClassNamesOnly = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

@@ -48,7 +48,7 @@ public class ShapeExportSettings {
             case SWF:
                 return ".swf";
             default:
-                throw new Error("Unsupported morphshape export mode: " + mode);
+                throw new Error("Unsupported shape export mode: " + mode);
         }
     }
 }
