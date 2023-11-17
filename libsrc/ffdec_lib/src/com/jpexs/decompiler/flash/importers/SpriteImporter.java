@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -173,9 +174,23 @@ public class SpriteImporter {
             if (tag instanceof DefineSpriteTag) {
                 DefineSpriteTag spriteTag = (DefineSpriteTag) tag;
                 List<File> existingFilesForSpriteTag = new ArrayList<>();
+                
+                List<String> classNameExpectedFileNames = new ArrayList<>();
+                for (String className : spriteTag.getClassNames()) {
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                }
+                
                 for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForSpriteTag.add(f);
+                    } else {
+                        String nameNoExt = f.getName();
+                        if (nameNoExt.contains(".")) {
+                            nameNoExt = nameNoExt.substring(0, nameNoExt.lastIndexOf("."));
+                        }
+                        if (classNameExpectedFileNames.contains(nameNoExt)) {
+                            existingFilesForSpriteTag.add(f);
+                        }
                     }
                 }
                 existingFilesForSpriteTag.sort(new Comparator<File>() {

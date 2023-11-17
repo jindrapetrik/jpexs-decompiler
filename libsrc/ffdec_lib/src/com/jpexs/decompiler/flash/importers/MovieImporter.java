@@ -77,9 +77,23 @@ public class MovieImporter {
             if (tag instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag movieTag = (DefineVideoStreamTag) tag;
                 List<File> existingFilesForMovieTag = new ArrayList<>();
+                
+                List<String> classNameExpectedFileNames = new ArrayList<>();
+                for (String className : movieTag.getClassNames()) {
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                }
+                
                 for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForMovieTag.add(f);
+                    } else {
+                        String nameNoExt = f.getName();
+                        if (nameNoExt.contains(".")) {
+                            nameNoExt = nameNoExt.substring(0, nameNoExt.lastIndexOf("."));
+                        }
+                        if (classNameExpectedFileNames.contains(nameNoExt)) {
+                            existingFilesForMovieTag.add(f);
+                        }
                     }
                 }
                 existingFilesForMovieTag.sort(new Comparator<File>() {

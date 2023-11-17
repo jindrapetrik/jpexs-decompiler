@@ -235,15 +235,32 @@ public class ImageImporter extends TagImporter {
                 }
                 List<File> existingFilesForImageTag = new ArrayList<>();
                 List<File> existingAlphaFilesForImageTag = new ArrayList<>();
+                List<String> classNameExpectedFileNames = new ArrayList<>();
+                for (String className : imageTag.getClassNames()) {
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                }
 
-                for (File f : allFiles) {
+                for (File f : allFiles) {                    
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForImageTag.add(f);
+                    } else {
+                        String nameNoExt = f.getName();
+                        if (nameNoExt.contains(".")) {
+                            nameNoExt = nameNoExt.substring(0, nameNoExt.lastIndexOf("."));
+                        }
+                        if (classNameExpectedFileNames.contains(nameNoExt)) {
+                            existingFilesForImageTag.add(f);
+                        }
                     }
                 }
                 for (File f : alphaFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingAlphaFilesForImageTag.add(f);
+                    } else {
+                        String nameNoExt = f.getName().substring(0, f.getName().length() - ".alpha.png".length());
+                        if (classNameExpectedFileNames.contains(nameNoExt)) {
+                            existingAlphaFilesForImageTag.add(f);
+                        }
                     }
                 }
                 existingFilesForImageTag.sort(new Comparator<File>() {
