@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
@@ -38,8 +39,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.imageio.ImageIO;
 
 /**
@@ -118,7 +123,6 @@ public class ImageExporter {
                     }
                 }, handler).run();
 
-                final File alphaBinFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.bin"));
                 final File alphaPngFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.png"));
 
                 if ((imageTag instanceof HasSeparateAlphaChannel)
@@ -145,7 +149,26 @@ public class ImageExporter {
                         }, handler).run();
                     }
                 }
-                ret.add(file);
+                Set<String> classNames = imageTag.getClassNames();                    
+                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                    for (String className : classNames) {
+                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + "." + ImageHelper.getImageFormatString(fileFormat)));
+                        File classAlphaPngFile = new File(outdir + File.separator + Helper.makeFileName(className + ".alpha.png"));
+                        new RetryTask(() -> {
+                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        },handler).run();
+                        if (alphaPngFile.exists()) {
+                            Files.copy(alphaPngFile.toPath(), classAlphaPngFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                        ret.add(classFile);
+                    }
+                    file.delete();
+                    if (alphaPngFile.exists()) {
+                        alphaPngFile.delete();
+                    }
+                } else {                
+                    ret.add(file);
+                }
 
                 if (Thread.currentThread().isInterrupted()) {
                     break;

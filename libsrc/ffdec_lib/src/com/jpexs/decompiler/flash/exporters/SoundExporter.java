@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
@@ -28,6 +29,7 @@ import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
@@ -43,9 +45,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -86,32 +92,44 @@ public class SoundExporter {
 
                 final SoundTag st = (SoundTag) t;
 
-                String ext = "wav";
+                String ext = ".wav";
                 SoundFormat fmt = st.getSoundFormat();
                 switch (fmt.getNativeExportFormat()) {
                     case MP3:
                         if (settings.mode.hasMP3()) {
-                            ext = "mp3";
+                            ext = ".mp3";
                         }
                         break;
                     case FLV:
                         if (settings.mode.hasFlv()) {
-                            ext = "flv";
+                            ext = ".flv";
                         }
                         break;
                 }
                 if (settings.mode == SoundExportMode.FLV) {
-                    ext = "flv";
+                    ext = ".flv";
                 }
 
-                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + "." + ext);
+                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + ext);
                 new RetryTask(() -> {
                     try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
                         exportSound(os, st, settings.mode);
                     }
                 }, handler).run();
 
-                ret.add(file);
+                Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag)st).getClassNames() : new HashSet<>();
+                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                    for (String className : classNames) {
+                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
+                        new RetryTask(() -> {
+                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        },handler).run();
+                        ret.add(classFile);
+                    }
+                    file.delete();
+                } else {                
+                    ret.add(file);
+                }
 
                 if (Thread.currentThread().isInterrupted()) {
                     break;

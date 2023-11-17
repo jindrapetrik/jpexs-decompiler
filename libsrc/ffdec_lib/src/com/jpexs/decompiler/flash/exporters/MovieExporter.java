@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
@@ -40,11 +41,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -90,6 +94,20 @@ public class MovieExporter {
                     }
                 }, handler).run();
 
+                Set<String> classNames = videoStream.getClassNames();                    
+                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                    for (String className : classNames) {
+                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ".flv"));
+                        new RetryTask(() -> {
+                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        },handler).run();
+                        ret.add(classFile);
+                    }
+                    file.delete();
+                } else {                
+                    ret.add(file);
+                }
+                
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }

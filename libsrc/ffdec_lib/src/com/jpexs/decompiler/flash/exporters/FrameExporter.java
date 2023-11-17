@@ -166,6 +166,75 @@ public class FrameExporter {
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
+    
+    private class MyFrameIterator implements Iterator<BufferedImage> {
+
+        private int pos = 0;
+        private final Timeline tim;
+        private final List<Integer> fframes;
+        private final EventListener evl;
+        private final boolean usesTransparency;
+        private final Color backgroundColor;        
+        private final FrameExportSettings settings;
+        
+        public MyFrameIterator(
+                Timeline tim, 
+                List<Integer> fframes,
+                final EventListener evl,
+                boolean usesTransparency,
+                Color backgroundColor,
+                FrameExportSettings settings
+                ) {
+            this.tim = tim;
+            this.fframes = fframes;
+            this.evl = evl;
+            this.usesTransparency = usesTransparency;
+            this.backgroundColor = backgroundColor;
+            this.settings = settings;
+        }
+
+        public void reset() {
+            pos = 0;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            if (Thread.currentThread().isInterrupted()) {
+                return false;
+            }
+            return fframes.size() > pos;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public BufferedImage next() {
+            if (!hasNext()) {
+                return null;
+            }
+
+            Tag parentTag = tim.getParentTag();
+            String tagName = parentTag == null ? "" : parentTag.getName();
+
+            if (evl != null) {
+                evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
+            }
+
+            int fframe = fframes.get(pos++);
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, usesTransparency ? null : backgroundColor, settings.zoom, true).getBufferedImage();
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+            if (evl != null) {
+                evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
+            }
+
+            return result;
+        }       
+    }
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
@@ -177,12 +246,21 @@ public class FrameExporter {
             return ret;
         }
         Timeline tim0;
-        String path = "";
+        List<String> paths = new ArrayList<>();
         if (containerId == 0) {
             tim0 = swf.getTimeline();
+            paths.add("");
         } else {
             tim0 = ((Timelined) swf.getCharacter(containerId)).getTimeline();
-            path = File.separator + Helper.makeFileName(swf.getCharacter(containerId).getExportFileName());
+            
+            Set<String> classNames = swf.getCharacter(containerId).getClassNames();
+            if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                for (String className : classNames) {
+                    paths.add(File.separator + Helper.makeFileName(className));
+                }
+            } else {            
+                paths.add(File.separator + Helper.makeFileName(swf.getCharacter(containerId).getExportFileName()));
+            }
         }
 
         final Timeline tim = tim0;
@@ -195,8 +273,14 @@ public class FrameExporter {
             }
         }
 
-        final File foutdir = new File(outdir + path);
-        Path.createDirectorySafe(foutdir);
+        final List<File> foutdirs = new ArrayList<>();
+        
+        for (String path : paths) {
+            File foutdir = new File(outdir + path);
+            foutdirs.add(foutdir);
+            Path.createDirectorySafe(foutdir);            
+        }
+        
 
         final List<Integer> fframes = frames;
 
@@ -215,25 +299,27 @@ public class FrameExporter {
 
                 final int fi = i;
                 final Color fbackgroundColor = null;
-                new RetryTask(() -> {
-                    int frame = fframes.get(fi);
-                    File f = new File(foutdir + File.separator + (frame + 1) + ".svg");
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                        ExportRectangle rect = new ExportRectangle(tim.displayRect);
-                        rect.xMax *= settings.zoom;
-                        rect.yMax *= settings.zoom;
-                        rect.xMin *= settings.zoom;
-                        rect.yMin *= settings.zoom;
-                        SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame");
-                        if (fbackgroundColor != null) {
-                            exporter.setBackGroundColor(fbackgroundColor);
-                        }
+                for (File foutdir : foutdirs) {
+                    new RetryTask(() -> {
+                        int frame = fframes.get(fi);
+                        File f = new File(foutdir + File.separator + (frame + 1) + ".svg");
+                        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                            ExportRectangle rect = new ExportRectangle(tim.displayRect);
+                            rect.xMax *= settings.zoom;
+                            rect.yMax *= settings.zoom;
+                            rect.xMin *= settings.zoom;
+                            rect.yMin *= settings.zoom;
+                            SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame");
+                            if (fbackgroundColor != null) {
+                                exporter.setBackGroundColor(fbackgroundColor);
+                            }
 
-                        tim.toSVG(frame, 0, null, 0, exporter, null, 0);
-                        fos.write(Utf8Helper.getBytes(exporter.getSVG()));
-                    }
-                    ret.add(f);
-                }, handler).run();
+                            tim.toSVG(frame, 0, null, 0, exporter, null, 0);
+                            fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                        }
+                        ret.add(f);
+                    }, handler).run();
+                }
 
                 if (Thread.currentThread().isInterrupted()) {
                     break;
@@ -257,104 +343,106 @@ public class FrameExporter {
             final Timeline ftim = tim;
             final Color fbackgroundColor = null;
             final SWF fswf = swf;
-            new RetryTask(() -> {
-                File fcanvas = new File(foutdir + File.separator + "canvas.js");
-                Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
-                ret.add(fcanvas);
+            for (File foutdir : foutdirs) {
+                new RetryTask(() -> {
+                    File fcanvas = new File(foutdir + File.separator + "canvas.js");
+                    Helper.saveStream(SWF.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/canvas.js"), fcanvas);
+                    ret.add(fcanvas);
 
-                File f = new File(foutdir + File.separator + "frames.js");
-                File fmin = new File(foutdir + File.separator + "frames.min.js");
-                int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
-                int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
-                try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                    fos.write(Utf8Helper.getBytes("\r\n"));
-                    fos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
-                    Set<Integer> library = new HashSet<>();
-                    ftim.getNeededCharacters(fframes, library);
+                    File f = new File(foutdir + File.separator + "frames.js");
+                    File fmin = new File(foutdir + File.separator + "frames.min.js");
+                    int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
+                    int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
+                    try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                        fos.write(Utf8Helper.getBytes("\r\n"));
+                        fos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
+                        Set<Integer> library = new HashSet<>();
+                        ftim.getNeededCharacters(fframes, library);
 
-                    SWF.libraryToHtmlCanvas(fswf, library, fos);
+                        SWF.libraryToHtmlCanvas(fswf, library, fos);
 
-                    String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
+                        String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("function ").append(currentName).append("(ctx,ctrans,frame,ratio,time){\r\n");
-                    sb.append("\tctx.save();\r\n");
-                    sb.append("\tctx.transform(1,0,0,1,").append(-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor).append(",").append(-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor).append(");\r\n");
-                    framesToHtmlCanvas(sb, SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, null, fbackgroundColor);
-                    sb.append("\tctx.restore();\r\n");
-                    sb.append("}\r\n\r\n");
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("function ").append(currentName).append("(ctx,ctrans,frame,ratio,time){\r\n");
+                        sb.append("\tctx.save();\r\n");
+                        sb.append("\tctx.transform(1,0,0,1,").append(-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor).append(",").append(-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor).append(");\r\n");
+                        framesToHtmlCanvas(sb, SWF.unitDivisor / settings.zoom, ftim, fframes, 0, null, 0, ftim.displayRect, null, fbackgroundColor);
+                        sb.append("\tctx.restore();\r\n");
+                        sb.append("}\r\n\r\n");
 
-                    sb.append("var frame = -1;\r\n");
-                    sb.append("var time = 0;\r\n");
-                    sb.append("var frames = [];\r\n");
-                    for (int i : fframes) {
-                        sb.append("frames.push(").append(i).append(");\r\n");
+                        sb.append("var frame = -1;\r\n");
+                        sb.append("var time = 0;\r\n");
+                        sb.append("var frames = [];\r\n");
+                        for (int i : fframes) {
+                            sb.append("frames.push(").append(i).append(");\r\n");
+                        }
+                        sb.append("\r\n");
+                        RGB backgroundColor1 = new RGB(255, 255, 255);
+                        if (setBgColorTag != null) {
+                            backgroundColor1 = setBgColorTag.backgroundColor;
+                        }
+
+                        sb.append("var backgroundColor = \"").append(backgroundColor1.toHexRGB()).append("\";\r\n");
+                        sb.append("var originalWidth = ").append(width).append(";\r\n");
+                        sb.append("var originalHeight= ").append(height).append(";\r\n");
+                        sb.append("function nextFrame(ctx,ctrans){\r\n");
+                        sb.append("\tvar oldframe = frame;\r\n");
+                        sb.append("\tframe = (frame+1)%frames.length;\r\n");
+                        sb.append("\tif(frame==oldframe){time++;}else{time=0;};\r\n");
+                        sb.append("\tdrawFrame();\r\n");
+                        sb.append("}\r\n\r\n");
+
+                        sb.append("function drawFrame(){\r\n");
+                        sb.append("\tctx.fillStyle = backgroundColor;\r\n");
+                        sb.append("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n");
+                        sb.append("\tctx.save();\r\n");
+                        sb.append("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n");
+                        sb.append("\t").append(currentName).append("(ctx,ctrans,frames[frame],0,time);\r\n");
+                        sb.append("\tctx.restore();\r\n");
+                        sb.append("}\r\n\r\n");
+                        if (ftim.swf.frameRate > 0) {
+                            sb.append("window.setInterval(function(){nextFrame(ctx,ctrans);},").append((int) (1000.0 / ftim.swf.frameRate)).append(");\r\n");
+                        }
+                        sb.append("nextFrame(ctx,ctrans);\r\n");
+                        fos.write(Utf8Helper.getBytes(sb.toString()));
                     }
-                    sb.append("\r\n");
-                    RGB backgroundColor1 = new RGB(255, 255, 255);
-                    if (setBgColorTag != null) {
-                        backgroundColor1 = setBgColorTag.backgroundColor;
-                    }
 
-                    sb.append("var backgroundColor = \"").append(backgroundColor1.toHexRGB()).append("\";\r\n");
-                    sb.append("var originalWidth = ").append(width).append(";\r\n");
-                    sb.append("var originalHeight= ").append(height).append(";\r\n");
-                    sb.append("function nextFrame(ctx,ctrans){\r\n");
-                    sb.append("\tvar oldframe = frame;\r\n");
-                    sb.append("\tframe = (frame+1)%frames.length;\r\n");
-                    sb.append("\tif(frame==oldframe){time++;}else{time=0;};\r\n");
-                    sb.append("\tdrawFrame();\r\n");
-                    sb.append("}\r\n\r\n");
-
-                    sb.append("function drawFrame(){\r\n");
-                    sb.append("\tctx.fillStyle = backgroundColor;\r\n");
-                    sb.append("\tctx.fillRect(0,0,canvas.width,canvas.height);\r\n");
-                    sb.append("\tctx.save();\r\n");
-                    sb.append("\tctx.transform(canvas.width/originalWidth,0,0,canvas.height/originalHeight,0,0);\r\n");
-                    sb.append("\t").append(currentName).append("(ctx,ctrans,frames[frame],0,time);\r\n");
-                    sb.append("\tctx.restore();\r\n");
-                    sb.append("}\r\n\r\n");
-                    if (ftim.swf.frameRate > 0) {
-                        sb.append("window.setInterval(function(){nextFrame(ctx,ctrans);},").append((int) (1000.0 / ftim.swf.frameRate)).append(");\r\n");
-                    }
-                    sb.append("nextFrame(ctx,ctrans);\r\n");
-                    fos.write(Utf8Helper.getBytes(sb.toString()));
-                }
-
-                boolean packed = false;
-                if (Configuration.packJavaScripts.get()) {
-                    try {
-                        JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
-                        f.delete();
-                        packed = true;
-                    } catch (Exception | Error e) { // Something wrong in the packer
-                        logger.log(Level.WARNING, "JPacker: Cannot minimize script");
+                    boolean packed = false;
+                    if (Configuration.packJavaScripts.get()) {
+                        try {
+                            JPacker.main(new String[]{"-q", "-b", "62", "-o", fmin.getAbsolutePath(), f.getAbsolutePath()});
+                            f.delete();
+                            packed = true;
+                        } catch (Exception | Error e) { // Something wrong in the packer
+                            logger.log(Level.WARNING, "JPacker: Cannot minimize script");
+                            f.renameTo(fmin);
+                        }
+                    } else {
                         f.renameTo(fmin);
                     }
-                } else {
-                    f.renameTo(fmin);
-                }
 
-                File fh = new File(foutdir + File.separator + "frames.html");
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fh)); FileInputStream fis = new FileInputStream(fmin)) {
-                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
-                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
-                    byte[] buf = new byte[1000];
-                    int cnt;
-                    while ((cnt = fis.read(buf)) > 0) {
-                        fos.write(buf, 0, cnt);
+                    File fh = new File(foutdir + File.separator + "frames.html");
+                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fh)); FileInputStream fis = new FileInputStream(fmin)) {
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlPrefix(width, height)));
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsPrefix()));
+                        byte[] buf = new byte[1000];
+                        int cnt;
+                        while ((cnt = fis.read(buf)) > 0) {
+                            fos.write(buf, 0, cnt);
+                        }
+                        if (packed) {
+                            fos.write(Utf8Helper.getBytes(";"));
+                        }
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));
+                        fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
                     }
-                    if (packed) {
-                        fos.write(Utf8Helper.getBytes(";"));
-                    }
-                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getJsSuffix()));
-                    fos.write(Utf8Helper.getBytes(CanvasShapeExporter.getHtmlSuffix()));
-                }
 
-                fmin.delete();
+                    fmin.delete();
 
-                ret.add(f);
-            }, handler).run();
+                    ret.add(f);
+                }, handler).run();
+            }
 
             if (evl != null) {
                 Tag parentTag = tim.getParentTag();
@@ -366,28 +454,13 @@ public class FrameExporter {
         if (settings.mode == FrameExportMode.SWF) {
             Color fBackgroundColor = backgroundColor;
             if (exportAll) {
-                new RetryTask(() -> {
-                    File f = new File(foutdir + File.separator + "frames.swf");
-
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
-                        try {
-                            new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
-                        } catch (ActionParseException ex) {
-                            Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-
-                    ret.add(f);
-                }, handler).run();
-            } else {
-                for (Integer frame : fframes) {
+                for (File foutdir : foutdirs) {
                     new RetryTask(() -> {
-                        File f = new File(foutdir + File.separator + (frame + 1) + ".swf");
-                        Frame fn = (Frame) tim.getFrame(frame);
+                        File f = new File(foutdir + File.separator + "frames.swf");
 
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             try {
-                                new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
+                                new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
                             } catch (ActionParseException ex) {
                                 Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -396,184 +469,175 @@ public class FrameExporter {
                         ret.add(f);
                     }, handler).run();
                 }
+            } else {
+                for (Integer frame : fframes) {
+                    for (File foutdir : foutdirs) {
+                        new RetryTask(() -> {
+                            File f = new File(foutdir + File.separator + (frame + 1) + ".swf");
+                            Frame fn = (Frame) tim.getFrame(frame);
+
+                            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                                try {
+                                    new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
+                                } catch (ActionParseException ex) {
+                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+
+                            ret.add(f);
+                        }, handler).run();
+                    }
+                }
             }
         }
 
         final Color fbackgroundColor = backgroundColor;
-        final boolean fusesTransparency = settings.mode == FrameExportMode.PNG || settings.mode == FrameExportMode.GIF;
-        final Iterator<BufferedImage> frameImages = new Iterator<BufferedImage>() {
-            private int pos = 0;
-
-            @Override
-            public boolean hasNext() {
-                if (Thread.currentThread().isInterrupted()) {
-                    return false;
-                }
-                return fframes.size() > pos;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public BufferedImage next() {
-                if (!hasNext()) {
-                    return null;
-                }
-
-                Tag parentTag = tim.getParentTag();
-                String tagName = parentTag == null ? "" : parentTag.getName();
-
-                if (evl != null) {
-                    evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
-                }
-
-                int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom, true).getBufferedImage();
-                if (Thread.currentThread().isInterrupted()) {
-                    return null;
-                }
-                if (evl != null) {
-                    evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
-                }
-
-                return result;
-            }
-        };
+        final boolean usesTransparency = settings.mode == FrameExportMode.PNG || settings.mode == FrameExportMode.GIF;
+        final MyFrameIterator frameImages = new MyFrameIterator(tim, fframes, evl, usesTransparency, backgroundColor, settings);
 
         switch (settings.mode) {
             case GIF:
-                new RetryTask(() -> {
-                    File f = new File(foutdir + File.separator + "frames.gif");
-                    makeGIF(frameImages, swf.frameRate, f, evl);
-                    ret.add(f);
-                }, handler).run();
-                break;
-            case BMP:
-                for (int i = 0; frameImages.hasNext(); i++) {
-                    final int fi = i;
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
                     new RetryTask(() -> {
-                        File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
-                        BufferedImage img = frameImages.next();
-                        if (img != null) {
-                            BMPFile.saveBitmap(img, f);
-                        }
+                        File f = new File(foutdir + File.separator + "frames.gif");
+                        makeGIF(frameImages, swf.frameRate, f, evl);
                         ret.add(f);
                     }, handler).run();
                 }
                 break;
+            case BMP:
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    for (int i = 0; frameImages.hasNext(); i++) {
+                        final int fi = i;
+                        new RetryTask(() -> {
+                            File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
+                            BufferedImage img = frameImages.next();
+                            if (img != null) {
+                                BMPFile.saveBitmap(img, f);
+                            }
+                            ret.add(f);
+                        }, handler).run();
+                    }
+                }        
+                break;
             case PNG:
-                for (int i = 0; frameImages.hasNext(); i++) {
-                    final int fi = i;
-                    new RetryTask(() -> {
-                        File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                        BufferedImage img = frameImages.next();
-                        if (img != null) {
-                            ImageHelper.write(img, ImageFormat.PNG, file);
-                            ret.add(file);
-                        }
-                    }, handler).run();
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    for (int i = 0; frameImages.hasNext(); i++) {
+                        final int fi = i;                    
+                        new RetryTask(() -> {
+                            File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
+                            BufferedImage img = frameImages.next();
+                            if (img != null) {
+                                ImageHelper.write(img, ImageFormat.PNG, file);
+                                ret.add(file);
+                            }
+                        }, handler).run();
+                    }
                 }
-
-                //ShapeExporterBase.clearCache();
                 break;
             case PDF:
                 if (frameImages.hasNext()) {
-                    new RetryTask(() -> {
-                        File f = new File(foutdir + File.separator + "frames.pdf");
-                        PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
-                        PageFormat pf = new PageFormat();
-                        pf.setOrientation(PageFormat.PORTRAIT);
-                        Paper p = new Paper();
-                        /*BufferedImage img = frameImages.next();
-                        p.setSize(img.getWidth() + 10, img.getHeight() + 10);*/
+                    for (File foutdir : foutdirs) {
+                        new RetryTask(() -> {
+                            File f = new File(foutdir + File.separator + "frames.pdf");
+                            PDFJob job = new PDFJob(new BufferedOutputStream(new FileOutputStream(f)));
+                            PageFormat pf = new PageFormat();
+                            pf.setOrientation(PageFormat.PORTRAIT);
+                            Paper p = new Paper();
+                            /*BufferedImage img = frameImages.next();
+                            p.setSize(img.getWidth() + 10, img.getHeight() + 10);*/
 
-                        int pos = 0;
-                        RECT rect = tim.displayRect;
+                            int pos = 0;
+                            RECT rect = tim.displayRect;
 
-                        double w = (rect.getWidth() * settings.zoom / SWF.unitDivisor);
-                        double h = (rect.getHeight() * settings.zoom / SWF.unitDivisor);
-                        p.setSize(w, h);
-                        pf.setPaper(p);
-                        double zoom = settings.zoom;
-                        Matrix m = new Matrix();
-                        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
-                        m.scale(zoom);
-                        Matrix transformation = m;
-                        Map<Integer, Font> existingFonts = new HashMap<>();
+                            double w = (rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                            double h = (rect.getHeight() * settings.zoom / SWF.unitDivisor);
+                            p.setSize(w, h);
+                            pf.setPaper(p);
+                            double zoom = settings.zoom;
+                            Matrix m = new Matrix();
+                            m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                            m.scale(zoom);
+                            Matrix transformation = m;
+                            Map<Integer, Font> existingFonts = new HashMap<>();
 
-                        while (pos < fframes.size()) {
+                            while (pos < fframes.size()) {
 
-                            if (evl != null) {
-                                Tag parentTag = tim.getParentTag();
-                                String tagName = parentTag == null ? "" : parentTag.getName();
-                                evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
-                            }
-                            int fframe = fframes.get(pos);
-                            final Graphics2D g = (Graphics2D) job.getGraphics(pf);
-                            //g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
+                                if (evl != null) {
+                                    Tag parentTag = tim.getParentTag();
+                                    String tagName = parentTag == null ? "" : parentTag.getName();
+                                    evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
+                                }
+                                int fframe = fframes.get(pos);
+                                final Graphics2D g = (Graphics2D) job.getGraphics(pf);
+                                //g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
 
-                            SerializableImage image = new SerializableImage((int) w + 1, (int) h + 1, SerializableImage.TYPE_INT_ARGB_PRE) {
+                                SerializableImage image = new SerializableImage((int) w + 1, (int) h + 1, SerializableImage.TYPE_INT_ARGB_PRE) {
 
-                                private Graphics2D compositeGraphics;
+                                    private Graphics2D compositeGraphics;
 
-                                @Override
-                                public Graphics getGraphics() {
-                                    if (compositeGraphics != null) {
+                                    @Override
+                                    public Graphics getGraphics() {
+                                        if (compositeGraphics != null) {
+                                            return compositeGraphics;
+                                        }
+                                        final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
+                                        compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
                                         return compositeGraphics;
                                     }
-                                    final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                    compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
-                                    return compositeGraphics;
+
+                                    @Override
+                                    public void fillTransparent() {
+
+                                    }
+
+                                };
+                                //if (backGroundColor == null) {
+                                //    image.fillTransparent();
+                                int imgWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
+                                int imgHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
+                                if (!usesTransparency && fbackgroundColor != null) {
+                                    g.setComposite(AlphaComposite.Src);
+                                    g.setColor(fbackgroundColor);
+                                    g.fill(new Rectangle(imgWidth, imgHeight));
                                 }
 
-                                @Override
-                                public void fillTransparent() {
+                                RenderContext renderContext = new RenderContext();
+                                renderContext.cursorPosition = new Point(-1, -1);
+                                renderContext.mouseButton = 0;
+                                renderContext.stateUnderCursor = new ArrayList<>();
 
+                                try {
+                                    tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
                                 }
+                                g.dispose();
 
-                            };
-                            //if (backGroundColor == null) {
-                            //    image.fillTransparent();
-                            int imgWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
-                            int imgHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
-                            if (!fusesTransparency && fbackgroundColor != null) {
-                                g.setComposite(AlphaComposite.Src);
-                                g.setColor(fbackgroundColor);
-                                g.fill(new Rectangle(imgWidth, imgHeight));
+                                if (Thread.currentThread().isInterrupted()) {
+                                    return;
+                                }
+                                pos++;
                             }
 
-                            RenderContext renderContext = new RenderContext();
-                            renderContext.cursorPosition = new Point(-1, -1);
-                            renderContext.mouseButton = 0;
-                            renderContext.stateUnderCursor = new ArrayList<>();
-
-                            try {
-                                tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                            g.dispose();
-
-                            if (Thread.currentThread().isInterrupted()) {
-                                return;
-                            }
-                            pos++;
-                        }
-
-                        job.end();
-                        ret.add(f);
-                    }, handler).run();
+                            job.end();
+                            ret.add(f);
+                        }, handler).run();
+                    }
                 }
                 break;
             case AVI:
-                new RetryTask(() -> {
-                    File f = new File(foutdir + File.separator + "frames.avi");
-                    makeAVI(frameImages, swf.frameRate, f, evl);
-                    ret.add(f);
-                }, handler).run();
+                for (File foutdir : foutdirs) {
+                    frameImages.reset();
+                    new RetryTask(() -> {
+                        File f = new File(foutdir + File.separator + "frames.avi");
+                        makeAVI(frameImages, swf.frameRate, f, evl);
+                        ret.add(f);
+                    }, handler).run();
+                }
                 break;
         }
 

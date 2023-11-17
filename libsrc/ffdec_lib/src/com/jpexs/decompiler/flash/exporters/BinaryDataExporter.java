@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -30,8 +31,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -78,8 +82,20 @@ public class BinaryDataExporter {
                         fos.write(bdt.binaryData.getRangeData());
                     }
                 }, handler).run();
-
-                ret.add(file);
+                
+                Set<String> classNames = bdt.getClassNames();                    
+                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                    for (String className : classNames) {
+                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
+                        new RetryTask(() -> {
+                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        },handler).run();
+                        ret.add(classFile);
+                    }
+                    file.delete();
+                } else {                
+                    ret.add(file);
+                }
 
                 if (Thread.currentThread().isInterrupted()) {
                     break;
