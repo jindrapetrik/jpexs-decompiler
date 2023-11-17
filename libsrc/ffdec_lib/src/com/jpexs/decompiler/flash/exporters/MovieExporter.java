@@ -100,7 +100,7 @@ public class MovieExporter {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ".flv"));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        },handler).run();
+                        }, handler).run();
                         ret.add(classFile);
                     }
                     file.delete();

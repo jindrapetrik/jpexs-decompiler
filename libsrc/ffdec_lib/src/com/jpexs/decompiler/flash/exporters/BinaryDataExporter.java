@@ -89,7 +89,7 @@ public class BinaryDataExporter {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
                         new RetryTask(() -> {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        },handler).run();
+                        }, handler).run();
                         ret.add(classFile);
                     }
                     file.delete();
