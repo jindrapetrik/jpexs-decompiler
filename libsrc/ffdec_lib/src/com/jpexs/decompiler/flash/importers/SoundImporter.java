@@ -515,9 +515,25 @@ public class SoundImporter {
         for (SoundTag tag : soundTags) {
             int characterId = tag.getCharacterId();
             List<File> existingFilesForSoundTag = new ArrayList<>();
+            
+            List<String> classNameExpectedFileNames = new ArrayList<>();
+            if (tag instanceof CharacterTag) {
+                for (String className : ((CharacterTag) tag).getClassNames()) {
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                }
+            }
+                
             for (File f : allFiles) {
                 if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                     existingFilesForSoundTag.add(f);
+                } else {
+                    String nameNoExt = f.getName();
+                    if (nameNoExt.contains(".")) {
+                        nameNoExt = nameNoExt.substring(0, nameNoExt.lastIndexOf("."));
+                    }
+                    if (classNameExpectedFileNames.contains(nameNoExt)) {
+                        existingFilesForSoundTag.add(f);
+                    }
                 }
             }
             existingFilesForSoundTag.sort(new Comparator<File>() {
