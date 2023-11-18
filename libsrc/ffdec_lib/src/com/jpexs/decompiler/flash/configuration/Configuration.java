@@ -987,6 +987,10 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> as3ExportNamesUseClassNamesOnly = null;
         
+    @ConfigurationDefaultString("")
+    @ConfigurationDirectory
+    public static ConfigurationItem<String> jnaTempDirectory = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
