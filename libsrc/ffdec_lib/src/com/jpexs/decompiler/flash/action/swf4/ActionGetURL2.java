@@ -87,7 +87,7 @@ public class ActionGetURL2 extends Action {
 
     @Override
     public String toString() {
-        return "GetURL2 " + sendVarsMethod + ", " + loadVariablesFlag + ", " + loadTargetFlag;
+        return "GetURL2 " + loadVariablesFlag + ", " + loadTargetFlag + ", " + sendVarsMethod;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ActionGetURL2 extends Action {
         
         ASMParsedSymbol symb = lexer.lex();
         boolean sendVarsMethodLast = false;
-        if (symb.type == ASMParsedSymbol.TYPE_BOOLEAN) { //backwards compatibility
+        if (symb.type == ASMParsedSymbol.TYPE_BOOLEAN) { //backwards compatibility. In 19.1.0 up to 20.0.0 sendVarsMethod is first
             sendVarsMethodLast = true;            
         }
         lexer.pushback(symb);
