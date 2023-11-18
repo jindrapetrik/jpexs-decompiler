@@ -22,10 +22,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.jpexs.debugger.flash.Debugger;
 import com.jpexs.debugger.flash.DebuggerCommands;
-import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableType;
-import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.EventListener;
@@ -48,7 +46,6 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
-import com.jpexs.decompiler.flash.gui.abc.LinkDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
@@ -95,6 +92,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -2320,27 +2318,7 @@ public class Main {
 
         initUiLang();
 
-        if (Configuration.useRibbonInterface.get()) {
-            View.setLookAndFeel();
-        } else {
-            try {
-                UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, null);
-                UIManager.put("Tree.expandedIcon", null);
-                UIManager.put("Tree.collapsedIcon", null);
-                UIManager.put("ColorChooserUI", null);
-                UIManager.put("ColorChooser.swatchesRecentSwatchSize", null);
-                UIManager.put("ColorChooser.swatchesSwatchSize", null);
-                UIManager.put("RibbonApplicationMenuPopupPanelUI", null);
-                UIManager.put("RibbonApplicationMenuButtonUI", null);
-                UIManager.put("ProgressBarUI", null);
-                UIManager.put("TextField.background", null);
-                UIManager.put("FormattedTextField.background", null);
-                UIManager.put("CommandButtonUI", null);
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-        }
+        initLookAndFeel();
 
         View.execInEventDispatch(() -> {
             ErrorLogFrame.createNewInstance();
@@ -2639,6 +2617,90 @@ public class Main {
         UIManager.put("ColorChooser.sampleText", AppStrings.translate("ColorChooser.sampleText"));
 
     }
+    
+    public static String getDefaultCharacterEncoding() { 
+        // Creating an array of byte type chars and
+        // passing random  alphabet as an argument.abstract
+        // Say alphabet be 'w'
+        byte[] byte_array = { 'w' };
+ 
+        // Creating an object of InputStream
+        InputStream instream
+            = new ByteArrayInputStream(byte_array);
+ 
+        // Now, opening new file input stream reader
+        InputStreamReader streamreader
+            = new InputStreamReader(instream);
+        String defaultCharset = streamreader.getEncoding();
+ 
+        // Returning default character encoding
+        return defaultCharset;
+    }
+    
+    private static void initLookAndFeel() {
+        if (Configuration.useRibbonInterface.get()) {
+            View.setLookAndFeel();
+        } else {
+            try {
+                UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, null);
+                UIManager.put("Tree.expandedIcon", null);
+                UIManager.put("Tree.collapsedIcon", null);
+                UIManager.put("ColorChooserUI", null);
+                UIManager.put("ColorChooser.swatchesRecentSwatchSize", null);
+                UIManager.put("ColorChooser.swatchesSwatchSize", null);
+                UIManager.put("RibbonApplicationMenuPopupPanelUI", null);
+                UIManager.put("RibbonApplicationMenuButtonUI", null);
+                UIManager.put("ProgressBarUI", null);
+                UIManager.put("TextField.background", null);
+                UIManager.put("FormattedTextField.background", null);
+                UIManager.put("CommandButtonUI", null);
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+       
+    public static void initJna() {
+        if (Platform.isWindows()) {
+            String jnaTempDir = Configuration.jnaTempDirectory.get();
+            if (!jnaTempDir.isEmpty()) {
+                System.setProperty("jna.tmpdir", jnaTempDir);
+            } else {
+                jnaTempDir = System.getProperty("java.io.tmpdir");
+            }
+            
+            try {
+                com.sun.jna.Native.toByteArray(""); //Trigger JNA.Native class static initializer, which will load the DLL
+            } catch (UnsatisfiedLinkError error) {
+                initLookAndFeel();
+                ViewMessages.showMessageDialog(null, 
+                        "Cannot read JNA DLL file from current Temporary directory:\r\n" 
+                                + jnaTempDir + "\r\n"
+                                + "The reason is probably Unicode characters in the path or in your username.\r\n"
+                                + "In the following dialog, please specify new temporary directory path,\r\n"
+                                + "which DOES NOT contain any special Unicode characters. (Only basic latin supported)\r\n"
+                                + "Then application restart is required.",
+                        "FFDec JNA Error", JOptionPane.ERROR_MESSAGE);
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        JFileChooser fc = new JFileChooser();
+                        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        fc.setDialogTitle("Select new temporary directory without Unicode characters in its path");
+                        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            File dir = Helper.fixDialogFile(fc.getSelectedFile());
+                            Configuration.jnaTempDirectory.set(dir.getAbsolutePath());
+                            Configuration.saveConfig();
+                            System.exit(0);
+                        } else {
+                            System.exit(1);
+                        }
+                    }                    
+                });                
+            }       
+        }
+    }
 
     public static void initLang() {
         if (!Configuration.locale.hasValue()) {
@@ -2738,7 +2800,7 @@ public class Main {
      * @param args the command line arguments
      * @throws IOException On error
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {    
         decodeLaunch5jArgs(args);
         setSessionLoaded(false);
 
@@ -2753,6 +2815,7 @@ public class Main {
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration._debugMode.get());
 
+        initJna();
         initLang();
 
         if (Configuration.cacheOnDisk.get()) {
