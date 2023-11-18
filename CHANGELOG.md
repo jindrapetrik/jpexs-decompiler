@@ -28,9 +28,12 @@ All notable changes to this project will be documented in this file.
 - [#2111] AS3 direct editation - access class in class initializer
 - [#2111] Flex AS3 editation - use SWF dependencies defined in GUI
 - SWF dependencies label was not updated on startup
+- [#2127] Wrong parameter order in AS1/2 P-code Action GetURL2 documentation
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
+- [#2127] AS1/2 P-code Action GetURL2 switched parameters back - correct order is (loadVariablesFlag, loadTargetFlag, sendVarsMethod),
+ code from 19.1.x to 20.0.0 is still accepted
 
 ## [20.0.0] - 2023-11-05
 ### Added
@@ -3287,6 +3290,7 @@ Major version of SWF to XML export changed to 2.
 [#2122]: https://www.free-decompiler.com/flash/issues/2122
 [#2111]: https://www.free-decompiler.com/flash/issues/2111
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
+[#2127]: https://www.free-decompiler.com/flash/issues/2127
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
 [#1717]: https://www.free-decompiler.com/flash/issues/1717
