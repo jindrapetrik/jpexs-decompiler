@@ -309,6 +309,7 @@ public abstract class StaticTextTag extends TextTag {
                 }
             }
         }
+        writer.finishHilights();
         return new HighlightedText(writer);
     }
 

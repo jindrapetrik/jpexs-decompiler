@@ -72,6 +72,7 @@ public class ActionScriptSearch {
 
                         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                         asm.getASMSource(ScriptExportMode.PCODE, writer, null);
+                        writer.finishHilights();
                         String text = writer.toString();
                         if (pat.matcher(text).find()) {
                             found.add(new ActionSearchResult(asm, pcode, item.getKey()));
@@ -187,6 +188,7 @@ public class ActionScriptSearch {
                                 MethodBody body = abc.bodies.get(bodyIndex);
                                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                                 abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, ScriptExportMode.PCODE, writer);
+                                writer.finishHilights();
                                 String text = writer.toString();
                                 if (pat.matcher(text).find()) {
                                     ABCSearchResult searchResult = new ABCSearchResult(pack, methodInfo.getClassIndex(), methodInfo.getTraitId());

@@ -636,6 +636,7 @@ public class DefineEditTextTag extends TextTag {
             String text = initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
             writer.hilightSpecial(text, HighlightSpecialType.TEXT);
         }
+        writer.finishHilights();
         return new HighlightedText(writer);
     }
 

@@ -59,6 +59,7 @@ public class ActionScript2UninitializedFieldsTest extends ActionScript2TestBase 
         } catch (InterruptedException ex) {
             fail();
         }
+        writer.finishHilights();
         String actualResult = cleanPCode(writer.toString());
         String expectedResult = cleanPCode("class " + BASE_TEST_PACKAGE + "." + testClassName + "\r\n"
                 + "{\r\n"

@@ -1654,6 +1654,7 @@ public class XFLConverter {
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        writer.finishHilights();
         return writer.toString();
     }
 

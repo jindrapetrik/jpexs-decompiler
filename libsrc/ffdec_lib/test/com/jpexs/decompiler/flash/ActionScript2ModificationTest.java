@@ -81,6 +81,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -107,6 +108,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -133,6 +135,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);
@@ -156,6 +159,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String actualResult = normalizeLabels(writer.toString());
 
             actualResult = cleanPCode(actualResult);

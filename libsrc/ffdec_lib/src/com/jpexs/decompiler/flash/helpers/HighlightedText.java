@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,33 +33,33 @@ public class HighlightedText implements Serializable {
 
     public String text;
 
-    private final List<Highlighting> traitHighlights;
+    private final HighlightingList traitHighlights;
 
-    private final List<Highlighting> classHighlights;
+    private final HighlightingList classHighlights;
 
-    private final List<Highlighting> methodHighlights;
+    private final HighlightingList methodHighlights;
 
-    private final List<Highlighting> instructionHighlights;
+    private final HighlightingList instructionHighlights;
 
-    private final List<Highlighting> specialHighlights;
+    private final HighlightingList specialHighlights;
 
-    public List<Highlighting> getTraitHighlights() {
+    public HighlightingList getTraitHighlights() {
         return traitHighlights;
     }
 
-    public List<Highlighting> getMethodHighlights() {
+    public HighlightingList getMethodHighlights() {
         return methodHighlights;
     }
 
-    public List<Highlighting> getClassHighlights() {
+    public HighlightingList getClassHighlights() {
         return classHighlights;
     }
 
-    public List<Highlighting> getInstructionHighlights() {
+    public HighlightingList getInstructionHighlights() {
         return instructionHighlights;
     }
 
-    public List<Highlighting> getSpecialHighlights() {
+    public HighlightingList getSpecialHighlights() {
         return specialHighlights;
     }
 
@@ -77,10 +78,10 @@ public class HighlightedText implements Serializable {
 
     public HighlightedText(String text) {
         this.text = text;
-        this.traitHighlights = new ArrayList<>();
-        this.classHighlights = new ArrayList<>();
-        this.methodHighlights = new ArrayList<>();
-        this.instructionHighlights = new ArrayList<>();
-        this.specialHighlights = new ArrayList<>();
+        this.traitHighlights = new HighlightingList();
+        this.classHighlights = new HighlightingList();
+        this.methodHighlights = new HighlightingList();
+        this.instructionHighlights = new HighlightingList();
+        this.specialHighlights = new HighlightingList();
     }
 }

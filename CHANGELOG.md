@@ -30,11 +30,17 @@ All notable changes to this project will be documented in this file.
 - SWF dependencies label was not updated on startup
 - [#2127] Wrong parameter order in AS1/2 P-code Action GetURL2 documentation
 - [#2025], [#2078], [#2053] Problems starting the app on Windows when the username has unicode characters
+- Incorrect debugger line numbers when "Open loaded while playing" is enabled
+- AS3 debugger - Slow injecting debug info - now faster
+- AS3 debugger - obfuscated classes debugging
+- Delayed open loaded SWFs while playing
+- AS3 Direct editation - script initializer for main document class
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
 - [#2127] AS1/2 P-code Action GetURL2 switched parameters back - correct order is (loadVariablesFlag, loadTargetFlag, sendVarsMethod),
  code from 19.1.x to 20.0.0 is still accepted
+- Wrong unicode escape `{invalid_utf8:xxx}` changed to `{invalid_utf8=xxx}` for compatibility with file names
 
 ## [20.0.0] - 2023-11-05
 ### Added

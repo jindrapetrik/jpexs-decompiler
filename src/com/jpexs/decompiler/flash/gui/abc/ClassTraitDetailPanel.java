@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class ClassTraitDetailPanel extends JPanel implements TraitDetail {
 
     private TraitClass trait;
 
-    private List<Highlighting> specialHilights;
+    private HighlightingList specialHilights;
 
     private boolean ignoreCaret = false;
 
@@ -103,6 +104,7 @@ public class ClassTraitDetailPanel extends JPanel implements TraitDetail {
             writer.unindent();
         }
         writer.appendNoHilight("end ; trait");
+        writer.finishHilights();
         String s = writer.toString();
         specialHilights = writer.specialHilights;
         classEditor.setText(s);

@@ -57,6 +57,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             return writer.toString();
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
@@ -78,7 +79,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             } catch (InterruptedException ex) {
                 fail();
             }
-
+            writer.finishHilights();
             return writer.toString();
         } catch (IOException | ActionParseException ex) {
             fail();
@@ -100,7 +101,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             } catch (InterruptedException ex) {
                 fail();
             }
-
+            writer.finishHilights();
             return writer.toString();
         } catch (IOException | ActionParseException ex) {
             fail();
@@ -126,9 +127,11 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(new HashMap<>(),doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
             String actualResult = writer.toString();
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String decompiled = writer.toString();
 
             assertEquals(actualResult.trim(), "ok = false;");

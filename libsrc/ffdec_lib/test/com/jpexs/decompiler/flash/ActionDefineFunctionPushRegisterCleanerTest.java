@@ -58,6 +58,7 @@ public class ActionDefineFunctionPushRegisterCleanerTest extends ActionScript2Te
         } catch (InterruptedException ex) {
             fail();
         }
+        writer.finishHilights();
         String actualResult = cleanPCode(writer.toString());
         String expectedResult = cleanPCode("class " + testClassName + "\r\n"
                 + "{\r\n"

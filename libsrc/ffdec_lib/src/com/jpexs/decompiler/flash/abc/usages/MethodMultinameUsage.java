@@ -90,6 +90,7 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
             }
             ((TraitMethodGetterSetter) traits.traits.get(traitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
         }
+        writer.finishHilights();
         return writer.toString().trim();
     }
 

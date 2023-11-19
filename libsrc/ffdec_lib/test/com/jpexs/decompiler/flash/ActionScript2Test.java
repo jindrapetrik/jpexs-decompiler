@@ -60,6 +60,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
         } catch (InterruptedException ex) {
             fail();
         }
+        writer.finishHilights();
         String actualResult = cleanPCode(writer.toString());
         expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);

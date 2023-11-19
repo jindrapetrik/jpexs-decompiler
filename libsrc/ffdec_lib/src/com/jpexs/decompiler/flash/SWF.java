@@ -94,6 +94,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -3945,7 +3946,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param decompileDir Directory to set file information paths
      */
-    public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {
+    public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {                
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
@@ -3954,10 +3955,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
             i++;
             informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
-            if (s.isSimple) {
-                s.injectDebugInfo(decompileDir);
+            if (s.isSimple) {       
+                try {
+                    s.injectDebugInfo(decompileDir);
+                } catch (Throwable t) {
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Errorr injecting debug info", t);
+                }
             }
-        }
+        }        
     }
 
     /**
@@ -4121,7 +4126,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-            List<Highlighting> hls = writer.instructionHilights;
+            writer.finishHilights();
+            HighlightingList hls = writer.instructionHilights;
 
             Map<Integer, Integer> offsetToLine = new TreeMap<>();
             String txt = writer.toString();

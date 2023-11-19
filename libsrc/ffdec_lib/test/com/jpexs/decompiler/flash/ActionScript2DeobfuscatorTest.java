@@ -63,6 +63,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         ActionList list = ActionListReader.readActionListTimeout(new ArrayList<>(), new SWFInputStream(swf, hex), SWF.DEFAULT_VERSION, 0, hex.length, "", 1);
         Action.actionsToSource(new HashMap<>(), null, list, "", writer, Utf8Helper.charsetName);
+        writer.finishHilights();
         return writer.toString();
     }
 
@@ -257,6 +258,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
             String actualResult = writer.toString();
 
             assertTrue(actualResult.contains("case \"c\":"));
@@ -282,6 +284,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));
@@ -309,6 +312,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
+            writer.finishHilights();
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));

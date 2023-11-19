@@ -434,6 +434,7 @@ public final class MethodBody implements Cloneable {
             writer.indent().indent().indent();
             toString(callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods);
             writer.unindent().unindent().unindent();
+            writer.finishHilights();
             return writer.toString();
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);

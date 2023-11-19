@@ -72,6 +72,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         } catch (InterruptedException ex) {
             fail();
         }
+        writer.finishHilights();
         String actualResult = cleanPCode(writer.toString());
         expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);

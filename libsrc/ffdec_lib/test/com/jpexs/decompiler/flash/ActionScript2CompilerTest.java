@@ -69,6 +69,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
             asm.setActionBytes(Action.actionsToBytes(asm.getActions(), true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
             asm.getASMSource(ScriptExportMode.PCODE, writer, null);
+            writer.finishHilights();
             String actualResult = normalizeLabels(writer.toString());
             actualResult = cleanPCode(actualResult);
             String expectedResult = cleanPCode(expectedPCode);

@@ -112,6 +112,7 @@ public class TraitsListItem {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
                 trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                writer.finishHilights();
                 s = writer.toString();
             } else {
                 ConvertData convertData = new ConvertData();
@@ -127,6 +128,7 @@ public class TraitsListItem {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
                 trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                writer.finishHilights();
                 s = writer.toString();
             }
         } catch (InterruptedException ex) {

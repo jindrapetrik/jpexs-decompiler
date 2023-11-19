@@ -73,6 +73,8 @@ public class DecompilerPool {
                 src.getActionScriptSource(writer, actions);
                 writer.endFunction();
 
+                writer.finishHilights();
+                
                 HighlightedText result = new HighlightedText(writer);
                 SWF swf = src.getSwf();
                 if (swf != null) {
@@ -107,6 +109,7 @@ public class DecompilerPool {
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 pack.toSource(abcIndex, writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false);
 
+                writer.finishHilights();
                 HighlightedText result = new HighlightedText(writer);
                 Openable openable = pack.getOpenable();
                 SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
