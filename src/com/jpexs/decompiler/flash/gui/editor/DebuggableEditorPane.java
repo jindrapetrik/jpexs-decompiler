@@ -178,44 +178,36 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
         ((Graphics2D) g).setStroke(new BasicStroke(0.5f));
 
-        boolean drawText = true;
         if (hasColorMarker(line, STACK_MARKER)) {
             g.setColor(BG_STACK_COLOR);
             g.fillPolygon(new int[]{x + 5, x + 15, x + 15}, new int[]{textY, textY, textY - 10}, 3);
             g.setColor(Color.black);
             g.drawPolygon(new int[]{x + 5, x + 15, x + 15}, new int[]{textY, textY, textY - 10}, 3);
-            drawText = false;
         }
         if (hasColorMarker(line, INVALID_BREAKPOINT_MARKER)) {
             g.setColor(BG_INVALID_BREAKPOINT_COLOR);
             g.fillOval(x + 5, textY - 10, 10, 10);
             g.setColor(Color.black);
             g.drawOval(x + 5, textY - 10, 10, 10);
-            drawText = false;
         } else if (hasColorMarker(line, BREAKPOINT_MARKER)) {
             g.setColor(BG_BREAKPOINT_COLOR);
             g.fillOval(x + 5, textY - 10, 10, 10);
             g.setColor(Color.black);
             g.drawOval(x + 5, textY - 10, 10, 10);
-            drawText = false;
         }
         if (hasColorMarker(line, IP_MARKER)) {
             int mx = x + 10;
             g.setColor(BG_IP_COLOR);
             g.fillPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);
             g.setColor(Color.black);
-            g.drawPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);
-            drawText = false;
+            g.drawPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);            
         }
-        if (drawText) {
-            if (currentLine) {
-                g.setColor(UIManager.getColor("List.selectionForeground"));
-            } else {
-                g.setColor(UIManager.getColor("Panel.foreground"));
-            }
-            g.drawString("" + line, x, textY);
+        if (currentLine) {
+            g.setColor(UIManager.getColor("List.selectionForeground"));
+        } else {
+            g.setColor(UIManager.getColor("Panel.foreground"));
         }
-
+        g.drawString("" + line, x + 16 + 5, textY);
     }
 
     @Override
