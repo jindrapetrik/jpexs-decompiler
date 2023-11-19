@@ -13,6 +13,7 @@
  */
 package jsyntaxpane.components;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -21,10 +22,19 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
+import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import jsyntaxpane.SyntaxView;
 import jsyntaxpane.actions.ActionUtils;
+import static jsyntaxpane.components.LineNumbersRuler.DEFAULT_L_MARGIN;
+import static jsyntaxpane.components.LineNumbersRuler.DEFAULT_R_MARGIN;
+import static jsyntaxpane.components.LineNumbersRuler.PROPERTY_BACKGROUND;
+import static jsyntaxpane.components.LineNumbersRuler.PROPERTY_FOREGROUND;
+import static jsyntaxpane.components.LineNumbersRuler.PROPERTY_LEFT_MARGIN;
+import static jsyntaxpane.components.LineNumbersRuler.PROPERTY_RIGHT_MARGIN;
+import jsyntaxpane.util.Configuration;
 
 /**
  *
@@ -92,9 +102,16 @@ public class LineNumbersBreakpointsRuler extends LineNumbersRuler {
                 if (y - lh > maxY) {
                     break;
                 }
-                ((LineMarkerPainter) editor).paintLineMarker(g, line, insets.left, y - lh + fontMetrics.getDescent() - 1, y, lh, currentLine == line, maxLines);
+                ((LineMarkerPainter) editor).paintLineMarker(g, line, insets.left - 16 - 5, y - lh + fontMetrics.getDescent() - 1, y, lh, currentLine == line, maxLines);
             }
         }
     }
 
+    @Override
+    public void config(Configuration config) {
+        super.config(config);
+        int right = config.getInteger(PROPERTY_RIGHT_MARGIN, DEFAULT_R_MARGIN);
+        int left = config.getInteger(PROPERTY_LEFT_MARGIN, DEFAULT_L_MARGIN);
+        setBorder(BorderFactory.createEmptyBorder(0, left + 16 + 5, 0, right));
+    }
 }
