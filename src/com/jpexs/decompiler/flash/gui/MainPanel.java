@@ -4359,9 +4359,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void refreshTree(Openable[] openables) {
-        TreeItem treeItem = null;
+        String selectionPath = null;
         if (currentView == VIEW_RESOURCES || currentView == VIEW_TAGLIST) {
-            treeItem = getCurrentTree().getCurrentTreeItem();
+            selectionPath = getCurrentTree().getSelectionPathString();
         }
 
         clear();
@@ -4369,23 +4369,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         tagTree.updateSwfs(openables);
         tagListTree.updateSwfs(openables);
-
-        if (treeItem != null) {
-            Openable openable = treeItem.getOpenable();
-
-            if (openable instanceof SWF) {
-                SWF swf = (SWF) openable;
-                SWF treeItemSwf = swf.getRootSwf();
-                if (this.openables.contains(treeItemSwf.openableList)) {
-                    setTagTreeSelectedNode(getCurrentTree(), treeItem);
-                }
-            } else if (openable != null) {
-                if (this.openables.contains(openable.getOpenableList())) {
-                    setTagTreeSelectedNode(getCurrentTree(), treeItem);
-                }
-            }
+        
+        
+        getCurrentTree().clearSelection();
+        if (selectionPath != null) {            
+            getCurrentTree().setSelectionPathString(selectionPath);
         }
-
         reload(true);
         updateMissingNeededCharacters();
         pinsPanel.refresh();
