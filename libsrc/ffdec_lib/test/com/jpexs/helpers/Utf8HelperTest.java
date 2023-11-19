@@ -30,12 +30,12 @@ public class Utf8HelperTest {
     public static Object[][] provideSamples() {
         return new Object[][]{
                 {new byte[] {'A'}, "A"},
-                {new byte[] {'A', (byte)0b10000111, 'B'}, "A{invalid_utf8:135}B"},
+                {new byte[] {'A', (byte)0b10000111, 'B'}, "A{invalid_utf8=135}B"},
                 {new byte[] {'A', (byte)0b11000101, (byte)0b10011001, 'B'}, "AřB"},
                 {new byte[] {'A', (byte)0b11100000, (byte)0b10100000, (byte)0b10000000, 'B'}, "A" + (char)0x0800 + "B"},                
                 {new byte[] {'A', (byte)0b11110000, (byte)0b10011101, (byte) 0b10010011, (byte)0b10101100, 'B'}, "A𝓬B"},
-                {new byte[] {'A', (byte)0b11000101}, "A{invalid_utf8:197}"},
-                {new byte[] {'A', (byte)0b11000101, 'B'}, "A{invalid_utf8:197}B"}                
+                {new byte[] {'A', (byte)0b11000101}, "A{invalid_utf8=197}"},
+                {new byte[] {'A', (byte)0b11000101, 'B'}, "A{invalid_utf8=197}B"}                
                 };
     }
     
