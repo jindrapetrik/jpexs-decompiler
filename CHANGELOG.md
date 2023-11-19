@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Debugging - activation object was not visible in locals
 - Linenumbers are visible even if debug markers are used
 - Marker of stack frames not properly cleared
+- Retain AS3 script selection in the tree after its editation and saving whole SWF
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
