@@ -16,15 +16,22 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
+import com.jpexs.decompiler.flash.abc.avm2.OffsetUpdater;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -370,6 +377,15 @@ public class ScriptPack extends AS3ClassTreeItem {
         abc.script_info.get(scriptIndex).setModified(false);
     }
 
+    private class Label {
+        public long addr;
+
+        public Label(long addr) {
+            this.addr = addr;
+        }
+        
+    }
+    
     /**
      * Injects debugfile, debugline instructions into the code.
      *
@@ -382,7 +398,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         Map<Integer, Map<Integer, Integer>> bodyLineToPos = new HashMap<>();
         Map<Integer, Map<Integer, String>> bodyToRegToName = new HashMap<>();
         Map<Integer, Map<Integer, Integer>> bodyToRegToLine = new HashMap<>();
-
+        
         Set<Integer> lonelyBody = new HashSet<>();
         try {
             HighlightedText decompiled = SWF.getCached(this);
@@ -391,6 +407,10 @@ public class ScriptPack extends AS3ClassTreeItem {
             txt = txt.replace("\r", "");
 
             for (int i = 0; i < txt.length(); i++) {
+                /*if ((i % 1000) == 0) {
+                    int percent = i * 100 / txt.length();
+                    System.err.println("" + i + "/" + txt.length() + " (" + percent + "%)");
+                }*/
                 blk:
                 while (true) {
                     Highlighting sh = Highlighting.searchPos(decompiled.getSpecialHighlights(), i);
@@ -407,7 +427,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (method == null) {
                         break blk;
                     }
-                    Highlighting instr = Highlighting.searchPos(decompiled.getInstructionHighlights(), i); //h
+                    Highlighting instr = Highlighting.searchPos(decompiled.getInstructionHighlights(), i); //h                    
                     /*if (instr == null) {
                      continue;
                      }*/
@@ -434,7 +454,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         if (instrOffset == -1) {
                             lonelyBody.add(bodyIndex);
                             break blk;
-                        }
+                        }                        
                         try {
                             pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
                         } catch (ConvertException cex) {
@@ -450,7 +470,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
                         //int origPos = bodyLineToPos.get(bodyIndex).containsKey(line) ? bodyLineToPos.get(bodyIndex).get(line) : -1;
 
-                        bodyToPosToLine.get(bodyIndex).put(pos, line);
+                        bodyToPosToLine.get(bodyIndex).put(pos, line);                        
                         bodyLineToPos.get(bodyIndex).put(line, pos);
                     } else {
                         lonelyBody.add(bodyIndex);
@@ -483,8 +503,14 @@ public class ScriptPack extends AS3ClassTreeItem {
         //String filepath = path.toString().replace('.', '/') + ".as";
         String pkg = path.packageStr.toString();
         String cls = path.className;
-        String filename = new File(directoryPath, path.packageStr.toFilePath()) + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
-
+        String filename = new File(directoryPath, path.packageStr.toFilePath()).getPath().replace(";", "{{semicolon}}")
+                + ";"
+                + pkg.replace(".", File.separator).replace(";", "{{semicolon}}")
+                + ";"
+                + cls.replace(";", "{{semicolon}}")
+                + ".as";
+        filename = filename.replaceAll("\\{(invalid_utf8=[0-9]+)\\}", "[$1]");
+        
         //Remove debug info from lonely bodies
         for (int bodyIndex : lonelyBody) {
             if (!bodyToPosToLine.keySet().contains(bodyIndex)) {
@@ -537,33 +563,91 @@ public class ScriptPack extends AS3ClassTreeItem {
             Collections.sort(pos);
             Collections.reverse(pos);
             Set<Integer> addedLines = new HashSet<>();
-            loopi:
-            for (int i : pos) {
+            Set<Long> importantOffsets = b.getCode().getImportantOffsets(b, true);
+            List<Object> code2 = new ArrayList<>();
+            Map<Integer, Integer> origPosToNewPos = new HashMap<>();
+            for (int i = 0; i < code.size(); i++) {
+                long adr = b.getCode().pos2adr(i);
+                if (importantOffsets.contains(adr)) {
+                    code2.add(new Label(adr));
+                }
+                origPosToNewPos.put(i, code2.size());
+                if (delIns.contains(code.get(i))) {
+                    continue;
+                }
+                code2.add(code.get(i));                
+            }
+            for (int i : pos) {               
                 int line = bodyToPosToLine.get(bodyIndex).get(i);
                 if (addedLines.contains(line)) {
                     continue;
                 }
                 addedLines.add(line);
                 logger.log(Level.FINE, "Script {0}: Insert debugline({1}) at pos {2} to body {3}", new Object[]{path, line, i, bodyIndex});
-                b.insertInstruction(i + dpos, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
+                code2.add(origPosToNewPos.get(i + dpos), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
-            //remove old debug instructions
-            for (int i = 0; i < code.size(); i++) {
-                AVM2Instruction ins = code.get(i);
-                for (AVM2Instruction d : delIns) {
-                    if (ins == d) {
-                        b.removeInstruction(i);
-                        i--;
-                        break;
+            long adr = 0;
+            Map<Long, Long> mapOffsets = new HashMap<>();
+            for (int i = 0; i < code2.size(); i++) {
+                Object obj = code2.get(i);
+                if (obj instanceof AVM2Instruction) {
+                    AVM2Instruction ins = (AVM2Instruction) obj;
+                    adr += ins.getBytesLength();
+                }
+                if (obj instanceof Label) {
+                    Label lab = (Label) obj;
+                    mapOffsets.put(lab.addr, adr);
+                }
+            }                        
+            code.clear();
+            
+            adr = 0;
+            for (int i = 0; i < code2.size(); i++) {
+                Object obj = code2.get(i);
+                if (obj instanceof AVM2Instruction) {
+                    AVM2Instruction ins = (AVM2Instruction) obj;
+                    long targetAddr;
+                    long changedAddr;
+                    int changedOperand;
+                    if (ins.definition instanceof IfTypeIns) {
+                        targetAddr = ins.getTargetAddress();
+                        changedAddr = mapOffsets.get(targetAddr);
+                        changedOperand = (int) (changedAddr - adr - 4);
+                        ins.operands[0] = changedOperand;
                     }
+                    if (ins.definition instanceof LookupSwitchIns) {
+                        targetAddr = ins.getAddress() + ins.operands[0];
+                        changedAddr = mapOffsets.get(targetAddr);
+                        changedOperand = (int) (changedAddr - adr);
+                        ins.operands[0] = changedOperand;
+                        for (int k = 2; k < ins.operands.length; k++) {
+                            targetAddr = ins.getAddress() + ins.operands[k];
+                            changedAddr = mapOffsets.get(targetAddr);
+                            changedOperand = (int) (changedAddr - adr);
+                            ins.operands[k] = changedOperand;
+                        }
+                    }
+                    ins.setAddress(adr);
+                    adr += ins.getBytesLength();
+                    code.add(ins);
                 }
             }
-
+            for (ABCException ex : b.exceptions) {
+                long lstart = ex.start;
+                long ltarget = ex.target;
+                long lend = ex.end;
+                lstart = mapOffsets.get(lstart);
+                ltarget = mapOffsets.get(ltarget);
+                lend = mapOffsets.get(lend);
+                ex.start = (int) lstart;
+                ex.target = (int) ltarget;
+                ex.end = (int) lend;
+            }                        
             b.setModified();
         }
-
-        ((Tag) abc.parentTag).setModified(true);
-    }
+        
+        ((Tag) abc.parentTag).setModified(true);        
+    }        
 
     public void injectPCodeDebugInfo(int abcIndex) {
 
