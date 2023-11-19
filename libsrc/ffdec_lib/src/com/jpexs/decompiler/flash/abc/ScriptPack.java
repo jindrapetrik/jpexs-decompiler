@@ -225,7 +225,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
-            writer.startMethod(script_init);
+            writer.startMethod(script_init, null);
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!scriptInitializerIsEmpty) {
                     writer.startBlock();
@@ -398,8 +398,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         Map<Integer, Map<Integer, Integer>> bodyLineToPos = new HashMap<>();
         Map<Integer, Map<Integer, String>> bodyToRegToName = new HashMap<>();
         Map<Integer, Map<Integer, Integer>> bodyToRegToLine = new HashMap<>();
-        
+        Map<Integer, Integer> bodyToActivationReg = new HashMap<>();
         Set<Integer> lonelyBody = new HashSet<>();
+        Map<Integer, Integer> bodyLines = new HashMap<>();
+        Map<Integer, String> bodyToFunctionName = new HashMap<>();
         try {
             HighlightedText decompiled = SWF.getCached(this);
             int line = 1;
@@ -437,6 +439,14 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (bodyIndex == -1) {
                         break blk;
                     }
+                    if (!bodyLines.containsKey(bodyIndex)) {
+                        bodyLines.put(bodyIndex, line);
+                    }
+                    if (!bodyToFunctionName.containsKey(bodyIndex)) {
+                        bodyToFunctionName.put(bodyIndex, method.getProperties().localName);
+                    }
+                    
+                    bodyToActivationReg.put(bodyIndex, method.getProperties().activationRegIndex);
                     int pos = -1;
                     int regIndex = -1;
                     String regName = null;
@@ -550,21 +560,34 @@ public class ScriptPack extends AS3ClassTreeItem {
                     delIns.add(ins);
                 }
             }
+            List<Object> code2 = new ArrayList<>();
+            
             int dpos = 0;
-            b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}), true);
+            code2.add(new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
             dpos++;
             Set<Integer> regs = bodyToRegToName.containsKey(bodyIndex) ? bodyToRegToName.get(bodyIndex).keySet() : new TreeSet<>();
             for (int r : regs) {
                 String name = bodyToRegToName.get(bodyIndex).get(r);
                 int line = bodyToRegToLine.get(bodyIndex).get(r);
-                b.insertInstruction(dpos++, new AVM2Instruction(0, AVM2Instructions.Debug, new int[]{1, abc.constants.getStringId(name, true), r - 1, line}));
+                code2.add(new AVM2Instruction(0, AVM2Instructions.Debug, new int[]{1, abc.constants.getStringId(name, true), r - 1, line}));
             }
+            int activationReg = -1;
+            if (bodyToActivationReg.containsKey(bodyIndex)) {
+                activationReg = bodyToActivationReg.get(bodyIndex);
+            }
+            if (activationReg > -1) {
+                int bodyLine = bodyLines.containsKey(bodyIndex) ? bodyLines.get(bodyIndex) : 0;
+                String activationRegName = "anonymous$0";
+                if (bodyToFunctionName.containsKey(bodyIndex) && bodyToFunctionName.get(bodyIndex) != null) {
+                    activationRegName = bodyToFunctionName.get(bodyIndex) + "$0";
+                }
+                code2.add(new AVM2Instruction(0, AVM2Instructions.Debug, new int[]{1, abc.constants.getStringId(activationRegName, true), activationReg - 1, bodyLine}));
+            }        
             List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
             Collections.sort(pos);
             Collections.reverse(pos);
             Set<Integer> addedLines = new HashSet<>();
             Set<Long> importantOffsets = b.getCode().getImportantOffsets(b, true);
-            List<Object> code2 = new ArrayList<>();
             Map<Integer, Integer> origPosToNewPos = new HashMap<>();
             for (int i = 0; i < code.size(); i++) {
                 long adr = b.getCode().pos2adr(i);

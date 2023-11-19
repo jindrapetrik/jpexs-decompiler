@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - AS3 debugger - obfuscated classes debugging
 - Delayed open loaded SWFs while playing
 - AS3 Direct editation - script initializer for main document class
+- AS3 Debugging - activation object was not visible in locals
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class

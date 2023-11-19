@@ -116,9 +116,10 @@ public class HighlightedTextWriter extends GraphTextWriter {
      * @return HighlightedTextWriter
      */
     @Override
-    public HighlightedTextWriter startMethod(long index) {
+    public HighlightedTextWriter startMethod(long index, String name) {
         HighlightData data = new HighlightData();
         data.index = index;
+        data.localName = name;
         return start(data, HighlightType.METHOD);
     }
 
@@ -309,7 +310,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
     private HighlightedTextWriter start(HighlightData data, HighlightType type) {
         if (hilight) {
             Highlighting h = new Highlighting(sb.length() - newLineCount, data, type, null);
-            hilightStack.add(h);
+            hilightStack.add(h);            
         }
         return this;
     }
@@ -376,5 +377,17 @@ public class HighlightedTextWriter extends GraphTextWriter {
         for (int i = 0; i < indent; i++) {
             appendNoHilight(formatting.indentString);
         }
+    }
+    
+    @Override
+    public GraphTextWriter addCurrentMethodData(HighlightData data) {
+        for (int i = hilightStack.size() - 1; i >= 0; i--) {
+            Highlighting h = hilightStack.get(i);
+            if (h.type == HighlightType.METHOD) {
+                h.getProperties().merge(data);
+                break;
+            }
+        }
+        return this;
     }
 }

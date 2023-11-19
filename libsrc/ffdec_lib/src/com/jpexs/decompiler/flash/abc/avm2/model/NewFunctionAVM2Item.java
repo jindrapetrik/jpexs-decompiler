@@ -75,7 +75,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         }
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function");
-        writer.startMethod(methodIndex);
+        writer.startMethod(methodIndex, null);
         writer.append((!functionName.isEmpty() ? " " + functionName : ""));
         writer.appendNoHilight("(");
         abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, localData.fullyQualifiedNames);

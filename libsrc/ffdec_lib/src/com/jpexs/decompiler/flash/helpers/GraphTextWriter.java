@@ -75,9 +75,10 @@ public abstract class GraphTextWriter {
      * Highlights specified text as method
      *
      * @param index MethodInfo index
+     * @param name
      * @return GraphTextWriter
      */
-    public GraphTextWriter startMethod(long index) {
+    public GraphTextWriter startMethod(long index, String name) {
         return this;
     }
 
@@ -248,6 +249,10 @@ public abstract class GraphTextWriter {
         } else if (formatting.spaceBeforeParenthesesMethodCallEmptyParentheses) {
             space();
         }
+        return this;
+    }
+    
+    public GraphTextWriter addCurrentMethodData(HighlightData data) {
         return this;
     }
 }
