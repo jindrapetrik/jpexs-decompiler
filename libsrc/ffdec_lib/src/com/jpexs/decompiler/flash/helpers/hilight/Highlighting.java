@@ -19,7 +19,10 @@ package com.jpexs.decompiler.flash.helpers.hilight;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -48,7 +51,7 @@ public class Highlighting implements Serializable {
         return properties;
     }
 
-    public static Highlighting search(List<Highlighting> list, HighlightData properties, long from, long to) {
+    public static Highlighting search(HighlightingList list, HighlightData properties, long from, long to) {
         Highlighting ret = null;
         looph:
         for (Highlighting h : list) {
@@ -82,11 +85,41 @@ public class Highlighting implements Serializable {
         return null;
     }
 
-    public static Highlighting searchPos(List<Highlighting> list, long pos) {
+    public static Highlighting searchPos(HighlightingList list, long pos) {
         return searchPos(list, pos, -1, -1);
     }
+    
+    public static Highlighting searchPos(HighlightingList list, long pos, long from, long to) { 
+        return searchPosNew(list, pos, from, to);
+    }
 
-    public static Highlighting searchPos(List<Highlighting> list, long pos, long from, long to) {
+    public static Highlighting searchPosNew(HighlightingList list, long pos, long from, long to) {  
+        Highlighting[] hmap = posToHighlightMap(list);
+        if (pos > -1) {
+            if (pos >= hmap.length) {
+                return null;
+            }
+            return hmap[(int) pos];
+        }
+        if (from == -1) {
+            from = 0;
+        }
+        if (to == -1) {
+            to = hmap.length;
+        }
+        for (long i = from; i < to; i++) {
+            Highlighting h = hmap[(int) i];
+            if (h != null) {
+                return h;
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    /*public static Highlighting searchPosOld(HighlightingList list, long pos, long from, long to) {                
+        
         Highlighting ret = null;
         looph:
         for (Highlighting h : list) {
@@ -111,13 +144,41 @@ public class Highlighting implements Serializable {
         }
 
         return ret;
+    }*/
+    
+    private static final Map<HighlightingList, Highlighting[]> listToPosMap = new WeakHashMap<>();
+    
+    private static Highlighting[] posToHighlightMap(HighlightingList list) {
+        if (list.isEmpty()) {
+            return new Highlighting[0];
+        }
+        if (listToPosMap.containsKey(list)) {
+            return listToPosMap.get(list);
+        }
+        Highlighting lastH = list.get(list.size() - 1);
+        int maxPos = lastH.startPos + Math.max(1, lastH.len);
+        Highlighting[] map = new Highlighting[maxPos];
+        for (Highlighting h : list) {
+            for (int i = h.startPos; i < h.startPos + Math.max(1, h.len); i++) {
+                Highlighting oldH = map[i];
+                if (oldH == null) {
+                    map[i] = h;
+                    continue;
+                }
+                if (h.len < oldH.len) {
+                    map[i] = h;
+                }
+            }
+        }
+        listToPosMap.put(list, map);
+        return map;
     }
 
-    public static Highlighting searchOffset(List<Highlighting> list, long offset) {
+    public static Highlighting searchOffset(HighlightingList list, long offset) {
         return searchOffset(list, offset, -1, -1);
     }
 
-    public static Highlighting searchOffset(List<Highlighting> list, long offset, long from, long to) {
+    public static Highlighting searchOffset(HighlightingList list, long offset, long from, long to) {
         looph:
         for (Highlighting h : list) {
             if (from > -1) {
@@ -140,11 +201,11 @@ public class Highlighting implements Serializable {
         return null;
     }
 
-    public static Highlighting searchIndex(List<Highlighting> list, long index) {
+    public static Highlighting searchIndex(HighlightingList list, long index) {
         return searchIndex(list, index, -1, -1);
     }
 
-    public static Highlighting searchIndex(List<Highlighting> list, long index, long from, long to) {
+    public static Highlighting searchIndex(HighlightingList list, long index, long from, long to) {
         looph:
         for (Highlighting h : list) {
             if (from > -1) {
@@ -167,8 +228,8 @@ public class Highlighting implements Serializable {
         return null;
     }
 
-    public static List<Highlighting> searchAllPos(List<Highlighting> list, long pos) {
-        List<Highlighting> ret = new ArrayList<>();
+    public static HighlightingList searchAllPos(HighlightingList list, long pos) {
+        HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
             if (pos == -1 || (pos >= h.startPos && (pos < h.startPos + h.len))) {
                 ret.add(h);
@@ -178,8 +239,8 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
-    public static List<Highlighting> searchAllIndexes(List<Highlighting> list, long index) {
-        List<Highlighting> ret = new ArrayList<>();
+    public static HighlightingList searchAllIndexes(HighlightingList list, long index) {
+        HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
             long i = h.getProperties().index;
             if (i == index) {
@@ -190,8 +251,8 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
-    public static List<Highlighting> searchAllLocalNames(List<Highlighting> list, String localName) {
-        List<Highlighting> ret = new ArrayList<>();
+    public static HighlightingList searchAllLocalNames(HighlightingList list, String localName) {
+        HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
             if (localName.equals(h.getProperties().localName)) {
                 ret.add(h);
