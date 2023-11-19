@@ -139,6 +139,21 @@ public class DebugPanel extends JPanel {
         }
 
     }
+    
+    private void logAdd(String message) {
+        boolean wasEmpty = logLength == 0;
+        String add = message + "\r\n";
+        logLength += add.length();
+        traceLogTextarea.append(add);
+        try {
+            traceLogTextarea.setCaretPosition(logLength);
+        } catch (IllegalArgumentException iex) {
+            //ignore
+        }
+        if (wasEmpty) {
+            refresh();
+        }
+    }
 
     public DebugPanel() {
         super(new BorderLayout());
@@ -273,20 +288,18 @@ public class DebugPanel extends JPanel {
             @Override
             public void trace(String... val) {
                 for (String s : val) {
-                    String add = "trace: " + s + "\r\n";
-                    boolean wasEmpty = logLength == 0;
-                    logLength += add.length();
-                    traceLogTextarea.append(add);
-                    try {
-                        traceLogTextarea.setCaretPosition(logLength);
-                    } catch (IllegalArgumentException iex) {
-                        //ignore
-                    }
-                    if (wasEmpty) {
-                        refresh();
-                    }
+                    logAdd("trace: " + s);
                 }
             }
+        });
+        
+        Main.getDebugHandler().addErrorListener(new DebuggerHandler.ErrorListener() {
+            @Override
+            public void errorException(String message, Variable thrownVar) {
+                logAdd("unhandled exception: " + message);
+                selectedTab = tabTypes.get(tabTypes.size() - 1);
+                refresh();
+            }            
         });
 
         Main.getDebugHandler().addConnectionListener(new DebuggerHandler.ConnectionListener() {

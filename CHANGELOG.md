@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Label that flex compiler is used (when it's enabled in settings)
 - [#2119] Option to export assets with names like their assigned classes via SymbolClass, without character id
 - [#2119] Bulk imported assets can also match filenames based on assigned classname, not just character id prefix
+- Debugger shows (logs) unhandled exceptions
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
