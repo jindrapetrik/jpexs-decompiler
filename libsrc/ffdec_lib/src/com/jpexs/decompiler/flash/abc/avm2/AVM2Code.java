@@ -266,6 +266,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StoreNewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
@@ -1822,7 +1823,9 @@ public class AVM2Code implements Cloneable {
                 GraphTargetItem item = items.get(i);
                 String propNameStr = null;
                 GraphTargetItem value = null;
-                if (item instanceof SetSlotAVM2Item) {
+                if (item instanceof StoreNewActivationAVM2Item) { //Special case
+                    continue;
+                } else if (item instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item ss = (SetSlotAVM2Item) item;
                     if (ss.slotName == null) {
                         break;
