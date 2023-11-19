@@ -20,9 +20,14 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
+import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
+import com.jpexs.decompiler.flash.gui.debugger.Debugger;
+import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
 import de.hameister.treetable.MyTreeTableModel;
@@ -38,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -201,19 +207,66 @@ public class DebugPanel extends JPanel {
                 if (isByteArray) {
                     JMenu exportMenu = new JMenu(AppStrings.translate("debug.export").replace("%name%", v.name));
                     JMenuItem exportByteArrayMenuItem = new JMenuItem(AppStrings.translate("debug.export.bytearray"));
-                    exportByteArrayMenuItem.addActionListener((ActionEvent e1) -> {
+                    exportByteArrayMenuItem.addActionListener((ActionEvent e1) -> {                                                                                                
                         JFileChooser fc = new JFileChooser();
                         fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
                         if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
                             File file = Helper.fixDialogFile(fc.getSelectedFile());
+                            
+                            //Variant with direct calling readByte - SLOW
+                            /*
                             try (FileOutputStream fos = new FileOutputStream(file)) {
                                 Main.debugExportByteArray(v, fos);
+                                fos.write(data);
                                 Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
                             } catch (IOException ex) {
                                 Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
-                                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
-                        }                                                
+                            */
+                            //Asynchronous variant
+                            /*DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {                                
+
+                                @Override
+                                public void onDumpByteArray(String clientId, byte[] data) {
+                                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                                        fos.write(data);
+                                        Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                        ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                                    }
+                                    DebuggerTools.initDebugger().removeMessageListener(this);
+                                }                                                 
+                            });    
+                            Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                            try {
+                                Main.getDebugHandler().callMethod(debugConnectionClass, "writeMsg", Arrays.asList(v, (Double) (double) Debugger.MSG_DUMP_BYTEARRAY));
+                            } catch (DebuggerHandler.ActionScriptException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, "Error exporting ByteArray", ex);
+                            }*/  
+                            
+                            //Variant using comma separated bytes, pretty fast
+                            try {
+                                Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;                            
+                                String dataStr = (String) Main.getDebugHandler().callMethod(debugConnectionClass, "readCommaSeparatedFromByteArray", Arrays.asList(v)).variables.get(0).value;
+                                String[] parts = dataStr.split(",");
+                                byte[] data = new byte[parts.length];
+                                for (int i = 0; i < parts.length; i++) {
+                                    data[i] = (byte) Integer.parseInt(parts[i]);
+                                }
+                                
+                                try (FileOutputStream fos = new FileOutputStream(file)) {
+                                    fos.write(data);
+                                    Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
+                                } catch (IOException ex) {
+                                    Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                    ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                                }
+                            } catch (DebuggerHandler.ActionScriptException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, "Error exporting ByteArray", ex);
+                            }   
+                        }                                               
                     });
 
                     exportMenu.add(exportByteArrayMenuItem);
@@ -227,8 +280,54 @@ public class DebugPanel extends JPanel {
                         if (fc.showOpenDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
                             File file = Helper.fixDialogFile(fc.getSelectedFile());
                             Configuration.lastOpenDir.set(file.getParentFile().getAbsolutePath());
-                            try (FileInputStream fis = new FileInputStream(file)) {
+                            
+                            //Variant with asynchronous connection
+                            /*DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {  
+                                @Override
+                                public byte[] onRequestBytes(String clientId) {
+                                    byte[] data = null;
+                                    try {
+                                        data = Helper.readFileEx(file.getAbsolutePath());
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                        ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                                    }
+                                    DebuggerTools.initDebugger().removeMessageListener(this);
+                                    return data;
+                                }
+                            });
+                            Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                            try {
+                                Main.getDebugHandler().callMethod(debugConnectionClass, "writeMsg", Arrays.asList(v, (Double) (double) Debugger.MSG_REQUEST_BYTEARRAY));
+                            } catch (DebuggerHandler.ActionScriptException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, "Error exporting ByteArray", ex);
+                            }*/
+                            
+                            //Variant with direct writeByte calls - SLOW
+                            /*try (FileInputStream fis = new FileInputStream(file)) {
                                 Main.debugImportByteArray(v, fis);
+                            } catch (IOException ex) {
+                                Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
+                                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
+                            }*/
+                            
+                            //Variant with using comma separated bytes, pretty fast
+                            try {
+                                byte[] data = Helper.readFileEx(file.getAbsolutePath());
+                                String splitter = "";
+                                StringBuilder sb = new StringBuilder();
+                                for (int i = 0; i < data.length; i++) {
+                                    sb.append(splitter);
+                                    sb.append(data[i] & 0xff);
+                                    splitter = ",";                                    
+                                }
+                                String dataStr = sb.toString();
+                                Variable debugConnectionClass = Main.getDebugHandler().getVariable(0, Main.currentDebuggerPackage + "::DebugConnection", false, false).parent;
+                                try {
+                                    Main.getDebugHandler().callMethod(debugConnectionClass, "writeCommaSeparatedToByteArray", Arrays.asList(dataStr, v));
+                                } catch (DebuggerHandler.ActionScriptException ex) {
+                                    Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, "Error exporting ByteArray", ex);
+                                }                            
                             } catch (IOException ex) {
                                 Logger.getLogger(DebugPanel.class.getName()).log(Level.SEVERE, null, ex); 
                                 ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                                                               
@@ -264,8 +363,8 @@ public class DebugPanel extends JPanel {
                 addWatchMenu.add(watchReadMenuItem);
                 addWatchMenu.add(watchWriteMenuItem);
                 addWatchMenu.add(watchReadWriteMenuItem);
-                pm.add(addWatchMenu);
-                pm.show(e.getComponent(), e.getX(), e.getY());
+                pm.add(addWatchMenu);                
+                pm.show(e.getComponent(), e.getX(), e.getY());                
             }
         };
 

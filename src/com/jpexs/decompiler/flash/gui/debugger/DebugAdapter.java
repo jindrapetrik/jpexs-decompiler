@@ -20,17 +20,31 @@ package com.jpexs.decompiler.flash.gui.debugger;
  *
  * @author JPEXS
  */
-public interface DebugListener {
+public class DebugAdapter implements DebugListener {
 
-    public void onMessage(String clientId, String msg);
+    @Override
+    public void onMessage(String clientId, String msg) {
+    }
 
-    public void onLoaderURL(String clientId, String url);
+    @Override
+    public void onLoaderURL(String clientId, String url) {
+    }
 
-    public void onLoaderBytes(String clientId, byte[] data);
+    @Override
+    public void onLoaderBytes(String clientId, byte[] data) {
+    }
+
+    @Override
+    public void onDumpByteArray(String clientId, byte[] data) {
+    }
+
+    @Override
+    public void onFinish(String clientId) {
+    }
+
+    @Override
+    public byte[] onRequestBytes(String clientId) {
+        return null;
+    }
     
-    public void onDumpByteArray(String clientId, byte[] data);
-
-    public void onFinish(String clientId);
-    
-    public byte[] onRequestBytes(String clientId);
 }
