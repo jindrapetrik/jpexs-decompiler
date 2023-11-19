@@ -98,7 +98,7 @@ public class GetPropertyAVM2Item extends AVM2Item {
 
     @Override
     public String getResultAsString() {
-        if (object.isCompileTime() && (propertyName instanceof FullMultinameAVM2Item) && (((FullMultinameAVM2Item) propertyName).name.isCompileTime()) && "constructor".equals(((FullMultinameAVM2Item) propertyName).name.getResult())) {
+        if (object.isCompileTime() && (propertyName instanceof FullMultinameAVM2Item) && ((FullMultinameAVM2Item) propertyName).name != null && (((FullMultinameAVM2Item) propertyName).name.isCompileTime()) && "constructor".equals(((FullMultinameAVM2Item) propertyName).name.getResult())) {
             Object obj = object.getResult();
             EcmaType t = EcmaScript.type(obj);
             if (t != EcmaType.OBJECT) {
