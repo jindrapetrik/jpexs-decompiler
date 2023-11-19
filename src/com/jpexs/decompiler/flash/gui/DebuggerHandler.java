@@ -31,6 +31,7 @@ import com.jpexs.debugger.flash.messages.in.InBreakReason;
 import com.jpexs.debugger.flash.messages.in.InCallFunction;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InContinue;
+import com.jpexs.debugger.flash.messages.in.InErrorException;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetSwd;
 import com.jpexs.debugger.flash.messages.in.InGetSwf;
@@ -359,6 +360,8 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private final List<TraceListener> traceListeners = new ArrayList<>();
     
+    private final List<ErrorListener> errorListeners = new ArrayList<>();
+    
     private final List<FrameChangeListener> frameChangeListeners = new ArrayList<>();
 
     private final List<ConnectionListener> clisteners = new ArrayList<>();
@@ -413,6 +416,10 @@ public class DebuggerHandler implements DebugConnectionListener {
         public void trace(String... val);
     }
     
+    public static interface ErrorListener {
+        public void errorException(String message, Variable thrownVar);                
+    }
+    
     public static interface FrameChangeListener {
 
         public void frameChanged();
@@ -443,6 +450,14 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     public void removeTraceListener(TraceListener l) {
         traceListeners.remove(l);
+    }
+    
+    public void addErrorListener(ErrorListener l) {
+        errorListeners.add(l);
+    }
+
+    public void removeErrorListener(ErrorListener l) {
+        errorListeners.remove(l);
     }
 
     public void removeBreakListener(BreakListener l) {
@@ -610,6 +625,17 @@ public class DebuggerHandler implements DebugConnectionListener {
         boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
         try {
 
+            
+            con.addMessageListener(new DebugMessageListener<InErrorException>() {
+                @Override
+                public void message(InErrorException t) {
+                    for (ErrorListener l : errorListeners) {
+                        l.errorException(t.exceptionMessage, t.thrownVar);
+                    }
+                    con.dropMessage(t);
+                }                
+            });
+            
             con.addMessageListener(new DebugMessageListener<InNumScript>() {
                 @Override
                 public void message(InNumScript t) {
