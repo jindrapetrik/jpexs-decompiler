@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StoreNewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -73,6 +74,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         localData.localRegAssignmentIps.put(regId, localData.localRegAssignmentIps.get(regId) + 1);
         //localRegsAssignmentIps.put(regId, ip);
         if (value.getThroughDuplicate() instanceof NewActivationAVM2Item) {
+            output.add(new StoreNewActivationAVM2Item(ins, localData.lineStartInstruction, regId));
             return;
         }
         if (value instanceof FindPropertyAVM2Item) {

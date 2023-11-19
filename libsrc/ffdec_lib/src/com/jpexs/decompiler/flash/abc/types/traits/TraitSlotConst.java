@@ -119,7 +119,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
             writer.startTrait(assignment.initializer);
-            writer.startMethod(assignment.method);
+            writer.startMethod(assignment.method, null);
             if (Configuration.showMethodBodyId.get()) {
                 writer.appendNoHilight("// method body index: ");
                 writer.appendNoHilight(abc.findBodyIndex(assignment.method));

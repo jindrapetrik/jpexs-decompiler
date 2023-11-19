@@ -185,7 +185,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
             writer.startTrait(GraphTextWriter.TRAIT_CLASS_INITIALIZER);
-            writer.startMethod(classInfo.cinit_index);
+            writer.startMethod(classInfo.cinit_index, "cinit");
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!classInitializerIsEmpty) {
                     writer.startBlock();
@@ -218,7 +218,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
             writer.newLine();
             writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
-            writer.startMethod(instanceInfo.iinit_index);
+            writer.startMethod(instanceInfo.iinit_index, "iinit");
             writer.appendNoHilight(modifier);
             writer.appendNoHilight("function ");
             writer.appendNoHilight(m.getName(abc.constants, null/*do not want full names here*/, false, true));

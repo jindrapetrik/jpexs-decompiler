@@ -108,7 +108,7 @@ public class TraitMethodGetterSetter extends Trait {
         if (classIndex < 0) {
             writeImports(abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
-        writer.startMethod(method_info);
+        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
@@ -136,7 +136,7 @@ public class TraitMethodGetterSetter extends Trait {
             writeImports(abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         getMetaData(parent, convertData, abc, writer);
-        writer.startMethod(method_info);
+        writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         int bodyIndex = abc.findBodyIndex(method_info);

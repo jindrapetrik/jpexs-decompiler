@@ -46,6 +46,8 @@ public class HighlightData implements Cloneable, Serializable {
     public int regIndex = -1;
 
     public int namespaceIndex = -1;
+    
+    public int activationRegIndex = -1;
 
     public boolean isStatic = false;
 
@@ -60,7 +62,8 @@ public class HighlightData implements Cloneable, Serializable {
                 && fileOffset == -1
                 && namespaceIndex == -1
                 && propertyType == null
-                && propertySubType == null;
+                && propertySubType == null
+                && activationRegIndex == -1;
     }
 
     public void merge(HighlightData data) {
@@ -108,6 +111,9 @@ public class HighlightData implements Cloneable, Serializable {
         }
         if (data.propertySubType != null) {
             propertySubType = data.propertySubType;
+        }
+        if (data.activationRegIndex != -1) {
+            activationRegIndex = data.activationRegIndex;
         }
     }
 
