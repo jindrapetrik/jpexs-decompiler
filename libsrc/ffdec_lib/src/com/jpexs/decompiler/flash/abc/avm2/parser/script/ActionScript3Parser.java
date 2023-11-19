@@ -2612,10 +2612,11 @@ public class ActionScript3Parser {
         return ret;
     }
 
-    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
+        localData.documentClass = documentClass;
         ScriptInfo si = new ScriptInfo();
         int scriptIndex = abcIndex.getSelectedAbc().script_info.size();
         abcIndex.getSelectedAbc().script_info.add(si);
@@ -2629,10 +2630,10 @@ public class ActionScript3Parser {
         abcIndex.getSelectedAbc().fireChanged();
     }
 
-    public void addScript(String s, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex);
-        addScriptFromTree(allOpenedNamespaces, traits, classPos);
+        addScriptFromTree(allOpenedNamespaces, traits, classPos, documentClass);
     }
 
     public ActionScript3Parser(AbcIndexing abcIndex) throws IOException, InterruptedException {
@@ -2641,14 +2642,14 @@ public class ActionScript3Parser {
         this.abcIndex = abcIndex;
     }
 
-    public static void compile(String src, ABC abc, AbcIndexing abcIndex, String fileName, int classPos, int scriptIndex, boolean air) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
+    public static void compile(String src, ABC abc, AbcIndexing abcIndex, String fileName, int classPos, int scriptIndex, boolean air, String documentClass) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
         SWF.initPlayer();
         ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
         try {
-            parser.addScript(src, fileName, classPos, scriptIndex);
+            parser.addScript(src, fileName, classPos, scriptIndex, documentClass);
             success = true;
         } finally {
             if (!success) {
@@ -2673,7 +2674,7 @@ public class ActionScript3Parser {
             AbcIndexing abcIndex = swf.getAbcIndex();
             abcIndex.selectAbc(abc);
             ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
-            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);
+            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex, swf.getDocumentClass());
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
             }

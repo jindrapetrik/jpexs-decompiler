@@ -577,8 +577,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
 
         Main.getMainFrame().getPanel().updateMenu();
-        boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
-
+        
         //enlog(DebuggerConnection.class);
         //enlog(DebuggerCommands.class);
         //enlog(DebuggerHandler.class);
@@ -608,6 +607,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         final Pattern patAS3 = Pattern.compile("^(.*);(.*);(.*)\\.as$");
         final Pattern patAS3PCode = Pattern.compile("^#PCODE abc:([0-9]+),script:([0-9]+),class:(-?[0-9]+),trait:(-?[0-9]+),method:([0-9]+),body:([0-9]+);(.*)$");
 
+        boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
         try {
 
             con.addMessageListener(new DebugMessageListener<InNumScript>() {
@@ -627,14 +627,15 @@ public class DebuggerHandler implements DebugConnectionListener {
                     moduleToSwfIndex.put(sc.module, sc.swfIndex);
                     int file = sc.module;
                     String name = sc.name;
-                    String[] parts = name.split(";");
-
+                    
+                    
+                    name = name.replaceAll("\\[(invalid_utf8=[0-9]+)\\]", "{$1}");
+                    
                     Matcher m;
                     if ((m = patAS3.matcher(name)).matches()) {
-                        String clsNameWithSuffix = m.group(3);
-                        String pkg = m.group(2).replace("\\", ".");
+                        String clsNameWithSuffix = m.group(3).replace("{{semicolon}}", ";");
+                        String pkg = m.group(2).replace("{{semicolon}}", ";").replace("\\", ".");
                         m = patAS3PCode.matcher(name);
-
                         if (m.matches()) {
                             moduleToClassIndex.put(file, Integer.parseInt(m.group(3)));
                             moduleToTraitIndex.put(file, Integer.parseInt(m.group(4)));
@@ -642,7 +643,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
                             name = "#PCODE abc:" + m.group(1) + ",body:" + m.group(6) + ";" + name;
                         } else {
-                            name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toString();
+                            name = DottedChain.parseWithSuffix(pkg).addWithSuffix(clsNameWithSuffix).toPrintableString(con.isAS3);
                         }
                     }
                     Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "Script added - index {0} name: {1}", new Object[]{file, name});
@@ -762,7 +763,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
                         } else if (reasonInt != InBreakReason.REASON_SCRIPT_LOADED) {
                             Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
-                            return;
+                            //return;
                         }
 
                         final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};

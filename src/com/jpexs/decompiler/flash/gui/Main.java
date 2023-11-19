@@ -456,8 +456,6 @@ public class Main {
 
         @Override
         public SWF prepare(SWF instrSWF) throws InterruptedException {
-            instrSWF = super.prepare(instrSWF);
-
             EventListener prepEventListner = new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -525,6 +523,9 @@ public class Main {
                 //ignore, return instrSWF
             }
             instrSWF.removeEventListener(prepEventListner);
+            
+            instrSWF = super.prepare(instrSWF);
+            
             return instrSWF;
         }
     }

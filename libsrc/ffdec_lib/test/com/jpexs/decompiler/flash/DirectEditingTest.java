@@ -92,6 +92,7 @@ public class DirectEditingTest extends FileTestBase {
                         System.out.println("Recompiling:" + classPathString + "...");
                         try {
                             en.toSource(swf.getAbcIndex(), htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
+                            htw.finishHilights();
                             String original = htw.toString();
                             abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original, new ArrayList<>());
                         } catch (As3ScriptReplaceException ex) {
@@ -109,6 +110,7 @@ public class DirectEditingTest extends FileTestBase {
                     try {
                         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
+                        writer.finishHilights();
                         String as = writer.toString();
                         //as = asm.removePrefixAndSuffix(as);
 
@@ -120,6 +122,7 @@ public class DirectEditingTest extends FileTestBase {
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
+                        writer.finishHilights();
                         String as2 = writer.toString();
                         //as2 = asm.removePrefixAndSuffix(as2);
                         try {
@@ -129,6 +132,7 @@ public class DirectEditingTest extends FileTestBase {
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
+                        writer.finishHilights();
                         String as3 = writer.toString();
                         //as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {

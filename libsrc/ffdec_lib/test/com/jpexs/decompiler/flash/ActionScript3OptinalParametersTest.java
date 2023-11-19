@@ -66,6 +66,7 @@ public class ActionScript3OptinalParametersTest extends ActionScript3DecompileTe
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         abc.method_info.get(methodInfo).getParamStr(writer, abc.constants, abc.bodies.get(bodyIndex), abc, new ArrayList<>());
+        writer.finishHilights();
         String actualResult = writer.toString().replaceAll("[ \r\n]", "");
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");

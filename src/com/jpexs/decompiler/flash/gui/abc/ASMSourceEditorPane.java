@@ -152,6 +152,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
             writer.appendNoHilight("end ; trait").newLine();
         }
+        writer.finishHilights();
         return new HighlightedText(writer);
     }
 
@@ -180,6 +181,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 if (bodyIndex > -1) {
                     Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCodeBytes());
                 }
+                writer.finishHilights();
                 textHexOnly = new HighlightedText(writer);
             }
             setText(textHexOnly);

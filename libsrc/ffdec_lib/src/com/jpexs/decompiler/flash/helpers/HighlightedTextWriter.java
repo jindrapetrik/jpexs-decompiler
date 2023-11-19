@@ -21,10 +21,9 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -50,16 +49,24 @@ public class HighlightedTextWriter extends GraphTextWriter {
 
     private final Stack<Highlighting> hilightStack = new Stack<>();
 
-    public List<Highlighting> traitHilights = new ArrayList<>();
+    public HighlightingList traitHilights = new HighlightingList();
 
-    public List<Highlighting> classHilights = new ArrayList<>();
+    public HighlightingList classHilights = new HighlightingList();
 
-    public List<Highlighting> methodHilights = new ArrayList<>();
+    public HighlightingList methodHilights = new HighlightingList();
 
-    public List<Highlighting> instructionHilights = new ArrayList<>();
+    public HighlightingList instructionHilights = new HighlightingList();
 
-    public List<Highlighting> specialHilights = new ArrayList<>();
+    public HighlightingList specialHilights = new HighlightingList();
 
+    public void finishHilights() {
+        traitHilights.finish();
+        classHilights.finish();
+        methodHilights.finish();
+        instructionHilights.finish();
+        specialHilights.finish();
+    }
+    
     public HighlightedTextWriter(CodeFormatting formatting, boolean hilight) {
         super(formatting);
         this.hilight = hilight;

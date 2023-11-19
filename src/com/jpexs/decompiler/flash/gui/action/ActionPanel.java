@@ -398,6 +398,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
 
         asm.removeDisassemblyListener(listener);
+        writer.finishHilights();
         return new HighlightedText(writer);
     }
 
@@ -432,6 +433,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 if (srcHexOnly == null) {
                     HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                     Helper.byteArrayToHexWithHeader(writer, src.getActionBytes().getRangeData());
+                    writer.finishHilights();
                     srcHexOnly = new HighlightedText(writer);
                 }
 

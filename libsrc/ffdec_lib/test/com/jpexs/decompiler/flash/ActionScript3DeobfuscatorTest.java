@@ -100,6 +100,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         deobfuscator.avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
+        writer.finishHilights();
         String ret = writer.toString();
         ret = ret.replaceAll("\r\n +", "\r\n");
         String prefix = "\r\ncode\r\n";
@@ -134,9 +135,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         index.rebuildPkgToObjectsNameMap();
         ActionScript3Parser par = new ActionScript3Parser(index);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        par.addScript(str, "Test.as", 0, 0);
+        par.addScript(str, "Test.as", 0, 0, swf.getDocumentClass());
 
         abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
+        writer.finishHilights();
         return writer.toString();
     }
 

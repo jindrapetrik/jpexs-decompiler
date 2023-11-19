@@ -115,6 +115,7 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
             return;
         }
         Configuration.autoDeobfuscate.set(false);
+        writer.finishHilights();
         String actualResult = cleanPCode(writer.toString());
         expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);

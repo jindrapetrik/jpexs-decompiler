@@ -1186,6 +1186,7 @@ public class AVM2Code implements Cloneable {
     public String toASMSource(ABC abc, AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         toASMSource(abc, constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        writer.finishHilights();
         return writer.toString();
     }
 

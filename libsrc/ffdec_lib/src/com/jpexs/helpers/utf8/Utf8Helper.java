@@ -104,19 +104,30 @@ public class Utf8Helper {
         }
     }
 
+    public static String stripEscapes(String string) {
+        return string.replaceAll("\\{invalid_utf8=[0-9]+\\}", "")
+               .replaceAll("\\{\\+(\\+*invalid_utf8=[0-9]+)\\}", "{$1}");
+    }
+    
     public static byte[] getBytes(String string) {
-        if (!string.contains("{invalid_utf8:")) {
+        if (!string.contains("invalid_utf8")) {
             return string.getBytes(charset);
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
-            Pattern invPattern = Pattern.compile("^(\\{invalid_utf8:([0-9]+)\\}).*", Pattern.DOTALL);
+            Pattern invPattern = Pattern.compile("^(\\{invalid_utf8[=:]([0-9]+)\\}).*", Pattern.DOTALL);
             for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
+                char c = string.charAt(i);                
                 if (c == '{') {
                     String subStr = string.substring(i);
+                    if (!subStr.isEmpty() && subStr.charAt(0) == '+') {
+                        baos.write(("" + c).getBytes(charset));
+                        i++;
+                        continue;
+                    }
+                                       
                     Matcher m = invPattern.matcher(subStr);
                     if (m.matches()) {
                         int v = Integer.parseInt(m.group(2));
@@ -125,6 +136,7 @@ public class Utf8Helper {
                         i--;
                         continue;
                     }
+                    
                 }
                 baos.write(("" + c).getBytes(charset));
             }
@@ -141,7 +153,8 @@ public class Utf8Helper {
     }    
 
     private static String escapeInvalidUtf8Char(int v) {
-        return "{invalid_utf8:" + v + "}";
+        //Note: for writing the string "{invalid_utf8=xxx}" itself, you can escape it with "{+invalid_utf8=xxx}"
+        return "{invalid_utf8=" + v + "}";
     }
 
     public static String decode(byte[] data) {

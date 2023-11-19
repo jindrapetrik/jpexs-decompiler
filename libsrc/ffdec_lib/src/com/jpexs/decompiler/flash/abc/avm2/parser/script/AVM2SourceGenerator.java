@@ -841,6 +841,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.traitUsages = localData.traitUsages;
         newlocalData.currentScript = localData.currentScript;
         newlocalData.scriptIndex = localData.scriptIndex;
+        newlocalData.documentClass = localData.documentClass;
         newlocalData.privateNs = localData.privateNs;
         newlocalData.protectedNs = localData.protectedNs;
         newlocalData.isStatic = isStatic;
@@ -1815,6 +1816,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
         mbCode.add(ins(AVM2Instructions.PushScope));
 
         int traitScope = 1;
+        
+        String documentClassStr = localData.documentClass;
+        DottedChain documentClass = null;
+        if (documentClassStr != null && !documentClassStr.isEmpty()) {
+            documentClass = DottedChain.parseNoSuffix(documentClassStr);
+        }
 
         Map<Trait, Integer> initScopes = new HashMap<>();
 
@@ -1823,9 +1830,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = (TraitClass) t;
                 DottedChain className = tc.getName(abc).getNameWithNamespace(abc.constants, true);
 
+                
+                
                 List<Integer> parents = new ArrayList<>();
-                int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};
-                mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
+                if (documentClass != null && documentClass.equals(className)) {
+                    mbCode.add(ins(AVM2Instructions.GetScopeObject, 0));
+                } else {
+                    int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};                
+                    mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
+                }
                 traitScope++;
                 if (abc.instance_info.get(tc.class_info).isInterface()) {
                     mbCode.add(ins(AVM2Instructions.PushNull));

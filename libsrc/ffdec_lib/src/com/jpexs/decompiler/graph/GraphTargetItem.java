@@ -328,6 +328,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public String toString(LocalData localData) throws InterruptedException {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         toString(writer, localData);
+        writer.finishHilights();
         return writer.toString();
     }
 
@@ -422,6 +423,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         try {
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             toStringNoQuotes(writer, localData);
+            writer.finishHilights();
             return writer.toString();
         } catch (InterruptedException ex) {
             //ignore

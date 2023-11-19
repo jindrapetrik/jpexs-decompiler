@@ -26,10 +26,10 @@
 		
 		private static function sendQueue(){
 			var qo = q;
-				q = [];
-				for each(var m in qo){
-					writeMsg(m.data,m.type);
-				}
+			q = [];
+			for each(var m in qo){
+				writeMsg(m.data,m.type);
+			}
 		}
 		
 		private static function writeStringNull(msg){
@@ -119,7 +119,7 @@
 			if(!inited){
 				initClient("");
 			}
-			if(s.connected){							
+			if(s.connected){		
 				if(first){
 					//s.writeByte(0);
 					writeStringNull("debug.version.major="+DEBUG_VERSION_MAJOR+";debug.version.minor="+DEBUG_VERSION_MINOR);
@@ -138,12 +138,13 @@
 						writeBytes(msg);
 						break;
 					case MSG_LOADER_URL_GETBYTES:
-						writeString(msg);						
+						writeString(msg);
 						break;
 					case MSG_LOADER_BYTES_GETBYTES:
 						writeBytes(msg);						
 						break;
-				}				
+				}
+				s.flush();
 			}else{
 				q.push({type:msgType,data:msg});
 			}			

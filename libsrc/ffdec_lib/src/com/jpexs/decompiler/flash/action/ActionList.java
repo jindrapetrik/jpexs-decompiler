@@ -556,6 +556,7 @@ public class ActionList extends ArrayList<Action> {
     public String toString() {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         Action.actionsToString(new ArrayList<>(), 0, this, SWF.DEFAULT_VERSION, ScriptExportMode.PCODE, writer);
+        writer.finishHilights();
         return writer.toString();
     }
 

@@ -29,6 +29,7 @@ public class As3ScriptReplaceException extends Exception {
 
     public As3ScriptReplaceException(String message) {
         super(message);
+        this.exceptionItems = new ArrayList<>();
     }
     
     public As3ScriptReplaceException(List<As3ScriptReplaceExceptionItem> exceptionItems) {

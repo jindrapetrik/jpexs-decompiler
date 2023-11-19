@@ -45,6 +45,7 @@ public class NewClassIns extends InstructionDefinition {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         stack.pop().toString(writer, LocalData.create(localData.callStack /*??*/, localData.abcIndex, localData.abc, localData.localRegNames, localData.fullyQualifiedNames, new HashSet<>()));
+        writer.finishHilights();
         String baseType = writer.toString();
         ABC abc = localData.abc;
         stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "§§newclass(" + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.getConstants(), localData.fullyQualifiedNames, false, true) + "," + baseType + ")"));

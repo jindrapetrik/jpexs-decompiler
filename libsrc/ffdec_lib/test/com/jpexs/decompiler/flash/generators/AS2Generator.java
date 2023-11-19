@@ -57,6 +57,7 @@ public class AS2Generator {
                 }
                 HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
                 Action.actionsToSource(new HashMap<>() /*FIXME*/,doa, doa.getActions(), "", writer, Utf8Helper.charsetName);
+                writer.finishHilights();
                 String src = writer.toString();
                 if (src.trim().isEmpty()) {
                     doa = null;

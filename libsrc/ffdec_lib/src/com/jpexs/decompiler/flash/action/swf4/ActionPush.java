@@ -377,8 +377,9 @@ public class ActionPush extends Action {
     
     @Override
     public String toString() {
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);       
         toString(writer);
+        writer.finishHilights();
         return writer.toString();
     }
 
