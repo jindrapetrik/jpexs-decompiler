@@ -112,6 +112,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         removeColorMarkerOnAllLines(BREAKPOINT_MARKER);
         removeColorMarkerOnAllLines(INVALID_BREAKPOINT_MARKER);
         removeColorMarkerOnAllLines(IP_MARKER);
+        removeColorMarkerOnAllLines(STACK_MARKER);
 
         if (scriptName == null) {
             return;
