@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import java.awt.BorderLayout;
@@ -54,18 +55,13 @@ public class DebugLogDialog extends AppDialog {
         JScrollPane spane = new FasterScrollPane(logTextArea);
         spane.setPreferredSize(new Dimension(800, 500));
 
-        debug.addMessageListener(new DebugListener() {
+        debug.addMessageListener(new DebugAdapter() {
 
             @Override
             public void onMessage(String clientId, String msg) {
                 log(translate("msg.header").replace("%clientid%", clientId) + msg);
             }
-
-            @Override
-            public void onFinish(String clientId) {
-
-            }
-
+            
             @Override
             public void onLoaderURL(String clientId, String url) {
                 log(translate("msg.header").replace("%clientid%", clientId) + " LOADURL:" + url);
@@ -75,6 +71,11 @@ public class DebugLogDialog extends AppDialog {
             public void onLoaderBytes(String clientId, byte[] data) {
                 log(translate("msg.header").replace("%clientid%", clientId) + " LOADBYTES: " + data.length + "B");
             }
+
+            @Override
+            public void onDumpByteArray(String clientId, byte[] data) {
+                log(translate("msg.header").replace("%clientid%", clientId) + " DUMPBYTEARRAY: " + data.length + "B");
+            }                             
         });
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());

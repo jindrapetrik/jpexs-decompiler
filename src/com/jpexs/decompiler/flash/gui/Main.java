@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
+import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
@@ -217,6 +218,8 @@ public class Main {
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
     public static CancellableWorker swfPrepareWorker = null;
+    
+    public static String currentDebuggerPackage = null;
 
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
@@ -524,7 +527,13 @@ public class Main {
             }
             instrSWF.removeEventListener(prepEventListner);
             
-            instrSWF = super.prepare(instrSWF);
+            //instrSWF = super.prepare(instrSWF);
+            
+            if (!DebuggerTools.hasDebugger(instrSWF)) {
+                DebuggerTools.switchDebugger(instrSWF);
+            }
+            DebuggerTools.injectDebugLoader(instrSWF);
+            currentDebuggerPackage = instrSWF.debuggerPackage;
             
             return instrSWF;
         }
@@ -2399,15 +2408,8 @@ public class Main {
                 watcherWorker.execute();
             }
 
-            DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
-                @Override
-                public void onMessage(String clientId, String msg) {
-                }
-
-                @Override
-                public void onLoaderURL(String clientId, String url) {
-                }
-
+            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {                
+                
                 @Override
                 public void onLoaderBytes(String clientId, byte[] data) {
                     String hash = md5(data);
@@ -2438,11 +2440,7 @@ public class Main {
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, "Cannot create tempfile");
                     }
-                }
-
-                @Override
-                public void onFinish(String clientId) {
-                }
+                }    
             });
 
             try {

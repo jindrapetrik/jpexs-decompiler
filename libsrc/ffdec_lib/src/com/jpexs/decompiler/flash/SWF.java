@@ -421,6 +421,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     
     @Internal
     private ExporterInfo exporterInfo = null;
+    
+    @Internal
+    public String debuggerPackage = null;
 
     private static AbcIndexing playerGlobalAbcIndex;
 

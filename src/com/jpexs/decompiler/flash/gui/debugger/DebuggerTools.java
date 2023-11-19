@@ -46,8 +46,8 @@ public class DebuggerTools {
 
     public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
 
-    private static volatile Debugger debugger;
-
+    private static volatile Debugger debugger;        
+    
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
         List<ABC> allAbcList = new ArrayList<>();
         for (ABCContainerTag ac : swf.getAbcList()) {
@@ -234,6 +234,7 @@ public class DebuggerTools {
                 if (Configuration.randomDebuggerPackage.get()) {
                     newdebuggerpkg += ".pkg" + rhex;
                 }
+                swf.debuggerPackage = newdebuggerpkg;
 
                 //add debug ABC tags to main SWF
                 for (ABCContainerTag ds : debugSWF.getAbcList()) {
@@ -261,6 +262,46 @@ public class DebuggerTools {
                     ft.useNetwork = true;
                     ft.setModified(true);
                 }
+                
+                
+                
+                //Add call to DebugConnection.initClient("") to the document class
+                /*String documentClass = swf.getDocumentClass();
+                if (documentClass != null) {
+                    List<String> searchClassNames = new ArrayList<>();
+                    searchClassNames.add(documentClass);
+                    List<ScriptPack> documentClassPacks = swf.getScriptPacksByClassNames(searchClassNames);
+                    if (!documentClassPacks.isEmpty()) {
+                        ScriptPack documentClassPack = documentClassPacks.get(0);
+                        Trait publicTrait = documentClassPack.getPublicTrait();
+                        if (publicTrait != null) {
+                            if (publicTrait instanceof TraitClass) {
+                                TraitClass classTrait = (TraitClass) publicTrait;
+                                int classIndex = classTrait.class_info;
+                                ABC a = documentClassPack.abc;
+                                int cinitMethodInfo = a.class_info.get(classIndex).cinit_index;
+                                MethodBody body = a.findBody(cinitMethodInfo);
+                                AVM2Code code = body.getCode();                                
+                                int debugConnectionMultiname = a.constants.getMultinameId(
+                                        Multiname.createQName(false, a.constants.getStringId("DebugConnection", true), 
+                                           a.constants.getNamespaceId(Namespace.KIND_PACKAGE, newdebuggerpkg, 0, true)
+                                        ), true);
+                                int initClientMultiname = a.constants.getMultinameId(
+                                        Multiname.createQName(false, a.constants.getStringId("initClient", true), 
+                                           a.constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true)
+                                        ), true);
+                                code.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.GetLex, new int[] {debugConnectionMultiname}), true, body);
+                                code.insertInstruction(1, new AVM2Instruction(0, AVM2Instructions.PushString, new int[] {a.constants.getStringId("", true)}), true, body);
+                                code.insertInstruction(2, new AVM2Instruction(0, AVM2Instructions.CallPropVoid, new int[] {initClientMultiname, 1}), true, body);
+                                if (body.max_stack < 2) {
+                                    body.max_stack = 2;
+                                }                                
+                                body.setModified();
+                            }
+                        }
+                    }
+                }
+                */
 
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error while attaching debugger", ex);
