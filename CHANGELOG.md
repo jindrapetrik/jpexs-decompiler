@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2119] Option to export assets with names like their assigned classes via SymbolClass, without character id
 - [#2119] Bulk imported assets can also match filenames based on assigned classname, not just character id prefix
 - Debugger shows (logs) unhandled exceptions
+- [#2129] MEMORY and STACK_SIZE parameters now can be set via external variables FFDEC_MEMORY, FFDEC_STACK_SIZE
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -3296,6 +3297,7 @@ Major version of SWF to XML export changed to 2.
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
+[#2129]: https://www.free-decompiler.com/flash/issues/2129
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
