@@ -12,6 +12,14 @@ Pull request target branch should be `dev`, as this is main development branch.
 ## GUI vs Library
 Make sure library part (libsrc/ffdec_lib) does not depend on GUI and does not contain anything GUI related.
 
+## Code formatting
+Your code should pass our checkstyle validation.
+To validate the code run:
+```
+ant checkstyle
+```
+It also will be executed via GitHub Actions when pushed.
+
 ## Tests
 Make sure existing tests pass.
 
