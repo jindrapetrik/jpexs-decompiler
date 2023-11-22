@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.ShapeExportData;
+import com.jpexs.decompiler.flash.harman.HarmanSwfEncrypt;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
@@ -1140,15 +1141,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      */
     @Override
     public void saveTo(OutputStream os) throws IOException {
-        checkCharset();
-        byte[] uncompressedData = saveToByteArray(false);
-        compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
+        saveTo(os, gfx, false);
     }
 
     public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
         checkCharset();
-        byte[] uncompressedData = saveToByteArray(gfx, includeImported);
-        compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
+        byte[] newUncompressedData = saveToByteArray(gfx, includeImported);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        compress(new ByteArrayInputStream(newUncompressedData), baos, compression, lzmaProperties);
+        byte[] newCompressedData = baos.toByteArray();
+        if (encrypted) {
+            encrypt(new ByteArrayInputStream(newCompressedData), os);
+        } else {
+            os.write(newCompressedData);
+        }
     }
 
     public byte[] getHeaderBytes() {
@@ -2002,8 +2008,30 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }    
 
     /**
-     * Decrypts Harman AIR encryption
-     *
+     * Encrypts Harman AIR encryption
+     */
+    public static boolean encrypt(InputStream is, OutputStream os) throws IOException {                
+        byte[] hdr = new byte[8];
+
+        // SWFheader: signature, version and fileSize
+        if (is.read(hdr) != 8) {
+            throw new SwfOpenException(AppResources.translate("error.swf.headerTooShort"));
+        }
+
+        decodeHeader(hdr);
+        
+        byte[] encrypted;
+        try {
+            encrypted = HarmanSwfEncrypt.encrypt(is, hdr);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+            return false;
+        }
+        os.write(encrypted);
+        return true;
+    }
+    
+    /**
+     * Decrypts Harman AIR encryption    
      */
     public static boolean decrypt(InputStream is, OutputStream os) throws IOException {
         byte[] hdr = new byte[8];
@@ -2019,11 +2047,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             case 'c':
             case 'z':
             case 'f':
-                HarmanDecryption dec = new HarmanDecryption();
                 try {
-                    is = dec.decrypt(is, hdr); //Note: this call will uppercase hdr[0]
+                    byte[] decrypted = HarmanSwfEncrypt.decrypt(is, hdr); //Note: this call will uppercase hdr[0]
                     os.write(hdr);
-                    Helper.copyStream(is, os);
+                    os.write(decrypted);
                     return true;
                 } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
                     throw new SwfOpenException(AppResources.translate("error.swf.decryptionProblem"));
@@ -2091,14 +2118,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 case 'c':
                 case 'z':
                 case 'f':
-                    header.encrypted = true;
-                    HarmanDecryption dec = new HarmanDecryption();
+                    header.encrypted = true;  
+                    byte[] decrypted;
                     try {
-                        is = dec.decrypt(is, hdr); //Note: this call will uppercase hdr[0]
-                    } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
+                        decrypted = HarmanSwfEncrypt.decrypt(is, hdr);
+                    } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
                         throw new SwfOpenException(AppResources.translate("error.swf.decryptionProblem"));
-                    }
+                    }                    
+                    is = new ByteArrayInputStream(decrypted);
                     break;
+
             }
 
             switch (hdr[0]) {
