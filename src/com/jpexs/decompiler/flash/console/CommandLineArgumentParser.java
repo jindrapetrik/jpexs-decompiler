@@ -485,9 +485,14 @@ public class CommandLineArgumentParser {
             out.println("  ...Decompress <infile> and save it to <outfile>");
         }
 
+        if (filter == null || filter.equals("encrypt")) {
+            out.println(" " + (cnt++) + ") -encrypt <infile> <outfile>");
+            out.println("  ...Encrypts file <infile> with HARMAN Air encryption and saves it to <outfile>");
+        }
+
         if (filter == null || filter.equals("decrypt")) {
             out.println(" " + (cnt++) + ") -decrypt <infile> <outfile>");
-            out.println("  ...Decrypts HARMAN Air encrypted file <infile> and save it to <outfile>");
+            out.println("  ...Decrypts HARMAN Air encrypted file <infile> and saves it to <outfile>");
         }
 
         if (filter == null || filter.equals("swf2xml")) {
@@ -1056,6 +1061,9 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("decompress")) {
             parseDecompress(args);
+            System.exit(0);
+        } else if (command.equals("encrypt")) {
+            parseDecrypt(args);
             System.exit(0);
         } else if (command.equals("decrypt")) {
             parseDecrypt(args);
@@ -2764,6 +2772,27 @@ public class CommandLineArgumentParser {
         System.exit(result ? 0 : 1);
     }
 
+    private static void parseEncrypt(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("encrypt");
+        }
+
+        boolean result = false;
+        try {
+            try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop())); OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
+                result = SWF.encrypt(fis, fos);
+                System.out.println(result ? "OK" : "FAIL");
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found.");
+                System.exit(1);
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        System.exit(result ? 0 : 1);
+    }
+    
     private static void parseDecrypt(Stack<String> args) {
         if (args.size() < 2) {
             badArguments("decrypt");
@@ -4535,6 +4564,7 @@ public class CommandLineArgumentParser {
         pw.println("fileSize=" + swf.fileSize);
         pw.println("version=" + swf.version);
         pw.println("compression=" + swf.compression);
+        pw.println("encrypted=" + swf.encrypted);
         pw.println("gfx=" + swf.gfx);
         pw.println("width=" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor));
         pw.println("height=" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor));
@@ -4564,9 +4594,11 @@ public class CommandLineArgumentParser {
             pw.println("actionScript3=" + fa.actionScript3);
             pw.println("hasMetadata=" + fa.hasMetadata);
             pw.println("noCrossDomainCache=" + fa.noCrossDomainCache);
+            pw.println("swfRelativeUrls=" + fa.swfRelativeUrls);
             pw.println("useDirectBlit=" + fa.useDirectBlit);
             pw.println("useGPU=" + fa.useGPU);
             pw.println("useNetwork=" + fa.useNetwork);
+            
             pw.println();
         }
 
@@ -4886,6 +4918,7 @@ public class CommandLineArgumentParser {
                     pw.println("fileSize=" + swf.fileSize);
                     pw.println("version=" + swf.version);
                     pw.println("compression=" + swf.compression);
+                    pw.println("encrypted=" + swf.encrypted);
                     pw.println("gfx=" + swf.gfx);
                     pw.println("displayRect=[" + swf.displayRect.Xmin + ", " + swf.displayRect.Ymin + ", " + swf.displayRect.Xmax + ", " + swf.displayRect.Ymax + "]");
                     pw.println("width=" + swf.displayRect.getWidth());

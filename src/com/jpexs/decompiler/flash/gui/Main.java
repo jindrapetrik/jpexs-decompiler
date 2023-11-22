@@ -1320,7 +1320,7 @@ public class Main {
         result.sourceInfo = sourceInfo;
 
         boolean hasVideoStreams = false;
-        boolean hasEncrypted = false;
+        //boolean hasEncrypted = false;
         for (Openable openable : result) {
 
             openable.setOpenableList(result);
@@ -1342,9 +1342,9 @@ public class Main {
                     }
                 }
 
-                if (swf.encrypted) {
+                /*if (swf.encrypted) {
                     hasEncrypted = true;
-                }
+                }*/
 
                 swf.addEventListener(new EventListener() {
                     @Override
@@ -1402,7 +1402,7 @@ public class Main {
             });
         }
 
-        if (hasEncrypted) {
+        /*if (hasEncrypted) {
             View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {
@@ -1410,7 +1410,7 @@ public class Main {
                 }
 
             });
-        }
+        }*/
 
         return result;
     }
