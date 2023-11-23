@@ -68,6 +68,9 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Internal
     private String scriptName = "-";
+    
+    @Internal
+    private String exportedScriptName = "-";
 
     @Override
     public String getScriptName() {
@@ -290,5 +293,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }
+    }
+    
+    @Override
+    public String getExportedScriptName() {
+        return exportedScriptName;
+    }
+    
+    @Override
+    public void setExportedScriptName(String scriptName) {
+        this.exportedScriptName = scriptName;
     }
 }

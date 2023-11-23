@@ -123,4 +123,8 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
     public String getScriptName();
 
     public void setScriptName(String scriptName);
+    
+    public String getExportedScriptName();
+    
+    public void setExportedScriptName(String scriptName);
 }

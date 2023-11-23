@@ -55,6 +55,8 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     private Tag tag;
 
     private String scriptName = "-";
+        
+    private String exportedScriptName = "-";
 
     @Override
     public String getScriptName() {
@@ -381,5 +383,15 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }
+    }
+    
+    @Override
+    public String getExportedScriptName() {
+        return exportedScriptName;
+    }
+    
+    @Override
+    public void setExportedScriptName(String scriptName) {
+        this.exportedScriptName = scriptName;
     }
 }

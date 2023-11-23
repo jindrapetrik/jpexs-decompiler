@@ -2315,7 +2315,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Map<String, ASMSource> asmsToExport = new LinkedHashMap<>();
         for (TreeItem treeItem : getFirstLevelASMNodes(null)) {
-            getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport, File.separator + getASMPath(exportFileNames, treeItem));
+            getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport,
+                    File.separator + getASMPath(true, treeItem),
+                    File.separator + getASMPath(false, treeItem)
+            );
         }
         if (exportAll) {
             if (exportFileNames) {
@@ -2327,48 +2330,67 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return asmsToExport;
     }
 
-    private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String path) {
+    private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String pathExportFilenames, String pathNoExportFilenames) {
         TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
         boolean exportNode = nodesToExport.contains(treeItem) || nodesToExport.contains(realItem);
 
         if (realItem instanceof ASMSource && (exportAll || exportNode)) {
-            String npath = path;
-            String exPath = path;
+            String pathNoExportFilenames2 = pathNoExportFilenames;
+            String pathExportFilenames2 = pathExportFilenames;
+            String path = exportFileNames ? pathExportFilenames : pathNoExportFilenames;            
+            
             int ppos = 1;
-            while (asmsToExport.containsKey(npath)) {
+            while (asmsToExport.containsKey(path)) {
                 ppos++;
-                npath = path + (exportFileNames ? "[" + ppos + "]" : "_" + ppos);
-                exPath = path + "[" + ppos + "]";
+                pathNoExportFilenames2 = pathNoExportFilenames +  "_" + ppos;
+                pathExportFilenames2 = pathExportFilenames + "[" + ppos + "]";
+                path = exportFileNames ? pathExportFilenames2 : pathNoExportFilenames2;
             }
-            ((ASMSource) realItem).setScriptName(exPath);
-            asmsToExport.put(npath, (ASMSource) realItem);
+            ((ASMSource) realItem).setScriptName(pathNoExportFilenames2);
+            ((ASMSource) realItem).setExportedScriptName(pathExportFilenames2);
+            asmsToExport.put(path, (ASMSource) realItem);
         }
 
         if (treeItem instanceof TagScript) {
             TagScript tagScript = (TagScript) treeItem;
             for (TreeItem subItem : tagScript.getFrames()) {
-                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, 
+                    pathExportFilenames + File.separator + getASMPath(true, subItem),
+                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                );
             }
         } else if (treeItem instanceof FrameScript) {
             FrameScript frameScript = (FrameScript) treeItem;
             Frame parentFrame = frameScript.getFrame();
             for (TreeItem subItem : parentFrame.actionContainers) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, 
+                    pathExportFilenames + File.separator + getASMPath(true, subItem),
+                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)                
+                );
             }
             for (TreeItem subItem : parentFrame.actions) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                    pathExportFilenames + File.separator + getASMPath(true, subItem),
+                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                );
             }
         } else if (treeItem instanceof AS2Package) {
             AS2Package as2Package = (AS2Package) treeItem;
             for (TreeItem subItem : as2Package.subPackages.values()) {
                 if ((subItem instanceof AS2Package) && ((AS2Package) subItem).isDefaultPackage()) {
-                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path);
+                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, pathExportFilenames, pathNoExportFilenames);
                 } else {
-                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, 
+                        pathExportFilenames + File.separator + getASMPath(true, subItem),
+                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    );
                 }
             }
             for (TreeItem subItem : as2Package.scripts.values()) {
-                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport,
+                    pathExportFilenames + File.separator + getASMPath(true, subItem),
+                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                );
             }
         }
     }

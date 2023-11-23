@@ -72,6 +72,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     public static final LineMarker STACK_MARKER = new LineMarker(FG_STACK_COLOR, BG_STACK_COLOR, PRIORITY_STACK);
 
     protected String scriptName = null;
+    
+    protected String breakPointScriptName = null;
 
     private LineNumbersBreakpointsRuler ruler;
 
@@ -85,19 +87,20 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         }
     }
 
-    public synchronized void setScriptName(String scriptName) {
+    public synchronized void setScriptName(String scriptName, String breakPointScriptName) {
         this.scriptName = scriptName;
+        this.breakPointScriptName = breakPointScriptName;
     }
 
     @Override
     public synchronized void toggled(int line) {
-        if (scriptName == null) {
+        if (breakPointScriptName == null) {
             return;
         }
-        boolean on = Main.toggleBreakPoint(scriptName, line - firstLineOffset());
+        boolean on = Main.toggleBreakPoint(breakPointScriptName, line - firstLineOffset());
         removeColorMarker(line, INVALID_BREAKPOINT_MARKER);
         if (on) {
-            if (Main.isBreakPointValid(scriptName, line - firstLineOffset())) {
+            if (Main.isBreakPointValid(breakPointScriptName, line - firstLineOffset())) {
                 addColorMarker(line, BREAKPOINT_MARKER);
             } else {
                 addColorMarker(line, INVALID_BREAKPOINT_MARKER);
@@ -114,22 +117,22 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         removeColorMarkerOnAllLines(IP_MARKER);
         removeColorMarkerOnAllLines(STACK_MARKER);
 
-        if (scriptName == null) {
+        if (breakPointScriptName == null) {
             return;
         }
 
-        Set<Integer> bkptLines = Main.getScriptBreakPoints(scriptName, false);
+        Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName, false);
 
         for (int line : bkptLines) {
-            if (Main.isBreakPointValid(scriptName, line)) {
+            if (Main.isBreakPointValid(breakPointScriptName, line)) {
                 addColorMarker(line + firstLineOffset(), BREAKPOINT_MARKER);
             } else {
                 addColorMarker(line + firstLineOffset(), INVALID_BREAKPOINT_MARKER);
             }
         }
-        int ip = Main.getIp(scriptName);
+        int ip = Main.getIp(breakPointScriptName);
         String ipPath = Main.getIpClass();
-        if (ip > 0 && ipPath != null && ipPath.equals(scriptName)) {
+        if (ip > 0 && ipPath != null && ipPath.equals(breakPointScriptName)) {
             addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }
         List<Integer> stackLines = Main.getStackLines();
@@ -137,7 +140,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         for (int i = 1; i < stackClasses.size(); i++) {
             String cls = stackClasses.get(i);
             int line = stackLines.get(i);
-            if (cls.equals(scriptName)) {
+            if (cls.equals(breakPointScriptName)) {
                 addColorMarker(line + firstLineOffset(), STACK_MARKER);
             }
         }
@@ -152,6 +155,10 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     public String getScriptName() {
         return scriptName;
     }
+
+    public String getBreakPointScriptName() {
+        return breakPointScriptName;
+    }        
 
     @Override
     public void paintLineMarker(Graphics g, int line, int x, int lineY, int textY, int lineHeight, boolean currentLine, int maxLines) {
