@@ -161,14 +161,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 try {
                     openable.saveTo(baos);
                     SWF swf = (SWF) openable;
-                    byte[] data = baos.toByteArray();
-                    if (swf.binaryData.usedPacker != null) {
-                        ByteArrayOutputStream encBaos = new ByteArrayOutputStream();
-                        swf.binaryData.usedPacker.encrypt(new ByteArrayInputStream(data), encBaos);
-                        data = encBaos.toByteArray();
-                    }
-                    swf.binaryData.binaryData = new ByteArrayRange(data);
+                    byte[] data = baos.toByteArray();                    
+                    swf.binaryData.setDataBytes(new ByteArrayRange(data));
                     swf.binaryData.setModified(true);
+                    swf.binaryData.getTopLevelBinaryData().pack();
                     saved = saveOpenable(swf.binaryData.getSwf()); //save parent swf                   
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
@@ -263,7 +259,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             SWF swf = (SWF) openable;
             if (swf.binaryData != null) {
                 // embedded swf
-                swf.binaryData.innerSwf = null;
+                swf.binaryData.setInnerSwf(null);
                 swf.clearTagSwfs();
                 binaryDataClosedSwfs.add(swf);
             } else {

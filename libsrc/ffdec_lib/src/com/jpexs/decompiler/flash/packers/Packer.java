@@ -37,6 +37,16 @@ public interface Packer {
      * work
      */
     public Boolean suitableForBinaryData(DefineBinaryDataTag dataTag);
+    
+    /**
+     * Is this data packed with this packer?
+     *
+     * @param data
+     * @return true = it definitely is encrypted with this, false = it
+     * definitely is not encrypted with this, null = it is unknown that it will
+     * work
+     */
+    public Boolean suitableForData(byte[] data);
 
     /**
      * Unpack the data
@@ -65,4 +75,6 @@ public interface Packer {
      * @return
      */
     public String getName();
+    
+    public String getIdentifier();
 }

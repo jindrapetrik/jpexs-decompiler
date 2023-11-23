@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
@@ -73,13 +74,14 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.PackedBinaryData;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -240,8 +242,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem pasteInsideMenuItem;
 
+    private JMenu applyUnpackerMenu;
+    
     private JMenuItem openSWFInsideTagMenuItem;
-
+        
     private JMenuItem addAs12ScriptMenuItem;
 
     private JMenuItem addAs12FrameScriptMenuItem;
@@ -598,6 +602,22 @@ public class TagTreeContextMenu extends JPopupMenu {
         pasteInsideMenuItem.addActionListener(this::pasteInsideActionPerformed);
         add(pasteInsideMenuItem);
 
+        applyUnpackerMenu = new JMenu(mainPanel.translate("contextmenu.applyUnpacker"));
+        applyUnpackerMenu.setIcon(View.getIcon("openinside16"));
+        
+        for (Packer packer : DefineBinaryDataTag.getAvailablePackers()) {
+            JMenuItem packerMenuItem = new JMenuItem(packer.getName());
+            packerMenuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    applyUnpackerActionPerformed(packer);
+                }                
+            });
+            applyUnpackerMenu.add(packerMenuItem);
+        }
+        
+        add(applyUnpackerMenu);
+        
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         openSWFInsideTagMenuItem.setIcon(View.getIcon("openinside16"));
         openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
@@ -953,7 +973,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean allSelectedIsBinaryData = true;
         for (TreeItem item : items) {
-            if (!(item instanceof DefineBinaryDataTag)) {
+            if (!(item instanceof BinaryDataInterface)) {
                 allSelectedIsBinaryData = false;
                 break;
             }
@@ -1069,6 +1089,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         pasteAfterMenuItem.setVisible(false);
         pasteBeforeMenuItem.setVisible(false);
         pasteInsideMenuItem.setVisible(false);
+        applyUnpackerMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
         addAs12ScriptMenuItem.setVisible(false);
         addAs12FrameScriptMenuItem.setVisible(false);
@@ -1127,7 +1148,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             replaceNoFillMenuItem.setVisible(true);
         }
 
-        if (canReplace.test(it -> it instanceof DefineBinaryDataTag)) {
+        if (canReplace.test(it -> it instanceof BinaryDataInterface)) {
             replaceMenuItem.setVisible(true);
         }
 
@@ -1308,7 +1329,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES
                     && !isFolder
-                    && !(firstItem instanceof AS3Package)) {
+                    && !(firstItem instanceof AS3Package)
+                    && !(firstItem instanceof PackedBinaryData)) {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
@@ -1471,17 +1493,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         if (allSelectedIsBinaryData) {
+            applyUnpackerMenu.setVisible(true);
+            
             boolean anyInnerSwf = false;
             for (TreeItem item : items) {
-                DefineBinaryDataTag binary = (DefineBinaryDataTag) item;
+                BinaryDataInterface binary = (BinaryDataInterface) item;
 
                 // inner swf is not loaded yet
-                if (binary.innerSwf == null && binary.isSwfData()) {
+                if (binary.getInnerSwf() == null && binary.isSwfData()) {
                     anyInnerSwf = true;
                 }
             }
 
-            openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
+            openSWFInsideTagMenuItem.setVisible(anyInnerSwf);            
         }
 
         for (TreeItem item : items) {
@@ -1521,7 +1545,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     moveTagToWithDependenciesMenu.setVisible(false);
                     cutTagToClipboardMenuItem.setVisible(false);
                     cutTagToClipboardWithDependenciesMenuItem.setVisible(false);
-                    openSWFInsideTagMenuItem.setVisible(false);
+                    //openSWFInsideTagMenuItem.setVisible(false);
                 }
             }
         }
@@ -2009,17 +2033,28 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyOrMoveTags(getDependenciesSet(items), true, timelined, position);
     }
 
+    private void applyUnpackerActionPerformed(Packer packer) {
+        List<TreeItem> sel = getSelectedItems();
+        for (TreeItem item : sel) {
+            BinaryDataInterface binaryData = (BinaryDataInterface) item;
+            if (!binaryData.unpack(packer)) {
+                ViewMessages.showMessageDialog(mainPanel, AppStrings.translate("error.wrong.packer").replace("%item%", item.toString()).replace("%packer%", packer.getName()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        mainPanel.refreshTree();
+    }
+    
     private void openSwfInsideActionPerformed(ActionEvent evt) {
         List<TreeItem> sel = getSelectedItems();
-        List<DefineBinaryDataTag> binaryDatas = new ArrayList<>();
+        List<BinaryDataInterface> binaryDatas = new ArrayList<>();
         for (TreeItem item : sel) {
-            DefineBinaryDataTag binaryData = (DefineBinaryDataTag) item;
+            BinaryDataInterface binaryData = (BinaryDataInterface) item;
             if (binaryData.isSwfData()) {
-                binaryDatas.add((DefineBinaryDataTag) item);
+                binaryDatas.add((BinaryDataInterface) item);
             }
         }
 
-        mainPanel.loadFromBinaryTag(binaryDatas);
+        mainPanel.loadFromBinaryTag(binaryDatas);        
     }
 
     private void replaceWithTagActionPerformed(ActionEvent evt) {
@@ -3201,7 +3236,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 SWF swf = (SWF) item;
                 if (swf.binaryData != null) {
                     // embedded swf
-                    swf.binaryData.innerSwf = null;
+                    swf.binaryData.setInnerSwf(null);
                     swf.clearTagSwfs();
                 } else {
                     Main.closeFile(swf.openableList);
@@ -3521,13 +3556,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         swfItem.setIcon(View.getIcon("flash16"));
         menu.add(swfItem);
 
-        for (Tag t : targetSwf.getTags()) {
-            if (t instanceof DefineBinaryDataTag) {
-                DefineBinaryDataTag binaryData = (DefineBinaryDataTag) t;
-                if (binaryData.innerSwf != null) {
-                    addCopyMoveToMenus(kind, menu, items, name + " / " + t.getTagName() + " (" + ((DefineBinaryDataTag) t).getCharacterId() + ")", binaryData.innerSwf);
-                }
-            }
+        Map<String, SWF> binaryMap = mainPanel.getSwfsMap(targetSwf);
+        for (String key : binaryMap.keySet()) {
+            addCopyMoveToMenus(kind, menu, items, key, binaryMap.get(key));
         }
     }
 
@@ -3545,16 +3576,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         });
         swfItem.setIcon(View.getIcon("flash16"));
         menu.add(swfItem);
-
-        for (Tag t : targetSwf.getTags()) {
-            if (t instanceof DefineBinaryDataTag) {
-                DefineBinaryDataTag binaryData = (DefineBinaryDataTag) t;
-                if (binaryData.innerSwf != null) {
-                    addCopyMoveToMenus(kind, menu, items, name + " / " + t.getTagName() + " (" + ((DefineBinaryDataTag) t).getCharacterId() + ")", binaryData.innerSwf);
-                }
-            }
-        }
+        
+        Map<String, SWF> binaryMap = mainPanel.getSwfsMap(targetSwf);
+        for (String key : binaryMap.keySet()) {
+            addCopyMoveToFramesMenus(kind, menu, items, key, binaryMap.get(key));
+        }        
     }
+    
+    
 
     private void attachTagActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl, TreeNodeType createNodeType) {
         int id = -1;

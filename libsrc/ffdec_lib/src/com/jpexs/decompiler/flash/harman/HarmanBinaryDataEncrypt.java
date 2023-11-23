@@ -32,25 +32,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class HarmanBinaryDataEncrypt {
 
-    private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";
-    
-    private static final String[] hexStringCache;
-
-    static {
-        hexStringCache = new String[256];
-        for (int i = 0; i < hexStringCache.length; i++) {
-            hexStringCache[i] = String.format("%02x", i);
-        }
-    }
-
-    public static String byteArrayToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        for (byte b : data) {
-            sb.append(hexStringCache[b & 0xff]);
-        }
-
-        return sb.toString();
-    }
+    private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";   
     
     public static byte[] encrypt(byte[] data) {
         byte[] result;
@@ -153,6 +135,9 @@ public class HarmanBinaryDataEncrypt {
     }
 
     public static byte[] decrypt(byte[] data) {
+        if (data.length < 32) {
+            return null;
+        }
         long encryptedLen = data.length;        
         long encryptedLenXorHash = unpack(data, 0);
         long decryptedLenXorRandom1 = unpack(data, 4);

@@ -122,6 +122,7 @@ import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -357,7 +358,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public DumpInfoSwfNode dumpInfo;
 
     @Internal
-    public DefineBinaryDataTag binaryData;
+    public BinaryDataInterface binaryData;
 
     @Internal
     private final HashMap<DottedChain, DottedChain> deobfuscated = new HashMap<>();
@@ -1756,7 +1757,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public String getShortPathTitle() {
         if (binaryData != null) {
-            return binaryData.getSwf().getShortPathTitle() + "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
+            return binaryData.getSwf().getShortPathTitle() + "/" + binaryData.getPathIdentifier();
         }
         if (openableList != null) {
             if (openableList.isBundle()) {
@@ -1774,7 +1775,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public String getFullPathTitle() {
         if (binaryData != null) {
-            return binaryData.getSwf().getFullPathTitle() + "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
+            return binaryData.getSwf().getFullPathTitle() + "/" + binaryData.getPathIdentifier();
         }
         if (openableList != null) {
             if (openableList.isBundle()) {

@@ -22,9 +22,12 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.packers.HarmanAirPacker;
 import com.jpexs.decompiler.flash.packers.MochiCryptPacker;
 import com.jpexs.decompiler.flash.packers.Packer;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.PackedBinaryData;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
@@ -43,7 +46,7 @@ import java.nio.charset.Charset;
  * @author JPEXS
  */
 @SWFVersion(from = 9)
-public class DefineBinaryDataTag extends CharacterTag {
+public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInterface {
 
     public static final int ID = 87;
 
@@ -63,11 +66,19 @@ public class DefineBinaryDataTag extends CharacterTag {
 
     @Internal
     public Packer usedPacker;
+    
+    @Internal
+    private PackedBinaryData sub;
 
-    private final Packer[] PACKERS = {
-        new MochiCryptPacker()
+    private static final Packer[] PACKERS = {
+        new MochiCryptPacker(),
+        new HarmanAirPacker()
     };
 
+    public static Packer[] getAvailablePackers() {
+        return PACKERS;
+    }
+    
     /**
      * Constructor
      *
@@ -84,6 +95,25 @@ public class DefineBinaryDataTag extends CharacterTag {
         readData(sis, data, 0, false, false, false);
     }
 
+    public PackedBinaryData getSub() {
+        return sub;
+    }
+    
+    @Override
+    public boolean unpack(Packer packer) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            if (!packer.decrypt(new ByteArrayInputStream(binaryData.getRangeData()), baos)) {
+                return false;
+            }
+        } catch (IOException ex) {
+            return false;
+        }
+        sub = new PackedBinaryData(swf, this, new ByteArrayRange(baos.toByteArray()));
+        usedPacker = packer;
+        return true;
+    }
+    
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         tag = sis.readUI16("tag");
@@ -100,16 +130,16 @@ public class DefineBinaryDataTag extends CharacterTag {
             InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
             detectPacker();
             String packerAdd = "";
+            BinaryDataInterface binaryData = this;
             if (usedPacker != null) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                usedPacker.decrypt(is, baos);
-                is = new ByteArrayInputStream(baos.toByteArray());
-                packerAdd = " - " + usedPacker.getName();
+                unpack(usedPacker);
+                is = new ByteArrayInputStream(sub.getDataBytes().getRangeData());
+                binaryData = sub;
             }
 
-            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", Configuration.parallelSpeedUp.get(), charset);
-            innerSwf = bswf;
-            bswf.binaryData = this;
+            SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get(), charset);
+            binaryData.setInnerSwf(bswf);
+            bswf.binaryData = binaryData;
         } catch (IOException | InterruptedException ex) {
             // ignore
         }
@@ -138,6 +168,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         this.tag = characterId;
     }
 
+    @Override
     public void detectPacker() {
         for (Packer packer : PACKERS) {
             if (packer.suitableForBinaryData(this) == Boolean.TRUE) {
@@ -147,6 +178,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         }
     }
 
+    @Override
     public boolean isSwfData() {
         try {
             if (binaryData.getLength() > 8) {
@@ -159,9 +191,7 @@ public class DefineBinaryDataTag extends CharacterTag {
             //ignored
         }
 
-        detectPacker();
-
-        return usedPacker != null;
+        return false;
     }
 
     @Override
@@ -173,5 +203,78 @@ public class DefineBinaryDataTag extends CharacterTag {
             return innerSwf.isModified();
         }
         return false;
+    }
+
+    @Override
+    public Packer getUsedPacker() {
+        return usedPacker;
+    }    
+
+    @Override
+    public void setDataBytes(ByteArrayRange data) {
+        this.binaryData = data;
+    }
+
+    @Override
+    public ByteArrayRange getDataBytes() {
+        return binaryData;
+    }
+    
+    @Override
+    public boolean pack() {
+        if (sub == null) {
+            return false;
+        }
+        sub.pack();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            if (!usedPacker.encrypt(new ByteArrayInputStream(sub.getDataBytes().getRangeData()), baos)) {
+                return false;
+            }
+        } catch (IOException ex) {
+            return false;
+        }
+        setDataBytes(new ByteArrayRange(baos.toByteArray()));
+        return true;
+    }
+    
+    @Override
+    public void setInnerSwf(SWF swf) {
+        this.innerSwf = swf;
+    }
+
+    @Override
+    public SWF getInnerSwf() {
+        return this.innerSwf;
+    }
+
+    @Override
+    public String getPathIdentifier() {
+        return "DefineBinaryData (" + getCharacterId() + ")";
+    }           
+
+    @Override
+    public String getStoragesPathIdentifier() {
+        return "binaryData[" + getCharacterId() + "]";
+    }        
+
+    @Override
+    public BinaryDataInterface getTopLevelBinaryData() {
+        return this;
+    }    
+
+    @Override
+    public void setModified(boolean value) {
+        super.setModified(value);
+        if (!value) {
+            if (sub != null) {
+                sub.setModified(false);
+            }
+        }
+    }    
+
+    @Override
+    public String getClassExportFileName(String className) {
+        return className;
     }
 }

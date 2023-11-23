@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -292,7 +293,7 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.SOUND;
         }
 
-        if (t instanceof DefineBinaryDataTag) {
+        if (t instanceof BinaryDataInterface) {
             return TreeNodeType.BINARY_DATA;
         }
 
@@ -594,7 +595,7 @@ public abstract class AbstractTagTree extends JTree {
                 }
             }
 
-            if (d instanceof Tag || d instanceof ASMSource) {
+            if (d instanceof Tag || d instanceof ASMSource || d instanceof BinaryDataInterface) {
                 TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                 if (nodeType == TreeNodeType.IMAGE) {
                     ret.add(d);

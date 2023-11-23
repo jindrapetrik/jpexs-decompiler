@@ -78,7 +78,7 @@ public class SearchResultsStorage {
         String binaryDataSuffix = "";
 
         while ((s instanceof SWF) && ((SWF) s).binaryData != null) {
-            binaryDataSuffix += "|binaryData[" + ((SWF) s).binaryData.getCharacterId() + "]";
+            binaryDataSuffix += "|" + ((SWF) s).binaryData.getStoragesPathIdentifier();
             s = ((SWF) s).binaryData.getSwf();
         }
 

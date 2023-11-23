@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file.
 - Saving Harman encrypted SWFs
 - Editing encrypted flag on header panel
 - `-encrypt` command on CLI for Harman encryption
+- Apply unpacker menu on binary data
+- Harman unpacker for binary data
+- Multilevel binary data unpacking is possible
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode

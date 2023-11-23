@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -32,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -527,10 +527,13 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof DefineSpriteTag) {
             result.addAll(((DefineSpriteTag) parentNode).getTimeline().getFrames());
             return result;
-        } else if (parentNode instanceof DefineBinaryDataTag) {
-            DefineBinaryDataTag binaryDataTag = (DefineBinaryDataTag) parentNode;
-            if (binaryDataTag.innerSwf != null) {
-                result.add(((DefineBinaryDataTag) parentNode).innerSwf);
+        } else if (parentNode instanceof BinaryDataInterface) {
+            BinaryDataInterface binaryData = (BinaryDataInterface) parentNode;
+            if (binaryData.getInnerSwf() != null) {
+                result.add(binaryData.getInnerSwf());
+                return result;
+            } else if (binaryData.getSub() != null) {
+                result.add(binaryData.getSub());
                 return result;
             } else {
                 return new ArrayList<>(0);
@@ -613,8 +616,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return ((Frame) parentNode).innerTags.get(index);
         } else if (parentNode instanceof DefineSpriteTag) {
             return ((DefineSpriteTag) parentNode).getTimeline().getFrame(index);
-        } else if (parentNode instanceof DefineBinaryDataTag) {
-            return ((DefineBinaryDataTag) parentNode).innerSwf;
+        } else if (parentNode instanceof BinaryDataInterface) {
+            BinaryDataInterface binaryData = (BinaryDataInterface) parentNode;
+            if (binaryData.getInnerSwf() != null) {
+                return binaryData.getInnerSwf();
+            }
+            return binaryData.getSub();
         } else if (parentNode instanceof AS2Package) {
             return ((AS2Package) parentNode).getChild(index);
         } else if (parentNode instanceof FrameScript) {
@@ -681,8 +688,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return mappedSize + ((Frame) parentNode).innerTags.size();
         } else if (parentNode instanceof DefineSpriteTag) {
             return mappedSize + ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
-        } else if (parentNode instanceof DefineBinaryDataTag) {
-            return mappedSize + (((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1);
+        } else if (parentNode instanceof BinaryDataInterface) {
+            BinaryDataInterface binary = (BinaryDataInterface) parentNode;
+            if (binary.getInnerSwf() != null) {
+                return mappedSize + 1;
+            }
+            return mappedSize + (binary.getSub() == null ? 0 : 1);
         } else if (parentNode instanceof AS2Package) {
             return mappedSize + ((AS2Package) parentNode).getChildCount();
         } else if (parentNode instanceof FrameScript) {
@@ -748,7 +759,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return indexOfAdd(baseIndex, ((Frame) parentNode).innerTags.indexOf(childNode));
         } else if (parentNode instanceof DefineSpriteTag) {
             return indexOfAdd(baseIndex, ((Frame) childNode).frame);
-        } else if (parentNode instanceof DefineBinaryDataTag) {
+        } else if (parentNode instanceof BinaryDataInterface) {
             return indexOfAdd(baseIndex, 0); // binary data tag can have only 1 child
         } else if (parentNode instanceof AS2Package) {
             return indexOfAdd(baseIndex, ((AS2Package) parentNode).getIndexOfChild(childNode));

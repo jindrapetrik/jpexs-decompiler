@@ -165,6 +165,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -174,6 +175,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.PackedBinaryData;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
@@ -2022,7 +2024,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> sounds = new ArrayList<>();
             List<Tag> texts = new ArrayList<>();
             List<TreeItem> as12scripts = new ArrayList<>();
-            List<Tag> binaryData = new ArrayList<>();
+            List<BinaryDataInterface> binaryData = new ArrayList<>();
             Map<Integer, List<Integer>> frames = new HashMap<>();
             List<Tag> fonts = new ArrayList<>();
             List<Tag> fonts4 = new ArrayList<>();
@@ -2042,7 +2044,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
 
-                if (d instanceof Tag || d instanceof ASMSource) {
+                if (d instanceof Tag || d instanceof ASMSource || d instanceof BinaryDataInterface) {
                     TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                     if (nodeType == TreeNodeType.IMAGE) {
                         images.add((Tag) d);
@@ -2074,7 +2076,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         sounds.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.BINARY_DATA) {
-                        binaryData.add((Tag) d);
+                        binaryData.add((BinaryDataInterface) d);
                     }
                     if (nodeType == TreeNodeType.TEXT) {
                         texts.add((Tag) d);
@@ -2169,7 +2171,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (export.isOptionEnabled(BinaryDataExportMode.class)) {
-                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile2 + File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(binaryData),
+                ret.addAll(new BinaryDataExporter().exportBinaryData(handler, selFile2 + File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME, binaryData,
                         new BinaryDataExportSettings(export.getValue(BinaryDataExportMode.class)), evl));
             }
 
@@ -2466,6 +2468,27 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public List<OpenableList> getSwfs() {
         return openables;
     }
+            
+    public Map<String, SWF> getSwfsMap(SWF swf) {
+        Map<String, SWF> result = new LinkedHashMap<>();
+        populateSwfs(result, swf, swf.getShortFileName());
+        return result;
+    }
+    
+    private void populateSwfs(Map<String, SWF> result, SWF targetSwf, String name) {
+        for (Tag t : targetSwf.getTags()) {
+            if (t instanceof DefineBinaryDataTag) {
+                BinaryDataInterface binaryData = (BinaryDataInterface) t;
+                String bname = name;
+                do {
+                    bname = bname + "/" + binaryData.getPathIdentifier();
+                    if (binaryData.getInnerSwf() != null) {
+                        result.put(bname, binaryData.getInnerSwf());
+                    }
+                } while ((binaryData = binaryData.getSub()) != null);          
+            }
+        }
+    }   
 
     public OpenableList getCurrentSwfList() {
         SWF swf = getCurrentSwf();
@@ -5371,32 +5394,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showCard(CARDDUMPVIEW);
     }
 
-    public void loadFromBinaryTag(final DefineBinaryDataTag binaryDataTag) {
+    public void loadFromBinaryTag(final BinaryDataInterface binaryDataTag) {
         loadFromBinaryTag(Arrays.asList(binaryDataTag));
     }
 
-    public void loadFromBinaryTag(final List<DefineBinaryDataTag> binaryDataTags) {
+    public void loadFromBinaryTag(final List<BinaryDataInterface> binaryDataTags) {
 
         Main.loadingDialog.setVisible(true);
         new CancellableWorker<Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 try {
-                    for (DefineBinaryDataTag binaryDataTag : binaryDataTags) {
-                        String path = binaryDataTag.getSwf().getShortPathTitle() + "/DefineBinaryData (" + binaryDataTag.getCharacterId() + ")";
+                    for (BinaryDataInterface binaryData : binaryDataTags) {
+                        String path = binaryData.getSwf().getShortPathTitle() + "/" + binaryData.getPathIdentifier();
                         try {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
                             String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                            byte[] data = binaryDataTag.binaryData.getRangeData();
-                            String packerAdd = "";
-                            if (binaryDataTag.usedPacker != null) {
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                binaryDataTag.usedPacker.decrypt(new ByteArrayInputStream(data), baos);
-                                data = baos.toByteArray();
-                                packerAdd = " - " + binaryDataTag.usedPacker.getName();
-                            }
+                            byte[] data = binaryData.getDataBytes().getRangeData();
                             InputStream is = new ByteArrayInputStream(data);
-                            SWF bswf = new SWF(is, null, "(SWF Data" + packerAdd + ")", new ProgressListener() {
+                            SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
@@ -5406,8 +5422,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 public void status(String status) {
                                 }
                             }, Configuration.parallelSpeedUp.get(), charset);
-                            binaryDataTag.innerSwf = bswf;
-                            bswf.binaryData = binaryDataTag;
+                            binaryData.setInnerSwf(bswf);
+                            bswf.binaryData = binaryData;
                         } catch (IOException ex) {
                             //ignore
                         }
@@ -5471,9 +5487,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
-        } else if (treeItem instanceof DefineBinaryDataTag) {
-            DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
-            previewPanel.showBinaryPanel(binaryTag);
+        } else if (treeItem instanceof BinaryDataInterface) {
+            BinaryDataInterface binary = (BinaryDataInterface) treeItem;
+            previewPanel.showBinaryPanel(binary);
         } else if (treeItem instanceof ProductInfoTag) {
             ProductInfoTag productInfoTag = (ProductInfoTag) treeItem;
             previewPanel.showProductInfoPanel(productInfoTag);
@@ -5787,7 +5803,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof MetadataTag) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if (treeItem instanceof DefineBinaryDataTag) {
+        } else if (treeItem instanceof BinaryDataInterface) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof UnknownTag) {
