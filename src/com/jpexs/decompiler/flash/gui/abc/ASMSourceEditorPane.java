@@ -262,7 +262,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
         }
         String aname = "#PCODE abc:" + abcIndex + ",body:" + bodyIndex + ";" + scriptPathName;
-        setScriptName(aname);
+        setScriptName(aname, aname);
         setHex(exportMode, true);
     }
 

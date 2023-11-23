@@ -891,7 +891,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
 
         String sn = scriptLeaf.getClassPath().toString();
-        setScriptName(sn);
+        setScriptName(sn, sn);
         abcPanel.scriptNameLabel.setText(sn);
         int scriptIndex = scriptLeaf.scriptIndex;
         ScriptInfo nscript = null;

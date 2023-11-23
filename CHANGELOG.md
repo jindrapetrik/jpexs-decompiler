@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Apply unpacker menu on binary data
 - Harman unpacker for binary data
 - Multilevel binary data unpacking is possible
+- [#2131] AS1/2 Debugger - show _root variable
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -47,6 +48,8 @@ All notable changes to this project will be documented in this file.
 - Linenumbers are visible even if debug markers are used
 - Marker of stack frames not properly cleared
 - Retain AS3 script selection in the tree after its editation and saving whole SWF
+- [#2131] AS1/2 Debugger - Breakpoint handling - incorrect script names
+- [#2131] Debugger - Correct walking variables tree
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3304,6 +3307,7 @@ Major version of SWF to XML export changed to 2.
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
 [#2129]: https://www.free-decompiler.com/flash/issues/2129
+[#2131]: https://www.free-decompiler.com/flash/issues/2131
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116

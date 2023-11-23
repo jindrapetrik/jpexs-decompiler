@@ -21,6 +21,7 @@ import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
 import com.jpexs.debugger.flash.messages.in.InGetVariable;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
@@ -504,15 +505,26 @@ public class DebugPanel extends JPanel {
 
                     SelectedTab oldSel = selectedTab;
                     localsTable = null;
+                    SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+                    if (swf == null) {
+                        return;
+                    }
+                    boolean as3 = swf.isAS3();
                     InFrame f = Main.getDebugHandler().getFrame();
                     if (f != null) {
-
+                        Variable root = null;
+                        if (!as3) {
+                            root = Main.getDebugHandler().getVariable(0, "_root", false, false).parent;
+                        }
                         List<Long> regVarIds = new ArrayList<>();
                         for (int i = 0; i < f.registers.size(); i++) {
                             regVarIds.add(0L);
                         }
                         safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers, regVarIds));
                         List<Variable> locals = new ArrayList<>();
+                        if (root != null) {
+                            locals.add(root);
+                        }
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
 

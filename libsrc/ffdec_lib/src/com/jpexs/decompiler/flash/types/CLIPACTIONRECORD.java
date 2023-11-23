@@ -50,6 +50,7 @@ import java.util.List;
 public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     private String scriptName = "-";
+    private String exportedScriptName = "-";
     private CLIPACTIONS parentClipActions;
 
     @Override
@@ -370,5 +371,15 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }
+    }
+    
+    @Override
+    public String getExportedScriptName() {
+        return exportedScriptName;
+    }
+    
+    @Override
+    public void setExportedScriptName(String scriptName) {
+        this.exportedScriptName = scriptName;
     }
 }

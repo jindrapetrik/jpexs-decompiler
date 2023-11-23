@@ -359,15 +359,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }            
             InGetVariable igv;
 
-            Long objectId = varToObjectId(var);
+            //Long objectId = varToObjectId(var);
             
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
             
-            if (objectId != 0) {
+            /*if (objectId != 0) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
-            } else {
-                igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
-            }
+            } else {*/
+            igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
+            //}
 
             //current var is getter function - set it to value really got
             if ((var.flags & VariableFlags.HAS_GETTER) > 0) {
@@ -440,6 +440,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (var.vType == VariableType.OBJECT) {
             return (Long) var.value;
         } 
+        if (var.vType == VariableType.MOVIECLIP) {
+            return (Long) var.value;
+        }
         return 0L;        
     }
 
