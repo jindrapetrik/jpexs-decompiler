@@ -46,7 +46,12 @@ public class MochiCryptPacker implements Packer {
         if (!handleXor(payload)) {
             return false;
         }
-        Helper.copyStream(new InflaterInputStream(new ByteArrayInputStream(payload)), os);
+        try {
+            Helper.copyStreamEx(new InflaterInputStream(new ByteArrayInputStream(payload)), os);
+        } catch (IOException ex) {
+            return false;
+        }
+        
         return true;
     }
 
@@ -100,7 +105,7 @@ public class MochiCryptPacker implements Packer {
     public boolean encrypt(InputStream is, OutputStream os) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(baos);
-        Helper.copyStream(is, def);
+        Helper.copyStreamEx(is, def);
         def.finish();
         byte[] payload = baos.toByteArray();
 
@@ -117,4 +122,14 @@ public class MochiCryptPacker implements Packer {
     public String getName() {
         return "MochiCrypt";
     }
+
+    @Override
+    public Boolean suitableForData(byte[] data) {
+        return null;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "mochicrypt";
+    }        
 }

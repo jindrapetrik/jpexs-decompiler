@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -100,7 +101,7 @@ public class ExportDialog extends AppDialog {
         {DefineVideoStreamTag.class},
         {SoundTag.class},
         {ASMSource.class, ScriptPack.class, TagScript.class},
-        {DefineBinaryDataTag.class},
+        {BinaryDataInterface.class},
         {Frame.class},
         {Frame.class},
         {ButtonTag.class},

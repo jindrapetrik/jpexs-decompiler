@@ -787,6 +787,15 @@ public class Helper {
         return baos.toByteArray();
     }
 
+    public static void copyStreamEx(InputStream is, OutputStream os) throws IOException {        
+        final int bufSize = 4096;
+        byte[] buf = new byte[bufSize];
+        int cnt = 0;
+        while ((cnt = is.read(buf)) > 0) {
+            os.write(buf, 0, cnt);
+        }        
+    }
+    
     public static void copyStream(InputStream is, OutputStream os) {
         try {
             final int bufSize = 4096;

@@ -19,9 +19,6 @@ package com.jpexs.decompiler.flash.harman;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
@@ -44,26 +41,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class HarmanSwfEncrypt {
 
-    private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";
-    
-    
-    private static final String[] hexStringCache;
-
-    static {
-        hexStringCache = new String[256];
-        for (int i = 0; i < hexStringCache.length; i++) {
-            hexStringCache[i] = String.format("%02x", i);
-        }
-    }
-
-    public static String byteArrayToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        for (byte b : data) {
-            sb.append(hexStringCache[b & 0xff]);
-        }
-
-        return sb.toString();
-    }
+    private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";       
     
     private static int sum(byte[] data) {
         int s = 0;

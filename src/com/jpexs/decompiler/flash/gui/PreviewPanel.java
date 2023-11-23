@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.math.BezierUtils;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -43,6 +42,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -1647,9 +1647,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         parametersPanel.setVisible(false);
     }
 
-    public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
+    public void showBinaryPanel(BinaryDataInterface binaryData) {
         showCardLeft(BINARY_TAG_CARD);
-        binaryPanel.setBinaryData(binaryDataTag);
+        binaryPanel.setBinaryData(binaryData);
         parametersPanel.setVisible(false);
     }
 
