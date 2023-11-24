@@ -213,7 +213,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             toRemoveBPointMap.get(scriptName).add(line);
         }
         try {
-            sendBreakPoints(false);
+            sendBreakPoints();
         } catch (IOException ex) {
             //ignore
         }
@@ -310,12 +310,10 @@ public class DebuggerHandler implements DebugConnectionListener {
                 toAddBPointMap.put(scriptName, new TreeSet<>());
             }
             toAddBPointMap.get(scriptName).add(line);
-            Logger
-                    .getLogger(DebuggerHandler.class
-                            .getName()).log(Level.FINE, "bp {0}:{1} added to todo", new Object[]{scriptName, line});
+            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp {0}:{1} added to todo", new Object[]{scriptName, line});
         }
         try {
-            sendBreakPoints(false);
+            sendBreakPoints();
         } catch (IOException ex) {
             //ignored
         }
@@ -797,7 +795,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "break at {0}:{1}, reason: {2}", new Object[]{newBreakScriptName, message.line, reason});
 
-                        sendBreakPoints(false);
+                        sendBreakPoints();
                         synchronized (DebuggerHandler.this) {
                             breakScriptName = newBreakScriptName;
                             breakIp = message.line;
@@ -877,12 +875,12 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
     }
 
-    private void sendBreakPoints(boolean force) throws IOException {
-        if (!force && !isPaused()) {
-            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "not sending bps, not paused");
+    private void sendBreakPoints() throws IOException {
+        if (!isConnected()) {
+            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "not sending bps, not connected");
             return;
-        }
-        synchronized (this) {
+        }                
+        synchronized (this) {                                   
             for (String scriptName : toRemoveBPointMap.keySet()) {
                 int file = moduleIdOf(scriptName);
                 if (file > -1) {

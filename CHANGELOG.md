@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - Retain AS3 script selection in the tree after its editation and saving whole SWF
 - [#2131] AS1/2 Debugger - Breakpoint handling - incorrect script names
 - [#2131] Debugger - Correct walking variables tree
+- [#2131] Debugger - Breakpoints can be added while SWF is running (not just on pause)
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
