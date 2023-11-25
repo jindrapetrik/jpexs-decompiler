@@ -95,7 +95,7 @@ public class DebugStackPanel extends JPanel {
                         String scriptName = (String) stackTable.getModel().getValueAt(row, 0);
                         int line = (int) (Integer) stackTable.getModel().getValueAt(row, 1);
                         Main.getMainFrame().getPanel().gotoScriptLine(Main.getMainFrame().getPanel().getCurrentSwf(),
-                                scriptName, line, classIndices[row], traitIndices[row], methodIndices[row]);
+                                scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
                         Main.getDebugHandler().setDepth(row);
                     }
                 }

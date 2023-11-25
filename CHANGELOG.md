@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file.
 - Multilevel binary data unpacking is possible
 - [#2131] AS1/2 Debugger - show _root variable
 - [#2124] Copy tags to other SWFs and replace same classes / export names
+- Remembering breakpoints
+- [#2131] Breakpoint list dialog
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -53,6 +55,7 @@ All notable changes to this project will be documented in this file.
 - [#2131] Debugger - Correct walking variables tree
 - [#2131] Debugger - Breakpoints can be added while SWF is running (not just on pause)
 - AS3 Direct editation - types on instance variable values not properly resolved
+- AS1/2 Debugger - script was cleared on stop button
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class

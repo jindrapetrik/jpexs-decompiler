@@ -17,8 +17,11 @@
 package com.jpexs.decompiler.flash.configuration;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -29,7 +32,22 @@ public class SwfSpecificCustomConfiguration implements Serializable {
     private static final long serialVersionUID = 0x2acb421da57f5eb4L;
 
     private Map<String, String> customData = new HashMap<>();
+    
+    public static final String LIST_SEPARATOR = "{*sep*}";
 
+
+    public List<String> getCustomDataAsList(String key) {
+        String data = getCustomData(key, "");
+        String[] parts = (data + LIST_SEPARATOR).split(Pattern.quote(LIST_SEPARATOR));
+        List<String> result = new ArrayList<>();
+        for (String part : parts) {
+            if (!part.isEmpty()) {
+                result.add(part);
+            }
+        }
+        return result;
+    }
+    
     public String getCustomData(String key, String defaultValue) {
         if (customData.containsKey(key)) {
             return customData.get(key);
@@ -40,5 +58,9 @@ public class SwfSpecificCustomConfiguration implements Serializable {
 
     public void setCustomData(String key, String value) {
         customData.put(key, value);
+    }
+    
+    public void setCustomData(String key, Iterable<? extends CharSequence> value) {
+        customData.put(key, String.join(LIST_SEPARATOR, value));
     }
 }
