@@ -640,7 +640,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
             instanceInfo.iinit_index = init = method(false, 0, false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) iinit;
-            instanceInfo.iinit_index = init = method(false, pkg.toRawString().isEmpty() ? str(name + "/" + name) : str(pkg.toRawString() + ":" + name + "/" + name), false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            List<AssignableAVM2Item> allIinitVariables = new ArrayList<>();
+            allIinitVariables.addAll(iinitVariables);
+            allIinitVariables.addAll(m.subvariables);
+            instanceInfo.iinit_index = init = method(false, pkg.toRawString().isEmpty() ? str(name + "/" + name) : str(pkg.toRawString() + ":" + name + "/" + name), false, false, new ArrayList<>(), pkg, m.needsActivation, allIinitVariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
         //Class initializer
