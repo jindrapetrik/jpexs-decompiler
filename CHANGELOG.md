@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Harman unpacker for binary data
 - Multilevel binary data unpacking is possible
 - [#2131] AS1/2 Debugger - show _root variable
+- [#2124] Copy tags to other SWFs and replace same classes / export names
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -3309,6 +3310,7 @@ Major version of SWF to XML export changed to 2.
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
 [#2129]: https://www.free-decompiler.com/flash/issues/2129
 [#2131]: https://www.free-decompiler.com/flash/issues/2131
+[#2124]: https://www.free-decompiler.com/flash/issues/2124
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
