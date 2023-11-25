@@ -414,6 +414,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
     @Internal
+    private Map<String, Integer> exportNameToCharacter = new HashMap<>();
+    
+    @Internal
     private AbcIndexing abcIndex;
 
     @Internal
@@ -820,6 +823,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             return null;
         }
         int charId = classToCharacter.get(className);
+        return getCharacter(charId);
+    }
+    
+    public CharacterTag getCharacterByExportName(String exportName) {
+        if (!exportNameToCharacter.containsKey(exportName)) {
+            return null;            
+        }
+        int charId = exportNameToCharacter.get(exportName);
         return getCharacter(charId);
     }
 
@@ -1821,6 +1832,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public void assignExportNamesToSymbols() {
+        exportNameToCharacter.clear();
         HashMap<Integer, String> exportNames = new HashMap<>(importedTagToExportNameMapping);
         for (Tag t : getTags()) {
             if (t instanceof ExportAssetsTag) {
@@ -1830,6 +1842,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     String name = eat.names.get(i);
                     if ((!exportNames.containsKey(tagId)) && (!exportNames.containsValue(name))) {
                         exportNames.put(tagId, name);
+                        exportNameToCharacter.put(name, tagId);
                     }
                 }
             }
