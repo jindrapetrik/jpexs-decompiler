@@ -52,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - [#2131] AS1/2 Debugger - Breakpoint handling - incorrect script names
 - [#2131] Debugger - Correct walking variables tree
 - [#2131] Debugger - Breakpoints can be added while SWF is running (not just on pause)
+- AS3 Direct editation - types on instance variable values not properly resolved
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
