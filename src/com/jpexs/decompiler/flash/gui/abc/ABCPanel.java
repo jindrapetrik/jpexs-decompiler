@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.BreakpointListDialog;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
@@ -962,6 +963,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         iconsPanel.add(deobfuscateButton);
         iconsPanel.add(deobfuscateOptionsButton);
+        
+        JButton breakpointListButton = new JButton(View.getIcon("breakpointlist16"));
+        breakpointListButton.setMargin(new Insets(5, 5, 5, 5));
+        breakpointListButton.addActionListener(this::breakPointListButtonActionPerformed);
+        breakpointListButton.setToolTipText(AppStrings.translate("button.breakpointList"));
+        iconsPanel.add(breakpointListButton);
 
         scriptNameLabel = new JLabel("-");
 
@@ -1890,6 +1897,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
         }
+    }
+    
+    private void breakPointListButtonActionPerformed(ActionEvent evt) {
+        Main.showBreakpointsList();
     }
 
     private void addTraitButtonActionPerformed(ActionEvent evt) {

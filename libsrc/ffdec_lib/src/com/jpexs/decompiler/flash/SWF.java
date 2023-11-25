@@ -215,6 +215,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -3458,6 +3459,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                 return list;
             } catch (InterruptedException ex) {
+                throw ex;
+            } catch (CancellationException ex) {
                 throw ex;
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);

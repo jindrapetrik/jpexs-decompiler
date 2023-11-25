@@ -559,7 +559,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
                     return null;
                 }
-
+                                
                 @Override
                 protected void done() {
                     View.execInEventDispatch(() -> {
@@ -934,6 +934,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         iconsPanel.add(deobfuscateButton);
         iconsPanel.add(deobfuscateOptionsButton);
+        
+        JButton breakpointListButton = new JButton(View.getIcon("breakpointlist16"));
+        breakpointListButton.setMargin(new Insets(5, 5, 5, 5));
+        breakpointListButton.addActionListener(this::breakPointListButtonActionPerformed);
+        breakpointListButton.setToolTipText(AppStrings.translate("button.breakpointList"));
+        iconsPanel.add(breakpointListButton);
 
         JPanel panelWithToolbar = new JPanel(new BorderLayout());
         panelWithToolbar.add(iconsPanel, BorderLayout.NORTH);
@@ -1072,6 +1078,10 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
         Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void breakPointListButtonActionPerformed(ActionEvent evt) {
+        Main.showBreakpointsList();
     }
 
     private void editorTextChanged() {

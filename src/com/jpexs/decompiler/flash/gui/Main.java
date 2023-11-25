@@ -647,6 +647,7 @@ public class Main {
         if (swf == null) {
             return;
         }
+        debugHandler.setDebuggedSwf(swf);
         File tempFile = null;
 
         try {
@@ -726,33 +727,39 @@ public class Main {
     }
 
     public static synchronized boolean isBreakPointValid(String scriptName, int line) {
-        return !getDebugHandler().isBreakpointInvalid(scriptName, line);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        return !getDebugHandler().isBreakpointInvalid(swf, scriptName, line);
     }
 
     public static synchronized void addBreakPoint(String scriptName, int line) {
-        getDebugHandler().addBreakPoint(scriptName, line);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        getDebugHandler().addBreakPoint(swf, scriptName, line);
     }
 
     public static synchronized void removeBreakPoint(String scriptName, int line) {
-        getDebugHandler().removeBreakPoint(scriptName, line);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        getDebugHandler().removeBreakPoint(swf, scriptName, line);
     }
 
     public static synchronized boolean toggleBreakPoint(String scriptName, int line) {
-        if (getDebugHandler().isBreakpointToAdd(scriptName, line) || getDebugHandler().isBreakpointConfirmed(scriptName, line) || getDebugHandler().isBreakpointInvalid(scriptName, line)) {
-            getDebugHandler().removeBreakPoint(scriptName, line);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        if (getDebugHandler().isBreakpointToAdd(swf, scriptName, line) || getDebugHandler().isBreakpointConfirmed(swf, scriptName, line) || getDebugHandler().isBreakpointInvalid(swf, scriptName, line)) {
+            getDebugHandler().removeBreakPoint(swf, scriptName, line);
             return false;
         } else {
-            getDebugHandler().addBreakPoint(scriptName, line);
+            getDebugHandler().addBreakPoint(swf, scriptName, line);
             return true;
         }
     }
 
     public static synchronized Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly) {
-        return getDebugHandler().getAllBreakPoints(validOnly);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        return getDebugHandler().getAllBreakPoints(swf, validOnly);
     }
 
     public static synchronized Set<Integer> getScriptBreakPoints(String pack, boolean onlyValid) {
-        return getDebugHandler().getBreakPoints(pack, onlyValid);
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        return getDebugHandler().getBreakPoints(swf, pack, onlyValid);
     }
 
     public static DebuggerHandler getDebugHandler() {
@@ -1640,15 +1647,8 @@ public class Main {
                             SWF swf = (SWF) openable;
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
                             if (conf != null) {
-                                String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
-                                if (!abcDependencies.isEmpty()) {
-                                    String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
-                                    List<String> preselectedNames = new ArrayList<>();
-                                    for (String part : parts) {
-                                        if (!part.isEmpty()) {
-                                            preselectedNames.add(part);
-                                        }
-                                    }
+                                List<String> preselectedNames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES);
+                                if (!preselectedNames.isEmpty()) {
                                     swf.setAbcIndexDependencies(namesToSwfs(preselectedNames));
                                     if (mainFrame != null && mainFrame.getPanel() != null && mainFrame.getPanel().getABCPanel() != null) {
                                         mainFrame.getPanel().getABCPanel().updateLinksLabel();
@@ -1687,6 +1687,14 @@ public class Main {
                     if (swfCustomConf != null) {
                         resourcesPathStr = swfCustomConf.getCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
                         tagListPathStr = swfCustomConf.getCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_TAGLIST, null);
+                        List<String> breakpointsList = swfCustomConf.getCustomDataAsList(CustomConfigurationKeys.KEY_BREAKPOINTS);
+                        for (String breakpoint : breakpointsList) {
+                            if (breakpoint.matches("^.*:[0-9]+$")) {
+                                int line = Integer.parseInt(breakpoint.substring(breakpoint.lastIndexOf(":") + 1));
+                                String scriptName = breakpoint.substring(0, breakpoint.lastIndexOf(":"));
+                                getDebugHandler().addBreakPoint(fswf, scriptName, line);
+                            }
+                        }
                     }
 
                     if (isInited()) {
@@ -2457,7 +2465,7 @@ public class Main {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
-                                mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex);
+                                mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
                             }
                         });
                     }
@@ -3315,18 +3323,16 @@ public class Main {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
         List<SWF> dependencies = new ArrayList<>();
         if (conf != null) {
-            String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
-            if (!abcDependencies.isEmpty()) {
-                String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
-                List<String> preselectedNames = new ArrayList<>();
-                for (String part : parts) {
-                    if (!part.isEmpty()) {
-                        preselectedNames.add(part);
-                    }
-                }
+            List<String> preselectedNames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES);
+            if (!preselectedNames.isEmpty()) {
                 dependencies = Main.namesToSwfs(preselectedNames);
             }
         }
         return dependencies;
+    }
+    
+    public static void showBreakpointsList() {
+        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+        getMainFrame().getPanel().showBreakpointlistDialog(swf);
     }
 }

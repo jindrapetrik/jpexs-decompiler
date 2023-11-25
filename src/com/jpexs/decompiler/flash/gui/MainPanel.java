@@ -453,6 +453,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public ScrollPosStorage scrollPosStorage;
 
     private Map<Openable, ABCExplorerDialog> abcExplorerDialogs = new WeakHashMap<>();
+    
+    private Map<SWF, BreakpointListDialog> breakpointsListDialogs = new WeakHashMap<>();
+
 
     public void savePins() {
         pinsPanel.save();
@@ -1685,7 +1688,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (abcExportDialog != null) {
                         abcExportDialog.setVisible(false);
                         abcExplorerDialogs.remove(openable);
-                    }
+                    }                    
                 }
             }
             for (Openable openable : openableList) {
@@ -1697,10 +1700,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         for (SWF swf : swfsToClose) {
             swf.clearTagSwfs();
+            saveBreakpoints(swf);
             ABCExplorerDialog abcExportDialog = abcExplorerDialogs.get(swf);
             if (abcExportDialog != null) {
                 abcExportDialog.setVisible(false);
                 abcExplorerDialogs.remove(swf);
+            }
+            BreakpointListDialog breakpointsListDialog = breakpointsListDialogs.get(swf);
+            if (breakpointsListDialog != null) {
+                breakpointsListDialog.setVisible(false);
+                breakpointsListDialogs.remove(swf);
             }
             if (!onExit) {
                 SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
@@ -1771,10 +1780,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (cc != null) {
                 cc.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
             }
+            
+            saveBreakpoints(swf);
 
             ABCExplorerDialog abcExportDialog = abcExplorerDialogs.get(swf);
             if (abcExportDialog != null) {
                 abcExportDialog.setVisible(false);
+            }
+            
+            BreakpointListDialog breakpointsListDialog = breakpointsListDialogs.get(swf);
+            if (breakpointsListDialog != null) {
+                breakpointsListDialog.setVisible(false);
+                breakpointsListDialogs.remove(swf);
             }
         }
 
@@ -2596,7 +2613,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         gotoScriptName(swf, scriptName);
     }
 
-    public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex) {
+    public void gotoScriptLine(SWF swf, String scriptName, int line, int classIndex, int traitIndex, int methodIndex, boolean pcode) {
         View.checkAccess();
 
         if (abcPanel != null && swf.isAS3()) {
@@ -2607,7 +2624,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     View.execInEventDispatchLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (Main.isDebugPCode()) {
+                            if (pcode) {
                                 if (classIndex != -1) {
                                     if (abcPanel.decompiledTextArea.getClassIndex() != classIndex) {
                                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
@@ -2638,7 +2655,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     View.execInEventDispatchLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (Main.isDebugPCode()) {
+                            if (pcode) {
                                 actionPanel.editor.gotoLine(line);
                             } else {
                                 actionPanel.decompiledEditor.gotoLine(line);
@@ -5613,10 +5630,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showCard(CARDEMPTYPANEL);
     }
 
-    public void reload(boolean forceReload) {
-        reload(forceReload, true);
+    private void saveBreakpoints(Openable openable) {
+        if (openable instanceof SWF) {
+            SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(openable.getShortPathTitle());                
+            SWF swf = (SWF) openable;
+            Map<String, Set<Integer>> breakpoints = Main.getDebugHandler().getAllBreakPoints(swf, false);
+            List<String> breakpointList = new ArrayList<>();
+            for (String scriptName : breakpoints.keySet()) {
+                for (int line : breakpoints.get(scriptName)) {
+                    breakpointList.add(scriptName + ":" + line);
+                }
+            }
+            swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_BREAKPOINTS, breakpointList);
+        }
     }
 
+    public void reload(boolean forceReload) {
+        reload(forceReload, true);
+    }   
+    
     public void reload(boolean forceReload, boolean scrollToVisible) {
         View.checkAccess();
 
@@ -5656,6 +5688,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(openable.getShortPathTitle());
                 swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
                 swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
+                saveBreakpoints(openable);
             }
         }
 
@@ -6497,6 +6530,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             dialog = new ABCExplorerDialog(mainFrame.getWindow(), this, openable, abc);
             abcExplorerDialogs.put(openable, dialog);
+            dialog.setVisible(true);
+        }
+        return dialog;
+    }
+    
+    public BreakpointListDialog showBreakpointlistDialog(SWF swf) {
+        BreakpointListDialog dialog = breakpointsListDialogs.get(swf);
+        if (dialog != null) {
+            dialog.refresh();
+            if (!dialog.isVisible()) {
+                dialog.setVisible(true);
+            } else {
+                dialog.toFront();
+            }
+        } else {
+            dialog = new BreakpointListDialog(mainFrame.getWindow(), swf);
+            breakpointsListDialogs.put(swf, dialog);
             dialog.setVisible(true);
         }
         return dialog;

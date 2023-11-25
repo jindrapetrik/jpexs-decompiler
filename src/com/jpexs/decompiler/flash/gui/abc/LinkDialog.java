@@ -118,15 +118,8 @@ public class LinkDialog extends JDialog {
         List<SWF> selectedSWFs = new ArrayList<>();
 
         if (conf != null) {
-            String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
-            if (!abcDependencies.isEmpty()) {
-                String[] parts = (abcDependencies + Configuration.ABC_DEPS_SEPARATOR).split(Pattern.quote(Configuration.ABC_DEPS_SEPARATOR));
-                List<String> preselectedNames = new ArrayList<>();
-                for (String part : parts) {
-                    if (!part.isEmpty()) {
-                        preselectedNames.add(part);
-                    }
-                }
+            List<String> preselectedNames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES);
+            if (!preselectedNames.isEmpty()) {
                 selectedSWFs = Main.namesToSwfs(preselectedNames);
             }
         }
@@ -142,8 +135,8 @@ public class LinkDialog extends JDialog {
     public void save(SWF swf, boolean force) {
         Map<String, SWF> map = getSelectedSwfs();
         SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
-        String oldValue = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
-        String newValue = String.join(Configuration.ABC_DEPS_SEPARATOR, map.keySet());
+        List<String> oldValue = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES);
+        List<String> newValue = new ArrayList<>(map.keySet());
         conf.setCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, newValue);
         List<SWF> swfs = new ArrayList<>(map.values());
         if (!Objects.equals(oldValue, newValue) || force) {
