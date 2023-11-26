@@ -57,6 +57,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Direct editation - types on instance variable values not properly resolved
 - AS1/2 Debugger - script was cleared on stop button
 - AS1/2 Vanishing source code in some cases
+- AS1/2 Debugger tooltips exception
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
