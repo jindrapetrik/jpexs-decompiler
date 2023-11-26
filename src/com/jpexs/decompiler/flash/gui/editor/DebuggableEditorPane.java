@@ -76,6 +76,8 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     protected String breakPointScriptName = null;
 
     private LineNumbersBreakpointsRuler ruler;
+    
+    private boolean showMarkers = true;
 
     public DebuggableEditorPane() {
 
@@ -120,6 +122,9 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         if (breakPointScriptName == null) {
             return;
         }
+        if (!showMarkers) {
+            return;
+        }
 
         Set<Integer> bkptLines = Main.getScriptBreakPoints(breakPointScriptName, false);
 
@@ -145,6 +150,14 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             }
         }
     }
+
+    public void setShowMarkers(boolean showMarkers) {
+        this.showMarkers = showMarkers;
+    }
+
+    public boolean isShowMarkers() {
+        return showMarkers;
+    }        
 
     @Override
     public void setText(String t) {

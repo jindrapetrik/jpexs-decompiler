@@ -516,6 +516,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         } else {
             decompiledText = SWF.getFromCache(asm);
         }
+        
+        HighlightedText fdecompiledText = decompiledText;
 
         setDecompiledEditMode(false);
         setEditMode(false);
@@ -533,20 +535,23 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                     ActionList innerActions = actions;
                     if (disassemblingNeeded) {
                         View.execInEventDispatch(() -> {
+                            editor.setShowMarkers(false);
                             setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; " + AppStrings.translate("work.disassembling") + "...", "text/flasm");
                             if (decompileNeeded) {
+                                decompiledEditor.setShowMarkers(false);
                                 setDecompiledText("-", "-", "// " + AppStrings.translate("work.waitingfordissasembly") + "...");
                             }
                         });
 
                         DisassemblyListener listener = getDisassemblyListener();
                         asm.addDisassemblyListener(listener);
-                        innerActions = asm.getActions();
+                        innerActions = asm.getActions();     
                         asm.removeDisassemblyListener(listener);
                     }
 
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
+                            decompiledEditor.setShowMarkers(false);                                
                             setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
                         });
 
@@ -554,6 +559,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         ActionList finalActions = innerActions;
                         View.execInEventDispatch(() -> {
                             setSourceCompleted(asm, htext, finalActions);
+                        });
+                    } else {
+                        ActionList finalActions = innerActions;
+                        View.execInEventDispatch(() -> {
+                            setSourceCompleted(asm, fdecompiledText, finalActions);
                         });
                     }
 
@@ -571,9 +581,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         try {
                             get();
                         } catch (CancellationException ex) {
+                            editor.setShowMarkers(false);
                             setEditorText("-", "-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, "Error", ex);
+                            decompiledEditor.setShowMarkers(false);
                             setDecompiledText("-", "-", "// " + AppStrings.translate("decompilationError") + ": " + ex);
                         }
                     });
@@ -583,6 +595,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             worker.execute();
             setSourceWorker = worker;
             if (!Main.isDebugging()) {
+                decompiledEditor.setShowMarkers(false);
                 Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
             }
         } else {
@@ -596,7 +609,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         if (decompiledText == null) {
             decompiledText = HighlightedText.EMPTY;
         }
-
+                
+        editor.setShowMarkers(true);
+        decompiledEditor.setShowMarkers(true);
         lastASM = asm;
         lastCode = actions;
         lastDecompiled = decompiledText;
