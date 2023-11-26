@@ -515,7 +515,7 @@ public class DefineEditTextTag extends TextTag {
                     public void characters(char[] ch, int start, int length) throws SAXException {
                         String txt = unescape(new String(ch, start, length));
                         TextStyle style = styles.peek();
-                        if (style.fontFace != null) {
+                        if (style.fontFace != null && useOutlines) {
                             style.font = swf.getFontByNameInTag(style.fontFace, style.bold, style.italic);
                             if (style.font == null) {
                                 style.fontFace = null;
@@ -1083,13 +1083,13 @@ public class DefineEditTextTag extends TextTag {
                 DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
                 ge.fontFace = lastStyle.fontFace;
                 if (ge.fontFace == null && font != null) {
-                    ge.fontFace = font.getFontName();
+                    ge.fontFace = font.getFontNameIntag();
                 }
 
                 ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
                 ge.character = c;
 
-                if (font != null) {
+                if (useOutlines && font != null) {
                     ge.glyphIndex = font.charToGlyph(c);
                 } else {
                     ge.glyphIndex = -1;
@@ -1100,7 +1100,7 @@ public class DefineEditTextTag extends TextTag {
                 ge.glyphAdvance = ge.glyphIndex == -1 ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, lastStyle.kerning ? nextChar : null))
                         : (int) Math.round(font.getGlyphAdvance(ge.glyphIndex) / font.getDivider() * lastStyle.fontHeight / 1024);
                 ge.glyphAdvance += lastStyle.letterSpacing * SWF.unitDivisor;
-                if (lastStyle.kerning && font != null && font.hasLayout()) {
+                if (useOutlines && lastStyle.kerning && font != null && font.hasLayout()) {
                     if (nextChar != null) {
                         ge.glyphAdvance += font.getCharKerningAdjustment(c, nextChar) / font.getDivider();
                     }
@@ -1116,18 +1116,63 @@ public class DefineEditTextTag extends TextTag {
         }
 
         textModel.calculateTextWidths();
+        
+        Set<Integer> noIndentLineIndices = new HashSet<>();
+        
         List<List<SameStyleTextRecord>> lines;
         if (multiline && wordWrap) {
             lines = new ArrayList<>();
             for (Paragraph paragraph : textModel.paragraphs) {
                 List<SameStyleTextRecord> line = new ArrayList<>();
                 int lineLength = 0;
-                for (Word word : paragraph.words) {
-                    if (lineLength + word.width <= bounds.getWidth()) {
+                for (Word word : paragraph.words) {       
+                    int indentVal = noIndentLineIndices.contains(lines.size()) ? 0 : indent;
+                    int maxLineWidth = bounds.getWidth() - leftMargin - indentVal;
+                    if (word.width > maxLineWidth) {
+                        List<SameStyleTextRecord> recs = new ArrayList<>();
+                        for (int i = 0; i < word.records.size(); i++) {
+                            SameStyleTextRecord rec = word.records.get(i);
+                            for (int g = 0; g < rec.glyphEntries.size(); g++) {
+                                GlyphCharacter gc = rec.glyphEntries.get(g);
+                                int ga = gc.glyphEntry.glyphAdvance;
+                                indentVal = noIndentLineIndices.contains(lines.size()) ? 0 : indent;
+                                maxLineWidth = bounds.getWidth() - leftMargin - indentVal;
+                                if (lineLength + ga > maxLineWidth) {                                    
+                                    recs.add(rec);
+                                    line.addAll(recs);
+                                    lines.add(line);                                
+                                    
+                                    recs = new ArrayList<>();
+                                    SameStyleTextRecord rec2 = new SameStyleTextRecord();
+                                    rec2.style = rec.style.clone();
+                                    rec2.glyphEntries = new ArrayList<>();
+                                    int glen = rec.glyphEntries.size();
+                                    for (int g2 = g; g2 < glen; g2++) {
+                                        rec2.glyphEntries.add(rec.glyphEntries.remove(g));
+                                    }
+                                    rec2.calculateTextWidths();                                    
+                                    rec.calculateTextWidths();
+                                    
+                                    rec = rec2;
+                                    g = 0;
+                                    
+                                    noIndentLineIndices.add(lines.size());                                
+                                    line = new ArrayList<>();                                                                
+                                    lineLength = 0;                                   
+                                }
+                                lineLength += ga;
+                            }                            
+                            recs.add(rec);
+                        }
+                        if (!recs.isEmpty()) {
+                            line.addAll(recs);                            
+                        }
+                    } else if (lineLength + word.width <= maxLineWidth) {
                         line.addAll(word.records);
                         lineLength += word.width;
-                    } else {
+                    } else {                        
                         lines.add(line);
+                        noIndentLineIndices.add(lines.size());
                         line = new ArrayList<>();
                         line.addAll(word.records);
                         lineLength = 0;
@@ -1172,40 +1217,6 @@ public class DefineEditTextTag extends TextTag {
 
         textModel.calculateTextWidths();
 
-        Set<Integer> noIndentLineIndices = new HashSet<>();
-        
-        for (int k = 0; k < lines.size(); k++) {
-            List<SameStyleTextRecord> line = lines.get(k);
-            int width = leftMargin;
-            if (!noIndentLineIndices.contains(k)) {
-                width += indent;
-            }
-            for (int i = 0; i < line.size(); i++) {
-                SameStyleTextRecord tr = line.get(i);
-                for (int g = 0; g < tr.glyphEntries.size(); g++) {
-                    GlyphCharacter gc = tr.glyphEntries.get(g);
-                    int advance = gc.glyphEntry.glyphAdvance;
-                    if (width + advance > bounds.getWidth()) {
-                        SameStyleTextRecord newTr = new SameStyleTextRecord();
-                        newTr.glyphEntries = new ArrayList<>();
-                        newTr.style = tr.style.clone();
-                        int gsize = tr.glyphEntries.size();
-                        for (int g2 = g; g2 < gsize; g2++) {
-                            newTr.glyphEntries.add(tr.glyphEntries.remove(g));
-                        }
-                        List<SameStyleTextRecord> newLine = new ArrayList<>();
-                        newLine.add(newTr);
-                        int lsize = line.size();
-                        for (int i2 = i + 1; i2 < lsize; i2++) {
-                            newLine.add(line.remove(i));
-                        }
-                        lines.add(k + 1, newLine);
-                        noIndentLineIndices.add(k + 1);
-                    }
-                    width += advance;
-                }
-            }
-        }
         List<TEXTRECORD> allTextRecords = new ArrayList<>();
         int lastHeight = 0;
         int yOffset = 0;
@@ -1219,9 +1230,9 @@ public class DefineEditTextTag extends TextTag {
             } else {
                 for (SameStyleTextRecord tr : line) {
                     width += tr.width;
-                    int lineHeight = (tr.style.font != null /*Font missing*/) && tr.style.font.hasLayout() ? (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading
+                    int lineHeight = (useOutlines && tr.style.font != null /*Font missing*/) && tr.style.font.hasLayout() ? (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading
                             : tr.style.fontHeight + tr.style.fontLeading;
-                    if (tr.style.font != null && !firstLine && tr.style.font.hasLayout()) {
+                    if (useOutlines && tr.style.font != null && !firstLine && tr.style.font.hasLayout()) {
                         lineHeight += (int) Math.round(tr.style.fontHeight * tr.style.font.getDescent() / tr.style.font.getDivider() / 1024.0);
                     }
                     //TODO: maybe get ascent/descent from system font when not haslayout
@@ -1268,14 +1279,14 @@ public class DefineEditTextTag extends TextTag {
                 if (fontClass != null) {
                     FontTag ft = swf.getFontByClass(fontClass);
                     if (ft != null) {
-                        fid = ft.getFontId();
+                        fid = ft.getFontId();                        
                     }
                 }
                 if (tr.style.font != null) {
                     fid = tr.style.font.getFontId();
-                }
-
-                tr2.styleFlagsHasFont = fid != 0;
+                }               
+                                
+                tr2.styleFlagsHasFont = fid != 0;                
                 tr2.fontId = fid;
                 tr2.textHeight = tr.style.fontHeight;
                 if (tr.style.textColor != null) {
