@@ -289,7 +289,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         lastIns = ins;
                     }
                     if (selIns != null) {
-                        if (selIns instanceof ActionPush) {
+                        if ((selIns instanceof ActionPush) && (inspos > 0)) {
                             ActionPush ap = (ActionPush) selIns;
                             Object var = ap.values.get(inspos - 1);
                             String identifier = null;
