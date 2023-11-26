@@ -611,7 +611,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
                 
         editor.setShowMarkers(true);
-        decompiledEditor.setShowMarkers(true);
+        decompiledEditor.setShowMarkers(Configuration.decompile.get());
         lastASM = asm;
         lastCode = actions;
         lastDecompiled = decompiledText;
