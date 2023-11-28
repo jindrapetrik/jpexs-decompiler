@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#2124] Copy tags to other SWFs and replace same classes / export names
 - Remembering breakpoints
 - [#2131] Breakpoint list dialog
+- ExportAssets tag - show first item as description in the tree when there is only single item
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode

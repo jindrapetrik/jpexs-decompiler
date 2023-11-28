@@ -154,4 +154,14 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.addAll(tags);
     }
+
+    @Override
+    public String toString() {
+        if (names.size() == 1) {
+            return super.toString() + " (" + tags.get(0) + ": " + names.get(0)+")";
+        }
+        return super.toString(); 
+    }
+    
+    
 }
