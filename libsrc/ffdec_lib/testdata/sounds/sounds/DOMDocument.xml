@@ -1,11 +1,15 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" frameRate="12" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMSoundItem name="203066__enjoypa__counting-from-1-to-20.mp3" itemID="63aa97da-00000200" sourceExternalFilepath="./LIBRARY/203066__enjoypa__counting-from-1-to-20.mp3" sourceLastImported="1672124292" externalFileSize="320619" href="203066__enjoypa__counting-from-1-to-20.mp3" soundDataHRef="M 4 1672124303.dat" format="44kHz 16bit Stereo" sampleCount="881280" exportFormat="1" exportBits="7" dataLength="319739" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="110160"/>
           <DOMSoundItem name="514508_gis-sweden_background-techno-loop131bpm_part.mp3" itemID="63aa96ed-000001f2" sourceExternalFilepath="Y:/sounds/sounds/LIBRARY/514508_gis-sweden_background-techno-loop131bpm_part.mp3" sourceLastImported="1672095296" externalFileSize="964275" href="514508_gis-sweden_background-techno-loop131bpm_part.mp3" soundDataHRef="M 3 1672066332.dat" format="44kHz 16bit Stereo" sampleCount="2626560" exportFormat="1" exportBits="7" dataLength="952947" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="328320"/>
+          <DOMSoundItem name="four.wav" itemID="656a2b47-0000021d" sourceExternalFilepath="./LIBRARY/four.wav" sourceLastImported="1701452860" externalFileSize="70740" href="four.wav" soundDataHRef="M 8 1701456682.dat" format="44kHz 16bit Stereo" sampleCount="17664"/>
+          <DOMSoundItem name="one.wav" itemID="656a2b47-0000021e" sourceExternalFilepath="./LIBRARY/one.wav" sourceLastImported="1701452812" externalFileSize="77908" href="one.wav" soundDataHRef="M 5 1701456672.dat" format="44kHz 16bit Stereo" sampleCount="19456"/>
           <DOMSoundItem name="POOL-Pool_Shot-709343898.wav" itemID="605a2676-00000203" sourceExternalFilepath="../../graphics/graphics/LIBRARY/POOL-Pool_Shot-709343898.wav" sourceLastImported="1515341955" externalFileSize="207370" href="POOL-Pool_Shot-709343898.wav" soundDataHRef="M 5 1616520759.dat" format="44kHz 16bit Stereo" sampleCount="51311"/>
+          <DOMSoundItem name="three.wav" itemID="656a2b47-0000021f" sourceExternalFilepath="./LIBRARY/three.wav" sourceLastImported="1701452842" externalFileSize="89684" href="three.wav" soundDataHRef="M 7 1701456679.dat" format="44kHz 16bit Stereo" sampleCount="22400"/>
+          <DOMSoundItem name="two.wav" itemID="656a2b47-00000220" sourceExternalFilepath="./LIBRARY/two.wav" sourceLastImported="1701452827" externalFileSize="77908" href="two.wav" soundDataHRef="M 6 1701456675.dat" format="44kHz 16bit Stereo" sampleCount="19456"/>
           <DOMSoundItem name="Yung Raf - Nothing To Lose.mp3" itemID="605a5e7d-00000258" sourceExternalFilepath="../../graphics/graphics/LIBRARY/Yung Raf - Nothing To Lose.mp3" sourceLastImported="1616534842" externalFileSize="2233572" href="Yung Raf - Nothing To Lose.mp3" soundDataHRef="M 6 1616534947.dat" format="44kHz 16bit Stereo" sampleCount="6156288" exportFormat="1" exportBits="7" dataLength="2233572" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="769536"/>
      </media>
      <symbols>
@@ -13,9 +17,10 @@
           <Include href="btnPrev.xml" itemIcon="0" loadImmediate="false" itemID="604e2299-000003f6" lastModified="1615733401"/>
           <Include href="Symbol 1.xml" loadImmediate="false" itemID="63a9b1e8-000001df" lastModified="1672066786"/>
           <Include href="Symbol 2.xml" loadImmediate="false" itemID="63aa96f3-000001f4" lastModified="1672124690"/>
+          <Include href="Symbol 3.xml" loadImmediate="false" itemID="656a2a12-00000207" lastModified="1701457078"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="12">
+          <DOMTimeline name="Scene 1" currentFrame="14">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -64,7 +69,13 @@
                                    </Actionscript>
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="13" keyMode="9728">
+                              <DOMFrame index="13" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="15" keyMode="9728">
                                    <Actionscript>
                                         <script><![CDATA[stopAllSounds();]]></script>
                                    </Actionscript>
@@ -74,7 +85,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="14" keyMode="9728">
+                              <DOMFrame index="0" duration="16" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -237,7 +248,7 @@
                               </DOMFrame>
                               <DOMFrame index="8" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -309,8 +320,36 @@
                                    </elements>
                               </DOMFrame>
                               <DOMFrame index="13" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="14" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>008 Stream multi</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Symbol 3" centerPoint3DX="229.95" centerPoint3DY="171.5">
+                                             <matrix>
+                                                  <Matrix tx="133.95" ty="103"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="96" y="68.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="15" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -332,6 +371,13 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="2349467" publishTime="1701459083"/>
+          <PublishItem publishSize="2274335" publishTime="1701458989"/>
+          <PublishItem publishSize="2349466" publishTime="1701457906"/>
+          <PublishItem publishSize="2274336" publishTime="1701457330"/>
+          <PublishItem publishSize="2349461" publishTime="1701457184"/>
+          <PublishItem publishSize="2349488" publishTime="1701457119" publishDebug="true"/>
+          <PublishItem publishSize="2312535" publishTime="1701456855" publishDebug="true"/>
           <PublishItem publishSize="2309636" publishTime="1672124722"/>
           <PublishItem publishSize="2309682" publishTime="1672124695" publishDebug="true"/>
           <PublishItem publishSize="2309682" publishTime="1672124676" publishDebug="true"/>
@@ -345,12 +391,5 @@
           <PublishItem publishSize="2309608" publishTime="1672124456"/>
           <PublishItem publishSize="2309671" publishTime="1672124395" publishDebug="true"/>
           <PublishItem publishSize="2275411" publishTime="1672069975"/>
-          <PublishItem publishSize="2275383" publishTime="1672066791"/>
-          <PublishItem publishSize="2275382" publishTime="1672066741"/>
-          <PublishItem publishSize="2279372" publishTime="1672066366"/>
-          <PublishItem publishSize="2237594" publishTime="1672065661"/>
-          <PublishItem publishSize="2279405" publishTime="1672065634"/>
-          <PublishItem publishSize="2237595" publishTime="1672065568"/>
-          <PublishItem publishSize="3657857" publishTime="1668349897"/>
      </publishHistory>
 </DOMDocument>
