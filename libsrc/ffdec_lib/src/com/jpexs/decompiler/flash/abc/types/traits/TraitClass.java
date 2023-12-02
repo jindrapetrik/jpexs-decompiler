@@ -64,7 +64,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     private boolean classInitializerIsEmpty;
 
-    private List<Integer> frameTraitNames = new ArrayList<>();
+    private List<String> frameTraitNames = new ArrayList<>();
 
     @Override
     public void delete(ABC abc, boolean d) {
@@ -338,14 +338,14 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                             if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
                                                 if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                     GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                    frameTraitNames.add(abc.constants.getMultinameId(lex.propertyName, false));
+                                                    frameTraitNames.add(lex.propertyName.getName(abc.constants, new ArrayList<>(), false, true));
                                                 } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                     GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                     if (getProp.object instanceof ThisAVM2Item) {
                                                         if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                             FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                             int multinameIndex = framePropName.multinameIndex;
-                                                            frameTraitNames.add(multinameIndex);
+                                                            frameTraitNames.add(abc.constants.getMultiname(multinameIndex).getName(abc.constants, new ArrayList<>(), false, true));
                                                         }
                                                     }
                                                 }
