@@ -61,6 +61,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Debugger tooltips exception
 - [#2131] UseOutline flag for DefineEditText
 - Wordrapping long words in DefineEditText
+- [#2133] Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3329,6 +3330,7 @@ Major version of SWF to XML export changed to 2.
 [#2025]: https://www.free-decompiler.com/flash/issues/2025
 [#2078]: https://www.free-decompiler.com/flash/issues/2078
 [#2053]: https://www.free-decompiler.com/flash/issues/2053
+[#2133]: https://www.free-decompiler.com/flash/issues/2133
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
