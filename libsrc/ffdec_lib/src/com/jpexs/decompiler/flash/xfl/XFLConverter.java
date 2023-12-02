@@ -2916,7 +2916,7 @@ public class XFLConverter {
                 callStack.add(constructorBody);
                 constructorBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
 
-                Map<Integer, Multiname> frameToTraitMultiname = new HashMap<>();
+                Map<Integer, String> frameToTraitName = new HashMap<>();
 
                 //find all addFrameScript(xx,this.method) in constructor
                 /*
@@ -2946,14 +2946,14 @@ public class XFLConverter {
                                             int frame = frameItem.intValue();
                                             if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
                                                 GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
-                                                frameToTraitMultiname.put(frame, lex.propertyName);
+                                                frameToTraitName.put(frame, lex.propertyName.getName(abc.constants, new ArrayList<>(), true, false));
                                             } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameToTraitMultiname.put(frame, abc.constants.getMultiname(multinameIndex));
+                                                        frameToTraitName.put(frame, abc.constants.getMultiname(multinameIndex).getName(abc.constants, new ArrayList<>(), true, false));
                                                     }
                                                 }
                                             }
@@ -2964,18 +2964,18 @@ public class XFLConverter {
                         }
                     }
                 }
-                Map<Multiname, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
+                Map<String, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
                 for (Trait trait : instanceInfo.instance_traits.traits) {
                     if (trait instanceof TraitMethodGetterSetter) {
                         Multiname m = abc.constants.getMultiname(trait.name_index);
-                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index), (TraitMethodGetterSetter) trait);
+                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index).getName(abc.constants, new ArrayList<>(), true, false), (TraitMethodGetterSetter) trait);
                     }
                 }
 
-                for (int frame : frameToTraitMultiname.keySet()) {
-                    Multiname multiName = frameToTraitMultiname.get(frame);
-                    if (multinameToMethodTrait.containsKey(multiName)) {
-                        TraitMethodGetterSetter methodTrait = multinameToMethodTrait.get(multiName);
+                for (int frame : frameToTraitName.keySet()) {
+                    String traitName = frameToTraitName.get(frame);
+                    if (multinameToMethodTrait.containsKey(traitName)) {
+                        TraitMethodGetterSetter methodTrait = multinameToMethodTrait.get(traitName);
                         int methodIndex = methodTrait.method_info;
                         MethodBody frameBody = abc.findBody(methodIndex);
 
