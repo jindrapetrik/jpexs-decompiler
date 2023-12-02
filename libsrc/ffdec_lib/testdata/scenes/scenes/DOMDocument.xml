@@ -4,9 +4,19 @@
           <Include href="Rect.xml" loadImmediate="false" itemID="640b7414-00000237" lastModified="1678472212"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="My first scene" currentFrame="9">
+          <DOMTimeline name="My first scene">
                <layers>
-                    <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Layer 3" color="#FF800A" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="20" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("scene 1 - frame 1");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 2" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="9" keyMode="9728">
                                    <elements/>
@@ -20,7 +30,7 @@
                          <frames>
                               <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="Rect" selected="true" centerPoint3DX="145.5" centerPoint3DY="169">
+                                        <DOMSymbolInstance libraryItemName="Rect" centerPoint3DX="145.5" centerPoint3DY="169">
                                              <matrix>
                                                   <Matrix tx="78" ty="109"/>
                                              </matrix>
@@ -46,9 +56,19 @@
                     </DOMLayer>
                </layers>
           </DOMTimeline>
-          <DOMTimeline name="My second scene" currentFrame="9">
+          <DOMTimeline name="My second scene" currentFrame="14">
                <layers>
-                    <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+                    <DOMLayer name="Layer 3" color="#FF800A" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="20" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("scene 2 - frame 1");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 2" color="#9933CC">
                          <frames>
                               <DOMFrame index="0" duration="9" keyMode="9728">
                                    <elements/>
@@ -62,7 +82,7 @@
                          <frames>
                               <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="Circle" selected="true" centerPoint3DX="141.75" centerPoint3DY="306.75">
+                                        <DOMSymbolInstance libraryItemName="Circle" centerPoint3DX="141.75" centerPoint3DY="306.75">
                                              <matrix>
                                                   <Matrix tx="74" ty="239"/>
                                              </matrix>
