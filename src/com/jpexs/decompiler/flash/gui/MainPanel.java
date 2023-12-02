@@ -192,6 +192,7 @@ import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -2038,7 +2039,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> sprites = new ArrayList<>();
             List<Tag> buttons = new ArrayList<>();
             List<Tag> movies = new ArrayList<>();
-            List<Tag> sounds = new ArrayList<>();
+            List<SoundTag> sounds = new ArrayList<>();
             List<Tag> texts = new ArrayList<>();
             List<TreeItem> as12scripts = new ArrayList<>();
             List<BinaryDataInterface> binaryData = new ArrayList<>();
@@ -2060,8 +2061,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         as12scripts.add(d);
                     }
                 }
+                
+                if (d instanceof SoundStreamHeadTypeTag) {
+                    continue;
+                }
 
-                if (d instanceof Tag || d instanceof ASMSource || d instanceof BinaryDataInterface) {
+                if (d instanceof Tag 
+                        || d instanceof ASMSource 
+                        || d instanceof BinaryDataInterface
+                        || d instanceof SoundStreamFrameRange) {
                     TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                     if (nodeType == TreeNodeType.IMAGE) {
                         images.add((Tag) d);
@@ -2090,7 +2098,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         movies.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.SOUND) {
-                        sounds.add((Tag) d);
+                        sounds.add((SoundTag) d);
                     }
                     if (nodeType == TreeNodeType.BINARY_DATA) {
                         binaryData.add((BinaryDataInterface) d);
@@ -2183,7 +2191,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (export.isOptionEnabled(SoundExportMode.class)) {
-                ret.addAll(new SoundExporter().exportSounds(handler, selFile2 + File.separator + SoundExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(sounds),
+                ret.addAll(new SoundExporter().exportSounds(handler, selFile2 + File.separator + SoundExportSettings.EXPORT_FOLDER_NAME, sounds,
                         new SoundExportSettings(export.getValue(SoundExportMode.class)), evl));
             }
 
@@ -5554,15 +5562,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
-            try {
-                SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
-                if (!Configuration.autoPlaySounds.get()) {
-                    soundThread.pause();
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((SoundTag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
+            if (!(treeItem instanceof SoundStreamHeadTypeTag)) {
+                try {
+                    SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
+                    if (!Configuration.autoPlaySounds.get()) {
+                        soundThread.pause();
+                    }
+                    previewPanel.setMedia(soundThread);
+                } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
-                previewPanel.setMedia(soundThread);
-            } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
-                logger.log(Level.SEVERE, null, ex);
             }
         } else if ((treeItem instanceof FontTag) && internalViewer) {
             previewPanel.showFontPanel((FontTag) treeItem);

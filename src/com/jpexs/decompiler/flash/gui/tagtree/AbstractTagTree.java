@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
@@ -89,6 +90,7 @@ import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
@@ -174,6 +176,11 @@ public abstract class AbstractTagTree extends JTree {
     }
 
     public static Icon getIconFor(TreeItem val, boolean folderExpanded) {
+        
+        if (val instanceof SoundStreamHeadTypeTag) {
+            return View.getIcon("foldersounds16");
+        }
+        
         TreeNodeType type = getTreeNodeType(val);
 
         if (type == TreeNodeType.FOLDER && folderExpanded) {
@@ -289,7 +296,8 @@ public abstract class AbstractTagTree extends JTree {
                 || (t instanceof SoundStreamHeadTag)
                 || (t instanceof SoundStreamHead2Tag)
                 || (t instanceof DefineExternalSound)
-                || (t instanceof DefineExternalStreamSound)) {
+                || (t instanceof DefineExternalStreamSound)
+                || (t instanceof SoundStreamFrameRange)) {
             return TreeNodeType.SOUND;
         }
 
@@ -595,7 +603,11 @@ public abstract class AbstractTagTree extends JTree {
                 }
             }
 
-            if (d instanceof Tag || d instanceof ASMSource || d instanceof BinaryDataInterface) {
+            if (d instanceof Tag 
+                    || d instanceof ASMSource 
+                    || d instanceof BinaryDataInterface
+                    || d instanceof SoundStreamFrameRange
+                ) {
                 TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                 if (nodeType == TreeNodeType.IMAGE) {
                     ret.add(d);

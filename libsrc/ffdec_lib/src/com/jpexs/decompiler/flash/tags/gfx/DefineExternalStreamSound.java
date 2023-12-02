@@ -255,4 +255,9 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", sampleCount);
     }
+    
+    @Override
+    public String getFlaExportName() {
+        return "sound" + getCharacterId();
+    }
 }

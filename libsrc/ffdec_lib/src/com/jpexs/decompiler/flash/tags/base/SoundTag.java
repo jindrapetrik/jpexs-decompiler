@@ -59,4 +59,10 @@ public interface SoundTag extends TreeItem {
     public void setSoundRate(int soundRate);
 
     public int getCharacterId();
+    
+    public boolean isReadOnly();
+    
+    public String getName();
+    
+    public String getFlaExportName();
 }

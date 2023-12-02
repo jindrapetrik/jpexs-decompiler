@@ -243,4 +243,9 @@ public class DefineExternalSound extends CharacterTag implements SoundTag {
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", sampleCount);
     }
+
+    @Override
+    public String getFlaExportName() {
+        return "sound" + getCharacterId();
+    }
 }

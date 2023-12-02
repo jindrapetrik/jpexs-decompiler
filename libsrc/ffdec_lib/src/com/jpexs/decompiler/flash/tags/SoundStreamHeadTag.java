@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -201,11 +202,10 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public List<SoundStreamBlockTag> getBlocks() {
+    public List<SoundStreamFrameRange> getRanges() {
         Timeline timeline = swf.getTimeline();
-        List<SoundStreamBlockTag> ret = timeline.getSoundStreamBlocks(this);
+        List<SoundStreamFrameRange> ret = timeline.getSoundStreamBlocks(this);
         return ret;
-
     }
 
     @Override
@@ -216,14 +216,16 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public List<ByteArrayRange> getRawSoundData() {
         List<ByteArrayRange> ret = new ArrayList<>();
-        List<SoundStreamBlockTag> blocks = getBlocks();
-        if (blocks != null) {
-            for (SoundStreamBlockTag block : blocks) {
-                ByteArrayRange data = block.streamSoundData;
-                if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-                    ret.add(data.getSubRange(4, data.getLength() - 4));
-                } else {
-                    ret.add(data);
+        List<SoundStreamFrameRange> frameRanges = getRanges();
+        if (frameRanges != null) {
+            for (SoundStreamFrameRange range : frameRanges) {
+                for (SoundStreamBlockTag block : range.blocks) {
+                    ByteArrayRange data = block.streamSoundData;
+                    if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+                        ret.add(data.getSubRange(4, data.getLength() - 4));
+                    } else {
+                        ret.add(data);
+                    }
                 }
             }
         }
@@ -232,7 +234,11 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
 
     @Override
     public long getTotalSoundSampleCount() {
-        return getBlocks().size() * streamSoundSampleCount;
+        int blockCount = 0;
+        for (SoundStreamFrameRange range : getRanges()) {
+            blockCount += range.blocks.size();
+        }
+        return blockCount * streamSoundSampleCount;
     }
 
     @Override
@@ -287,5 +293,10 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
+    }
+    
+    @Override
+    public String getFlaExportName() {
+        return "sound" + getCharacterId();
     }
 }

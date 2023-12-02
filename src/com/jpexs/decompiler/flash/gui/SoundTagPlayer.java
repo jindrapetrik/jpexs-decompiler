@@ -187,7 +187,7 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     private void openSound(SOUNDINFO soundInfo, SoundTag tag) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
-        SWF swf = ((Tag) tag).getSwf();
+        SWF swf = (SWF) tag.getOpenable();
         wavData = swf.getFromCache(soundInfo, tag);
         if (wavData == null) {
             List<ByteArrayRange> soundData = tag.getRawSoundData();

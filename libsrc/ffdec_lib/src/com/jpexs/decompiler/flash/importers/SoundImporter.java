@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundImportException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
@@ -329,7 +330,14 @@ public class SoundImporter {
 
         ByteArrayInputStream bais = uncompressedSoundData == null ? null : new ByteArrayInputStream(uncompressedSoundData);
 
-        List<SoundStreamBlockTag> existingBlocks = streamHead.getBlocks();
+        List<SoundStreamFrameRange> ranges = streamHead.getRanges();
+        
+        List<SoundStreamBlockTag> existingBlocks = new ArrayList<>();
+        for (SoundStreamFrameRange range : ranges) {
+            existingBlocks.addAll(range.blocks);
+        }
+        
+        
         int startFrame = 0;
         Timelined timelined = streamHead.getTimelined();
         if (!existingBlocks.isEmpty()) {

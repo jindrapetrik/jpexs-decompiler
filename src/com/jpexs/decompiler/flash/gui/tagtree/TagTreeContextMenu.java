@@ -1180,7 +1180,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             replaceMenuItem.setVisible(true);
         }
 
-        if (canReplace.test(it -> it instanceof SoundTag)) {
+        if (canReplace.test(it -> it instanceof SoundTag && ((SoundTag) it).importSupported())) {
             replaceMenuItem.setVisible(true);
         }
 

@@ -237,4 +237,9 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public void setSoundRate(int soundRate) {
         this.soundRate = soundRate;
     }
+    
+    @Override
+    public String getFlaExportName() {
+        return "sound" + getCharacterId();
+    }
 }
