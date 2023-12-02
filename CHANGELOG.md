@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#2131] Breakpoint list dialog
 - ExportAssets tag - show first item as description in the tree when there is only single item
 - [#2134] FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present
+- [#2132] Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -64,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - Wordrapping long words in DefineEditText
 - [#2133] Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it
 - [#2135] FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames
+- [#1194] FLA Export - stream sound export
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3324,6 +3326,7 @@ Major version of SWF to XML export changed to 2.
 [#2131]: https://www.free-decompiler.com/flash/issues/2131
 [#2124]: https://www.free-decompiler.com/flash/issues/2124
 [#2134]: https://www.free-decompiler.com/flash/issues/2134
+[#2132]: https://www.free-decompiler.com/flash/issues/2132
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
@@ -3335,6 +3338,7 @@ Major version of SWF to XML export changed to 2.
 [#2053]: https://www.free-decompiler.com/flash/issues/2053
 [#2133]: https://www.free-decompiler.com/flash/issues/2133
 [#2135]: https://www.free-decompiler.com/flash/issues/2135
+[#1194]: https://www.free-decompiler.com/flash/issues/1194
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
@@ -3765,7 +3769,6 @@ Major version of SWF to XML export changed to 2.
 [#1200]: https://www.free-decompiler.com/flash/issues/1200
 [#1198]: https://www.free-decompiler.com/flash/issues/1198
 [#1205]: https://www.free-decompiler.com/flash/issues/1205
-[#1194]: https://www.free-decompiler.com/flash/issues/1194
 [#1210]: https://www.free-decompiler.com/flash/issues/1210
 [#1217]: https://www.free-decompiler.com/flash/issues/1217
 [#1244]: https://www.free-decompiler.com/flash/issues/1244

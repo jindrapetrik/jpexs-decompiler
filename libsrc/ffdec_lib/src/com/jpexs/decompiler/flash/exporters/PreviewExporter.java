@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -261,7 +262,13 @@ public class PreviewExporter {
 
         List<SoundStreamBlockTag> soundFrames = new ArrayList<>();
         if (treeItem instanceof SoundStreamHeadTypeTag) {
-            soundFrames = ((SoundStreamHeadTypeTag) treeItem).getBlocks();
+            SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) treeItem;
+            for (SoundStreamFrameRange range : head.getRanges()) {
+                soundFrames.addAll(range.blocks);
+            }
+        }
+        if (treeItem instanceof SoundStreamFrameRange) {
+            soundFrames = ((SoundStreamFrameRange) treeItem).blocks;
             frameCount = soundFrames.size();
         }
 

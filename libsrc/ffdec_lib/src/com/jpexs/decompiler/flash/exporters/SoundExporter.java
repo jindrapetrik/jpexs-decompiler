@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
@@ -58,8 +59,17 @@ import java.util.Set;
  * @author JPEXS
  */
 public class SoundExporter {
-
     public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+        List<SoundTag> sounds = new ArrayList<>();
+        for (Tag t : tags) {
+            if (t instanceof SoundTag) {
+                sounds.add((SoundTag) t);
+            }
+        }
+        return exportSounds(handler, outdir, sounds, settings, evl);
+    }
+    
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<SoundTag> tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {    
         List<File> ret = new ArrayList<>();
         if (Thread.currentThread().isInterrupted()) {
             return ret;
@@ -72,75 +82,64 @@ public class SoundExporter {
         File foutdir = new File(outdir);
         Path.createDirectorySafe(foutdir);
 
-        int count = 0;
-        for (Tag t : tags) {
-            if (t instanceof SoundTag) {
-                count++;
-            }
-        }
-
-        if (count == 0) {
+        if (tags.isEmpty()) {
             return ret;
         }
 
         int currentIndex = 1;
-        for (Tag t : tags) {
-            if (t instanceof SoundTag) {
-                if (evl != null) {
-                    evl.handleExportingEvent("sound", currentIndex, count, t.getName());
-                }
-
-                final SoundTag st = (SoundTag) t;
-
-                String ext = ".wav";
-                SoundFormat fmt = st.getSoundFormat();
-                switch (fmt.getNativeExportFormat()) {
-                    case MP3:
-                        if (settings.mode.hasMP3()) {
-                            ext = ".mp3";
-                        }
-                        break;
-                    case FLV:
-                        if (settings.mode.hasFlv()) {
-                            ext = ".flv";
-                        }
-                        break;
-                }
-                if (settings.mode == SoundExportMode.FLV) {
-                    ext = ".flv";
-                }
-
-                final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + ext);
-                new RetryTask(() -> {
-                    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-                        exportSound(os, st, settings.mode);
-                    }
-                }, handler).run();
-
-                Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag) st).getClassNames() : new HashSet<>();
-                if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
-                    for (String className : classNames) {
-                        File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
-                        new RetryTask(() -> {
-                            Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        }, handler).run();
-                        ret.add(classFile);
-                    }
-                    file.delete();
-                } else {                
-                    ret.add(file);
-                }
-
-                if (Thread.currentThread().isInterrupted()) {
-                    break;
-                }
-
-                if (evl != null) {
-                    evl.handleExportedEvent("sound", currentIndex, count, t.getName());
-                }
-
-                currentIndex++;
+        for (SoundTag st : tags) {
+            if (evl != null) {
+                evl.handleExportingEvent("sound", currentIndex, tags.size(), st.getName());
             }
+
+            String ext = ".wav";
+            SoundFormat fmt = st.getSoundFormat();
+            switch (fmt.getNativeExportFormat()) {
+                case MP3:
+                    if (settings.mode.hasMP3()) {
+                        ext = ".mp3";
+                    }
+                    break;
+                case FLV:
+                    if (settings.mode.hasFlv()) {
+                        ext = ".flv";
+                    }
+                    break;
+            }
+            if (settings.mode == SoundExportMode.FLV) {
+                ext = ".flv";
+            }
+
+            final File file = new File(outdir + File.separator + Helper.makeFileName(st.getCharacterExportFileName()) + ext);
+            new RetryTask(() -> {
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+                    exportSound(os, st, settings.mode);
+                }
+            }, handler).run();
+
+            Set<String> classNames = (st instanceof CharacterTag) ? ((CharacterTag) st).getClassNames() : new HashSet<>();
+            if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
+                for (String className : classNames) {
+                    File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
+                    new RetryTask(() -> {
+                        Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }, handler).run();
+                    ret.add(classFile);
+                }
+                file.delete();
+            } else {                
+                ret.add(file);
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
+
+            if (evl != null) {
+                evl.handleExportedEvent("sound", currentIndex, tags.size(), st.getName());
+            }
+
+            currentIndex++;            
         }
         return ret;
     }
@@ -168,12 +167,22 @@ public class SoundExporter {
                 for (ByteArrayRange data : datas) {
                     flv.writeTag(new FLVTAG(0, new AUDIODATA(st.getSoundFormatId(), st.getSoundRate(), st.getSoundSize(), st.getSoundType(), data.getRangeData())));
                 }
-            } else if (st instanceof SoundStreamHeadTypeTag) {
-                SoundStreamHeadTypeTag sh = (SoundStreamHeadTypeTag) st;
+            } else if ((st instanceof SoundStreamFrameRange) || (st instanceof SoundStreamHeadTypeTag)) {
+                List<SoundStreamBlockTag> blocks;
+                if (st instanceof SoundStreamHeadTypeTag) {
+                    blocks = new ArrayList<>();
+                    SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
+                    for (SoundStreamFrameRange range : head.getRanges()) {
+                        blocks.addAll(range.blocks);
+                    }
+                } else {
+                    blocks = ((SoundStreamFrameRange) st).blocks;
+                }
+                
+                SoundStreamFrameRange sh = (SoundStreamFrameRange) st;
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
-                List<SoundStreamBlockTag> blocks = sh.getBlocks();
-
+                
                 int ms = (int) (1000.0 / ((Tag) st).getSwf().frameRate);
                 for (int b = 0; b < blocks.size(); b++) {
                     byte[] data = blocks.get(b).streamSoundData.getRangeData();

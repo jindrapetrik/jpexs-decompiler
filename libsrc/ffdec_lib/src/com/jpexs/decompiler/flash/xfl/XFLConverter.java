@@ -102,6 +102,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -1949,6 +1950,158 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
+    private void convertSoundMedia(SWF swf, ReadOnlyTagList tags, SoundTag symbol, XFLXmlWriter writer, HashMap<String, byte[]> files) throws XMLStreamException {
+        int soundFormat = 0;
+        int soundRate = 0;
+        boolean soundType = false;
+        boolean soundSize = false;
+        long soundSampleCount = 0;
+        byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
+        int[] rateMap = {5, 11, 22, 44};
+        String exportFormat = "flv";        
+        if (symbol instanceof SoundStreamFrameRange) {
+            SoundStreamHeadTypeTag head = ((SoundStreamFrameRange) symbol).getHead();
+            soundFormat = head.getSoundFormatId();
+            soundRate = head.getSoundRate();
+            soundType = head.getSoundType();
+            soundSize = head.getSoundSize();
+            soundSampleCount = head.getSoundSampleCount();            
+            boolean found = false;
+            for (Tag t : tags) {
+                if (found && (t instanceof SoundStreamBlockTag)) {
+                    SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
+                    soundData = bl.streamSoundData.getRangeData();
+                    break;
+                }
+                if (t == head) {
+                    found = true;
+                }
+            }
+        } else if (symbol instanceof DefineSoundTag) {
+            DefineSoundTag sound = (DefineSoundTag) symbol;
+            soundFormat = sound.soundFormat;
+            soundRate = sound.soundRate;
+            soundType = sound.soundType;
+            soundData = sound.soundData.getRangeData();
+            soundSize = sound.soundSize;
+            soundSampleCount = sound.soundSampleCount;
+        }
+        int format = 0;
+        int bits = 0;
+        if ((soundFormat == SoundFormat.FORMAT_ADPCM)
+                || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
+                || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
+            exportFormat = "wav";
+            if (soundType) { //stereo
+                format += 1;
+            }
+            switch (soundRate) {
+                case 0:
+                    format += 2;
+                    break;
+                case 1:
+                    format += 6;
+                    break;
+                case 2:
+                    format += 10;
+                    break;
+                case 3:
+                    format += 14;
+                    break;
+            }
+        }
+        if (soundFormat == SoundFormat.FORMAT_SPEEX) {
+            bits = 18;
+        }
+        if (soundFormat == SoundFormat.FORMAT_ADPCM) {
+            exportFormat = "wav";
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, soundData);
+                int adpcmCodeSize = (int) sis.readUB(2, "adpcmCodeSize");
+                bits = 2 + adpcmCodeSize;
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        if (soundFormat == SoundFormat.FORMAT_MP3) {
+            exportFormat = "mp3";
+            if (!soundType) { //mono
+                format += 1;
+            }
+            format += 4; //quality best
+            try {
+                SWFInputStream sis = new SWFInputStream(swf, soundData);
+                MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                if (!s.frames.isEmpty()) {
+                    MP3FRAME frame = s.frames.get(0);
+                    int bitRate = frame.getBitRate();
+
+                    switch (bitRate) {
+                        case 8:
+                            bits = 6;
+                            break;
+                        case 16:
+                            bits = 7;
+                            break;
+                        case 20:
+                            bits = 8;
+                            break;
+                        case 24:
+                            bits = 9;
+                            break;
+                        case 32:
+                            bits = 10;
+                            break;
+                        case 48:
+                            bits = 11;
+                            break;
+                        case 56:
+                            bits = 12;
+                            break;
+                        case 64:
+                            bits = 13;
+                            break;
+                        case 80:
+                            bits = 14;
+                            break;
+                        case 112:
+                            bits = 15;
+                            break;
+                        case 128:
+                            bits = 16;
+                            break;
+                        case 160:
+                            bits = 17;
+                            break;
+
+                    }
+                }
+            } catch (IOException | IndexOutOfBoundsException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        SoundTag st = (SoundTag) symbol;
+        SoundFormat fmt = st.getSoundFormat();
+        byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
+        try {
+            data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        String symbolFile = symbol.getFlaExportName() + "." + exportFormat;
+        files.put(symbolFile, data);
+        writer.writeStartElement("DOMSoundItem", new String[]{
+            "name", symbolFile,
+            "sourceLastImported", Long.toString(getTimestamp(swf)),
+            "externalFileSize", Integer.toString(data.length)});
+        writer.writeAttribute("href", symbolFile);
+        writer.writeAttribute("format", rateMap[soundRate] + "kHz" + " " + (soundSize ? "16bit" : "8bit") + " " + (soundType ? "Stereo" : "Mono"));
+        writer.writeAttribute("exportFormat", format);
+        writer.writeAttribute("exportBits", bits);
+        writer.writeAttribute("sampleCount", soundSampleCount);
+    }
+    
     private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer, StatusStack statusStack) throws XMLStreamException {
         boolean hasMedia = false;
         for (int ch : characters.keySet()) {
@@ -1967,7 +2120,8 @@ public class XFLConverter {
 
         int mediaCount = 0;
         writer.writeStartElement("media");
-
+        
+      
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
             if (symbol instanceof ImageTag) {
@@ -2060,157 +2214,9 @@ public class XFLConverter {
                 writer.writeEndElement();
                 mediaCount++;
                 statusStack.popStatus();
-            } else if (/*(symbol instanceof SoundStreamHeadTypeTag) || FIXME */(symbol instanceof DefineSoundTag)) {
+            } else if (symbol instanceof DefineSoundTag) {
                 statusStack.pushStatus(symbol.toString());
-                int soundFormat = 0;
-                int soundRate = 0;
-                boolean soundType = false;
-                boolean soundSize = false;
-                long soundSampleCount = 0;
-                byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
-                int[] rateMap = {5, 11, 22, 44};
-                String exportFormat = "flv";
-                if (false) { //FIXME symbol instanceof SoundStreamHeadTypeTag) {
-                    SoundStreamHeadTypeTag sstream = null; //(SoundStreamHeadTypeTag) symbol;
-                    soundFormat = sstream.getSoundFormatId();
-                    soundRate = sstream.getSoundRate();
-                    soundType = sstream.getSoundType();
-                    soundSize = sstream.getSoundSize();
-                    soundSampleCount = sstream.getSoundSampleCount();
-                    boolean found = false;
-                    for (Tag t : tags) {
-                        if (found && (t instanceof SoundStreamBlockTag)) {
-                            SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
-                            soundData = bl.streamSoundData.getRangeData();
-                            break;
-                        }
-                        if (t == symbol) {
-                            found = true;
-                        }
-                    }
-                } else if (symbol instanceof DefineSoundTag) {
-                    DefineSoundTag sound = (DefineSoundTag) symbol;
-                    soundFormat = sound.soundFormat;
-                    soundRate = sound.soundRate;
-                    soundType = sound.soundType;
-                    soundData = sound.soundData.getRangeData();
-                    soundSize = sound.soundSize;
-                    soundSampleCount = sound.soundSampleCount;
-                }
-                int format = 0;
-                int bits = 0;
-                if ((soundFormat == SoundFormat.FORMAT_ADPCM)
-                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
-                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
-                    exportFormat = "wav";
-                    if (soundType) { //stereo
-                        format += 1;
-                    }
-                    switch (soundRate) {
-                        case 0:
-                            format += 2;
-                            break;
-                        case 1:
-                            format += 6;
-                            break;
-                        case 2:
-                            format += 10;
-                            break;
-                        case 3:
-                            format += 14;
-                            break;
-                    }
-                }
-                if (soundFormat == SoundFormat.FORMAT_SPEEX) {
-                    bits = 18;
-                }
-                if (soundFormat == SoundFormat.FORMAT_ADPCM) {
-                    exportFormat = "wav";
-                    try {
-                        SWFInputStream sis = new SWFInputStream(swf, soundData);
-                        int adpcmCodeSize = (int) sis.readUB(2, "adpcmCodeSize");
-                        bits = 2 + adpcmCodeSize;
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
-                if (soundFormat == SoundFormat.FORMAT_MP3) {
-                    exportFormat = "mp3";
-                    if (!soundType) { //mono
-                        format += 1;
-                    }
-                    format += 4; //quality best
-                    try {
-                        SWFInputStream sis = new SWFInputStream(swf, soundData);
-                        MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
-                        if (!s.frames.isEmpty()) {
-                            MP3FRAME frame = s.frames.get(0);
-                            int bitRate = frame.getBitRate();
-
-                            switch (bitRate) {
-                                case 8:
-                                    bits = 6;
-                                    break;
-                                case 16:
-                                    bits = 7;
-                                    break;
-                                case 20:
-                                    bits = 8;
-                                    break;
-                                case 24:
-                                    bits = 9;
-                                    break;
-                                case 32:
-                                    bits = 10;
-                                    break;
-                                case 48:
-                                    bits = 11;
-                                    break;
-                                case 56:
-                                    bits = 12;
-                                    break;
-                                case 64:
-                                    bits = 13;
-                                    break;
-                                case 80:
-                                    bits = 14;
-                                    break;
-                                case 112:
-                                    bits = 15;
-                                    break;
-                                case 128:
-                                    bits = 16;
-                                    break;
-                                case 160:
-                                    bits = 17;
-                                    break;
-
-                            }
-                        }
-                    } catch (IOException | IndexOutOfBoundsException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
-                SoundTag st = (SoundTag) symbol;
-                SoundFormat fmt = st.getSoundFormat();
-                byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
-                try {
-                    data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-
-                String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
-                files.put(symbolFile, data);
-                writer.writeStartElement("DOMSoundItem", new String[]{
-                    "name", symbolFile,
-                    "sourceLastImported", Long.toString(getTimestamp(swf)),
-                    "externalFileSize", Integer.toString(data.length)});
-                writer.writeAttribute("href", symbolFile);
-                writer.writeAttribute("format", rateMap[soundRate] + "kHz" + " " + (soundSize ? "16bit" : "8bit") + " " + (soundType ? "Stereo" : "Mono"));
-                writer.writeAttribute("exportFormat", format);
-                writer.writeAttribute("exportBits", bits);
-                writer.writeAttribute("sampleCount", soundSampleCount);
+                convertSoundMedia(swf, tags, (DefineSoundTag) symbol, writer, files);
 
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
@@ -2314,6 +2320,35 @@ public class XFLConverter {
             }
         }
 
+        for (Tag t : tags) {
+            if (t instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
+                for (SoundStreamFrameRange range : head.getRanges()) {
+                    statusStack.pushStatus(range.toString());
+                    convertSoundMedia(swf, tags, range, writer, files);
+                    writer.writeEndElement();
+                    mediaCount++;
+                    statusStack.popStatus();
+                }                
+            }
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) t;
+                for (Tag st : sprite.getTags()) {
+                    if (st instanceof SoundStreamHeadTypeTag) {
+                        SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
+                        for (SoundStreamFrameRange range : head.getRanges()) {
+                            statusStack.pushStatus(range.toString());
+                            convertSoundMedia(swf, sprite.getTags(), range, writer, files);
+                            writer.writeEndElement();
+                            mediaCount++;
+                            statusStack.popStatus();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
         writer.writeEndElement();
     }
 
@@ -2420,7 +2455,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFrame(boolean shapeTween, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertFrame(Scene scene, boolean shapeTween, SoundStreamFrameRange soundStreamRange, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
             SWF swf = startSound.getSwf();
@@ -2438,13 +2473,14 @@ public class XFLConverter {
         } else {
             writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         }
-        if (soundStreamHead != null && startSound == null) {
-            String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase();
+        if (soundStreamRange != null && startSound == null) {
+            String soundName = soundStreamRange.getFlaExportName() + "." + soundStreamRange.getExportFormat().toString().toLowerCase();
             writer.writeAttribute("soundName", soundName);
             writer.writeAttribute("soundSync", "stream");
             writer.writeStartElement("SoundEnvelope");
             writer.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
             writer.writeEndElement();
+            
         }
         if (startSound != null && sound != null) {
             convertSoundUsage(writer, sound, startSound.soundInfo);
@@ -2497,7 +2533,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+    private static void convertFrames(Scene scene, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         boolean lastIn = true;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
@@ -2669,7 +2705,7 @@ public class XFLConverter {
                             SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);
                             convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter);
                             //duration--;
-                            convertFrame(true, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                            convertFrame(scene, true, null, null, frame - duration, duration, "", lastElements, files, writer2);
                             duration = 1;
                             lastElements = addLastWriter.toString();
                             lastCharacter = m;
@@ -2730,7 +2766,7 @@ public class XFLConverter {
                         frame++;
                         String elements = elementsWriter.toString();
                         if (!elements.equals(lastElements) && frame > 0) {
-                            convertFrame(false, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                            convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2);
                             duration = 1;
                         } else if (frame == 0) {
                             duration = 1;
@@ -2768,7 +2804,7 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty() || writer2.length() > 0) {
             frame++;
-            convertFrame(false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
+            convertFrame(scene, false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
         }
         afterStr = "</frames>" + afterStr;
 
@@ -3140,13 +3176,12 @@ public class XFLConverter {
         return hasLabel;
     }
 
-    private void convertSoundLayer(ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSoundLayer(Scene scene, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         int soundLayerIndex = 0;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         List<StartSoundTag> startSounds = new ArrayList<>();
         List<Integer> startSoundFrameNumbers = new ArrayList<>();
-        List<SoundStreamHeadTypeTag> soundStreamHeads = new ArrayList<>();
-        List<Integer> soundStreamHeadFrameNumbers = new ArrayList<>();
+        List<SoundStreamFrameRange> soundStreamRanges = new ArrayList<>();
         int frame = 0;
         for (Tag t : timeLineTags) {
             if (t instanceof StartSoundTag) {
@@ -3168,32 +3203,30 @@ public class XFLConverter {
                 }
             } else if (t instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag soundStreamHead = (SoundStreamHeadTypeTag) t;
-                if (!files.containsKey("sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase())) { //Sound was not exported
-                    soundStreamHead = null; // ignore
-                }
-
-                if (soundStreamHead != null) {
-                    soundStreamHeads.add(soundStreamHead);
-                    soundStreamHeadFrameNumbers.add(frame);
+                
+                for (SoundStreamFrameRange range : soundStreamHead.getRanges()) {
+                    if (files.containsKey(range.getFlaExportName() + "." + soundStreamHead.getExportFormat().toString().toLowerCase())) { //Sound was really exported              
+                        soundStreamRanges.add(range);
+                    }
                 }
             } else if (t instanceof ShowFrameTag) {
                 frame++;
             }
         }
 
-        for (int i = 0; i < soundStreamHeads.size(); i++) {
+        for (int i = 0; i < soundStreamRanges.size(); i++) {
             writer.writeStartElement("DOMLayer", new String[]{"name", "Sound Layer " + (soundLayerIndex++), "color", randomOutlineColor()});
             writer.writeStartElement("frames");
 
-            int startFrame = soundStreamHeadFrameNumbers.get(i);
+            int startFrame = soundStreamRanges.get(i).startFrame - scene.startFrame;
             int duration = frame - startFrame;
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(false, null, null, 0, startFrame, "", "", files, writer);
+                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer);
             }
 
-            convertFrame(false, soundStreamHeads.get(i), null, startFrame, duration, "", "", files, writer);
+            convertFrame(scene, false, soundStreamRanges.get(i), null, startFrame, duration, "", "", files, writer);
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -3208,10 +3241,10 @@ public class XFLConverter {
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(false, null, null, 0, startFrame, "", "", files, writer);
+                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer);
             }
 
-            convertFrame(false, null, startSounds.get(i), startFrame, duration, "", "", files, writer);
+            convertFrame(scene, false, null, startSounds.get(i), startFrame, duration, "", "", files, writer);
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -4076,7 +4109,7 @@ public class XFLConverter {
                             "color", randomOutlineColor(),
                             "layerType", "mask",
                             "locked", "true"});
-                        convertFrames(swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, tags, sceneTimelineTags, characters, po.getDepth(), flaVersion, files, writer, multiUsageMorphShapes, statusStack);
+                        convertFrames(scene, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, tags, sceneTimelineTags, characters, po.getDepth(), flaVersion, files, writer, multiUsageMorphShapes, statusStack);
                         writer.writeEndElement();
 
                         int parentIndex = index;
@@ -4165,7 +4198,7 @@ public class XFLConverter {
                         }
 
                         for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                            boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, tags, sceneTimelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
+                            boolean nonEmpty = writeLayer(scene, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, tags, sceneTimelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
                             for (int i = clipFrame; i <= lastFrame; i++) {
                                 depthToFramesList.get(nd).remove((Integer) i);
                             }
@@ -4179,7 +4212,7 @@ public class XFLConverter {
                     }
                 }
 
-                boolean nonEmpty = writeLayer(swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, sceneTimelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
+                boolean nonEmpty = writeLayer(scene, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, sceneTimelineTags, characters, flaVersion, files, multiUsageMorphShapes, statusStack);
                 if (nonEmpty) {
                     index++;
                 }
@@ -4190,7 +4223,7 @@ public class XFLConverter {
                 index++;
             }
 
-            convertSoundLayer(sceneTimelineTags, files, writer);
+            convertSoundLayer(scene, sceneTimelineTags, files, writer);
             writer.writeEndElement(); //layers
             writer.writeEndElement(); //DOMTimeline
         }
@@ -4218,7 +4251,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+    private boolean writeLayer(Scene scene, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
@@ -4237,7 +4270,7 @@ public class XFLConverter {
         layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
         String layerAfter = "</DOMLayer>";
         int prevLength = writer.length();
-        convertFrames(swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer, multiUsageMorphShapes, statusStack);
+        convertFrames(scene, swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer, multiUsageMorphShapes, statusStack);
         statusStack.popStatus();
         return writer.length() != prevLength;
     }

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.helpers.ByteArrayRange;
 import java.util.List;
 
@@ -37,6 +38,6 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
     public abstract long getSoundSampleCount();
 
-    public abstract List<SoundStreamBlockTag> getBlocks();
+    public abstract List<SoundStreamFrameRange> getRanges();
 
 }

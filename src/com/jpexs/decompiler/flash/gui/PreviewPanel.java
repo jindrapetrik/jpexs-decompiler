@@ -1529,6 +1529,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showImagePanel(SerializableImage image) {
         showCardLeft(DRAW_PREVIEW_CARD);
+        imageTransformButton.setVisible(false);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
         imagePanel.setImage(image);

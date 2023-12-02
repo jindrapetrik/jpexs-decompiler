@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
+import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -264,8 +265,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
         for (int i = sounds.size() - 1; i >= 0; i--) {
             TreeItem sound = sounds.get(i);
             if (sound instanceof SoundStreamHeadTypeTag) {
-                List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sound).getBlocks();
-                if (blocks == null || blocks.isEmpty()) {
+                List<SoundStreamFrameRange> ranges = ((SoundStreamHeadTypeTag) sound).getRanges();
+                if (ranges == null || ranges.isEmpty()) {
                     sounds.remove(i);
                 }
             }
@@ -580,6 +581,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof ABC) {
             ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
             return classesTreeModel.getAllChildren(classesTreeModel.getRoot());
+        } else if (parentNode instanceof SoundStreamHeadTypeTag) {
+            SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) parentNode;
+            return head.getRanges();
         }
 
         return result;
@@ -662,7 +666,10 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof ABC) {
             ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
             return classesTreeModel.getChild(classesTreeModel.getRoot(), index);
-        }
+        } else if (parentNode instanceof SoundStreamHeadTypeTag) {
+            SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) parentNode;
+            return head.getRanges().get(index);
+        } 
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
     }
@@ -713,6 +720,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof ABC) {
             ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
             return classesTreeModel.getChildCount(classesTreeModel.getRoot());
+        } else if (parentNode instanceof SoundStreamHeadTypeTag) {
+            SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) parentNode;
+            return head.getRanges().size();
         }
 
         return 0;
@@ -787,6 +797,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof ABC) {
             ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
             return indexOfAdd(baseIndex, classesTreeModel.getIndexOfChild(classesTreeModel.getRoot(), childNode));
+        } else if (parentNode instanceof SoundStreamHeadTypeTag) {
+            SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) parentNode;
+            return indexOfAdd(baseIndex, head.getRanges().indexOf(childNode));
         }
 
         return -1;

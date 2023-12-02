@@ -118,7 +118,7 @@ public class Timeline {
 
     private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
 
-    private final Map<Integer, List<SoundStreamBlockTag>> soundStramBlocks = new LinkedHashMap<>();
+    private final Map<Integer, List<SoundStreamFrameRange>> soundStreamRanges = new LinkedHashMap<>();
 
     private AS2Package as2RootPackage;
 
@@ -174,9 +174,9 @@ public class Timeline {
         return depthMaxFrame;
     }
 
-    public List<SoundStreamBlockTag> getSoundStreamBlocks(SoundStreamHeadTypeTag head) {
+    public List<SoundStreamFrameRange> getSoundStreamBlocks(SoundStreamHeadTypeTag head) {
         ensureInitialized();
-        return soundStramBlocks.get(head.getCharacterId());
+        return soundStreamRanges.get(head.getCharacterId());
     }
 
     public Tag getParentTag() {
@@ -194,7 +194,7 @@ public class Timeline {
         asmSources.clear();
         asmSourceContainers.clear();
         actionFrames.clear();
-        soundStramBlocks.clear();
+        soundStreamRanges.clear();
         otherTags.clear();
         this.id = id;
         this.swf = swf;
@@ -576,13 +576,23 @@ public class Timeline {
     }
 
     private void populateSoundStreamBlocks(int containerId, Iterable<Tag> tags) {
-        List<SoundStreamBlockTag> blocks = null;
+        List<SoundStreamFrameRange> ranges = null;
+        SoundStreamFrameRange range = null;
+        final int MIN_NUM_FRAMES_NO_SOUND = 2;
+        int numFramesNoSound = MIN_NUM_FRAMES_NO_SOUND;
+        boolean frameHasSound = false;
+        int frame = 0;
+        SoundStreamHeadTypeTag head = null;
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
-                SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
+                head = (SoundStreamHeadTypeTag) t;
                 head.setCharacterId(containerId);
-                blocks = new ArrayList<>();
-                soundStramBlocks.put(containerId, blocks);
+                ranges = new ArrayList<>();
+                range = new SoundStreamFrameRange(head);
+                range.startFrame = -1;
+                range.endFrame = -1;  
+                numFramesNoSound = MIN_NUM_FRAMES_NO_SOUND;
+                soundStreamRanges.put(containerId, ranges);
                 continue;
             }
             if (t instanceof DefineExternalStreamSound) {
@@ -595,14 +605,41 @@ public class Timeline {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getTags());
             }
+            
+            if (t instanceof ShowFrameTag) {
+                frame++;
+                if (frameHasSound) {                    
+                    numFramesNoSound = 0;
+                } else {
+                    numFramesNoSound++;                    
+                }
+                frameHasSound = false;
+            }
 
-            if (blocks == null) {
+            if (ranges == null) {
+                continue;
+            }
+            if (range == null) {
                 continue;
             }
 
-            if (t instanceof SoundStreamBlockTag) {
-                blocks.add((SoundStreamBlockTag) t);
-            }
+            if (t instanceof SoundStreamBlockTag) {                
+                if (numFramesNoSound >= MIN_NUM_FRAMES_NO_SOUND && range.endFrame > -1) {
+                    ranges.add(range);
+                    range = new SoundStreamFrameRange(head);
+                    range.startFrame = -1;
+                    range.endFrame = -1;  
+                }               
+                range.blocks.add((SoundStreamBlockTag) t);
+                if (range.startFrame == -1) {
+                    range.startFrame = frame;
+                }
+                range.endFrame = frame;
+                frameHasSound = true;
+            }            
+        }
+        if (range != null && ranges != null && range.endFrame > -1) {
+            ranges.add(range);
         }
     }
 
