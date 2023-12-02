@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Remembering breakpoints
 - [#2131] Breakpoint list dialog
 - ExportAssets tag - show first item as description in the tree when there is only single item
+- [#2134] FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -3322,6 +3323,7 @@ Major version of SWF to XML export changed to 2.
 [#2129]: https://www.free-decompiler.com/flash/issues/2129
 [#2131]: https://www.free-decompiler.com/flash/issues/2131
 [#2124]: https://www.free-decompiler.com/flash/issues/2124
+[#2134]: https://www.free-decompiler.com/flash/issues/2134
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
