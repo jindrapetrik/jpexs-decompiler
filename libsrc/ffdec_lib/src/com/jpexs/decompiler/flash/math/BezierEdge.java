@@ -17,10 +17,6 @@
 package com.jpexs.decompiler.flash.math;
 
 import com.jpexs.helpers.Reference;
-import java.awt.Shape;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
@@ -38,36 +34,43 @@ import java.util.Stack;
  */
 public class BezierEdge implements Serializable {
 
-    public List<Point2D> points = new ArrayList<>();
+    public List<Point2D> points = new ArrayList<>(3);
+    
+    private List<Point2D> revPoints = new ArrayList<>();
+    
+    private int hash;
+    
+    private int revHash;
+    
+    private Rectangle2D bbox;
 
+    private boolean empty;
+    
     public BezierEdge(List<Point2D> points) {
         this.points = points;
+        calcParams();
     }
-
+        
     @Override
     public BezierEdge clone() {
         return new BezierEdge(new ArrayList<>(points));
     }
 
     public boolean isEmpty() {
-        Point2D p1 = getBeginPoint();
-        for (int i = 1; i < points.size(); i++) {
-            if (!points.get(i).equals(p1)) {
-                return false;
-            }
-        }
-        return true;
+        return empty;
     }
 
     public BezierEdge(double x0, double y0, double x1, double y1) {
         points.add(new Point2D.Double(x0, y0));
         points.add(new Point2D.Double(x1, y1));
+        calcParams();
     }
 
     public BezierEdge(double x0, double y0, double cx, double cy, double x1, double y1) {
         points.add(new Point2D.Double(x0, y0));
         points.add(new Point2D.Double(cx, cy));
         points.add(new Point2D.Double(x1, y1));
+        calcParams();
     }
 
     public Point2D getBeginPoint() {
@@ -80,10 +83,12 @@ public class BezierEdge implements Serializable {
 
     public void setBeginPoint(Point2D p) {
         points.set(0, p);
+        calcParams();
     }
 
     public void setEndPoint(Point2D p) {
         points.set(points.size() - 1, p);
+        calcParams();
     }
 
     public Point2D pointAt(double t) {
@@ -102,14 +107,12 @@ public class BezierEdge implements Serializable {
         return new Point2D.Double(x, y);
     }
 
-    public Rectangle2D bbox() {
+    private void calcParams() {
         double minX = Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
-        //System.err.println("calculating bbox");
         for (Point2D p : points) {
-            //System.err.println(" point " + p);
             if (p.getX() < minX) {
                 minX = p.getX();
             }
@@ -124,11 +127,29 @@ public class BezierEdge implements Serializable {
             }
         }
 
-        Rectangle2D b = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
-        /*System.err.println(" bbox = "+b);
-        System.err.println(" maxx = "+maxX);
-        System.err.println(" maxy = "+maxY);*/
-        return b;
+                        
+        this.bbox = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);       
+        this.hash = points.hashCode();
+        
+        revPoints = new ArrayList<>();
+        for (int i = points.size() - 1; i >= 0; i--) {
+            revPoints.add(points.get(i));
+        }
+        this.revHash = revPoints.hashCode();
+        
+        
+        empty = true;
+        Point2D p1 = getBeginPoint();
+        for (int i = 1; i < points.size(); i++) {
+            if (!points.get(i).equals(p1)) {
+                empty = false;
+                break;
+            }
+        }
+    }
+    
+    public Rectangle2D bbox() {
+        return bbox;
     }
 
     private final double MIN_SIZE = 0.5;
@@ -166,6 +187,9 @@ public class BezierEdge implements Serializable {
     }
 
     public List<Point2D> getIntersections(BezierEdge b2) {
+        if (!Intersections.rectIntersection(bbox, b2.bbox)) {
+            return new ArrayList<>();
+        }
         if (points.size() == 2) {
             if (b2.points.size() == 2) {
                 return Intersections.intersectLineLine(points.get(0), points.get(1), b2.points.get(0), b2.points.get(1), true);
@@ -374,11 +398,7 @@ public class BezierEdge implements Serializable {
         right.setVal(new BezierEdge(rightPoints));
     }
 
-    public BezierEdge reverse() {
-        List<Point2D> revPoints = new ArrayList<>();
-        for (int i = points.size() - 1; i >= 0; i--) {
-            revPoints.add(points.get(i));
-        }
+    public BezierEdge reverse() {        
         return new BezierEdge(revPoints);
     }
 
@@ -389,6 +409,7 @@ public class BezierEdge implements Serializable {
                     Math.round(this.points.get(i).getY())
             ));
         }
+        calcParams();
     }
 
     public void roundHalf() {
@@ -398,17 +419,18 @@ public class BezierEdge implements Serializable {
                     Math.round(this.points.get(i).getY() * 2.0) / 2.0
             ));
         }
+        calcParams();
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 41 * hash + Objects.hashCode(this.points);
+        hash = 41 * hash + this.hash;
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj) {        
         if (this == obj) {
             return true;
         }
@@ -419,7 +441,25 @@ public class BezierEdge implements Serializable {
             return false;
         }
         final BezierEdge other = (BezierEdge) obj;
+        if (other.hash != hash) {
+            return false;
+        }
         return Objects.equals(this.points, other.points);
+    }
+    
+    public boolean equalsReverse(BezierEdge other) {
+        if (hash != other.revHash) {
+            return false;
+        }
+        if (other.points.size() != points.size()) {
+            return false;
+        }
+        for (int i = 0; i < points.size(); i++) {
+            if (!points.get(i).equals(other.points.get(points.size() - 1 - i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {

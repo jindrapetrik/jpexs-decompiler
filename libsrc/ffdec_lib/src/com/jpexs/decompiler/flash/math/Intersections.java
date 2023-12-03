@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.math;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -165,7 +166,48 @@ public class Intersections {
         return intersectPolylinePolyline(a, b);
     }
 
-    public static List<Point2D> intersectBezier2Bezier2(Point2D a1, Point2D a2, Point2D a3, Point2D b1, Point2D b2, Point2D b3) {
+    
+    public static boolean rectIntersection(Rectangle2D r1, Rectangle2D r2) {
+        double xmin = Math.max(r1.getX(), r2.getX());
+        double xmax1 = r1.getX() + r1.getWidth();
+        double xmax2 = r2.getX() + r2.getWidth();
+        double xmax = Math.min(xmax1, xmax2);
+        if (Double.compare(xmax, xmin) >= 0) {
+            double ymin = Math.max(r1.getY(), r2.getY());
+            double ymax1 = r1.getY() + r1.getHeight();
+            double ymax2 = r2.getY() + r2.getHeight();
+            double ymax = Math.min(ymax1, ymax2);
+            if (Double.compare(ymax, ymin) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static Rectangle2D getBBox(Point2D ...points) {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        for (Point2D p : points) {
+            if (p.getX() < minX) {
+                minX = p.getX();
+            }
+            if (p.getX() > maxX) {
+                maxX = p.getX();
+            }
+            if (p.getY() < minY) {
+                minY = p.getY();
+            }
+            if (p.getY() > maxY) {
+                maxY = p.getY();
+            }
+        }
+
+        return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
+    }
+    
+    public static List<Point2D> intersectBezier2Bezier2(Point2D a1, Point2D a2, Point2D a3, Point2D b1, Point2D b2, Point2D b3) {      
         Point2D pa;
         Point2D pb;
         List<Point2D> result = new ArrayList<>();

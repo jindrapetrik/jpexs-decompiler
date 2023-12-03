@@ -3402,6 +3402,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             path += compressed ? ".fla" : ".xfl";
             final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(selectedFilter) : xflFilters.indexOf(selectedFilter));
             final File selfile = new File(path);           
+            long timeBefore = System.currentTimeMillis();
             new CancellableWorker() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -3442,15 +3443,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                    });
+                    
                     if (Configuration.openFolderAfterFlaExport.get()) {
                         try {
                             Desktop.getDesktop().open(selfile.getAbsoluteFile().getParentFile());
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
-                    }
-
-                    Main.stopWork();
+                    }                 
                 }
             }.execute();
         }
