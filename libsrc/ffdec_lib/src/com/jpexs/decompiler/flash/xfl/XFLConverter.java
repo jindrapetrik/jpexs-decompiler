@@ -1846,13 +1846,21 @@ public class XFLConverter {
                                         int characterId = character.getCharacterId();
                                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
                                             ShapeTag shape = (ShapeTag) character;
+                                            statusStack.pushStatus(character.toString());
                                             convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
-                                        } else if (character instanceof TextTag) {
+                                            statusStack.popStatus();
+                                        } else if (character instanceof TextTag) {                                            
+                                            statusStack.pushStatus(character.toString());                                            
                                             convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
+                                            statusStack.popStatus();
                                         } else if (character instanceof DefineVideoStreamTag) {
+                                            statusStack.pushStatus(character.toString());                                            
                                             convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
+                                            statusStack.popStatus();
                                         } else if (character instanceof ImageTag) {
+                                            statusStack.pushStatus(character.toString());                                            
                                             convertImageInstance(null, matrix, (ImageTag) character, null, recCharWriter);
+                                            statusStack.popStatus();
                                         } else {
                                             convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
                                         }
@@ -2718,9 +2726,16 @@ public class XFLConverter {
                                 convertSymbolInstance(instanceName, standaloneShapeTweenerMatrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, standaloneShapeTweener, characters, tags, flaVersion, elementsWriter);
                                 standaloneShapeTweener = null;
                             } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) { // || shapeTweener != null)) {
-                                ShapeTag shape = (ShapeTag) character;
-                                convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
-
+                                if (lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
+                                    elementsWriter.writeCharactersRaw(lastElements);
+                                } else {
+                                    ShapeTag shape = (ShapeTag) character;
+                                    statusStack.pushStatus(character.toString());                                            
+                                    convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
+                                    statusStack.popStatus();
+                                }
+                                lastCharacter = character;
+                                lastMatrix = matrix;
                                 shapeTween = false;
                                 shapeTweener = null;
                             } else if (character != null) {

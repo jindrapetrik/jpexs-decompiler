@@ -186,9 +186,24 @@ public class ShapeFixer {
         //------------------- detecting overlapping edges --------------------
         List<BezierPair> splittedPairs = new ArrayList<>();
 
+        //long t1 = System.currentTimeMillis();
+        //int oldpct = 0;
         loopi1:
         for (int i1 = 0; i1 < shapes.size(); i1++) {
             layer = layers.get(i1);
+            /*if (i1 % 10 == 0) {
+                int pct = i1 * 100 / shapes.size();
+                if (oldpct != pct) {
+                    //System.err.println("pct: " + pct + "%");
+                    if (pct == 10) {
+                        long t2 = System.currentTimeMillis();
+                        long dt = t2 - t1;
+                        System.err.println("Time per 10%: " + Helper.formatTimeSec(dt));
+                    }
+                }
+                oldpct = pct;
+            }*/
+            
             loopj1:
             for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
                 BezierEdge be1 = shapes.get(i1).get(j1);
@@ -222,7 +237,7 @@ public class ShapeFixer {
                         }
 
                         //duplicated edge
-                        if (be1.equals(be2) || be1.equals(be2.reverse())) {
+                        if (be1.equals(be2) || be1.equalsReverse(be2)) {
                             shapes.get(i2).remove(j2);
                             if (i1 == i2 && j1 > j2) {
                                 j1--;
@@ -248,128 +263,136 @@ public class ShapeFixer {
                         }
 
                         boolean isint = be1.intersects(be2, t1Ref, t2Ref, intPoints);
-                        if (DEBUG_PRINT) {
-                            //System.err.println(" " + isint);
+                        if (!isint) {
+                            continue;
                         }
 
-                        if (!t1Ref.isEmpty()) {
+                        if (t1Ref.isEmpty()) {
+                            continue;
+                        }
 
-                            if ((be1.getBeginPoint().equals(be2.getBeginPoint())
-                                    || be1.getBeginPoint().equals(be2.getEndPoint())
-                                    || be1.getEndPoint().equals(be2.getBeginPoint())
-                                    || be1.getEndPoint().equals(be2.getEndPoint())) && (t1Ref.size() == 1)) {
+                        if ((be1.getBeginPoint().equals(be2.getBeginPoint())
+                                || be1.getBeginPoint().equals(be2.getEndPoint())
+                                || be1.getEndPoint().equals(be2.getBeginPoint())
+                                || be1.getEndPoint().equals(be2.getEndPoint())) && (t1Ref.size() == 1)) {
+                            continue;
+                        }
+                        
+                        if (t1Ref.size() == 2) {
+                            if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
+                                && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
                                 continue;
+                            } 
+                        }
+
+                        if (DEBUG_PRINT) {
+                            System.err.println("intersects " + be1.toSvg() + "   " + be2.toSvg());
+                            System.err.println(" fillstyle0: " + fillStyles0.get(i1) + " , " + fillStyles0.get(i2));
+                            System.err.println(" fillstyle1: " + fillStyles1.get(i1) + " , " + fillStyles1.get(i2));
+                            System.err.println(" linestyle: " + lineStyles.get(i1) + " , " + lineStyles.get(i2));
+
+                            for (int n = 0; n < t1Ref.size(); n++) {
+                                System.err.println("- " + t1Ref.get(n) + " , " + t2Ref.get(n) + " : " + intPoints.get(n));
                             }
+                        }
 
-                            if (DEBUG_PRINT) {
-                                System.err.println("intersects " + be1.toSvg() + "   " + be2.toSvg());
-                                System.err.println(" fillstyle0: " + fillStyles0.get(i1) + " , " + fillStyles0.get(i2));
-                                System.err.println(" fillstyle1: " + fillStyles1.get(i1) + " , " + fillStyles1.get(i2));
-                                System.err.println(" linestyle: " + lineStyles.get(i1) + " , " + lineStyles.get(i2));
+                        if ((t1Ref.size() == 2) && !((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
+                                && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1))) {
+                            t1Ref.add(0, t1Ref.remove(1));
+                            t2Ref.add(0, t2Ref.remove(1));
+                            intPoints.add(0, intPoints.remove(1));
+                        }
 
-                                for (int n = 0; n < t1Ref.size(); n++) {
-                                    System.err.println("- " + t1Ref.get(n) + " , " + t2Ref.get(n) + " : " + intPoints.get(n));
-                                }
-                            }
+                        int splitPointIndex = 0;
+                        if (intPoints.size() > 1) {
+                            splitPointIndex = 1;
+                        }
 
-                            if ((t1Ref.size() == 2) && !((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
-                                    && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1))) {
-                                t1Ref.add(0, t1Ref.remove(1));
-                                t2Ref.add(0, t2Ref.remove(1));
-                                intPoints.add(0, intPoints.remove(1));
-                            }
+                        splittedPairs.add(pair);
 
-                            int splitPointIndex = 0;
-                            if (intPoints.size() > 1) {
-                                splitPointIndex = 1;
-                            }
+                        Reference<BezierEdge> be1LRef = new Reference<>(null);
+                        Reference<BezierEdge> be1RRef = new Reference<>(null);
+                        be1.split(t1Ref.get(splitPointIndex), be1LRef, be1RRef);
+                        Reference<BezierEdge> be2LRef = new Reference<>(null);
+                        Reference<BezierEdge> be2RRef = new Reference<>(null);
+                        be2.split(t2Ref.get(splitPointIndex), be2LRef, be2RRef);
 
-                            splittedPairs.add(pair);
+                        BezierEdge be1L = be1LRef.getVal();
+                        BezierEdge be1R = be1RRef.getVal();
+                        BezierEdge be2L = be2LRef.getVal();
+                        BezierEdge be2R = be2RRef.getVal();
 
-                            Reference<BezierEdge> be1LRef = new Reference<>(null);
-                            Reference<BezierEdge> be1RRef = new Reference<>(null);
-                            be1.split(t1Ref.get(splitPointIndex), be1LRef, be1RRef);
-                            Reference<BezierEdge> be2LRef = new Reference<>(null);
-                            Reference<BezierEdge> be2RRef = new Reference<>(null);
-                            be2.split(t2Ref.get(splitPointIndex), be2LRef, be2RRef);
+                        Point2D intP = intPoints.get(splitPointIndex);
 
-                            BezierEdge be1L = be1LRef.getVal();
-                            BezierEdge be1R = be1RRef.getVal();
-                            BezierEdge be2L = be2LRef.getVal();
-                            BezierEdge be2R = be2RRef.getVal();
+                        be1L.setEndPoint(intP);
+                        be1R.setBeginPoint(intP);
+                        be2L.setEndPoint(intP);
+                        be2R.setBeginPoint(intP);
 
-                            Point2D intP = intPoints.get(splitPointIndex);
-
-                            be1L.setEndPoint(intP);
-                            be1R.setBeginPoint(intP);
-                            be2L.setEndPoint(intP);
-                            be2R.setBeginPoint(intP);
-
-                            be1L.roundHalf();
-                            be1R.roundHalf();
-                            be2L.roundHalf();
-                            be2R.roundHalf();
-                            if (i1 == i2) {
-                                if (j1 < j2) {
-                                    shapes.get(i1).remove(j2);
-                                    shapes.get(i2).remove(j1);
-                                    j2--;
-                                } else {
-                                    shapes.get(i1).remove(j1);
-                                    shapes.get(i2).remove(j2);
-                                    j1--;
-                                }
+                        be1L.roundHalf();
+                        be1R.roundHalf();
+                        be2L.roundHalf();
+                        be2R.roundHalf();
+                        if (i1 == i2) {
+                            if (j1 < j2) {
+                                shapes.get(i1).remove(j2);
+                                shapes.get(i2).remove(j1);
+                                j2--;
                             } else {
                                 shapes.get(i1).remove(j1);
                                 shapes.get(i2).remove(j2);
+                                j1--;
                             }
-                            int n1 = j1;
-                            int n2 = j2;
-
-                            if (!be1L.isEmpty()) {
-                                shapes.get(i1).add(n1, be1L);
-                                if (DEBUG_PRINT) {
-                                    System.err.println("added " + be1L.toSvg() + " to j1=" + n1);
-                                }
-                                if (i1 == i2 && n2 >= n1) {
-                                    n2++;
-                                }
-                                n1++;
-
-                            }
-
-                            if (!be1R.isEmpty()) {
-                                shapes.get(i1).add(n1, be1R);
-                                if (DEBUG_PRINT) {
-                                    System.err.println("added " + be1R.toSvg() + " to j1=" + n1);
-                                }
-                                if (i1 == i2 && n2 >= n1) {
-                                    n2++;
-                                }
-                                n1++;
-
-                            }
-
-                            if (!be2L.isEmpty()) {
-                                shapes.get(i2).add(n2, be2L);
-                                if (DEBUG_PRINT) {
-                                    System.err.println("added " + be2L.toSvg() + " to j2=" + n2);
-                                }
-                                n2++;
-
-                            }
-
-                            if (!be2R.isEmpty()) {
-                                shapes.get(i2).add(n2, be2R);
-                                if (DEBUG_PRINT) {
-                                    System.err.println("added " + be2R.toSvg() + " to j2=" + n2);
-                                }
-                                n2++;
-                            }
-
-                            j1--;
-                            continue loopj1;
+                        } else {
+                            shapes.get(i1).remove(j1);
+                            shapes.get(i2).remove(j2);
                         }
+                        int n1 = j1;
+                        int n2 = j2;
+
+                        if (!be1L.isEmpty()) {
+                            shapes.get(i1).add(n1, be1L);
+                            if (DEBUG_PRINT) {
+                                System.err.println("added " + be1L.toSvg() + " to j1=" + n1);
+                            }
+                            if (i1 == i2 && n2 >= n1) {
+                                n2++;
+                            }
+                            n1++;
+
+                        }
+
+                        if (!be1R.isEmpty()) {
+                            shapes.get(i1).add(n1, be1R);
+                            if (DEBUG_PRINT) {
+                                System.err.println("added " + be1R.toSvg() + " to j1=" + n1);
+                            }
+                            if (i1 == i2 && n2 >= n1) {
+                                n2++;
+                            }
+                            n1++;
+
+                        }
+
+                        if (!be2L.isEmpty()) {
+                            shapes.get(i2).add(n2, be2L);
+                            if (DEBUG_PRINT) {
+                                System.err.println("added " + be2L.toSvg() + " to j2=" + n2);
+                            }
+                            n2++;
+
+                        }
+
+                        if (!be2R.isEmpty()) {
+                            shapes.get(i2).add(n2, be2R);
+                            if (DEBUG_PRINT) {
+                                System.err.println("added " + be2R.toSvg() + " to j2=" + n2);
+                            }
+                            n2++;
+                        }
+
+                        j1--;
+                        continue loopj1;                        
                     }
                 }
             }

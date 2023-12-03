@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - ExportAssets tag - show first item as description in the tree when there is only single item
 - [#2134] FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present
 - [#2132] Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges
+- FLA export - show export time
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
@@ -66,6 +67,7 @@ All notable changes to this project will be documented in this file.
 - [#2133] Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it
 - [#2135] FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames
 - [#1194] FLA Export - stream sound export
+- [#2136] FLA export - optimized Shape fixer speed, repeated shape on timeline not exported twice
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3339,6 +3341,7 @@ Major version of SWF to XML export changed to 2.
 [#2133]: https://www.free-decompiler.com/flash/issues/2133
 [#2135]: https://www.free-decompiler.com/flash/issues/2135
 [#1194]: https://www.free-decompiler.com/flash/issues/1194
+[#2136]: https://www.free-decompiler.com/flash/issues/2136
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
