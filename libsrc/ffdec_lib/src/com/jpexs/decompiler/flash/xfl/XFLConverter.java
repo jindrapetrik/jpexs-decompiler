@@ -3123,9 +3123,7 @@ public class XFLConverter {
         return hasScript;
     }
 
-    private boolean convertLabelsLayer(ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
-        boolean hasLabel = false;
-
+    private int convertLabelsLayers(ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {        
         Map<Integer, List<FrameLabelTag>> frameToLabels = new HashMap<>();
         int frame = 0;
         int layerCount = 0;
@@ -3145,7 +3143,7 @@ public class XFLConverter {
         }
         int frameCount = frame;
 
-        for (int lay = 0; lay < layerCount; lay++) {
+        for (int lay = 0; lay < layerCount; lay++) {            
             writer.writeStartElement("DOMLayer", new String[]{"name", "Labels Layer" + (layerCount > 1 ? " " + (lay + 1) : ""), "color", randomOutlineColor()});
             writer.writeStartElement("frames");
             int duration = 0;
@@ -3187,8 +3185,8 @@ public class XFLConverter {
             writer.writeEndElement(); // frames
             writer.writeEndElement(); // DOMLayer
         }
-
-        return hasLabel;
+        
+        return layerCount;
     }
 
     private void convertSoundLayer(Scene scene, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
@@ -3932,16 +3930,14 @@ public class XFLConverter {
             writer.writeStartElement("layers");                        
 
             ReadOnlyTagList sceneTimelineTags = scene.timelineSubTags;
-            
-            boolean hasLabel = convertLabelsLayer(tags, sceneTimelineTags, backgroundColor, writer);
+            Reference<Integer> labelLayerCountRef = new Reference<>(0);
+            int labelLayerCount = convertLabelsLayers(tags, sceneTimelineTags, backgroundColor, writer);
             boolean hasScript = convertActionScriptLayer(scene, initClipScript, abcIndex, spriteId, tags, sceneTimelineTags, backgroundColor, writer, scriptPack);
 
             int index = 0;
-
-            if (hasLabel) {
-                index++;
-            }
-
+            
+            index += labelLayerCount;
+            
             if (hasScript) {
                 index++;
             }
