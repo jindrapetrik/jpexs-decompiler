@@ -69,6 +69,7 @@ All notable changes to this project will be documented in this file.
 - [#1194] FLA Export - stream sound export
 - [#2136] FLA Export - optimized Shape fixer speed, repeated shape on timeline not exported twice
 - [#2139] FLA Export - labels layer not counted as layer index causing masked layer parentindex wrong
+- [#2138] Nested clipping (masks) display
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3344,6 +3345,7 @@ Major version of SWF to XML export changed to 2.
 [#1194]: https://www.free-decompiler.com/flash/issues/1194
 [#2136]: https://www.free-decompiler.com/flash/issues/2136
 [#2139]: https://www.free-decompiler.com/flash/issues/2139
+[#2138]: https://www.free-decompiler.com/flash/issues/2138
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220

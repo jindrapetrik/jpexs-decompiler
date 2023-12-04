@@ -1,0 +1,51 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Masked1" itemID="656e11cc-00008613" lastModified="1701712353" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="Masked1">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" locked="true" current="true" isSelected="true" layerType="mask">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal">
+                        <fill>
+                          <SolidColor color="#ECECEC"/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!5680 2560S6[5680 3620 4848 4370!4848 4370[4016 5120 2840 5120!2840 5120[1664 5120 832 4370!832 4370[0 3620 0 2560!0 2560[0 1500 832 750!832 750[1664 0 2840 0!2840 0[4016 0 4848 750!4848 750[5680 1500 5680 2560"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 2" color="#9933CC" parentLayerIndex="0" locked="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Rect" centerPoint3DX="75" centerPoint3DY="86">
+                  <matrix>
+                    <Matrix tx="-104.95" ty="-40"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="179.95" y="126"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

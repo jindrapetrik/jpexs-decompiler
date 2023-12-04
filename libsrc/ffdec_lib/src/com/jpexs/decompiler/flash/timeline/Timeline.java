@@ -1095,8 +1095,11 @@ public class Timeline {
             }
 
             if (clipChanged) {
-                if (clips.size() > 0) {
+                if (clips.size() > 0) {                    
                     Area clip = null;
+                    if (prevClip != null) {
+                        clip = new Area(prevClip);
+                    }
                     for (Clip clip1 : clips) {
                         Shape shape = clip1.shape;
                         if (clip == null) {
@@ -1114,7 +1117,7 @@ public class Timeline {
                     //g.setStroke(new BasicStroke(2));
                     //g.draw(clip);
                 } else {
-                    g.setClip(null);
+                    g.setClip(prevClip);
                 }
 
                 clipCount = clips.size();

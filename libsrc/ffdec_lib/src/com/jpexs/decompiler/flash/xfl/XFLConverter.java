@@ -235,7 +235,7 @@ public class XFLConverter {
     private final Random random = new Random(123); // predictable random
 
     /**
-     * Adds "(depht xxx)" to layer name
+     * Adds "(depth xxx)" to layer name
      */
     private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 

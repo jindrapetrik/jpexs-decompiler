@@ -1,0 +1,33 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <symbols>
+          <Include href="Masked1.xml" loadImmediate="false" itemID="656e11cc-00008613" lastModified="1701712353"/>
+          <Include href="Masked2.xml" loadImmediate="false" itemID="656e1205-0000861a" lastModified="1701713636"/>
+          <Include href="Rect.xml" loadImmediate="false" itemID="656e11a0-0000860e" lastModified="1701712288"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Masked2" selected="true" centerPoint3DX="294.45" centerPoint3DY="172.5">
+                                             <matrix>
+                                                  <Matrix tx="254.95" ty="133"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="39.5" y="39.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="796" publishTime="1701712423"/>
+     </publishHistory>
+</DOMDocument>
