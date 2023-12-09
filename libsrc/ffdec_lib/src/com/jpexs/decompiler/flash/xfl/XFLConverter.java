@@ -2463,7 +2463,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFrame(Scene scene, boolean shapeTween, SoundStreamFrameRange soundStreamRange, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertFrame(Scene scene, boolean shapeTween, SoundStreamFrameRange soundStreamRange, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer, Integer acceleration) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
             SWF swf = startSound.getSwf();
@@ -2478,6 +2478,9 @@ public class XFLConverter {
         if (shapeTween) {
             writer.writeAttribute("tweenType", "shape");
             writer.writeAttribute("keyMode", KEY_MODE_SHAPE_TWEEN);
+            if (acceleration != null) {
+                writer.writeAttribute("acceleration", acceleration);
+            }
         } else {
             writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         }
@@ -2567,6 +2570,7 @@ public class XFLConverter {
         int ratio = -1;
         boolean shapeTween = false;
         MorphShapeTag shapeTweener = null;
+        List<Integer> morphShapeRatios = new ArrayList<>();
         int lastTweenRatio = -1;
 
         //Add ShowFrameTag to the end when there is one last missing
@@ -2711,15 +2715,20 @@ public class XFLConverter {
                             MorphShapeTag m = shapeTweener;
                             XFLXmlWriter addLastWriter = new XFLXmlWriter();
                             SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);
-                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(lastTweenRatio), m.getLineStyles().getLineStylesAt(m.getShapeNum(), lastTweenRatio), true, false, addLastWriter);
-                            //duration--;
-                            convertFrame(scene, true, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
+                            Integer ease = Easing.getEaseFromShapeRatios(morphShapeRatios);
+                            Integer acceleration = null;
+                            if (ease != null) {
+                                acceleration  = -ease;
+                            }
+                            convertFrame(scene, true, null, null, frame - duration, duration, "", lastElements, files, writer2, acceleration);
                             duration = 1;
                             lastElements = addLastWriter.toString();
                             lastCharacter = m;
                             lastMatrix = matrix;
                             shapeTweener = null;
                             shapeTweenNow = true;
+                            morphShapeRatios.clear();
                         }
                         if (!shapeTweenNow) {
                             if (character instanceof ShapeTag && standaloneShapeTweener != null) {
@@ -2747,7 +2756,8 @@ public class XFLConverter {
                                         standaloneShapeTweener = m;
                                         standaloneShapeTweenerMatrix = matrix;
                                         convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
-                                    } else {
+                                    } else {                                        
+                                        morphShapeRatios.add(ratio == -1 ? 0 : ratio);
                                         if (lastCharacter == m && Objects.equals(matrix, lastMatrix)) {
                                             elementsWriter.writeCharactersRaw(lastElements);
                                         } else {       
@@ -2781,7 +2791,7 @@ public class XFLConverter {
                         frame++;
                         String elements = elementsWriter.toString();
                         if (!elements.equals(lastElements) && frame > 0) {
-                            convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                            convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2, null);
                             duration = 1;
                         } else if (frame == 0) {
                             duration = 1;
@@ -2819,7 +2829,7 @@ public class XFLConverter {
         }
         if (!lastElements.isEmpty() || writer2.length() > 0) {
             frame++;
-            convertFrame(scene, false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
+            convertFrame(scene, false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2, null);
         }
         afterStr = "</frames>" + afterStr;
 
@@ -3236,10 +3246,10 @@ public class XFLConverter {
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer);
+                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer, null);
             }
 
-            convertFrame(scene, false, soundStreamRanges.get(i), null, startFrame, duration, "", "", files, writer);
+            convertFrame(scene, false, soundStreamRanges.get(i), null, startFrame, duration, "", "", files, writer, null);
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -3254,10 +3264,10 @@ public class XFLConverter {
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer);
+                convertFrame(scene, false, null, null, 0, startFrame, "", "", files, writer, null);
             }
 
-            convertFrame(scene, false, null, startSounds.get(i), startFrame, duration, "", "", files, writer);
+            convertFrame(scene, false, null, startSounds.get(i), startFrame, duration, "", "", files, writer, null);
 
             writer.writeEndElement();
             writer.writeEndElement();
