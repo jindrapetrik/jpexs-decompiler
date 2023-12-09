@@ -2722,7 +2722,7 @@ public class XFLConverter {
                         convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
                     }
                     
-                    Integer ease = Easing.getEaseFromShapeRatios(morphShapeRatios);
+                    Integer ease = EasingDetector.getEaseFromShapeRatios(morphShapeRatios);
                     Integer acceleration = null;
                     if (ease != null) {
                         acceleration  = -ease;

@@ -103,14 +103,14 @@ public class MorphShapeFixer extends ShapeFixer {
                 boolean doRemove = false;
                 if (
                     fillStyles0.get(i1) != 0 && fillStyles1.get(i1) == 0
-                    && fillStyles1.get(i2) != 0 && fillStyles0.get(i2) == 0
+                        && fillStyles1.get(i2) != 0 && fillStyles0.get(i2) == 0
                     ) {
                     fillStyles1.set(i1, fillStyles1.get(i2));
                     doRemove = true;
                 } else if (
                     fillStyles1.get(i1) != 0 && fillStyles0.get(i1) == 0
-                    && fillStyles0.get(i2) != 0 && fillStyles1.get(i2) == 0
-                    ) {
+                        && fillStyles0.get(i2) != 0 && fillStyles1.get(i2) == 0
+                ) {
                     fillStyles0.set(i1, fillStyles0.get(i2));
                     doRemove = true;                   
                 }
