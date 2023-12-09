@@ -1877,7 +1877,7 @@ public class XFLConverter {
                                                 symbolStr.writeEndElement();
                                             }
                                             symbolStr.writeStartElement("DOMFrame", new String[]{
-                                                "index", Integer.toString(frame - 1),
+                                                "index", Integer.toString(frame),
                                                 "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                                             symbolStr.writeStartElement("elements");
                                             symbolStr.writeCharactersRaw(recCharWriter.toString());
@@ -2548,7 +2548,7 @@ public class XFLConverter {
         boolean lastIn = true;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
-        int frame = -1;
+        int frame = -1;        
         String lastElements = "";
         CharacterTag lastCharacter = null;
         MATRIX lastMatrix = null;
@@ -2572,7 +2572,9 @@ public class XFLConverter {
         MorphShapeTag shapeTweener = null;
         List<Integer> morphShapeRatios = new ArrayList<>();
         int lastTweenRatio = -1;
-
+        MorphShapeTag standaloneShapeTweener = null;
+        MATRIX standaloneShapeTweenerMatrix = null;
+        
         //Add ShowFrameTag to the end when there is one last missing
         List<Tag> timTags = timelineTags.toArrayList();
         boolean needsFrameAdd = false;
@@ -2589,8 +2591,7 @@ public class XFLConverter {
             timTags.add(new ShowFrameTag(swf));
         }
 
-        MorphShapeTag standaloneShapeTweener = null;
-        MATRIX standaloneShapeTweenerMatrix = null;
+        
         for (Tag t : timTags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -2658,22 +2659,10 @@ public class XFLConverter {
                             ratio = po.getRatio();
                             clipActions = po.getClipActions();
                         }
-
                     }
                 }
             }
-
-            /*if (t instanceof ShowFrameTag) {
-                if (t == timTags.get(timTags.size() - 1)) {
-                    if (shapeTween && character != null && (character instanceof MorphShapeTag)) {
-                        MorphShapeTag m = (MorphShapeTag) character;
-                        shapeTweener = m;
-                        shapeTween = false;
-                        lastTweenRatio = ratio;
-                        character = null;
-                    }
-                }
-            }*/
+            
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 if (rt.getDepth() == depth) {
@@ -2699,137 +2688,121 @@ public class XFLConverter {
             }
 
             if (t instanceof ShowFrameTag) {
-                /*if (prevWasShapeTween) {
-                    prevWasShapeTween = false;
-                    continue;
-                }*/
-
-                boolean shapeTweenNow = false;
-                if (frame + 1 >= startFrame && (onlyFrames == null || onlyFrames.contains(frame + 1))) {
-
-                    XFLXmlWriter elementsWriter = new XFLXmlWriter();
-
-                    if (frame + 1 <= endFrame) {
-                        lastIn = true;
-                        if (shapeTweener != null) {
-                            MorphShapeTag m = shapeTweener;
-                            XFLXmlWriter addLastWriter = new XFLXmlWriter();
-                            SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);
-                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
-                            Integer ease = Easing.getEaseFromShapeRatios(morphShapeRatios);
-                            Integer acceleration = null;
-                            if (ease != null) {
-                                acceleration  = -ease;
-                            }
-                            convertFrame(scene, true, null, null, frame - duration, duration, "", lastElements, files, writer2, acceleration);
-                            duration = 1;
-                            lastElements = addLastWriter.toString();
-                            lastCharacter = m;
-                            lastMatrix = matrix;
-                            shapeTweener = null;
-                            shapeTweenNow = true;
-                            morphShapeRatios.clear();
-                        }
-                        if (!shapeTweenNow) {
-                            if (character instanceof ShapeTag && standaloneShapeTweener != null) {
-                                convertSymbolInstance(instanceName, standaloneShapeTweenerMatrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, standaloneShapeTweener, characters, tags, flaVersion, elementsWriter);
-                                standaloneShapeTweener = null;
-                            } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) { // || shapeTweener != null)) {
-                                if (lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
-                                    elementsWriter.writeCharactersRaw(lastElements);
-                                } else {
-                                    ShapeTag shape = (ShapeTag) character;
-                                    statusStack.pushStatus(character.toString());                                            
-                                    convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
-                                    statusStack.popStatus();
-                                }
-                                lastCharacter = character;
-                                lastMatrix = matrix;
-                                shapeTween = false;
-                                shapeTweener = null;
-                            } else if (character != null) {
-                                if (character instanceof MorphShapeTag) {
-                                    MorphShapeTag m = (MorphShapeTag) character;
-                                    if (multiUsageMorphShapes.contains(m.getCharacterId())) {
-                                        shapeTween = false;
-                                        shapeTweener = null;
-                                        standaloneShapeTweener = m;
-                                        standaloneShapeTweenerMatrix = matrix;
-                                        convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
-                                    } else {                                        
-                                        morphShapeRatios.add(ratio == -1 ? 0 : ratio);
-                                        if (lastCharacter == m && Objects.equals(matrix, lastMatrix)) {
-                                            elementsWriter.writeCharactersRaw(lastElements);
-                                        } else {       
-                                            statusStack.pushStatus(m.toString());
-                                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
-                                            statusStack.popStatus();
-                                        }
-                                       
-                                        lastCharacter = m;
-                                        lastMatrix = matrix;
-                                        shapeTween = true;
-                                    }
-                                } else {
-                                    shapeTween = false;
-                                    if (character instanceof TextTag) {
-                                        statusStack.pushStatus(character.toString());
-                                        convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
-                                        statusStack.popStatus();
-                                    } else if (character instanceof DefineVideoStreamTag) {
-                                        convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
-                                    } else if (character instanceof ImageTag) {
-                                        convertImageInstance(instanceName, matrix, (ImageTag) character, clipActions, elementsWriter);
-                                    } else {
-                                        convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!shapeTweenNow) {
-                        frame++;
-                        String elements = elementsWriter.toString();
-                        if (!elements.equals(lastElements) && frame > 0) {
-                            convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2, null);
-                            duration = 1;
-                        } else if (frame == 0) {
-                            duration = 1;
-                        } else {
-                            duration++;
-                        }
-
-                        lastElements = elements;
-                        lastCharacter = character;
-                        lastMatrix = matrix;
-                        if (frame > endFrame) {
-                            if (lastIn) {
-                                lastElements = "";
-                                lastIn = false;
-                                lastCharacter = null;
-                                lastMatrix = null;
-                            }
-                        }
-                    }
-                } else {
+                frame++;
+                if (frame < startFrame || frame > endFrame || (onlyFrames != null && !onlyFrames.contains(frame))) {                    
                     if (lastIn) {
                         lastElements = "";
                         lastIn = false;
                         lastCharacter = null;
                         lastMatrix = null;
                     }
-                    frame++;
                     if (frame == 0) {
                         duration = 1;
                     } else {
                         duration++;
                     }
+                    continue;
                 }
+                lastIn = true;
+                
+                XFLXmlWriter elementsWriter = new XFLXmlWriter();
+                
+                if (shapeTweener != null) {
+                    MorphShapeTag m = shapeTweener;
+                    XFLXmlWriter addLastWriter = new XFLXmlWriter();
+                    
+                    if ((character instanceof MorphShapeTag) && (!multiUsageMorphShapes.contains(character.getCharacterId()))) {
+                        MorphShapeTag m2 = (MorphShapeTag) character;
+                        statusStack.pushStatus(m2.toString());
+                        convertShape(swf, characters, matrix, m2.getShapeNum() == 1 ? 3 : 4, m2.getStartEdges().shapeRecords, m2.getFillStyles().getStartFillStyles(), m2.getLineStyles().getStartLineStyles(m2.getShapeNum()), true, false, addLastWriter);
+                        statusStack.popStatus();
+                        shapeTween = true;
+                    } else {
+                        SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);                    
+                        convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
+                    }
+                    
+                    Integer ease = Easing.getEaseFromShapeRatios(morphShapeRatios);
+                    Integer acceleration = null;
+                    if (ease != null) {
+                        acceleration  = -ease;
+                    }
+                    convertFrame(scene, true, null, null, frame - duration, duration, "", lastElements, files, writer2, acceleration);
+                    duration = 1;
+                    lastElements = addLastWriter.toString();
+                    lastMatrix = matrix;
+                    lastCharacter = character;
+                    shapeTweener = null;
+                    morphShapeRatios.clear();    
+                    continue;
+                }
+                
+                if (character instanceof ShapeTag && standaloneShapeTweener != null) {
+                    convertSymbolInstance(instanceName, standaloneShapeTweenerMatrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, standaloneShapeTweener, characters, tags, flaVersion, elementsWriter);
+                    standaloneShapeTweener = null;
+                } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
+                    if (lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
+                        elementsWriter.writeCharactersRaw(lastElements);
+                    } else {
+                        ShapeTag shape = (ShapeTag) character;
+                        statusStack.pushStatus(character.toString());                                            
+                        convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
+                        statusStack.popStatus();
+                    }
+                    shapeTween = false;
+                    shapeTweener = null;
+                } else if (character instanceof MorphShapeTag) {
+                    MorphShapeTag m = (MorphShapeTag) character;
+                    if (multiUsageMorphShapes.contains(m.getCharacterId())) {
+                        shapeTween = false;
+                        shapeTweener = null;
+                        standaloneShapeTweener = m;
+                        standaloneShapeTweenerMatrix = matrix;
+                        convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
+                    } else {                                        
+                        morphShapeRatios.add(ratio == -1 ? 0 : ratio);
+                        if (lastCharacter == m && Objects.equals(matrix, lastMatrix)) {
+                            elementsWriter.writeCharactersRaw(lastElements);
+                        } else {       
+                            statusStack.pushStatus(m.toString());
+                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
+                            statusStack.popStatus();
+                        }
+                        shapeTween = true;
+                    }
+                } else {
+                    shapeTween = false;
+                    if (character instanceof TextTag) {
+                        statusStack.pushStatus(character.toString());
+                        convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
+                        statusStack.popStatus();
+                    } else if (character instanceof DefineVideoStreamTag) {
+                        convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
+                    } else if (character instanceof ImageTag) {
+                        convertImageInstance(instanceName, matrix, (ImageTag) character, clipActions, elementsWriter);
+                    } else if (character != null) {
+                        convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
+                    }
+                }                
+                
+                String elements = elementsWriter.toString();
+                if (!elements.equals(lastElements) && frame > 0) {
+                    convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2, null);
+                    duration = 1;
+                } else if (frame == 0) {
+                    duration = 1;
+                } else {
+                    duration++;
+                }
+                lastElements = elements;
+                lastCharacter = character;
+                lastMatrix = matrix;                        
             }
         }
+                
         if (!lastElements.isEmpty() || writer2.length() > 0) {
             frame++;
-            convertFrame(scene, false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2, null);
+            convertFrame(scene, false, null, null, frame - duration, duration, "", lastElements, files, writer2, null);
         }
         afterStr = "</frames>" + afterStr;
 

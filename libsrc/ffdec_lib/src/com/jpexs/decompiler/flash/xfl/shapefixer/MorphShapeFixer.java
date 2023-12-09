@@ -27,6 +27,7 @@ import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -266,12 +267,23 @@ public class MorphShapeFixer extends ShapeFixer {
                     px = r.getX() + r.getWidth() * Math.random();
                     py = r.getY() + r.getHeight() * Math.random();
                 } while (!region.contains(px, py));*/
+                
+                
                 PathIterator pi = region.getPathIterator(null);
                 if (!pi.isDone()) {
                     double[] points = new double[6];
                     int type = pi.currentSegment(points);
-                    if (type == PathIterator.SEG_MOVETO) {
-                        if (!path.contains(points[0], points[1])) {
+                    if (type == PathIterator.SEG_MOVETO) {                            
+                        double x = points[0];
+                        double y = points[1];
+                        Rectangle2D bounds = region.getBounds2D();
+                        double centerX = bounds.getCenterX();
+                        double centerY = bounds.getCenterY();
+
+                        double p = Math.sqrt((centerX - x) * (centerX - x) + (centerY - y) * (centerY - y));
+                        double x1 = (centerX - x) * 0.1 / p;
+                        double y1 = (centerY - y) * 0.1 / p;
+                        if (!path.contains(x + x1, y + y1)) {                        
                             closedHolesI.add(i);
                         }
                     }
