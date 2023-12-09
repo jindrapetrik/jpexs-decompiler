@@ -237,7 +237,7 @@ public class XFLConverter {
     /**
      * Adds "(depth xxx)" to layer name
      */
-    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
+    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = true;
 
     private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
@@ -4216,6 +4216,29 @@ public class XFLConverter {
                             if (nonEmpty) {
                                 index++;
                             }
+                        }
+                        
+                        if (index == parentIndex + 1) {
+                            //put at least one empty layer as masked, otherwise the mask layer will be visible
+                            writer.writeStartElement("DOMLayer", new String[]{
+                                "name", "Layer " + (index + 1),
+                                "color", randomOutlineColor(),
+                                "parentLayerIndex", "" + parentIndex,
+                                "locked", "true"
+                            });
+                            writer.writeStartElement("frames");
+
+                            writer.writeStartElement("DOMFrame");
+                            writer.writeAttribute("index", 0);
+                            writer.writeAttribute("duration", lastFrame + 1);
+                            writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+                            writer.writeStartElement("elements");
+                            writer.writeEndElement(); //elements
+                            writer.writeEndElement(); //DOMFrame
+
+                            writer.writeEndElement(); //frames
+                            writer.writeEndElement(); //DOMLayer 
+                            index++;
                         }
                         for (int i = clipFrame; i <= lastFrame; i++) {
                             depthToFramesList.get(po.getDepth()).remove((Integer) i);

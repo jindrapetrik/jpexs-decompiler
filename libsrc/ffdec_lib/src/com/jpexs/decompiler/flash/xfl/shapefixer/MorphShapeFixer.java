@@ -64,8 +64,67 @@ public class MorphShapeFixer extends ShapeFixer {
         mergeWithSamePrefix(shapes, fillStyles0, fillStyles1, lineStyles);
         clearDuplicatePathsNextToEachOther(shapes, fillStyles0, lineStyles);
         fixHolesAndAntiClockwise(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+        mergeSamePathsWithOppositeFillstyles(shapes, fillStyles0, fillStyles1, lineStyles, layers);
     }
 
+    
+    /**
+     * shape 1 [FS0:A, FS1:-, LS:n], shape 2 [FS0:-, FS1:B, LS:n]  
+     * => shape 1 [FS0:A, FS1:B], remove shape 2
+     * @param shapes
+     * @param fillStyles0
+     * @param fillStyles1
+     * @param lineStyles
+     * @param layers 
+     */
+    private void mergeSamePathsWithOppositeFillstyles(
+            List<List<BezierEdge>> shapes,
+            List<Integer> fillStyles0,
+            List<Integer> fillStyles1,
+            List<Integer> lineStyles,
+            List<Integer> layers
+    ) {
+        for (int i1 = 0; i1 < shapes.size(); i1++) {
+            for (int i2 = 0; i2 < shapes.size(); i2++) {
+                if (i1 == i2) {
+                    continue;
+                }
+                if (layers.get(i1) != layers.get(i2)) {
+                    continue;
+                }
+                if (lineStyles.get(i1) != lineStyles.get(i2)) {
+                    continue;
+                }
+                if (!shapes.get(i1).equals(shapes.get(i2))) {
+                    continue;
+                }
+                boolean doRemove = false;
+                if (
+                    fillStyles0.get(i1) != 0 && fillStyles1.get(i1) == 0
+                    && fillStyles1.get(i2) != 0 && fillStyles0.get(i2) == 0
+                    ) {
+                    fillStyles1.set(i1, fillStyles1.get(i2));
+                    doRemove = true;
+                } else if (
+                    fillStyles1.get(i1) != 0 && fillStyles0.get(i1) == 0
+                    && fillStyles0.get(i2) != 0 && fillStyles1.get(i2) == 0
+                    ) {
+                    fillStyles0.set(i1, fillStyles0.get(i2));
+                    doRemove = true;                   
+                }
+                
+                if (doRemove) {
+                    shapes.remove(i2);
+                    fillStyles0.remove(i2);
+                    fillStyles1.remove(i2);
+                    lineStyles.remove(i2);
+                    layers.remove(i2);
+                    i2--;                    
+                }
+            }
+        }
+    }
+    
     private boolean isEmptyPath(List<BezierEdge> path) {
         for (BezierEdge be : path) {
             if (!be.isEmpty()) {

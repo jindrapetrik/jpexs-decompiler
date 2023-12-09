@@ -95,94 +95,15 @@ public class ShapeFixer {
             List<LINESTYLEARRAY> lineStyleLayers
     ) {        
     }
-
-    public List<ShapeRecordAdvanced> fix(
-            List<SHAPERECORD> records,
-            int shapeNum,
-            FILLSTYLEARRAY baseFillStyles,
-            LINESTYLEARRAY baseLineStyles
+    
+    
+    private void detectOverlappingEdges(
+            List<List<BezierEdge>> shapes,
+            List<Integer> fillStyles0,
+            List<Integer> fillStyles1,
+            List<Integer> lineStyles,
+            List<Integer> layers
     ) {
-        List<List<BezierEdge>> shapes = new ArrayList<>();
-        List<BezierEdge> currentShape = new ArrayList<>();
-        List<Integer> fillStyles0 = new ArrayList<>();
-        List<Integer> fillStyles1 = new ArrayList<>();
-        List<Integer> lineStyles = new ArrayList<>();
-        List<Integer> layers = new ArrayList<>();
-        List<FILLSTYLEARRAY> fillStyleLayers = new ArrayList<>();
-        List<LINESTYLEARRAY> lineStyleLayers = new ArrayList<>();
-
-        int fillStyle0 = 0;
-        int fillStyle1 = 0;
-        int lineStyle = 0;
-        int layer = -1;
-        int x = 0;
-        int y = 0;
-        for (SHAPERECORD rec : records) {
-            if (rec instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) rec;
-                if (scr.stateMoveTo
-                        || scr.stateNewStyles
-                        || scr.stateFillStyle0
-                        || scr.stateFillStyle1
-                        || scr.stateLineStyle) {
-                    if (!currentShape.isEmpty()) {
-                        shapes.add(currentShape);
-                        fillStyles0.add(fillStyle0);
-                        fillStyles1.add(fillStyle1);
-                        lineStyles.add(lineStyle);
-                        layers.add(layer);
-                        currentShape = new ArrayList<>();
-                    }
-                }
-                if (scr.stateNewStyles) {
-                    layer++;
-                    fillStyle0 = 0;
-                    fillStyle1 = 0;
-                    lineStyle = 0;
-                    fillStyleLayers.add(scr.fillStyles);
-                    lineStyleLayers.add(scr.lineStyles);
-                }
-                if (scr.stateFillStyle0) {
-                    fillStyle0 = scr.fillStyle0;
-                }
-                if (scr.stateFillStyle1) {
-                    fillStyle1 = scr.fillStyle1;
-                }
-                if (scr.stateLineStyle) {
-                    lineStyle = scr.lineStyle;
-                }
-            }
-            if (rec instanceof StraightEdgeRecord) {
-                int x2 = rec.changeX(x);
-                int y2 = rec.changeY(y);
-                BezierEdge be = new BezierEdge(x, y, x2, y2);
-                currentShape.add(be);
-            }
-            if (rec instanceof CurvedEdgeRecord) {
-                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
-                int cx = x + cer.controlDeltaX;
-                int cy = y + cer.controlDeltaY;
-                int ax = cx + cer.anchorDeltaX;
-                int ay = cy + cer.anchorDeltaY;
-                BezierEdge be = new BezierEdge(x, y, cx, cy, ax, ay);
-                currentShape.add(be);
-            }
-            if (rec instanceof EndShapeRecord) {
-                if (!currentShape.isEmpty()) {
-                    shapes.add(currentShape);
-                    fillStyles0.add(fillStyle0);
-                    fillStyles1.add(fillStyle1);
-                    lineStyles.add(lineStyle);
-                    layers.add(layer);
-                    currentShape = new ArrayList<>();
-                }
-            }
-            x = rec.changeX(x);
-            y = rec.changeY(y);
-        }
-        
-        beforeHandle(shapeNum, shapes, fillStyles0, fillStyles1, lineStyles, layers, baseFillStyles, baseLineStyles, fillStyleLayers, lineStyleLayers);
-        
         //------------------- detecting overlapping edges --------------------
         List<BezierPair> splittedPairs = new ArrayList<>();
 
@@ -190,7 +111,7 @@ public class ShapeFixer {
         //int oldpct = 0;
         loopi1:
         for (int i1 = 0; i1 < shapes.size(); i1++) {
-            layer = layers.get(i1);
+            int layer = layers.get(i1);
             /*if (i1 % 10 == 0) {
                 int pct = i1 * 100 / shapes.size();
                 if (oldpct != pct) {
@@ -397,10 +318,102 @@ public class ShapeFixer {
                 }
             }
         }
-
+    }            
+    
+    private void splitToLayers(
+            List<SHAPERECORD> records,
+            List<List<BezierEdge>> shapes,
+            List<Integer> fillStyles0,
+            List<Integer> fillStyles1,
+            List<Integer> lineStyles,
+            List<Integer> layers,
+            List<FILLSTYLEARRAY> fillStyleLayers,
+            List<LINESTYLEARRAY> lineStyleLayers                        
+    ) {        
+        List<BezierEdge> currentShape = new ArrayList<>();
+        
+        int fillStyle0 = 0;
+        int fillStyle1 = 0;
+        int lineStyle = 0;
+        int layer = -1;
+        int x = 0;
+        int y = 0;
+        for (SHAPERECORD rec : records) {
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateMoveTo
+                        || scr.stateNewStyles
+                        || scr.stateFillStyle0
+                        || scr.stateFillStyle1
+                        || scr.stateLineStyle) {
+                    if (!currentShape.isEmpty()) {
+                        shapes.add(currentShape);
+                        fillStyles0.add(fillStyle0);
+                        fillStyles1.add(fillStyle1);
+                        lineStyles.add(lineStyle);
+                        layers.add(layer);
+                        currentShape = new ArrayList<>();
+                    }
+                }
+                if (scr.stateNewStyles) {
+                    layer++;
+                    fillStyle0 = 0;
+                    fillStyle1 = 0;
+                    lineStyle = 0;
+                    fillStyleLayers.add(scr.fillStyles);
+                    lineStyleLayers.add(scr.lineStyles);
+                }
+                if (scr.stateFillStyle0) {
+                    fillStyle0 = scr.fillStyle0;
+                }
+                if (scr.stateFillStyle1) {
+                    fillStyle1 = scr.fillStyle1;
+                }
+                if (scr.stateLineStyle) {
+                    lineStyle = scr.lineStyle;
+                }
+            }
+            if (rec instanceof StraightEdgeRecord) {
+                int x2 = rec.changeX(x);
+                int y2 = rec.changeY(y);
+                BezierEdge be = new BezierEdge(x, y, x2, y2);
+                currentShape.add(be);
+            }
+            if (rec instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                int cx = x + cer.controlDeltaX;
+                int cy = y + cer.controlDeltaY;
+                int ax = cx + cer.anchorDeltaX;
+                int ay = cy + cer.anchorDeltaY;
+                BezierEdge be = new BezierEdge(x, y, cx, cy, ax, ay);
+                currentShape.add(be);
+            }
+            if (rec instanceof EndShapeRecord) {
+                if (!currentShape.isEmpty()) {
+                    shapes.add(currentShape);
+                    fillStyles0.add(fillStyle0);
+                    fillStyles1.add(fillStyle1);
+                    lineStyles.add(lineStyle);
+                    layers.add(layer);
+                    currentShape = new ArrayList<>();
+                }
+            }
+            x = rec.changeX(x);
+            y = rec.changeY(y);
+        }
+    }
+    
+    private List<ShapeRecordAdvanced> combineLayers(
+            List<List<BezierEdge>> shapes,
+            List<Integer> fillStyles0,
+            List<Integer> fillStyles1,
+            List<Integer> lineStyles,
+            List<Integer> layers,
+            List<FILLSTYLEARRAY> fillStyleLayers,
+            List<LINESTYLEARRAY> lineStyleLayers   
+    ) {
         List<ShapeRecordAdvanced> ret = new ArrayList<>();
-
-        layer = -1;
+        int layer = -1;
         double dx = 0;
         double dy = 0;
         for (int i = 0; i < shapes.size(); i++) {
@@ -444,6 +457,29 @@ public class ShapeFixer {
             }
         }
         return ret;
+    }
+
+    public List<ShapeRecordAdvanced> fix(
+            List<SHAPERECORD> records,
+            int shapeNum,
+            FILLSTYLEARRAY baseFillStyles,
+            LINESTYLEARRAY baseLineStyles
+    ) {
+        List<List<BezierEdge>> shapes = new ArrayList<>();
+        List<Integer> fillStyles0 = new ArrayList<>();
+        List<Integer> fillStyles1 = new ArrayList<>();
+        List<Integer> lineStyles = new ArrayList<>();
+        List<Integer> layers = new ArrayList<>();
+        List<FILLSTYLEARRAY> fillStyleLayers = new ArrayList<>();
+        List<LINESTYLEARRAY> lineStyleLayers = new ArrayList<>();
+        
+        splitToLayers(records, shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);
+        
+        beforeHandle(shapeNum, shapes, fillStyles0, fillStyles1, lineStyles, layers, baseFillStyles, baseLineStyles, fillStyleLayers, lineStyleLayers);
+        
+        detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+        
+        return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);        
     }
 
     private ShapeRecordAdvanced bezierToAdvancedRecord(BezierEdge be) {
