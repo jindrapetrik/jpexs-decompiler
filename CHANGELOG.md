@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - [#2134] FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present
 - [#2132] Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges
 - FLA export - show export time
+- [#2138] Morphshapes - detect classic easing
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
