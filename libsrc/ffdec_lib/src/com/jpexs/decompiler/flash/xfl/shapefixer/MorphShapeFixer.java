@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -258,17 +259,23 @@ public class MorphShapeFixer extends ShapeFixer {
 
             for (int i : closedPaths.keySet()) {
                 GeneralPath region = closedPaths.get(i);
-                Rectangle r = region.getBounds();
+                /*Rectangle r = region.getBounds();
                 double px;
                 double py;
                 do {
                     px = r.getX() + r.getWidth() * Math.random();
                     py = r.getY() + r.getHeight() * Math.random();
-                } while (!region.contains(px, py));
-
-                if (!path.contains(px, py)) {
-                    closedHolesI.add(i);
-                }
+                } while (!region.contains(px, py));*/
+                PathIterator pi = region.getPathIterator(null);
+                if (!pi.isDone()) {
+                    double[] points = new double[6];
+                    int type = pi.currentSegment(points);
+                    if (type == PathIterator.SEG_MOVETO) {
+                        if (!path.contains(points[0], points[1])) {
+                            closedHolesI.add(i);
+                        }
+                    }
+                }               
             }
         }
 
