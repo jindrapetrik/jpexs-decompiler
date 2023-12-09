@@ -71,8 +71,9 @@ All notable changes to this project will be documented in this file.
 - [#2136] FLA Export - optimized Shape fixer speed, repeated shape on timeline not exported twice
 - [#2139] FLA Export - labels layer not counted as layer index causing masked layer parentindex wrong
 - [#2138] Nested clipping (masks) display
-- [#2138] Missing morphshapes (incorrect holes calculation)
-- [#2138] Mask layer was visible when did not contain a masked layer
+- [#2138] FLA Export - Missing morphshapes (incorrect holes calculation)
+- [#2138] FLA Export - Mask layer was visible when did not contain a masked layer
+- FLA Export - frame numbering problem
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
