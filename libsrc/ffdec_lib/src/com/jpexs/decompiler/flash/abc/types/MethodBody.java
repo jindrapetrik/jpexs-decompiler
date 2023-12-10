@@ -144,13 +144,15 @@ public final class MethodBody implements Cloneable {
         }
     }
 
-    public synchronized AVM2Code getCode() {
+    public synchronized AVM2Code getCode() {        
         if (code == null) {
             AVM2Code avm2Code;
             try {
                 ABCInputStream ais = new ABCInputStream(new MemoryInputStream(codeBytes));
                 avm2Code = new AVM2Code(ais, this);
-                avm2Code.removeWrongIndices(abc.constants);
+                if (abc != null) {
+                    avm2Code.removeWrongIndices(abc.constants);
+                }
             } catch (UnknownInstructionCode | IOException ex) {
                 avm2Code = new AVM2Code();
                 logger.log(Level.SEVERE, null, ex);

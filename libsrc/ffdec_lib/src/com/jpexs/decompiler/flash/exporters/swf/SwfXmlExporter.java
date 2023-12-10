@@ -53,7 +53,7 @@ import javax.xml.stream.XMLStreamWriter;
 public class SwfXmlExporter {
 
     public static final int XML_EXPORT_VERSION_MAJOR = 2;
-    public static final int XML_EXPORT_VERSION_MINOR = 0;
+    public static final int XML_EXPORT_VERSION_MINOR = 1;
 
     private static final Logger logger = Logger.getLogger(SwfXmlExporter.class.getName());
 
@@ -158,7 +158,7 @@ public class SwfXmlExporter {
 
             if (isListItem) {
                 writer.writeStartElement(name);
-                writer.writeCharacters(stringValue);
+                writer.writeCharacters(stringValue);                
                 writer.writeEndElement();
             } else {
                 writer.writeAttribute(name, stringValue);
