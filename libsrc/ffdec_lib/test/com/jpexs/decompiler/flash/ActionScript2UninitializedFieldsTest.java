@@ -91,6 +91,7 @@ public class ActionScript2UninitializedFieldsTest extends ActionScript2TestBase 
                 + "   var f;\n"
                 + "   var c;\n"
                 + "   var d;\n"
+                + "   static var sv2;\n"
                 + "   static var sv;\n"
                 + "   var init_v = 2;\n"
                 + "   static var sinit_v = 3;\n"
