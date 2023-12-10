@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -125,7 +126,10 @@ public class CallMethodActionItem extends ActionItem {
                 } else {
                     scriptObject.toString(writer, localData);
                 }
-                if (IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
+                if (
+                    !(((DirectValueActionItem)methodName).value instanceof RegisterNumber)
+                        && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))
+                ) {
                     writer.append(".");
                     methodName.toStringNoQuotes(writer, localData);
                 } else {
