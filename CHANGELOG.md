@@ -74,6 +74,7 @@ All notable changes to this project will be documented in this file.
 - [#2138] FLA Export - Missing morphshapes (incorrect holes calculation)
 - [#2138] FLA Export - Mask layer was visible when did not contain a masked layer
 - FLA Export - frame numbering problem
+- [#2145] FLA Export - missing frames, cliping layers order, nullpointer, empty sound layers
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3335,6 +3336,7 @@ Major version of SWF to XML export changed to 2.
 [#2124]: https://www.free-decompiler.com/flash/issues/2124
 [#2134]: https://www.free-decompiler.com/flash/issues/2134
 [#2132]: https://www.free-decompiler.com/flash/issues/2132
+[#2138]: https://www.free-decompiler.com/flash/issues/2138
 [#2021]: https://www.free-decompiler.com/flash/issues/2021
 [#2000]: https://www.free-decompiler.com/flash/issues/2000
 [#2116]: https://www.free-decompiler.com/flash/issues/2116
@@ -3349,7 +3351,7 @@ Major version of SWF to XML export changed to 2.
 [#1194]: https://www.free-decompiler.com/flash/issues/1194
 [#2136]: https://www.free-decompiler.com/flash/issues/2136
 [#2139]: https://www.free-decompiler.com/flash/issues/2139
-[#2138]: https://www.free-decompiler.com/flash/issues/2138
+[#2145]: https://www.free-decompiler.com/flash/issues/2145
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220
