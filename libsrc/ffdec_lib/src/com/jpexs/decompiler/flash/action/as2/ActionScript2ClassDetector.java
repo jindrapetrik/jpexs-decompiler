@@ -37,7 +37,9 @@ import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.IfItem;
@@ -620,6 +622,25 @@ public class ActionScript2ClassDetector {
                                                 func.isSetter = true;
 
                                                 if (FunctionActionItem.DECOMPILE_GET_SET) {
+                                                    
+                                                    AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+                                                        @Override
+                                                        public void visit(GraphTargetItem item) {
+                                                            if (item instanceof ReturnActionItem) {
+                                                                ReturnActionItem ret = (ReturnActionItem) item;
+                                                                if (ret.value instanceof DirectValueActionItem) {
+                                                                    DirectValueActionItem dv = (DirectValueActionItem) ret.value;
+                                                                    if (dv.value instanceof Undefined) {
+                                                                        ret.value = null;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    };
+                                                    for (GraphTargetItem ti : func.actions) {
+                                                        ti.visitRecursively(visitor);
+                                                    }
+                                                    
                                                     //There is return getter added at the end of every setter, gotta remove it, since it won't compile
                                                     //as setter must not return a value
                                                     if (!func.actions.isEmpty()) {
