@@ -1321,6 +1321,14 @@ public class Helper {
     }
 
     public static String escapeXmlExportString(String s) {
+        if (s.matches("^ +$")) {
+            StringBuilder ret = new StringBuilder(s.length());
+            for (int i = 0; i < s.length(); i++) {
+                ret.append("\\u0020");
+            }
+            return ret.toString();
+        }
+        
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
