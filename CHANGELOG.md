@@ -77,6 +77,7 @@ All notable changes to this project will be documented in this file.
 - [#2145] FLA Export - missing frames, cliping layers order, nullpointer, empty sound layers
 - [#2142] XML Export - string values containing only spaces
 - AS3 - Nullpointer in MethodBody when no ABC set
+- [#2148] AS2 Uninitialized class fields detector
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3355,6 +3356,7 @@ Major version of SWF to XML export changed to 2.
 [#2139]: https://www.free-decompiler.com/flash/issues/2139
 [#2145]: https://www.free-decompiler.com/flash/issues/2145
 [#2142]: https://www.free-decompiler.com/flash/issues/2142
+[#2148]: https://www.free-decompiler.com/flash/issues/2148
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220

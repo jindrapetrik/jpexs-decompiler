@@ -313,24 +313,27 @@ public class UninitializedClassFieldsDetector {
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                     @Override
                     public void visit(GraphTargetItem item) {
-                        if (item instanceof SetMemberActionItem) {
-                            if (item instanceof SetMemberActionItem) {
-                                List<String> path = getFullPath(item);
-                                if (path != null) {
-                                    List<String> parent = new ArrayList<>(path);
-                                    parent.remove(parent.size() - 1);
-                                    String name = path.get(path.size() - 1);
+                        if ((item instanceof SetMemberActionItem)
+                                || (item instanceof CallMethodActionItem)
+                                || (item instanceof NewMethodActionItem)
+                                || (item instanceof DeleteActionItem)
+                                || (item instanceof GetMemberActionItem)
+                        ) {
+                            List<String> path = getFullPath(item);
+                            if (path != null) {
+                                List<String> parent = new ArrayList<>(path);
+                                parent.remove(parent.size() - 1);
+                                String name = path.get(path.size() - 1);
 
-                                    String className = String.join(".", parent);
-                                    if (classInheritance.containsKey(className)) {
-                                        //it's a class
-                                        if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
-                                            Variable v = new Variable(true, name, null, className);
-                                            if (!result.containsKey(className)) {
-                                                result.put(className, new LinkedHashMap<>());
-                                            }
-                                            result.get(className).put(name, v);
-                                        }
+                                String className = String.join(".", parent);
+                                if (classInheritance.containsKey(className)) {
+                                    //it's a class
+                                    if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
+                                        if (!result.containsKey(className)) {
+                                            result.put(className, new LinkedHashMap<>());
+                                        }                                        
+                                        Variable v = new Variable(true, name, null, className);
+                                        result.get(className).put(name, v);
                                     }
                                 }
                             }
