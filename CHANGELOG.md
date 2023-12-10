@@ -78,6 +78,7 @@ All notable changes to this project will be documented in this file.
 - [#2142] XML Export - string values containing only spaces
 - AS3 - Nullpointer in MethodBody when no ABC set
 - [#2148] AS2 Uninitialized class fields detector
+- [#2148] AS1/2 callmethod by register value
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
