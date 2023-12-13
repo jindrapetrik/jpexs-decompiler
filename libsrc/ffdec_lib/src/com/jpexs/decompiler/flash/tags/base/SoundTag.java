@@ -65,4 +65,6 @@ public interface SoundTag extends TreeItem {
     public String getName();
     
     public String getFlaExportName();
+    
+    public int getInitialLatency();
 }

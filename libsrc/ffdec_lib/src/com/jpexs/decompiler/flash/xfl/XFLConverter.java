@@ -162,6 +162,7 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1961,7 +1962,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private void convertSoundMedia(SWF swf, ReadOnlyTagList tags, SoundTag symbol, XFLXmlWriter writer, HashMap<String, byte[]> files) throws XMLStreamException {
+    private void convertSoundMedia(SWF swf, ReadOnlyTagList tags, SoundTag symbol, XFLXmlWriter writer, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles) throws XMLStreamException {
         int soundFormat = 0;
         int soundRate = 0;
         boolean soundType = false;
@@ -2034,6 +2035,7 @@ public class XFLConverter {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
+        int seekSamples = 0;
         if (soundFormat == SoundFormat.FORMAT_MP3) {
             exportFormat = "mp3";
             if (!soundType) { //mono
@@ -2043,9 +2045,13 @@ public class XFLConverter {
             try {
                 SWFInputStream sis = new SWFInputStream(swf, soundData);
                 MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                if (s.seekSamples > 0) {
+                    seekSamples = s.seekSamples;
+                    exportFormat = "wav";
+                }                    
                 if (!s.frames.isEmpty()) {
                     MP3FRAME frame = s.frames.get(0);
-                    int bitRate = frame.getBitRate();
+                    int bitRate = frame.getBitRate() / 1000;
 
                     switch (bitRate) {
                         case 8:
@@ -2084,8 +2090,7 @@ public class XFLConverter {
                         case 160:
                             bits = 17;
                             break;
-
-                    }
+                    }                    
                 }
             } catch (IOException | IndexOutOfBoundsException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -2095,9 +2100,21 @@ public class XFLConverter {
         SoundFormat fmt = st.getSoundFormat();
         byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
         try {
-            data = new SoundExporter().exportSound(st, SoundExportMode.MP3_WAV);
+            data = new SoundExporter().exportSound(st, seekSamples > 0 ? SoundExportMode.WAV : SoundExportMode.MP3_WAV);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
+        }
+        
+        String datFileName = null;
+        if (seekSamples > 0) {
+            long ts = getTimestamp(swf);
+            datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
+            try {
+                byte[] decodedData = st.getSoundFormat().decode(null, st.getRawSoundData(), seekSamples);
+                datfiles.put(datFileName, decodedData);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
 
         String symbolFile = symbol.getFlaExportName() + "." + exportFormat;
@@ -2107,6 +2124,9 @@ public class XFLConverter {
             "sourceLastImported", Long.toString(getTimestamp(swf)),
             "externalFileSize", Integer.toString(data.length)});
         writer.writeAttribute("href", symbolFile);
+        if (datFileName != null) {
+            writer.writeAttribute("soundDataHRef", datFileName);
+        }
         writer.writeAttribute("format", rateMap[soundRate] + "kHz" + " " + (soundSize ? "16bit" : "8bit") + " " + (soundType ? "Stereo" : "Mono"));
         writer.writeAttribute("exportFormat", format);
         writer.writeAttribute("exportBits", bits);
@@ -2227,7 +2247,7 @@ public class XFLConverter {
                 statusStack.popStatus();
             } else if (symbol instanceof DefineSoundTag) {
                 statusStack.pushStatus(symbol.toString());
-                convertSoundMedia(swf, tags, (DefineSoundTag) symbol, writer, files);
+                convertSoundMedia(swf, tags, (DefineSoundTag) symbol, writer, files, datfiles);
 
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
@@ -2336,7 +2356,7 @@ public class XFLConverter {
                 SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
                 for (SoundStreamFrameRange range : head.getRanges()) {
                     statusStack.pushStatus(range.toString());
-                    convertSoundMedia(swf, tags, range, writer, files);
+                    convertSoundMedia(swf, tags, range, writer, files, datfiles);
                     writer.writeEndElement();
                     mediaCount++;
                     statusStack.popStatus();
@@ -2349,7 +2369,7 @@ public class XFLConverter {
                         SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
                         for (SoundStreamFrameRange range : head.getRanges()) {
                             statusStack.pushStatus(range.toString());
-                            convertSoundMedia(swf, sprite.getTags(), range, writer, files);
+                            convertSoundMedia(swf, sprite.getTags(), range, writer, files, datfiles);
                             writer.writeEndElement();
                             mediaCount++;
                             statusStack.popStatus();
@@ -3195,7 +3215,7 @@ public class XFLConverter {
                 SWF swf = startSound.getSwf();
                 DefineSoundTag s = swf.getSound(startSound.soundId);
                 if (s == null) {
-                    logger.log(Level.WARNING, "Sount tag (ID={0}) was not found", startSound.soundId);
+                    logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", startSound.soundId);
                     continue;
                 }
 

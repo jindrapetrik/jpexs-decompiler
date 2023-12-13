@@ -164,4 +164,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     public String getFlaExportName() {
         return head.getFlaExportName() + "_" + (startFrame + 1) + "-" + (endFrame + 1);
     }        
+    
+    @Override
+    public int getInitialLatency() {
+        return 0;
+    }
 }

@@ -1290,6 +1290,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
             return false;
         }
 
+        if (tag == null) {
+            return true;
+        }
         SWF swf = tag.getSwf();
         assignTag(tag, editedTag);
         tag.setModified(true);

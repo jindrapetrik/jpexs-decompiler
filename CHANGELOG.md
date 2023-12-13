@@ -80,6 +80,7 @@ All notable changes to this project will be documented in this file.
 - [#2148] AS2 Uninitialized class fields detector
 - [#2148] AS1/2 callmethod by register value
 - [#2148] AS2 Do not return undefined for setters
+- [#2143] FLA Export / Sound playback - taking MP3 initial latency into account
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3359,6 +3360,7 @@ Major version of SWF to XML export changed to 2.
 [#2145]: https://www.free-decompiler.com/flash/issues/2145
 [#2142]: https://www.free-decompiler.com/flash/issues/2142
 [#2148]: https://www.free-decompiler.com/flash/issues/2148
+[#2143]: https://www.free-decompiler.com/flash/issues/2143
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220

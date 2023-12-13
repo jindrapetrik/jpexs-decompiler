@@ -260,4 +260,9 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String getFlaExportName() {
         return "sound" + getCharacterId();
     }
+            
+    @Override
+    public int getInitialLatency() {
+        return 0;
+    }
 }

@@ -31,6 +31,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -137,6 +139,9 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     @Override
     public SoundExportFormat getExportFormat() {
         if (soundFormat == SoundFormat.FORMAT_MP3) {
+            if (getInitialLatency() > 0) {
+                return SoundExportFormat.WAV;
+            }
             return SoundExportFormat.MP3;
         }
         if (soundFormat == SoundFormat.FORMAT_ADPCM) {
@@ -241,5 +246,19 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
+    }      
+    
+    @Override
+    public int getInitialLatency() {
+        if (soundFormat == SoundFormat.FORMAT_MP3) {
+            SWFInputStream sis;
+            try {
+                sis = new SWFInputStream(null, soundData.getRangeData(0, 2));
+                return sis.readSI16("seekSamples"); 
+            } catch (IOException ex) {
+                //ignore
+            }                   
+        }
+        return 0;
     }
 }
