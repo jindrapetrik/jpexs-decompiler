@@ -192,7 +192,7 @@ public class SoundTagPlayer implements MediaDisplay {
         if (wavData == null) {
             List<ByteArrayRange> soundData = tag.getRawSoundData();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            tag.getSoundFormat().createWav(soundInfo, soundData, baos);
+            tag.getSoundFormat().createWav(soundInfo, soundData, baos, tag.getInitialLatency());
             wavData = baos.toByteArray();
             swf.putToCache(soundInfo, tag, wavData);
         }

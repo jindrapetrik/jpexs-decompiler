@@ -23,6 +23,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -86,28 +87,11 @@ public class SoundFormat {
         this.samplingRate = samplingRate;
         this.stereo = stereo;
         ensureFormat();
-    }
-
-    public byte[] decode(SWFInputStream sis) {
-        try {
-            return getDecoder().decode(sis);
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    public boolean decode(SWFInputStream sis, OutputStream os) {
-        try {
-            getDecoder().decode(sis, os);
-            return true;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
+    }  
 
     public boolean play(SWFInputStream sis) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (!decode(sis, baos)) {
+        if (!SoundFormat.this.decode(sis, baos)) {
             return false;
         }
 
@@ -200,7 +184,24 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os) throws IOException {
+    public byte[] decode(SWFInputStream sis) {
+        try {
+            return getDecoder().decode(sis);
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    public boolean decode(SWFInputStream sis, OutputStream os) {
+        try {
+            getDecoder().decode(sis, os);
+            return true;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+    
+    public byte[] decode(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, int skipSamples) throws IOException {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SoundDecoder decoder = getDecoder();
@@ -209,34 +210,48 @@ public class SoundFormat {
             sis.seek(dataRange.getPos());
             decoder.decode(sis, baos);
         }
-
-        /*
-        System.err.println("sampling rate:" + samplingRate);
-        System.err.println("len:" + baos.toByteArray().length);
-         */
+        byte[] decodedData = baos.toByteArray();
+        if (skipSamples > 0) {
+            byte[] data = decodedData;
+            data = Arrays.copyOfRange(
+                    data, 
+                    skipSamples * 2 * (stereo ? 2 : 1),
+                    data.length
+                );
+            return data;
+        }
+        
+        return decodedData;
+    }
+    
+    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os, int skipSamples) throws IOException {
+        
+        byte[] decodedData = decode(soundInfo, dataRanges, skipSamples);
         boolean convertedStereo = stereo;
 
         ByteArrayOutputStream baosFiltered;
         if (soundInfo == null) {
-            baosFiltered = baos;
+            baosFiltered = new ByteArrayOutputStream();
+            baosFiltered.write(decodedData);
         } else {
             int inPoint = (soundInfo.hasInPoint ? (int) Math.round(soundInfo.inPoint * samplingRate / 44100.0) : 0);
             int outPoint = (soundInfo.hasOutPoint ? (int) Math.round(soundInfo.outPoint * samplingRate / 44100.0) : Integer.MAX_VALUE);
-            byte[] data = baos.toByteArray();
             baosFiltered = new ByteArrayOutputStream();
             int inPointBytes = inPoint * 2 /*16bit*/ * (stereo ? 2 : 1);
-            int outPointBytes = soundInfo.hasOutPoint ? outPoint * 2 /*16bit*/ * (stereo ? 2 : 1) : data.length;
+            //Q: Use skipSamples value?
+            
+            int outPointBytes = soundInfo.hasOutPoint ? outPoint * 2 /*16bit*/ * (stereo ? 2 : 1) : decodedData.length;
             for (int i = inPointBytes; i < outPointBytes; i += (stereo ? 4 : 2)) {
-                if (i + 1 >= data.length) {
+                if (i + 1 >= decodedData.length) {
                     break;
                 }
-                int left = ((data[i] & 0xff) + ((data[i + 1] & 0xff) << 8)) << 16 >> 16;
+                int left = ((decodedData[i] & 0xff) + ((decodedData[i + 1] & 0xff) << 8)) << 16 >> 16;
                 int right = left;
                 if (stereo) {
-                    if (i + 3 >= data.length) {
+                    if (i + 3 >= decodedData.length) {
                         break;
                     }
-                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;
+                    right = ((decodedData[i + 2] & 0xff) + ((decodedData[i + 3] & 0xff) << 8)) << 16 >> 16;
                 }
 
                 if (soundInfo.hasEnvelope) {

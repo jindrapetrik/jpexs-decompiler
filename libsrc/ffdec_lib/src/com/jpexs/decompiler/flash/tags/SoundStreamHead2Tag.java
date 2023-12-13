@@ -290,4 +290,9 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public String getFlaExportName() {
         return "sound" + getCharacterId();
     }
+        
+    @Override
+    public int getInitialLatency() {
+        return 0;
+    }
 }

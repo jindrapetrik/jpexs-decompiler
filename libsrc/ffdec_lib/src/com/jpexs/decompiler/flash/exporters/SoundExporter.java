@@ -194,7 +194,7 @@ public class SoundExporter {
             }
         } else {
             List<ByteArrayRange> soundData = st.getRawSoundData();
-            fmt.createWav(null, soundData, fos);
+            fmt.createWav(null, soundData, fos, st.getInitialLatency());
         }
     }
 }
