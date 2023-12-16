@@ -22,10 +22,8 @@ pipeline {
                         mkdir moje
                         echo "zkouska" > moje/neco.txt
                     '''                    
-                }
-                node {
                     zip zipFile: 'release.zip', archive: true, dir: 'moje', overwrite: true
-                }
+                }                
             }
         }
         stage('Test') {
