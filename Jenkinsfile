@@ -17,7 +17,7 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant build"
                 }
-                zip zipFile: 'release.zip', archive: false, dir: 'dist'
+                zip zipFile: 'release.zip', dir: 'dist'
                 archiveArtifacts artifacts: 'release.zip', fingerprint: true
             }
         }
@@ -26,7 +26,7 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant test"
                 }
-                zip zipFile: 'reports.zip', archive: false, dir: 'reports'
+                zip zipFile: 'reports.zip', dir: 'reports'
                 archiveArtifacts artifacts: 'reports.zip', fingerprint: true
             }
         }
@@ -35,7 +35,7 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant javadoc"
                 }
-                zip zipFile: 'javadoc.zip', archive: false, dir: 'javadoc'
+                zip zipFile: 'javadoc.zip', dir: 'javadoc'
                 archiveArtifacts artifacts: 'javadoc.zip', fingerprint: true
             }
         }
