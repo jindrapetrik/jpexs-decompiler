@@ -18,14 +18,10 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo "CH=${COMMIT_HASH}"
-                sh "nic"
                 withAnt(installation: 'myinstall') {
                     sh "ant build"
                 }
-                script {
-                    zip zipFile: "release${COMMIT_HASH}.zip", archive: true, dir: 'dist', overwrite: true
-                }                
+                zip zipFile: "release${COMMIT_HASH}.zip", archive: true, dir: 'dist', overwrite: true                            
             }
         }
         stage('Test') {
