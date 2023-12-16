@@ -2,9 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Clean') {
             steps {
-                echo 'Hello Github World'
+                sh '''
+                    rm -rf build
+                    rm -rf javadoc
+                    rm -rf reports
+                '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "ant build"
+            }
+        }
+        stage('Test') {
+            steps {
+                sh "ant test"
+            }
+        }
+        stage('Javadoc') {
+            steps {
+                sh "ant javadoc"
             }
         }
     }
