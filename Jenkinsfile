@@ -18,11 +18,13 @@ pipeline {
         }
         stage('Build') {
             steps {
+                echo "CH=${COMMIT_HASH}"
+                sh "nic"
                 withAnt(installation: 'myinstall') {
                     sh "ant build"
                 }
                 script {
-                    zip zipFile: 'release${COMMIT_HASH}.zip', archive: true, dir: 'dist', overwrite: true
+                    zip zipFile: "release${COMMIT_HASH}.zip", archive: true, dir: 'dist', overwrite: true
                 }                
             }
         }
@@ -32,7 +34,7 @@ pipeline {
                     sh "ant test"
                 }
                 script {
-                    zip zipFile: 'reports${COMMIT_HASH}.zip', archive: true, dir: 'reports', overwrite: true
+                    zip zipFile: "reports${COMMIT_HASH}.zip", archive: true, dir: 'reports', overwrite: true
                 }
             }
         }
@@ -42,7 +44,7 @@ pipeline {
                     sh "ant javadoc"
                 }
                 script {
-                    zip zipFile: 'javadoc${COMMIT_HASH}.zip', archive: true, dir: 'javadoc', overwrite: true
+                    zip zipFile: "javadoc${COMMIT_HASH}.zip", archive: true, dir: 'javadoc', overwrite: true
                 }                
             }
         }
