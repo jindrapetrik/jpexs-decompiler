@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-          COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true)
+          COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
     }
 
     stages {
