@@ -5,6 +5,7 @@ pipeline {
         stage('Clean') {
             steps {
                 sh '''
+                    rm -rf dist
                     rm -rf build
                     rm -rf javadoc
                     rm -rf reports
@@ -16,6 +17,8 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant build"
                 }
+                zip zipFile: 'release.zip', archive: false, dir: 'dist'
+                archiveArtifacts artifacts: 'release.zip', fingerprint: true
             }
         }
         stage('Test') {
@@ -23,6 +26,8 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant test"
                 }
+                zip zipFile: 'reports.zip', archive: false, dir: 'reports'
+                archiveArtifacts artifacts: 'reports.zip', fingerprint: true
             }
         }
         stage('Javadoc') {
@@ -30,6 +35,8 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant javadoc"
                 }
+                zip zipFile: 'javadoc.zip', archive: false, dir: 'javadoc'
+                archiveArtifacts artifacts: 'javadoc.zip', fingerprint: true
             }
         }
     }
