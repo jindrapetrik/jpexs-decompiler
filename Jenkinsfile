@@ -13,17 +13,23 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh "ant build"
+                withAnt(installation: 'myinstall') {
+                    sh "ant build"
+                }
             }
         }
         stage('Test') {
             steps {
-                sh "ant test"
+                withAnt(installation: 'myinstall') {
+                    sh "ant test"
+                }
             }
         }
         stage('Javadoc') {
             steps {
-                sh "ant javadoc"
+                withAnt(installation: 'myinstall') {
+                    sh "ant javadoc"
+                }
             }
         }
     }
