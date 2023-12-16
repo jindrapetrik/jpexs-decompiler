@@ -14,20 +14,24 @@ pipeline {
         }
         stage('Build') {
             steps {
-                withAnt(installation: 'myinstall') {
+                /*withAnt(installation: 'myinstall') {
                     sh "ant build"
-                }
+                }*/
                 script {
-                    zip zipFile: 'release.zip', archive: false, dir: 'dist'
+                    sh '''
+                        mkdir moje
+                        echo "zkouska" > moje/neco.txt
+                    '''
+                    zip zipFile: 'release.zip', archive: false, dir: 'moje'
                     archiveArtifacts artifacts: 'release.zip', fingerprint: true
                 }
             }
         }
         stage('Test') {
             steps {
-                withAnt(installation: 'myinstall') {
+                /*withAnt(installation: 'myinstall') {
                     sh "ant test"
-                }
+                }*/
                 script {
                     zip zipFile: 'reports.zip', archive: false, dir: 'reports'
                     archiveArtifacts artifacts: 'reports.zip', fingerprint: true
@@ -36,9 +40,9 @@ pipeline {
         }
         stage('Javadoc') {
             steps {
-                withAnt(installation: 'myinstall') {
+                /*withAnt(installation: 'myinstall') {
                     sh "ant javadoc"
-                }
+                }*/
                 script {
                     zip zipFile: 'javadoc.zip', archive: false, dir: 'javadoc'
                     archiveArtifacts artifacts: 'javadoc.zip', fingerprint: true
