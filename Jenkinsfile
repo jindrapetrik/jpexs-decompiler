@@ -21,7 +21,9 @@ pipeline {
                 withAnt(installation: 'myinstall') {
                     sh "ant build"
                 }
-                zip zipFile: "release${COMMIT_HASH}.zip", archive: true, dir: 'dist', overwrite: true                            
+                script {
+                    zip zipFile: "release${COMMIT_HASH}.zip", archive: true, dir: 'dist', overwrite: true                            
+                }
             }
         }
         stage('Test') {
