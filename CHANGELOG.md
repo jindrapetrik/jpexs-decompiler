@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#2131] Breakpoint list dialog
 - ExportAssets tag - show first item as description in the tree when there is only single item
 - [#2134] FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present
-- [#2132] Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges
+- [#2132] Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges (+ take scenes into account)
 - FLA export - show export time
 - [#2138] Morphshapes - detect classic easing
 - FLA export - option to disable fixing of shapes

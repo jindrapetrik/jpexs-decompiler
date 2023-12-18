@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
+import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -583,7 +584,14 @@ public class Timeline {
         boolean frameHasSound = false;
         int frame = 0;
         SoundStreamHeadTypeTag head = null;
+        List<Integer> sceneOffsets = new ArrayList<>();
         for (Tag t : tags) {
+            if (containerId == -1 && (t instanceof DefineSceneAndFrameLabelDataTag)) {
+                DefineSceneAndFrameLabelDataTag sceneFrameData = (DefineSceneAndFrameLabelDataTag) t;
+                for (Long offset : sceneFrameData.sceneOffsets) {
+                    sceneOffsets.add((int) (long) offset);
+                }
+            }
             if (t instanceof SoundStreamHeadTypeTag) {
                 head = (SoundStreamHeadTypeTag) t;
                 head.setCharacterId(containerId);
@@ -608,12 +616,20 @@ public class Timeline {
             
             if (t instanceof ShowFrameTag) {
                 frame++;
-                if (frameHasSound) {                    
+                if (frameHasSound) {
                     numFramesNoSound = 0;
                 } else {
                     numFramesNoSound++;                    
                 }
                 frameHasSound = false;
+                if (sceneOffsets.contains(frame)) {
+                    if (range.endFrame > -1) {
+                        ranges.add(range);
+                    }
+                    range = new SoundStreamFrameRange(head);
+                    range.startFrame = -1;
+                    range.endFrame = -1;  
+                }
             }
 
             if (ranges == null) {
