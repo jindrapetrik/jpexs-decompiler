@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.xfl.shapefixer;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.math.BezierEdge;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
@@ -477,7 +478,9 @@ public class ShapeFixer {
         
         beforeHandle(shapeNum, shapes, fillStyles0, fillStyles1, lineStyles, layers, baseFillStyles, baseLineStyles, fillStyleLayers, lineStyleLayers);
         
-        detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+        if (Configuration.flaExportFixShapes.get()) {
+            detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
+        }
         
         return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);        
     }

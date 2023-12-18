@@ -989,6 +989,10 @@ public final class Configuration {
     @ConfigurationDirectory
     public static ConfigurationItem<String> jnaTempDirectory = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> flaExportFixShapes = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
