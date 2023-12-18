@@ -2149,7 +2149,6 @@ public class XFLConverter {
             return;
         }
 
-        int mediaCount = 0;
         writer.writeStartElement("media");
         
       
@@ -2239,11 +2238,12 @@ public class XFLConverter {
                 }
                 writer.writeAttribute("quality", 50);
                 writer.writeAttribute("href", symbolFile);
-                writer.writeAttribute("bitmapDataHRef", "M " + (mediaCount + 1) + " " + getTimestamp(swf) + ".dat");
+                String datFileName = "M " + (datfiles.size() + 1) + " " + getTimestamp(swf) + ".dat";
+                writer.writeAttribute("bitmapDataHRef", datFileName);
                 writer.writeAttribute("frameRight", image.getWidth());
                 writer.writeAttribute("frameBottom", image.getHeight());
                 writer.writeEndElement();
-                mediaCount++;
+                datfiles.put(datFileName, new byte[0]); //empty byte arrays are not written
                 statusStack.popStatus();
             } else if (symbol instanceof DefineSoundTag) {
                 statusStack.pushStatus(symbol.toString());
@@ -2264,7 +2264,6 @@ public class XFLConverter {
                 }
 
                 writer.writeEndElement();
-                mediaCount++;
                 statusStack.popStatus();
             } else if (symbol instanceof DefineVideoStreamTag) {
                 statusStack.pushStatus(symbol.toString());
@@ -2345,8 +2344,6 @@ public class XFLConverter {
                     }
                     writer.writeEndElement();
                 }
-
-                mediaCount++;
                 statusStack.popStatus();
             }
         }
@@ -2358,7 +2355,6 @@ public class XFLConverter {
                     statusStack.pushStatus(range.toString());
                     convertSoundMedia(swf, tags, range, writer, files, datfiles);
                     writer.writeEndElement();
-                    mediaCount++;
                     statusStack.popStatus();
                 }                
             }
@@ -2371,7 +2367,6 @@ public class XFLConverter {
                             statusStack.pushStatus(range.toString());
                             convertSoundMedia(swf, sprite.getTags(), range, writer, files, datfiles);
                             writer.writeEndElement();
-                            mediaCount++;
                             statusStack.popStatus();
                         }
                         break;
@@ -5198,8 +5193,12 @@ public class XFLConverter {
                         out.write(files.get(fileName));
                     }
                     for (String fileName : datfiles.keySet()) {
+                        byte[] data = datfiles.get(fileName);
+                        if (data.length == 0) {
+                            continue;
+                        }
                         out.putNextEntry(new ZipEntry("bin/" + fileName));
-                        out.write(datfiles.get(fileName));
+                        out.write(data);
                     }
                 }
             }, handler).run();
@@ -5216,7 +5215,11 @@ public class XFLConverter {
                 writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
             }
             for (String fileName : datfiles.keySet()) {
-                writeFile(handler, datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
+                byte[] data = datfiles.get(fileName);
+                if (data.length == 0) {
+                    continue;
+                }
+                writeFile(handler, data, binDir.getAbsolutePath() + File.separator + fileName);
             }
             writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile);
         }
