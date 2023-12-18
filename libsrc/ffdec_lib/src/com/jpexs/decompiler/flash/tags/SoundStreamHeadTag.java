@@ -147,8 +147,11 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public SoundExportFormat getExportFormat() {
+    public SoundExportFormat getExportFormat() {        
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+            if (getInitialLatency() > 0) {
+                return SoundExportFormat.WAV;
+            }
             return SoundExportFormat.MP3;
         }
         if (streamSoundCompression == SoundFormat.FORMAT_ADPCM) {
@@ -302,6 +305,6 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
                 
     @Override
     public int getInitialLatency() {
-        return 0;
+        return latencySeek;
     }
 }
