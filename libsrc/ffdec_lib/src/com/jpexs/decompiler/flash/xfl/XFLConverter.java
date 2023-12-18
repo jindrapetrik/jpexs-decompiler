@@ -1977,7 +1977,7 @@ public class XFLConverter {
             soundRate = head.getSoundRate();
             soundType = head.getSoundType();
             soundSize = head.getSoundSize();
-            soundSampleCount = head.getSoundSampleCount();            
+            soundSampleCount = 0; //head.getSoundSampleCount();
             boolean found = false;
             for (Tag t : tags) {
                 if (found && (t instanceof SoundStreamBlockTag)) {
@@ -2105,16 +2105,22 @@ public class XFLConverter {
             logger.log(Level.SEVERE, null, ex);
         }
         
+        byte[] decodedData = null;
+        try {
+            decodedData = st.getSoundFormat().decode(null, st.getRawSoundData(), seekSamples);
+            if (soundSampleCount == 0) {
+                soundSampleCount = decodedData.length / (2 * (st.getSoundType() ? 2 : 1));
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        
         String datFileName = null;
-        if (seekSamples > 0) {
+        if (seekSamples > 0 && decodedData != null) {
             long ts = getTimestamp(swf);
             datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
-            try {
-                byte[] decodedData = st.getSoundFormat().decode(null, st.getRawSoundData(), seekSamples);
-                datfiles.put(datFileName, decodedData);
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
+            datfiles.put(datFileName, decodedData);
         }
 
         String symbolFile = symbol.getFlaExportName() + "." + exportFormat;
