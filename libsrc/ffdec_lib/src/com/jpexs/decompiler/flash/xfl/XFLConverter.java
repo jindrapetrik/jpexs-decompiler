@@ -4786,6 +4786,22 @@ public class XFLConverter {
         }
         return false;
     }
+    
+    private SoundStreamHeadTypeTag getFirstSoundStreamHead(ReadOnlyTagList tags, Reference<ReadOnlyTagList> foundTags) {
+        for (Tag t : tags) {
+            if (t instanceof SoundStreamHeadTypeTag) {
+                foundTags.setVal(tags);
+                return (SoundStreamHeadTypeTag) t;
+            }
+            if (t instanceof DefineSpriteTag) {
+                SoundStreamHeadTypeTag st = getFirstSoundStreamHead(((DefineSpriteTag) t).getTags(), foundTags);
+                if (st != null) {
+                    return st;
+                }
+            }
+        }
+        return null;
+    }
 
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
 
@@ -5011,8 +5027,126 @@ public class XFLConverter {
             publishSettings.writeElementValue("OmitTraceActions", 0);
             publishSettings.writeElementValue("Quality", "80");
             publishSettings.writeElementValue("DeblockingFilter", 0);
-            publishSettings.writeElementValue("StreamFormat", 0);
-            publishSettings.writeElementValue("StreamCompress", 7);
+            Reference<ReadOnlyTagList> tagsRef = new Reference<>(null);
+            SoundStreamHeadTypeTag shead = getFirstSoundStreamHead(swf.getTags(), tagsRef);
+            if (shead == null) {
+                publishSettings.writeElementValue("StreamFormat", 0);
+                publishSettings.writeElementValue("StreamCompress", 7);
+            } else {
+                byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
+                int soundFormat = shead.getSoundFormatId();
+                int soundRate = shead.getSoundRate();
+                boolean soundType = shead.getSoundType();
+                boolean found = false;
+                for (Tag t : tagsRef.getVal()) {
+                    if (found && (t instanceof SoundStreamBlockTag)) {
+                        SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
+                        soundData = bl.streamSoundData.getRangeData();
+                        break;
+                    }
+                    if (t == shead) {
+                        found = true;
+                    }
+                }
+               
+                int streamFormat = 0;
+                int streamCompress = 0;
+                if ((soundFormat == SoundFormat.FORMAT_ADPCM)
+                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
+                        || (soundFormat == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
+                    if (soundType) { //stereo
+                        streamFormat += 1;
+                    }
+                    switch (soundRate) {
+                        case 0:
+                            streamFormat += 0;
+                            break;
+                        case 1:
+                            streamFormat += 2;
+                            break;
+                        case 2:
+                            streamFormat += 4;
+                            break;
+                        case 3:
+                            streamFormat += 6;
+                            break;
+                    }
+                }
+                if (soundFormat == SoundFormat.FORMAT_SPEEX) {
+                    streamCompress = 18;
+                }
+                if (soundFormat == SoundFormat.FORMAT_ADPCM) {
+                    try {
+                        SWFInputStream sis = new SWFInputStream(swf, soundData);
+                        int adpcmCodeSize = (int) sis.readUB(2, "adpcmCodeSize");
+                        streamCompress = 2 + adpcmCodeSize;
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                if (soundFormat == SoundFormat.FORMAT_MP3) {
+                    streamFormat = -1;
+                    if (!soundType) { //mono
+                        streamFormat += 1;
+                    }
+                    streamFormat += 4; //quality best, medium = +2
+                    if (soundData == null) {
+                        streamCompress = 17;
+                    } else {
+                        try {
+                            SWFInputStream sis = new SWFInputStream(swf, soundData);
+                            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
+                            if (!s.frames.isEmpty()) {
+                                MP3FRAME frame = s.frames.get(0);
+                                int bitRate = frame.getBitRate() / 1000;
+
+                                switch (bitRate) {
+                                    case 8:
+                                        streamCompress = 6;
+                                        break;
+                                    case 16:
+                                        streamCompress = 7;
+                                        break;
+                                    case 20:
+                                        streamCompress = 8;
+                                        break;
+                                    case 24:
+                                        streamCompress = 9;
+                                        break;
+                                    case 32:
+                                        streamCompress = 10;
+                                        break;
+                                    case 48:
+                                        streamCompress = 11;
+                                        break;
+                                    case 56:
+                                        streamCompress = 12;
+                                        break;
+                                    case 64:
+                                        streamCompress = 13;
+                                        break;
+                                    case 80:
+                                        streamCompress = 14;
+                                        break;
+                                    case 112:
+                                        streamCompress = 15;
+                                        break;
+                                    case 128:
+                                        streamCompress = 16;
+                                        break;
+                                    case 160:
+                                        streamCompress = 17;
+                                        break;
+                                }                    
+                            }
+                        } catch (IOException | IndexOutOfBoundsException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                publishSettings.writeElementValue("StreamFormat", streamFormat);
+                publishSettings.writeElementValue("StreamCompress", streamCompress);
+            }        
             publishSettings.writeElementValue("EventFormat", 0);
             publishSettings.writeElementValue("EventCompress", 7);
             publishSettings.writeElementValue("OverrideSounds", 0);
