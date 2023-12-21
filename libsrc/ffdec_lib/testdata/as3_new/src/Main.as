@@ -53,6 +53,7 @@ package
         TestForEachSwitch;
         TestForEachReturn;
         TestForEachReturn2;
+        TestForEachTry;
         TestForGoto;
         TestForIn;
         TestForInIf;

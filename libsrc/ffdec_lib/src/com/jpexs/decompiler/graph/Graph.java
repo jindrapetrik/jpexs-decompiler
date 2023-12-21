@@ -834,6 +834,11 @@ public class Graph {
         processSwitches(list, -1);
     }
 
+    
+    protected void processOther(List<GraphTargetItem> list, long lastLoopId) {
+        
+    }
+    
     /*
     
     while(something){
@@ -2891,6 +2896,7 @@ public class Graph {
                 boolean hasContinue = false;
                 processIfs(loopItem.commands);
                 processSwitches(loopItem.commands, currentLoop.id);
+                processOther(loopItem.commands, currentLoop.id);
 
                 checkContinueAtTheEnd(loopItem.commands, currentLoop);
                 List<ContinueItem> continues = loopItem.getContinues();

@@ -2048,48 +2048,59 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
-        super.finalProcessAfter(list, level, localData, path);
-        for (int i = 0; i < list.size(); i++) {
-
-            //Remove continues from all branches of try...catch block if its continue to parent loop
-            if (list.get(i) instanceof LoopItem) {
-                LoopItem li = (LoopItem) list.get(i);
-                if (li.hasBaseBody()) {
-                    List<GraphTargetItem> loopCommands = li.getBaseBodyCommands();
-                    if (!loopCommands.isEmpty()) {
-                        if (loopCommands.get(loopCommands.size() - 1) instanceof TryAVM2Item) {
-                            TryAVM2Item ta = (TryAVM2Item) loopCommands.get(loopCommands.size() - 1);
-                            for (List<GraphTargetItem> cc : ta.catchCommands) {
-                                if (!cc.isEmpty()) {
-                                    if (cc.get(cc.size() - 1) instanceof ContinueItem) {
-                                        ContinueItem ci = (ContinueItem) cc.get(cc.size() - 1);
-                                        if (ci.loopId == li.loop.id) {
-                                            cc.remove(cc.size() - 1);
-                                        }
-                                    }
-                                }
-                            }
-                            if (!ta.tryCommands.isEmpty()) {
-                                if (ta.tryCommands.get(ta.tryCommands.size() - 1) instanceof ContinueItem) {
-                                    ContinueItem ci = (ContinueItem) ta.tryCommands.get(ta.tryCommands.size() - 1);
-                                    if (ci.loopId == li.loop.id) {
-                                        ta.tryCommands.remove(ta.tryCommands.size() - 1);
-                                    }
-                                }
-                            }
-                            if (!ta.finallyCommands.isEmpty()) {
-                                if (ta.finallyCommands.get(ta.finallyCommands.size() - 1) instanceof ContinueItem) {
-                                    ContinueItem ci = (ContinueItem) ta.finallyCommands.get(ta.finallyCommands.size() - 1);
-                                    if (ci.loopId == li.loop.id) {
-                                        ta.finallyCommands.remove(ta.finallyCommands.size() - 1);
-                                    }
-                                }
-                            }
+    protected void processOther(List<GraphTargetItem> list, long lastLoopId) {
+        if (list.isEmpty()) {
+            return;
+        }    
+        
+        int pos = list.size() - 1;
+        
+        if (list.get(pos) instanceof ContinueItem) {
+            if (((ContinueItem) list.get(pos)).loopId != lastLoopId) {
+                return;
+            }
+            pos--;
+            if (list.size() < 2) {
+                return;
+            }
+        }
+                                
+        //Remove continues from all branches of try...catch block if its continue to parent loop
+        if (list.get(pos) instanceof TryAVM2Item) {                
+            TryAVM2Item ta = (TryAVM2Item) list.get(pos);
+            for (List<GraphTargetItem> cc : ta.catchCommands) {
+                if (!cc.isEmpty()) {
+                    if (cc.get(cc.size() - 1) instanceof ContinueItem) {
+                        ContinueItem ci = (ContinueItem) cc.get(cc.size() - 1);
+                        if (ci.loopId == lastLoopId) {
+                            cc.remove(cc.size() - 1);
                         }
                     }
                 }
             }
+            if (!ta.tryCommands.isEmpty()) {
+                if (ta.tryCommands.get(ta.tryCommands.size() - 1) instanceof ContinueItem) {
+                    ContinueItem ci = (ContinueItem) ta.tryCommands.get(ta.tryCommands.size() - 1);
+                    if (ci.loopId == lastLoopId) {
+                        ta.tryCommands.remove(ta.tryCommands.size() - 1);
+                    }
+                }
+            }
+            if (!ta.finallyCommands.isEmpty()) {
+                if (ta.finallyCommands.get(ta.finallyCommands.size() - 1) instanceof ContinueItem) {
+                    ContinueItem ci = (ContinueItem) ta.finallyCommands.get(ta.finallyCommands.size() - 1);
+                    if (ci.loopId == lastLoopId) {
+                        ta.finallyCommands.remove(ta.finallyCommands.size() - 1);
+                    }
+                }
+            }
+        }        
+    }
+       
+    @Override
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
+        super.finalProcessAfter(list, level, localData, path);
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof SetTypeAVM2Item) {
                 if (((SetTypeAVM2Item) list.get(i)).getValue().getThroughDuplicate() instanceof ExceptionAVM2Item) {
 
