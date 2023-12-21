@@ -50,6 +50,7 @@ package
         TestForEach;
         TestForEachObjectArray;
         TestForEachObjectAttribute;
+        TestForEachSwitch;
         TestForEachReturn;
         TestForEachReturn2;
         TestForGoto;

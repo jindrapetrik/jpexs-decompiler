@@ -728,6 +728,46 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testForEachSwitch() {
+        decompileMethod("classic", "testForEachSwitch", "var name:String = null;\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "var c:Boolean = true;\r\n"
+                + "var s:int = 5;\r\n"
+                + "var obj:Object = {};\r\n"
+                + "for each(name in obj)\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "switch(s)\r\n"
+                + "{\r\n"
+                + "case 1:\r\n"
+                + "trace(\"1\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"1b\");\r\n"
+                + "}\r\n"
+                + "case 2:\r\n"
+                + "trace(\"2\");\r\n"
+                + "break;\r\n"
+                + "case 3:\r\n"
+                + "trace(\"3\");\r\n"
+                + "break;\r\n"
+                + "case 4:\r\n"
+                + "trace(\"4\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"2c\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"before_continue\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic", "testForGoto", "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"

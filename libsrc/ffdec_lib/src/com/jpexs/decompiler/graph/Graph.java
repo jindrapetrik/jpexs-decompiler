@@ -286,7 +286,7 @@ public class Graph {
         stack.add(queue);
         stacknext:
         while (!stack.isEmpty()) {
-
+            
             queue = stack.peek();
             if (!queue.isEmpty()) {
                 part = queue.remove();
@@ -472,9 +472,9 @@ public class Graph {
         }
         Comparator<PartCommon> comparator = new Comparator<PartCommon>() {
             @Override
-            public int compare(PartCommon o1, PartCommon o2) {
+            public int compare(PartCommon o1, PartCommon o2) {                
                 int levelCompare = o2.level - o1.level;
-                if (levelCompare == 0) {
+                if (levelCompare == 0) {                    
                     try {
                         if (o1.part.leadsTo(localData, Graph.this, code, o2.part, loops, throwStates, false)) {
                             return -1;
@@ -637,7 +637,7 @@ public class Graph {
         }
 
         @Override
-        public int compareTo(PartCommon o) {
+        public int compareTo(PartCommon o) {            
             int ret = o.level - level;
             if (ret == 0) {
                 ret = part.closedTime - o.part.closedTime;
@@ -886,7 +886,7 @@ public class Graph {
                         BreakItem br = (BreakItem) it;
                         if (br.loopId == swi.loop.id) {
                             breakCount++;
-                            if (breakCount > 1) {
+                            if (breakCount > 2) {
                                 continue loopi;
                             }
                         }
@@ -894,11 +894,11 @@ public class Graph {
                 }
                 if (!swi.caseCommands.isEmpty()) {
                     List<GraphTargetItem> lastCommands = swi.caseCommands.get(swi.caseCommands.size() - 1);
-                    if (lastCommands.isEmpty() && breakCount == 1) {
+                    if (lastCommands.isEmpty() && breakCount > 0) {
                         continue loopi;
                     }
 
-                    if (breakCount == 1 && !(lastCommands.get(lastCommands.size() - 1) instanceof ContinueItem)
+                    if (breakCount > 0 && !(lastCommands.get(lastCommands.size() - 1) instanceof ContinueItem)
                             && !(lastCommands.get(lastCommands.size() - 1) instanceof ExitItem)) {
                         continue loopi;
                     }
@@ -909,10 +909,12 @@ public class Graph {
                     List<GraphTargetItem> commands = swi.caseCommands.get(c);
                     if (!commands.isEmpty()) {
                         if (commands.get(commands.size() - 1) instanceof BreakItem) {
-                            BreakItem br = (BreakItem) commands.get(commands.size() - 1);
-                            if (br.loopId == swi.loop.id) {
-                                breakCaseIndex = c;
-                                break;
+                            if (commands.size() == 1) {
+                                BreakItem br = (BreakItem) commands.get(commands.size() - 1);
+                                if (br.loopId == swi.loop.id) {
+                                    breakCaseIndex = c;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -928,6 +930,24 @@ public class Graph {
                         }
                     }
                 }
+                
+                if (breakCount == 2) {
+                    if (breakCaseIndex == 0) {
+                        continue loopi;
+                    }
+                    if (swi.caseCommands.get(breakCaseIndex - 1).isEmpty()) {
+                        continue loopi;
+                    }
+                    GraphTargetItem ti = swi.caseCommands.get(breakCaseIndex - 1).get(swi.caseCommands.get(breakCaseIndex - 1).size() - 1);
+                    if (!(ti instanceof BreakItem)) {
+                        continue loopi;
+                    }
+                    BreakItem br = (BreakItem) ti;
+                    if (br.loopId != swi.loop.id) {
+                        continue loopi;
+                    }
+                    swi.caseCommands.get(breakCaseIndex - 1).remove(swi.caseCommands.get(breakCaseIndex - 1).size() - 1);                           
+                }                
 
                 boolean hasContinues = false;
                 for (int c = 0; c < swi.caseCommands.size(); c++) {
@@ -962,6 +982,9 @@ public class Graph {
                         targetCommands.add(new BreakItem(null, null, swi.loop.id));
                     }
                 }
+            } else if (item instanceof IfItem) {
+                processSwitches(((IfItem) item).onTrue, lastLoopId);
+                processSwitches(((IfItem) item).onFalse, lastLoopId);
             }
         }
     }
@@ -1465,6 +1488,41 @@ public class Graph {
                             list.addAll(i + 1, ifi.onTrue);
                             ifi.onTrue.clear();
                             ifi.onTrue.addAll(onTrueItems);
+                        }
+                    }
+                }
+                
+                /*
+                if (xx) {
+                    A;
+                    break/continue x;
+                }
+                break/continue x;
+                
+                =>
+                
+                if (xx) {
+                    A;
+                }
+                break/continue x;
+                
+                */
+                if (i + 1 < list.size()) {
+                    GraphTargetItem nextItem = list.get(i + 1);
+                    if (onFalse.isEmpty() && !onTrue.isEmpty()) {
+                        if ((onTrue.get(onTrue.size() - 1) instanceof ContinueItem) && (nextItem instanceof ContinueItem)) {
+                            ContinueItem cntOnTrue = (ContinueItem) onTrue.get(onTrue.size() - 1);
+                            ContinueItem cntNext = (ContinueItem) nextItem;
+                            if (cntOnTrue.loopId == cntNext.loopId) {
+                                onTrue.remove(onTrue.size() - 1);
+                            }
+                        }
+                        if ((onTrue.get(onTrue.size() - 1) instanceof BreakItem) && (nextItem instanceof BreakItem)) {
+                            BreakItem brkOnTrue = (BreakItem) onTrue.get(onTrue.size() - 1);
+                            BreakItem brkNext = (BreakItem) nextItem;
+                            if (brkOnTrue.loopId == brkNext.loopId) {
+                                onTrue.remove(onTrue.size() - 1);
+                            }
                         }
                     }
                 }
@@ -3357,7 +3415,7 @@ public class Graph {
             }
         }
     }
-
+    
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
             List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
@@ -3561,7 +3619,7 @@ public class Graph {
                 }
             }
         }
-
+        
         //If the lastone is default empty and alone, remove it
         if (!caseCommands.isEmpty()) {
             List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
