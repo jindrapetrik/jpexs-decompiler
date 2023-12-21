@@ -770,6 +770,33 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testForEachTry() {
+        decompileMethod("classic_air", "testForEachTry", "var list:* = {};\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "for each(var name in list)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"xx\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
                 + "var c:int = 0;\r\n"

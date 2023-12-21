@@ -87,6 +87,7 @@ All notable changes to this project will be documented in this file.
 - [#2162] Debugger - ignore (warn) invalid jumps when injecting debug info
 - AS3 - extra newlines on methods which use activation
 - [#2162] AS3 switch inside foreach
+- [#2162] AS3 try inside foreach
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class

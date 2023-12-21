@@ -244,7 +244,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "_loc1_ = 0;\r\n"
                 + "var _loc2_:int = 0;\r\n"
                 + "_loc2_ = 5;\r\n"
-                + "for(; _loc1_ < 10; _loc1_++)\r\n"
+                + "while(_loc1_ < 10)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -258,6 +258,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "throw new Error(\"Problem: \" + _loc3_);\r\n"
                 + "}\r\n"
                 + "}\r\n"
+                + "_loc1_++;\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
                  false);

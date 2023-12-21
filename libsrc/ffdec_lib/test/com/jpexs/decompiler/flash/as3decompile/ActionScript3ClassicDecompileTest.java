@@ -768,6 +768,34 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testForEachTry() {
+        decompileMethod("classic", "testForEachTry", "var name:* = undefined;\r\n"
+                + "var list:* = {};\r\n"
+                + "var b:* = true;\r\n"
+                + "for each(name in list)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"xx\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic", "testForGoto", "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
