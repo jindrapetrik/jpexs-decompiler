@@ -731,6 +731,45 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testForEachSwitch() {
+        decompileMethod("classic_air", "testForEachSwitch", "var a:Boolean = true;\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "var c:Boolean = true;\r\n"
+                + "var s:int = 5;\r\n"
+                + "var obj:Object = {};\r\n"
+                + "for each(var name in obj)\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "switch(s - 1)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"1\");\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"1b\");\r\n"
+                + "}\r\n"
+                + "case 1:\r\n"
+                + "trace(\"2\");\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "trace(\"3\");\r\n"
+                + "break;\r\n"
+                + "case 3:\r\n"
+                + "trace(\"4\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"2c\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"before_continue\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
                 + "var c:int = 0;\r\n"
@@ -1820,7 +1859,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "if(a)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "break;\r\n"
                 + "}\r\n"
