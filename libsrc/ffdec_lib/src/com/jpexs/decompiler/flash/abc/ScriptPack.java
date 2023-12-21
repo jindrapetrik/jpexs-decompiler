@@ -544,6 +544,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
 
         for (int bodyIndex : bodyToPosToLine.keySet()) {
+            System.err.println("bi="+bodyIndex);
             List<AVM2Instruction> delIns = new ArrayList<>();
 
             MethodBody b = abc.bodies.get(bodyIndex);
@@ -605,6 +606,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (addedLines.contains(line)) {
                     continue;
                 }
+                if (!origPosToNewPos.containsKey(i + dpos)) {
+                    continue;
+                }
                 addedLines.add(line);
                 logger.log(Level.FINE, "Script {0}: Insert debugline({1}) at pos {2} to body {3}", new Object[]{path, line, i, bodyIndex});
                 code2.add(origPosToNewPos.get(i + dpos), new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
@@ -634,20 +638,32 @@ public class ScriptPack extends AS3ClassTreeItem {
                     int changedOperand;
                     if (ins.definition instanceof IfTypeIns) {
                         targetAddr = ins.getTargetAddress();
-                        changedAddr = mapOffsets.get(targetAddr);
-                        changedOperand = (int) (changedAddr - adr - 4);
-                        ins.operands[0] = changedOperand;
+                        if (mapOffsets.containsKey(targetAddr)) {
+                            changedAddr = mapOffsets.get(targetAddr);
+                            changedOperand = (int) (changedAddr - adr - 4);
+                            ins.operands[0] = changedOperand;
+                        } else {
+                            logger.log(Level.WARNING, "Invalid jump target in script {0}, bodyIndex {1}", new Object[]{toString(), bodyIndex});
+                        }
                     }
                     if (ins.definition instanceof LookupSwitchIns) {
                         targetAddr = ins.getAddress() + ins.operands[0];
-                        changedAddr = mapOffsets.get(targetAddr);
-                        changedOperand = (int) (changedAddr - adr);
-                        ins.operands[0] = changedOperand;
-                        for (int k = 2; k < ins.operands.length; k++) {
-                            targetAddr = ins.getAddress() + ins.operands[k];
+                        if (mapOffsets.containsKey(targetAddr)) {
                             changedAddr = mapOffsets.get(targetAddr);
                             changedOperand = (int) (changedAddr - adr);
-                            ins.operands[k] = changedOperand;
+                            ins.operands[0] = changedOperand;                        
+                        } else {
+                            logger.log(Level.WARNING, "Invalid jump target in script {0}, bodyIndex {1}", new Object[]{toString(), bodyIndex});
+                        }
+                        for (int k = 2; k < ins.operands.length; k++) {
+                            targetAddr = ins.getAddress() + ins.operands[k];
+                            if (mapOffsets.containsKey(targetAddr)) {                        
+                                changedAddr = mapOffsets.get(targetAddr);
+                                changedOperand = (int) (changedAddr - adr);
+                                ins.operands[k] = changedOperand;
+                            } else {
+                                logger.log(Level.WARNING, "Invalid jump target in script {0}, bodyIndex {1}", new Object[]{toString(), bodyIndex});
+                            }
                         }
                     }
                     ins.setAddress(adr);
