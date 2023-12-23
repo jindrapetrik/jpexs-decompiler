@@ -829,14 +829,13 @@ public class Graph {
     protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         return null;
     }
-
-    protected void processSwitches(List<GraphTargetItem> list) {
-        processSwitches(list, -1);
-    }
-
-    
+       
     protected void processOther(List<GraphTargetItem> list, long lastLoopId) {
         
+    }
+    
+    protected void processSwitches(List<GraphTargetItem> list) {
+        processSwitches(list, -1);
     }
     
     /*

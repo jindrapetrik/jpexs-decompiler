@@ -544,7 +544,6 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
 
         for (int bodyIndex : bodyToPosToLine.keySet()) {
-            System.err.println("bi="+bodyIndex);
             List<AVM2Instruction> delIns = new ArrayList<>();
 
             MethodBody b = abc.bodies.get(bodyIndex);
