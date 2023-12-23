@@ -1153,18 +1153,45 @@ public class XFLConverter {
 
     private static void walkShapeUsages(ReadOnlyTagList timeLineTags, HashMap<Integer, CharacterTag> characters, HashMap<Integer, Integer> usages) {
         Map<Integer, Integer> depthMap = new HashMap<>();
+        Map<Integer, Boolean> depthHasInstanceName = new HashMap<>();
+        Map<Integer, Boolean> depthHasColorTransform = new HashMap<>();
+        Map<Integer, Boolean> depthCacheAsBitmap = new HashMap<>();
+        Map<Integer, Boolean> depthHasNonemptyMatrix = new HashMap<>();
         for (Tag t : timeLineTags) {
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 walkShapeUsages(sprite.getTags(), characters, usages);
             }
             if (t instanceof RemoveTag) {
-                depthMap.remove(((RemoveTag) t).getDepth());
+                int d = ((RemoveTag) t).getDepth();
+                depthMap.remove(d);
+                depthHasInstanceName.remove(d);
+                depthHasColorTransform.remove(d);
+                depthCacheAsBitmap.remove(d);
+                depthHasNonemptyMatrix.remove(d);
             }
-            if (t instanceof PlaceObjectTypeTag) {
+            if (t instanceof PlaceObjectTypeTag) {                
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int d = po.getDepth();
+                
                 if (po.flagMove() || !depthMap.containsKey(d)) {
+                    if (!po.flagMove()) {
+                        depthHasInstanceName.put(d, false);
+                        depthHasColorTransform.put(d, false);
+                        depthCacheAsBitmap.put(d, false);
+                        depthHasNonemptyMatrix.put(d, false);
+                    }
+                    
+                    if (po.getInstanceName() != null) {
+                        depthHasInstanceName.put(d, true);
+                    } else if (po.getColorTransform() != null) {
+                        depthHasColorTransform.put(d, true);
+                    } else if (po.cacheAsBitmap()) {
+                        depthCacheAsBitmap.put(d, true);
+                    } else if (po.getMatrix() != null && !po.getMatrix().isEmpty()) {
+                        depthHasNonemptyMatrix.put(d, true);
+                    }
+
                     int ch = po.getCharacterId();
                     if (ch == -1) {
                         if (depthMap.containsKey(d)) {
@@ -1182,18 +1209,17 @@ public class XFLConverter {
                     }
                     int usageCount = usages.get(ch);
                     usageCount++;
-                    if (po.getInstanceName() != null) {
+                    if (depthHasInstanceName.get(d)) {
                         usageCount++;
-                    } else if (po.getColorTransform() != null) {
+                    } else if (depthHasColorTransform.get(d)) {
                         usageCount++;
-                    } else if (po.cacheAsBitmap()) {
+                    } else if (depthCacheAsBitmap.get(d)) {
                         usageCount++;
-                    } else if (po.getMatrix() != null && !po.getMatrix().isEmpty()) {
+                    } else if (depthHasNonemptyMatrix.get(d)) {
                         usageCount++;
                     }
                     usages.put(ch, usageCount);
                 }
-
             }
         }
     }
