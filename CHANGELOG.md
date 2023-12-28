@@ -89,6 +89,7 @@ All notable changes to this project will be documented in this file.
 - [#2162] AS3 switch inside foreach
 - [#2162] AS3 try inside foreach
 - [#2152] FLA Export - wrong nonlibrary shapes detection
+- [#2147] Display of empty video
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
@@ -3373,6 +3374,7 @@ Major version of SWF to XML export changed to 2.
 [#2163]: https://www.free-decompiler.com/flash/issues/2163
 [#2162]: https://www.free-decompiler.com/flash/issues/2162
 [#2152]: https://www.free-decompiler.com/flash/issues/2152
+[#2147]: https://www.free-decompiler.com/flash/issues/2147
 [#2120]: https://www.free-decompiler.com/flash/issues/2120
 [#1130]: https://www.free-decompiler.com/flash/issues/1130
 [#1220]: https://www.free-decompiler.com/flash/issues/1220

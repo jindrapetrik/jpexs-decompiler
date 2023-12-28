@@ -142,7 +142,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     @Internal
     private boolean renderingPaused = false;
-
+    
     public static final int CODEC_JPEG = 1;
     public static final int CODEC_SORENSON_H263 = 2;
     public static final int CODEC_SCREEN_VIDEO = 3;
@@ -277,27 +277,31 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     private void initPlayer() {
         if (mediaPlayer != null) { // && !mediaPlayer.isFinished()) {
             return;
-        }
-        mediaPlayer = new SimpleMediaPlayer();
-        players.add(mediaPlayer);
-        mediaPlayer.addFrameListener(new FrameListener() {
-            @Override
-            public void newFrameRecieved(BufferedImage image) {
-                synchronized (getFrameLock) {
-                    activeFrame = image;
-                    //System.out.println("received frame");
-                    getFrameLock.notifyAll();
-                    /*if (mediaPlayer.isFinished()) {
-                        mediaPlayer.rewind();
-                    }*/
-                }
-            }
-        });
+        }        
         MovieExporter exp = new MovieExporter();
         try {
             byte[] data = exp.exportMovie(this, MovieExportMode.FLV, true);
+            if (data.length == 0) {
+                return;
+            }
             File tempFile = File.createTempFile("ffdec_video", ".flv");
             Helper.writeFile(tempFile.getAbsolutePath(), data);
+            
+            mediaPlayer = new SimpleMediaPlayer();
+            players.add(mediaPlayer);
+            mediaPlayer.addFrameListener(new FrameListener() {
+                @Override
+                public void newFrameRecieved(BufferedImage image) {
+                    synchronized (getFrameLock) {
+                        activeFrame = image;
+                        //System.out.println("received frame");
+                        getFrameLock.notifyAll();
+                        /*if (mediaPlayer.isFinished()) {
+                            mediaPlayer.rewind();
+                        }*/
+                    }
+                }
+            });
             mediaPlayer.play(tempFile.getAbsolutePath());
             tempFiles.add(tempFile);
             //mediaPlayer.pause();
@@ -331,7 +335,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     @Override
     public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-
+        
         if (renderingPaused || !SimpleMediaPlayer.isAvailable()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             Matrix mat = transformation;
@@ -366,6 +370,10 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         synchronized (DefineVideoStreamTag.class) {
             if (!(activeFrame != null && lastFrame == f)) {
                 initPlayer();
+                
+                if (mediaPlayer == null) {
+                    return;
+                }
 
                 float oneFr = 0; //1f / (getNumFrames() + 2);
 
