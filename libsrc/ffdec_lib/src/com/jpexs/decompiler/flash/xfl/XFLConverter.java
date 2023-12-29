@@ -620,8 +620,8 @@ public class XFLConverter {
         return false;
     }
 
-    private static void convertShape(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer) throws XMLStreamException {
-        List<String> layers = getShapeLayers(swf, characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
+    private static void convertShape(int characterId, SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape, boolean useLayers, XFLXmlWriter writer) throws XMLStreamException {
+        List<String> layers = getShapeLayers(characterId, swf, characters, mat, shapeNum, shapeRecords, fillStyles, lineStyles, morphshape);
         if (!useLayers) {
             for (int l = layers.size() - 1; l >= 0; l--) {
                 writer.writeCharactersRaw(layers.get(l));
@@ -813,7 +813,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static List<String> getShapeLayers(SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
+    private static List<String> getShapeLayers(int characterId, SWF swf, HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
@@ -1877,7 +1877,7 @@ public class XFLConverter {
                                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId))) {
                                             ShapeTag shape = (ShapeTag) character;
                                             statusStack.pushStatus(character.toString());
-                                            convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
+                                            convertShape(characterId, swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, recCharWriter);
                                             statusStack.popStatus();
                                         } else if (character instanceof TextTag) {                                            
                                             statusStack.pushStatus(character.toString());                                            
@@ -1946,7 +1946,7 @@ public class XFLConverter {
                     symbolStr.writeStartElement("layers");
                     SHAPEWITHSTYLE shapeWithStyle = shape.getShapes();
                     if (shapeWithStyle != null) {
-                        convertShape(swf, characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, symbolStr);
+                        convertShape(shape.getCharacterId(), swf, characters, null, shape.getShapeNum(), shapeWithStyle.shapeRecords, shapeWithStyle.fillStyles, shapeWithStyle.lineStyles, false, true, symbolStr);
                     }
 
                     symbolStr.writeEndElement(); // layers
@@ -2769,12 +2769,12 @@ public class XFLConverter {
                     if ((character instanceof MorphShapeTag) && (!multiUsageMorphShapes.contains(character.getCharacterId()))) {
                         MorphShapeTag m2 = (MorphShapeTag) character;
                         statusStack.pushStatus(m2.toString());
-                        convertShape(swf, characters, matrix, m2.getShapeNum() == 1 ? 3 : 4, m2.getStartEdges().shapeRecords, m2.getFillStyles().getStartFillStyles(), m2.getLineStyles().getStartLineStyles(m2.getShapeNum()), true, false, addLastWriter);
+                        convertShape(m2.getCharacterId(), swf, characters, matrix, m2.getShapeNum() == 1 ? 3 : 4, m2.getStartEdges().shapeRecords, m2.getFillStyles().getStartFillStyles(), m2.getLineStyles().getStartLineStyles(m2.getShapeNum()), true, false, addLastWriter);
                         statusStack.popStatus();
                         shapeTween = true;
                     } else {
                         SHAPEWITHSTYLE endShape = m.getShapeAtRatio(65535); //lastTweenRatio);                    
-                        convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
+                        convertShape(m.getCharacterId(), swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, endShape.shapeRecords, m.getFillStyles().getFillStylesAt(65535), m.getLineStyles().getLineStylesAt(m.getShapeNum(), 65535), true, false, addLastWriter);
                     }
                     
                     Integer ease = EasingDetector.getEaseFromShapeRatios(morphShapeRatios);
@@ -2801,7 +2801,7 @@ public class XFLConverter {
                     } else {
                         ShapeTag shape = (ShapeTag) character;
                         statusStack.pushStatus(character.toString());                                            
-                        convertShape(swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
+                        convertShape(shape.getCharacterId(), swf, characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
                         statusStack.popStatus();
                     }
                     shapeTween = false;
@@ -2820,7 +2820,7 @@ public class XFLConverter {
                             elementsWriter.writeCharactersRaw(lastElements);
                         } else {       
                             statusStack.pushStatus(m.toString());
-                            convertShape(swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
+                            convertShape(m.getCharacterId(), swf, characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
                             statusStack.popStatus();
                         }
                         shapeTween = true;
