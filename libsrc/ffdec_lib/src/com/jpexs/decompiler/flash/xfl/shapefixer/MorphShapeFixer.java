@@ -270,24 +270,45 @@ public class MorphShapeFixer extends ShapeFixer {
                 
                 
                 PathIterator pi = region.getPathIterator(null);
-                if (!pi.isDone()) {
+                Rectangle2D bounds = region.getBounds2D();
+                double centerX = bounds.getCenterX();
+                double centerY = bounds.getCenterY();
+                int numPoints = 0;
+                int numContains = 0;
+                int numNotContains = 0;
+                double x = 0;
+                double y = 0;
+                while (!pi.isDone()) {
                     double[] points = new double[6];
                     int type = pi.currentSegment(points);
-                    if (type == PathIterator.SEG_MOVETO) {                            
-                        double x = points[0];
-                        double y = points[1];
-                        Rectangle2D bounds = region.getBounds2D();
-                        double centerX = bounds.getCenterX();
-                        double centerY = bounds.getCenterY();
-
-                        double p = Math.sqrt((centerX - x) * (centerX - x) + (centerY - y) * (centerY - y));
-                        double x1 = (centerX - x) * 0.1 / p;
-                        double y1 = (centerY - y) * 0.1 / p;
-                        if (!path.contains(x + x1, y + y1)) {                        
-                            closedHolesI.add(i);
-                        }
+                    switch (type) {
+                        case PathIterator.SEG_MOVETO:
+                        case PathIterator.SEG_LINETO:
+                            x = points[0];
+                            y = points[1];
+                            break;
+                        case PathIterator.SEG_QUADTO:
+                            x = points[2];
+                            y = points[3];                            
                     }
-                }               
+                    
+                    numPoints++;
+                    double p = Math.sqrt((centerX - x) * (centerX - x) + (centerY - y) * (centerY - y));
+                    double x1 = (centerX - x) * 0.1 / p;
+                    double y1 = (centerY - y) * 0.1 / p;
+                    if (path.contains(x + x1, y + y1)) {                        
+                        numContains++;                        
+                    } else {
+                        numNotContains++;
+                    }
+                    if (numPoints == 4) {
+                        break;
+                    }
+                    pi.next();
+                }
+                if (numNotContains > numContains) {
+                    closedHolesI.add(i);
+                }
             }
         }
 

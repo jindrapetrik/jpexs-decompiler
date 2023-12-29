@@ -72,7 +72,7 @@ All notable changes to this project will be documented in this file.
 - [#2136] FLA Export - optimized Shape fixer speed, repeated shape on timeline not exported twice
 - [#2139] FLA Export - labels layer not counted as layer index causing masked layer parentindex wrong
 - [#2138] Nested clipping (masks) display
-- [#2138] FLA Export - Missing morphshapes (incorrect holes calculation)
+- [#2138], [#2156] FLA Export - Missing morphshapes (incorrect holes calculation)
 - [#2138] FLA Export - Mask layer was visible when did not contain a masked layer
 - FLA Export - frame numbering problem
 - [#2145] FLA Export - missing frames, cliping layers order, nullpointer, empty sound layers
@@ -3366,6 +3366,7 @@ Major version of SWF to XML export changed to 2.
 [#1194]: https://www.free-decompiler.com/flash/issues/1194
 [#2136]: https://www.free-decompiler.com/flash/issues/2136
 [#2139]: https://www.free-decompiler.com/flash/issues/2139
+[#2156]: https://www.free-decompiler.com/flash/issues/2156
 [#2145]: https://www.free-decompiler.com/flash/issues/2145
 [#2142]: https://www.free-decompiler.com/flash/issues/2142
 [#2148]: https://www.free-decompiler.com/flash/issues/2148
