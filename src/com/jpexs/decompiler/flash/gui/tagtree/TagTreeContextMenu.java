@@ -95,6 +95,8 @@ import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
+import com.jpexs.decompiler.flash.timeline.Scene;
+import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -275,6 +277,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInTagListViewTagMenuItem;
 
     private JMenuItem showInHexDumpViewTagMenuItem;
+    
+    private JMenuItem showInFramesFolderMenuItem;
 
     private JMenuItem addFramesMenuItem;
 
@@ -501,6 +505,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSymbolClassMenuItem.setIcon(View.getIcon("importsymbolclass16"));
         add(importSymbolClassMenuItem);
 
+        showInFramesFolderMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInFramesFolder"));
+        showInFramesFolderMenuItem.addActionListener(this::showInFramesFolderActionPerformed);
+        showInFramesFolderMenuItem.setIcon(View.getIcon("frame16"));
+        add(showInFramesFolderMenuItem);
+
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
         showInResourcesViewTagMenuItem.setIcon(View.getIcon("folder16"));
@@ -515,7 +524,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInHexDumpViewTagMenuItem.addActionListener(this::showInHexDumpViewActionPerformed);
         showInHexDumpViewTagMenuItem.setIcon(View.getIcon("viewhex16"));
         add(showInHexDumpViewTagMenuItem);
-
+                        
         addTagInsideMenu = new JMenu(mainPanel.translate("contextmenu.addTagInside"));
         addTagInsideMenu.setIcon(View.getIcon("addtag16"));
         add(addTagInsideMenu);
@@ -1130,6 +1139,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInResourcesViewTagMenuItem.setVisible(false);
         showInTagListViewTagMenuItem.setVisible(false);
         showInHexDumpViewTagMenuItem.setVisible(false);
+        showInFramesFolderMenuItem.setVisible(false);
         addFramesMenuItem.setVisible(false);
         addFramesBeforeMenuItem.setVisible(false);
         addFramesAfterMenuItem.setVisible(false);
@@ -1368,6 +1378,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     || (firstItem instanceof BUTTONCONDACTION)
                     || (firstItem instanceof TagScript)) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
+            }
+            
+            if ((firstItem instanceof Scene) || (firstItem instanceof SceneFrame)) {
+                showInFramesFolderMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof SWF) {
@@ -1693,6 +1707,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         boolean insideSprite = false;
 
         if (item instanceof SWF) {
+            return;
+        }
+        
+        if (item instanceof Scene) {
+            return;
+        }        
+        
+        if (item instanceof SceneFrame) {
             return;
         }
 
@@ -3563,6 +3585,18 @@ public class TagTreeContextMenu extends JPopupMenu {
             logger.log(Level.SEVERE, null, ex);
         }
     }
+    
+    private void showInFramesFolderActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        if (item instanceof SceneFrame) {
+            item = ((SceneFrame) item).getFrame();
+        }
+        if (item instanceof Scene) {
+            item = ((Scene) item).getSceneFrame(0).getFrame();
+        }
+        mainPanel.setTagTreeSelectedNode(mainPanel.tagTree, item);
+        mainPanel.updateMenu();
+    }
 
     private void showInResourcesViewActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
@@ -3577,6 +3611,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
+        }
+        if (item instanceof SceneFrame) {
+            item = ((SceneFrame) item).getFrame();
+        }
+        if (item instanceof Scene) {
+            item = ((Scene) item).getSceneFrame(0).getFrame();
         }
         mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
         mainPanel.updateMenu();
