@@ -4394,63 +4394,65 @@ public class TagTreeContextMenu extends JPopupMenu {
                         && i + 1 + 1 < sourceTimelined.getTags().size()) {
                     Frame lastNotDeletedFrame = lastNotDeletedFrameNum == 0 ? null : sourceTimeline.getFrame(lastNotDeletedFrameNum - 1);
                     Frame nextFrame = sourceTimeline.getFrame(f + 1 - 1);
-                    Set<Integer> allDepths = new TreeSet<>(nextFrame.layers.keySet());
-                    if (lastNotDeletedFrame != null) {
-                        allDepths.addAll(lastNotDeletedFrame.layers.keySet());
-                    }
-                    for (int j = i + 1 + 1; j < sourceTimelined.getTags().size(); j++) {
-                        Tag t2 = sourceTimelined.getTags().get(j);
-                        if (t2 instanceof ShowFrameTag) {
-                            break;
+                    if (nextFrame != null) {
+                        Set<Integer> allDepths = new TreeSet<>(nextFrame.layers.keySet());
+                        if (lastNotDeletedFrame != null) {
+                            allDepths.addAll(lastNotDeletedFrame.layers.keySet());
                         }
-                        if (t2 instanceof RemoveTag) {
-                            sourceTimelined.removeTag(j);
-                            j--;
-                        }
-                    }
-                    for (int depth : allDepths) {
-                        DepthState lastDepthstate = lastNotDeletedFrame == null ? null : lastNotDeletedFrame.layers.get(depth);
-                        DepthState nextDepthstate = nextFrame.layers.get(depth);
-                        if (nextDepthstate != null 
-                                && nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame
-                                && nextDepthstate.placeFrame.frame > lastNotDeletedFrameNum - 1) {
-                            //the place was deleted                                                      
-                            PlaceObjectTypeTag placeFull = nextDepthstate.toPlaceObjectTag(depth);
-                            if (lastDepthstate != null) {
-                                if (USE_REMOVE_TAG) {
-                                    RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                                    rem.depth = depth;
-                                    i++;
-                                    sourceTimelined.addTag(i, rem);
-                                } else {
-                                    placeFull.setPlaceFlagMove(true);
-                                }
+                        for (int j = i + 1 + 1; j < sourceTimelined.getTags().size(); j++) {
+                            Tag t2 = sourceTimelined.getTags().get(j);
+                            if (t2 instanceof ShowFrameTag) {
+                                break;
                             }
-                            i++;                                                        
-                            sourceTimelined.addTag(i, placeFull);
-                        } else if (lastDepthstate != null 
-                                && nextDepthstate != null
-                                && !lastDepthstate.equals(nextDepthstate)) {
-                            if (nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame) {
+                            if (t2 instanceof RemoveTag) {
+                                sourceTimelined.removeTag(j);
+                                j--;
+                            }
+                        }
+                        for (int depth : allDepths) {
+                            DepthState lastDepthstate = lastNotDeletedFrame == null ? null : lastNotDeletedFrame.layers.get(depth);
+                            DepthState nextDepthstate = nextFrame.layers.get(depth);
+                            if (nextDepthstate != null 
+                                    && nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame
+                                    && nextDepthstate.placeFrame.frame > lastNotDeletedFrameNum - 1) {
+                                //the place was deleted                                                      
                                 PlaceObjectTypeTag placeFull = nextDepthstate.toPlaceObjectTag(depth);
-                                if (USE_REMOVE_TAG) {
-                                    RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                                    rem.depth = depth;
-                                    i++;
-                                    sourceTimelined.addTag(i, rem);
-                                } else {
-                                    placeFull.setPlaceFlagMove(true);
+                                if (lastDepthstate != null) {
+                                    if (USE_REMOVE_TAG) {
+                                        RemoveObject2Tag rem = new RemoveObject2Tag(swf);
+                                        rem.depth = depth;
+                                        i++;
+                                        sourceTimelined.addTag(i, rem);
+                                    } else {
+                                        placeFull.setPlaceFlagMove(true);
+                                    }
                                 }
-                                i++;
+                                i++;                                                        
                                 sourceTimelined.addTag(i, placeFull);
-                            }
-                        } else if (lastDepthstate != null
-                                && nextDepthstate == null) {
-                            RemoveObject2Tag rem = new RemoveObject2Tag(swf);
-                            rem.depth = depth;
-                            i++;
-                            sourceTimelined.addTag(i, rem);
-                        }                        
+                            } else if (lastDepthstate != null 
+                                    && nextDepthstate != null
+                                    && !lastDepthstate.equals(nextDepthstate)) {
+                                if (nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame) {
+                                    PlaceObjectTypeTag placeFull = nextDepthstate.toPlaceObjectTag(depth);
+                                    if (USE_REMOVE_TAG) {
+                                        RemoveObject2Tag rem = new RemoveObject2Tag(swf);
+                                        rem.depth = depth;
+                                        i++;
+                                        sourceTimelined.addTag(i, rem);
+                                    } else {
+                                        placeFull.setPlaceFlagMove(true);
+                                    }
+                                    i++;
+                                    sourceTimelined.addTag(i, placeFull);
+                                }
+                            } else if (lastDepthstate != null
+                                    && nextDepthstate == null) {
+                                RemoveObject2Tag rem = new RemoveObject2Tag(swf);
+                                rem.depth = depth;
+                                i++;
+                                sourceTimelined.addTag(i, rem);
+                            }                        
+                        }
                     }
                 }
                 f++;
