@@ -3261,7 +3261,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
                 confirmationMessage = mainPanel.translate("message.confirm.remove" + (removeDependencies ? "" : ".nodep")).replace("%item%", toRemove.toString());
             } else {
-                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size() + itemCountFix));
+                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size() + itemCountFix + framesToRemove.size()));
             }
 
             if (ViewMessages.showConfirmDialog(mainPanel, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
@@ -4405,7 +4405,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                         if (t2 instanceof RemoveTag) {
                             sourceTimelined.removeTag(j);
-                            j--;;
+                            j--;
                         }
                     }
                     for (int depth : allDepths) {
