@@ -128,6 +128,8 @@ public class Timeline {
     private boolean initialized = false;
 
     private Map<String, Integer> labelToFrame = new HashMap<>();
+    
+    private List<Scene> scenes = new ArrayList<>();            
 
     public static final int DRAW_MODE_ALL = 0;
     public static final int DRAW_MODE_SHAPES = 1;
@@ -282,6 +284,8 @@ public class Timeline {
         Frame frame = new Frame(this, frameIdx++);
         frame.layersChanged = true;
         boolean newFrameNeeded = false;
+        scenes = new ArrayList<>();
+        Scene prevScene = null;                
         for (Tag t : timelined.getTags()) {
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
@@ -290,6 +294,20 @@ public class Timeline {
             }
             frame.allInnerTags.add(t);
 
+            if (id == 0 && (t instanceof DefineSceneAndFrameLabelDataTag)) {
+                DefineSceneAndFrameLabelDataTag sceneData = (DefineSceneAndFrameLabelDataTag) t;
+                scenes = new ArrayList<>();
+                for (int i = 0; i < sceneData.sceneNames.length; i++) {
+                    int ioffset = (int) sceneData.sceneOffsets[i];
+                    Scene currentScene = new Scene(swf, ioffset, -1, sceneData.sceneNames[i]);
+                    scenes.add(currentScene);
+                    if (prevScene != null) {
+                        prevScene.endFrame = ioffset - 1;
+                    }
+                    prevScene = currentScene;
+                }                
+            }
+            
             if (t instanceof ASMSourceContainer) {
                 ASMSourceContainer asmSourceContainer = (ASMSourceContainer) t;
                 if (!asmSourceContainer.getSubItems().isEmpty()) {
@@ -444,6 +462,10 @@ public class Timeline {
         }
         if (newFrameNeeded) {
             frames.add(frame);
+        }
+        
+        if (prevScene != null) {
+            prevScene.endFrame = frames.size() - 1;
         }
 
         maxDepth = getMaxDepthInternal();
@@ -1520,5 +1542,10 @@ public class Timeline {
         }
 
         return false;
+    }
+    
+    public List<Scene> getScenes() {
+        ensureInitialized();
+        return new ArrayList<>(scenes);
     }
 }

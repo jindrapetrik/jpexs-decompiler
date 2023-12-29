@@ -40,6 +40,8 @@ import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
+import com.jpexs.decompiler.flash.timeline.Scene;
+import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -91,6 +93,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
     public static final String FOLDER_OTHERS = "others";
 
     public static final String FOLDER_SCRIPTS = "scripts";
+    
+    public static final String FOLDER_SCENES = "scenes";
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 
@@ -261,6 +265,10 @@ public class TagTreeModel extends AbstractTagTreeModel {
         for (int i = 0; i < frameCount; i++) {
             frames.add(timeline.getFrame(i));
         }
+        List<TreeItem> scenes = new ArrayList<>();
+        
+        List<Scene> sceneList = timeline.getScenes();
+        scenes.addAll(sceneList);
 
         for (int i = sounds.size() - 1; i >= 0; i--) {
             TreeItem sound = sounds.get(i);
@@ -285,6 +293,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.fonts"), FOLDER_FONTS, swf, fonts);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.binaryData"), FOLDER_BINARY_DATA, swf, binaryData);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.frames"), FOLDER_FRAMES, swf, frames);
+        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.scenes"), FOLDER_SCENES, swf, scenes);
         addFolderItem(nodeList, emptyFolders, true /*always add*/, translate("node.others"), FOLDER_OTHERS, swf, others);
 
         Map<Tag, TagScript> currentTagScriptCache = new HashMap<>();
@@ -418,6 +427,15 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
 
+            if (obj instanceof SceneFrame && n instanceof SceneFrame) {
+                // SceneFrames are always recreated, so compare them by frame and swf
+                SceneFrame nds = (SceneFrame) n;
+                SceneFrame objs = (SceneFrame) obj;
+                if (objs.getFrame().frame == nds.getFrame().frame && objs.getOpenable() == nds.getOpenable()) {
+                    return newPath;
+                }
+            }
+            
             if (obj instanceof FolderItem && n instanceof FolderItem) {
                 // FolderItems are always recreated, so compare them by name and swf
                 FolderItem nds = (FolderItem) n;
@@ -521,6 +539,13 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return ((OpenableList) parentNode).items;
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode);
+        } else if (parentNode instanceof Scene) {
+            Scene scene = (Scene) parentNode;
+            List<SceneFrame> sceneFrames = new ArrayList<>();
+            for (int i = 0; i < scene.getSceneFrameCount(); i++) {
+                sceneFrames.add(scene.getSceneFrame(i));
+            }
+            return sceneFrames;
         } else if (parentNode instanceof FolderItem) {
             return ((FolderItem) parentNode).subItems;
         } else if (parentNode instanceof Frame) {
@@ -614,6 +639,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return ((OpenableList) parentNode).items.get(index);
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode).get(index);
+        } else if (parentNode instanceof Scene) {
+            return ((Scene) parentNode).getSceneFrame(index);
         } else if (parentNode instanceof FolderItem) {
             return ((FolderItem) parentNode).subItems.get(index);
         } else if (parentNode instanceof Frame) {
@@ -687,6 +714,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return mappedSize + ((OpenableList) parentNode).items.size();
         } else if (parentNode instanceof SWF) {
             return mappedSize + getSwfFolders((SWF) parentNode).size();
+        } else if (parentNode instanceof Scene) {
+            return mappedSize + ((Scene) parentNode).getSceneFrameCount();            
         } else if (parentNode instanceof HeaderItem) {
             return mappedSize + 0;
         } else if (parentNode instanceof FolderItem) {
@@ -763,6 +792,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return indexOfAdd(baseIndex, ((OpenableList) parentNode).items.indexOf(childNode));
         } else if (parentNode instanceof SWF) {
             return indexOfAdd(baseIndex, getSwfFolders((SWF) parentNode).indexOf(childNode));
+        } else if (parentNode instanceof Scene) {
+            return getAllChildren(parentNode).indexOf(childNode);
         } else if (parentNode instanceof FolderItem) {
             return indexOfAdd(baseIndex, ((FolderItem) parentNode).subItems.indexOf(childNode));
         } else if (parentNode instanceof Frame) {

@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - FLA export - show export time
 - [#2138] Morphshapes - detect classic easing
 - FLA export - option to disable fixing of shapes
+- Scenes folder with (readonly) display of scene frames
 
 ### Fixed
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode

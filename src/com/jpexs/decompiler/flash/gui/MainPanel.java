@@ -192,6 +192,8 @@ import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Scene;
+import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -5737,6 +5739,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
+        Frame frameTreeItem = null;
+        if (treeItem instanceof Frame) {
+            frameTreeItem = (Frame) treeItem;
+        }
+        if (treeItem instanceof SceneFrame) {
+            frameTreeItem = ((SceneFrame) treeItem).getFrame();
+        }
+        
         if ((treeItem instanceof AS3Package) && ((AS3Package) treeItem).isCompoundScript()) {
             final ScriptPack scriptLeaf = ((AS3Package) treeItem).getCompoundInitializerPack();
             if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {
@@ -5810,8 +5820,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 showDetail(DETAILCARDEMPTYPANEL);
             }
-        } else if (treeItem instanceof Frame) {
-            Frame frame = (Frame) treeItem;
+        } else if (frameTreeItem != null) {
+            Frame frame = frameTreeItem;
             Set<Integer> needed = new LinkedHashSet<>();
 
             frame.getNeededCharacters(needed);
@@ -5850,6 +5860,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof SWF) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof Scene) {
+            showFolderPreviewList(treePath);
         } else if (treeItem instanceof MetadataTag) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
@@ -5874,8 +5886,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if ((treeItem instanceof TextTag) && internalViewer) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if (treeItem instanceof Frame && internalViewer) {
-            showPreview(treeItem, previewPanel, -1, null);
+        } else if (frameTreeItem != null && internalViewer) {
+            showPreview(frameTreeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ShowFrameTag && internalViewer) {
             showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), getTimelinedForTreeItem(treeItem));
@@ -5883,9 +5895,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
+        } else if (frameTreeItem != null) {
+            showPreview(frameTreeItem, previewPanel, -1, null);
+            showCard(CARDPREVIEWPANEL);
+        } else if ((treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
             showPreview(treeItem, previewPanel, -1, null);
-
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof PlaceObjectTypeTag) {
             showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null);
@@ -6027,6 +6041,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
                 break;
+            case TagTreeModel.FOLDER_SCENES:
+                folderPreviewItems.addAll(timelined.getTimeline().getScenes());
+                break;
         }
     }
 
@@ -6042,6 +6059,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         currentFolderName = folderName;
         folderPreviewPanel.setItems(folderPreviewItems);
+        showCard(CARDFOLDERPREVIEWPANEL);
+    }
+    
+    private void showFolderPreviewList(TreePath path) {
+        List<TreeItem> items = new ArrayList<>(getCurrentTree().getFullModel().getAllChildren((TreeItem) path.getLastPathComponent()));
+        folderPreviewPanel.setItems(items);
         showCard(CARDFOLDERPREVIEWPANEL);
     }
 

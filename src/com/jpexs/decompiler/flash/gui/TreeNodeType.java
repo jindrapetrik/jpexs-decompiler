@@ -44,6 +44,7 @@ public enum TreeNodeType {
     AS_INIT,
     PACKAGE,
     FRAME,
+    SCENE,
     SHOW_FRAME,
     MOVIE,
     SOUND,

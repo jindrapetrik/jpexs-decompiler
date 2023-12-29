@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Scene;
+import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -294,6 +296,12 @@ public class FolderPreviewPanel extends JPanel {
         Matrix m = new Matrix();
         double ow = 1;
         double oh = 1;
+        if (treeItem instanceof Scene) {
+            treeItem = ((Scene) treeItem).getSceneFrame(0);
+        }
+        if (treeItem instanceof SceneFrame) {
+            treeItem = ((SceneFrame) treeItem).getFrame();
+        }
         if (treeItem instanceof Frame) {
             Frame fn = (Frame) treeItem;
             RECT rect = swf.displayRect;

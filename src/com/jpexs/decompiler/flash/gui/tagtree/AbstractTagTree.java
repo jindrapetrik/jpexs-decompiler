@@ -90,6 +90,8 @@ import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
+import com.jpexs.decompiler.flash.timeline.Scene;
+import com.jpexs.decompiler.flash.timeline.SceneFrame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
@@ -376,8 +378,13 @@ public abstract class AbstractTagTree extends JTree {
         }
 
         if ((t instanceof Frame)
-                || (t instanceof FrameScript)) {
+                || (t instanceof FrameScript)
+                || (t instanceof SceneFrame)) {
             return TreeNodeType.FRAME;
+        }                
+        
+        if (t instanceof Scene) {
+            return TreeNodeType.SCENE;
         }
 
         if (t instanceof ShowFrameTag) {
