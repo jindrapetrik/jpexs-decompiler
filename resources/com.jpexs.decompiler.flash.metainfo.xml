@@ -63,6 +63,109 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="20.1.0" date="2023-12-30">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3</li>
+					<li>#2100 Copy/paste frames (same SWF only)</li>
+					<li>Updated portugese-brasil translation</li>
+					<li>AS3 Debugging - export/import ByteArray variable data</li>
+					<li>#2123 FLA export - show some progress info</li>
+					<li>Label that flex compiler is used (when it's enabled in settings)</li>
+					<li>#2119 Option to export assets with names like their assigned classes via SymbolClass, without character id</li>
+					<li>#2119 Bulk imported assets can also match filenames based on assigned classname, not just character id prefix</li>
+					<li>Debugger shows (logs) unhandled exceptions</li>
+					<li>#2129 MEMORY and STACK_SIZE parameters now can be set via external variables FFDEC_MEMORY, FFDEC_STACK_SIZE</li>
+					<li>Saving Harman encrypted SWFs</li>
+					<li>Editing encrypted flag on header panel</li>
+					<li>`-encrypt` command on CLI for Harman encryption</li>
+					<li>Apply unpacker menu on binary data</li>
+					<li>Harman unpacker for binary data</li>
+					<li>Multilevel binary data unpacking is possible</li>
+					<li>#2131 AS1/2 Debugger - show _root variable</li>
+					<li>#2124 Copy tags to other SWFs and replace same classes / export names</li>
+					<li>Remembering breakpoints</li>
+					<li>#2131 Breakpoint list dialog</li>
+					<li>ExportAssets tag - show first item as description in the tree when there is only single item</li>
+					<li>#2134 FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present</li>
+					<li>#2132 Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges (+ take scenes into account)</li>
+					<li>FLA export - show export time</li>
+					<li>#2138 Morphshapes - detect classic easing</li>
+					<li>FLA export - option to disable fixing of shapes</li>
+					<li>Scenes folder with (readonly) display of scene frames</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2021, #2000 Caret position in editors when using tabs and / or unicode</li>
+					<li>#2021 Indent continuation when using tabs</li>
+					<li>#2116 DefineEditText display - correct getting fonts</li>
+					<li>#2116 DefineEditText display - apostroph decoding</li>
+					<li>#2116 Apply colortransform after filters</li>
+					<li>#2116 Limit maximum number of box blur pixels</li>
+					<li>#2122 `-header` command did not support negative integers for displayrect</li>
+					<li>AS3 direct editation - namespaces were initialized in class initializers</li>
+					<li>Debugging - do not invoke getter when there is none - avoid freezing</li>
+					<li>Debugging - properly getting variable value through getter</li>
+					<li>#2123 FLA export - IndexOutOfBounds in shape fixer</li>
+					<li>#2123 FLA export - morphshapes fixer</li>
+					<li>#2111 AS3 direct editation - access class in class initializer</li>
+					<li>#2111 Flex AS3 editation - use SWF dependencies defined in GUI</li>
+					<li>SWF dependencies label was not updated on startup</li>
+					<li>#2127 Wrong parameter order in AS1/2 P-code Action GetURL2 documentation</li>
+					<li>#2025, #2078, #2053 Problems starting the app on Windows when the username has unicode characters</li>
+					<li>Incorrect debugger line numbers when "Open loaded while playing" is enabled</li>
+					<li>AS3 debugger - Slow injecting debug info - now faster</li>
+					<li>AS3 debugger - obfuscated classes debugging</li>
+					<li>Delayed open loaded SWFs while playing</li>
+					<li>AS3 Direct editation - script initializer for main document class</li>
+					<li>AS3 Debugging - activation object was not visible in locals</li>
+					<li>Linenumbers are visible even if debug markers are used</li>
+					<li>Marker of stack frames not properly cleared</li>
+					<li>Retain AS3 script selection in the tree after its editation and saving whole SWF</li>
+					<li>#2131 AS1/2 Debugger - Breakpoint handling - incorrect script names</li>
+					<li>#2131 Debugger - Correct walking variables tree</li>
+					<li>#2131 Debugger - Breakpoints can be added while SWF is running (not just on pause)</li>
+					<li>AS3 Direct editation - types on instance variable values not properly resolved</li>
+					<li>AS1/2 Debugger - script was cleared on stop button</li>
+					<li>AS1/2 Vanishing source code in some cases</li>
+					<li>AS1/2 Debugger tooltips exception</li>
+					<li>#2131 UseOutline flag for DefineEditText</li>
+					<li>Wordrapping long words in DefineEditText</li>
+					<li>#2133 Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it</li>
+					<li>#2135 FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames</li>
+					<li>#1194 FLA Export - stream sound export</li>
+					<li>#2136 FLA Export - optimized Shape fixer speed, repeated shape on timeline not exported twice</li>
+					<li>#2139 FLA Export - labels layer not counted as layer index causing masked layer parentindex wrong</li>
+					<li>#2138 Nested clipping (masks) display</li>
+					<li>#2138, #2156 FLA Export - Missing morphshapes (incorrect holes calculation)</li>
+					<li>#2138 FLA Export - Mask layer was visible when did not contain a masked layer</li>
+					<li>FLA Export - frame numbering problem</li>
+					<li>#2145 FLA Export - missing frames, cliping layers order, nullpointer, empty sound layers</li>
+					<li>#2142 XML Export - string values containing only spaces</li>
+					<li>AS3 - Nullpointer in MethodBody when no ABC set</li>
+					<li>#2148 AS2 Uninitialized class fields detector</li>
+					<li>#2148 AS1/2 callmethod by register value</li>
+					<li>#2148 AS2 Do not return undefined for setters</li>
+					<li>#2143 FLA Export / Sound playback - taking MP3 initial latency into account</li>
+					<li>#2153 FLA Export - sound streams were limited to first stream block</li>
+					<li>#2163 FLA Export - maintain sound export settings for streams</li>
+					<li>#2162 Debugger - ignore (warn) invalid jumps when injecting debug info</li>
+					<li>AS3 - extra newlines on methods which use activation</li>
+					<li>#2162 AS3 switch inside foreach</li>
+					<li>#2162 AS3 try inside foreach</li>
+					<li>#2152 FLA Export - wrong nonlibrary shapes detection</li>
+					<li>#2147 Display of empty video</li>
+					<li>Saving SWFs opened by "Open loaded while playing" feature</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2120 Exported assets no longer take names from assigned classes if there is more than 1 assigned class</li>
+					<li>#2127 AS1/2 P-code Action GetURL2 switched parameters back - correct order is (loadVariablesFlag, loadTargetFlag, sendVarsMethod), code from 19.1.x to 20.0.0 is still accepted</li>
+					<li>Wrong unicode escape `{invalid_utf8:xxx}` changed to `{invalid_utf8=xxx}` for compatibility with file names</li>
+				</ul>
+			</description>
+		</release>
 		<release version="20.0.0" date="2023-11-05">
 			<description>
 				<p>Added</p>
