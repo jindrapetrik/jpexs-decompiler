@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Debugger - getting children of top level variables
 
 ## [20.1.0] - 2023-12-30
 ### Added

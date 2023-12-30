@@ -360,15 +360,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }            
             InGetVariable igv;
 
-            //Long objectId = varToObjectId(var);
+            Long objectId = varToObjectId(var);
             
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
             
-            /*if (objectId != 0) {
+            if (parentObjectId == 0 && objectId != 0L) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
-            } else {*/
-            igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
-            //}
+            } else {
+                igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
+            }
 
             //current var is getter function - set it to value really got
             if ((var.flags & VariableFlags.HAS_GETTER) > 0) {
@@ -467,13 +467,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         private final MyTreeTable ttable;
 
-        public VariablesTableModel(MyTreeTable ttable, List<Variable> vars, List<Long> parentIds) {
+        public VariablesTableModel(MyTreeTable ttable, List<Variable> vars) {
             this.ttable = ttable;
 
             List<VariableNode> childs = new ArrayList<>();
 
             for (int i = 0; i < vars.size(); i++) {
-                childs.add(new VariableNode(new ArrayList<>(), 1, vars.get(i), 0L/*parentIds.get(i)*/, null));
+                childs.add(new VariableNode(new ArrayList<>(), 1, vars.get(i), 0L, null));
             }
             root = new VariableNode(new ArrayList<>(), 0, null, 0L, null, childs);
         }
