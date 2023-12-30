@@ -644,13 +644,13 @@ public class Timeline {
                     numFramesNoSound++;                    
                 }
                 frameHasSound = false;
-                if (sceneOffsets.contains(frame)) {
+                if (sceneOffsets.contains(frame) && range != null) {
                     if (range.endFrame > -1) {
                         ranges.add(range);
                     }
                     range = new SoundStreamFrameRange(head);
                     range.startFrame = -1;
-                    range.endFrame = -1;  
+                    range.endFrame = -1;
                 }
             }
 
