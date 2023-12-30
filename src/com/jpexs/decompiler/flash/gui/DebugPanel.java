@@ -164,8 +164,8 @@ public class DebugPanel extends JPanel {
 
     public DebugPanel() {
         super(new BorderLayout());
-        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()), false);
-        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()), false);
+        debugRegistersTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>()), false);
+        debugLocalsTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>()), false);
 
         MouseAdapter watchHandler = new MouseAdapter() {
 
@@ -372,7 +372,7 @@ public class DebugPanel extends JPanel {
         debugLocalsTable.addMouseListener(watchHandler);
 
         //debugScopeTable.addMouseListener(watchHandler);                           
-        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()), false);
+        debugScopeTable = new MyTreeTable(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>()), false);
 
         constantPoolTable = new JTable();
         traceLogTextarea = new JTextArea();
@@ -516,11 +516,7 @@ public class DebugPanel extends JPanel {
                         if (!as3) {
                             root = Main.getDebugHandler().getVariable(0, "_root", false, false).parent;
                         }
-                        List<Long> regVarIds = new ArrayList<>();
-                        for (int i = 0; i < f.registers.size(); i++) {
-                            regVarIds.add(0L);
-                        }
-                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers, regVarIds));
+                        safeSetTreeModel(debugRegistersTable, new ABCPanel.VariablesTableModel(debugRegistersTable, f.registers));
                         List<Variable> locals = new ArrayList<>();
                         if (root != null) {
                             locals.add(root);
@@ -528,13 +524,9 @@ public class DebugPanel extends JPanel {
                         locals.addAll(f.arguments);
                         locals.addAll(f.variables);
 
-                        List<Long> localIds = new ArrayList<>();
-                        localIds.addAll(f.argumentFrameIds);
-                        localIds.addAll(f.frameIds);
-
-                        localsTable = new ABCPanel.VariablesTableModel(debugLocalsTable, locals, localIds);
+                        localsTable = new ABCPanel.VariablesTableModel(debugLocalsTable, locals);
                         safeSetTreeModel(debugLocalsTable, localsTable);
-                        safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain, f.scopeChainFrameIds));
+                        safeSetTreeModel(debugScopeTable, new ABCPanel.VariablesTableModel(debugScopeTable, f.scopeChain));
 
                         /*TableModelListener refreshListener = new TableModelListener() {
                          @Override
@@ -571,9 +563,9 @@ public class DebugPanel extends JPanel {
                         debugLocalsTable.getTreeTableModel().addTreeModelListener(refreshListener);
                         debugScopeTable.getTreeTableModel().addTreeModelListener(refreshListener);
                     } else {
-                        debugRegistersTable.setTreeModel(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>(), new ArrayList<>()));
-                        debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>(), new ArrayList<>()));
-                        debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>(), new ArrayList<>()));
+                        debugRegistersTable.setTreeModel(new ABCPanel.VariablesTableModel(debugRegistersTable, new ArrayList<>()));
+                        debugLocalsTable.setTreeModel(new ABCPanel.VariablesTableModel(debugLocalsTable, new ArrayList<>()));
+                        debugScopeTable.setTreeModel(new ABCPanel.VariablesTableModel(debugScopeTable, new ArrayList<>()));
                     }
                     InConstantPool cpool = Main.getDebugHandler().getConstantPool();
                     if (cpool != null) {
