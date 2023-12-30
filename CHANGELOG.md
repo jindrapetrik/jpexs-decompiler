@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [20.1.0] - 2023-12-30
 ### Added
 - Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3
@@ -3191,6 +3193,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.1.0...dev
 [20.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.0.0...version20.1.0
 [20.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.2...version20.0.0
 [19.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.1...version19.1.2
