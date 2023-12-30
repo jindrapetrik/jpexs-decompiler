@@ -91,6 +91,7 @@ All notable changes to this project will be documented in this file.
 - [#2162] AS3 try inside foreach
 - [#2152] FLA Export - wrong nonlibrary shapes detection
 - [#2147] Display of empty video
+- Saving SWFs opened by "Open loaded while playing" feature
 
 ### Changed
 - [#2120] Exported assets no longer take names from assigned classes if there is more than 1 assigned class
