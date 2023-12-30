@@ -47,7 +47,6 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
-import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
@@ -71,6 +70,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
@@ -2436,18 +2436,13 @@ public class Main {
 
                     String title = swf == null ? "?" : swf.getTitleOrShortFileName();
                     final String titleWithHash = title + ":" + hash;
-                    try {
-                        final String tfile = tempFile(titleWithHash);
-                        Helper.writeFile(tfile, data);
-                        View.execInEventDispatch(new Runnable() {
-                            @Override
-                            public void run() {
-                                openFile(new OpenableSourceInfo(null, tfile, titleWithHash));
-                            }
-                        });
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, "Cannot create tempfile");
-                    }
+                    View.execInEventDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            OpenableSourceInfo osi = new OpenableSourceInfo(new ReReadableInputStream(new ByteArrayInputStream(data)), null, titleWithHash);
+                            openFile(osi);
+                        }
+                    });
                 }    
             });
 
