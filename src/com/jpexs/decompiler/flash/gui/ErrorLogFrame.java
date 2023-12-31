@@ -238,7 +238,7 @@ public class ErrorLogFrame extends AppFrame {
                 if (View.isOceanic()) {
                     header.setBackground(Color.white);
                 }
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 final String dateStr = format.format(new Date());
 
                 JToggleButton copyButton = new JToggleButton(View.getIcon("copy16"));
