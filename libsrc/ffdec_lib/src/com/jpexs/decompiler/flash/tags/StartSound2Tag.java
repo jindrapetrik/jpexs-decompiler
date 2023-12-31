@@ -79,4 +79,9 @@ public class StartSound2Tag extends Tag {
         sos.writeString(soundClassName);
         sos.writeSOUNDINFO(soundInfo);
     }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " (" + soundClassName + ")";
+    }
 }
