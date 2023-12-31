@@ -92,4 +92,9 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         soundId = characterId;
     }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " (" + soundId + ")";
+    }
 }

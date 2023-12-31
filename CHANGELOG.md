@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- StartSound and StartSound2 show characterId/class in the tag tree
+
 ### Fixed
 - Debugger - getting children of top level variables
 
