@@ -162,7 +162,6 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -4813,14 +4812,17 @@ public class XFLConverter {
         return false;
     }
     
-    private SoundStreamHeadTypeTag getFirstSoundStreamHead(ReadOnlyTagList tags, Reference<ReadOnlyTagList> foundTags) {
+    private SoundStreamHeadTypeTag getFirstNonEmptySoundStreamHead(ReadOnlyTagList tags, Reference<ReadOnlyTagList> foundTags) {
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
                 foundTags.setVal(tags);
-                return (SoundStreamHeadTypeTag) t;
+                SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
+                if (!head.getRanges().isEmpty()) {
+                    return head;
+                }
             }
             if (t instanceof DefineSpriteTag) {
-                SoundStreamHeadTypeTag st = getFirstSoundStreamHead(((DefineSpriteTag) t).getTags(), foundTags);
+                SoundStreamHeadTypeTag st = getFirstNonEmptySoundStreamHead(((DefineSpriteTag) t).getTags(), foundTags);
                 if (st != null) {
                     return st;
                 }
@@ -5054,7 +5056,7 @@ public class XFLConverter {
             publishSettings.writeElementValue("Quality", "80");
             publishSettings.writeElementValue("DeblockingFilter", 0);
             Reference<ReadOnlyTagList> tagsRef = new Reference<>(null);
-            SoundStreamHeadTypeTag shead = getFirstSoundStreamHead(swf.getTags(), tagsRef);
+            SoundStreamHeadTypeTag shead = getFirstNonEmptySoundStreamHead(swf.getTags(), tagsRef);
             if (shead == null) {
                 publishSettings.writeElementValue("StreamFormat", 0);
                 publishSettings.writeElementValue("StreamCompress", 7);
