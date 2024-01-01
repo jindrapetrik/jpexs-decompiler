@@ -102,4 +102,12 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         }
         return (DefineScalingGridTag) swf.getCharacterIdTag(getCharacterId(), DefineScalingGridTag.ID);
     }
+
+    @Override
+    public String getUniqueId() {
+        if (getCharacterId() == -1) {
+            return null;
+        }
+        return "" + getCharacterId();
+    }        
 }

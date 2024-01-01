@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#2149] FLA Export - compressed sound streams in some cases
 - [#2172] Wrong year in error log window (week year)
 - [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks
+- Folder preview - GFX image identifiers not shown
 
 ## [20.1.0] - 2023-12-30
 ### Added
