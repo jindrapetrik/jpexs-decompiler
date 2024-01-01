@@ -262,6 +262,11 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public String toString() {
         return getName() + " (" + virtualCharacterId + ")";
     }
+    
+    @Override
+    public String getUniqueId() {
+        return "" + virtualCharacterId;
+    }        
 
     //getNeededCharacters intentionally not defined
     @Override

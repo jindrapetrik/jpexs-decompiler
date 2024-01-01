@@ -242,10 +242,12 @@ public class FolderListPanel extends JPanel {
                     icon.paintIcon(l, g, x * CELL_WIDTH + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconWidth() / 2, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE / 2 - icon.getIconHeight() / 2);
                     String s;
                     if (treeItem instanceof Tag) {
+                        Tag t = (Tag) treeItem;
+                        String uniqueId = t.getUniqueId();                                                
                         s = ((Tag) treeItem).getTagName();
-                        if (treeItem instanceof CharacterTag) {
-                            s = s + " (" + ((CharacterTag) treeItem).getCharacterId() + ")";
-                        }
+                        if (uniqueId != null) {
+                            s = s + " (" + uniqueId + ")";
+                        }                        
                     } else {
                         s = treeItem.toString();
                     }

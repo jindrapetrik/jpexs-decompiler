@@ -243,6 +243,11 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String toString() {
         return getName() + " (" + virtualCharacterId + ")";
     }
+    
+    @Override
+    public String getUniqueId() {
+        return "" + virtualCharacterId;
+    }
 
     @Override
     public void getTagInfo(TagInfo tagInfo) {

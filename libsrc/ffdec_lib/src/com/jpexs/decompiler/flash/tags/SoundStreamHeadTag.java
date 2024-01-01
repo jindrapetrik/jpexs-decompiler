@@ -272,6 +272,11 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
         return getName() + " (" + virtualCharacterId + ")";
     }
 
+    @Override
+    public String getUniqueId() {
+        return "" + virtualCharacterId;
+    }        
+
     //getNeededCharacters intentionally not defined
     @Override
     public void setSoundSize(boolean soundSize) {
