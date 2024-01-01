@@ -2451,6 +2451,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void updateScrollBars() {
+        if (!zoomAvailable) {
+            View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                horizontalScrollBar.setVisible(false);
+                verticalScrollBar.setVisible(false);
+            }
+            });
+            return;
+        }
         View.execInEventDispatchLater(new Runnable() {
             @Override
             public void run() {
@@ -2513,6 +2523,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
     
     private synchronized void zoom(Zoom zoom, boolean useCursor) {
+        if (!zoomAvailable) {
+            return;
+        }
         double zoomDoubleBefore = this.zoom.fit ? getZoomToFit() : this.zoom.value;
 
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
@@ -3451,7 +3464,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 } else if (handCursor) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-                                } else if (iconPanel.hasAllowMove()) {
+                                } else if (zoomAvailable && iconPanel.hasAllowMove()) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
                                 } else {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
