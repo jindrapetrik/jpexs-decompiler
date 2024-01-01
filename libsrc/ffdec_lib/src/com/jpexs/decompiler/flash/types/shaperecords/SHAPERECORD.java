@@ -200,13 +200,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static void shapeListToImage(int windingRule, int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform, double unzoom, Matrix transformation2) {
+    public static void shapeListToImage(int windingRule, int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             return;
         }
 
-        int prevWidth = FontTag.PREVIEWSIZE;
-        int prevHeight = FontTag.PREVIEWSIZE;
+        int prevWidth = image.getWidth();
+        int prevHeight = image.getHeight();
 
         int maxw = 0;
         int maxh = 0;
@@ -282,7 +282,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 double px = x * w2 + w2 / 2 - w / 2 - minXMin * ratio;
                 double py = y * h2 - minYMin * ratio;
 
-                Matrix transformation = transformation2.concatenate(Matrix.getTranslateInstance(px, py));
+                Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
                 BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
 

@@ -5,7 +5,6 @@ All notable changes to this project will be documented in this file.
 ### Added
 - StartSound and StartSound2 show characterId/class in the tag tree
 - Folder preview for sounds
-- Allow zooming fonts
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -13,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2172] Wrong year in error log window (week year)
 - [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks
 - Folder preview - GFX image identifiers not shown
+- Hide zooming buttons in fonts display
 
 ## [20.1.0] - 2023-12-30
 ### Added
