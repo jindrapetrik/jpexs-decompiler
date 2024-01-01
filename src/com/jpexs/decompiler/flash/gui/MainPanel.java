@@ -6049,7 +6049,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void showFolderPreview(FolderItem item) {
         String folderName = item.getName();
-        if (TagTreeModel.FOLDER_OTHERS.equals(folderName) || TagTreeModel.FOLDER_SCRIPTS.equals(folderName)) {
+        if (TagTreeModel.FOLDER_OTHERS.equals(folderName)
+                || TagTreeModel.FOLDER_SCRIPTS.equals(folderName)
+                || TagTreeModel.FOLDER_SOUNDS.equals(folderName)
+            ) {
             showFolderList(tagTree.getFullModel().getTreePath(item));
             return;
         }
