@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -199,13 +200,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static void shapeListToImage(int windingRule, int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
+    public static void shapeListToImage(int windingRule, int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform, double unzoom, Matrix transformation2) {
         if (shapes.isEmpty()) {
             return;
         }
 
-        int prevWidth = image.getWidth();
-        int prevHeight = image.getHeight();
+        int prevWidth = FontTag.PREVIEWSIZE;
+        int prevHeight = FontTag.PREVIEWSIZE;
 
         int maxw = 0;
         int maxh = 0;
@@ -281,7 +282,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 double px = x * w2 + w2 / 2 - w / 2 - minXMin * ratio;
                 double py = y * h2 - minYMin * ratio;
 
-                Matrix transformation = Matrix.getTranslateInstance(px, py);
+                Matrix transformation = transformation2.concatenate(Matrix.getTranslateInstance(px, py));
                 transformation.scale(ratio);
                 BitmapExporter.export(windingRule, shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true, true);
 

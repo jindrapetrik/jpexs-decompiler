@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - StartSound and StartSound2 show characterId/class in the tag tree
 - Folder preview for sounds
+- Allow zooming fonts
 
 ### Fixed
 - Debugger - getting children of top level variables
