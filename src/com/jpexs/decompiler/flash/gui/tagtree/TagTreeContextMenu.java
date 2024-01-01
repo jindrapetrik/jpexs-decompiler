@@ -65,17 +65,23 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -4382,8 +4388,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                             break;
                         }
                         if ((t2 instanceof PlaceObjectTypeTag)
-                                || (t2 instanceof RemoveObject2Tag)) {
-                            sourceTimelined.removeTag(i);
+                                || (t2 instanceof RemoveObject2Tag)
+                                || (t2 instanceof RemoveObjectTag)
+                                || (t2 instanceof FrameLabelTag)
+                                || (t2 instanceof StartSoundTag)
+                                || (t2 instanceof StartSound2Tag)
+                                || (t2 instanceof SoundStreamBlockTag)
+                                ) {
+                            sourceTimelined.removeTag(i);                            
                         }
                     }
                 } else {
@@ -4408,6 +4420,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 sourceTimelined.removeTag(j);
                                 j--;
                             }
+                            i = j;
                         }
                         for (int depth : allDepths) {
                             DepthState lastDepthstate = lastNotDeletedFrame == null ? null : lastNotDeletedFrame.layers.get(depth);
@@ -4423,12 +4436,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                                         rem.depth = depth;
                                         i++;
                                         sourceTimelined.addTag(i, rem);
+                                        rem.setTimelined(sourceTimelined);
                                     } else {
                                         placeFull.setPlaceFlagMove(true);
                                     }
                                 }
                                 i++;                                                        
                                 sourceTimelined.addTag(i, placeFull);
+                                placeFull.setTimelined(sourceTimelined);
                             } else if (lastDepthstate != null 
                                     && nextDepthstate != null
                                     && !lastDepthstate.equals(nextDepthstate)) {
@@ -4444,6 +4459,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                     i++;
                                     sourceTimelined.addTag(i, placeFull);
+                                    placeFull.setTimelined(sourceTimelined);
                                 }
                             } else if (lastDepthstate != null
                                     && nextDepthstate == null) {
@@ -4451,6 +4467,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 rem.depth = depth;
                                 i++;
                                 sourceTimelined.addTag(i, rem);
+                                rem.setTimelined(sourceTimelined);
                             }                        
                         }
                     }

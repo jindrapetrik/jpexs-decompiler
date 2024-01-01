@@ -7,8 +7,9 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Debugger - getting children of top level variables
-- [#2149] - FLA Export - compressed sound streams in some cases
-- [#2172] - Wrong year in error log window (week year)
+- [#2149] FLA Export - compressed sound streams in some cases
+- [#2172] Wrong year in error log window (week year)
+- [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3357,6 +3358,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
+[#2174]: https://www.free-decompiler.com/flash/issues/2174
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
