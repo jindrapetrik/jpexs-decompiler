@@ -259,11 +259,16 @@ public class DefineExternalImage2 extends ImageTag {
 
     @Override
     public String toString() {
-        if (unknownID == 0) {
-            return super.toString();
-        }
-        return tagName + " (i" + imageID + ")";
+        return tagName + " (" + getUniqueId() + ")";
     }
+
+    @Override
+    public String getUniqueId() {
+        if (unknownID == 0) {
+            return super.getUniqueId();
+        }
+        return "i" + imageID;
+    }        
 
     @Override
     public void setCharacterId(int characterId) {

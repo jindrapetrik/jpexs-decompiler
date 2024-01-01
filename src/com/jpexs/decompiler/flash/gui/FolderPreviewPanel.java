@@ -247,10 +247,12 @@ public class FolderPreviewPanel extends JPanel {
                     String s;
                     TreeItem treeItem = items.get(index);
                     if (treeItem instanceof Tag) {
+                        Tag t = (Tag) treeItem;
+                        String uniqueId = t.getUniqueId();                                                
                         s = ((Tag) treeItem).getTagName();
-                        if (treeItem instanceof CharacterTag) {
-                            s = s + " (" + ((CharacterTag) treeItem).getCharacterId() + ")";
-                        }
+                        if (uniqueId != null) {
+                            s = s + " (" + uniqueId + ")";
+                        }                        
                     } else {
                         s = treeItem.toString();
                     }

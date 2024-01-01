@@ -89,8 +89,13 @@ public class DefineExternalGradient extends Tag {
 
     @Override
     public String toString() {
-        return tagName + " (g" + gradientId + ")";
+        return tagName + " (" + getUniqueId() + ")";
     }
+    
+    @Override
+    public String getUniqueId() {
+        return "g" + gradientId;
+    }  
     
     @Override
     public void getTagInfo(TagInfo tagInfo) {

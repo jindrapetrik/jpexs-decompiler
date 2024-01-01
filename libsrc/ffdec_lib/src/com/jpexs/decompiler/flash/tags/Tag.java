@@ -761,4 +761,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
         return swf.getCharset();
     }
+    
+    public String getUniqueId() {
+        return null;
+    }
 }

@@ -154,8 +154,13 @@ public class FontTextureInfo extends Tag {
     
     @Override
     public String toString() {
-        return tagName + " (ft" + textureID + ")";
+        return tagName + " (" + getUniqueId() + ")";
     }
+    
+    @Override
+    public String getUniqueId() {
+        return "ft" + textureID;
+    }  
     
     @Override
     public void getTagInfo(TagInfo tagInfo) {
