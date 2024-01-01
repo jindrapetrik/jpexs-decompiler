@@ -3452,6 +3452,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             removeFrames(new LinkedHashSet<>(framesToRemove));
                             
                             swf.resetTimelines(tim);
+                            swf.clearImageCache();
                             tim.setFrameCount(tim.getTimeline().getFrameCount());
                             
                             mainPanel.refreshTree(swf);                            
@@ -4250,9 +4251,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         fixDefineBeforeUsage(swf);
         fixHeaderTags(swf);
         swf.resetTimelines(targetTimelined);
+        swf.clearImageCache();
         targetTimelined.setFrameCount(targetTimelined.getTimeline().getFrameCount());
         swf.resetTimelines(sourceTimelined);
-        sourceTimelined.setFrameCount(sourceTimelined.getTimeline().getFrameCount());
+        sourceTimelined.setFrameCount(sourceTimelined.getTimeline().getFrameCount());        
                 
         mainPanel.refreshTree(swf);
     }
