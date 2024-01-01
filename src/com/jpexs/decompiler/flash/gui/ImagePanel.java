@@ -2598,7 +2598,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Timer setTimelinedTimer = null;
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -2667,7 +2667,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             centerImage();
             this.swf = swf;
-            zoomAvailable = true;
+            zoomAvailable = allowZoom;
             if (frame > -1) {
                 this.frame = frame;
                 this.stillFrame = true;
