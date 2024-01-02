@@ -4428,6 +4428,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                             DepthState lastDepthstate = lastNotDeletedFrame == null ? null : lastNotDeletedFrame.layers.get(depth);
                             DepthState nextDepthstate = nextFrame.layers.get(depth);
                             if (nextDepthstate != null 
+                                    && lastDepthstate == null
+                                    && nextDepthstate.placeObjectTag.flagMove()
+                                    ) {
+                                nextDepthstate.placeObjectTag.setPlaceFlagMove(false);
+                            } else if (nextDepthstate != null 
                                     && nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame
                                     && nextDepthstate.placeFrame.frame > lastNotDeletedFrameNum - 1) {
                                 //the place was deleted                                                      
