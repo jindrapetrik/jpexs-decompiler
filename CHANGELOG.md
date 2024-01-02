@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks
 - Folder preview - GFX image identifiers not shown
 - Hide zooming buttons in fonts display
+- [#2174] Ignoring PlaceObjects with flagMove on empty depth
 
 ## [20.1.0] - 2023-12-30
 ### Added

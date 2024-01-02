@@ -1173,7 +1173,7 @@ public class XFLConverter {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int d = po.getDepth();
                 
-                if (po.flagMove() || !depthMap.containsKey(d)) {
+                if (po.flagMove() == depthMap.containsKey(d)) {
                     if (!po.flagMove()) {
                         depthHasInstanceName.put(d, false);
                         depthHasColorTransform.put(d, false);
@@ -1236,7 +1236,7 @@ public class XFLConverter {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int d = po.getDepth();
-                if (po.flagMove() || !depthMap.containsKey(d)) {
+                if (po.flagMove() == depthMap.containsKey(d)) {
                     int ch = po.getCharacterId();
                     if (ch == -1) {
                         if (depthMap.containsKey(d)) {
@@ -3539,6 +3539,8 @@ public class XFLConverter {
         Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
         Map<PlaceObjectTypeTag, Integer> clipStartFrames = new HashMap<>();
 
+        Set<Integer> occupiedDepths = new HashSet<>();
+        
         int maxDepth = getMaxDepth(timelineTags);
         Tag lastTag = null;
         for (Tag t : timelineTags) {
@@ -3547,22 +3549,36 @@ public class XFLConverter {
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                if (po.getClipDepth() > -1) {
-                    clipStartFrames.put(po, f);
-                    clipPlaces.add(po);
-                    if (depthToClipPlace.containsKey(po.getDepth())) {
-                        clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                
+                if (po.flagMove() == occupiedDepths.contains(po.getDepth())) {
+                    
+                    if (po.flagMove()) {
+                        if (po.getCharacterId() != -1 || po.getClassName() != null) {
+                            occupiedDepths.add(po.getDepth());
+                        }
+                    } else {
+                        occupiedDepths.add(po.getDepth());
                     }
-                    depthToClipPlace.put(po.getDepth(), po);
-                } else {
-                    if (!po.flagMove() && depthToClipPlace.containsKey(po.getDepth())) {
-                        clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
-                        depthToClipPlace.remove(po.getDepth());
+                    
+                    if (po.getClipDepth() > -1) {
+                        clipStartFrames.put(po, f);
+                        clipPlaces.add(po);
+                        if (depthToClipPlace.containsKey(po.getDepth())) {
+                            clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                        }
+                        depthToClipPlace.put(po.getDepth(), po);
+                    } else {
+                        if (!po.flagMove() && depthToClipPlace.containsKey(po.getDepth())) {
+                            clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                            depthToClipPlace.remove(po.getDepth());
+                        }
                     }
-                }
+                }                                
             }
             if (t instanceof RemoveTag) {
                 RemoveTag re = (RemoveTag) t;
+                occupiedDepths.remove(re.getDepth());
+                
                 if (depthToClipPlace.containsKey(re.getDepth())) {
                     clipFinishFrames.put(depthToClipPlace.get(re.getDepth()), f - 1);
                     depthToClipPlace.remove(re.getDepth());
@@ -3637,38 +3653,44 @@ public class XFLConverter {
                     boolean removed = false;
                     int numFrames = 0;
                     lastTag = null;
-                    Map<Integer, Integer> depthStates = new HashMap<>();
+                    //Map<Integer, Integer> depthStates = new HashMap<>();
+                    occupiedDepths.clear();
 
                     for (Tag t : timelineTags) {
                         if (f < fr) {
                             if (t instanceof PlaceObjectTypeTag) {
                                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
-                                if (depthStates.containsKey(place.getDepth()) && !place.flagMove()) {
+                                if (place.flagMove() != occupiedDepths.contains(place.getDepth())) {
                                     continue;
                                 }
-                                if (place.getCharacterId() != -1) {
-                                    depthStates.put(place.getDepth(), place.getCharacterId());
+                                if (place.getCharacterId() != -1 && place.getClassName() != null) {
+                                    occupiedDepths.add(place.getDepth());
                                 }
                             }
                             if (t instanceof RemoveTag) {
-                                depthStates.remove(((RemoveTag) t).getDepth());
+                                occupiedDepths.remove(((RemoveTag) t).getDepth());
                             }
                         }
                         if (f >= fr) {
                             if (t instanceof PlaceObjectTypeTag) {
                                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
-                                if (place.getDepth() == secondPlace.getDepth()) {
-                                    if (place.flagMove()) {
-                                        removed = false;
-                                    } else if (place.getClipDepth() == secondPlace.getClipDepth()) {
-                                        removed = false;
-                                        delegatedPlaces.add(place);
-                                    } else {
-                                        removed = true;
+                                if (place.flagMove() == occupiedDepths.contains(place.getDepth())) {
+                                    if (place.getCharacterId() != -1 && place.getClassName() != null) {
+                                        occupiedDepths.add(place.getDepth());
                                     }
-                                }
-                                if (!removed && place.getDepth() >= secondPlace.getDepth() && place.getDepth() <= secondPlace.getClipDepth()) {
-                                    delegatedTimeline.add(place);
+                                    if (place.getDepth() == secondPlace.getDepth()) {
+                                        if (place.flagMove()) {
+                                            removed = false;
+                                        } else if (place.getClipDepth() == secondPlace.getClipDepth()) {
+                                            removed = false;
+                                            delegatedPlaces.add(place);
+                                        } else {
+                                            removed = true;
+                                        }
+                                    }
+                                    if (!removed && place.getDepth() >= secondPlace.getDepth() && place.getDepth() <= secondPlace.getClipDepth()) {
+                                        delegatedTimeline.add(place);
+                                    }
                                 }
                             }
                             if (t instanceof RemoveTag) {
@@ -3676,6 +3698,7 @@ public class XFLConverter {
                                 if (rt.getDepth() == secondPlace.getDepth()) {
                                     removed = true;
                                 }
+                                occupiedDepths.remove(rt.getDepth());
                             }
                         }
                         lastTag = t;
@@ -3695,107 +3718,7 @@ public class XFLConverter {
                         ShowFrameTag showFrame = new ShowFrameTag(swf);
                         //set timelined?
                         delegatedTimeline.add(showFrame);
-                    }
-
-                    /*
-                    List<Tag> delegatedTimeline2 = Helper.deepCopy(delegatedTimeline);
-                    for (int i = 0; i < delegatedTimeline2.size(); i++) {
-                        delegatedTimeline2.get(i).setSwf(swf);
-                    }
-                    
-                    for (Tag t : delegatedTimeline2) {
-                        if (t instanceof PlaceObjectTypeTag) {
-                            PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
-                            if (depthStates.containsKey(place.getDepth()) && !place.flagMove()) {
-                                continue;
-                            }
-                            if (place.getCharacterId() != -1) {
-                                depthStates.put(place.getDepth(), place.getCharacterId());
-                            }
-                            if (place.flagMove()) {
-                                place.setCharacterId(depthStates.get(place.getDepth()));
-                                place.setPlaceFlagMove(false);
-                            }                            
-                        }
-                        if (t instanceof RemoveTag) {
-                            depthStates.remove(((RemoveTag)t).getDepth());
-                        }                        
-                    }
-                    
-                    //find shape looping, find largest loop
-                    int found = -1;
-                    loopi: for (int i = numFrames - 1; i >= 1; i--) {
-                        System.err.println("checking len = " + i);
-                        List<Tag> firstBatch = new ArrayList<>();
-                        Map<Integer, Map<Integer, PlaceObjectTypeTag>> firstFramesDepthStates = new HashMap<>();
-                        Map<Integer, PlaceObjectTypeTag> curDepthStates = new LinkedHashMap<>();
-                        
-                        f = 0;
-                        for (Tag t : delegatedTimeline2) {
-                            if (t instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
-                                curDepthStates.put(place.getDepth(), place);
-                            }
-                            if (t instanceof RemoveTag) {
-                                RemoveTag rem = (RemoveTag) t;
-                                curDepthStates.remove(rem.getDepth());
-                            }
-                            if (t instanceof ShowFrameTag) {
-                                firstFramesDepthStates.put(f, new LinkedHashMap<>(curDepthStates));
-                                f++;
-                                if (f == i) {
-                                    break;
-                                }
-                            }
-                        }                                               
-                        
-                        int numParts = (int) Math.ceil(numFrames / (float) i); //example 4
-                        if (numParts < 2) {
-                            continue;
-                        }
-                        
-                        
-                        f = 0;
-                        curDepthStates = new LinkedHashMap<>();
-                        boolean same = true;                                
-                        loopt: for (Tag t : delegatedTimeline2) {
-                            if (t instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
-                                curDepthStates.put(place.getDepth(), place);
-                            }
-                            if (t instanceof RemoveTag) {
-                                RemoveTag rem = (RemoveTag) t;
-                                curDepthStates.remove(rem.getDepth());
-                            }
-                            if (t instanceof ShowFrameTag) {
-                                int firstF = f % i;
-                                Map<Integer, PlaceObjectTypeTag> firstFDepthStates = firstFramesDepthStates.get(firstF);
-                                if (firstFDepthStates.size() == curDepthStates.size()) {                                    
-                                    for (int k : curDepthStates.keySet()) {
-                                        if (!firstFDepthStates.containsKey(k)) {
-                                            same = false;
-                                            break loopt;
-                                        }
-                                        PlaceObjectTypeTag p1 = firstFDepthStates.get(k);
-                                        PlaceObjectTypeTag p2 = curDepthStates.get(k);
-                                        if (!p1.placeEquals(p2)) {
-                                            same = false;
-                                            break loopt;
-                                        }
-                                    }
-                                } else {
-                                    same = false;
-                                    break loopt;
-                                }
-                                f++;
-                            }
-                        }      
-                        if (same) {
-                            System.err.println("same");
-                            found = f;                            
-                        }
-                    }
-                    System.err.println("clip repeats in " + found);*/
+                    }                  
                     addExtractedClip(new ReadOnlyTagList(delegatedTimeline), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, characters, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
                     placeToMaskedSymbol.put(secondPlace, new MultiLevelClip(secondPlace, nextClipId.getVal(), numFrames));
                 }
@@ -3999,6 +3922,7 @@ public class XFLConverter {
             Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
             Map<PlaceObjectTypeTag, Integer> clipStartFrames = new HashMap<>();
             Map<PlaceObjectTypeTag, Integer> placeToFirstCharacterDepth = new HashMap<>();
+            Set<Integer> occupiedDepths = new HashSet<>();
             Tag lastTag = null;
             int tpos = 0;
             for (Tag t : sceneTimelineTags) {
@@ -4007,34 +3931,44 @@ public class XFLConverter {
                 }
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                    if (po.getClipDepth() > -1) {
-                        clipFrameSplitters.add(f);
-                        clipStartFrames.put(po, f);
-                        clipPlaces.add(po);
-
-                        if (depthToClipPlace.containsKey(po.getDepth())) {
-                            clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                    if (po.flagMove() == occupiedDepths.contains(po.getDepth())) {
+                        if (po.flagMove()) {
+                            if (po.getCharacterId() != -1 || po.getClassName() != null) {
+                                occupiedDepths.add(po.getDepth());
+                            }
+                        } else {
+                            occupiedDepths.add(po.getDepth());
                         }
 
-                        depthToClipPlace.put(po.getDepth(), po);
-                        for (int j = tpos + 1; j <= sceneTimelineTags.size(); j++) {
-                            Tag t2 = sceneTimelineTags.get(j);
-                            if (t2 instanceof PlaceObject2Tag) {
-                                PlaceObject2Tag pl = (PlaceObject2Tag) t2;
-                                int d = pl.getDepth();
-                                if (d >= po.getDepth() && d <= po.getClipDepth()) {
-                                    placeToFirstCharacterDepth.put(po, d);
+                        if (po.getClipDepth() > -1) {
+                            clipFrameSplitters.add(f);
+                            clipStartFrames.put(po, f);
+                            clipPlaces.add(po);
+
+                            if (depthToClipPlace.containsKey(po.getDepth())) {
+                                clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                            }
+
+                            depthToClipPlace.put(po.getDepth(), po);
+                            for (int j = tpos + 1; j <= sceneTimelineTags.size(); j++) {
+                                Tag t2 = sceneTimelineTags.get(j);
+                                if (t2 instanceof PlaceObject2Tag) {
+                                    PlaceObject2Tag pl = (PlaceObject2Tag) t2;
+                                    int d = pl.getDepth();
+                                    if (d >= po.getDepth() && d <= po.getClipDepth()) {
+                                        placeToFirstCharacterDepth.put(po, d);
+                                    }
                                 }
-                            }
-                            if (t2 instanceof ShowFrameTag) {
-                                break;
-                            }
+                                if (t2 instanceof ShowFrameTag) {
+                                    break;
+                                }
 
-                        }
-                    } else {
-                        if (!po.flagMove() && depthToClipPlace.containsKey(po.getDepth())) {
-                            clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
-                            depthToClipPlace.remove(po.getDepth());
+                            }
+                        } else {
+                            if (!po.flagMove() && depthToClipPlace.containsKey(po.getDepth())) {
+                                clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                                depthToClipPlace.remove(po.getDepth());
+                            }
                         }
                     }
                 }
@@ -4044,6 +3978,7 @@ public class XFLConverter {
                         clipFinishFrames.put(depthToClipPlace.get(re.getDepth()), f - 1);
                         depthToClipPlace.remove(re.getDepth());
                     }
+                    occupiedDepths.remove(re.getDepth());
                 }
                 lastTag = t;
                 tpos++;

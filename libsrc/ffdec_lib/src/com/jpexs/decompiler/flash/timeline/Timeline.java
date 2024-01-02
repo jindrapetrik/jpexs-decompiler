@@ -347,9 +347,9 @@ public class Timeline {
                 fl.placeFrame = frame;
                 fl.minPlaceObjectNum = Math.max(fl.minPlaceObjectNum, po.getPlaceObjectNum());
 
-                boolean wasEmpty = fl.characterId == -1 && fl.className == null;
+                boolean wasOccupied = fl.characterId != -1 || fl.className != null;
 
-                if (po.flagMove() || wasEmpty) {
+                if (po.flagMove() == wasOccupied) {
                     int characterId = po.getCharacterId();
                     if (characterId != -1) {
                         fl.characterId = characterId;
@@ -382,64 +382,64 @@ public class Timeline {
                     } else {
                         fl.key = characterId != -1 || className != null;
                     }
-                }
+                    
+                    if (po.flagMove()) {
+                        MATRIX matrix2 = po.getMatrix();
+                        if (matrix2 != null) {
+                            fl.matrix = matrix2;
+                        }
+                        String instanceName2 = po.getInstanceName();
+                        if (instanceName2 != null) {
+                            fl.instanceName = instanceName2;
+                        }
+                        ColorTransform colorTransForm2 = po.getColorTransform();
+                        if (colorTransForm2 != null) {
+                            fl.colorTransForm = colorTransForm2;
+                        }
 
-                if (po.flagMove()) {
-                    MATRIX matrix2 = po.getMatrix();
-                    if (matrix2 != null) {
-                        fl.matrix = matrix2;
-                    }
-                    String instanceName2 = po.getInstanceName();
-                    if (instanceName2 != null) {
-                        fl.instanceName = instanceName2;
-                    }
-                    ColorTransform colorTransForm2 = po.getColorTransform();
-                    if (colorTransForm2 != null) {
-                        fl.colorTransForm = colorTransForm2;
-                    }
+                        String className2 = po.getClassName();
+                        if (className2 != null) {
+                            fl.className = className2;
+                        }
 
-                    String className2 = po.getClassName();
-                    if (className2 != null) {
-                        fl.className = className2;
-                    }
+                        CLIPACTIONS clipActions2 = po.getClipActions();
+                        if (clipActions2 != null) {
+                            fl.clipActions = clipActions2;
+                        }
+                        if (po.cacheAsBitmap()) {
+                            fl.cacheAsBitmap = true;
+                        }
+                        int blendMode2 = po.getBlendMode();
+                        if (blendMode2 > 0) {
+                            fl.blendMode = blendMode2;
+                        }
+                        List<FILTER> filters2 = po.getFilters();
+                        if (filters2 != null) {
+                            fl.filters = filters2;
+                        }
+                        int ratio2 = po.getRatio();
+                        if (ratio2 > -1) {
+                            fl.ratio = ratio2;
+                        }
+                        int clipDepth2 = po.getClipDepth();
+                        if (clipDepth2 > -1) {
+                            fl.clipDepth = clipDepth2;
+                        }
 
-                    CLIPACTIONS clipActions2 = po.getClipActions();
-                    if (clipActions2 != null) {
-                        fl.clipActions = clipActions2;
+                        fl.isVisible = po.isVisible();
+                    } else {
+                        fl.matrix = po.getMatrix();
+                        fl.instanceName = po.getInstanceName();
+                        fl.colorTransForm = po.getColorTransform();
+                        fl.cacheAsBitmap = po.cacheAsBitmap();
+                        fl.blendMode = po.getBlendMode();
+                        fl.filters = po.getFilters();
+                        fl.ratio = po.getRatio();
+                        fl.clipActions = po.getClipActions();
+                        fl.clipDepth = po.getClipDepth();
+                        fl.isVisible = po.isVisible();
                     }
-                    if (po.cacheAsBitmap()) {
-                        fl.cacheAsBitmap = true;
-                    }
-                    int blendMode2 = po.getBlendMode();
-                    if (blendMode2 > 0) {
-                        fl.blendMode = blendMode2;
-                    }
-                    List<FILTER> filters2 = po.getFilters();
-                    if (filters2 != null) {
-                        fl.filters = filters2;
-                    }
-                    int ratio2 = po.getRatio();
-                    if (ratio2 > -1) {
-                        fl.ratio = ratio2;
-                    }
-                    int clipDepth2 = po.getClipDepth();
-                    if (clipDepth2 > -1) {
-                        fl.clipDepth = clipDepth2;
-                    }
-
-                    fl.isVisible = po.isVisible();
-                } else if (wasEmpty) {
-                    fl.matrix = po.getMatrix();
-                    fl.instanceName = po.getInstanceName();
-                    fl.colorTransForm = po.getColorTransform();
-                    fl.cacheAsBitmap = po.cacheAsBitmap();
-                    fl.blendMode = po.getBlendMode();
-                    fl.filters = po.getFilters();
-                    fl.ratio = po.getRatio();
-                    fl.clipActions = po.getClipActions();
-                    fl.clipDepth = po.getClipDepth();
-                    fl.isVisible = po.isVisible();
-                }
+                }               
 
             } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
