@@ -4396,6 +4396,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 || (t2 instanceof StartSoundTag)
                                 || (t2 instanceof StartSound2Tag)
                                 || (t2 instanceof SoundStreamBlockTag)
+                                || (t2 instanceof DoActionTag)
                                 ) {
                             sourceTimelined.removeTag(i);                            
                         }

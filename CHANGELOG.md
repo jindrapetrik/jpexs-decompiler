@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - Debugger - getting children of top level variables
 - [#2149] FLA Export - compressed sound streams in some cases
 - [#2172] Wrong year in error log window (week year)
-- [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks
+- [#2174] Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks, DoAction
 - Folder preview - GFX image identifiers not shown
 - Hide zooming buttons in fonts display
 - [#2174] Ignoring PlaceObjects with flagMove on empty depth
