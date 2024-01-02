@@ -251,7 +251,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                     }
                 }
 
-                if (!pot.flagMove() && depthMap.containsKey(pot.getDepth())) {
+                if (pot.flagMove() != depthMap.containsKey(pot.getDepth())) {
                     continue;
                 }
 
