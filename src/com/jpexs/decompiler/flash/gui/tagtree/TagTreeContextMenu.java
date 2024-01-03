@@ -4389,15 +4389,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         if (t2 instanceof ShowFrameTag) {
                             break;
                         }
-                        if ((t2 instanceof PlaceObjectTypeTag)
-                                || (t2 instanceof RemoveObject2Tag)
-                                || (t2 instanceof RemoveObjectTag)
-                                || (t2 instanceof FrameLabelTag)
-                                || (t2 instanceof StartSoundTag)
-                                || (t2 instanceof StartSound2Tag)
-                                || (t2 instanceof SoundStreamBlockTag)
-                                || (t2 instanceof DoActionTag)
-                                ) {
+                        if (isFrameTagToDelete(t2)) {
                             sourceTimelined.removeTag(i);                            
                         }
                     }
@@ -4433,6 +4425,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     && nextDepthstate.placeObjectTag.flagMove()
                                     ) {
                                 nextDepthstate.placeObjectTag.setPlaceFlagMove(false);
+                                nextDepthstate.placeObjectTag.setModified(true);
                             } else if (nextDepthstate != null 
                                     && nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame
                                     && nextDepthstate.placeFrame.frame > lastNotDeletedFrameNum - 1) {
@@ -4489,13 +4482,27 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (t2 instanceof ShowFrameTag) {                    
                     break;
                 }
-                if ((t2 instanceof PlaceObjectTypeTag)
-                        || (t2 instanceof RemoveObject2Tag)) {
+                if (isFrameTagToDelete(t2)) {
                     sourceTimelined.removeTag(i);
                 }
             }      
         }
         //WARNING: this method does not reset timeline and does not set frame count. Caller must do it.
+    }
+    
+    /**
+     * Which of tags in a frame are deleted when deleting a frame
+     * @param tag
+     * @return 
+     */
+    private boolean isFrameTagToDelete(Tag tag) {
+        return (tag instanceof PlaceObjectTypeTag)
+                || (tag instanceof RemoveTag)
+                || (tag instanceof FrameLabelTag)
+                || (tag instanceof StartSoundTag)
+                || (tag instanceof StartSound2Tag)
+                || (tag instanceof SoundStreamBlockTag)
+                || (tag instanceof DoActionTag);                                
     }
 
     public void copyOrMoveTags(Set<TreeItem> items, boolean move, Timelined targetTimelined, Tag position) {
