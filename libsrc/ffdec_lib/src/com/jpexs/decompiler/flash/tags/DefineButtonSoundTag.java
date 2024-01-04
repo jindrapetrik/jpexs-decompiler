@@ -162,4 +162,66 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     public String toString() {
         return super.toString() + " (" + buttonId + ")";
     }
+
+    @Override
+    public boolean removeCharacter(int characterId) {
+        boolean modified = false;
+                
+        if (buttonSoundChar0 == characterId) {
+            buttonSoundChar0 = 0;
+            buttonSoundInfo0 = null;
+            modified = true;
+        }
+        if (buttonSoundChar1 == characterId) {
+            buttonSoundChar1 = 0;
+            buttonSoundInfo1 = null;
+            modified = true;
+        }
+        if (buttonSoundChar2 == characterId) {
+            buttonSoundChar2 = 0;
+            buttonSoundInfo2 = null;
+            modified = true;
+        }
+        if (buttonSoundChar3 == characterId) {
+            buttonSoundChar3 = 0;
+            buttonSoundInfo3 = null;
+            modified = true;
+        }
+        
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
+        boolean modified = false;
+        
+        if (buttonId == oldCharacterId) {
+            buttonId = newCharacterId;
+            modified = true;
+        }        
+        if (buttonSoundChar0 == oldCharacterId) {
+            buttonSoundChar0 = newCharacterId;
+            modified = true;
+        }
+        if (buttonSoundChar1 == oldCharacterId) {
+            buttonSoundChar1 = newCharacterId;
+            modified = true;
+        }
+        if (buttonSoundChar2 == oldCharacterId) {
+            buttonSoundChar2 = newCharacterId;
+            modified = true;
+        }
+        if (buttonSoundChar3 == oldCharacterId) {
+            buttonSoundChar3 = newCharacterId;
+            modified = true;
+        }
+                
+        if (modified) {
+            setModified(true);
+        }
+        return modified;
+    }        
 }

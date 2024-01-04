@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Folder preview - GFX image identifiers not shown
 - Hide zooming buttons in fonts display
 - [#2174] Ignoring PlaceObjects with flagMove on empty depth
+- [#2175] Removing DefineButtonSound, warning about incorrect sound character type in FLA export
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3363,6 +3364,7 @@ Major version of SWF to XML export changed to 2.
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
+[#2175]: https://www.free-decompiler.com/flash/issues/2175
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119

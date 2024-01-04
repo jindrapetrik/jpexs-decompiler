@@ -1811,8 +1811,15 @@ public class XFLConverter {
                                 "index", Integer.toString(frame - 1),
                                 "keyMode", Integer.toString(KEY_MODE_NORMAL)});
                             if (soundChar > 0) {
-                                DefineSoundTag sound = (DefineSoundTag) swf.getCharacter(soundChar);
-                                convertSoundUsage(symbolStr, sound, soundInfo);
+                                CharacterTag soundCharTag = swf.getCharacter(soundChar);
+                                if (soundCharTag == null) {
+                                    logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", soundChar);
+                                } else if (soundCharTag instanceof DefineSoundTag) {
+                                    DefineSoundTag sound = (DefineSoundTag) soundCharTag;
+                                    convertSoundUsage(symbolStr, sound, soundInfo);
+                                } else {
+                                    logger.log(Level.WARNING, "Tag (ID={0}) expected to be DefineSound, {1} found. It is referenced from DefineButtonSound({2}).", new Object[] {soundChar, soundCharTag.getClass().getSimpleName(), defineButtonSound.buttonId});
+                                }
                             }
                             symbolStr.writeStartElement("elements");
                             symbolStr.writeEndElement(); //elements
