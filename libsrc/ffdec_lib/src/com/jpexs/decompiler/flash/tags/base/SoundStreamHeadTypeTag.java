@@ -17,10 +17,15 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
+import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
+import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,4 +45,25 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
     public abstract List<SoundStreamFrameRange> getRanges();
 
+    
+    protected boolean isMp3HigherThan160Kbps() {        
+        List<SoundStreamFrameRange> ranges = getRanges();
+        if (ranges.isEmpty()) {
+            return false;
+        }
+        try {
+            SWFInputStream sis = new SWFInputStream(swf, ranges.get(0).blocks.get(0).streamSoundData.getRangeData());
+            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);                      
+            if (!s.frames.isEmpty()) {
+                MP3FRAME frame = s.frames.get(0);
+                int bitRate = frame.getBitRate() / 1000;
+                if (bitRate > 160) {
+                    return true;
+                }
+            }
+        } catch (IOException ex) {
+            //ignore
+        }
+        return false;
+    }
 }

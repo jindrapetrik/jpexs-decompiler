@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Hide zooming buttons in fonts display
 - [#2174] Ignoring PlaceObjects with flagMove on empty depth
 - [#2175] Removing DefineButtonSound, warning about incorrect sound character type in FLA export
+- [#2175] FLA Export - exporting 320kbps MP3s as 160kbps
 
 ## [20.1.0] - 2023-12-30
 ### Added

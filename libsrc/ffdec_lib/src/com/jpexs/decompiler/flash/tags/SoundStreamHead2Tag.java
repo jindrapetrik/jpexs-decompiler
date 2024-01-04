@@ -149,7 +149,7 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     @Override
     public SoundExportFormat getExportFormat() {
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
-            if (getInitialLatency() > 0) {
+            if (getInitialLatency() > 0 || isMp3HigherThan160Kbps()) {
                 return SoundExportFormat.WAV;
             }
             return SoundExportFormat.MP3;
