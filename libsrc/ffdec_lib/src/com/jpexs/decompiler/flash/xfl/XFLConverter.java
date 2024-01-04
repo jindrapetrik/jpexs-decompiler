@@ -2068,6 +2068,7 @@ public class XFLConverter {
             }
         }
         int seekSamples = 0;
+        boolean convertMp3ToWav = false;
         if (soundFormat == SoundFormat.FORMAT_MP3) {
             exportFormat = "mp3";
             if (!soundType) { //mono
@@ -2080,6 +2081,7 @@ public class XFLConverter {
                 if (s.seekSamples > 0) {
                     seekSamples = s.seekSamples;
                     exportFormat = "wav";
+                    convertMp3ToWav = true;
                 }                    
                 if (!s.frames.isEmpty()) {
                     MP3FRAME frame = s.frames.get(0);
@@ -2122,6 +2124,11 @@ public class XFLConverter {
                         case 160:
                             bits = 17;
                             break;
+                        default:
+                            bits = 17;
+                            exportFormat = "wav";
+                            convertMp3ToWav = true;
+                            break;
                     }                    
                 }
             } catch (IOException | IndexOutOfBoundsException ex) {
@@ -2132,7 +2139,7 @@ public class XFLConverter {
         SoundFormat fmt = st.getSoundFormat();
         byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
         try {
-            data = new SoundExporter().exportSound(st, seekSamples > 0 ? SoundExportMode.WAV : SoundExportMode.MP3_WAV);
+            data = new SoundExporter().exportSound(st, convertMp3ToWav ? SoundExportMode.WAV : SoundExportMode.MP3_WAV);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -2149,7 +2156,7 @@ public class XFLConverter {
 
         
         String datFileName = null;
-        if (seekSamples > 0 && decodedData != null) {
+        if (convertMp3ToWav && decodedData != null) {
             long ts = getTimestamp(swf);
             datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
             datfiles.put(datFileName, decodedData);
@@ -5105,6 +5112,9 @@ public class XFLConverter {
                                         streamCompress = 16;
                                         break;
                                     case 160:
+                                        streamCompress = 17;
+                                        break;
+                                    default:
                                         streamCompress = 17;
                                         break;
                                 }                    

@@ -25,14 +25,14 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
+import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -139,7 +139,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     @Override
     public SoundExportFormat getExportFormat() {
         if (soundFormat == SoundFormat.FORMAT_MP3) {
-            if (getInitialLatency() > 0) {
+            if (getInitialLatency() > 0 || isMp3HigherThan160Kbps()) {
                 return SoundExportFormat.WAV;
             }
             return SoundExportFormat.MP3;
@@ -260,5 +260,25 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
             }                   
         }
         return 0;
+    }
+    
+    private boolean isMp3HigherThan160Kbps() {
+        if (soundFormat != SoundFormat.FORMAT_MP3) {
+            return false;
+        }
+        try {
+            SWFInputStream sis = new SWFInputStream(swf, soundData.getRangeData());                    
+            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);                      
+            if (!s.frames.isEmpty()) {
+                MP3FRAME frame = s.frames.get(0);
+                int bitRate = frame.getBitRate() / 1000;
+                if (bitRate > 160) {
+                    return true;
+                }
+            }
+        } catch (IOException ex) {
+            //ignore
+        }
+        return false;
     }
 }
