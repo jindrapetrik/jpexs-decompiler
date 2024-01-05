@@ -3482,6 +3482,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     Tag tag = (Tag) item;
                     tag.undo();
                     tag.getSwf().clearAllCache();
+                    if (tag instanceof Timelined) {
+                        ((Timelined) tag).resetTimeline();
+                    }
                     tree.getFullModel().updateNode(item);
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
