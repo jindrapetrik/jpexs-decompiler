@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - StartSound and StartSound2 show characterId/class in the tag tree
 - Folder preview for sounds
+- [#2176] Ignoring letter spacing on text search (only applies to global search, not to search inside text)
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -17,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#2175] Removing DefineButtonSound, warning about incorrect sound character type in FLA export
 - [#2175] FLA Export - exporting 320kbps MP3s as 160kbps
 - [#2178] Undo on sprites
+- [#2176] Reset letterspacing on text import
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3363,6 +3365,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
