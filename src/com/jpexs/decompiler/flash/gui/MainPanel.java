@@ -2973,7 +2973,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
                 boolean regexp = searchDialog.regexpCheckBox.isSelected();
-
+                
                 boolean scriptSearch = searchDialog.searchInASRadioButton.isSelected()
                         || searchDialog.searchInPCodeRadioButton.isSelected();
                 if (scriptSearch) {
@@ -3144,7 +3144,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             for (Tag tag : swf.getTags()) {
                 if (tag instanceof TextTag) {
                     TextTag textTag = (TextTag) tag;
-                    if (pat.matcher(textTag.getFormattedText(false).text).find()) {
+                    if (pat.matcher(textTag.getFormattedText(true).text).find()) {
                         found.add(textTag);
                     }
                 }

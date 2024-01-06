@@ -302,7 +302,7 @@ public abstract class StaticTextTag extends TextTag {
                         }
                         int advance = getAdvance(fnt, ge.glyphIndex, textHeight, c, nextChar);
                         int delta = ge.glyphAdvance - advance;
-                        if (delta != letterSpacing) {
+                        if (delta != letterSpacing && !ignoreLetterSpacing) {
                             writer.append("[space " + (delta - letterSpacing) + "]");
                         }
                     }
