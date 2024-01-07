@@ -3481,10 +3481,22 @@ public class TagTreeContextMenu extends JPopupMenu {
                 try {
                     Tag tag = (Tag) item;
                     tag.undo();
-                    tag.getSwf().clearAllCache();
+                    SWF swf = tag.getSwf();                                        
+                    swf.clearAllCache();
                     if (tag instanceof Timelined) {
                         ((Timelined) tag).resetTimeline();
                     }
+                    tag.getTimelined().resetTimeline();
+                    //For example DefineButton and its DefineButtonCxForm
+                    if ((tag instanceof CharacterIdTag) && (!(tag instanceof CharacterTag))) {
+                        CharacterTag parentCharacter = swf.getCharacter(((CharacterIdTag) tag).getCharacterId());
+                        if (parentCharacter instanceof Timelined) {
+                            ((Timelined) parentCharacter).resetTimeline();
+                        }
+                    }
+                    swf.computeDependentCharacters();
+                    swf.computeDependentFrames();
+                    
                     tree.getFullModel().updateNode(item);
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
