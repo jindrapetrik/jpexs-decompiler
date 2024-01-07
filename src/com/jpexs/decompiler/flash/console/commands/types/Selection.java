@@ -14,27 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console;
+package com.jpexs.decompiler.flash.console.commands.types;
 
-import com.jpexs.decompiler.flash.console.commands.Main;
-import picocli.CommandLine;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class NewCommandLine {                
-        
-    public static void main(String[] args) {        
-        //args = new String[] {"--cli", "sample", "jedna", "dva", "tri"};
-        //args = new String[] {"--cli", "help", "sample"};
-        
-        args = new String[] {"--cli", "help", "export"};
-        //args = new String[] {"--help"};
-        //args = new String[] {"--cli", "export", "script:as,image:png", "C:/out/", "C:/in/myfile.swf"};
-        
-        
-        int exitCode = new CommandLine(new Main()).execute(args); 
-        System.exit(exitCode);
+public class Selection {
+
+    public List<Range> ranges;
+
+    public Selection() {
+        this.ranges = new ArrayList<>();
+        this.ranges.add(new Range(null, null));
+    }
+
+    public Selection(List<Range> ranges) {
+        this.ranges = ranges;
+    }
+
+    public boolean contains(int index) {
+        for (Range r : ranges) {
+            if (r.contains(index)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -16,13 +16,17 @@
  */
 package com.jpexs.decompiler.flash.console.commands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.console.commands.types.ConfigConverter;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.HelpCommand;
+import picocli.CommandLine.ScopeType;
 
 /**
  *
@@ -39,6 +43,17 @@ import picocli.CommandLine.HelpCommand;
         customSynopsis = "<ffdec> [FILE...]%n    or <ffdec> [-hV]%n    or <ffdec> --cli [COMMAND]"
         )
 public class Main implements Runnable {
+    
+    @Option(names = "--config",
+            paramLabel = "<key>=<value>[,<key>=<value>...]",
+            converter = ConfigConverter.class,
+            description = {
+                "Sets configuration values for this session.",
+                "Use command 'config' to list available configuration settings. "
+            },
+            scope = ScopeType.INHERIT
+            )
+    private Map<String, String> configs = new HashMap<>();
     
     @Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
     private File[] files;

@@ -14,27 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console;
-
-import com.jpexs.decompiler.flash.console.commands.Main;
-import picocli.CommandLine;
+package com.jpexs.decompiler.flash.console.commands.types;
 
 /**
  *
  * @author JPEXS
  */
-public class NewCommandLine {                
-        
-    public static void main(String[] args) {        
-        //args = new String[] {"--cli", "sample", "jedna", "dva", "tri"};
-        //args = new String[] {"--cli", "help", "sample"};
-        
-        args = new String[] {"--cli", "help", "export"};
-        //args = new String[] {"--help"};
-        //args = new String[] {"--cli", "export", "script:as,image:png", "C:/out/", "C:/in/myfile.swf"};
-        
-        
-        int exitCode = new CommandLine(new Main()).execute(args); 
-        System.exit(exitCode);
-    }
+public class ExportObjectFormat {
+    public ExportObject object;
+    public String format;
+
+    public ExportObjectFormat(ExportObject type, String format) {
+        this.object = type;
+        this.format = format;
+    }        
 }
