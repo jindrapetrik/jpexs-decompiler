@@ -3474,7 +3474,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void undoTagActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
-        List<TreeItem> sel = getSelectedItems();
+        List<TreeItem> sel = getSelectedItems();    
+        Set<SWF> computeSWFs = new LinkedIdentityHashSet<>();
 
         for (TreeItem item : sel) {
             if (item instanceof Tag) {
@@ -3494,9 +3495,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             ((Timelined) parentCharacter).resetTimeline();
                         }
                     }
-                    swf.computeDependentCharacters();
-                    swf.computeDependentFrames();
-                    
+                    computeSWFs.add(swf);                    
                     tree.getFullModel().updateNode(item);
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -3504,6 +3503,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
 
+        for (SWF swf : computeSWFs) {
+            swf.computeDependentCharacters();
+            swf.computeDependentFrames();                    
+        }
+        
         mainPanel.repaintTree();
     }
 
