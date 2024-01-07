@@ -11089,6 +11089,7 @@ public class CommandLine {
             final String name;
             int position;
 
+            @SuppressWarnings("deprecation") //JPEXS                
             public MethodParam(Method method, int paramIndex) {
                 this.method = method;
                 this.paramIndex = paramIndex;
@@ -15871,7 +15872,9 @@ public class CommandLine {
                 } else {
                     text = text.concat("[").concat(name).concat(param).concat("]");
                     if (option.isMultiValue()) { // add ellipsis to show option is repeatable
-                        text = text.concat("...");
+                        if (option.splitRegex().isEmpty() && option.converters().length == 0) { //JPEXS
+                            text = text.concat("...");
+                        }
                     }
                 }
             }

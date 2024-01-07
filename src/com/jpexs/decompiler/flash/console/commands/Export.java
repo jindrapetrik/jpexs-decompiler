@@ -15,10 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.console.commands;
+import com.jpexs.decompiler.flash.console.commands.types.ConfigConverter;
+import com.jpexs.decompiler.flash.console.commands.types.ExportObject;
+import com.jpexs.decompiler.flash.console.commands.types.ExportObjectFormat;
+import com.jpexs.decompiler.flash.console.commands.types.ExportObjectFormatConverter;
+import com.jpexs.decompiler.flash.console.commands.types.Selection;
+import com.jpexs.decompiler.flash.console.commands.types.SelectionConverter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParentCommand;
 
 /**
  *
@@ -27,84 +38,119 @@ import picocli.CommandLine.Parameters;
 @Command(name = "export",
         header = "Export sources to directory"
         )
-public class Export {
+public class Export implements Runnable {
        
+    @ParentCommand
+    private Main parent;
+    
+    @Option(names = "--frame", 
+            paramLabel = "<frameRanges>",
+            converter = SelectionConverter.class,            
+            description = {
+                "Selected frame(s) to export.",
+                "Sample values: 1-5 or 2,4 or 2-5,7,9-"
+            }
+            )
+    private Selection frames = new Selection();
+    
+    @Option(names = "--character-id",
+            paramLabel = "<characterIdRanges>",
+            converter = SelectionConverter.class,
+            description = {
+                "Selected character id(s) to export.",
+                "Sample values: 27 or 2-5 or 12,24 or 2-5,10,9-"
+            }
+            )
+    private Selection characterIds = new Selection();
+    
+    @Option(names = "--class", 
+            paramLabel = "<class>",
+            split = ",",
+            description = {
+                "Selected scripts to export by classname (ActionScript 3 ONLY).",
+                "Sample values:",
+                "com.example.MyClass",
+                "com.example.+  (all classes in package \"com.example\")",
+                "com.++,net.company.MyClass  (all classes in package \"com\" and all subpackages, class net.company.MyClass)",
+            })
+    private List<String> classes = new ArrayList<>();
+    
+    @Option(names = "--embed",
+            description = {
+                "Enables exporting embedded assets via [Embed tag].",
+                "For script:as exports."
+            }
+            )
+    private boolean useEmbed = false;
+    
+    
+    
     @Parameters(index = "0", 
             split = ",", 
-            paramLabel = "<type>",
-            description = {"Types to export:",
-            "script - Scripts (Default format: ActionScript source)",
-        "image - Images (Default format: PNG/JPEG)",
-        "shape - Shapes (Default format: SVG)",
-        "morphshape - MorphShapes (Default format: SVG)",
-        "movie - Movies (Default format: FLV without sound)",
-        "font - Fonts (Default format: TTF)",
-        "font4 - DefineFont4 (Default format: CFF)",
-        "frame - Frames (Default format: PNG)",
-        "sprite - Sprites (Default format: PNG)",
-        "button - Buttons (Default format: PNG)",
-        "sound - Sounds (Default format: MP3/WAV/FLV only sound)",
-        "binaryData - Binary data (Default format:  Raw data)",
-        "symbolClass - Symbol-Class mapping (Default format: CSV)",
-        "text - Texts (Default format: Plain text)",
-        "all - Every resource (but not FLA and XFL)",
-        "fla - Everything to FLA compressed format",
-        "xfl - Everything to uncompressed FLA format (XFL)"}
-            )
-    private String[] types;
-    
-    @Option(names = "--format", split = ",", paramLabel = "<type:format>", description = {
-        "Sets output format for export:",
-        "script:as - ActionScript source",
-        "script:pcode - ActionScript P-code",
-        "script:pcodehex - ActionScript P-code with hex",
-        "script:hex - ActionScript Hex only",
-        "shape:svg - SVG format for Shapes",
-        "shape:png - PNG format for Shapes",
-        "shape:canvas - HTML5 Canvas format for Shapes",
-        "shape:bmp - BMP format for Shapes",
-        "morphshape:svg - SVG format for MorphShapes",
-        "morphshape:canvas - HTML5 Canvas  format for MorphShapes",
-        "frame:png - PNG format for Frames",
-        "frame:gif - GIF format for Frames",
-        "frame:avi - AVI format for Frames",
-        "frame:svg - SVG format for Frames",
-        "frame:canvas - HTML5 Canvas format for Frames",
-        "frame:pdf - PDF format for Frames",
-        "frame:bmp - BMP format for Frames",
-        "sprite:png - PNG format for Sprites",
-        "sprite:gif - GIF format for Sprites",
-        "sprite:avi - AVI format for Sprites",
-        "sprite:svg - SVG format for Sprites",
-        "sprite:canvas - HTML5 Canvas format for Sprites",
-        "sprite:pdf - PDF format for Sprites",
-        "sprite:bmp - BMP format for Sprites",
-        "button:png - PNG format for Buttons",
-        "button:svg - SVG format for Buttons",
-        "button:bmp - BMP format for Buttons",
-        "image:png_gif_jpeg - PNG/GIF/JPEG format for Images",
-        "image:png - PNG format for Images",
-        "image:jpeg - JPEG format for Images",
-        "image:bmp - BMP format for Images",
-        "image:png_gif_jpeg_alpha - PNG/GIF/JPEG+ALPHA format for Images",
-        "text:plain - Plain text format for Texts",
-        "text:formatted - Formatted text format for Texts",
-        "text:svg - SVG format for Texts",
-        "sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds",
-        "sound:mp3_wav - MP3/WAV format for Sounds",
-        "sound:wav - WAV format for Sounds",
-        "sound:flv - FLV format for Sounds",
-        "font:ttf - TTF format for Fonts",
-        "font:woff - WOFF format for Fonts",
-        "font4:cff - CFF format for DefineFont4",
-        "fla:<flaversion> or xfl:<flaversion> - Specify FLA format version",
-        "   - values for <flaversion>: cs5,cs5.5,cs6,cc",
-    })
-    private String[] formats;
+            converter = ExportObjectFormatConverter.class,
+            paramLabel = "<type[:format]>",
+            description = {"What objects to export. Available formats:",   
+        "script:as (default)",
+        "script:pcode",
+        "script:pcodehex",
+        "script:hex",
+        "shape:svg (default)",
+        "shape:png",
+        "shape:canvas",
+        "shape:bmp",
+        "morphshape:svg (default)",
+        "morphshape:canvas",
+        "frame:png (default)",
+        "frame:gif",
+        "frame:avi",
+        "frame:svg",
+        "frame:canvas",
+        "frame:pdf",
+        "frame:bmp",
+        "sprite:png (default)",
+        "sprite:gif",
+        "sprite:avi",
+        "sprite:svg",
+        "sprite:canvas",
+        "sprite:pdf",
+        "sprite:bmp",
+        "button:png (default)",
+        "button:svg",
+        "button:bmp",
+        "image:png_gif_jpeg (default)",
+        "image:png",
+        "image:jpeg",
+        "image:bmp",
+        "image:png_gif_jpeg_alpha",
+        "text:plain (default)",
+        "text:formatted",
+        "text:svg",
+        "sound:mp3_wav_flv (default)",
+        "sound:mp3_wav",
+        "sound:wav",
+        "sound:flv",
+        "font:ttf (default)",
+        "font:woff",
+        "font4:cff (default)",
+        "fla:cs5",
+        "fla:cs5.5",
+        "fla:cs6",
+        "fla:cc",
+        "xfl:cs5",
+        "xfl:cs5.5",
+        "xfl:cs6",
+        "xfl:cc",                          
+            })
+    private List<ExportObjectFormat> objects;        
     
     @Parameters(index = "1", description = "Target directory")
     private String outDirectory;
     
     @Parameters(index = "2", description = "Input file or directory")
     private String inFileOrDirectory;    
+
+    @Override
+    public void run() {
+        System.out.println("exporting...ok");
+    }
 }
