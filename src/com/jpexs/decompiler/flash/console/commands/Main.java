@@ -32,15 +32,27 @@ import picocli.CommandLine.ScopeType;
  *
  * @author JPEXS
  */
-@Command(name="<ffdec> --cli",
+@Command(name="<ffdec>",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
         subcommands = {
             HelpCommand.class,
             Export.class
+        },        
+        descriptionHeading = "%n@|bold,underline Description|@:%n",        
+        optionListHeading = "%n@|bold,underline Options|@:%n",           
+        parameterListHeading = "%n@|bold,underline Parameters|@:%n",
+        synopsisHeading = "@|bold,underline Usage|@:",
+        customSynopsis = {"<ffdec> [@|fg(yellow) FILE|@...]",
+                           "   or <ffdec> [@|fg(yellow) -hV|@]",
+                           "   or <ffdec> @|fg(yellow) --cli|@ [COMMAND]"},
+        description = {"JPEXS Free Flash Decompiler commandline interface",
+                       "",
+                       "@|bold,underline Executable|@:",
+                       "      <ffdec>    ffdec.sh on Linux/MacOs, ffdec.bat on Windows",
+                       "                 or 'java -jar ffdec.jar' on all java"
         },
-        descriptionHeading = "%n     <ffdec>      ffdec.sh on Linux/MacOs, ffdec.bat on Windows%n",
-        customSynopsis = "<ffdec> [FILE...]%n    or <ffdec> [-hV]%n    or <ffdec> --cli [COMMAND]"
+        commandListHeading = "%n@|bold,underline Commands|@:%n"
         )
 public class Main implements Runnable {
     
@@ -58,7 +70,10 @@ public class Main implements Runnable {
     @Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
     private File[] files;
     
-    @Option(names = "--cli", required = true, description = "Use new commandline mode")
+    @Option(names = "--cli", 
+            required = true, 
+            description = "Use new commandline mode",
+            scope = ScopeType.INHERIT)
     private boolean cli = false;        
     
     @Override

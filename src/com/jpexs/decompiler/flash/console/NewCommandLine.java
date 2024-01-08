@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.console;
 
 import com.jpexs.decompiler.flash.console.commands.Main;
+import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
 
 /**
@@ -25,16 +26,10 @@ import picocli.CommandLine;
  */
 public class NewCommandLine {                
         
-    public static void main(String[] args) {        
-        //args = new String[] {"--cli", "sample", "jedna", "dva", "tri"};
-        //args = new String[] {"--cli", "help", "sample"};
-        
-        args = new String[] {"--cli", "help", "export"};
-        //args = new String[] {"--help"};
-        //args = new String[] {"--cli", "export", "script:as,image:png", "C:/out/", "C:/in/myfile.swf"};
-        
-        
+    public static void main(String[] args) {
+        AnsiConsole.systemInstall();
         int exitCode = new CommandLine(new Main()).execute(args); 
+        AnsiConsole.systemUninstall();
         System.exit(exitCode);
     }
 }
