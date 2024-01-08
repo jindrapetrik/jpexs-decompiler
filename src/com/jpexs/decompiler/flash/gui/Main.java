@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.console.NewCommandLine;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
@@ -2850,7 +2851,7 @@ public class Main {
                     } else {
                         for (String fileToOpen : filesToOpen) {
                             openFile(fileToOpen, null);
-                        }
+                        }                        
                     }
                 });
             }

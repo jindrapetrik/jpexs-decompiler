@@ -36,19 +36,23 @@ import picocli.CommandLine.ParentCommand;
  * @author JPEXS
  */
 @Command(name = "export",
-        header = "Export sources to directory"
+        header = "Export sources to a directory",
+        //descriptionHeading = "%n@|bold,underline Description|@:%n",        
+        optionListHeading = "%n@|bold,underline Options|@:%n",           
+        parameterListHeading = "%n@|bold,underline Parameters|@:%n",
+        synopsisHeading = "@|bold,underline Usage|@:"
         )
 public class Export implements Runnable {
        
     @ParentCommand
     private Main parent;
-    
+            
     @Option(names = "--frame", 
             paramLabel = "<frameRanges>",
             converter = SelectionConverter.class,            
             description = {
                 "Selected frame(s) to export.",
-                "Sample values: 1-5 or 2,4 or 2-5,7,9-"
+                "@|bold Sample values|@: 1-5 or 2,4 or 2-5,7,9-"
             }
             )
     private Selection frames = new Selection();
@@ -58,7 +62,7 @@ public class Export implements Runnable {
             converter = SelectionConverter.class,
             description = {
                 "Selected character id(s) to export.",
-                "Sample values: 27 or 2-5 or 12,24 or 2-5,10,9-"
+                "@|bold Sample values|@: 27 or 2-5 or 12,24 or 2-5,10,9-"
             }
             )
     private Selection characterIds = new Selection();
@@ -68,7 +72,7 @@ public class Export implements Runnable {
             split = ",",
             description = {
                 "Selected scripts to export by classname (ActionScript 3 ONLY).",
-                "Sample values:",
+                "@|bold Sample values|@:",
                 "com.example.MyClass",
                 "com.example.+  (all classes in package \"com.example\")",
                 "com.++,net.company.MyClass  (all classes in package \"com\" and all subpackages, class net.company.MyClass)",
@@ -89,7 +93,7 @@ public class Export implements Runnable {
             split = ",", 
             converter = ExportObjectFormatConverter.class,
             paramLabel = "<type[:format]>",
-            description = {"What objects to export. Available formats:",   
+            description = {"What objects to export. @|bold Available formats|@:",   
         "script:as (default)",
         "script:pcode",
         "script:pcodehex",
