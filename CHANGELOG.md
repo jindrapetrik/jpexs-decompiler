@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2175] FLA Export - exporting 320kbps MP3s as 160kbps
 - [#2178] Undo on sprites
 - [#2176] Reset letterspacing on text import
+- Nullpointer on recent searches loader
 
 ## [20.1.0] - 2023-12-30
 ### Added

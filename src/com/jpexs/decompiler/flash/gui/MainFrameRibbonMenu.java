@@ -173,8 +173,15 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             searchHistoryPanel.addButtonGroup(groupName);
 
             Openable openable = Main.getMainFrame().getPanel().getCurrentOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
-            List<Integer> indices = Main.searchResultsStorage.getIndicesForOpenable(openable);
+            SWF swf;
+            if (openable == null) {
+                swf = null;
+            } else if (openable instanceof SWF) {                
+                swf = (SWF) openable;
+            } else {
+                swf = ((ABC) openable).getSwf();
+            }
+            List<Integer> indices = openable == null ? new ArrayList<>() : Main.searchResultsStorage.getIndicesForOpenable(openable);
 
             int height = 0;
             height = searchHistoryPanel.getInsets().top + searchHistoryPanel.getInsets().bottom + 6/*groupInset top*/ + new JLabel(groupName).getPreferredSize().height + 4 /*layoutGap*/;
