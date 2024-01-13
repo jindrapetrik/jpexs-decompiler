@@ -99,9 +99,7 @@ public class LoadingDialog extends AppDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (Main.shouldCloseWhenClosingLoadingDialog) {
-                    System.exit(0);
-                } else if (worker != null) {
+                if (worker != null) {
                     worker.cancel(true);
                 }
             }

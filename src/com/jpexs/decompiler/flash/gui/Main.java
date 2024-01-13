@@ -183,8 +183,6 @@ public class Main {
 
     public static DebugLogDialog debugDialog;
 
-    public static boolean shouldCloseWhenClosingLoadingDialog;
-
     private static Debugger flashDebugger;
 
     private static DebuggerHandler debugHandler = null;
@@ -1660,12 +1658,15 @@ public class Main {
                 }
             }
 
-            loadingDialog.setVisible(false);
-            shouldCloseWhenClosingLoadingDialog = false;
-
             final SWF fswf = firstSWF;
             final Openable fopenable = firstOpenable;
-            View.execInEventDispatch(() -> {
+            View.execInEventDispatch(() -> {                
+                if (mainFrame == null) {
+                    Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
+                    ensureMainFrame();
+                }
+                loadingDialog.setVisible(false);            
+                
                 if (mainFrame != null) {
                     mainFrame.setVisible(true);
                 }
@@ -2844,7 +2845,6 @@ public class Main {
             if (filesToOpen != null && filesToOpen.length > 0) {
                 initGui();
                 View.execInEventDispatch(() -> {
-                    shouldCloseWhenClosingLoadingDialog = true;
                     if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
                         Main.exit();
                     } else {
