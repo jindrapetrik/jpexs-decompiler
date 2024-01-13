@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#2178] Undo on sprites
 - [#2176] Reset letterspacing on text import
 - Nullpointer on recent searches loader
+- [#2177] Leftover process when invalid SWF opened - now main window is shown
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3372,6 +3373,7 @@ Major version of SWF to XML export changed to 2.
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
 [#2175]: https://www.free-decompiler.com/flash/issues/2175
 [#2178]: https://www.free-decompiler.com/flash/issues/2178
+[#2177]: https://www.free-decompiler.com/flash/issues/2177
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
