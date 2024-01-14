@@ -169,6 +169,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private final MainPanel mainPanel;
 
     private JMenuItem expandRecursiveMenuItem;
+    
+    private JMenuItem collapseRecursiveMenuItem;
 
     private JMenuItem removeMenuItem;
 
@@ -334,6 +336,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         add(expandRecursiveMenuItem);
+        
+        collapseRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.collapseAll"));
+        collapseRecursiveMenuItem.addActionListener(this::collapseRecursiveActionPerformed);
+        collapseRecursiveMenuItem.setIcon(View.getIcon("collapse16"));
+        add(collapseRecursiveMenuItem);
 
         changeCharsetMenu = new JMenu();
         JMenu currentCharsetMenu = changeCharsetMenu;
@@ -1079,6 +1086,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         boolean hasExportableNodes = tree.hasExportableNodes();
 
         expandRecursiveMenuItem.setVisible(false);
+        collapseRecursiveMenuItem.setVisible(false);
         pinMenuItem.setVisible(false);
         unpinMenuItem.setVisible(false);
         unpinAllMenuItem.setVisible(false);
@@ -1316,6 +1324,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (tree.getModel().getChildCount(firstItem) > 0) {
                 expandRecursiveMenuItem.setVisible(true);
+                collapseRecursiveMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof HasCharacterId && !(firstItem instanceof CharacterTag)) {
@@ -2454,8 +2463,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         HasCharacterId hasCharacterId = (HasCharacterId) itemj;
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), ((SWF) itemj.getOpenable()).getCharacter(hasCharacterId.getCharacterId()));
-    }
-
+    }   
+    
     private void expandRecursiveActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
         TreePath path = tree.getFullModel().getTreePath(getCurrentItem());
@@ -2463,6 +2472,15 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         View.expandTreeNodes(tree, path, true);
+    }
+    
+    private void collapseRecursiveActionPerformed(ActionEvent evt) {
+        AbstractTagTree tree = getTree();
+        TreePath path = tree.getFullModel().getTreePath(getCurrentItem());
+        if (path == null) {
+            return;
+        }
+        View.expandTreeNodes(tree, path, false);
     }
 
     private void textSearchActionPerformed(ActionEvent evt) {
