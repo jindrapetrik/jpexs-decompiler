@@ -14,27 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console.commands.types;
+package com.jpexs.decompiler.flash.cli;
+
+import com.jpexs.decompiler.flash.cli.commands.Main;
+import org.fusesource.jansi.AnsiConsole;
+import picocli.CommandLine;
 
 /**
  *
  * @author JPEXS
  */
-public class Range {
-
-    public Integer min;
-
-    public Integer max;
-
-    public Range(Integer min, Integer max) {
-        this.min = min;
-        this.max = max;
-    }
-
-    public boolean contains(int index) {
-        int minimum = min == null ? Integer.MIN_VALUE : min;
-        int maximum = max == null ? Integer.MAX_VALUE : max;
-
-        return index >= minimum && index <= maximum;
+public class CommandlineInterface {                
+        
+    public static void main(String[] args) {
+        AnsiConsole.systemInstall();
+        int exitCode = new CommandLine(new Main()).execute(args); 
+        AnsiConsole.systemUninstall();
+        System.exit(exitCode);
     }
 }

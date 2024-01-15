@@ -14,18 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console.commands.types;
+package com.jpexs.decompiler.flash.cli.commands.types;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class ExportObjectFormat {
-    public ExportObject object;
-    public String format;
+public class Selection {
 
-    public ExportObjectFormat(ExportObject type, String format) {
-        this.object = type;
-        this.format = format;
-    }        
+    public List<Range> ranges;
+
+    public Selection() {
+        this.ranges = new ArrayList<>();
+        this.ranges.add(new Range(null, null));
+    }
+
+    public Selection(List<Range> ranges) {
+        this.ranges = ranges;
+    }
+
+    public boolean contains(int index) {
+        for (Range r : ranges) {
+            if (r.contains(index)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

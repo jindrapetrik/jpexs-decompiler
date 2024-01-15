@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console;
-
-import com.jpexs.decompiler.flash.console.commands.Main;
-import org.fusesource.jansi.AnsiConsole;
-import picocli.CommandLine;
+package com.jpexs.decompiler.flash.cli.commands.types;
 
 /**
  *
  * @author JPEXS
  */
-public class NewCommandLine {                
-        
-    public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        int exitCode = new CommandLine(new Main()).execute(args); 
-        AnsiConsole.systemUninstall();
-        System.exit(exitCode);
-    }
+public class ExportObjectFormat {
+    public ExportObject object;
+    public String format;
+
+    public ExportObjectFormat(ExportObject type, String format) {
+        this.object = type;
+        this.format = format;
+    }        
 }
