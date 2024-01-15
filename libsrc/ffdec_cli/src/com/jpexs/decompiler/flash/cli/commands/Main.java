@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console.commands;
+package com.jpexs.decompiler.flash.cli.commands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.console.commands.types.ConfigConverter;
+import com.jpexs.decompiler.flash.cli.commands.types.ConfigConverter;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import picocli.CommandLine.ScopeType;
  *
  * @author JPEXS
  */
-@Command(name="<ffdec>",
+@Command(name="ffdec-cli",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
         subcommands = {
@@ -43,18 +43,13 @@ import picocli.CommandLine.ScopeType;
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
-        customSynopsis = {"<ffdec> [@|fg(yellow) FILE|@...]",
+        /*customSynopsis = {"<ffdec> [@|fg(yellow) FILE|@...]",
                            "   or <ffdec> [@|fg(yellow) -hV|@]",
-                           "   or <ffdec> @|fg(yellow) --cli|@ [COMMAND]"},
-        description = {"JPEXS Free Flash Decompiler commandline interface",
-                       "",
-                       "@|bold,underline Executable|@:",
-                       "      <ffdec>    ffdec.sh on Linux/MacOs, ffdec.bat on Windows",
-                       "                 or 'java -jar ffdec.jar' on all java"
-        },
-        commandListHeading = "%n@|bold,underline Commands|@:%n"
+                           "   or <ffdec> @|fg(yellow) --cli|@ [COMMAND]"},*/
+        description = {"JPEXS Free Flash Decompiler commandline interface"},        
+        commandListHeading = "%n@|bold,underline Commands|@:%n"        
         )
-public class Main implements Runnable {
+public class Main {
     
     @Option(names = "--config",
             paramLabel = "<key>=<value>[,<key>=<value>...]",
@@ -67,19 +62,9 @@ public class Main implements Runnable {
             )
     private Map<String, String> configs = new HashMap<>();
     
-    @Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
-    private File[] files;
-    
-    @Option(names = "--cli", 
-            required = true, 
-            description = "Use new commandline mode",
-            scope = ScopeType.INHERIT)
-    private boolean cli = false;        
-    
-    @Override
-    public void run() {
-        System.out.println("Main command");
-    }
+    /*@Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
+    private File[] files;      */
+        
 }
 
 class VersionProvider implements IVersionProvider {

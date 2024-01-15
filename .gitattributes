@@ -33,6 +33,8 @@
 
 # Batch files
 *.sh text eol=lf
+ffdec text eol=lf
+ffdec-cli text eol=lf
 *.bat text eol=crlf
 
 # PHP scripts

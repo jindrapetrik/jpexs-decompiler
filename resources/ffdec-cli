@@ -12,6 +12,6 @@
 
 # Hide VLC error output
 export VLC_VERBOSE=-1
-export FFDEC_JARFILENAME=ffdec.jar
+export FFDEC_JARFILENAME=ffdec-cli.jar
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 exec $SCRIPT_DIR/run-java.sh "$@"

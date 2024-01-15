@@ -14,34 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console.commands.types;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.jpexs.decompiler.flash.cli.commands.types;
 
 /**
  *
  * @author JPEXS
  */
-public class Selection {
+public class Range {
 
-    public List<Range> ranges;
+    public Integer min;
 
-    public Selection() {
-        this.ranges = new ArrayList<>();
-        this.ranges.add(new Range(null, null));
-    }
+    public Integer max;
 
-    public Selection(List<Range> ranges) {
-        this.ranges = ranges;
+    public Range(Integer min, Integer max) {
+        this.min = min;
+        this.max = max;
     }
 
     public boolean contains(int index) {
-        for (Range r : ranges) {
-            if (r.contains(index)) {
-                return true;
-            }
-        }
-        return false;
+        int minimum = min == null ? Integer.MIN_VALUE : min;
+        int maximum = max == null ? Integer.MAX_VALUE : max;
+
+        return index >= minimum && index <= maximum;
     }
 }

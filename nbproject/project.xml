@@ -28,6 +28,12 @@
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
+                    <label>libsrc\ffdec_cli\src</label>
+                    <type>java</type>
+                    <location>libsrc/ffdec_cli/src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
                     <label>libsrc\ffdec_lib\src</label>
                     <type>java</type>
                     <location>libsrc/ffdec_lib/src</location>
@@ -238,6 +244,10 @@
                         <location>test</location>
                     </source-folder>
                     <source-folder style="packages">
+                        <label>libsrc\ffdec_cli\src</label>
+                        <location>libsrc/ffdec_cli/src</location>
+                    </source-folder>
+                    <source-folder style="packages">
                         <label>libsrc\ffdec_lib\src</label>
                         <location>libsrc/ffdec_lib/src</location>
                     </source-folder>
@@ -338,6 +348,10 @@
                 <unit-tests/>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar;lib/ffdec_lib.jar;lib/JavactiveX.jar</classpath>
                 <built-to>build/test</built-to>
+                <source-level>1.8</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>libsrc/ffdec_cli/src</package-root>
                 <source-level>1.8</source-level>
             </compilation-unit>
             <compilation-unit>

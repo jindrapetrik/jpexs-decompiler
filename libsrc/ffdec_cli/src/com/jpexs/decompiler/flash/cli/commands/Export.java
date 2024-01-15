@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.console.commands;
-import com.jpexs.decompiler.flash.console.commands.types.ConfigConverter;
-import com.jpexs.decompiler.flash.console.commands.types.ExportObject;
-import com.jpexs.decompiler.flash.console.commands.types.ExportObjectFormat;
-import com.jpexs.decompiler.flash.console.commands.types.ExportObjectFormatConverter;
-import com.jpexs.decompiler.flash.console.commands.types.Selection;
-import com.jpexs.decompiler.flash.console.commands.types.SelectionConverter;
+package com.jpexs.decompiler.flash.cli.commands;
+import com.jpexs.decompiler.flash.cli.commands.types.ConfigConverter;
+import com.jpexs.decompiler.flash.cli.commands.types.ExportObject;
+import com.jpexs.decompiler.flash.cli.commands.types.ExportObjectFormat;
+import com.jpexs.decompiler.flash.cli.commands.types.ExportObjectFormatConverter;
+import com.jpexs.decompiler.flash.cli.commands.types.Selection;
+import com.jpexs.decompiler.flash.cli.commands.types.SelectionConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
