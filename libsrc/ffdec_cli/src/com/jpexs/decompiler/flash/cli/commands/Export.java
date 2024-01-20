@@ -134,6 +134,12 @@ public class Export implements Runnable {
     )
     Integer fileTimeout = null;        
     
+    @Option(
+            names = "--stats",
+            description = "Show export performance statistics"
+    )
+    boolean showStatistics = false;
+    
     @Parameters(index = "0", 
             split = ",", 
             arity = "1",
