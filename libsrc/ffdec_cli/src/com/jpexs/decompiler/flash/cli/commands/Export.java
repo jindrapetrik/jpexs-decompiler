@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.cli.commands.types.ConfigConverter;
 import com.jpexs.decompiler.flash.cli.commands.types.ExportObject;
 import com.jpexs.decompiler.flash.cli.commands.types.ExportObjectFormat;
 import com.jpexs.decompiler.flash.cli.commands.types.ExportObjectFormatConverter;
+import com.jpexs.decompiler.flash.cli.commands.types.OnErrorMode;
 import com.jpexs.decompiler.flash.cli.commands.types.Selection;
 import com.jpexs.decompiler.flash.cli.commands.types.SelectionConverter;
 import java.util.ArrayList;
@@ -97,6 +98,23 @@ public class Export implements Runnable {
             )
     private boolean useEmbed = false;
     
+    @Option(
+            names = "--on-error",
+            description = {
+                "Error handling mode.",
+                "@|bold Possible values|@:",
+                " @|bold abort|@ - stops exporting",
+                " @|bold retry|@ - retries exporting (see --num-retries option)",
+                " @|bold ignore|@ - ignores current file"
+            }
+    )
+    private OnErrorMode onError = OnErrorMode.abort;
+    
+    @Option(
+            names = "--num-retries",
+            description = "Number of retries for option --on-error=retry. Default is 3."
+    )
+    private int numRetries = 3;
     
     
     @Parameters(index = "0", 
