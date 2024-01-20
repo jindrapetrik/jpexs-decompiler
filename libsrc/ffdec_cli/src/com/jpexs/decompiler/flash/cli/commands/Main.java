@@ -41,7 +41,8 @@ import picocli.CommandLine.ScopeType;
             Export.class,
             Dump.class,
             Compress.class,
-            Decompress.class
+            Decompress.class,
+            Decrypt.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
