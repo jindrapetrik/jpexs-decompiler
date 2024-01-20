@@ -116,6 +116,23 @@ public class Export implements Runnable {
     )
     private int numRetries = 3;
     
+    @Option(
+            names = "--timeout-method",
+            description = "Decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds"
+    )
+    Integer methodTimeout = null;
+    
+    @Option(
+            names = "--timeout-total",
+            description = "Total export timeout in seconds"
+    )
+    Integer totalTimeout = null;
+    
+    @Option(
+            names = "--timeout-file",
+            description = "Export timeout for a single AS3 class in seconds"
+    )
+    Integer fileTimeout = null;        
     
     @Parameters(index = "0", 
             split = ",", 
