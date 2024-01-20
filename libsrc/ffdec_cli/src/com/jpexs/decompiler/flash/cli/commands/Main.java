@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.cli.commands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import com.jpexs.decompiler.flash.cli.VersionProvider;
 import com.jpexs.decompiler.flash.cli.commands.types.ConfigConverter;
 import java.io.File;
 import java.util.HashMap;
@@ -43,9 +44,6 @@ import picocli.CommandLine.ScopeType;
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
-        /*customSynopsis = {"<ffdec> [@|fg(yellow) FILE|@...]",
-                           "   or <ffdec> [@|fg(yellow) -hV|@]",
-                           "   or <ffdec> @|fg(yellow) --cli|@ [COMMAND]"},*/
         description = {"JPEXS Free Flash Decompiler commandline interface"},        
         commandListHeading = "%n@|bold,underline Commands|@:%n"        
         )
@@ -65,11 +63,4 @@ public class Main {
     /*@Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
     private File[] files;      */
         
-}
-
-class VersionProvider implements IVersionProvider {
-    @Override
-    public String[] getVersion() throws Exception {
-        return new String[]{ApplicationInfo.applicationVerName};
-    }        
 }

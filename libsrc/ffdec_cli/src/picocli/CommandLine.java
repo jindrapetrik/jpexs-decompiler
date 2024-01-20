@@ -15872,7 +15872,8 @@ public class CommandLine {
                 } else {
                     text = text.concat("[").concat(name).concat(param).concat("]");
                     if (option.isMultiValue()) { // add ellipsis to show option is repeatable
-                        if (option.splitRegex().isEmpty() && option.converters().length == 0) { //JPEXS
+                        //if (option.splitRegex().isEmpty() && option.converters().length == 0) 
+                        { //JPEXS                        
                             text = text.concat("...");
                         }
                     }
