@@ -137,7 +137,7 @@
         <jar destfile="${dist.dir}/${jar.filename}.jar" basedir="${compile.dir}">
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
-                <attribute name="Class-Path" value="${manifestClassPath}"/>
+                <attribute name="Class-Path" value="${manifestClassPath} ${ffdec_lib.path}"/>
             </manifest>
         </jar>
         <copy file="${dist.dir}/${jar.filename}.jar" tofile="${app.dir}/${jar.filename}.jar" />

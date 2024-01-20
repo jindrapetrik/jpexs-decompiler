@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.jpexs.decompiler.flash.cli.commands;
+import com.jpexs.decompiler.flash.cli.VersionProvider;
 import com.jpexs.decompiler.flash.cli.commands.types.ConfigConverter;
 import com.jpexs.decompiler.flash.cli.commands.types.ExportObject;
 import com.jpexs.decompiler.flash.cli.commands.types.ExportObjectFormat;
@@ -36,11 +37,20 @@ import picocli.CommandLine.ParentCommand;
  * @author JPEXS
  */
 @Command(name = "export",
+        mixinStandardHelpOptions = true,
+        versionProvider = VersionProvider.class,
         header = "Export sources to a directory",
         //descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
-        synopsisHeading = "@|bold,underline Usage|@:"
+        synopsisHeading = "@|bold,underline Usage|@:",
+        footerHeading = "%n@|bold,underline Examples|@:%n",
+        footer = {
+            "ffdec-cli export --character-id=51,43 shape:png,shape:bmp c:/out/ c:/files/input.swf",
+            "ffdec-cli export --frame=2-10 frame:svg c:/out/ c:/files/input.swf",
+            "ffdec-cli export --embed --class=mypkg.Main,other.+ script c:/out/ c:/files/input.swf",
+            "ffdec-cli export all c:/out/ c:/files/input.swf",
+        }
         )
 public class Export implements Runnable {
        
@@ -91,70 +101,39 @@ public class Export implements Runnable {
     
     @Parameters(index = "0", 
             split = ",", 
+            arity = "1",
             converter = ExportObjectFormatConverter.class,
             paramLabel = "<type[:format]>",
-            description = {"What objects to export. @|bold Available formats|@:",   
-        "script:as (default)",
-        "script:pcode",
-        "script:pcodehex",
-        "script:hex",
-        "shape:svg (default)",
-        "shape:png",
-        "shape:canvas",
-        "shape:bmp",
-        "morphshape:svg (default)",
-        "morphshape:canvas",
-        "frame:png (default)",
-        "frame:gif",
-        "frame:avi",
-        "frame:svg",
-        "frame:canvas",
-        "frame:pdf",
-        "frame:bmp",
-        "sprite:png (default)",
-        "sprite:gif",
-        "sprite:avi",
-        "sprite:svg",
-        "sprite:canvas",
-        "sprite:pdf",
-        "sprite:bmp",
-        "button:png (default)",
-        "button:svg",
-        "button:bmp",
-        "image:png_gif_jpeg (default)",
-        "image:png",
-        "image:jpeg",
-        "image:bmp",
-        "image:png_gif_jpeg_alpha",
-        "text:plain (default)",
-        "text:formatted",
-        "text:svg",
-        "sound:mp3_wav_flv (default)",
-        "sound:mp3_wav",
-        "sound:wav",
-        "sound:flv",
-        "font:ttf (default)",
-        "font:woff",
-        "font4:cff (default)",
-        "fla:cs5",
-        "fla:cs5.5",
-        "fla:cs6",
-        "fla:cc",
-        "xfl:cs5",
-        "xfl:cs5.5",
-        "xfl:cs6",
-        "xfl:cc",                          
+            description = {"What objects to export.",
+        "@|bold Available types and formats|@:",   
+        "script:as|pcode|pcodehex|hex",
+        "shape:svg|png|canvas|bmp|svg",
+        "morphshape:svg|canvas",
+        "frame:png|gif|avi|svg|canvas|pdf|bmp",
+        "sprite:png|gif|avi|svg|canvas|pdf|bmp",
+        "button:png|svg|bmp",
+        "image:png_gif_jpeg|png|jpeg|bmp|png_gif_jpeg_alpha",
+        "text:plain|formatted|svg",
+        "sound:mp3_wav_flv|mp3_wav|wav|flv",
+        "font:ttf|woff",
+        "font4:cff",
+        "fla:cs5|cs5.5|cs6|cc",
+        "xfl:cs5|cs5.5|cs6|cc",
+        "all (=everything except fla and xfl)"
             })
     private List<ExportObjectFormat> objects;        
     
-    @Parameters(index = "1", description = "Target directory")
+    @Parameters(index = "1", description = "Target directory", paramLabel = "OUT_DIR")
     private String outDirectory;
     
-    @Parameters(index = "2", description = "Input file or directory")
+    @Parameters(index = "2", description = "Input file or directory", paramLabel = "IN_DIR_OR_FILE")
     private String inFileOrDirectory;    
 
     @Override
     public void run() {
         System.out.println("exporting...ok");
+        for(String c : classes) {
+            System.out.println("class " + c);
+        }
     }
 }
