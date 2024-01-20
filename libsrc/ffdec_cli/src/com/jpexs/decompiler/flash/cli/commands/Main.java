@@ -42,7 +42,9 @@ import picocli.CommandLine.ScopeType;
             Dump.class,
             Compress.class,
             Decompress.class,
-            Decrypt.class
+            Decrypt.class,
+            Swf2Xml.class,
+            Xml2Swf.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
