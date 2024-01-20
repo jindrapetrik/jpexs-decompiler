@@ -39,7 +39,9 @@ import picocli.CommandLine.ScopeType;
         subcommands = {
             HelpCommand.class,
             Export.class,
-            Dump.class
+            Dump.class,
+            Compress.class,
+            Decompress.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
