@@ -47,7 +47,7 @@ import picocli.CommandLine.ParentCommand;
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Examples|@:%n",
         footer = {
-            "ffdec-cli export --character-id=51,43 shape:png,shape:bmp c:/out/ c:/files/input.swf",
+            "ffdec-cli export --zoom=2 --character-id=51,43 shape:png,shape:bmp c:/out/ c:/files/input.swf",
             "ffdec-cli export --frame=2-10 frame:svg c:/out/ c:/files/input.swf",
             "ffdec-cli export --embed --class=mypkg.Main,other.+ script c:/out/ c:/files/input.swf",
             "ffdec-cli export all c:/out/ c:/files/input.swf",
@@ -139,6 +139,13 @@ public class Export implements Runnable {
             description = "Show export performance statistics"
     )
     boolean showStatistics = false;
+    
+    @Option (
+            names = "--zoom",
+            paramLabel = "<N>",
+            description = "Apply zoom level"
+    )
+    Double zoom;
     
     @Parameters(index = "0", 
             split = ",", 

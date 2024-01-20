@@ -44,7 +44,8 @@ import picocli.CommandLine.ScopeType;
             Decompress.class,
             Decrypt.class,
             Swf2Xml.class,
-            Xml2Swf.class
+            Xml2Swf.class,
+            FlashPaper2Pdf.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
