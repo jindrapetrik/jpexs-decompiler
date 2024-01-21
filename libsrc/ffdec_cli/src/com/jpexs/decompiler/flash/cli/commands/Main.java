@@ -52,7 +52,8 @@ import picocli.CommandLine.ScopeType;
             ReplaceCharacterId.class,
             Remove.class,
             RemoveCharacter.class,
-            Import.class
+            Import.class,
+            Deobfuscate.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
