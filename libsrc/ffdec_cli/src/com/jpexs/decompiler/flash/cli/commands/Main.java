@@ -60,7 +60,8 @@ import picocli.CommandLine.ScopeType;
             LinkReport.class,
             Swf2Swc.class,
             AbcMerge.class,
-            Swf2Exe.class
+            Swf2Exe.class,
+            Header.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
