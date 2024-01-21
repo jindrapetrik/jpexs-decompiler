@@ -30,7 +30,14 @@ import picocli.CommandLine.ArgGroup;
         },
         sortSynopsis = false
 )
-public class Replace implements Runnable {      
+public class Replace implements Runnable {     
+    
+    @Option(
+            names = "--air",
+            description = "Use AIR (airglobal.swc) for AS3 compilation instead of playerglobal.swc"
+    )
+    boolean air = false;
+    
     @Parameters(
             index = "0",
             paramLabel = "IN_FILE",
