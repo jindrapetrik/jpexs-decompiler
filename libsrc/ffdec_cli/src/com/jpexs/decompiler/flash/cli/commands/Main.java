@@ -75,13 +75,19 @@ public class Main {
             paramLabel = "<key>=<value>[,<key>=<value>...]",
             converter = ConfigConverter.class,
             description = {
-                "Sets configuration values for this session.",
+                "Set configuration values for this session.",
                 "Use command 'config' to list available configuration settings. "
             },
             scope = ScopeType.INHERIT
-            )
+    )
     private Map<String, String> configs = new HashMap<>();
     
+    @Option(
+            names = "--charset",
+            description = "Set desired character set for reading/writing SWF files with SWF version <= 5",
+            scope = ScopeType.INHERIT
+    )
+    String charset = null;
     /*@Parameters(paramLabel = "FILE", description = "one or more files to open in GUI")
     private File[] files;      */
         
