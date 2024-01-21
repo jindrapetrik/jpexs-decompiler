@@ -57,7 +57,8 @@ import picocli.CommandLine.ScopeType;
             EnableDebugging.class,
             GenerateDoc.class,
             InstanceMetadata.class,
-            LinkReport.class
+            LinkReport.class,
+            Swf2Swc.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
