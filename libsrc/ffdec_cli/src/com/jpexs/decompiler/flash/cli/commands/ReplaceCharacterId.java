@@ -26,7 +26,9 @@ import picocli.CommandLine.ArgGroup;
         footerHeading = "%n@|bold,underline Examples|@:%n",
         footer = {
             "ffdec-cli replacecharacterid --old-id=12 --new-id=15 --old-id=56 --new-id=49  input.swf output.swf",
-            "ffdec-cli replacecharacterid --old-id=7 --new-id=9 input.swf output.swf"
+            "ffdec-cli replacecharacterid --old-id=7 --new-id=9 input.swf output.swf",
+            "ffdec-cli replacecharacterid --pack input.swf output.swf",
+            "ffdec-cli replacecharacterid --sort input.swf output.swf"
         },
         sortSynopsis = false
 )
