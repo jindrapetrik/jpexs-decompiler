@@ -23,7 +23,8 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.packers.HarmanAirPacker;
-import com.jpexs.decompiler.flash.packers.MochiCryptPacker;
+import com.jpexs.decompiler.flash.packers.MochiCryptPacker16Bit;
+import com.jpexs.decompiler.flash.packers.MochiCryptPacker32Bit;
 import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -71,7 +72,8 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     private PackedBinaryData sub;
 
     private static final Packer[] PACKERS = {
-        new MochiCryptPacker(),
+        new MochiCryptPacker16Bit(),
+        new MochiCryptPacker32Bit(),
         new HarmanAirPacker()
     };
 
@@ -133,8 +135,10 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
             BinaryDataInterface binaryData = this;
             if (usedPacker != null) {
                 unpack(usedPacker);
-                is = new ByteArrayInputStream(sub.getDataBytes().getRangeData());
-                binaryData = sub;
+                if (sub != null) {
+                    is = new ByteArrayInputStream(sub.getDataBytes().getRangeData());
+                    binaryData = sub;
+                }
             }
 
             SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get(), charset);
