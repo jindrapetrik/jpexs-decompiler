@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - [#2176] Ignoring letter spacing on text search (only applies to global search, not to search inside text)
 - [#2179] Collapse all option for tree items
 - [#2185] 16bit MochiCrypt packer support
+- Windows commandline executable
+- Reformatted commandline help using ansi colors
+- Linux ffdec script without extension
 
 ### Fixed
 - Debugger - getting children of top level variables
