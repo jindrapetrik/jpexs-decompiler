@@ -30,13 +30,13 @@ import java.util.zip.InflaterInputStream;
  *
  * @author JPEXS
  */
-public class MochiCryptPacker implements Packer {
+public class MochiCryptPacker16Bit implements Packer {
 
     @Override
     public Boolean suitableForBinaryData(DefineBinaryDataTag dataTag) {
-        if (dataTag.getClassNames().contains("mochicrypt.Payload")) {
+        /*if (dataTag.getClassNames().contains("mochicrypt.Payload")) {
             return true;
-        }
+        }*/
         return null;
     }
 
@@ -56,7 +56,7 @@ public class MochiCryptPacker implements Packer {
     }
 
     private boolean handleXor(byte[] payload) {
-        if (payload.length < 32) {
+        if (payload.length < 16) {
             return false;
         }
         int[] S = new int[256];
@@ -67,7 +67,7 @@ public class MochiCryptPacker implements Packer {
         int u;
         int v;
 
-        n = payload.length - 32;
+        n = payload.length - 16;
         while (i < 256) {
             S[i] = i;
             i++;
@@ -75,7 +75,7 @@ public class MochiCryptPacker implements Packer {
         j = 0;
         i = 0;
         while (i < 256) {
-            j = (j + S[i] + (payload[n + (i & 31)] & 0xff)) & 255;
+            j = (j + S[i] + (payload[n + (i & 15)] & 0xff)) & 255;
             u = S[i];
             S[i] = S[j];
             S[j] = u;
@@ -120,7 +120,7 @@ public class MochiCryptPacker implements Packer {
 
     @Override
     public String getName() {
-        return "MochiCrypt";
+        return "MochiCrypt 16bit";
     }
 
     @Override
@@ -130,6 +130,6 @@ public class MochiCryptPacker implements Packer {
 
     @Override
     public String getIdentifier() {
-        return "mochicrypt";
+        return "mochicrypt16";
     }        
 }

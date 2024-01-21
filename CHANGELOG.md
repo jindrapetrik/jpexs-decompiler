@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Folder preview for sounds
 - [#2176] Ignoring letter spacing on text search (only applies to global search, not to search inside text)
 - [#2179] Collapse all option for tree items
+- [#2185] 16bit MochiCrypt packer support
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -23,6 +24,9 @@ All notable changes to this project will be documented in this file.
 - Nullpointer on recent searches loader
 - [#2177] Leftover process when invalid SWF opened - now main window is shown
 - Opening files with "Open with FFDec" on windows did not use same instance
+
+### Changed
+- [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3371,6 +3375,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
+[#2185]: https://www.free-decompiler.com/flash/issues/2185
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
