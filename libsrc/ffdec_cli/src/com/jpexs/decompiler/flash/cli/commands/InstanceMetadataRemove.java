@@ -22,7 +22,7 @@ import picocli.CommandLine.ArgGroup;
         name = "remove",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Remove instance metadata",
+        header = "Remove instance metadata.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "flashpaper2pdf",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Convert FlashPaper SWF file to PDF",
+        header = "Convert FlashPaper SWF file to PDF.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Examples|@:%n",

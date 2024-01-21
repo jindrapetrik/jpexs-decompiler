@@ -20,7 +20,7 @@ import picocli.CommandLine.ParentCommand;
         name = "header",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Display and manipulate SWF header values",
+        header = "Display and manipulate SWF header values.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

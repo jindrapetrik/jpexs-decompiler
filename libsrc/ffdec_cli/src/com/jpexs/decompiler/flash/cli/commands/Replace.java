@@ -19,7 +19,7 @@ import picocli.CommandLine.ArgGroup;
         name = "replace",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Replace the data of the specified items",
+        header = "Replace the data of the specified items.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

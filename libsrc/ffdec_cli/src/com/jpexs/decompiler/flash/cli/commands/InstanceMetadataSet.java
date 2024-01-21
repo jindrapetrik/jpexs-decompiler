@@ -22,7 +22,7 @@ import picocli.CommandLine.ArgGroup;
         name = "set",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Set instance metadata",
+        header = "Set instance metadata.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

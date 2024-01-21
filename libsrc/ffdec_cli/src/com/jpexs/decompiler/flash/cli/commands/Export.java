@@ -40,7 +40,7 @@ import picocli.CommandLine.ParentCommand;
 @Command(name = "export",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Export sources to a directory",
+        header = "Export sources to a directory.",
         //descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",

@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "decrypt",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Decrypt HARMAN Air encrypted SWF file",
+        header = "Decrypt HARMAN Air encrypted SWF file.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

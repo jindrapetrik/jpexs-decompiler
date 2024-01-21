@@ -19,7 +19,7 @@ import picocli.CommandLine.ArgGroup;
         name = "linkreport",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Generate linker report for the swffile",
+        header = "Generate linker report for the swffile.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

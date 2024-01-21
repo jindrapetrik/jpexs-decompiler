@@ -31,7 +31,7 @@ import picocli.CommandLine.ParentCommand;
         name="dump",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Dumps specific data of SWF file to console",
+        header = "Dump specific data of SWF file to console.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

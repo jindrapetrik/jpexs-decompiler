@@ -21,7 +21,7 @@ import picocli.CommandLine.ArgGroup;
         name = "deobfuscate",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Deobfuscate AS3 P-code",
+        header = "Deobfuscate AS3 P-code.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
