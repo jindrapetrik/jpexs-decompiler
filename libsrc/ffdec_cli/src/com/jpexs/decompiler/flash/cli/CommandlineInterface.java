@@ -16,40 +16,19 @@
  */
 package com.jpexs.decompiler.flash.cli;
 
-import com.jpexs.decompiler.flash.cli.commands.Main;
-import java.net.URLDecoder;
-import org.fusesource.jansi.AnsiConsole;
-import picocli.CommandLine;
+import com.jpexs.decompiler.flash.gui.Main;
+import java.io.IOException;
 
 /**
  *
  * @author JPEXS
  */
-public class CommandlineInterface {                
-        
-    /**
-     * To bypass wrong encoded unicode characters coming from EXE, it Launch5j
-     * encodes characters using URLEncoder.
-     *
-     */
-    private static void decodeLaunch5jArgs(String[] args) {
-        String encargs = System.getProperty("l5j.encargs");
-        if ("true".equals(encargs) || "1".equals(encargs)) {
-            for (int i = 0; i < args.length; ++i) {
-                try {
-                    args[i] = URLDecoder.decode(args[i], "UTF-8");
-                } catch (Exception e) {
-                    //ignored
-                }
-            }
-        }
-    }
+public class CommandlineInterface {                            
     
-    public static void main(String[] args) {
-        decodeLaunch5jArgs(args);
-        AnsiConsole.systemInstall();
-        int exitCode = new CommandLine(new Main()).execute(args); 
-        AnsiConsole.systemUninstall();
-        System.exit(exitCode);
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            args = new String[] {"--help"};
+        }
+        Main.main(args);
     }
 }

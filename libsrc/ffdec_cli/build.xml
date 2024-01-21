@@ -52,6 +52,7 @@
             <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${app.dir}" includes="${app.jar}"/>
             </classpath>
         </javac>
         <copy todir="${compile.dir}">
@@ -137,7 +138,7 @@
         <jar destfile="${dist.dir}/${jar.filename}.jar" basedir="${compile.dir}">
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
-                <attribute name="Class-Path" value="${manifestClassPath} ${ffdec_lib.path} ${additional.libs}"/>
+                <attribute name="Class-Path" value="${manifestClassPath} ${app.jar}"/>
             </manifest>
         </jar>
         <copy file="${dist.dir}/${jar.filename}.jar" tofile="${app.dir}/${jar.filename}.jar" />

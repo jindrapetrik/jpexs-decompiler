@@ -68,7 +68,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/jansi-2.4.0.jar;../../lib/ffdec_lib.jar;../../lib/gnujpdf.jar</classpath>
+                <classpath mode="compile">../../dist/ffdec.jar</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>
