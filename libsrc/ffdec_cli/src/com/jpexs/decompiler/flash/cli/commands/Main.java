@@ -61,7 +61,8 @@ import picocli.CommandLine.ScopeType;
             Swf2Swc.class,
             AbcMerge.class,
             Swf2Exe.class,
-            Header.class
+            Header.class,
+            Config.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
