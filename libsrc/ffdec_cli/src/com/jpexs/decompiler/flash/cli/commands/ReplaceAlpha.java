@@ -50,7 +50,7 @@ public class ReplaceAlpha implements Runnable {
     
     static class Item {      
         
-       @Option(
+        @Option(
                 names = "--character-id",
                 description = "Character id",
                 required = true,
