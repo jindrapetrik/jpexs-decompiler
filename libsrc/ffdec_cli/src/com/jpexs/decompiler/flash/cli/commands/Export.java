@@ -179,9 +179,6 @@ public class Export implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("exporting...ok");
-        for(String c : classes) {
-            System.out.println("class " + c);
-        }
+        
     }
 }
