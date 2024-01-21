@@ -47,15 +47,30 @@ public class FirstInstance {
 
     public static final String PIPE_APP_CODE = "ffdec";
 
-    private static boolean isRunning() {
+    private static boolean mainInstance = false;
+    private static boolean alreadyRunning = false;
+    private static boolean canCommunicate = false;
+    private static boolean inited = false;
+
+    public synchronized static void ensureInited() {
+        if (inited) {
+            return;
+        }
+        inited = true;
         if (Platform.isWindows()) {
             mutex = Kernel32.INSTANCE.CreateMutex(null, false, MUTEX_NAME);
             if (mutex == null) {
-                return false;
+                mainInstance = false;
+                alreadyRunning = false;
+                canCommunicate = false;
+                return;
             }
             int er = Kernel32.INSTANCE.GetLastError();
             if (er == WinError.ERROR_ALREADY_EXISTS) {
-                return true;
+                mainInstance = false;
+                alreadyRunning = true;
+                canCommunicate = true;
+                return;
             }
 
             new Thread("OtherInstanceCommunicator") {
@@ -113,9 +128,14 @@ public class FirstInstance {
                     }
                 }
             }.start();
-
+            mainInstance = true;
+            alreadyRunning = false;
+            canCommunicate = true;
+            return;
         }
-        return false;
+        mainInstance = true;
+        alreadyRunning = false;
+        canCommunicate = false;
     }
 
     private static ObjectOutputStream startCommand(String command) throws IOException {
@@ -133,7 +153,8 @@ public class FirstInstance {
     }
 
     public static boolean focus() {
-        if (!isRunning()) {
+        ensureInited();
+        if (!canCommunicate || !alreadyRunning) {
             return false;
         }
         try {
@@ -146,6 +167,10 @@ public class FirstInstance {
     }
 
     public static boolean openFiles(List<String> files) {
+        ensureInited();
+        if (!canCommunicate || mainInstance) {
+            return false;
+        }
         try {
             ObjectOutputStream oos = startCommand("open");
             oos.writeInt(files.size());

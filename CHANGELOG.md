@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#2176] Reset letterspacing on text import
 - Nullpointer on recent searches loader
 - [#2177] Leftover process when invalid SWF opened - now main window is shown
+- Opening files with "Open with FFDec" on windows did not use same instance
 
 ## [20.1.0] - 2023-12-30
 ### Added
