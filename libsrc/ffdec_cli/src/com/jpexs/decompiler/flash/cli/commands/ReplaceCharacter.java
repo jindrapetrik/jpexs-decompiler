@@ -19,7 +19,7 @@ import picocli.CommandLine.ArgGroup;
         name = "replacecharacter",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Replace a character tag with another character tag from the same SWF",
+        header = "Replace a character tag with other character.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

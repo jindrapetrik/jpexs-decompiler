@@ -19,7 +19,7 @@ import picocli.CommandLine.ArgGroup;
         name = "replacealpha",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Replace the alpha channel of the specified JPEG3 or JPEG4 tag",
+        header = "Replace the alpha channel of the specified JPEG3/4 tag.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

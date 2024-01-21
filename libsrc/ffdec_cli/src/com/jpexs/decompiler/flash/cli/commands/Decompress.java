@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "decompress",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Decompress SWF file",
+        header = "Decompress SWF file.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

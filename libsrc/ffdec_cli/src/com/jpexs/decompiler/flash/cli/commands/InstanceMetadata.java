@@ -21,7 +21,7 @@ import picocli.CommandLine.ArgGroup;
         name = "instancemetadata",        
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Instance metadata operations",
+        header = "Instance metadata operations.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",        

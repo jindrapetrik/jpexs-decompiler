@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "abcmerge",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Merge all ABC tags in SWF file to one",
+        header = "Merge all ABC tags in SWF file to one.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

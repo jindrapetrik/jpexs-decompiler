@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "compress",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Compress SWF file",
+        header = "Compress SWF file.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

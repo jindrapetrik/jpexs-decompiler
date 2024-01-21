@@ -21,7 +21,7 @@ import picocli.CommandLine.ArgGroup;
         name = "enabledebugging",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Enable debugging for SWF file",
+        header = "Enable debugging for SWF file.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",

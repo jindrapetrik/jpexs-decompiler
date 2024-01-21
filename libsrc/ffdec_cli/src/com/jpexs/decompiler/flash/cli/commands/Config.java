@@ -20,7 +20,7 @@ import picocli.CommandLine.ParentCommand;
         name = "config",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "List available configuration options",
+        header = "List available configuration options.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

@@ -17,7 +17,7 @@ import picocli.CommandLine.ParentCommand;
         name = "swf2exe",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Export SWF to executable file",
+        header = "Export SWF to executable file.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

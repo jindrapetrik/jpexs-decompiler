@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "swf2swc",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Generate SWC file from SWF",
+        header = "Generate SWC file from SWF.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

@@ -16,7 +16,7 @@ import picocli.CommandLine.ParentCommand;
         name = "xml2swf",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Convert XML file to SWF",
+        header = "Convert XML file to SWF.",
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
         footerHeading = "%n@|bold,underline Example|@:%n",

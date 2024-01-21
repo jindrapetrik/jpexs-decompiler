@@ -19,7 +19,7 @@ import picocli.CommandLine.ArgGroup;
         name = "remove",
         mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class,
-        header = "Removes a tag from the SWF",
+        header = "Remove a tag from the SWF.",
         optionListHeading = "%n@|bold,underline Options|@:%n",           
         parameterListHeading = "%n@|bold,underline Parameters|@:%n",
         synopsisHeading = "@|bold,underline Usage|@:",
