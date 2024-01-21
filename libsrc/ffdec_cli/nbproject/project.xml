@@ -63,11 +63,12 @@ auxiliary.show.customizer.message=<message>
                     <ide-action name="test"/>
                 </context-menu>
             </view>
+            <subprojects/>
         </general-data>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/jansi-2.4.0.jar;../../lib/ffdec_lib.jar</classpath>
+                <classpath mode="compile">lib/jansi-2.4.0.jar;../../lib/ffdec_lib.jar;../../lib/gnujpdf.jar</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>
