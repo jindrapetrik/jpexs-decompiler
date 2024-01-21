@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="FFDec CLI" basedir="." default="build" xmlns:jacoco="antlib:org.jacoco.ant">
+    <description>Builds project FFDec CLI</description>  
+    <loadproperties srcfile="build.properties" />
+    
+    
+    <path id="ant.lib.classpath">
+        <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
+    </path>
+    <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
+    
+    <property name="jar.filename" value="${prefix.filename}"/>  
+    <description>Builds project</description>      
+    <property name="dist.lib.dir" value="${dist.dir}/${dist.lib.dirname}"/>    
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>        
+        <include name="**/?*.bin"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.txt"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.mid"/>
+        <include name="**/?*.wav"/>
+        <include name="**/?*.js"/>
+        <include name="**/?*.css"/>
+    </patternset>
+
+    
+   
+    <target name="compile">
+        <mkdir dir="${compile.dir}"/>
+        <mkdir dir="${lib.dir}"/>  
+        <copy todir="${lib.dir}">
+            <fileset dir="${liblib.dir}">
+                <type type="file"/>
+            </fileset>
+        </copy>  
+        <mkdir dir="${app.lib.dir}"/>   
+        <copy todir="${app.lib.dir}">
+            <fileset dir="${liblib.dir}">
+                <type type="file"/>
+            </fileset>
+        </copy>   
+        <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
+               debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
+            <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${app.dir}" includes="${app.jar}"/>
+            </classpath>
+        </javac>
+        <copy todir="${compile.dir}">
+            <fileset dir="${src.dir}">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="compile-tests">
+        <delete dir="${compile.test.dir}"/>
+        <mkdir dir="${compile.test.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${compile.test.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true" includeantruntime="false" encoding="utf-8">                        
+            <classpath>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="-test-sethalt" depends="">
+        <property name="test.halt" value="true" />
+    </target>
+    <target name="-test-setnohalt" unless="test.halt">
+        <property name="test.halt" value="false" />
+    </target>
+    <target name="testhalt" depends="-test-sethalt,test">
+    </target>
+
+    <target name="test" depends="-test-setnohalt,compile,compile-tests">
+        <delete dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}"/>
+        <mkdir dir="${test.result.dir}/raw/"/>
+        
+         <mkdir dir="${coverage.dir}" />
+        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
+        <testng 
+            outputDir="${test.result.dir}"
+            haltOnFailure="${test.halt}" verbose="2" workingDir="${basedir}" >
+        
+            <classpath>
+                <pathelement path="${compile.test.dir}"/>
+                <pathelement path="${compile.dir}"/>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
+            
+        </testng>      
+        </jacoco:coverage>
+        <!-- Coverage report -->
+        <mkdir dir="${coverage.result.dir}"/>
+        
+        <jacoco:report>
+            <executiondata>
+                <file file="${coverage.dir}/jacoco.exec" />
+            </executiondata>
+            <structure name="${project.name}">
+                <classfiles>
+                    <fileset dir="${compile.dir}" />
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${src.dir}" />
+                </sourcefiles>
+            </structure>
+            <html destdir="${coverage.result.dir}" />
+        </jacoco:report>        
+    
+    </target>           
+    
+    <target name="build" depends="compile">
+        <mkdir dir="${dist.dir}"/>     
+        <pathconvert pathsep=" " property="manifestClassPath">
+            <fileset dir="${basedir}" includes="${dist.lib.dirname}/**/*.*"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="${dist.lib.dirname}/*"/>
+            </chainedmapper>
+        </pathconvert>                                                                                
+        <jar destfile="${dist.dir}/${jar.filename}.jar" basedir="${compile.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="${manifestClassPath} ${app.jar}"/>
+            </manifest>
+        </jar>
+        <copy file="${dist.dir}/${jar.filename}.jar" tofile="${app.dir}/${jar.filename}.jar" />
+    </target>
+    
+    <target name="javadoc">
+        <mkdir dir="${javadoc.dir}"/>
+        <javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" windowtitle="${project.name}"
+                 useexternalfile="yes">
+            <fileset dir="${src.dir}" includes="**/*.java"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+    <target name="clean">        
+        <delete dir="${dist.dir}"/>
+        <delete dir="${compile.test.dir}"/>
+        <delete dir="${compile.dir}"/>
+        <delete dir="${coverage.dir}"/>
+        <delete dir="${test.result.dir}"/>
+        <delete dir="${coverage.result.dir}"/>
+        <delete dir="${javadoc.dir}"/>
+    </target>
+   
+    <target name="run" depends="build">        
+        <java jar="${app.dir}/${jar.filename}.jar" fork="true">
+            <env key="VLC_VERBOSE" value="-1" />          
+            <jvmarg value="-Xmx${max.heap.size.run}m" />
+            <jvmarg value="-Djava.net.preferIPv4Stack=true" />
+            <arg line="${run.params}" />
+        </java>
+    </target>
+</project>
+

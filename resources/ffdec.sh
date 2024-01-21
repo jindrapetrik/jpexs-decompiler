@@ -10,10 +10,9 @@
 # If the app then terminates with OutOfMemory you can experiment with lower value.
 # FFDEC_STACK_SIZE=32m
 
+
 # Hide VLC error output
 export VLC_VERBOSE=-1
-
-# Based on Freerapid Downloader startup script - created by Petris 2009
 
 # FFDec requires Oracle Java 8
 # Look for java in these directories
@@ -24,12 +23,17 @@ REQ_JVER2=8
 REQ_JVER3=0
 REQ_JVER4=0
 
+
+if [ -z ${FFDEC_JARFILENAME+x} ]; then
+    FFDEC_JARFILENAME=ffdec.jar
+fi
+
 search_jar_file() {
-    JAR_FILE_CANDIDATES='./ffdec.jar ../dist/ffdec.jar /usr/share/java/ffdec.jar /usr/share/java/ffdec/ffdec.jar /usr/share/java/jpexs-decompiler/ffdec.jar'
+    JAR_FILE_CANDIDATES="./${FFDEC_JARFILENAME} ../dist/${FFDEC_JARFILENAME} /usr/share/java/${FFDEC_JARFILENAME} /usr/share/java/ffdec/${FFDEC_JARFILENAME} /usr/share/java/jpexs-decompiler/${FFDEC_JARFILENAME}"
     for f in $JAR_FILE_CANDIDATES ; do
         [ -r "$f" ] && JAR_FILE="$f" && return 0
     done
-    echo Unable to find ffdec.jar in the following locations:
+    echo Unable to find ${FFDEC_JARFILE} in the following locations:
     echo "${JAR_FILE_CANDIDATES// /$'\n'}"
     return 1
 }

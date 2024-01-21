@@ -2850,7 +2850,7 @@ public class Main {
                     } else {
                         for (String fileToOpen : filesToOpen) {
                             openFile(fileToOpen, null);
-                        }
+                        }                        
                     }
                 });
             }
