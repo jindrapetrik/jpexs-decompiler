@@ -47,7 +47,8 @@ import picocli.CommandLine.ScopeType;
             Xml2Swf.class,
             FlashPaper2Pdf.class,
             Replace.class,
-            ReplaceAlpha.class
+            ReplaceAlpha.class,
+            ReplaceCharacter.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
