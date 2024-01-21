@@ -44,7 +44,7 @@ public class LinkReport implements Runnable {
             paramLabel = "IN_FILE",
             description = "Input file"
     )
-    String inFile;        
+    String inFile;
     
     @Override
     public void run() {
