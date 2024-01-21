@@ -54,7 +54,8 @@ import picocli.CommandLine.ScopeType;
             RemoveCharacter.class,
             Import.class,
             Deobfuscate.class,
-            EnableDebugging.class
+            EnableDebugging.class,
+            GenerateDoc.class
         },        
         descriptionHeading = "%n@|bold,underline Description|@:%n",        
         optionListHeading = "%n@|bold,underline Options|@:%n",           
