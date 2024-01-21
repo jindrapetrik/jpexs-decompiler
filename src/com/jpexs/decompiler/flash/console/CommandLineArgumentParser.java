@@ -335,7 +335,14 @@ public class CommandLineArgumentParser {
 
     public static void printCmdLineUsage(PrintStream out, boolean webHelp, String filter) {
         int cnt = 1;
-        out.println("@|underline,bold Usage|@: @|bold ffdec-cli|@ [PRE-OPTIONS] [COMMAND]");
+        out.println("@|underline,bold Usage|@: @|bold <executable>|@ [PRE-OPTIONS] [COMMAND]");
+        out.println();
+        out.println("@|underline,bold Executable|@:");
+        out.println("       Linux: ffdec or ffdec.sh");
+        out.println("      Mac OS: ffdec.sh");
+        out.println("     Windows: ffdec-cli.exe or ffdec.bat");
+        out.println("        Java: java -jar ffdec.jar");
+        out.println();
         out.println("@|underline,bold Commands|@:");
         if (filter == null) {
             out.println("@|bold -help|@ | @|bold --help|@ | @|bold /?|@");
@@ -347,13 +354,13 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("proxy")) {
-            out.println("@|bold proxy|@ [-P<port>]");
+            out.println("@|bold -proxy|@ [-P<port>]");
             out.println("     auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
             out.println();
         }
 
         if (filter == null || filter.equals("export")) {
-            out.println("@|bold export|@ <itemtypes> <outdirectory> <infile_or_directory>");
+            out.println("@|bold -export|@ <itemtypes> <outdirectory> <infile_or_directory>");
             out.println("     export <infile_or_directory> sources to <outdirectory>.");
             out.println("  Exports all files from <infile_or_directory> when it is a folder.");
             out.println("     Values for <itemtypes> parameter:");
@@ -380,61 +387,61 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("dumpswf")) {
-            out.println("@|bold dumpSWF|@ <infile>");
+            out.println("@|bold -dumpSWF|@ <infile>");
             out.println("     dumps list of SWF tags to console");
             out.println();
         }
 
         if (filter == null || filter.equals("dumpas2")) {
-            out.println("@|bold dumpAS2|@ <infile>");
+            out.println("@|bold -dumpAS2|@ <infile>");
             out.println("     dumps list of AS1/2 scripts to console");
             out.println();            
         }
 
         if (filter == null || filter.equals("dumpas3")) {
-            out.println("@|bold dumpAS3|@ <infile>");
+            out.println("@|bold -dumpAS3|@ <infile>");
             out.println("     dumps list of AS3 scripts to console");
             out.println();
         }
 
         if (filter == null || filter.equals("compress")) {
-            out.println("@|bold compress|@ <infile> <outfile> [(zlib|lzma)]");
+            out.println("@|bold -compress|@ <infile> <outfile> [(zlib|lzma)]");
             out.println("     Compress SWF <infile> and save it to <outfile>. If <infile> is already compressed, it will be re-compressed. Default compression method is ZLIB");
             out.println();
         }
 
         if (filter == null || filter.equals("decompress")) {
-            out.println("@|bold decompress|@ <infile> <outfile>");
+            out.println("@|bold -decompress|@ <infile> <outfile>");
             out.println("     Decompress <infile> and save it to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("encrypt")) {
-            out.println("@|bold encrypt|@ <infile> <outfile>");
+            out.println("@|bold -encrypt|@ <infile> <outfile>");
             out.println("     Encrypts file <infile> with HARMAN Air encryption and saves it to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("decrypt")) {
-            out.println("@|bold decrypt|@ <infile> <outfile>");
+            out.println("@|bold -decrypt|@ <infile> <outfile>");
             out.println("     Decrypts HARMAN Air encrypted file <infile> and saves it to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("swf2xml")) {
-            out.println("@|bold swf2xml|@ <infile> <outfile>");
+            out.println("@|bold -swf2xml|@ <infile> <outfile>");
             out.println("     Converts the <infile> SWF to <outfile> XML file");
             out.println();
         }
 
         if (filter == null || filter.equals("xml2swf")) {
-            out.println("@|bold xml2swf|@ <infile> <outfile>");
+            out.println("@|bold -xml2swf|@ <infile> <outfile>");
             out.println("     Converts the <infile> XML to <outfile> SWF file");
             out.println();
         }
 
         if (filter == null || filter.equals("extract")) {
-            out.println("@|bold extract|@ <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
+            out.println("@|bold -extract|@ <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
             out.println("     Extracts SWF files from ZIP or other binary files");
             out.println("     -o parameter should contain a file path when \"biggest\" or \"first\" parameter is specified");
             out.println("     -o parameter should contain a folder path when no extaction mode or \"all\" parameter is specified");
@@ -442,25 +449,25 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("memorysearch")) {
-            out.println("@|bold memorySearch|@ (<processName1>|<processId1>) (<processName2>|<processId2>)...");
+            out.println("@|bold -memorySearch|@ (<processName1>|<processId1>) (<processName2>|<processId2>)...");
             out.println("     Search SWF files in the memory");
             out.println();
         }
 
         if (filter == null || filter.equals("renameinvalididentifiers")) {
-            out.println("@|bold renameInvalidIdentifiers|@ (typeNumber|randomWord) <infile> <outfile>");
+            out.println("@|bold -renameInvalidIdentifiers|@ (typeNumber|randomWord) <infile> <outfile>");
             out.println("     Renames the invalid identifiers in <infile> and save it to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("flashpaper2pdf")) {
-            out.println("@|bold flashpaper2pdf|@ <infile> <outfile>");
+            out.println("@|bold -flashpaper2pdf|@ <infile> <outfile>");
             out.println("     converts FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.");
             out.println();
         }
 
         if (filter == null || filter.equals("replace")) {
-            out.println("@|bold replace|@ <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [nofill] ([<format1>][<methodBodyIndex1>]) [(<characterId2>|<scriptName2>) <importDataFile2> [nofill] ([<format2>][<methodBodyIndex2>])]...");
+            out.println("@|bold -replace|@ <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [nofill] ([<format1>][<methodBodyIndex1>]) [(<characterId2>|<scriptName2>) <importDataFile2> [nofill] ([<format2>][<methodBodyIndex2>])]...");
             out.println("     replaces the data of the specified BinaryData, Image, Shape, Text, Sound tag or Script");
             out.println("     nofill parameter can be specified only for shape replace");
             out.println("     <format> parameter can be specified for Image and Shape tags");
@@ -468,26 +475,26 @@ public class CommandLineArgumentParser {
             out.println("     <methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code");
             out.println("     use -1 as characterId to replace main timeline SoundStreamHead");
 
-            out.println("@|bold replace|@ <infile> <outfile> <argsfile>");
+            out.println("@|bold -replace|@ <infile> <outfile> <argsfile>");
             out.println("      same as -replace command, but the rest of arguments is read as lines from a text file <argsfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("replacealpha")) {
-            out.println("@|bold replaceAlpha|@ <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...");
+            out.println("@|bold -replaceAlpha|@ <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...");
             out.println("     replaces the alpha channel of the specified JPEG3 or JPEG4 tag");
             out.println();
         }
 
         if (filter == null || filter.equals("replacecharacter")) {
-            out.println("@|bold replaceCharacter|@ <infile> <outfile> <characterId1> <newCharacterId1> [<characterId2> <newCharacterId2>]...");
+            out.println("@|bold -replaceCharacter|@ <infile> <outfile> <characterId1> <newCharacterId1> [<characterId2> <newCharacterId2>]...");
             out.println("     replaces a character tag with another character tag from the same SWF");
             out.println();
         }
 
         if (filter == null || filter.equals("replacecharacterid")) {
-            out.println("@|bold replaceCharacterId|@ <infile> <outfile> <oldId1>,<newId1>,<oldId2>,<newId2>... or");
-            out.println("@|bold replaceCharacterId|@ <infile> <outfile> (pack|sort)");
+            out.println("@|bold -replaceCharacterId|@ <infile> <outfile> <oldId1>,<newId1>,<oldId2>,<newId2>... or");
+            out.println("@|bold -replaceCharacterId|@ <infile> <outfile> (pack|sort)");
             out.println("     replaces the <oldId1> character id with <newId1>");
             out.println("     pack: removes the spaces between the character ids (1,4,3 => 1,3,2)");
             out.println("     sort: assigns increasing IDs to the character tags + pack (1,4,3 => 1,2,3)");
@@ -496,74 +503,74 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("remove")) {
-            out.println("@|bold remove|@ <infile> <outfile> <tagNo1> [<tagNo2>]...");
+            out.println("@|bold -remove|@ <infile> <outfile> <tagNo1> [<tagNo2>]...");
             out.println("     removes a tag from the SWF");
             out.println();
         }
 
         if (filter == null || filter.equals("removecharacter")) {
-            out.println("@|bold removeCharacter[WithDependencies]|@ <infile> <outfile> <characterId1> [<characterId2>]...");
+            out.println("@|bold -removeCharacter[WithDependencies]|@ <infile> <outfile> <characterId1> [<characterId2>]...");
             out.println("     removes a character tag from the SWF");
             out.println();
         }
 
         if (filter == null || filter.equals("importsymbolclass")) {
-            out.println("@|bold importSymbolClass|@ <infile> <outfile> <symbolclassfile>");
+            out.println("@|bold -importSymbolClass|@ <infile> <outfile> <symbolclassfile>");
             out.println("     imports Symbol-Class mapping to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importmovies")) {
-            out.println("@|bold importMovies|@ <infile> <outfile> <moviesfolder>");
+            out.println("@|bold -importMovies|@ <infile> <outfile> <moviesfolder>");
             out.println("     imports movies to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importsounds")) {
-            out.println("@|bold importSounds|@ <infile> <outfile> <soundsfolder>");
+            out.println("@|bold -importSounds|@ <infile> <outfile> <soundsfolder>");
             out.println("     imports sounds to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importshapes")) {
-            out.println("@|bold importShapes|@ <infile> <outfile> [nofill] <shapesfolder>");
+            out.println("@|bold -importShapes|@ <infile> <outfile> [nofill] <shapesfolder>");
             out.println("     imports shapes to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importimages")) {
-            out.println("@|bold importImages|@ <infile> <outfile> <imagesfolder>");
+            out.println("@|bold -importImages|@ <infile> <outfile> <imagesfolder>");
             out.println("     imports images to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importsprites")) {
-            out.println("@|bold importSprites|@ <infile> <outfile> <spritesfolder>");
+            out.println("@|bold -importSprites|@ <infile> <outfile> <spritesfolder>");
             out.println("     imports sprites to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importtext")) {
-            out.println("@|bold importText|@ <infile> <outfile> <textsfolder>");
+            out.println("@|bold -importText|@ <infile> <outfile> <textsfolder>");
             out.println("     imports texts to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("importscript")) {
-            out.println("@|bold importScript|@ <infile> <outfile> <scriptsfolder>");
+            out.println("@|bold -importScript|@ <infile> <outfile> <scriptsfolder>");
             out.println("     imports scripts to <infile> and saves the result to <outfile>");
             out.println();
         }
 
         if (filter == null || filter.equals("deobfuscate")) {
-            out.println("@|bold deobfuscate|@ <level> <infile> <outfile>");
+            out.println("@|bold -deobfuscate|@ <level> <infile> <outfile>");
             out.println("     Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
             out.println("     <level> can be one of: traps/2/max, deadcode/1");
             out.println();
         }
 
         if (filter == null || filter.equals("enabledebugging")) {
-            out.println("@|bold enabledebugging|@ [-injectas3|-generateswd] [-pcode] <infile> <outfile>");
+            out.println("@|bold -enabledebugging|@ [-injectas3|-generateswd] [-pcode] <infile> <outfile>");
             out.println("     Enables debugging for <infile> and saves result to <outfile>");
             out.println("     -injectas3 (optional) causes debugfile and debugline instructions to be injected into the code to match decompiled/pcode source.");
             out.println("     -generateswd (optional) parameter creates SWD file needed for AS1/2 debugging. for <outfile.swf>, <outfile.swd> is generated");
@@ -573,7 +580,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("doc")) {
-            out.println("@|bold doc|@ -type <type> [-out <outfile>] [-format <format>] [-locale <locale>]");
+            out.println("@|bold -doc|@ -type <type> [-out <outfile>] [-format <format>] [-locale <locale>]");
             out.println("     Generate documentation");
             out.println("     -type <type> Selects documentation type");
             out.println("     <type> can be currently only: as3.pcode.instructions for list of ActionScript3 AVM2 instructions");
@@ -587,7 +594,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("getinstancemetadata")) {
-            out.println("@|bold getInstanceMetadata|@ -instance <instanceName> [-outputFormat <outputFormat>] [-key <key> ] [-datafile <datafile>] <swffile>");
+            out.println("@|bold -getInstanceMetadata|@ -instance <instanceName> [-outputFormat <outputFormat>] [-key <key> ] [-datafile <datafile>] <swffile>");
             out.println("     reads instance metadata");
             out.println("     -instance <instanceName>: name of instance to fetch metadata from");
             out.println("     -outputFormat <outputFormat> (optional): format of output - one of: jslike|raw. Default is jslike.");
@@ -598,7 +605,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("setinstancemetadata")) {
-            out.println("@|bold setInstanceMetadata|@ -instance <instanceName>  [-inputFormat <inputFormat>] [-key <key> ] [-value <value> | -datafile <datafile>] [-outfile <outFile>] <swffile>");
+            out.println("@|bold -setInstanceMetadata|@ -instance <instanceName>  [-inputFormat <inputFormat>] [-key <key> ] [-value <value> | -datafile <datafile>] [-outfile <outFile>] <swffile>");
             out.println("     adds metadata to instance");
             out.println("     -instance <instanceName>: name of instance to replace data in");
             out.println("     -inputFormat <inputFormat>: format of input data - one of: jslike|raw. Default is jslike.");
@@ -613,7 +620,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("removeinstancemetadata")) {
-            out.println("@|bold removeInstanceMetadata|@ -instance <instanceName> [-key <key> ] [-outfile <outFile>] <swffile>");
+            out.println("@|bold -removeInstanceMetadata|@ -instance <instanceName> [-key <key> ] [-outfile <outFile>] <swffile>");
             out.println("     removes metadata from instance");
             out.println("     -instance <instanceName>: name of instance to remove data from");
             out.println("     - key <key> (optional): name of subkey to remove. When present, only the value from subkey <key> of the AMF object is removed.");
@@ -624,7 +631,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("linkreport")) {
-            out.println("@|bold linkReport|@ [-outfile <outfile>] <swffile>");
+            out.println("@|bold -linkReport|@ [-outfile <outfile>] <swffile>");
             out.println("     generates linker report for the swffile");
             out.println("     -outfile <outfile> (optional): Saves XML report to <outfile>. When ommited, the report is printed to stdout.");
             out.println("     <swffile>: SWF file to search instance in");
@@ -632,7 +639,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("swf2swc")) {
-            out.println("@|bold swf2swc|@ <outfile> <swffile>");
+            out.println("@|bold -swf2swc|@ <outfile> <swffile>");
             out.println("     generates SWC file from SWF");
             out.println("     <outfile>: Where to save SWC file");
             out.println("     <swffile>: Input SWF file");
@@ -640,7 +647,7 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("abcmerge")) {
-            out.println("@|bold abcmerge|@ <outfile> <swffile>");
+            out.println("@|bold -abcmerge|@ <outfile> <swffile>");
             out.println("     merge all ABC tags in SWF file to one");
             out.println("     <outfile>: Where to save merged file");
             out.println("     <swffile>: Input SWF file");
@@ -648,14 +655,14 @@ public class CommandLineArgumentParser {
         }
 
         if (filter == null || filter.equals("swf2exe")) {
-            out.println("@|bold swf2exe|@ <exportMode> <outfile> <swffile>");
+            out.println("@|bold -swf2exe|@ <exportMode> <outfile> <swffile>");
             out.println("     export SWF to executable file");
             out.println("     <exportMode>: wrapper|projector_win||projector_mac|projector_linux");
             out.println();
         }
 
         if (filter == null || filter.equals("header")) {
-            out.println("@|bold header|@ -set <key> <value> [-set <key2> <value2> ...] <swffile> [<outfile>]");
+            out.println("@|bold -header|@ -set <key> <value> [-set <key2> <value2> ...] <swffile> [<outfile>]");
             out.println("     prints header or sets SWF header values (with -set arguments) in <swffile> and saves it to <outfile>");
             out.println("   Available keys: version");
             out.println("                   gfx (true/false)");
@@ -672,7 +679,7 @@ public class CommandLineArgumentParser {
         out.println("@|underline,bold Pre-options|@:");
         if (filter == null || filter.equals("format")) {
             out.println("@|yellow -format|@ <formats>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     sets output formats for export");
             out.println("    Values for <formats> parameter:");
             out.println("         script:as - ActionScript source");
@@ -734,7 +741,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("select")) {
             out.println("@|yellow -select|@ <ranges>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     selects frames/pages for export");
             out.println("    Example <ranges> formats:");
             out.println("                      1-5");
@@ -751,7 +758,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("selectclass")) {
             out.println("@|yellow -selectclass|@ <classnames>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     selects scripts to export by class name (ActionScript 3 ONLY)");
             out.println("     <classnames> format:");
             out.println("                    com.example.MyClass");
@@ -763,7 +770,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("exportembed")) {
             out.println("@|yellow -exportembed|@");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     Allows exporting embedded assets via [Embed tag]");
             out.println();
         }
@@ -781,7 +788,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("onerror")) {
             out.println("@|yellow -onerror|@ (abort|retry <N>|ignore)");
-            out.println("     Applies to: export, import COMMANDs");
+            out.println("     Applies to: -export, -import COMMANDs");
             out.println("     error handling mode: ");
             out.println("       \"abort\" stops the exporting");
             out.println("       \"retry\" tries the exporting N times");
@@ -791,35 +798,35 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("timeout")) {
             out.println("@|yellow -timeout|@ <N>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
             out.println();
         }
 
         if (filter == null || filter.equals("exporttimeout")) {
             out.println("@|yellow -exportTimeout|@ <N>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     total export timeout in seconds");
             out.println();
         }
 
         if (filter == null || filter.equals("exportfiletimeout")) {
             out.println("@|yellow -exportFileTimeout|@ <N>");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     export timeout for a single AS3 class in seconds");
             out.println();
         }
 
         if (filter == null || filter.equals("stat")) {
             out.println("@|yellow -stat|@");
-            out.println("     Applies to: export COMMAND");
+            out.println("     Applies to: -export COMMAND");
             out.println("     show export performance statistics");
             out.println();
         }
 
         if (filter == null || filter.equals("zoom")) {
             out.println("@|yellow -zoom|@ <N>");
-            out.println("     Applies to: export, flashpaper2pdf COMMANDs");
+            out.println("     Applies to: -export, -flashpaper2pdf COMMANDs");
             out.println("     apply zoom during export");
             out.println();
         }
@@ -840,7 +847,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("air")) {
             out.println("@|yellow -air|@");
-            out.println("     Applies to: replace, import COMMANDs");
+            out.println("     Applies to: -replace, -import COMMANDs");
             out.println("     use AIR (airglobal.swc) for AS3 compilation instead of playerglobal.swc");
             out.println();
         }
@@ -854,7 +861,7 @@ public class CommandLineArgumentParser {
         out.println();
         out.println("@|underline,bold Examples|@:");
 
-        final String PREFIX = "ffdec-cli ";
+        final String PREFIX = "ffdec ";
 
         boolean exampleFound = false;
         if (filter == null) {

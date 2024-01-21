@@ -559,7 +559,6 @@
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
             <fileset dir="${resources.dir}" includes="ffdec"/>
-            <fileset dir="${resources.dir}" includes="ffdec-cli"/>
         </copy>
         <copy todir="${dist.dir}" file="${changelog.file}"/>
         <fixcrlf srcdir="${dist.dir}" includes="**/*.md" eol="crlf" preservelastmodified="true" />        
