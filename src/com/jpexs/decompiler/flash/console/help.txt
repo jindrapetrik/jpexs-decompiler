@@ -1,0 +1,373 @@
+Usage: <executable> [PRE-OPTIONS] [COMMAND]
+
+Executable:
+       Linux: ffdec or ffdec.sh
+      Mac OS: ffdec.sh
+     Windows: ffdec-cli.exe or ffdec.bat
+        Java: java -jar ffdec.jar
+
+Commands:
+-help | --help | /?
+    Show commandline arguments (this help).
+
+<infile> [<infile2> <infile3> ...]
+    Open SWF file(s) with the decompiler GUI.
+
+-proxy [-P<port>]
+    Auto start proxy in the tray.
+    Start proxy in the system tray. Optional parameter -P specifies port for proxy. Defaults to 55555. 
+
+-export <itemtypes> <outdirectory> <infile_or_directory>
+    Export sources.
+    Export <infile_or_directory> sources to <outdirectory>.
+    Exports all files from <infile_or_directory> when it is a folder.
+    Values for <itemtypes> parameter:
+        script - Scripts (Default format: ActionScript source)
+        image - Images (Default format: PNG/JPEG)
+        shape - Shapes (Default format: SVG)
+    morphshape - MorphShapes (Default format: SVG)
+        movie - Movies (Default format: FLV without sound)
+        font - Fonts (Default format: TTF)
+        font4 - DefineFont4 (Default format: CFF)
+        frame - Frames (Default format: PNG)
+        sprite - Sprites (Default format: PNG)
+        button - Buttons (Default format: PNG)
+        sound - Sounds (Default format: MP3/WAV/FLV only sound)
+        binaryData - Binary data (Default format:  Raw data)
+        symbolClass - Symbol-Class mapping (Default format: CSV)
+        text - Texts (Default format: Plain text)
+        all - Every resource (but not FLA and XFL)
+        fla - Everything to FLA compressed format
+        xfl - Everything to uncompressed FLA format (XFL)
+    You can export multiple types of items by using colon ",".
+    DO NOT PUT space between comma (,) and next value.
+
+-dumpSWF <infile>
+    Dump list of SWF tags to console.
+
+-dumpAS2 <infile>
+    Dump list of AS1/2 scripts to console.
+
+-dumpAS3 <infile>
+    Dump list of AS3 scripts to console.
+
+-compress <infile> <outfile> [(zlib|lzma)]
+    Compress SWF file.
+    Compress SWF <infile> and save it to <outfile>. If <infile> is already compressed, it will be re-compressed. Default compression method is ZLIB
+
+-decompress <infile> <outfile>
+    Decompress SWF file.
+    Decompress <infile> and save it to <outfile>
+
+-encrypt <infile> <outfile>
+    Encrypt SWF file with HARMAN Air encryption.
+    Encrypt file <infile> with HARMAN Air encryption and saves it to <outfile>
+
+-decrypt <infile> <outfile>
+    Decrypt HARMAN Air encrypted file.
+    Decrypt HARMAN Air encrypted file <infile> and saves it to <outfile>
+
+-swf2xml <infile> <outfile>
+    Convert SWF to XML.
+    Convert the <infile> SWF to <outfile> XML file
+
+-xml2swf <infile> <outfile>
+    Convert XML to SWF.
+    Convert the <infile> XML to <outfile> SWF file
+
+-extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]    
+    Extract SWF files from ZIP or other binary files.
+    -o parameter should contain a file path when "biggest" or "first" parameter is specified
+    -o parameter should contain a folder path when no extaction mode or "all" parameter is specified
+
+-memorySearch (<processName1>|<processId1>) (<processName2>|<processId2>)...
+    Search SWF files in the memory.
+
+-renameInvalidIdentifiers (typeNumber|randomWord) <infile> <outfile>
+    Rename invalid identifiers.
+    Rename the invalid identifiers in <infile> and save it to <outfile>
+
+-flashpaper2pdf <infile> <outfile>
+    Convert FlashPaper SWF file to PDF.
+    Convert FlashPaper SWF file <infile> to PDF <outfile>. Use -zoom parameter to specify image quality.
+
+-replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [nofill] ([<format1>][<methodBodyIndex1>]) [(<characterId2>|<scriptName2>) <importDataFile2> [nofill] ([<format2>][<methodBodyIndex2>])]...
+    Replace data.
+    Replaces the data of the specified BinaryData, Image, Shape, Text, Sound tag or Script
+    nofill parameter can be specified only for shape replace
+    <format> parameter can be specified for Image and Shape tags
+    valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4
+    <methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code
+    use -1 as characterId to replace main timeline SoundStreamHead
+-replace <infile> <outfile> <argsfile>
+    Replace data using argsfile.     
+    Same as -replace command, but the rest of arguments is read as lines from a text file <argsfile>
+
+-replaceAlpha <infile> <outfile> <imageId1> <importDataFile1> [<imageId2> <importDataFile2>]...    
+    Replace the alpha channel of the specified JPEG3/4 tag.
+
+-replaceCharacter <infile> <outfile> <characterId1> <newCharacterId1> [<characterId2> <newCharacterId2>]...
+    Replace a character tag with another from the same SWF.
+
+-replaceCharacterId <infile> <outfile> <oldId1>,<newId1>,<oldId2>,<newId2>...
+    Replace character ids.
+    Replace the <oldId1> character id with <newId1>.
+-replaceCharacterId <infile> <outfile> (pack|sort)
+    Replace character ids bulk operation.
+    pack: removes the spaces between the character ids (1,4,3 => 1,3,2)
+    sort: assigns increasing IDs to the character tags + pack (1,4,3 => 1,2,3)
+    DO NOT PUT space between comma (,) and next value.
+
+-remove <infile> <outfile> <tagIndex1> [<tagIndex2>]...
+    Remove a tag from the SWF.
+    Remove tags based in index from main SWF timeline.
+
+-removeCharacter[WithDependencies] <infile> <outfile> <characterId1> [<characterId2>]...
+    Remove a character tag from the SWF
+
+-importSymbolClass <infile> <outfile> <symbolclassfile>
+    Import Symbol-Class mapping.
+    Import Symbol-Class mapping to <infile> and saves the result to <outfile>.
+
+-importMovies <infile> <outfile> <moviesfolder>
+    Bulk import movies.
+    Import movies to <infile> and saves the result to <outfile>.
+
+-importSounds <infile> <outfile> <soundsfolder>
+    Bulk import sounds.
+    Import sounds to <infile> and saves the result to <outfile>.
+
+-importShapes <infile> <outfile> [nofill] <shapesfolder>
+    Bulk import shapes.
+    Import shapes to <infile> and saves the result to <outfile>.
+
+-importImages <infile> <outfile> <imagesfolder>
+    Bulk import images.
+    Import images to <infile> and saves the result to <outfile>.
+
+-importSprites <infile> <outfile> <spritesfolder>
+    Bulk import sprites.
+    Import sprites to <infile> and saves the result to <outfile>.
+
+-importText <infile> <outfile> <textsfolder>
+    Bulk import texts.
+    Import texts to <infile> and saves the result to <outfile>,
+
+-importScript <infile> <outfile> <scriptsfolder>
+    Bulk import scripts.
+    Import scripts to <infile> and saves the result to <outfile>.
+
+-deobfuscate <level> <infile> <outfile>
+    Deobfuscate AS3 P-code.
+    Deobfuscate AS3 P-code in <infile> and saves result to <outfile>.
+    <level> can be one of: traps/2/max, deadcode/1
+
+-enabledebugging [-injectas3|-generateswd] [-pcode] <infile> <outfile>
+    Enable debugging in SWF file.
+    Enable debugging for <infile> and saves result to <outfile>.
+    -injectas3 (optional) causes debugfile and debugline instructions to be injected into the code to match decompiled/pcode source.
+    -generateswd (optional) parameter creates SWD file needed for AS1/2 debugging. for <outfile.swf>, <outfile.swd> is generated
+    -pcode (optional) parameter specified after -injectas3 or -generateswd causes lines to be handled as lines in P-code => All P-code lines are injected, etc.
+    WARNING: Injected/SWD script filenames may be different than from standard compiler
+
+-doc -type <type> [-out <outfile>] [-format <format>] [-locale <locale>]
+    Generate documentation.
+    -type <type> Selects documentation type
+    <type> can be currently only: as3.pcode.instructions for list of ActionScript3 AVM2 instructions
+    -out <outfile> (optional) If specified, output is written to <outfile> instead of stdout
+    -format <format> (optional, html is default) Selects output format
+    <format> is currently only html
+    -locale <locale> (optional) Override default locale
+    <locale> is localization identifier, en for english for example
+    <format> is currently only html
+
+-getInstanceMetadata -instance <instanceName> [-outputFormat <outputFormat>] [-key <key> ] [-datafile <datafile>] <swffile>
+    Read instance metadata.
+    -instance <instanceName>: name of instance to fetch metadata from
+    -outputFormat <outputFormat> (optional): format of output - one of: jslike|raw. Default is jslike.
+    - key <key> (optional): name of subkey to display. When present, only value from subkey <key> is shown, whole object value otherwise.
+    -datafile <datafile> (optional): File to write the data to. If ommited, stdout is used.
+    <swffile>: SWF file to read metadata from
+
+-setInstanceMetadata -instance <instanceName>  [-inputFormat <inputFormat>] [-key <key> ] [-value <value> | -datafile <datafile>] [-outfile <outFile>] <swffile>
+    Add metadata to instance.
+    -instance <instanceName>: name of instance to replace data in
+    -inputFormat <inputFormat>: format of input data - one of: jslike|raw. Default is jslike.
+    - key <key> (optional): name of subkey to use. When present, the value is set as object property with the <key> name.
+           Otherwise the value is set directly to the instance without any subkeys.
+    -value <value> (optional): value to set.
+    -datafile <datafile> (optional): value to set from file.
+    If no -value or -infile parameter present, the value to set is taken from stdin.
+    -outfile <outfile> (optional): Where to save resulting file. If ommited, original SWF file is overwritten.
+    <swffile>: SWF file to search instance in
+
+-removeInstanceMetadata -instance <instanceName> [-key <key> ] [-outfile <outFile>] <swffile>
+    Remove metadata from instance.
+    -instance <instanceName>: name of instance to remove data from
+    -key <key> (optional): name of subkey to remove. 
+        When present, only the value from subkey <key> of the AMF object is removed.
+        Otherwise all metadata are removed from the instance.
+    -outfile <outfile> (optional): Where to save resulting file. If ommited, original SWF file is overwritten.
+    <swffile>: SWF file to search instance in
+
+-linkReport [-outfile <outfile>] <swffile>
+    Generate linker report for the swffile.
+    -outfile <outfile> (optional): Saves XML report to <outfile>. When ommited, the report is printed to stdout.
+    <swffile>: SWF file to search instance in
+
+-swf2swc <outfile> <swffile>
+    Generate SWC file from SWF.
+    <outfile>: Where to save SWC file
+    <swffile>: Input SWF file
+
+-abcmerge <outfile> <swffile>
+    Merge all ABC tags in SWF file to one.
+    <outfile>: Where to save merged file
+    <swffile>: Input SWF file
+
+-swf2exe <exportMode> <outfile> <swffile>
+    Export SWF to executable file.
+    <exportMode>: wrapper|projector_win||projector_mac|projector_linux
+
+-header -set <key> <value> [-set <key2> <value2> ...] <swffile> [<outfile>]
+    Print or set SWF header values.
+    Print header or sets SWF header values (with -set arguments) in <swffile> and saves it to <outfile>
+    Available keys: version
+                    gfx (true/false)
+                    displayrect ([x1,y1,x2,y2])
+                    width
+                    height
+                    framecount
+                    framerate
+    For width, height and displayrect subvalues you can use suffix px for pixel values. Otherwise its twips.
+
+
+Pre-options:
+-format <formats>
+    Applies to: -export COMMAND
+    Set output formats for export.
+    Values for <formats> parameter:
+        script:as - ActionScript source
+        script:pcode - ActionScript P-code
+        script:pcodehex - ActionScript P-code with hex
+        script:hex - ActionScript Hex only
+        shape:svg - SVG format for Shapes
+        shape:png - PNG format for Shapes
+        shape:canvas - HTML5 Canvas format for Shapes
+        shape:bmp - BMP format for Shapes
+        morphshape:svg - SVG format for MorphShapes
+        morphshape:canvas - HTML5 Canvas  format for MorphShapes
+        frame:png - PNG format for Frames
+        frame:gif - GIF format for Frames
+        frame:avi - AVI format for Frames
+        frame:svg - SVG format for Frames
+        frame:canvas - HTML5 Canvas format for Frames
+        frame:pdf - PDF format for Frames
+        frame:bmp - BMP format for Frames
+        sprite:png - PNG format for Sprites
+        sprite:gif - GIF format for Sprites
+        sprite:avi - AVI format for Sprites
+        sprite:svg - SVG format for Sprites
+        sprite:canvas - HTML5 Canvas format for Sprites
+        sprite:pdf - PDF format for Sprites
+        sprite:bmp - BMP format for Sprites
+        button:png - PNG format for Buttons
+        button:svg - SVG format for Buttons
+        button:bmp - BMP format for Buttons
+        image:png_gif_jpeg - PNG/GIF/JPEG format for Images
+        image:png - PNG format for Images
+        image:jpeg - JPEG format for Images
+        image:bmp - BMP format for Images
+        image:png_gif_jpeg_alpha - PNG/GIF/JPEG+ALPHA format for Images
+        text:plain - Plain text format for Texts
+        text:formatted - Formatted text format for Texts
+        text:svg - SVG format for Texts
+        sound:mp3_wav_flv - MP3/WAV/FLV format for Sounds
+        sound:mp3_wav - MP3/WAV format for Sounds
+        sound:wav - WAV format for Sounds
+        sound:flv - FLV format for Sounds
+        font:ttf - TTF format for Fonts
+        font:woff - WOFF format for Fonts
+        font4:cff - CFF format for DefineFont4
+        fla:<flaversion> or xfl:<flaversion> - Specify FLA format version
+           - values for <flaversion>: cs5,cs5.5,cs6,cc
+    You can set multiple formats at once using comma (,)
+    DO NOT PUT space between comma (,) and next value.
+    The prefix with colon (:) is neccessary.
+
+-cli
+    Applies to: MAIN COMMAND
+    Command line mode. Parse the SWFs without opening the GUI.
+
+-select <ranges>
+    Applies to: -export COMMAND
+    Select frames/pages for export.
+    Example <ranges> formats:
+                      1-5
+                      2,3
+                      2-5,7,9-
+    DO NOT PUT space between comma (,) and next ramge.
+
+-selectid <ranges>
+    Select characters for export by character id.
+    <ranges> format is same as in -select
+
+-selectclass <classnames>
+    Applies to: -export COMMAND
+    Select scripts to export by class name (AS 3 ONLY).
+    <classnames> format:
+                    com.example.MyClass
+                    com.example.+   (all classes in package "com.example")
+                    com.++,net.company.MyClass   (all classes in package "com" and all subpackages, class net.company.MyClass)
+        DO NOT PUT space between comma (,) and next class.
+
+-exportembed
+    Applies to: -export COMMAND
+    Allow exporting embedded assets via [Embed tag].
+
+-config key=value[,key2=value2][,key3=value3...] [other parameters]
+    Applies to: everything configurable
+    Set configuration values.
+    Use -listconfigs command to list the available configuration settings.
+    Values are boolean, you can use 0/1, true/false, on/off or yes/no.
+    If no other parameters passed, configuration is saved. Otherwise it is used only once.
+    DO NOT PUT space between comma (,) and next value.
+
+-onerror (abort|retry <N>|ignore)
+    Applies to: -export, -import COMMANDs
+    Error handling mode.
+    "abort" stops the exporting
+    "retry" tries the exporting N times
+    "ignore" ignores the current file
+
+-timeout <N>
+    Applies to: -export COMMAND
+    Decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds.
+
+-exportTimeout <N>
+    Applies to: -export COMMAND
+    Total export timeout in seconds.
+
+-exportFileTimeout <N>
+    Applies to: -export COMMAND
+    Export timeout for a single AS3 class in seconds.
+
+-stat
+    Applies to: -export COMMAND
+    Show export performance statistics.
+
+-zoom <N>
+    Applies to: -export, -flashpaper2pdf COMMANDs
+    Apply zoom during export.
+
+-custom <customparameter1> [<customparameter2>]...
+    Applies to: MAIN COMMAND
+    Forward all parameters after the -custom parameter to the plugins.
+
+-charset <charsetName>
+    Applies to: every SWF reading COMMAND
+    Set desired character set for reading/writing SWF files with SWF version <= 5.
+
+-air
+    Applies to: -replace, -import COMMANDs
+    Use AIR ("airglobal.swc") for AS3 compilation instead of "playerglobal.swc".
