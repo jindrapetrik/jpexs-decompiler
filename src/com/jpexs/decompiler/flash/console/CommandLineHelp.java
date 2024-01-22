@@ -40,6 +40,7 @@ public class CommandLineHelp {
     private static Map<String, List<Command>> commands = new LinkedHashMap<>();
     private static Map<String, Option> preOptions = new LinkedHashMap<>();
     private static String preface = null;
+    private static Map<String, String> aliasMap = new HashMap<>();
     
     static {
         parse(); 
@@ -272,6 +273,9 @@ public class CommandLineHelp {
                                 commands.put(itemName.toLowerCase(), new ArrayList<>());
                             }
                             commands.get(itemName.toLowerCase()).add(new Command(itemName, customSynopsis, arguments, header, descriptionBuffer.toString(), aliases));
+                            for (String alias : aliases) {
+                                aliasMap.put(alias.toLowerCase(), itemName.toLowerCase());
+                            }
                             itemName = null;
                             argumentsContinuation = false;
                         }
@@ -406,7 +410,14 @@ public class CommandLineHelp {
                 out.println(opt.getHelp(true));                 
             }
             out.println();
-        } else {
+        } else {            
+            
+            if (aliasMap.containsKey("-" + filter)) {
+                filter = aliasMap.get("-" + filter).substring(1);
+            } else if (aliasMap.containsKey(filter)) {
+                filter = aliasMap.get(filter).substring(1);
+            }
+            
             if (commands.containsKey("-" + filter.toLowerCase())) {
                 boolean first = true;
                 for (Command c : commands.get("-" + filter.toLowerCase())) {
