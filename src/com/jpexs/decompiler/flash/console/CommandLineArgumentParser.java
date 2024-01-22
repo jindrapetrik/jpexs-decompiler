@@ -334,7 +334,7 @@ public class CommandLineArgumentParser {
     }
 
     public static void printCmdLineUsage(PrintStream out, boolean webHelp, String filter) {
-        int cnt = 1;
+        AnsiConsole.systemInstall();
         out.println("@|underline,bold Usage|@: @|bold <executable>|@ [PRE-OPTIONS] [COMMAND]");
         out.println();
         out.println("@|underline,bold Executable|@:");
@@ -855,6 +855,8 @@ public class CommandLineArgumentParser {
         printCmdLineUsageExamples(out, filter);
 
         System.out.println("You can use special value \"/dev/stdin\" for input files to read data from standard input (even on Windows)");
+        
+        AnsiConsole.systemUninstall();
     }
 
     private static void printCmdLineUsageExamples(PrintStream out, String filter) {
@@ -973,13 +975,8 @@ public class CommandLineArgumentParser {
      * @return paths to the file which should be opened or null
      * @throws java.io.IOException On error
      */
-    public static String[] parseArguments(String[] arguments) throws IOException {
-        AnsiConsole.systemInstall();
-        try {
-            return parseArgumentsInternal(arguments);
-        } finally {
-            AnsiConsole.systemUninstall();
-        }
+    public static String[] parseArguments(String[] arguments) throws IOException {        
+        return parseArgumentsInternal(arguments);
     }
 
     private static PrintStream ansiSystemOut() {
@@ -1320,7 +1317,9 @@ public class CommandLineArgumentParser {
     }
 
     public static void printHeader() {
+        AnsiConsole.systemInstall();
         ansiPrintln(ApplicationInfo.cliApplicationVerName);
+        AnsiConsole.systemUninstall();
         for (int i = 0; i < ApplicationInfo.applicationVerName.length(); i++) {
             System.out.print("-");
         }
