@@ -290,6 +290,9 @@ alias /?
     For width, height and displayrect subvalues you can use suffix px for
     pixel values. Otherwise its twips.
 
+-listconfigs
+    List all available configuration keys and current values.
+    These keys can be used in -config pre-option.
 
 Pre-options:
 -format <formats>
