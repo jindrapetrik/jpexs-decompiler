@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Nullpointer on recent searches loader
 - [#2177] Leftover process when invalid SWF opened - now main window is shown
 - Opening files with "Open with FFDec" on windows did not use same instance
+- [#2183] AS1/2 Direct editation - case sensitive identifiers since SWF version 7
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3386,6 +3387,7 @@ Major version of SWF to XML export changed to 2.
 [#2175]: https://www.free-decompiler.com/flash/issues/2175
 [#2178]: https://www.free-decompiler.com/flash/issues/2178
 [#2177]: https://www.free-decompiler.com/flash/issues/2177
+[#2183]: https://www.free-decompiler.com/flash/issues/2183
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119
