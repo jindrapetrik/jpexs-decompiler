@@ -258,6 +258,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 ident = tData.toString();
                 //We need to get unescaped identifier, so we use our Lexer
                 ActionScriptLexer lex = new ActionScriptLexer(new StringReader(ident));
+                if (src != null) {
+                    if (src.getSwf().version >= ActionScriptLexer.SWF_VERSION_CASE_SENSITIVE) {
+                        lex.setCaseSensitiveIdentifiers(true);
+                    }
+                }
                 try {
                     ParsedSymbol symb = lex.lex();
                     if (symb.type == SymbolType.IDENTIFIER) {
