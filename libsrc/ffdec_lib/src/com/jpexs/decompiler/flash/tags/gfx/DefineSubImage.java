@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
@@ -35,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import javax.imageio.ImageIO;
 import net.npe.dds.DDSReader;
 
 /**
@@ -182,6 +184,7 @@ public class DefineSubImage extends ImageTag {
         }
         int targetWidth = x2 - x1;
         int targetHeight = y2 - y1;
+        int bitmapFormat = image.bitmapFormat;
 
         if (!Objects.equals(cachedImageFilename, image.fileName)
                 || !Objects.equals(cachedX1, (Integer) x1)
@@ -194,25 +197,51 @@ public class DefineSubImage extends ImageTag {
                 serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
                 serImage.fillTransparent();
                 return;
-            }
-
+            } 
+            
             Path imagePath = image.getSwf().getFile() == null ? null : Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
-            if (imagePath != null && imagePath.toFile().exists()) {
-                try {
-                    byte[] imageData = Files.readAllBytes(imagePath);
-                    int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-                    BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-                    bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-                    Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
-                    bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-                    bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
-                    serImage = new SerializableImage(bufImage);
-                    cachedImageFilename = image.fileName;
-                    cachedX1 = x1;
-                    cachedX2 = x2;
-                    cachedY1 = y1;
-                    cachedY2 = y2;
-                } catch (IOException e) {
+            if (imagePath != null && imagePath.toFile().exists()) {                
+                if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_JPEG 
+                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_TGA
+                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_TGA) {
+                    try {
+                        if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_TGA 
+                                || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_TGA) {
+                            TgaSupport.init();
+                        }
+                        BufferedImage bufImage = ImageIO.read(imagePath.toFile());
+                        Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
+                        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+                        bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
+                        serImage = new SerializableImage(bufImage);
+                        cachedImageFilename = image.fileName;
+                        cachedX1 = x1;
+                        cachedX2 = x2;
+                        cachedY1 = y1;
+                        cachedY2 = y2;
+                    } catch (IOException ex) {
+                        createFailedImage();
+                    }                    
+                } else if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_DDS 
+                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_DDS) {
+                    try {
+                        byte[] imageData = Files.readAllBytes(imagePath);
+                        int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+                        BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+                        bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+                        Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
+                        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+                        bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
+                        serImage = new SerializableImage(bufImage);
+                        cachedImageFilename = image.fileName;
+                        cachedX1 = x1;
+                        cachedX2 = x2;
+                        cachedY1 = y1;
+                        cachedY2 = y2;
+                    } catch (IOException e) {
+                        createFailedImage();
+                    }
+                } else {
                     createFailedImage();
                 }
             } else {

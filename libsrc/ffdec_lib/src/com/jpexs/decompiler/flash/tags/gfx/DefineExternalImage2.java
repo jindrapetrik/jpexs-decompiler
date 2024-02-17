@@ -227,7 +227,7 @@ public class DefineExternalImage2 extends ImageTag {
                 } else {
                     createFailedImage();
                 }
-            } else if (bitmapFormat == BITMAP_FORMAT2_DDS || bitmapFormat == BITMAP_FORMAT2_DDS) {
+            } else if (bitmapFormat == BITMAP_FORMAT2_DDS || bitmapFormat == BITMAP_FORMAT_DDS) {
                 Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
                 if (imagePath != null && imagePath.toFile().exists()) {
                     try {
