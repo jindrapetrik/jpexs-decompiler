@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Opening files with "Open with FFDec" on windows did not use same instance
 - [#2183] AS1/2 Direct editation - case sensitive identifiers since SWF version 7
 - [#2203] GFX - DefineSubImage with TGA bitmapFormat
+- [#2207] AS - Index -2 out of bounds for some of the switches
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3390,6 +3391,7 @@ Major version of SWF to XML export changed to 2.
 [#2177]: https://www.free-decompiler.com/flash/issues/2177
 [#2183]: https://www.free-decompiler.com/flash/issues/2183
 [#2203]: https://www.free-decompiler.com/flash/issues/2203
+[#2207]: https://www.free-decompiler.com/flash/issues/2207
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119

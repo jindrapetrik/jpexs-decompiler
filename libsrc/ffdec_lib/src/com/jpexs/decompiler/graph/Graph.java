@@ -936,7 +936,7 @@ public class Graph {
                 }
                 
                 if (breakCount == 2) {
-                    if (breakCaseIndex == 0) {
+                    if (breakCaseIndex <= 0) {
                         continue loopi;
                     }
                     if (swi.caseCommands.get(breakCaseIndex - 1).isEmpty()) {
