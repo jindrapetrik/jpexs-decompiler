@@ -1929,15 +1929,15 @@ public class SWFInputStream implements AutoCloseable {
         ret.hasScale = readUB(1, "hasScale") == 1;
         if (ret.hasScale) {
             int NScaleBits = (int) readUB(5, "NScaleBits");
-            ret.scaleX = (int) readSB(NScaleBits, "scaleX");
-            ret.scaleY = (int) readSB(NScaleBits, "scaleY");
+            ret.scaleX = readFB(NScaleBits, "scaleX");
+            ret.scaleY = readFB(NScaleBits, "scaleY");
             ret.nScaleBits = NScaleBits;
         }
         ret.hasRotate = readUB(1, "hasRotate") == 1;
         if (ret.hasRotate) {
             int NRotateBits = (int) readUB(5, "NRotateBits");
-            ret.rotateSkew0 = (int) readSB(NRotateBits, "rotateSkew0");
-            ret.rotateSkew1 = (int) readSB(NRotateBits, "rotateSkew1");
+            ret.rotateSkew0 = readFB(NRotateBits, "rotateSkew0");
+            ret.rotateSkew1 = readFB(NRotateBits, "rotateSkew1");
             ret.nRotateBits = NRotateBits;
         }
         int NTranslateBits = (int) readUB(5, "NTranslateBits");

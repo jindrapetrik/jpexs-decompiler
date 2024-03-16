@@ -132,10 +132,10 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
         }
         MATRIX ret = new MATRIX();
         double ratio_d = ratio / 65535.0;
-        ret.scaleX = (int) Math.round(a.getScaleX() + (b.getScaleX() - a.getScaleX()) * ratio_d);
-        ret.scaleY = (int) Math.round(a.getScaleY() + (b.getScaleY() - a.getScaleY()) * ratio_d);
-        ret.rotateSkew0 = (int) Math.round(a.getRotateSkew0() + (b.getRotateSkew0() - a.getRotateSkew0()) * ratio_d);
-        ret.rotateSkew1 = (int) Math.round(a.getRotateSkew1() + (b.getRotateSkew1() - a.getRotateSkew1()) * ratio_d);
+        ret.scaleX = MATRIX.toFloat((int) Math.round(a.getScaleXInteger() + (b.getScaleXInteger() - a.getScaleXInteger()) * ratio_d));
+        ret.scaleY = MATRIX.toFloat((int) Math.round(a.getScaleYInteger() + (b.getScaleYInteger() - a.getScaleYInteger()) * ratio_d));
+        ret.rotateSkew0 = MATRIX.toFloat((int) Math.round(a.getRotateSkew0Integer() + (b.getRotateSkew0Integer() - a.getRotateSkew0Integer()) * ratio_d));
+        ret.rotateSkew1 = MATRIX.toFloat((int) Math.round(a.getRotateSkew1Integer() + (b.getRotateSkew1Integer() - a.getRotateSkew1Integer()) * ratio_d));
         ret.translateX = (int) Math.round(a.translateX + (b.translateX - a.translateX) * ratio_d);
         ret.translateY = (int) Math.round(a.translateY + (b.translateY - a.translateY) * ratio_d);
         ret.hasRotate = true;

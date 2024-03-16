@@ -40,14 +40,14 @@ public class MATRIX implements Serializable {
      */
     @Conditional("hasScale")
     @SWFType(value = BasicType.FB, countField = "nScaleBits")
-    public int scaleX;
+    public float scaleX;
 
     /**
      * Y scale value
      */
     @Conditional("hasScale")
     @SWFType(value = BasicType.FB, countField = "nScaleBits")
-    public int scaleY;
+    public float scaleY;
 
     /**
      * Has rotate and skew values
@@ -59,14 +59,14 @@ public class MATRIX implements Serializable {
      */
     @Conditional("hasRotate")
     @SWFType(value = BasicType.FB, countField = "nRotateBits")
-    public int rotateSkew0;
+    public float rotateSkew0;
 
     /**
      * Second rotate and skew value
      */
     @Conditional("hasRotate")
     @SWFType(value = BasicType.FB, countField = "nRotateBits")
-    public int rotateSkew1;
+    public float rotateSkew1;
 
     /**
      * X translate value in twips
@@ -114,14 +114,14 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
-    private float toFloat(int i) {
+    public static float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
 
     public Point apply(Point p) {
         Point ret = new Point();
-        ret.x = (int) (p.x * (hasScale ? toFloat(scaleX) : 1) + p.y * (hasRotate ? toFloat(rotateSkew1) : 0) + translateX);
-        ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
+        ret.x = (int) (p.x * (hasScale ? scaleX : 1) + p.y * (hasRotate ? rotateSkew1  : 0) + translateX);
+        ret.y = (int) (p.x * (hasRotate ? rotateSkew0 : 0) + p.y * (hasScale ? scaleY : 1) + translateY);
         return ret;
     }
 
@@ -135,37 +135,41 @@ public class MATRIX implements Serializable {
         return new RECT(Xmin, Xmax, Ymin, Ymax);
 
     }
-
-    public int getRotateSkew0() {
-        return hasRotate ? rotateSkew0 : 0;
+    
+    private int fromFloat(double f) {
+        return (int) (f * (1 << 16));
     }
 
-    public int getRotateSkew1() {
-        return hasRotate ? rotateSkew1 : 0;
+    public int getRotateSkew0Integer() {
+        return hasRotate ? fromFloat(rotateSkew0) : 0;
+    }
+
+    public int getRotateSkew1Integer() {
+        return hasRotate ? fromFloat(rotateSkew1) : 0;
     }
 
     public float getRotateSkew0Float() {
-        return (hasRotate ? toFloat(rotateSkew0) : 0);
+        return (hasRotate ? rotateSkew0 : 0);
     }
 
     public float getRotateSkew1Float() {
-        return (hasRotate ? toFloat(rotateSkew1) : 0);
+        return (hasRotate ? rotateSkew1 : 0);
     }
 
     public float getScaleXFloat() {
-        return (hasScale ? toFloat(scaleX) : 1);
+        return (hasScale ? scaleX : 1);
     }
 
     public float getScaleYFloat() {
-        return (hasScale ? toFloat(scaleY) : 1);
+        return (hasScale ? scaleY : 1);
     }
 
-    public int getScaleX() {
-        return (hasScale ? (scaleX) : (1 << 16));
+    public int getScaleXInteger() {
+        return (hasScale ? fromFloat(scaleX) : (1 << 16));
     }
 
-    public int getScaleY() {
-        return (hasScale ? (scaleY) : (1 << 16));
+    public int getScaleYInteger() {
+        return (hasScale ? fromFloat(scaleY) : (1 << 16));
     }
 
     public boolean isEmpty() {
@@ -175,10 +179,10 @@ public class MATRIX implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + getScaleX();
-        hash = 37 * hash + getScaleY();
-        hash = 37 * hash + getRotateSkew0();
-        hash = 37 * hash + getRotateSkew1();
+        hash = 37 * hash + getScaleXInteger();
+        hash = 37 * hash + getScaleYInteger();
+        hash = 37 * hash + getRotateSkew0Integer();
+        hash = 37 * hash + getRotateSkew1Integer();
         hash = 37 * hash + translateX;
         hash = 37 * hash + translateY;
         return hash;
@@ -193,16 +197,16 @@ public class MATRIX implements Serializable {
             return false;
         }
         final MATRIX other = (MATRIX) obj;
-        if (getScaleX() != other.getScaleX()) {
+        if (getScaleXInteger() != other.getScaleXInteger()) {
             return false;
         }
-        if (getScaleY() != other.getScaleY()) {
+        if (getScaleYInteger() != other.getScaleYInteger()) {
             return false;
         }
-        if (getRotateSkew0() != other.getRotateSkew0()) {
+        if (getRotateSkew0Integer() != other.getRotateSkew0Integer()) {
             return false;
         }
-        if (getRotateSkew1() != other.getRotateSkew1()) {
+        if (getRotateSkew1Integer() != other.getRotateSkew1Integer()) {
             return false;
         }
         if (translateX != other.translateX) {
