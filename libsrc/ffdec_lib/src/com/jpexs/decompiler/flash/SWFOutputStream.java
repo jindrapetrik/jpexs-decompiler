@@ -650,30 +650,30 @@ public class SWFOutputStream extends OutputStream {
         writeUB(1, value.hasScale ? 1 : 0);
         if (value.hasScale) {
             int nBits = 0;
-            nBits = enlargeBitCountS(nBits, value.scaleX);
-            nBits = enlargeBitCountS(nBits, value.scaleY);
+            nBits = enlargeBitCountS(nBits, value.getScaleXInteger());
+            nBits = enlargeBitCountS(nBits, value.getScaleYInteger());
 
             if (Configuration._debugCopy.get()) {
                 nBits = Math.max(nBits, value.nScaleBits);
             }
 
             writeUB(5, nBits);
-            writeSB(nBits, value.scaleX);
-            writeSB(nBits, value.scaleY);
+            writeFB(nBits, value.scaleX);
+            writeFB(nBits, value.scaleY);
         }
         writeUB(1, value.hasRotate ? 1 : 0);
         if (value.hasRotate) {
             int nBits = 0;
-            nBits = enlargeBitCountS(nBits, value.rotateSkew0);
-            nBits = enlargeBitCountS(nBits, value.rotateSkew1);
+            nBits = enlargeBitCountS(nBits, value.getRotateSkew0Integer());
+            nBits = enlargeBitCountS(nBits, value.getRotateSkew1Integer());
 
             if (Configuration._debugCopy.get()) {
                 nBits = Math.max(nBits, value.nRotateBits);
             }
 
             writeUB(5, nBits);
-            writeSB(nBits, value.rotateSkew0);
-            writeSB(nBits, value.rotateSkew1);
+            writeFB(nBits, value.rotateSkew0);
+            writeFB(nBits, value.rotateSkew1);            
         }
         int NTranslateBits = 0;
         NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);

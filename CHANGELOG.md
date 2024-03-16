@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
+- [#2206] FB values in MATRIX (scale/rotate) as floats instead of int, -f suffixed parameters in text editor
 
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3383,6 +3384,7 @@ Major version of SWF to XML export changed to 2.
 [#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
+[#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174

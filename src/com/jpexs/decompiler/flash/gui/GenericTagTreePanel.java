@@ -19,12 +19,14 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.gui.generictageditors.ColorEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.EnumEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.FloatEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
@@ -346,11 +348,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         }
 
                         editor = new EnumEditor(field.getName(), obj, field, index, type, swfType, values);
+                    } else if (type.equals(double.class) || type.equals(Double.class)
+                            || type.equals(float.class) || type.equals(Float.class)) {
+                        editor = new FloatEditor(field.getName(), obj, field, index, type);
                     } else if (type.equals(int.class) || type.equals(Integer.class)
                             || type.equals(short.class) || type.equals(Short.class)
-                            || type.equals(long.class) || type.equals(Long.class)
-                            || type.equals(double.class) || type.equals(Double.class)
-                            || type.equals(float.class) || type.equals(Float.class)) {
+                            || type.equals(long.class) || type.equals(Long.class)) {
                         editor = new NumberEditor(field.getName(), obj, field, index, type, swfType);
                     } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
                         editor = new BooleanEditor(field.getName(), obj, field, index, type);
@@ -904,8 +907,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {
-                    valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
-                } else {
+                    valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";                    
+                } else {             
                     valStr += " = " + colorAdd + val.toString() + enumAdd;
                 }
             }

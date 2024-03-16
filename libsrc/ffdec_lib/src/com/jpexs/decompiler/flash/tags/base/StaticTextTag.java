@@ -242,12 +242,12 @@ public abstract class StaticTextTag extends TextTag {
             writer.append("translatey ").append(textMatrix.translateY).newLine();
         }
         if (textMatrix.hasScale) {
-            writer.append("scalex ").append(textMatrix.scaleX).newLine();
-            writer.append("scaley ").append(textMatrix.scaleY).newLine();
+            writer.append("scalexf ").append(textMatrix.scaleX).newLine();
+            writer.append("scaleyf ").append(textMatrix.scaleY).newLine();
         }
         if (textMatrix.hasRotate) {
-            writer.append("rotateskew0 ").append(textMatrix.rotateSkew0).newLine();
-            writer.append("rotateskew1 ").append(textMatrix.rotateSkew1).newLine();
+            writer.append("rotateskew0f ").append(textMatrix.rotateSkew0).newLine();
+            writer.append("rotateskew1f ").append(textMatrix.rotateSkew1).newLine();
         }
         writer.append("]");
         int textHeight = 12;
@@ -433,7 +433,7 @@ public abstract class StaticTextTag extends TextTag {
                                 break;
                             case "scalex":
                                 try {
-                                    textMatrix.scaleX = Integer.parseInt(paramValue);
+                                    textMatrix.scaleX = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasScale = true;
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid scalex value - number expected. Found: " + paramValue, lexer.yyline());
@@ -441,15 +441,33 @@ public abstract class StaticTextTag extends TextTag {
                                 break;
                             case "scaley":
                                 try {
-                                    textMatrix.scaleY = Integer.parseInt(paramValue);
+                                    textMatrix.scaleY = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasScale = true;
                                 } catch (NumberFormatException nfe) {
-                                    throw new TextParseException("Invalid scalex value - number expected. Found: " + paramValue, lexer.yyline());
+                                    throw new TextParseException("Invalid scaley value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
+                            
+                            case "scalexf":
+                                try {
+                                    textMatrix.scaleX = Float.parseFloat(paramValue);
+                                    textMatrix.hasScale = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid scalexf value - float number expected. Found: " + paramValue, lexer.yyline());
+                                }
+                                break;
+                            case "scaleyf":
+                                try {
+                                    textMatrix.scaleY = Float.parseFloat(paramValue);
+                                    textMatrix.hasScale = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid scaleyf value - float number expected. Found: " + paramValue, lexer.yyline());
+                                }
+                                break;
+                                
                             case "rotateskew0":
                                 try {
-                                    textMatrix.rotateSkew0 = Integer.parseInt(paramValue);
+                                    textMatrix.rotateSkew0 = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasRotate = true;
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid rotateskew0 value - number expected. Found: " + paramValue, lexer.yyline());
@@ -457,10 +475,26 @@ public abstract class StaticTextTag extends TextTag {
                                 break;
                             case "rotateskew1":
                                 try {
-                                    textMatrix.rotateSkew1 = Integer.parseInt(paramValue);
+                                    textMatrix.rotateSkew1 = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasRotate = true;
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid rotateskew1 value - number expected. Found: " + paramValue, lexer.yyline());
+                                }
+                                break;
+                            case "rotateskew0f":
+                                try {
+                                    textMatrix.rotateSkew0 = Float.parseFloat(paramValue);
+                                    textMatrix.hasRotate = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid rotateskew0 value - float number expected. Found: " + paramValue, lexer.yyline());
+                                }
+                                break;
+                            case "rotateskew1f":
+                                try {
+                                    textMatrix.rotateSkew1 = Float.parseFloat(paramValue);
+                                    textMatrix.hasRotate = true;
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid rotateskew1 value - float number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
                             case "translatex":

@@ -141,7 +141,6 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
             case FLOAT16:
                 m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
                 break;
-            case FB:
             case SB:
                 long max = 1;
                 if (swfType.count() > 0) {
@@ -153,11 +152,6 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
                 break;
             case SI32:
                 m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
-                break;
-            case FLOAT:
-            case FIXED:
-            case FIXED8:
-                m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 0.01);
                 break;
         }
         return m;

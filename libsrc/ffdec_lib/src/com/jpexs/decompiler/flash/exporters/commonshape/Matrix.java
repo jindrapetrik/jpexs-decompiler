@@ -474,10 +474,10 @@ public final class Matrix implements Cloneable {
         result.translateY = (int) translateY;
         result.hasRotate = true;
         result.hasScale = true;
-        result.scaleX = fromFloat(scaleX);
-        result.scaleY = fromFloat(scaleY);
-        result.rotateSkew0 = fromFloat(rotateSkew0);
-        result.rotateSkew1 = fromFloat(rotateSkew1);
+        result.scaleX = (float) scaleX;
+        result.scaleY = (float) scaleY;
+        result.rotateSkew0 = (float) rotateSkew0;
+        result.rotateSkew1 = (float) rotateSkew1;
         return result;
     }
 }
