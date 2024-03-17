@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - [#2203] GFX - DefineSubImage with TGA bitmapFormat
 - [#2207] AS - Index -2 out of bounds for some of the switches
 - [#2190] AS1/2 - for..in inside switch before break
+- Raw edit of fonts - shape table was not visible
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
