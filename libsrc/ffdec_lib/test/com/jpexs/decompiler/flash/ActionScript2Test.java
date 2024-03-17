@@ -2410,13 +2410,13 @@ public class ActionScript2Test extends ActionScript2TestBase {
     }
 
     @Test
-    public void frame87_CallRegisterTest() {
+    public void frame87_callRegisterTest() {
         compareSrc(87, "function tst(o)\r\n"
                 + "{\r\n"
                 + "var _loc1_ = \"a\";\r\n"
                 + "o[_loc1_]();\r\n"
                 + "}\r\n"
-                + "trace(\"CallRegisterTest\");\r\n"
+                + "trace(\"callRegisterTest\");\r\n"
                 + "var f = function()\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -2427,6 +2427,29 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "};\r\n"
                 + "var obj = {a:f,b:g};\r\n"
                 + "tst(obj);\r\n"
+        );
+    }
+
+    @Test
+    public void frame88_switchForInTest() {
+        compareSrc(88, "trace(\"switchForInTest\");\r\n"
+                + "var t = 5;\r\n"
+                + "var a = [\"x\",\"y\",\"z\"];\r\n"
+                + "switch(t)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "trace(\"B\");\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "for(var k in a)\r\n"
+                + "{\r\n"
+                + "trace(k);\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n"
         );
     }
 }

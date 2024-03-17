@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
@@ -70,6 +71,7 @@ import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
@@ -362,59 +364,28 @@ public class ActionGraph extends Graph {
                     checkedLoop = null;
                 }
             }
+            
+            EnumerateActionItem enumerateItem = null;
+            BinaryOpItem comparisonOp = null;
+            //for..in inside switch before break
+            if ((checkedCondition instanceof TrueItem) && checkedBody != null) {
+                if (!checkedBody.isEmpty() && (checkedBody.get(0) instanceof IfItem)) {
+                    IfItem ifi = (IfItem) checkedBody.get(0);
+                    if (ifi.onFalse.isEmpty()) {
+                        if (!ifi.onTrue.isEmpty() && (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof BreakItem)) {
+                            checkedCondition = ifi.expression;
 
-            if (checkedCondition instanceof NeqActionItem) {
-                NeqActionItem ne = (NeqActionItem) checkedCondition;
-                if (ne.rightSide instanceof DirectValueActionItem) {
-                    DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
-                    if (dv.value == Null.INSTANCE) {
-                        GraphTargetItem en = list.get(t - 1);
-                        if (en instanceof EnumerateActionItem) {
-                            EnumerateActionItem eti = (EnumerateActionItem) en;
-                            if (checkedCondition instanceof NeqActionItem) {
-                                NeqActionItem neq = (NeqActionItem) checkedCondition;
-                                if (neq.leftSide instanceof StoreRegisterActionItem) {
-                                    if (checkedBody != null && (!checkedBody.isEmpty()) && (checkedBody.get(0) instanceof SetTypeActionItem)) {
-                                        SetTypeActionItem sti = (SetTypeActionItem) checkedBody.get(0);
-
-                                        if ((sti.getValue() instanceof DirectValueActionItem) && (((DirectValueActionItem) sti.getValue()).value instanceof RegisterNumber)) {
-                                            if ((neq.rightSide instanceof DirectValueActionItem) && (((DirectValueActionItem) neq.rightSide).value instanceof Null)) {
-                                                if (neq.leftSide.value instanceof EnumeratedValueActionItem) {
-                                                    if (((StoreRegisterActionItem) neq.leftSide).register.number == ((RegisterNumber) (((DirectValueActionItem) sti.getValue()).value)).number) {
-                                                        list.remove(t);
-                                                        checkedBody.remove(0);
-                                                        if (checkedLoop == null) {
-                                                            checkedLoop = new Loop(localData.loops.size(), null, null);
-                                                            checkedBody.add(new BreakItem(null, null, checkedLoop.id));
-                                                        }
-                                                        sti.setValue(new DirectValueActionItem(Null.INSTANCE));
-                                                        list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) sti, eti.object, checkedBody));
-                                                        //sti.getObject()
-                                                        list.remove(t - 1);
-                                                        t--;
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (checkedBody != null) {
-                                        list.remove(t);
-                                        if (checkedLoop == null) {
-                                            checkedLoop = new Loop(localData.loops.size(), null, null);
-                                            checkedBody.add(new BreakItem(null, null, checkedLoop.id));
-                                        }
-                                        list.remove(t - 1);
-                                        t--;
-                                        if (eti.object instanceof SetTypeActionItem) {
-                                            list.add(t++, eti.object);
-                                            eti.object = ((SetTypeActionItem) eti.object).getObject();
-                                        }
-                                        list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) neq.leftSide, eti.object, checkedBody));
-                                        if (t + 1 < list.size()) {
-                                            if (list.get(t + 1) instanceof EnumeratedValueActionItem) {
-                                                list.remove(t + 1);
+                            if (checkedCondition instanceof EqActionItem) {
+                                EqActionItem eq = (EqActionItem) checkedCondition;
+                                if (eq.rightSide instanceof DirectValueActionItem) {
+                                    DirectValueActionItem dv = (DirectValueActionItem) eq.rightSide;
+                                    if (dv.value == Null.INSTANCE) {   
+                                        GraphTargetItem en = list.get(t - 1);
+                                        if (en instanceof EnumerateActionItem) {
+                                            enumerateItem = (EnumerateActionItem) en;
+                                            if (eq.leftSide instanceof StoreRegisterActionItem) {
+                                                comparisonOp = eq;
+                                                checkedBody.remove(0);
                                             }
                                         }
                                     }
@@ -425,6 +396,68 @@ public class ActionGraph extends Graph {
                 }
             }
 
+            if (checkedCondition instanceof NeqActionItem) {
+                NeqActionItem ne = (NeqActionItem) checkedCondition;
+                if (ne.rightSide instanceof DirectValueActionItem) {
+                    DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
+                    if (dv.value == Null.INSTANCE) {
+                        GraphTargetItem en = list.get(t - 1);
+                        if (en instanceof EnumerateActionItem) {
+                            enumerateItem = (EnumerateActionItem) en;
+                            if (ne.leftSide instanceof StoreRegisterActionItem) {
+                                comparisonOp = ne;
+                            }                            
+                        }
+                    }
+                }
+            }
+            if (comparisonOp != null) {
+                                    
+                if (checkedBody != null && (!checkedBody.isEmpty()) && (checkedBody.get(0) instanceof SetTypeActionItem)) {
+                    SetTypeActionItem sti = (SetTypeActionItem) checkedBody.get(0);
+
+                    if ((sti.getValue() instanceof DirectValueActionItem) && (((DirectValueActionItem) sti.getValue()).value instanceof RegisterNumber)) {
+                        if ((comparisonOp.rightSide instanceof DirectValueActionItem) && (((DirectValueActionItem) comparisonOp.rightSide).value instanceof Null)) {
+                            if (comparisonOp.leftSide.value instanceof EnumeratedValueActionItem) {
+                                if (((StoreRegisterActionItem) comparisonOp.leftSide).register.number == ((RegisterNumber) (((DirectValueActionItem) sti.getValue()).value)).number) {
+                                    list.remove(t);
+                                    checkedBody.remove(0);
+                                    if (checkedLoop == null) {
+                                        checkedLoop = new Loop(localData.loops.size(), null, null);
+                                        checkedBody.add(new BreakItem(null, null, checkedLoop.id));
+                                    }
+                                    sti.setValue(new DirectValueActionItem(Null.INSTANCE));
+                                    list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) sti, enumerateItem.object, checkedBody));
+                                    //sti.getObject()
+                                    list.remove(t - 1);
+                                    t--;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (checkedBody != null) {
+                    list.remove(t);
+                    if (checkedLoop == null) {
+                        checkedLoop = new Loop(localData.loops.size(), null, null);
+                        checkedBody.add(new BreakItem(null, null, checkedLoop.id));
+                    }
+                    list.remove(t - 1);
+                    t--;
+                    if (enumerateItem.object instanceof SetTypeActionItem) {
+                        list.add(t++, enumerateItem.object);
+                        enumerateItem.object = ((SetTypeActionItem) enumerateItem.object).getObject();
+                    }
+                    list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) comparisonOp.leftSide, enumerateItem.object, checkedBody));
+                    if (t + 1 < list.size()) {
+                        if (list.get(t + 1) instanceof EnumeratedValueActionItem) {
+                            list.remove(t + 1);
+                        }
+                    }
+                }
+            }
         }
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);
