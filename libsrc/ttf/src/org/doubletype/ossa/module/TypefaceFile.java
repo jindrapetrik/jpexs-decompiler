@@ -474,13 +474,18 @@ public class TypefaceFile extends GlyphFile {
             glyph = createCompoundGlyph(a_glyphFile, a_writer);
         }
 
-        if (glyph == null && a_glyphFile.isWhiteSpace()) {
+        /*if (glyph == null && a_glyphFile.isWhiteSpace()) {
             glyph = new TTGlyph();
         }
 
         if (glyph == null) {
             return;
+        }*/
+        //JPEXS
+        if (glyph == null) {
+            glyph = new TTGlyph();
         }
+        
 
         int glyphIndex = a_writer.addGlyph(glyph);
         long unicode = a_glyphFile.getUnicode();

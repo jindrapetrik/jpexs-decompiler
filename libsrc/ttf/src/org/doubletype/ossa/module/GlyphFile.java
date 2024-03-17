@@ -267,14 +267,12 @@ public class GlyphFile {
     public TTGlyph toSimpleGlyph() {
         // convert the file into array of contours
         EContour[] contours = toContours();
-        if ((contours == null) && (!isRequiredGlyph())) {
-            return null;
-        }
-
+        
         TTGlyph retval = new TTGlyph();
         retval.setSimple(true);
         retval.setAdvanceWidth(getAdvanceWidth());
 
+        //JPEXS
         if (contours == null) {
             return retval;
         }
