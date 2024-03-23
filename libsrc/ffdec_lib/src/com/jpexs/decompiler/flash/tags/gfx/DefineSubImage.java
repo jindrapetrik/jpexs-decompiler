@@ -43,7 +43,7 @@ import net.npe.dds.DDSReader;
  *
  * @author JPEXS
  */
-public class DefineSubImage extends ImageTag {
+public class DefineSubImage extends AbstractGfxImageTag {
 
     public static final int ID = 1008;
 
@@ -186,68 +186,38 @@ public class DefineSubImage extends ImageTag {
         int targetHeight = y2 - y1;
         int bitmapFormat = image.bitmapFormat;
 
-        if (!Objects.equals(cachedImageFilename, image.fileName)
-                || !Objects.equals(cachedX1, (Integer) x1)
-                || !Objects.equals(cachedX2, (Integer) x2)
-                || !Objects.equals(cachedY1, (Integer) y1)
-                || !Objects.equals(cachedY2, (Integer) y2)
-                || (serImage != null && (serImage.getWidth() != targetWidth || serImage.getHeight() != targetHeight))) {
-
-            if (targetWidth <= 0 || targetHeight <= 0) {
-                serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-                serImage.fillTransparent();
-                return;
-            } 
-            
-            Path imagePath = image.getSwf().getFile() == null ? null : Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
-            if (imagePath != null && imagePath.toFile().exists()) {                
-                if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_JPEG 
-                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_TGA
-                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_TGA) {
-                    try {
-                        if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_TGA 
-                                || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_TGA) {
-                            TgaSupport.init();
-                        }
-                        BufferedImage bufImage = ImageIO.read(imagePath.toFile());
-                        Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
-                        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-                        bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
-                        serImage = new SerializableImage(bufImage);
-                        cachedImageFilename = image.fileName;
-                        cachedX1 = x1;
-                        cachedX2 = x2;
-                        cachedY1 = y1;
-                        cachedY2 = y2;
-                    } catch (IOException ex) {
-                        createFailedImage();
-                    }                    
-                } else if (bitmapFormat == DefineExternalImage2.BITMAP_FORMAT2_DDS 
-                        || bitmapFormat == DefineExternalImage2.BITMAP_FORMAT_DDS) {
-                    try {
-                        byte[] imageData = Files.readAllBytes(imagePath);
-                        int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-                        BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-                        bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-                        Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
-                        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-                        bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
-                        serImage = new SerializableImage(bufImage);
-                        cachedImageFilename = image.fileName;
-                        cachedX1 = x1;
-                        cachedX2 = x2;
-                        cachedY1 = y1;
-                        cachedY2 = y2;
-                    } catch (IOException e) {
-                        createFailedImage();
-                    }
-                } else {
-                    createFailedImage();
-                }
-            } else {
-                createFailedImage();
-            }
+        if (Objects.equals(cachedImageFilename, image.fileName)
+                && Objects.equals(cachedX1, (Integer) x1)
+                && Objects.equals(cachedX2, (Integer) x2)
+                && Objects.equals(cachedY1, (Integer) y1)
+                && Objects.equals(cachedY2, (Integer) y2)
+                && serImage != null 
+                && serImage.getWidth() == targetWidth 
+                && serImage.getHeight() == targetHeight) {
+            return;
         }
+
+        if (targetWidth <= 0 || targetHeight <= 0) {
+            serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+            serImage.fillTransparent();
+            return;
+        } 
+            
+        BufferedImage bufImage = getExternalBufferedImage(image.fileName, bitmapFormat);
+        if (bufImage == null) {
+            createFailedImage();
+            return;
+        }
+            
+        Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
+        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
+        serImage = new SerializableImage(bufImage);
+        cachedImageFilename = image.fileName;
+        cachedX1 = x1;
+        cachedX2 = x2;
+        cachedY1 = y1;
+        cachedY2 = y2;                         
     }
     
     @Override
