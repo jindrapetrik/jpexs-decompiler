@@ -213,6 +213,11 @@ public class UninitializedClassFieldsDetector {
                                 GraphTargetItem value = en.getValue();
                                 boolean isStatic = cai.traitsStatic.get(i);
                                 if (value instanceof FunctionActionItem) {
+                                    if (name.startsWith("__get__") || name.startsWith("__set__")) {
+                                        String vname = name.substring(7);
+                                        Variable v = new Variable(isStatic, vname, vname, className);
+                                        classTraits.get(className).put(vname, v);
+                                    }
                                     Method m = new Method(isStatic, name, "Unknown" /*FIXME?*/, className);
                                     classTraits.get(className).put(name, m);
                                 } else {
