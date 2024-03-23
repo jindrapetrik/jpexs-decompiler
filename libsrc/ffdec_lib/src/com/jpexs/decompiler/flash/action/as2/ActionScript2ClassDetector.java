@@ -734,6 +734,24 @@ public class ActionScript2ClassDetector {
                 DirectValueActionItem classBaseName = new DirectValueActionItem(classNamePath.get(classNamePath.size() - 1));
                 ((FunctionActionItem) constructor).calculatedFunctionName = classBaseName;
                 traits.add(0, new MyEntry<>(classBaseName, constructor));
+                
+                AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+                    @Override
+                    public void visit(GraphTargetItem item) {
+                        if (item instanceof ReturnActionItem) {
+                            ReturnActionItem ret = (ReturnActionItem) item;
+                            if (ret.value instanceof DirectValueActionItem) {
+                                DirectValueActionItem dv = (DirectValueActionItem) ret.value;
+                                if (dv.value instanceof Undefined) {
+                                    ret.value = null;
+                                }
+                            }
+                        }
+                    }
+                };
+                for (GraphTargetItem ti : ((FunctionActionItem) constructor).actions) {
+                    ti.visitRecursively(visitor);
+                }                
             } else {
                 //throw new AssertException("No constructor found");
             }

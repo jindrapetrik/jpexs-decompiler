@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - [#2211] PDF export, Font export - glyphs with no contours (advance only)
 - [#2212] GFX - Allow loading (DDS) images despite of set bitmapFormat
 - [#2202] AS2 detection of uninitialized class fields colliding with setters/getters
+- [#2202] AS2 return in constructor does not take a value
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
