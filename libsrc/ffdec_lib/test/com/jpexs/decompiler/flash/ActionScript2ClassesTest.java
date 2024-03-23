@@ -208,4 +208,29 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
                 + "      com.jpexs.flash.test.testcases.TestSetterGetter.mystvar = 6;\n"
                 + "   }");
     }
+
+    @Test
+    public void testReturnInConstructor() {
+        compareSrc("TestReturnInConstructor", "   function TestReturnInConstructor()\n"
+                + "   {\n"
+                + "      var _loc1_ = 3;\n"
+                + "      if(_loc1_ == 3)\n"
+                + "      {\n"
+                + "         trace(\"A\");\n"
+                + "         return;\n"
+                + "      }\n"
+                + "      trace(\"B\");\n"
+                + "   }\n"
+                + "   function func()\n"
+                + "   {\n"
+                + "      var _loc1_ = 3;\n"
+                + "      if(_loc1_ == 3)\n"
+                + "      {\n"
+                + "         trace(\"A\");\n"
+                + "         return undefined;\n"
+                + "      }\n"
+                + "      trace(\"B\");\n"
+                + "      return 5;\n"
+                + "   }");
+    }
 }

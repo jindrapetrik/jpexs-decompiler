@@ -8,5 +8,6 @@ class com.jpexs.flash.test.TestLoader {
 		new com.jpexs.flash.test.testcases.TestCallSetterGetter();
 		new com.jpexs.flash.test.testcases.TestVarsMethods();      
 		new com.jpexs.flash.test.testcases.TestMaintainOrder();
+		new com.jpexs.flash.test.testcases.TestReturnInConstructor();
 	}
 }
