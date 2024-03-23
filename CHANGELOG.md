@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - [#2190] AS1/2 - for..in inside switch before break
 - Raw edit of fonts - shape table was not visible
 - [#2211] PDF export, Font export - glyphs with no contours (advance only)
+- [#2212] GFX - Allow loading (DDS) images despite of set bitmapFormat
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3398,6 +3399,7 @@ Major version of SWF to XML export changed to 2.
 [#2207]: https://www.free-decompiler.com/flash/issues/2207
 [#2190]: https://www.free-decompiler.com/flash/issues/2190
 [#2211]: https://www.free-decompiler.com/flash/issues/2211
+[#2212]: https://www.free-decompiler.com/flash/issues/2212
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
