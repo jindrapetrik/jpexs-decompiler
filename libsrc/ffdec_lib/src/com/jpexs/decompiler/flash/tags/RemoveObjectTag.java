@@ -98,6 +98,11 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
     }
 
     @Override
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    @Override
     public int getCharacterId() {
         return characterId;
     }

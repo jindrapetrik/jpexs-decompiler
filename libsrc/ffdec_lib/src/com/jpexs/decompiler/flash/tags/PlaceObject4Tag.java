@@ -540,6 +540,11 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    @Override
     public MATRIX getMatrix() {
         if (placeFlagHasMatrix) {
             return matrix;
