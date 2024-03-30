@@ -4318,7 +4318,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     
     private void replaceSprite(DefineSpriteTag sprite, Timelined timelined, SWF swf, int depth, Frame first, Frame afterLast, boolean offset, int dx, int dy) {
         // Add new tag for the new sprite
-        PlaceObject3Tag place = new PlaceObject3Tag(swf);
+        PlaceObject2Tag place = new PlaceObject2Tag(swf);
         place.placeFlagHasCharacter = true;
         place.characterId = sprite.getCharacterId();
         place.depth = depth;
