@@ -4124,212 +4124,236 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         CollectDepthAsSpritesDialogue dialog = new CollectDepthAsSpritesDialogue(Main.getDefaultDialogsOwner());
 
-        if (dialog.showDialog(originalDepths) == CollectDepthAsSpritesDialogue.OK_OPTION) {
-            Frame first = frames.get(0);
-            Frame afterLast = null;
+        if (dialog.showDialog(originalDepths) != CollectDepthAsSpritesDialogue.OK_OPTION) {
+            return;
+        }
+        
+        Frame first = frames.get(0);
+        Frame afterLast = null;
 
-            Timelined timelined = first.timeline.timelined;
-            SWF swf = timelined instanceof SWF ? (SWF) timelined : ((DefineSpriteTag) timelined).getSwf();
+        Timelined timelined = first.timeline.timelined;
+        SWF swf = timelined instanceof SWF ? (SWF) timelined : ((DefineSpriteTag) timelined).getSwf();
 
-            List<Integer> depths = dialog.getDepths();
-            boolean replace = dialog.getReplace();
-            boolean offset = dialog.getOffset();
-            boolean firstMatrix = dialog.getEnsureFirstMatrix();
+        List<Integer> depths = dialog.getDepths();
+        boolean replace = dialog.getReplace();
+        boolean offset = dialog.getOffset();
+        boolean firstMatrix = dialog.getEnsureFirstMatrix();
+
+        // Keep track of next frame if replacing to fix matrices
+        if (replace) {
+            Frame last = frames.get(frames.size() - 1);
+            afterLast = last.timeline.getFrame(last.frame + 1);
+        }
+
+        // Sprites creation
+        Map<Integer, DefineSpriteTag> sprites = new HashMap<>();
+        int idOffset = 0;
+        for (int d : depths) {
+            DefineSpriteTag sprite = new DefineSpriteTag(swf);
+            sprite.spriteId += idOffset;
+            ++idOffset;
+            sprite.frameCount = frames.size();
+
+            for (int i = 0; i < frames.size(); i++) {
+                Tag showFrame = new ShowFrameTag(swf);
+                showFrame.setTimelined(sprite);
+                sprite.addTag(showFrame);
+            }
 
             if (replace) {
-                Frame last = frames.get(frames.size() - 1);
-                afterLast = last.timeline.getFrame(last.frame + 1);
+                timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), sprite);
+            } else {
+                timelined.addTag(sprite);
             }
+            sprite.setTimelined(timelined);
+            sprite.getTimeline();
+            sprites.put(d, sprite);
+        }
 
-            Map<Integer, DefineSpriteTag> sprites = new HashMap<>();
-            for (int d : depths) {
-                DefineSpriteTag sprite = new DefineSpriteTag(swf);
-                sprite.frameCount = frames.size();
+        try {
+            // Tags collection
+            for (int i = frames.size() - 1; i > -1; i--) {
+                Frame f = frames.get(i);
+                Map<Integer, MATRIX> prevMatrixAtDepth = new HashMap<>();
+                int pf = f.frame - 1;
 
-                for (int i = 0; i < frames.size(); i++) {
-                    Tag showFrame = new ShowFrameTag(swf);
-                    showFrame.setTimelined(sprite);
-                    sprite.addTag(showFrame);
-                }
+                for (int j = 0; j < f.innerTags.size(); j++) {
+                    Tag t = f.innerTags.get(j);
 
-                if (replace) {
-                    timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), sprite);
-                } else {
-                    timelined.addTag(sprite);
-                }
-                sprite.setTimelined(timelined);
-                sprite.getTimeline();
-                sprites.put(d, sprite);
-            }
-
-            try {
-                for (int i = frames.size() - 1; i > -1; i--) {
-                    Frame f = frames.get(i);
-                    Map<Integer, MATRIX> prevMatrixAtDepth = new HashMap<>();
-                    int pf = f.frame - 1;
-
-                    for (int j = 0; j < f.innerTags.size(); j++) {
-                        Tag t = f.innerTags.get(j);
-
-                        if (t instanceof DepthTag) {
-                            int depth = ((DepthTag) t).getDepth();
-
-                            if (!sprites.containsKey(depth)) {
-                                continue;
-                            }
-
-                            DefineSpriteTag sprite = sprites.get(depth);
-                            Tag clone = t.cloneTag();
-                            clone.setModified(true);
-
-                            if (firstMatrix && i == 0 && clone instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag place = (PlaceObjectTypeTag) clone;
-
-                                if (place.getMatrix() == null) {
-                                    for (; pf > -1; pf--) {
-                                        if (prevMatrixAtDepth.containsKey(depth)) {
-                                            break;
-                                        }
-
-                                        Frame prev = f.timeline.getFrame(pf);
-                                        for (Tag pt : prev.innerTags) {
-                                            if (pt instanceof PlaceObjectTypeTag) {
-                                                PlaceObjectTypeTag pplace = (PlaceObjectTypeTag) pt;
-                                                MATRIX m = pplace.getMatrix();
-
-                                                if (m != null) {
-                                                    prevMatrixAtDepth.putIfAbsent(pplace.getDepth(), m);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    MATRIX prevMatrix = prevMatrixAtDepth.get(place.getDepth());
-                                    if (prevMatrix != null) {
-                                        place.setPlaceFlagHasMatrix(true);
-                                        place.setPlaceFlagMove(true);
-                                        place.setMatrix(new MATRIX(prevMatrix));
-                                    }
-                                }
-                            }
-
-                            clone.setTimelined(sprite);
-                            sprite.addTag(i, clone);
-
-                            if (replace) {
-                                f.innerTags.remove(t);
-                                timelined.removeTag(t);
-                                //swf.removeTag(t);
-                                j--;
-                            }
-                        }
+                    // Only handle Place/Remove Object tags
+                    if (!(t instanceof DepthTag)) {
+                        continue;
                     }
-                }
+                    
+                    int depth = ((DepthTag) t).getDepth();
 
-                for (Entry<Integer, DefineSpriteTag> entry : sprites.entrySet()) {
-                    DefineSpriteTag sprite = entry.getValue();
+                    if (!sprites.containsKey(depth)) {
+                        continue;
+                    }
 
-                    if (offset || replace) {
-                        int minX = Integer.MAX_VALUE;
-                        int minY = Integer.MAX_VALUE;
+                    DefineSpriteTag sprite = sprites.get(depth);
+                    Tag clone = t.cloneTag();
+                    clone.setModified(true);
 
-                        for (Tag t : sprite.getTags()) {
-                            if (t instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
-                                MATRIX m = placeTag.getMatrix();
+                    // Get previous matrix
+                    if (firstMatrix && i == 0 && clone instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag place = (PlaceObjectTypeTag) clone;
 
-                                if (m != null) {
-                                    if (m.translateX < minX) {
-                                        minX = m.translateX;
-                                    }
-
-                                    if (m.translateY < minY) {
-                                        minY = m.translateY;
-                                    }
+                        if (place.getMatrix() == null) {
+                            for (; pf > -1; pf--) {
+                                if (prevMatrixAtDepth.containsKey(depth)) {
+                                    break;
                                 }
-                            }
-                        }
 
-                        if (offset) {
-                            for (Tag t : sprite.getTags()) {
-                                if (t instanceof PlaceObjectTypeTag) {
-                                    PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
-                                    MATRIX m = placeTag.getMatrix();
+                                Frame prev = f.timeline.getFrame(pf);
+                                for (Tag pt : prev.innerTags) {
+                                    if (!(pt instanceof PlaceObjectTypeTag)) {
+                                        continue;
+                                    }
+                                    
+                                    PlaceObjectTypeTag pplace = (PlaceObjectTypeTag) pt;
+                                    MATRIX m = pplace.getMatrix();
 
                                     if (m != null) {
-                                        m.translateX -= minX;
-                                        m.translateY -= minY;
+                                        prevMatrixAtDepth.putIfAbsent(pplace.getDepth(), m);
                                     }
                                 }
+                            }
+
+                            MATRIX prevMatrix = prevMatrixAtDepth.get(place.getDepth());
+                            if (prevMatrix != null) {
+                                place.setPlaceFlagHasMatrix(true);
+                                place.setPlaceFlagMove(true);
+                                place.setMatrix(new MATRIX(prevMatrix));
                             }
                         }
+                    }
 
-                        if (replace) {
-                            PlaceObject3Tag place = new PlaceObject3Tag(swf);
-                            place.placeFlagHasCharacter = true;
-                            place.characterId = sprite.getCharacterId();
-                            place.depth = entry.getKey();
-                            if (offset) {
-                                place.placeFlagHasMatrix = true;
-                                place.placeFlagMove = true;
-                                place.matrix = new MATRIX();
-                                place.matrix.translateX = minX;
-                                place.matrix.translateY = minY;
+                    clone.setTimelined(sprite);
+                    sprite.addTag(i, clone);
+
+                    if (replace) {
+                        f.innerTags.remove(t);
+                        timelined.removeTag(t);
+                        //swf.removeTag(t);
+                        j--;
+                    }
+                    
+                }
+            }
+
+            for (Entry<Integer, DefineSpriteTag> entry : sprites.entrySet()) {
+                DefineSpriteTag sprite = entry.getValue();
+
+                if (offset || replace) {
+                    int minX = Integer.MAX_VALUE;
+                    int minY = Integer.MAX_VALUE;
+
+                    for (Tag t : sprite.getTags()) {
+                        if (!(t instanceof PlaceObjectTypeTag)) {
+                            continue;
+                        }
+                        
+                        PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
+                        MATRIX m = placeTag.getMatrix();
+
+                        if (m != null) {
+                            if (m.translateX < minX) {
+                                minX = m.translateX;
                             }
 
-                            place.setTimelined(timelined);
-                            first.innerTags.add(place);
-                            timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), place);
+                            if (m.translateY < minY) {
+                                minY = m.translateY;
+                            }
+                        }
+                        
+                    }
 
-                            if (afterLast != null) {
-                                MATRIX lastMatrix = null;
-                                ReadOnlyTagList sTags = sprite.getTags();
+                    if (offset) {
+                        for (Tag t : sprite.getTags()) {
+                            if (!(t instanceof PlaceObjectTypeTag)) {
+                                continue;
+                            }
+                            
+                            PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
+                            MATRIX m = placeTag.getMatrix();
 
-                                for (int i = sTags.size() - 1; i > -1; i--) {
-                                    Tag t = sTags.get(i);
+                            if (m != null) {
+                                m.translateX -= minX;
+                                m.translateY -= minY;
+                            }
+                        }
+                    }
 
-                                    if (t instanceof PlaceObjectTypeTag) {
-                                        PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
-                                        lastMatrix = tplace.getMatrix();
+                    if (replace) {
+                        // Add new tag for the new sprite
+                        PlaceObject3Tag place = new PlaceObject3Tag(swf);
+                        place.placeFlagHasCharacter = true;
+                        place.characterId = sprite.getCharacterId();
+                        place.depth = entry.getKey();
+                        if (offset) {
+                            place.placeFlagHasMatrix = true;
+                            place.placeFlagMove = true;
+                            place.matrix = new MATRIX();
+                            place.matrix.translateX = minX;
+                            place.matrix.translateY = minY;
+                        }
 
-                                        if (lastMatrix != null) {
-                                            break;
-                                        }
+                        place.setTimelined(timelined);
+                        first.innerTags.add(place);
+                        timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), place);
+
+                        // Correct next frame matrix
+                        if (afterLast != null) {
+                            MATRIX lastMatrix = null;
+                            ReadOnlyTagList sTags = sprite.getTags();
+
+                            // Get last matrix of the sprite
+                            for (int i = sTags.size() - 1; i > -1; i--) {
+                                Tag t = sTags.get(i);
+
+                                if (t instanceof PlaceObjectTypeTag) {
+                                    PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
+                                    lastMatrix = tplace.getMatrix();
+
+                                    if (lastMatrix != null) {
+                                        break;
                                     }
                                 }
+                            }
 
-                                List<Tag> tags = afterLast.innerTags;
-                                for (int i = tags.size() - 1; i > -1; i--) {
-                                    Tag t = tags.get(i);
+                            // Find next matrix-less place tag
+                            List<Tag> tags = afterLast.innerTags;
+                            for (int i = tags.size() - 1; i > -1; i--) {
+                                Tag t = tags.get(i);
 
-                                    if (t instanceof PlaceObjectTypeTag) {
-                                        PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
-                                        if (tplace.getDepth() == place.depth && tplace.getMatrix() == null) {
-                                            tplace.setMatrix(new MATRIX(lastMatrix));
-                                            tplace.setPlaceFlagHasMatrix(true);
-                                            tplace.setPlaceFlagMove(true);
-                                        }
+                                if (t instanceof PlaceObjectTypeTag) {
+                                    PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
+                                    if (tplace.getDepth() == place.depth && tplace.getMatrix() == null) {
+                                        tplace.setMatrix(new MATRIX(lastMatrix));
+                                        tplace.setPlaceFlagHasMatrix(true);
+                                        tplace.setPlaceFlagMove(true);
                                     }
                                 }
                             }
                         }
                     }
-
-                    sprite.setSwf(swf, true);
-                    sprite.resetTimeline();
                 }
 
-                swf.updateCharacters();
-                if (replace) {
-                    timelined.resetTimeline();
-                    swf.computeDependentCharacters();
-                    swf.computeDependentFrames();
-                }
-                swf.resetTimelines(swf);
-                mainPanel.refreshTree(swf);
-            } catch (InterruptedException | IOException ex) {
-                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                sprite.setSwf(swf, true);
+                sprite.resetTimeline();
             }
+
+            swf.updateCharacters();
+            if (replace) {
+                timelined.resetTimeline();
+                swf.computeDependentCharacters();
+                swf.computeDependentFrames();
+            }
+            swf.resetTimelines(swf);
+            mainPanel.refreshTree(swf);
+        } catch (InterruptedException | IOException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
