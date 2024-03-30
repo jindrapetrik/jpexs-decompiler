@@ -4198,34 +4198,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     // Get previous matrix
                     if (firstMatrix && i == 0 && clone instanceof PlaceObjectTypeTag) {
                         PlaceObjectTypeTag place = (PlaceObjectTypeTag) clone;
-
                         if (place.getMatrix() == null) {
-                            for (; pf > -1; pf--) {
-                                if (prevMatrixAtDepth.containsKey(depth)) {
-                                    break;
-                                }
-
-                                Frame prev = f.timeline.getFrame(pf);
-                                for (Tag pt : prev.innerTags) {
-                                    if (!(pt instanceof PlaceObjectTypeTag)) {
-                                        continue;
-                                    }
-                                    
-                                    PlaceObjectTypeTag pplace = (PlaceObjectTypeTag) pt;
-                                    MATRIX m = pplace.getMatrix();
-
-                                    if (m != null) {
-                                        prevMatrixAtDepth.putIfAbsent(pplace.getDepth(), m);
-                                    }
-                                }
-                            }
-
-                            MATRIX prevMatrix = prevMatrixAtDepth.get(place.getDepth());
-                            if (prevMatrix != null) {
-                                place.setPlaceFlagHasMatrix(true);
-                                place.setPlaceFlagMove(true);
-                                place.setMatrix(new MATRIX(prevMatrix));
-                            }
+                            pf = getPreviousMatrix(pf, prevMatrixAtDepth, place, f.timeline);
                         }
                     }
 
@@ -4238,7 +4212,6 @@ public class TagTreeContextMenu extends JPopupMenu {
                         //swf.removeTag(t);
                         j--;
                     }
-                    
                 }
             }
 
@@ -4266,77 +4239,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 minY = m.translateY;
                             }
                         }
-                        
                     }
 
                     if (offset) {
-                        for (Tag t : sprite.getTags()) {
-                            if (!(t instanceof PlaceObjectTypeTag)) {
-                                continue;
-                            }
-                            
-                            PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
-                            MATRIX m = placeTag.getMatrix();
-
-                            if (m != null) {
-                                m.translateX -= minX;
-                                m.translateY -= minY;
-                            }
-                        }
+                        offsetSprite(sprite, -minX, -minY);
                     }
 
                     if (replace) {
-                        // Add new tag for the new sprite
-                        PlaceObject3Tag place = new PlaceObject3Tag(swf);
-                        place.placeFlagHasCharacter = true;
-                        place.characterId = sprite.getCharacterId();
-                        place.depth = entry.getKey();
-                        if (offset) {
-                            place.placeFlagHasMatrix = true;
-                            place.placeFlagMove = true;
-                            place.matrix = new MATRIX();
-                            place.matrix.translateX = minX;
-                            place.matrix.translateY = minY;
-                        }
-
-                        place.setTimelined(timelined);
-                        first.innerTags.add(place);
-                        timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), place);
-
-                        // Correct next frame matrix
-                        if (afterLast != null) {
-                            MATRIX lastMatrix = null;
-                            ReadOnlyTagList sTags = sprite.getTags();
-
-                            // Get last matrix of the sprite
-                            for (int i = sTags.size() - 1; i > -1; i--) {
-                                Tag t = sTags.get(i);
-
-                                if (t instanceof PlaceObjectTypeTag) {
-                                    PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
-                                    lastMatrix = tplace.getMatrix();
-
-                                    if (lastMatrix != null) {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Find next matrix-less place tag
-                            List<Tag> tags = afterLast.innerTags;
-                            for (int i = tags.size() - 1; i > -1; i--) {
-                                Tag t = tags.get(i);
-
-                                if (t instanceof PlaceObjectTypeTag) {
-                                    PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
-                                    if (tplace.getDepth() == place.depth && tplace.getMatrix() == null) {
-                                        tplace.setMatrix(new MATRIX(lastMatrix));
-                                        tplace.setPlaceFlagHasMatrix(true);
-                                        tplace.setPlaceFlagMove(true);
-                                    }
-                                }
-                            }
-                        }
+                        replaceSprite(sprite, timelined, swf, entry.getKey(), first, afterLast, offset, minX, minY);
                     }
                 }
 
@@ -4354,6 +4264,115 @@ public class TagTreeContextMenu extends JPopupMenu {
             mainPanel.refreshTree(swf);
         } catch (InterruptedException | IOException ex) {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private int getPreviousMatrix(int frameIndex, Map<Integer, MATRIX> prevMatrixAtDepth, PlaceObjectTypeTag target, Timeline timeline) {
+        int depth = target.getDepth();
+        
+        for (; frameIndex > -1; frameIndex--) {
+            if (prevMatrixAtDepth.containsKey(depth)) {
+                break;
+            }
+
+            Frame prev = timeline.getFrame(frameIndex);
+            for (Tag pt : prev.innerTags) {
+                if (!(pt instanceof PlaceObjectTypeTag)) {
+                    continue;
+                }
+
+                PlaceObjectTypeTag pplace = (PlaceObjectTypeTag) pt;
+                MATRIX m = pplace.getMatrix();
+
+                if (m != null) {
+                    prevMatrixAtDepth.putIfAbsent(pplace.getDepth(), m);
+                }
+            }
+        }
+
+        MATRIX prevMatrix = prevMatrixAtDepth.get(depth);
+        if (prevMatrix != null) {
+            target.setPlaceFlagHasMatrix(true);
+            target.setPlaceFlagMove(true);
+            target.setMatrix(new MATRIX(prevMatrix));
+        }
+        
+        return frameIndex;
+    }
+    
+    private void offsetSprite(DefineSpriteTag sprite, int dx, int dy) {
+        for (Tag t : sprite.getTags()) {
+            if (!(t instanceof PlaceObjectTypeTag)) {
+                continue;
+            }
+
+            PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
+            MATRIX m = placeTag.getMatrix();
+
+            if (m != null) {
+                m.translateX += dx;
+                m.translateY += dy;
+            }
+        }
+    }
+    
+    private void replaceSprite(DefineSpriteTag sprite, Timelined timelined, SWF swf, int depth, Frame first, Frame afterLast, boolean offset, int dx, int dy) {
+        // Add new tag for the new sprite
+        PlaceObject3Tag place = new PlaceObject3Tag(swf);
+        place.placeFlagHasCharacter = true;
+        place.characterId = sprite.getCharacterId();
+        place.depth = depth;
+        if (offset) {
+            place.placeFlagHasMatrix = true;
+            place.placeFlagMove = true;
+            place.matrix = new MATRIX();
+            place.matrix.translateX = dx;
+            place.matrix.translateY = dy;
+        }
+
+        place.setTimelined(timelined);
+        first.innerTags.add(place);
+        timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), place);
+
+        // Correct next frame matrix
+        if (afterLast == null) {
+            return;
+        }
+        
+        MATRIX lastMatrix = null;
+        ReadOnlyTagList sTags = sprite.getTags();
+
+        // Get last matrix of the sprite
+        for (int i = sTags.size() - 1; i > -1; i--) {
+            Tag t = sTags.get(i);
+
+            if (!(t instanceof PlaceObjectTypeTag)) {
+                continue;
+            }
+            
+            PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
+            lastMatrix = tplace.getMatrix();
+
+            if (lastMatrix != null) {
+                break;
+            }
+        }
+
+        // Find next matrix-less place tag
+        List<Tag> tags = afterLast.innerTags;
+        for (int i = tags.size() - 1; i > -1; i--) {
+            Tag t = tags.get(i);
+
+            if (!(t instanceof PlaceObjectTypeTag)) {
+                continue;
+            }
+            
+            PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
+            if (tplace.getDepth() == place.depth && tplace.getMatrix() == null) {
+                tplace.setMatrix(new MATRIX(lastMatrix));
+                tplace.setPlaceFlagHasMatrix(true);
+                tplace.setPlaceFlagMove(true);
+            }
         }
     }
 
