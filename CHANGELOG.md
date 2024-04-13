@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - [#2212] GFX - Allow loading (DDS) images despite of set bitmapFormat
 - [#2202] AS2 detection of uninitialized class fields colliding with setters/getters
 - [#2202] AS2 return in constructor does not take a value
+- [#2222] Missing shapes when gradient fillstyle has only two gradrecords with the same ratio
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3403,6 +3404,7 @@ Major version of SWF to XML export changed to 2.
 [#2211]: https://www.free-decompiler.com/flash/issues/2211
 [#2212]: https://www.free-decompiler.com/flash/issues/2212
 [#2202]: https://www.free-decompiler.com/flash/issues/2202
+[#2222]: https://www.free-decompiler.com/flash/issues/2222
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
