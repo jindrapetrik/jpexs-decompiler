@@ -261,112 +261,66 @@ public class BitmapExporter extends ShapeExporterBase {
         if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
             cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
         }
-        switch (type) {
-            case FILLSTYLE.LINEAR_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
+        
+        List<Color> colors = new ArrayList<>();
+        List<Float> ratios = new ArrayList<>();
+        int lastRatio = -1;
+        for (int i = 0; i < gradientRecords.length; i++) {
+            if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
+                if (lastRatio < 255) {
+                    lastRatio++;          
                 }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
+            } else {
+                if (gradientRecords[i].ratio > lastRatio) {
+                    lastRatio = gradientRecords[i].ratio;      
+                } else if (lastRatio < 255) {
+                    lastRatio++;
                 }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                }
-
-                if (colorsArr.length >= 2) {
-                    fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
-                } else {
-                    if (!linearGradientColorWarnignShown) {
-                        Logger.getLogger(BitmapExporter.class.getName()).log(Level.WARNING, "Linear gradient fill should have at least 2 gradient records.");
-                        linearGradientColorWarnignShown = true;
-                    }
-
-                    if (colorsArr.length == 1) {
-                        fillPaint = colorsArr[0];
-                    } else {
-                        fillPaint = null;
-                    }
-                }
-
-                fillTransform = matrix.toTransform();
             }
-            break;
-            case FILLSTYLE.RADIAL_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
-                }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
-                }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                }
-
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point(0, 0), ratiosArr, colorsArr, cm, cstype, new AffineTransform());
-                fillTransform = matrix.toTransform();
-            }
-            break;
-            case FILLSTYLE.FOCAL_RADIAL_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
-                }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
-                }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                }
-
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
-                fillTransform = matrix.toTransform();
-            }
-            break;
+            ratios.add(lastRatio / 255f);
+            colors.add(gradientRecords[i].color.toColor());
+            if (lastRatio == 255) {
+                break;
+            }                    
         }
+
+        if (colors.size() == 1) {
+            colors.add(colors.get(0));
+            ratios.set(0, 0f);
+            ratios.add(1f);
+        }
+
+        float[] ratiosArr = new float[ratios.size()];
+        for (int i = 0; i < ratios.size(); i++) {
+            ratiosArr[i] = ratios.get(i);
+        }
+        Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+
+        MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+        switch (spreadMethod) {
+            case GRADIENT.SPREAD_PAD_MODE:
+                cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                break;
+            case GRADIENT.SPREAD_REFLECT_MODE:
+                cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                break;
+            case GRADIENT.SPREAD_REPEAT_MODE:
+                cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                break;
+        }
+        
+        switch (type) {
+            case FILLSTYLE.LINEAR_GRADIENT:
+                fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
+                break;
+            case FILLSTYLE.RADIAL_GRADIENT:            
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point(0, 0), ratiosArr, colorsArr, cm, cstype, new AffineTransform());
+                break;
+            case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
+                break;
+        }
+        fillTransform = matrix.toTransform();
     }
 
     @Override
@@ -484,102 +438,67 @@ public class BitmapExporter extends ShapeExporterBase {
         if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
             cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
         }
-        switch (type) {
-            case FILLSTYLE.LINEAR_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
+        
+        List<Color> colors = new ArrayList<>();
+        List<Float> ratios = new ArrayList<>();
+        int lastRatio = -1;
+        for (int i = 0; i < gradientRecords.length; i++) {
+            if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
+                if (lastRatio < 255) {
+                    lastRatio++;          
                 }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
+            } else {
+                if (gradientRecords[i].ratio > lastRatio) {
+                    lastRatio = gradientRecords[i].ratio;      
+                } else if (lastRatio < 255) {
+                    lastRatio++;
                 }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                }
-
-                linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
-                lineTransform = matrix.toTransform();
             }
-            break;
-            case FILLSTYLE.RADIAL_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
-                }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
-                }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                switch (spreadMethod) {
-                    case GRADIENT.SPREAD_PAD_MODE:
-                        cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                        break;
-                    case GRADIENT.SPREAD_REFLECT_MODE:
-                        cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                        break;
-                    case GRADIENT.SPREAD_REPEAT_MODE:
-                        cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                        break;
-                }
-
-                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
-                lineTransform = matrix.toTransform();
-            }
-            break;
-            case FILLSTYLE.FOCAL_RADIAL_GRADIENT: {
-                List<Color> colors = new ArrayList<>();
-                List<Float> ratios = new ArrayList<>();
-                for (int i = 0; i < gradientRecords.length; i++) {
-                    if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
-                        continue;
-                    }
-                    ratios.add(gradientRecords[i].getRatioFloat());
-                    colors.add(gradientRecords[i].color.toColor());
-                }
-
-                float[] ratiosArr = new float[ratios.size()];
-                for (int i = 0; i < ratios.size(); i++) {
-                    ratiosArr[i] = ratios.get(i);
-                }
-                Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-
-                MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                if (spreadMethod == GRADIENT.SPREAD_PAD_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
-                } else if (spreadMethod == GRADIENT.SPREAD_REFLECT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REFLECT;
-                } else if (spreadMethod == GRADIENT.SPREAD_REPEAT_MODE) {
-                    cm = MultipleGradientPaint.CycleMethod.REPEAT;
-                }
-
-                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
-                lineTransform = matrix.toTransform();
-            }
-            break;
+            ratios.add(lastRatio / 255f);
+            colors.add(gradientRecords[i].color.toColor());
+            if (lastRatio == 255) {
+                break;
+            }                    
         }
+
+        if (colors.size() == 1) {
+            colors.add(colors.get(0));
+            ratios.set(0, 0f);
+            ratios.add(1f);
+        }
+
+        float[] ratiosArr = new float[ratios.size()];
+        for (int i = 0; i < ratios.size(); i++) {
+            ratiosArr[i] = ratios.get(i);
+        }
+        Color[] colorsArr = colors.toArray(new Color[colors.size()]);
+        
+        MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+        switch (spreadMethod) {
+            case GRADIENT.SPREAD_PAD_MODE:
+                cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
+                break;
+            case GRADIENT.SPREAD_REFLECT_MODE:
+                cm = MultipleGradientPaint.CycleMethod.REFLECT;
+                break;
+            case GRADIENT.SPREAD_REPEAT_MODE:
+                cm = MultipleGradientPaint.CycleMethod.REPEAT;
+                break;
+        }
+        
+        switch (type) {
+            case FILLSTYLE.LINEAR_GRADIENT:            
+                linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);                
+                break;
+            case FILLSTYLE.RADIAL_GRADIENT:
+                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);                
+                break;
+            case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
+                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
+                break;
+        }
+        
+        lineTransform = matrix.toTransform();
     }
 
     @Override
