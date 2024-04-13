@@ -24,13 +24,11 @@ import com.jpexs.helpers.ByteArrayRange;
  *
  * @author JPEXS
  */
-public abstract class RemoveTag extends Tag {
+public abstract class RemoveTag extends Tag implements DepthTag {
 
     public RemoveTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
-
-    public abstract int getDepth();
 
     @Override
     public String getName() {

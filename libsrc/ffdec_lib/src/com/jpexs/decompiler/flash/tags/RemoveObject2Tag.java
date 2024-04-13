@@ -81,4 +81,9 @@ public class RemoveObject2Tag extends RemoveTag {
     public int getDepth() {
         return depth;
     }
+
+    @Override
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
 }
