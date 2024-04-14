@@ -64,6 +64,8 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -82,6 +84,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -91,6 +94,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -570,12 +574,25 @@ public class AS3ScriptExporter {
                                 st.getNeededCharactersDeep(neededCharacters);
                                 neededCharacters.add(st.spriteId);
                             }
-                            for (int n : neededCharacters) {
+                            for (int n : neededCharacters) {                                
                                 CharacterTag ct = (CharacterTag) swf.getCharacter(n);
                                 if (ct == null) {
                                     continue;
                                 }
-                                ct.writeTag(sos2);
+                                if (ct instanceof DefineBitsTag) {
+                                    //Convert DefineBits+(global)JPEGTables to standalone DefineBitsJPEG2 so they do not share same JPEGTables anymore
+                                    DefineBitsTag db = (DefineBitsTag) ct;
+                                    InputStream isd = db.getOriginalImageData();
+                                    if (isd == null) {
+                                        continue;
+                                    }
+                                    DefineBitsJPEG2Tag dbj2 = new DefineBitsJPEG2Tag(swf);
+                                    dbj2.characterID = db.characterID;
+                                    dbj2.imageData = new ByteArrayRange(Helper.readStream(isd));
+                                    dbj2.writeTag(sos2);
+                                } else {
+                                    ct.writeTag(sos2);
+                                }
                                 for (String cls : ct.getClassNames()) {
                                     symbolClassIds.add(ct.getCharacterId());
                                     symbolClassNames.add(cls);
