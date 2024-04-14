@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - [#2202] AS2 detection of uninitialized class fields colliding with setters/getters
 - [#2202] AS2 return in constructor does not take a value
 - [#2222] Missing shapes when gradient fillstyle has only two gradrecords with the same ratio
+- [#2224] Exporting Embed assets - handling DefineBits(+JPEGTables) - convert to DefineBitsJPEG2
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3405,6 +3406,7 @@ Major version of SWF to XML export changed to 2.
 [#2212]: https://www.free-decompiler.com/flash/issues/2212
 [#2202]: https://www.free-decompiler.com/flash/issues/2202
 [#2222]: https://www.free-decompiler.com/flash/issues/2222
+[#2224]: https://www.free-decompiler.com/flash/issues/2224
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
