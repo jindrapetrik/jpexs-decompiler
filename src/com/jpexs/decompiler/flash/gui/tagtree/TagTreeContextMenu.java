@@ -36,7 +36,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.ClipboardType;
-import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialogue;
+import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
@@ -4122,9 +4122,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
 
-        CollectDepthAsSpritesDialogue dialog = new CollectDepthAsSpritesDialogue(Main.getDefaultDialogsOwner());
+        CollectDepthAsSpritesDialog dialog = new CollectDepthAsSpritesDialog(Main.getDefaultDialogsOwner());
 
-        if (dialog.showDialog(originalDepths) != CollectDepthAsSpritesDialogue.OK_OPTION) {
+        if (dialog.showDialog(originalDepths) != CollectDepthAsSpritesDialog.OK_OPTION) {
             return;
         }
         

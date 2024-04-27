@@ -38,7 +38,7 @@ import javax.swing.ListSelectionModel;
  *
  * @author JPEXS
  */
-public class CollectDepthAsSpritesDialogue extends AppDialog {
+public class CollectDepthAsSpritesDialog extends AppDialog {
 
     private final JButton okButton = new JButton(translate("button.ok"));
 
@@ -54,7 +54,7 @@ public class CollectDepthAsSpritesDialogue extends AppDialog {
 
     private int result = ERROR_OPTION;
 
-    public CollectDepthAsSpritesDialogue(Window owner) {
+    public CollectDepthAsSpritesDialog(Window owner) {
         super(owner);
         setSize(400, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
