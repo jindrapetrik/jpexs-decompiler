@@ -46,7 +46,7 @@ jobs:
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
         apt-get -y update
-        apt-get -y install -t unstable nsis
+        apt-get -y install -t unstable nsis=3.09
         makensis -VERSION
     - name: Set up ant
       run: |
