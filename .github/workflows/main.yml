@@ -45,7 +45,7 @@ jobs:
     - name: Set up NSis
       run: |
         apt-get -y update
-        apt-get -y install nsis=3.09-4
+        apt-get -y install nsis
         makensis -VERSION
     - name: Set up ant
       run: |
