@@ -23,7 +23,7 @@ Unicode true
 !define APP_EXENAME "ffdec.exe"
 
 ;!addplugindir "nsis_plugins\ansi\"
-!addplugindir "nsis_plugins\unicode\"
+;!addplugindir "nsis_plugins\unicode\"
 
 
 SetCompressor /SOLID lzma
