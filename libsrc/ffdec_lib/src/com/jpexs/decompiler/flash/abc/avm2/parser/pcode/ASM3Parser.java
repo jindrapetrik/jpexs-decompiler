@@ -286,6 +286,7 @@ public class ASM3Parser {
         }
 
         tc.slot_id = slotid;
+        tc.name_index = name_index;
 
         return true;
     }
