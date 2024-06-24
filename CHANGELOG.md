@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - New organized commandline help
 - Ansi colors in commandline help
 - Linux ffdec script without extension
+- [PR190] Collect depth as sprites
+- Updated Dutch translation
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -39,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - [#2202] AS2 return in constructor does not take a value
 - [#2222] Missing shapes when gradient fillstyle has only two gradrecords with the same ratio
 - [#2224] Exporting Embed assets - handling DefineBits(+JPEGTables) - convert to DefineBitsJPEG2
+- [PR191] Saving class name during AS3 P-code class trait editation
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -4423,6 +4426,8 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
+[PR191]: https://github.com/jindrapetrik/jpexs-decompiler/pull/191
 [PR176]: https://github.com/jindrapetrik/jpexs-decompiler/pull/176
 [PR178]: https://github.com/jindrapetrik/jpexs-decompiler/pull/178
 [PR179]: https://github.com/jindrapetrik/jpexs-decompiler/pull/179
