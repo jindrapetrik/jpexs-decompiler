@@ -107,6 +107,7 @@ package
         TestSlots;
         TestSlots2;
         TestStrictEquals;
+        TestStringCoerce;
         TestStringConcat;
         TestStrings;        
         TestSwitch;

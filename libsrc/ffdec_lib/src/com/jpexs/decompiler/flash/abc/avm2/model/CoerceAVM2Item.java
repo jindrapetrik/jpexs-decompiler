@@ -88,11 +88,12 @@ public class CoerceAVM2Item extends AVM2Item {
                 }
                 break;
             case "String":
-                displayCoerce = !valueReturnType.equals(TypeItem.STRING)
+                /*displayCoerce = !valueReturnType.equals(TypeItem.STRING)
                         && !valueReturnType.equals(new TypeItem("XML"))
                         && !valueReturnType.equals(new TypeItem("XMLList"))
                         && !valueReturnType.equals(new TypeItem("null"))
-                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);*/
+                displayCoerce = false;
                 break;
             default:
                 displayCoerce = false;
