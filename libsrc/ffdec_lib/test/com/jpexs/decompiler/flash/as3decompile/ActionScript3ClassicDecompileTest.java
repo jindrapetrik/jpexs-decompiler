@@ -1758,6 +1758,13 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testStringCoerce() {
+        decompileMethod("classic", "testStringCoerce", "var text1:String = this.a[\"test\"];\r\n"
+                + "var text2:String = String(this.a[\"test\"]);\r\n",
+                 false);
+    }
+
+    @Test
     public void testStringConcat() {
         decompileMethod("classic", "testStringConcat", "var k:int = 8;\r\n"
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"

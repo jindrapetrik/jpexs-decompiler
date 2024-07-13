@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
 - [#2222] Missing shapes when gradient fillstyle has only two gradrecords with the same ratio
 - [#2224] Exporting Embed assets - handling DefineBits(+JPEGTables) - convert to DefineBitsJPEG2
 - [PR191] Saving class name during AS3 P-code class trait editation
+- [#2231] AS3 coercion to String as convert
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3410,6 +3411,7 @@ Major version of SWF to XML export changed to 2.
 [#2202]: https://www.free-decompiler.com/flash/issues/2202
 [#2222]: https://www.free-decompiler.com/flash/issues/2222
 [#2224]: https://www.free-decompiler.com/flash/issues/2224
+[#2231]: https://www.free-decompiler.com/flash/issues/2231
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123

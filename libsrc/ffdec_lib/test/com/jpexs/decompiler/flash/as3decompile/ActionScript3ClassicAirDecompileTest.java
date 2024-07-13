@@ -1771,6 +1771,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testStringCoerce() {
+        decompileMethod("classic_air", "testStringCoerce", "var text1:String = this.a[\"test\"];\r\n"
+                + "var text2:String = String(this.a[\"test\"]);\r\n",
+                 false);
+    }
+
+    @Test
     public void testStringConcat() {
         decompileMethod("classic_air", "testStringConcat", "var k:int = 8;\r\n"
                 + "this.traceIt(\"hello30\");\r\n"
