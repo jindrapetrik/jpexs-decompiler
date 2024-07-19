@@ -93,7 +93,7 @@ if [ -n "$FFDEC_MEMORY" ]; then
     MEMORY_PARAM=" -Xmx$FFDEC_MEMORY"
 fi
 
-args=(-Djava.net.preferIPv4Stack=true${MEMORY_PARAM}${STACK_SIZE_PARAM} -jar $JAR_FILE "$@")
+args=(-Djava.net.preferIPv4Stack=true${MEMORY_PARAM}${STACK_SIZE_PARAM} -jar "$JAR_FILE" "$@")
 
 if [ "$(uname)" = "Darwin" ]; then
     args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
