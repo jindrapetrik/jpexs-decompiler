@@ -27,8 +27,11 @@ public class SoundExportSettings {
     public static final String EXPORT_FOLDER_NAME = "sounds";
 
     public SoundExportMode mode;
+    
+    public boolean resampleWav;
 
-    public SoundExportSettings(SoundExportMode mode) {
+    public SoundExportSettings(SoundExportMode mode, boolean resampleWav) {
         this.mode = mode;
+        this.resampleWav = resampleWav;
     }
 }

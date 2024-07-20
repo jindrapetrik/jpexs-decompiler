@@ -475,4 +475,9 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public boolean isMutable() {
         return false;
     }
+
+    @Override
+    public void setResample(boolean resample) {
+        
+    }
 }

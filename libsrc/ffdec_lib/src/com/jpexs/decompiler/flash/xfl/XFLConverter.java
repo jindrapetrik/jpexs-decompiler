@@ -2139,7 +2139,7 @@ public class XFLConverter {
         SoundFormat fmt = st.getSoundFormat();
         byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
         try {
-            data = new SoundExporter().exportSound(st, convertMp3ToWav ? SoundExportMode.WAV : SoundExportMode.MP3_WAV);
+            data = new SoundExporter().exportSound(st, convertMp3ToWav ? SoundExportMode.WAV : SoundExportMode.MP3_WAV, true);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -5345,7 +5345,7 @@ public class XFLConverter {
         }
         if (useAS3 && settings.exportScript) {
             try {
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true, false, true);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true, false, true, true);
                 swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);

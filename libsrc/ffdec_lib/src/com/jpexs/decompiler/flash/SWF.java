@@ -3251,8 +3251,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
     }
 
-    public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, byte[] data) {
-        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
+    public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample, byte[] data) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
         soundCache.put(key, data);
     }
 
@@ -3399,8 +3399,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return null;
     }
 
-    public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag) {
-        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
+    public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
         if (soundCache.contains(key)) {
             return soundCache.get(key);
         }

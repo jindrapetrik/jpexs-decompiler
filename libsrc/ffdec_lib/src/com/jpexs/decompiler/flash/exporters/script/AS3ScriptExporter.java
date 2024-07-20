@@ -536,7 +536,7 @@ public class AS3ScriptExporter {
                     return ret;
                 }
                 SoundExporter se = new SoundExporter();
-                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
+                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV, exportSettings.resampleWav), evl);
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
                 }
