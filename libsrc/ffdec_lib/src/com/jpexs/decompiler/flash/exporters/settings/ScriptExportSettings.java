@@ -38,19 +38,23 @@ public class ScriptExportSettings {
     public boolean exportEmbed;
 
     public boolean exportEmbedFlaMode;
+    
+    public boolean resampleWav;
 
     public ScriptExportSettings(
             ScriptExportMode mode,
             boolean singleFile,
             boolean ignoreFrameScripts,
             boolean exportEmbed,
-            boolean exportEmbedFlaMode
+            boolean exportEmbedFlaMode,
+            boolean resampleWav
     ) {
         this.mode = mode;
         this.singleFile = singleFile;
         this.ignoreFrameScripts = ignoreFrameScripts;
         this.exportEmbed = exportEmbed;
         this.exportEmbedFlaMode = exportEmbedFlaMode;
+        this.resampleWav = resampleWav;
     }
 
     public String getFileExtension() {

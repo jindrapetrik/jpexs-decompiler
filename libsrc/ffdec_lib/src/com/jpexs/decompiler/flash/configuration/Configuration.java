@@ -993,6 +993,14 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> flaExportFixShapes = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> lastExportResampleWav = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> previewResampleSound = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

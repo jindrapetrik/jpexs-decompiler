@@ -502,6 +502,7 @@ public class CommandLineArgumentParser {
         boolean cliMode = false;
         boolean air = false;
         boolean exportEmbed = false;
+        boolean resampleWav = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
@@ -534,6 +535,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-exportembed":
                     exportEmbed = true;
+                    break;
+                case "-resamplewav":
+                    resampleWav = true;
                     break;
                 case "-zoom":
                     zoom = parseZoom(args);
@@ -649,7 +653,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -1914,7 +1918,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed) {
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav) {
         if (args.size() < 3) {
             badArguments("export");
         }
@@ -2111,7 +2115,7 @@ public class CommandLineArgumentParser {
 
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
-                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);
+                    new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class), resampleWav), evl);
                 }
 
                 if (exportAll || exportFormats.contains("binarydata")) {
@@ -2178,7 +2182,7 @@ public class CommandLineArgumentParser {
                     singleScriptFile = false;
                 }
 
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false, exportEmbed, false);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false, exportEmbed, false, resampleWav);
                 boolean exportAllScript = exportAll || exportFormats.contains("script");
                 boolean exportAs2Script = exportAllScript || exportFormats.contains("script_as2");
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");

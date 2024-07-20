@@ -262,6 +262,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean frozen = false;
 
     private boolean muted = false;
+    
+    private boolean resample = false;
 
     private boolean mutable = false;
 
@@ -732,6 +734,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         } else {
             prevFrame = -1; //initiate refreshing frame to play sounds again
         }
+    }
+
+    @Override
+    public void setResample(boolean resample) {
+        this.resample = resample;
     }
 
     private class IconPanel extends JPanel {
@@ -2723,6 +2730,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.alwaysDisplay = alwaysDisplay;
             this.frozen = frozen;
             this.muted = muted;
+            this.resample = Configuration.previewResampleSound.get();
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;
@@ -3528,7 +3536,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 loopCount = Math.max(1, soundInfo.loopCount);
             }
 
-            sp = new SoundTagPlayer(soundInfo, st, loopCount, false);
+            sp = new SoundTagPlayer(soundInfo, st, loopCount, false, resample);
             sp.addEventListener(new MediaDisplayListener() {
                 @Override
                 public void mediaDisplayStateChanged(MediaDisplay source) {

@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Linux ffdec script without extension
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
+- [#2259] Optional resampling sound to 44kHz on playback and on export
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -3396,6 +3397,7 @@ Major version of SWF to XML export changed to 2.
 [#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
+[#2259]: https://www.free-decompiler.com/flash/issues/2259
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
