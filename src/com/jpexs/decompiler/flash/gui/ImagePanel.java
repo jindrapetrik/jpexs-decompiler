@@ -754,6 +754,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private Point2D dragStart = null;
 
         private Point2D selectionEnd = null;
+        
+        private boolean canInvert = true;
 
         private Rectangle2D getSelectionRect() {
             Point2D selectStart = dragStart;
@@ -936,7 +938,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             RECT timRect = timelined.getRect();
                             axisX = (int) Math.round(offsetPoint.getX());
                             axisY = (int) Math.round(offsetPoint.getY());
-                            g2.setComposite(BlendComposite.Invert);
+                            if (canInvert) {                            
+                                g2.setComposite(BlendComposite.Invert);
+                            } else {
+                                g2.setComposite(AlphaComposite.SrcOver);
+                            }
                             g2.setPaint(new Color(255, 255, 255, 128));
                             float dp;
                             dp = -(float) offsetPoint.getY();
@@ -963,10 +969,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Rectangle2D selectionRect = getSelectionRect();
                         if (selectionRect != null) {
                             g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
-                            g2.setComposite(BlendComposite.Invert);
+                            if (canInvert) {
+                                g2.setComposite(BlendComposite.Invert);
+                            } else {
+                                g2.setComposite(AlphaComposite.SrcOver);
+                            }
                             g2.draw(new Rectangle2D.Double(selectionRect.getX(), selectionRect.getY(), selectionRect.getWidth(), selectionRect.getHeight()));
                             g2.setComposite(AlphaComposite.SrcOver);
                         }
+                    }
+                } catch (InternalError ie) {
+                    //On some devices like Linux X11 - BlendComposite.Invert is not available
+                    //since sun.java2d.xr.XRSurfaceData.getRaster(XRSurfaceData.java:72) is not implemented
+                    // (tried in WSL)
+                    if (canInvert) {
+                        canInvert = false;
+                        continue;
                     }
                 } finally {
                     if (g2 != null) {
