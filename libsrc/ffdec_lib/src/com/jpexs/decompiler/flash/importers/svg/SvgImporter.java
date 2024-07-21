@@ -1719,7 +1719,7 @@ public class SvgImporter {
         if (fill instanceof SvgGradient) {
             SvgGradient gfill = (SvgGradient) fill;
             Matrix gradientMatrix = Matrix.parseSvgMatrix(gfill.gradientTransform, SWF.unitDivisor, 1);
-            gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);
+            gradientMatrix = transform.concatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).concatenate(gradientMatrix);                       
             fillStyle.gradientMatrix = gradientMatrix.toMATRIX();
             if (fill instanceof SvgLinearGradient) {
                 SvgLinearGradient lgfill = (SvgLinearGradient) fill;
@@ -1760,7 +1760,7 @@ public class SvgImporter {
                         .concatenate(zeroStartMatrix)
                         .concatenate(scaleMatrix);                    
                 } else {
-                    Matrix gmatrix = new Matrix(fillStyle.gradientMatrix);
+
                     x1 *= SWF.unitDivisor;
                     y1 *= SWF.unitDivisor;
                     x2 *= SWF.unitDivisor;
@@ -1786,14 +1786,13 @@ public class SvgImporter {
                         double scale = lenCD / lenAB;
 
                         tMatrix = tMatrix
+                                .concatenate(gradientMatrix)
                                 .concatenate(Matrix.getTranslateInstance(c.x, c.y))
                                 .concatenate(Matrix.getRotateInstance(rotation * 180 / Math.PI))
                                 .concatenate(Matrix.getScaleInstance(scale))
                                 .concatenate(Matrix.getTranslateInstance(-a.x, -a.y))
                                 ;
                     }
-                    
-                    tMatrix = tMatrix.concatenate(gmatrix);
                 }                                                   
                 fillStyle.gradientMatrix = tMatrix.toMATRIX();
             } else if (fill instanceof SvgRadialGradient) {
