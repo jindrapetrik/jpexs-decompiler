@@ -45,6 +45,7 @@ All notable changes to this project will be documented in this file.
 - [PR191] Saving class name during AS3 P-code class trait editation
 - [#2231] AS3 coercion to String as convert
 - [#2257] Shape SVG Importer - Linear gradient matrix
+- [#2253] Drawing 0,0 grid in transform tool on Linux causing sun internal errors
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3416,6 +3417,7 @@ Major version of SWF to XML export changed to 2.
 [#2224]: https://www.free-decompiler.com/flash/issues/2224
 [#2231]: https://www.free-decompiler.com/flash/issues/2231
 [#2257]: https://www.free-decompiler.com/flash/issues/2257
+[#2253]: https://www.free-decompiler.com/flash/issues/2253
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
