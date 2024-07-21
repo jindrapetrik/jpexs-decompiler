@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - [#2253] Drawing 0,0 grid in transform tool on Linux causing sun internal errors
 - [#2239] Default font name detection
 - [#2239] Exporting TTF font on Linux
+- [PR193] Quoting JAR file in ffdec.sh
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -4439,6 +4440,7 @@ Major version of SWF to XML export changed to 2.
 [#27]: https://www.free-decompiler.com/flash/issues/27
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
 [PR191]: https://github.com/jindrapetrik/jpexs-decompiler/pull/191
+[PR193]: https://github.com/jindrapetrik/jpexs-decompiler/pull/193
 [PR176]: https://github.com/jindrapetrik/jpexs-decompiler/pull/176
 [PR178]: https://github.com/jindrapetrik/jpexs-decompiler/pull/178
 [PR179]: https://github.com/jindrapetrik/jpexs-decompiler/pull/179
