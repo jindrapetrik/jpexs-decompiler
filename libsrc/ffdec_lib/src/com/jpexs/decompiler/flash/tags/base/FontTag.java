@@ -376,11 +376,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
 
         if (installedFontsByFamily.containsKey("Times New Roman")) {
-            defaultFontName = "Times New Roman";
+            defaultFontName = installedFontsByFamily.get("Times New Roman").keySet().iterator().next();
         } else if (installedFontsByFamily.containsKey("Arial")) {
-            defaultFontName = "Arial";
+            defaultFontName = installedFontsByFamily.get("Arial").keySet().iterator().next();
         } else {
-            defaultFontName = installedFontsByFamily.keySet().iterator().next();
+            defaultFontName = installedFontsByFamily.get(installedFontsByFamily.keySet().iterator().next()).keySet().iterator().next();
         }
     }
 
