@@ -28,9 +28,15 @@ package fontastic;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.doubletype.ossa.Engine;
 import org.doubletype.ossa.OutOfRangeException;
 import org.doubletype.ossa.adapter.EContour;
@@ -169,11 +175,18 @@ public class Fontastic {
         m_engine.getTypeface().addRequiredGlyphs();
         m_engine.buildTrueType();
 
-        // End TTF creation
-        if (outFile.exists()) {
-            outFile.delete();
+        // End TTF creation        
+        
+        Path copied = outFile.toPath();
+        Path originalPath = ttfFile.toPath();
+        try {
+            Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ex) {
+            //ignore
         }
-        ttfFile.renameTo(outFile);
+        
+        ttfFile.delete();
+        
         cleanup();
     }
 

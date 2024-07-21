@@ -128,7 +128,7 @@ public class FontExporter {
                 currentIndex++;
             }
         }
-
+        
         return ret;
     }
 
@@ -158,7 +158,7 @@ public class FontExporter {
         final double divider = t.getDivider();
 
         File ttfFile = file;
-
+        
         if (mode == FontExportMode.WOFF) {
             ttfFile = File.createTempFile("ffdec_export", ".ttf");
         }
@@ -167,7 +167,7 @@ public class FontExporter {
         if (fontName.length() == 0) {
             fontName = "noname";
         }
-
+        
         Fontastic f = new Fontastic(fontName, ttfFile);
         String cop = t.getCopyright();
 
