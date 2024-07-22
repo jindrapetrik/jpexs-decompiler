@@ -188,10 +188,10 @@ public abstract class ImageTag extends DrawableTag {
         matrix.hasScale = true;
         if (fill) {
             RECT imageRect = getRect();
-            matrix.scaleX = (int) ((((long) SWF.unitDivisor) << 16) * rect.getWidth() / imageRect.getWidth());
-            matrix.scaleY = (int) ((((long) SWF.unitDivisor) << 16) * rect.getHeight() / imageRect.getHeight());
+            matrix.scaleX = (float) (SWF.unitDivisor * rect.getWidth() / imageRect.getWidth());
+            matrix.scaleY = (float) (SWF.unitDivisor * rect.getHeight() / imageRect.getHeight());
         } else {
-            matrix.scaleX = ((int) SWF.unitDivisor) << 16;
+            matrix.scaleX = (float) SWF.unitDivisor;
             matrix.scaleY = matrix.scaleX;
         }
         if (translated) {
