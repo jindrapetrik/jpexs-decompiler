@@ -105,7 +105,7 @@ public class Frame implements TreeItem, Exportable {
             }
         }
         if (!labels.isEmpty()) {
-            name += " (" + String.join(", ", labels) + ")";
+            name += " (name: " + String.join(", ", labels) + ")";
         }
         return name;
     }

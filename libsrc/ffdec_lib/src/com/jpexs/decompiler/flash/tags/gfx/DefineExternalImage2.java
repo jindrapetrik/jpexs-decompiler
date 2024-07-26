@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import net.npe.dds.DDSReader;
@@ -215,10 +216,12 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     public boolean importSupported() {
         return false;
     }
-
+    
     @Override
-    public String toString() {
-        return tagName + " (" + getUniqueId() + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("iid", "" + getUniqueId());
+        return ret;
     }
 
     @Override

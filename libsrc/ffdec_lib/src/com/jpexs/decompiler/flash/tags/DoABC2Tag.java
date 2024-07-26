@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
@@ -116,10 +117,14 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
     public ABC getABC() {
         return abc;
     }
-
+  
     @Override
-    public String getName() {
-        return super.getName() + (!name.isEmpty() ? " (" + name + ")" : "");
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        if (!name.isEmpty()) {
+            ret.put("nm", name);
+        }
+        return ret;
     }
 
     @Override

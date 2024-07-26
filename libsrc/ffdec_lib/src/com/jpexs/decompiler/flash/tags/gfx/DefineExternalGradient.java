@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -86,10 +87,12 @@ public class DefineExternalGradient extends Tag {
         gradientSize = sis.readUI16("gradientSize");
         fileName = sis.readNetString("fileName");
     }
-
+    
     @Override
-    public String toString() {
-        return tagName + " (" + getUniqueId() + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("gid", "" + getUniqueId());
+        return ret;
     }
     
     @Override

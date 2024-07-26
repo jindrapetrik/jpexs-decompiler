@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -94,7 +95,9 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     }
     
     @Override
-    public String toString() {
-        return super.toString() + " (" + soundId + ")";
-    }
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("cid", "" + soundId);
+        return ret;
+    }        
 }

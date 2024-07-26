@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -145,8 +146,25 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return tagName;
     }
 
+    public Map<String, String> getNameProperties() {
+        return new LinkedHashMap<>();
+    }
+        
     public String getName() {
-        return tagName;
+        StringBuilder sb = new StringBuilder();        
+        sb.append(tagName);
+        
+        Map<String, String> props = getNameProperties();
+        if (!props.isEmpty()) {
+            sb.append(" (");
+            List<String> parts = new ArrayList<>();                    
+            for (String key : props.keySet()) {
+                parts.add(key + ": " + props.get(key));
+            }
+            sb.append(String.join(", ", parts));
+            sb.append(")");
+        }
+        return sb.toString();
     }
 
     @Override
@@ -477,7 +495,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     @Override
     public String toString() {
         return getName();
-    }
+    }    
 
     /**
      * Gets data bytes

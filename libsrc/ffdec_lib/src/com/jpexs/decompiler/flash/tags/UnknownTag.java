@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -57,9 +58,12 @@ public class UnknownTag extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.write(unknownData);
     }
-
+    
     @Override
-    public String getName() {
-        return super.getName() + " (ID=" + id + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("tid", "" + id);
+        return ret;
     }
+
 }

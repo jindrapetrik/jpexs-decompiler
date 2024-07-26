@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -151,10 +152,12 @@ public class FontTextureInfo extends Tag {
         }
         sis.skipBytes(mis.getPos() - misStartPos);       
     }
-    
+        
     @Override
-    public String toString() {
-        return tagName + " (" + getUniqueId() + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("chid", "" + getUniqueId());
+        return ret;
     }
     
     @Override

@@ -155,13 +155,16 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         needed.addAll(tags);
     }
 
-    @Override
-    public String toString() {
-        if (names.size() == 1) {
-            return super.toString() + " (" + tags.get(0) + ": " + names.get(0) + ")";
-        }
-        return super.toString(); 
-    }
     
+    
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        if (names.size() == 1) {
+            ret.put("chid", "" + tags.get(0));
+            ret.put("cls", "" + names.get(0));
+        }
+        return ret;
+    }        
     
 }

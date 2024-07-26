@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -91,9 +92,12 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
         this.fontId = characterId;
     }
 
+    
     @Override
-    public String toString() {
-        return super.toString() + " (" + fontId + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("fid", "" + fontId);
+        return ret;
     }
 
     @Override

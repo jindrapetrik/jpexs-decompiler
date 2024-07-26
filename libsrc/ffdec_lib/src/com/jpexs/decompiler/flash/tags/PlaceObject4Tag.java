@@ -44,6 +44,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -635,12 +636,12 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
-    public String getName() {
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
         if (placeFlagHasName) {
-            return super.getName() + " (" + name + ")";
-        } else {
-            return super.getName();
+            ret.put("nm", "" + name);
         }
+        return ret;
     }
 
     @Override

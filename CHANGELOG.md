@@ -55,6 +55,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
 - [#2206] FB values in MATRIX (scale/rotate) as floats instead of int, -f suffixed parameters in text editor
+- Information in the tag node title now has abbreviated prefix of type for each bit of info. 
+  Example: `DefineSprite (chid: 27, cls: pkg.MySprite)` instead of `DefineSprite (27, pkg.MySprite)`
+- Information in the tag node title - separated exportName from assigned class
 
 ## [20.1.0] - 2023-12-30
 ### Added

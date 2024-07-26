@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
+import java.util.Map;
 
 /**
  *
@@ -31,24 +32,20 @@ public abstract class RemoveTag extends Tag implements DepthTag {
     }
 
     @Override
-    public String getName() {
-        String result = super.getName();
-        String exportName = swf.getExportName(getCharacterId());
-        String nameAppend = "";
-        if (exportName != null) {
-            nameAppend = ": " + exportName;
-        }
-
+    public Map<String, String> getNameProperties() {
+        String exportName = swf.getExportName(getCharacterId());       
+        
+        Map<String, String> ret = super.getNameProperties();
         if (getCharacterId() != -1) {
-            result += " (" + getCharacterId() + nameAppend + ")";
+            ret.put("chid", "" + getCharacterId());
         }
-
-        if (!nameAppend.isEmpty()) {
-            result += " (" + nameAppend + ")";
+        if (exportName != null) {
+            ret.put("exp", exportName);
         }
-
-        return result + " Depth: " + getDepth();
-    }
+        ret.put("dpt", "" + getDepth());
+        
+        return ret;
+    }        
 
     @Override
     public String getExportFileName() {

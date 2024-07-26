@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -65,9 +66,11 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
     public abstract boolean isShiftJIS();
 
     public abstract boolean isAnsi();
-
+    
     @Override
-    public String toString() {
-        return super.toString() + " (" + fontID + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("fid", "" + fontID);
+        return ret;
     }
 }
