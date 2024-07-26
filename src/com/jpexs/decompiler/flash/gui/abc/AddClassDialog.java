@@ -227,8 +227,8 @@ public class AddClassDialog extends AppDialog {
             selectedAbcContainer = preselectedAbcContainer;
         } else {
             if (existingAbcTagRadioButton.isSelected()) {
-                SelectDoABCDialog selectDoABCDialog = new SelectDoABCDialog(owner, (SWF) openable);
-                selectedAbcContainer = selectDoABCDialog.showDialog();
+                SelectTagOfTypeDialog selectDoABCDialog = new SelectTagOfTypeDialog(owner, (SWF) openable, ABCContainerTag.class, "DoABC", 1);
+                selectedAbcContainer = (ABCContainerTag) selectDoABCDialog.showDialog();
                 if (selectedAbcContainer == null) {
                     cancelButtonActionPerformed(evt);
                     return;
