@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
+- Set class to character mapping tool (via SymbolClass) context menu on characters
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -49,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - [#2239] Default font name detection
 - [#2239] Exporting TTF font on Linux
 - [PR193] Quoting JAR file in ffdec.sh
+- Refreshing class/exportname association on SymbolClass/ExportAssets deletion
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu

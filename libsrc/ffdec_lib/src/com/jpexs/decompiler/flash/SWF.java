@@ -1856,6 +1856,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
                 if (exportNames.containsKey(ct.getCharacterId())) {
                     ct.setExportName(exportNames.get(ct.getCharacterId()));
+                } else {
+                    ct.setExportName("");
                 }
             }
         }
@@ -1894,6 +1896,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
                 if (classes.containsKey(ct.getCharacterId())) {
                     ct.setClassNames(classes.get((Integer) ct.getCharacterId()));
+                } else {
+                    ct.setClassNames(new LinkedHashSet<>());
                 }
             }
         }

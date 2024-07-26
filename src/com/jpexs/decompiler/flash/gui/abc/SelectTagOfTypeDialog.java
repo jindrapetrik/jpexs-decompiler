@@ -18,10 +18,9 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppDialog;
-import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.Component;
 import java.awt.Container;
@@ -40,30 +39,38 @@ import javax.swing.JPanel;
  *
  * @author JPEXS
  */
-public class SelectDoABCDialog extends AppDialog {
+public class SelectTagOfTypeDialog extends AppDialog {
 
-    private JComboBox<ComboItem> abcComboBox;
-    private ABCContainerTag result = null;
+    private JComboBox<ComboItem> tagComboBox;
+    private Tag result = null;
 
-    public SelectDoABCDialog(Window window, SWF swf) {
+    public SelectTagOfTypeDialog(Window window, SWF swf, Class<?> tagType, String tagTypeName, int minFrame) {
         super(window);
-        setTitle(translate("dialog.title"));
+        setTitle(translate("dialog.title").replace("%type%", tagTypeName));
         Container cnt = getContentPane();
 
-        abcComboBox = new JComboBox<>();
+        tagComboBox = new JComboBox<>();
         int pos = 0;
+        int frame = 1;
         for (Tag t : swf.getTags()) {
-            if (t instanceof ABCContainerTag) {
-                abcComboBox.addItem(new ComboItem(pos, (ABCContainerTag) t));
-                pos++;
+            if (t instanceof ShowFrameTag) {
+                frame++;
+            }
+            
+            if (frame >= minFrame) {
+                if (tagType.isAssignableFrom(t.getClass())) {
+                    tagComboBox.addItem(new ComboItem(pos, t, frame));
+                    pos++;
+                }
             }
         }
 
-        abcComboBox.setRenderer(new DefaultListCellRenderer() {
+        tagComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                label.setIcon(TagTree.getIconForType(TreeNodeType.AS));
+                ComboItem item = (ComboItem) value;
+                label.setIcon(TagTree.getIconFor(item.tag));
                 label.setText(value.toString());
                 return label;
             }
@@ -79,7 +86,7 @@ public class SelectDoABCDialog extends AppDialog {
         buttonsPanel.add(cancelButton);
 
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
-        cnt.add(abcComboBox);
+        cnt.add(tagComboBox);
         cnt.add(buttonsPanel);
 
         pack();
@@ -89,13 +96,13 @@ public class SelectDoABCDialog extends AppDialog {
         View.centerScreen(this);
     }
 
-    public ABCContainerTag getResult() {
+    public Tag getResult() {
         return result;
     }
 
     @SuppressWarnings("unchecked")
     private void okButtonActionPerformed(ActionEvent evt) {
-        result = ((ComboItem) abcComboBox.getSelectedItem()).abc;
+        result = ((ComboItem) tagComboBox.getSelectedItem()).tag;
         setVisible(false);
     }
 
@@ -104,13 +111,13 @@ public class SelectDoABCDialog extends AppDialog {
         setVisible(false);
     }
 
-    public ABCContainerTag showDialog() {
+    public Tag showDialog() {
         result = null;
-        if (abcComboBox.getItemCount() == 0) {
+        if (tagComboBox.getItemCount() == 0) {
             return null;
         }
-        if (abcComboBox.getItemCount() == 1) {
-            result = abcComboBox.getItemAt(0).abc;
+        if (tagComboBox.getItemCount() == 1) {
+            result = tagComboBox.getItemAt(0).tag;
             return result;
         }
         setVisible(true);
@@ -120,16 +127,18 @@ public class SelectDoABCDialog extends AppDialog {
     class ComboItem {
 
         public int index;
-        public ABCContainerTag abc;
+        public Tag tag;
+        public int frame;
 
-        public ComboItem(int index, ABCContainerTag abc) {
+        public ComboItem(int index, Tag tag, int frame) {
             this.index = index;
-            this.abc = abc;
+            this.tag = tag;
+            this.frame = frame;
         }
 
         @Override
         public String toString() {
-            return "" + (index + 1) + ". " + abc.toString();
+            return "" + (index + 1) + ". " + tag.toString() + " (frame " + frame + ")";
         }
 
     }

@@ -192,35 +192,46 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    private void populateNodes(MyTreeNode root, Timelined tim) {
+    private void populateNodes(MyTreeNode root, Timelined tim, int minFrame) {
         int f = 1;
 
         MyTreeNode frameNode = new MyTreeNode();
         List<String> labels = new ArrayList<>();
-        frameNode.setData(new MyFrame(1, labels));
-        frameNode.setParent(root);
-        root.addChild(frameNode);
+        if (minFrame <= 1) {
+            frameNode.setData(new MyFrame(1, labels));
+            frameNode.setParent(root);
+            root.addChild(frameNode);
+        }
 
+        boolean wasMinFrame = minFrame <= 1;
+        
         for (Tag t : tim.getTags()) {
-            MyTreeNode node = new MyTreeNode();
-            node.setData(t);
-            frameNode.addChild(node);
+            
+            if (wasMinFrame) {
+                MyTreeNode node = new MyTreeNode();
+                node.setData(t);
+                frameNode.addChild(node);
 
-            if (t instanceof DefineSpriteTag) {
-                if (allowInsideSprites) {
-                    populateNodes(node, (DefineSpriteTag) t);
+                if (t instanceof DefineSpriteTag) {
+                    if (allowInsideSprites) {
+                        populateNodes(node, (DefineSpriteTag) t, 1);
+                    }
                 }
-            }
-            if (t instanceof FrameLabelTag) {
-                labels.add(((FrameLabelTag) t).name);
+                if (t instanceof FrameLabelTag) {
+                    labels.add(((FrameLabelTag) t).name);
+                }
             }
             if (t instanceof ShowFrameTag) {
                 f++;
-                frameNode = new MyTreeNode();
-                labels = new ArrayList<>();
-                frameNode.setData(new MyFrame(f, labels));
-                frameNode.setParent(root);
-                root.addChild(frameNode);
+                if (f >= minFrame) {
+                    wasMinFrame = true;
+                    
+                    frameNode = new MyTreeNode();
+                    labels = new ArrayList<>();
+                    frameNode.setData(new MyFrame(f, labels));
+                    frameNode.setParent(root);
+                    root.addChild(frameNode);
+                }                
             }
         }
         if (frameNode.isLeaf()) {
@@ -279,7 +290,11 @@ public class SelectTagPositionDialog extends AppDialog {
     }
 
     public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites) {
-        this(parent, swf, null, null, allowInsideSprites, false);
+        this(parent, swf, allowInsideSprites, null, 1);
+    }
+    
+    public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites, String newTypeName, int minFrame) {
+        this(parent, swf, null, null, allowInsideSprites, false, newTypeName, minFrame);
     }
 
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -320,14 +335,18 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites, boolean selectNext) {
+    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites, boolean selectNext, String newTypeName, int minFrame) {
         super(parent);
         this.swf = swf;
         this.selectedTag = selectedTag;
         this.selectedTimelined = selectedTimelined;
         this.allowInsideSprites = allowInsideSprites;
         this.selectNext = selectNext;
-        setTitle(translate("dialog.title").replace("%filetitle%", swf.getShortPathTitle()));
+        if (newTypeName != null) {
+            setTitle(translate("dialog.title.new.typed").replace("%type%", newTypeName).replace("%filetitle%", swf.getShortPathTitle()));
+        } else {
+            setTitle(translate("dialog.title").replace("%filetitle%", swf.getShortPathTitle()));
+        }
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
@@ -344,7 +363,7 @@ public class SelectTagPositionDialog extends AppDialog {
         MyTreeNode root = new MyTreeNode();
         root.setData("root");
 
-        populateNodes(root, swf);
+        populateNodes(root, swf, minFrame);
 
         positionTree = new JTree(root) {
             @Override

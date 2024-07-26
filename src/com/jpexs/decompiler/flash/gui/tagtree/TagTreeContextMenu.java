@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
+import com.jpexs.decompiler.flash.gui.abc.SetClassToCharacterMappingDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -62,6 +63,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -79,6 +81,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -172,6 +175,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private final MainPanel mainPanel;
 
+    private JMenuItem setClassToCharacterMappingMenuItem;
+    
     private JMenuItem expandRecursiveMenuItem;
     
     private JMenuItem collapseRecursiveMenuItem;
@@ -336,8 +341,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
-        this.mainPanel = mainPanel;
-
+        this.mainPanel = mainPanel;       
+        
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
@@ -438,6 +443,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
+        
+        setClassToCharacterMappingMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setClassToCharacterMapping")); //FIXME
+        setClassToCharacterMappingMenuItem.addActionListener(this::setClassToCharacterMappingActionPerformed);
+        setClassToCharacterMappingMenuItem.setIcon(View.getIcon("asclass16"));
+        add(setClassToCharacterMappingMenuItem);
 
         abcExplorerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.abcexplorer"));
         abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
@@ -1104,6 +1114,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
+        setClassToCharacterMappingMenuItem.setVisible(false);
         expandRecursiveMenuItem.setVisible(false);
         collapseRecursiveMenuItem.setVisible(false);
         pinMenuItem.setVisible(false);
@@ -1342,6 +1353,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 addTagAfterMenu.add(othersMenu);*/
             addTagAfterMenu.setVisible(addTagAfterMenu.getItemCount() > 0);
 
+            if ((firstItem instanceof CharacterTag)) {
+                if (SetClassToCharacterMappingDialog.getParentClassFromCharacter((CharacterTag) firstItem) != null) {
+                    setClassToCharacterMappingMenuItem.setVisible(true);
+                }
+            }
+            
             if (tree.getModel().getChildCount(firstItem) > 0) {
                 expandRecursiveMenuItem.setVisible(true);
                 collapseRecursiveMenuItem.setVisible(true);
@@ -1945,7 +1962,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             selectedTimelined = (SWF) item;
         }
 
-        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, selectedTag, selectedTimelined, true, selectNext);
+        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, selectedTag, selectedTimelined, true, selectNext, null, 1);
         if (selectPositionDialog.showDialog() == AppDialog.OK_OPTION) {
             selectedTimelined = selectPositionDialog.getSelectedTimelined();
             selectedTag = selectPositionDialog.getSelectedTag();
@@ -2484,6 +2501,163 @@ public class TagTreeContextMenu extends JPopupMenu {
         HasCharacterId hasCharacterId = (HasCharacterId) itemj;
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), ((SWF) itemj.getOpenable()).getCharacter(hasCharacterId.getCharacterId()));
     }   
+    
+    /*
+    How set class to character mapping work in AS3:
+    a) a character is selected
+    b) if the character already has assigned more than 1 class then exit with a message that user must do this manually
+    c) new class name is entered, must be different than previous
+    d) if new class name is already assigned to different character, exit
+    e) find the ABC, where class with that name is defined
+            if found
+                    determine its frame
+                    find nearest frame >= ABC frame, such that the character is defined in it (or is defined earlier in the file)
+                    if the SymbolClass exists in that frame, use that one
+                            otherwise create new SymbolClass in that frame
+            else (not found)
+                    suggest creating new class
+                            select parent class (extends) - the default is set according to type of the character(sound = flash.media.Sound, etc.)
+                            choose whether to use existing ABC or add new ABC
+                            AFTER PRESSING OK:
+                            select existing ABC or add new ABC (select its position). 
+                            find nearest frame >= ABC frame, such that the character is defined in it (or is defined earlier in the file)
+                            if the SymbolClass exists in that frame, use that one
+                                    otherwise create new SymbolClass in that frame
+
+                    or suggest not creating class, set only its name
+                            choose whether to use existing Symbolclass or add new
+                            AFTER PRESSING OK:
+                            select existing SymbolClass or add new SymbolClass (on selected position). 
+                            (Selected frame for target SymbolClass must have defined the character in it or earlier in the file)
+    AFTER PRESSING OK:
+    I. if there is previously assigned classname, find associated SymbolClass and remove the mapping from it
+    II. if the previous Symbolclass is empty, remove it
+    III. add new character mapping to new SymbolClass determined
+    */
+    private void setClassToCharacterMappingActionPerformed(ActionEvent evt) {
+        CharacterTag ch = (CharacterTag) getCurrentItem();
+        SWF swf = ch.getSwf();
+        SetClassToCharacterMappingDialog d = new SetClassToCharacterMappingDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
+        if (d.showDialog() != AppDialog.OK_OPTION) {
+            return;
+        }
+        
+        int abcFrame = d.getAbcFrame();
+        int characterFrame = d.getCharacterFrame();
+                        
+        SymbolClassTag selectedSymbolClass = d.getSelectedSymbolClassTag();
+        ABCContainerTag selectedAbcContainer = d.getSelectedAbcContainer();
+        String className = d.getSelectedClass();
+        String parentClassName = d.getSelectedParentClass();
+              
+        if (!d.isClassFound() && !d.doCreateClass() && selectedSymbolClass == null) { //we selected position of new SymbolClass
+            selectedSymbolClass = new SymbolClassTag(swf);
+            selectedSymbolClass.setTimelined(swf);
+            Tag pos = d.getSelectedPosition();
+            if (pos == null) {
+                swf.addTag(selectedSymbolClass);
+            } else {
+                swf.addTag(swf.indexOfTag(pos), selectedSymbolClass);
+            }            
+        }
+        
+        if (!d.isClassFound() && d.doCreateClass()) {
+            if (d.getSelectedAbcContainer() == null) {
+                selectedAbcContainer = new DoABC2Tag(swf);
+                ((Tag)selectedAbcContainer).setTimelined(swf);
+                Tag pos = d.getSelectedPosition();
+                if (pos == null) {
+                    swf.addTag((Tag) selectedAbcContainer);
+                } else {
+                    swf.addTag(swf.indexOfTag(pos), (Tag) selectedAbcContainer);
+                } 
+            }
+            
+            String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
+            String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
+            String fileName = className.replace(".", "/");
+            String[] pkgParts = new String[0];
+            if (!pkg.isEmpty()) {
+                if (pkg.contains(".")) {
+                    pkgParts = pkg.split("\\.");
+                } else {
+                    pkgParts = new String[]{pkg};
+                }
+            }
+            try {
+                AbcIndexing abcIndex = swf.getAbcIndex();
+                abcIndex.selectAbc(selectedAbcContainer.getABC());
+                ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
+
+                DottedChain dc = new DottedChain(pkgParts);
+                String script = "package " + dc.toPrintableString(true) + " {"
+                        + (parentClassName.isEmpty() ? "" : "import " + parentClassName + ";")
+                        + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
+                        + " }"
+                        + "}";
+                parser.addScript(script, fileName, 0, 0, swf.getDocumentClass());
+            } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
+                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
+            }
+
+            ((Tag) selectedAbcContainer).setModified(true);            
+        }
+        
+        if (selectedSymbolClass == null) {
+            int symbolClassFrame = Math.max(abcFrame, characterFrame);
+            int frame = 1;
+            int pos = 0;
+            int symbolClassPos = -1;
+            for (Tag t : swf.getTags()) {
+                if ((t instanceof SymbolClassTag) && (symbolClassFrame == frame)) {
+                    selectedSymbolClass = (SymbolClassTag) t;
+                    break;
+                }
+                if (t instanceof ShowFrameTag) {
+                    if (symbolClassFrame == frame) {
+                        symbolClassPos = pos;
+                    }
+                    frame++;
+                }
+                pos++;
+            }
+            if (selectedSymbolClass == null) {
+                if (symbolClassPos == -1) {
+                    symbolClassPos = pos;
+                }
+                selectedSymbolClass = new SymbolClassTag(swf);
+                selectedSymbolClass.setTimelined(swf);
+                swf.addTag(symbolClassPos, selectedSymbolClass);
+            }
+        }
+        
+        
+        //remove previously assigned name
+        ReadOnlyTagList tags = swf.getTags();
+        for (int j = 0; j < tags.size(); j++) {
+            Tag t = tags.get(j);
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sct = (SymbolClassTag) t;
+                for (int i = sct.tags.size() - 1; i >= 0; i--) {
+                    if (sct.tags.get(i) == ch.getCharacterId()) {
+                        sct.names.remove(i);
+                        sct.tags.remove(i);
+                    }
+                }
+                if (sct.names.isEmpty() && sct != selectedSymbolClass) {
+                    swf.removeTag(t);
+                }
+            }
+        }
+        
+        selectedSymbolClass.tags.add(ch.getCharacterId());
+        selectedSymbolClass.names.add(className);
+        
+        swf.clearAllCache();
+        swf.assignClassesToSymbols();
+        swf.setModified(true);
+        mainPanel.refreshTree(swf); 
+    }
     
     private void expandRecursiveActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
@@ -3315,6 +3489,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     public void run() {
                         Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
                         Set<SWF> swfsToClearCache = new HashSet<>();
+                        Set<SWF> swfToAssignClassesToSymbols = new HashSet<>();
+                        Set<SWF> swfToAssignExportNamesToSymbols = new HashSet<>();
 
                         for (int i = 0; i < itemsToRemove.size(); i++) {
                             Object item = itemsToRemove.get(i);
@@ -3422,7 +3598,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                         }
                                     }
                                 }
-                            }
+                            }                                                        
 
                             if (item instanceof TreeItem) {
                                 mainPanel.unpinItem((TreeItem) item);
@@ -3449,13 +3625,24 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
 
                         for (Tag tag : tagsToRemove) {
+                            
+                            
                             SWF swf = tag.getSwf();
+                            
+                            if (tag instanceof SymbolClassTag) {
+                                swfToAssignClassesToSymbols.add(swf);
+                            }
+                            
+                            if (tag instanceof ExportAssetsTag) {
+                                swfToAssignExportNamesToSymbols.add(swf);
+                            }
+                            
                             if (!tagsToRemoveBySwf.containsKey(swf)) {
                                 tagsToRemoveBySwf.put(swf, new ArrayList<>());
                             }
 
                             tagsToRemoveBySwf.get(swf).add(tag);
-                            mainPanel.unpinItem(tag);
+                            mainPanel.unpinItem(tag);                                                        
                         }
 
                         for (SWF swf : tagsToRemoveBySwf.keySet()) {
@@ -3482,6 +3669,14 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                         for (SWF swf : swfsToClearCache) {
                             swf.clearAllCache();
+                        }
+                        
+                        for (SWF swf : swfToAssignClassesToSymbols) {
+                            swf.assignClassesToSymbols();
+                        }
+                        
+                        for (SWF swf: swfToAssignExportNamesToSymbols) {
+                            swf.assignExportNamesToSymbols();
                         }
                         
                         if (!framesToRemove.isEmpty()) {
@@ -3713,7 +3908,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
 
-        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined, true, false);
+        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined, true, false, null, 1);
         if (dialog.showDialog() == AppDialog.OK_OPTION) {
             Tag selectedTag = dialog.getSelectedTag();
             Timelined selectedTimelined = dialog.getSelectedTimelined();
