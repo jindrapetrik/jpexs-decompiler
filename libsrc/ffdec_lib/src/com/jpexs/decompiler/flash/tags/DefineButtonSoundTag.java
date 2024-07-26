@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -158,9 +159,12 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
         needed.add(buttonId);
     }
 
+    
     @Override
-    public String toString() {
-        return super.toString() + " (" + buttonId + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("bid", "" + buttonId);
+        return ret;
     }
 
     @Override

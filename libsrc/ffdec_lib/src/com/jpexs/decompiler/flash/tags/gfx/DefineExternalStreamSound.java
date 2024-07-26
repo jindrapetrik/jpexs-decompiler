@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -238,10 +239,12 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String getCharacterExportFileName() {
         return "" + getCharacterId();
     }
-
+    
     @Override
-    public String toString() {
-        return getName() + " (" + virtualCharacterId + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("chid", "" + virtualCharacterId);
+        return ret;
     }
     
     @Override

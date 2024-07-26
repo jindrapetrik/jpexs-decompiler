@@ -41,6 +41,7 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -236,15 +237,22 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         return pathParts[pathParts.length - 1];
     }
 
+    
     @Override
-    public String getName() {
+    public Map<String, String> getNameProperties() {
         String expName = swf == null ? "" : swf.getExportName(spriteId);
+        
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("sid", "" + spriteId);
+        
         if (expName == null || expName.isEmpty()) {
-            return super.getName() + " (" + spriteId + ")";
+            return ret;
         }
-        String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-        return pathParts[pathParts.length - 1];
-    }
+        //String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
+        //ret.put("exp", pathParts[pathParts.length - 1]);   
+        ret.put("exp", expName);
+        return ret;
+    }        
 
     @Override
     public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -81,7 +82,9 @@ public class StartSound2Tag extends Tag {
     }
     
     @Override
-    public String toString() {
-        return super.toString() + " (" + soundClassName + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("cls", "" + soundClassName);
+        return ret;
     }
 }

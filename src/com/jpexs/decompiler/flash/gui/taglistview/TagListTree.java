@@ -65,22 +65,7 @@ public class TagListTree extends AbstractTagTree {
     @Override
     public TagListTreeModel getFullModel() {
         return (TagListTreeModel) super.getFullModel();
-    }
-
-    @Override
-    public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        if (value instanceof DoInitActionTag) {
-            DoInitActionTag tag = (DoInitActionTag) value;
-            return DoInitActionTag.NAME + " (" + tag.spriteId + ")";
-        }
-        if (value != null) {
-            String sValue = value.toString();
-            if (sValue != null) {
-                return sValue;
-            }
-        }
-        return "";
-    }
+    }   
 
     class TreeTransferHandler extends TransferHandler {
 

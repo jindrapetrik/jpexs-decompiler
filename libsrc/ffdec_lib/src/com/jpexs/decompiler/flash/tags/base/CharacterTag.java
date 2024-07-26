@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 /**
  *
@@ -47,17 +48,19 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         classNames.add(className);
     }
 
+    
     @Override
-    public String getName() {
-        String nameAppend = "";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("chid", "" + getCharacterId());
         if (exportName != null) {
-            nameAppend = ": " + Helper.escapePCodeString(exportName);
+            ret.put ("exp", Helper.escapePCodeString(exportName));
         }
         if (!classNames.isEmpty()) {
-            nameAppend = ": " + Helper.joinEscapePCodeString(", ", classNames);
+            ret.put("cls", Helper.joinEscapePCodeString(", ", classNames));
         }
-        return tagName + " (" + getCharacterId() + nameAppend + ")";
-    }
+        return ret;
+    }       
 
     @Override
     public String getExportFileName() {

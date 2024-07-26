@@ -89,13 +89,6 @@ public class SelectTagPositionDialog extends AppDialog {
 
         @Override
         public String toString() {
-            if (data instanceof DoInitActionTag) {
-                DoInitActionTag doinit = (DoInitActionTag) data;
-                String exportName = doinit.getSwf().getExportName(doinit.spriteId);
-                if (exportName != null && !exportName.isEmpty()) {
-                    return DoInitActionTag.NAME + " (" + doinit.spriteId + ") : " + exportName;
-                }
-            }
             return data.toString();
         }
 

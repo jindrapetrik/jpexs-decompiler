@@ -343,4 +343,22 @@ public class TagTree extends AbstractTagTree {
         return (TagTreeModel) super.getFullModel();
     }
 
+    @Override
+    public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if (value instanceof DoInitActionTag) {
+            DoInitActionTag tag = (DoInitActionTag) value;
+            String expName = tag.getSwf().getExportName(tag.getCharacterId());
+            if (expName != null && !expName.isEmpty()) {
+                String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
+                return pathParts[pathParts.length - 1];  
+            }
+        }
+        if (value != null) {
+            String sValue = value.toString();
+            if (sValue != null) {
+                return sValue;
+            }
+        }
+        return "";
+    }
 }

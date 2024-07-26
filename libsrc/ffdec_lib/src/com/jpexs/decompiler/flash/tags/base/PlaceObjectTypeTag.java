@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -136,33 +137,35 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
     }
 
     @Override
-    public String getName() {
-        String result = super.getName();
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
         int charId = getCharacterId();
         String charClassName = getClassName();
-        String exportName = null;
         if (charId == -1 && charClassName != null) {
-            exportName = charClassName;
+            ret.put("cls", charClassName);
             CharacterTag ch = swf.getCharacterByClass(charClassName);
             if (ch != null) {
                 charId = ch.getCharacterId();
-            }
+                ret.put("chid", "" + charId);
+            }            
         } else {
-            exportName = swf.getExportName(charId);
+            String exportName = swf.getExportName(charId);
+            if (charId > -1) {
+                ret.put("chid", "" + charId);
+            }
+            if (exportName != null) {
+                ret.put("exp", exportName);
+            }
         }
-        String nameAppend = "";
-        if (exportName != null) {
-            nameAppend = ": " + exportName;
+         
+        int depth = getDepth();
+        ret.put("dpt", "" + depth);
+        int clipDepth = getClipDepth();
+        if (clipDepth > -1) {
+            ret.put("cdp", "" + clipDepth);
         }
-
-        if (charId != -1) {
-            result += " (" + charId + nameAppend + ")";
-        } else if (!nameAppend.isEmpty()) {
-            result += " (" + nameAppend + ")";
-        }
-
-        return result + " Depth: " + getDepth();
-    }
+        return ret;
+    }        
 
     @Override
     public String getExportFileName() {

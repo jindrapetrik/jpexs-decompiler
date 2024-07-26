@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -93,10 +94,12 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.buttonId = characterId;
     }
-
+   
     @Override
-    public String toString() {
-        return super.toString() + " (" + buttonId + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("bid", "" + buttonId);
+        return ret;
     }
 
     @Override

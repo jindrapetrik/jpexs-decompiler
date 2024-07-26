@@ -35,6 +35,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -268,8 +269,10 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public String toString() {
-        return getName() + " (" + virtualCharacterId + ")";
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("cid", "" + virtualCharacterId);
+        return ret;
     }
 
     @Override
