@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.usages;
+package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -23,14 +23,20 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  *
  * @author JPEXS
  */
-public class MethodParamsMultinameUsage extends MethodMultinameUsage {
+public class MethodBodyMultinameUsage extends MethodMultinameUsage {
 
-    public MethodParamsMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
+    public MethodBodyMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex);
     }
 
     @Override
     public String toString() {
-        return super.toString() + " params";
+        return super.toString() + " body";
     }
+
+    @Override
+    public boolean collides(MultinameUsage other) {
+        return false;
+    }
+
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.usages;
+package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -23,10 +23,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  *
  * @author JPEXS
  */
-public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implements DefinitionUsage {
+public class MethodNameMultinameUsage extends MethodMultinameUsage implements DefinitionUsage {
 
-    public ConstVarNameMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, traits, parentTraitIndex);
+    public MethodNameMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex);
     }
 
     @Override
@@ -36,15 +36,22 @@ public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implement
 
     @Override
     public boolean collides(MultinameUsage other) {
-        if ((other instanceof ConstVarNameMultinameUsage) || (other instanceof MethodNameMultinameUsage)) {
+        if ((other instanceof MethodNameMultinameUsage) || (other instanceof ConstVarNameMultinameUsage)) {
             TraitMultinameUsage otherTrait = (TraitMultinameUsage) other;
             if (otherTrait.classIndex == classIndex && otherTrait.traitsType == traitsType && otherTrait.parentTraitIndex == parentTraitIndex) {
                 if (other.sameMultinameName(this)) {
+
+                    if (other instanceof MethodNameMultinameUsage) {
+                        MethodNameMultinameUsage otherM = (MethodNameMultinameUsage) other;
+                        //getter/setter/method must match
+                        if (otherM.traits.traits.get(otherM.traitIndex).kindType != traits.traits.get(traitIndex).kindType) {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             }
         }
         return false;
     }
-
 }

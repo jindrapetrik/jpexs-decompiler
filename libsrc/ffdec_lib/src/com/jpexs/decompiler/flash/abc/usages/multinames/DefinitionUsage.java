@@ -14,23 +14,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.usages;
-
-import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 /**
  *
  * @author JPEXS
  */
-public class MethodReturnTypeMultinameUsage extends MethodMultinameUsage {
-
-    public MethodReturnTypeMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + " return type";
-    }
+public interface DefinitionUsage {
 }
