@@ -162,7 +162,7 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         Map<String, String> ret = super.getNameProperties();
         if (names.size() == 1) {
             ret.put("chid", "" + tags.get(0));
-            ret.put("cls", "" + names.get(0));
+            ret.put("ex", "" + names.get(0));
         }
         return ret;
     }        
