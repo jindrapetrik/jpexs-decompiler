@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
 - Set class to character mapping tool (via SymbolClass) context menu on characters
+- [#2189] Search bar in replace character (+ replace references) window
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -3408,6 +3409,7 @@ Major version of SWF to XML export changed to 2.
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
 [#2259]: https://www.free-decompiler.com/flash/issues/2259
+[#2189]: https://www.free-decompiler.com/flash/issues/2189
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
