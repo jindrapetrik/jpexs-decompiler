@@ -149,6 +149,8 @@ public class ExportDialog extends AppDialog {
     private JCheckBox embedCheckBox;
     
     private JCheckBox resampleWavCheckBox;
+    
+    private JCheckBox transparentFrameBackgroundCheckBox;
 
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
@@ -178,6 +180,10 @@ public class ExportDialog extends AppDialog {
     public boolean isResampleWavEnabled() {
         return resampleWavCheckBox.isSelected();
     }
+    
+    public boolean isTransparentFrameBackgroundEnabled() {
+        return transparentFrameBackgroundCheckBox.isSelected();
+    }
 
     public double getZoom() {
         return Double.parseDouble(zoomTextField.getText()) / 100;
@@ -203,6 +209,9 @@ public class ExportDialog extends AppDialog {
         }
         if (resampleWavCheckBox.isVisible()) {
             Configuration.lastExportResampleWav.set(resampleWavCheckBox.isSelected());
+        }
+        if (transparentFrameBackgroundCheckBox.isVisible()) {
+            Configuration.lastExportTransparentBackground.set(transparentFrameBackgroundCheckBox.isSelected());
         }
     }
 
@@ -392,7 +401,25 @@ public class ExportDialog extends AppDialog {
             if (resampleWavCheckBox.getWidth() + 10 > w) {
                 w = resampleWavCheckBox.getWidth() + 10;
             }
-        }            
+        }
+        
+        transparentFrameBackgroundCheckBox = new JCheckBox(translate("transparentFrameBackground"));
+        transparentFrameBackgroundCheckBox.setVisible(false);
+        if (visibleOptionClasses.contains(FrameExportMode.class)) {
+            top += 2;            
+            transparentFrameBackgroundCheckBox.setVisible(true);
+            comboPanel.add(transparentFrameBackgroundCheckBox);
+            if (Configuration.lastExportTransparentBackground.get()) {
+                transparentFrameBackgroundCheckBox.setSelected(true);
+            }
+            
+            transparentFrameBackgroundCheckBox.setBounds(10, top, transparentFrameBackgroundCheckBox.getPreferredSize().width, transparentFrameBackgroundCheckBox.getPreferredSize().height);
+            top += transparentFrameBackgroundCheckBox.getHeight();
+
+            if (transparentFrameBackgroundCheckBox.getWidth() + 10 > w) {
+                w = transparentFrameBackgroundCheckBox.getWidth() + 10;
+            }
+        }
 
         int zoomWidth = 50;
         if (zoomable) {

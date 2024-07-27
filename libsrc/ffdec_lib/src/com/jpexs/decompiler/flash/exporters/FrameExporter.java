@@ -128,7 +128,7 @@ public class FrameExporter {
             frames.add(0); // todo: export all frames
         }
 
-        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
 
@@ -163,7 +163,7 @@ public class FrameExporter {
                 throw new Error("Unsupported sprite export mode");
         }
 
-        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom);
+        FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
     
@@ -224,7 +224,7 @@ public class FrameExporter {
             }
 
             int fframe = fframes.get(pos++);
-            BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, usesTransparency ? null : backgroundColor, settings.zoom, true).getBufferedImage();
+            BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true).getBufferedImage();
             if (Thread.currentThread().isInterrupted()) {
                 return null;
             }
@@ -286,7 +286,7 @@ public class FrameExporter {
 
         Color backgroundColor = null;
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
-        if (setBgColorTag != null) {
+        if (!settings.transparentBackground && setBgColorTag != null) {
             backgroundColor = setBgColorTag.backgroundColor.toColor();
         }
 
@@ -298,7 +298,7 @@ public class FrameExporter {
                 }
 
                 final int fi = i;
-                final Color fbackgroundColor = null;
+                final Color fbackgroundColor = backgroundColor;
                 for (File foutdir : foutdirs) {
                     new RetryTask(() -> {
                         int frame = fframes.get(fi);
@@ -309,11 +309,8 @@ public class FrameExporter {
                             rect.yMax *= settings.zoom;
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
-                            SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame");
-                            if (fbackgroundColor != null) {
-                                exporter.setBackGroundColor(fbackgroundColor);
-                            }
-
+                            SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
+                            
                             tim.toSVG(frame, 0, null, 0, exporter, null, 0);
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
@@ -379,7 +376,7 @@ public class FrameExporter {
                         }
                         sb.append("\r\n");
                         RGB backgroundColor1 = new RGB(255, 255, 255);
-                        if (setBgColorTag != null) {
+                        if (!settings.transparentBackground && setBgColorTag != null) {
                             backgroundColor1 = setBgColorTag.backgroundColor;
                         }
 

@@ -503,6 +503,7 @@ public class CommandLineArgumentParser {
         boolean air = false;
         boolean exportEmbed = false;
         boolean resampleWav = false;
+        boolean transparentBackground = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
@@ -538,6 +539,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-resamplewav":
                     resampleWav = true;
+                    break;
+                case "-ignorebackground":
+                    transparentBackground = true;
                     break;
                 case "-zoom":
                     zoom = parseZoom(args);
@@ -653,7 +657,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed, resampleWav, transparentBackground);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -1918,7 +1922,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav) {
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed, boolean resampleWav, boolean transparentBackground) {
         if (args.size() < 3) {
             badArguments("export");
         }
@@ -2147,7 +2151,7 @@ public class CommandLineArgumentParser {
                             frames.add(i);
                         }
                     }
-                    FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom);
+                    FrameExportSettings fes = new FrameExportSettings(enumFromStr(formats.get("frame"), FrameExportMode.class), zoom, transparentBackground);
                     frameExporter.exportFrames(handler, outDir + (multipleExportTypes ? File.separator + FrameExportSettings.EXPORT_FOLDER_NAME : ""), swf, 0, frames, fes, evl);
                 }
 

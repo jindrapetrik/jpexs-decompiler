@@ -2220,7 +2220,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             FrameExporter frameExporter = new FrameExporter();
 
             if (export.isOptionEnabled(FrameExportMode.class)) {
-                FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
+                FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom(), export.isTransparentFrameBackgroundEnabled());
                 if (frames.containsKey(0)) {
                     String subFolder = FrameExportSettings.EXPORT_FOLDER_NAME;
                     ret.addAll(frameExporter.exportFrames(handler, selFile2 + File.separator + subFolder, swf, 0, frames.get(0), fes, evl));
@@ -2333,7 +2333,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         FrameExporter frameExporter = new FrameExporter();
 
         if (export.isOptionEnabled(FrameExportMode.class)) {
-            FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom());
+            FrameExportSettings fes = new FrameExportSettings(export.getValue(FrameExportMode.class), export.getZoom(), export.isTransparentFrameBackgroundEnabled());
             frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME), swf, 0, null, fes, evl);
         }
 
@@ -2444,7 +2444,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(FrameExportMode.class)) {
             for (FrameExportMode exportMode : FrameExportMode.values()) {
-                FrameExportSettings fes = new FrameExportSettings(exportMode, export.getZoom());
+                FrameExportSettings fes = new FrameExportSettings(exportMode, export.getZoom(), export.isTransparentFrameBackgroundEnabled());
                 frameExporter.exportFrames(handler, Path.combine(selFile, FrameExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, 0, null, fes, evl);
             }
         }

@@ -432,3 +432,8 @@ Pre-options:
     Applies to: -export
     Enables resampling exported WAV sound files to 44kHz.
 
+-ignorebackground
+    Applies to: -export
+    Ignores SWF background color when exporting frames
+    and thus make background transparent.
+
