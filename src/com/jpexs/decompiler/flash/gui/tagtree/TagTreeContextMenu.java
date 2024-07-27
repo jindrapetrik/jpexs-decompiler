@@ -1354,7 +1354,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             addTagAfterMenu.setVisible(addTagAfterMenu.getItemCount() > 0);
 
             if ((firstItem instanceof CharacterTag)) {
-                if (SetClassToCharacterMappingDialog.getParentClassFromCharacter((CharacterTag) firstItem) != null) {
+                CharacterTag cht = (CharacterTag) firstItem;
+                if (cht.getSwf().isAS3() && SetClassToCharacterMappingDialog.getParentClassFromCharacter(cht) != null) {
                     setClassToCharacterMappingMenuItem.setVisible(true);
                 }
             }
