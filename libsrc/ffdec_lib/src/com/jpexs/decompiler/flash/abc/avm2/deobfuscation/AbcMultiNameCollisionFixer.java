@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
-import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
+import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.util.HashSet;

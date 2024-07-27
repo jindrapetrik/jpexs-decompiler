@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.usages;
+package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -23,11 +23,11 @@ import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
  *
  * @author JPEXS
  */
-public class ClassNameMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {
+public class SuperInterfaceMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
 
     private final int classIndex;
 
-    public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
+    public SuperInterfaceMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;
     }
@@ -41,13 +41,13 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " name";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true) + " " + (ii.isInterface() ? "extends" : "implements");
     }
 
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 67 * hash + this.classIndex;
+        hash = 59 * hash + this.classIndex;
         return hash;
     }
 
@@ -65,7 +65,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
         if (!super.equals(obj)) {
             return false;
         }
-        final ClassNameMultinameUsage other = (ClassNameMultinameUsage) obj;
+        final SuperInterfaceMultinameUsage other = (SuperInterfaceMultinameUsage) obj;
         if (this.classIndex != other.classIndex) {
             return false;
         }
@@ -74,14 +74,6 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     @Override
     public boolean collides(MultinameUsage other) {
-        if (other instanceof InsideClassMultinameUsageInterface) {
-            if (((InsideClassMultinameUsageInterface) other).getClassIndex() == getClassIndex()) {
-                return false;
-            }
-        }
-        if (other instanceof ClassNameMultinameUsage) {
-            return sameMultinameName(other);
-        }
         return false;
     }
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.abc.usages;
+package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -23,11 +23,11 @@ import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
  *
  * @author JPEXS
  */
-public class SuperClassMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
+public class ClassNameMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {
 
     private final int classIndex;
 
-    public SuperClassMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
+    public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;
     }
@@ -41,13 +41,13 @@ public class SuperClassMultinameUsage extends MultinameUsage implements InsideCl
     public String toString() {
         InstanceInfo ii = abc.instance_info.get(classIndex);
         String kind = ii.isInterface() ? "interface" : "class";
-        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true) + " extends";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " name";
     }
 
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 17 * hash + this.classIndex;
+        hash = 67 * hash + this.classIndex;
         return hash;
     }
 
@@ -65,7 +65,7 @@ public class SuperClassMultinameUsage extends MultinameUsage implements InsideCl
         if (!super.equals(obj)) {
             return false;
         }
-        final SuperClassMultinameUsage other = (SuperClassMultinameUsage) obj;
+        final ClassNameMultinameUsage other = (ClassNameMultinameUsage) obj;
         if (this.classIndex != other.classIndex) {
             return false;
         }
@@ -74,6 +74,14 @@ public class SuperClassMultinameUsage extends MultinameUsage implements InsideCl
 
     @Override
     public boolean collides(MultinameUsage other) {
+        if (other instanceof InsideClassMultinameUsageInterface) {
+            if (((InsideClassMultinameUsageInterface) other).getClassIndex() == getClassIndex()) {
+                return false;
+            }
+        }
+        if (other instanceof ClassNameMultinameUsage) {
+            return sameMultinameName(other);
+        }
         return false;
     }
 
