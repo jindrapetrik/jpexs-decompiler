@@ -29,9 +29,12 @@ public class FrameExportSettings {
     public FrameExportMode mode;
 
     public double zoom;
+    
+    public boolean transparentBackground;
 
-    public FrameExportSettings(FrameExportMode mode, double zoom) {
+    public FrameExportSettings(FrameExportMode mode, double zoom, boolean transparentBackground) {
         this.mode = mode;
         this.zoom = zoom;
+        this.transparentBackground = transparentBackground;
     }
 }

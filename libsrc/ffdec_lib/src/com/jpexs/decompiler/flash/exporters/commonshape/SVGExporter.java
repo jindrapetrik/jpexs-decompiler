@@ -89,7 +89,10 @@ public class SVGExporter {
     public boolean useTextTag = Configuration.textExportExportFontFace.get();
 
     public SVGExporter(ExportRectangle bounds, double zoom, String objectType) {
+        this(bounds, zoom, objectType, null);
+    }
 
+    public SVGExporter(ExportRectangle bounds, double zoom, String objectType, Color backgroundColor) {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -109,8 +112,22 @@ public class SVGExporter {
                     svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
                 }
                 createDefGroup(bounds, null, zoom);
+                
+                if (backgroundColor != null) {
+                    Element rect = _svg.createElement("rect");
+                    rect.setAttribute("fill", new RGBA(backgroundColor).toHexRGB());
+                    if (Configuration.svgRetainBounds.get()) {
+                        rect.setAttribute("width", (bounds.xMax / SWF.unitDivisor) + "px");
+                        rect.setAttribute("height", (bounds.yMax / SWF.unitDivisor) + "px");
+                    } else {
+                        rect.setAttribute("width", (bounds.getWidth() / SWF.unitDivisor) + "px");
+                        rect.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
+                    }
+                    _svgGs.peek().appendChild(rect);
+                }
             }
             svgRoot.setAttribute("ffdec:objectType", objectType);
+                        
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -227,10 +244,10 @@ public class SVGExporter {
         return writer.toString();
     }
 
-    public void setBackGroundColor(Color backGroundColor) {
+    /*public void setBackGroundColor(Color backGroundColor) {
         Attr attr = _svg.createAttribute("style");
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
-    }
+    }*/
 
     private String addClip(String path) {
         lastClipId++;

@@ -1001,6 +1001,10 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> previewResampleSound = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> lastExportTransparentBackground = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
