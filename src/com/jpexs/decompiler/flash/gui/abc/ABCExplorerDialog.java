@@ -38,11 +38,13 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.usages.simple.ABCSimpleUsageDetector;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
@@ -53,6 +55,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -60,12 +63,15 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayDeque;
@@ -77,18 +83,30 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -108,6 +126,15 @@ public class ABCExplorerDialog extends AppDialog {
     private MainPanel mainPanel;
 
     private Runnable packListener;
+
+    private ABCSimpleUsageDetector usageDetector = null;
+    
+    private JTable usagesTable = new JTable(new DefaultTableModel()) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }        
+    };
 
     public ABCExplorerDialog(Window owner, MainPanel mainPanel, Openable openable, ABC abc) {
         super(owner);
@@ -167,6 +194,7 @@ public class ABCExplorerDialog extends AppDialog {
                 abcComboBoxActionPerformed(null);
                 cpTabbedPane.setSelectedIndex(cpIndex);
                 mainTabbedPane.setSelectedIndex(mainIndex);
+                refreshUsages();
             }
         };
 
@@ -175,9 +203,87 @@ public class ABCExplorerDialog extends AppDialog {
 
         mainTabbedPane = new JTabbedPane();
         cpTabbedPane = new JTabbedPane();
-
+        
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn(translate("usages").replace("%item%", "-"));
+        usagesTable.setModel(model);
+        
+        usagesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                    int row = usagesTable.getSelectedRow();
+                    if (row == -1) {
+                        return;
+                    }
+                    String path = (String) usagesTable.getModel().getValueAt(row, 0);
+                    selectPath(path);
+                }
+            }            
+        });
+        
+        usagesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int row = usagesTable.rowAtPoint( e.getPoint() );
+                    int column = usagesTable.columnAtPoint( e.getPoint() );
+                    if (!usagesTable.isRowSelected(row)) {
+                        usagesTable.changeSelection(row, column, false, false);
+                    }
+                    JPopupMenu popupMenu = new JPopupMenu();
+                    JMenuItem hilightMenuItem = new JMenuItem(translate("hilight.usage"), View.getIcon("jumpto16"));
+                    hilightMenuItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int row = usagesTable.getSelectedRow();
+                            if (row == -1) {
+                                return;
+                            }
+                            selectPath((String) usagesTable.getModel().getValueAt(row, 0));
+                        }                        
+                    });
+                    JMenuItem copyMenuItem = new JMenuItem(translate("copy.paths"), View.getIcon("copy16"));
+                    copyMenuItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int[] rows = usagesTable.getSelectedRows();
+                            List<String> values = new ArrayList<>();
+                            for (int row : rows) {
+                                values.add((String)usagesTable.getModel().getValueAt(row, 0));
+                            }
+                            copyToClipboard(String.join("\r\n", values));
+                        }                        
+                    });
+                    JMenuItem copyAllMenuItem = new JMenuItem(translate("copy.paths.all"), View.getIcon("copy16"));
+                    copyAllMenuItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            List<String> values = new ArrayList<>();
+                            for (int row = 0; row < usagesTable.getModel().getRowCount(); row++) {
+                                values.add((String)usagesTable.getModel().getValueAt(row, 0));
+                            }
+                            copyToClipboard(String.join("\r\n", values));
+                        }                        
+                    });
+                    popupMenu.add(hilightMenuItem);
+                    popupMenu.add(copyMenuItem);
+                    popupMenu.add(copyAllMenuItem);
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());                                        
+                }
+            }            
+        });
+        
+        JPanel centralPanel = new JPanel(new BorderLayout());
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(new FasterScrollPane(usagesTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);        
+        //rightPanel.add(calculateUsagesButton, BorderLayout.SOUTH);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainTabbedPane, rightPanel);
+        splitPane.setDividerLocation(800);
+        centralPanel.add(splitPane);        
+        
         cnt.add(topPanel, BorderLayout.NORTH);
-        cnt.add(mainTabbedPane, BorderLayout.CENTER);
+        cnt.add(centralPanel, BorderLayout.CENTER);
 
         if (!abcs.isEmpty()) {
             if (abcComboBox != null) {
@@ -186,7 +292,25 @@ public class ABCExplorerDialog extends AppDialog {
                 abcComboBoxActionPerformed(null);
             }
         }
-        setSize(800, 600);
+        
+        JRootPane rootPane = getRootPane();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK);
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+        
+        inputMap.put(keyStroke, "ctrlGAction");
+        actionMap.put("ctrlGAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String path = ViewMessages.showInputDialog(ABCExplorerDialog.this, translate("goto.path.label"), translate("goto.path"), "");
+                if (path == null || path.isEmpty()) {
+                    return;
+                }
+                selectPath(path);
+            }
+        });
+        
+        setSize(1024, 600);
         setTitle(translate("title") + " - " + openable.getTitleOrShortFileName());
         List<Image> images = new ArrayList<>();
         images.add(View.loadImage("abcexplorer16"));
@@ -222,6 +346,11 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private void abcComboBoxActionPerformed(ActionEvent e) {
+        usageDetector = null;   
+        DefaultTableModel model = new DefaultTableModel();                                
+        model.addColumn(translate("usages").replace("%item%", "-"));
+        usagesTable.setModel(model);
+        
         int index = abcComboBox == null ? 0 : abcComboBox.getSelectedIndex();
         if (index == -1) {
             return;
@@ -288,7 +417,15 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", View.getIcon(TreeType.METHOD_BODY.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_BODY));
 
         abc.removeChangeListener(packListener);
-        abc.addChangeListener(packListener);
+        abc.addChangeListener(packListener);   
+        refreshUsages();
+        repaint();
+    }
+    
+    private void refreshUsages() {
+        ABCSimpleUsageDetector newUsageDetector = new ABCSimpleUsageDetector(getSelectedAbc());
+        newUsageDetector.detect(); 
+        usageDetector = newUsageDetector;
     }
 
     private JTree getCurrentTree() {
@@ -301,6 +438,38 @@ public class ABCExplorerDialog extends AppDialog {
         FasterScrollPane fasterScrollPane = (FasterScrollPane) pan.getComponent(0);
         JTree tree = (JTree) fasterScrollPane.getViewport().getView();
         return tree;
+    }
+    
+    private String getCurrentPath() {
+        JTree tree = getCurrentTree();
+        TreePath tp = tree.getSelectionPath();
+        if (tp == null) {
+            return "";
+        }
+        List<String> pathParts = new ArrayList<>();
+        Object[] path = tp.getPath();
+        for (int i = 1; i < path.length; i++) {
+            Object child = path[i];
+            String key;
+            if (child instanceof ValueWithIndex) {
+                ValueWithIndex vwi = (ValueWithIndex) child;
+                if (!vwi.getTitle().isEmpty()) {
+                    key = vwi.getTitle();
+                } else {
+                    key = vwi.getType().getAbbreviation() + vwi.getIndex();
+                }
+            } else if (child instanceof SubValue) {
+                SubValue sv = (SubValue) child;
+                key = sv.getTitle();
+            } else if (child instanceof SimpleValue) {
+                SimpleValue sv = (SimpleValue) child;
+                key = sv.getTitle();
+            } else {
+                break;
+            }       
+            pathParts.add(key);
+        }
+        return String.join("/", pathParts);    
     }
 
     public void selectTrait(int scriptIndex, int classIndex, int traitIndex, int traitType) {
@@ -347,14 +516,113 @@ public class ABCExplorerDialog extends AppDialog {
         return -1;
     }
 
+    private void selectPath(String path) {
+        String[] parts = path.split("/");
+        String mainItem = parts[0];
+        TreeType selectedType = null;
+        for (TreeType type : TreeType.values()) {
+            if (mainItem.startsWith(type.getAbbreviation())) {
+                selectedType = type;
+            }
+        }
+        if (selectedType == null) {
+            return;
+        }
+        
+        if (mainTabbedPane.getTabCount() == 0) {
+            return;
+        }
+        
+        int stringOffset = 0;
+        if (getSelectedAbc().hasDecimalSupport()) {
+            stringOffset = 1;
+        }
+        if (getSelectedAbc().hasFloatSupport()) {
+            stringOffset = 2;
+        }
+        switch (selectedType) {
+            case CONSTANT_INT:
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(0);
+                break;
+            case CONSTANT_UINT:
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(1);
+                break;
+            case CONSTANT_DOUBLE:
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(2);
+                break;                
+            case CONSTANT_DECIMAL:
+                if (!getSelectedAbc().hasDecimalSupport()) {
+                    return;
+                }
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(3);
+                break;
+            case CONSTANT_FLOAT:
+                if (!getSelectedAbc().hasFloatSupport()) {
+                    return;
+                }
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(3);
+                break;
+            case CONSTANT_FLOAT_4:
+                if (!getSelectedAbc().hasFloatSupport()) {
+                    return;
+                }
+                mainTabbedPane.setSelectedIndex(0);
+                cpTabbedPane.setSelectedIndex(4);
+                break;                
+            case CONSTANT_STRING:
+                mainTabbedPane.setSelectedIndex(0);                
+                cpTabbedPane.setSelectedIndex(3 + stringOffset);
+                break;
+            case CONSTANT_NAMESPACE:
+                mainTabbedPane.setSelectedIndex(0);                
+                cpTabbedPane.setSelectedIndex(4 + stringOffset);
+                break;
+            case CONSTANT_NAMESPACE_SET:
+                mainTabbedPane.setSelectedIndex(0);                
+                cpTabbedPane.setSelectedIndex(5 + stringOffset);
+                break;
+            case CONSTANT_MULTINAME:
+                mainTabbedPane.setSelectedIndex(0);                
+                cpTabbedPane.setSelectedIndex(6 + stringOffset);
+                break;
+            case METHOD_INFO:
+                mainTabbedPane.setSelectedIndex(1);
+                break;
+            case METADATA_INFO:
+                mainTabbedPane.setSelectedIndex(2);
+                break;
+            case INSTANCE_INFO:
+                mainTabbedPane.setSelectedIndex(3);
+                break;
+            case CLASS_INFO:
+                mainTabbedPane.setSelectedIndex(4);
+                break;
+            case SCRIPT_INFO:
+                mainTabbedPane.setSelectedIndex(5);                
+                break;
+            case METHOD_BODY:
+                mainTabbedPane.setSelectedIndex(6);
+                break;
+        }
+        
+        selectPath(getCurrentTree(), path);
+    }
+    
     private void selectPath(JTree tree, String path) {
         String[] parts = path.split("/");
         TreeModel model = tree.getModel();
         Object root = model.getRoot();
         Object parent = root;
 
-        Object[] treePathObjects = new Object[parts.length + 1];
-        treePathObjects[0] = root;
+        List<Object> treePathObjectsList = new ArrayList<>();
+        /*Object[] treePathObjects = new Object[parts.length + 1];
+        treePathObjects[0] = root;*/
+        treePathObjectsList.add(root);
 
         loopp:
         for (int p = 0; p < parts.length; p++) {
@@ -377,14 +645,14 @@ public class ABCExplorerDialog extends AppDialog {
                     key = sv.getTitle();
                 }
                 if (key.equals(part)) {
-                    treePathObjects[1 + p] = child;
+                    //treePathObjects[1 + p] = child;
+                    treePathObjectsList.add(child);
                     parent = child;
                     continue loopp;
                 }
-            }
-            return;
+            }            
         }
-        TreePath treePath = new TreePath(treePathObjects);
+        TreePath treePath = new TreePath(treePathObjectsList.toArray(new Object[treePathObjectsList.size()]));
         tree.setSelectionPath(treePath);
         tree.scrollPathToVisible(treePath);
     }
@@ -414,12 +682,47 @@ public class ABCExplorerDialog extends AppDialog {
         if (View.isOceanic()) {
             tree.setBackground(Color.white);
         }
-        tree.setCellRenderer(new ExplorerTreeCellRenderer());
+        tree.setCellRenderer(new ExplorerTreeCellRenderer(this));
         tree.setUI(new BasicTreeUI() {
             {
                 if (View.isOceanic()) {
                     setHashColor(Color.gray);
                 }
+            }
+        });
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultTableModel model = new DefaultTableModel();
+                                
+                if (tree.getSelectionCount() != 1 || usageDetector == null) {
+                    //usagesList.setModel(new DefaultListModel<>());
+                    model.addColumn(translate("usages").replace("%item%", "-"));
+                    usagesTable.setModel(model);
+                    return;                
+                }
+                
+                Object selection = tree.getLastSelectedPathComponent();
+
+                if (selection instanceof ValueWithIndex) {
+                    ValueWithIndex vwi = (ValueWithIndex) selection;
+                    if (vwi.getType().getUsageKind() != null) {
+                        List<String> newUsages = usageDetector.getUsages(vwi.type.getUsageKind(), vwi.index);
+                        //DefaultListModel<String> model = new DefaultListModel<>();
+                        //model.addAll(newUsages);
+                        //usagesList.setModel(model);                   
+                        model.addColumn(translate("usages").replace("%item%", vwi.type.getAbbreviation() + vwi.index + ": " + vwi.getDescription()));
+                        for (String usage : newUsages) {
+                            model.addRow(new Object[] {usage});
+                        }
+                    usagesTable.setModel(model);
+                    } else {
+                        model.addColumn(translate("usages").replace("%item%", "-"));                        
+                    }
+                } else {
+                    model.addColumn(translate("usages").replace("%item%", "-"));                    
+                }
+                usagesTable.setModel(model);
             }
         });
         tree.addMouseListener(new MouseAdapter() {
@@ -447,8 +750,11 @@ public class ABCExplorerDialog extends AppDialog {
         if (tree.getSelectionCount() != 1) {
             return null;
         }
+        
+        
+        
         Object selection = tree.getLastSelectedPathComponent();
-
+                
         if (selection instanceof ValueWithIndex) {
             ValueWithIndex vwi = (ValueWithIndex) selection;
             if (vwi.getType() == TreeType.SCRIPT_INFO) {
@@ -488,7 +794,12 @@ public class ABCExplorerDialog extends AppDialog {
                     break;
             }
         }
-        if (selection != null) {
+               
+        if (selection != null) {            
+            JMenuItem copyMenuItem = new JMenuItem(translate("copy.path"), View.getIcon("copy16"));
+            copyMenuItem.addActionListener(this::copyPathActionPerformed);
+            menu.add(copyMenuItem);
+        
             JMenuItem copyRowMenuItem = new JMenuItem(translate("copy.row"), View.getIcon("copy16"));
             copyRowMenuItem.addActionListener(this::copyRowActionPerformed);
             menu.add(copyRowMenuItem);
@@ -544,14 +855,16 @@ public class ABCExplorerDialog extends AppDialog {
         return menu;
     }
 
+    private void copyPathActionPerformed(ActionEvent e) {
+        copyToClipboard(getCurrentPath());             
+    }
+    
     private void copyRowActionPerformed(ActionEvent e) {
         Object selection = getCurrentTree().getLastSelectedPathComponent();
         if (selection != null) {
             copyToClipboard(selection.toString());
         }
     }
-
-    
 
     private boolean showMethodInfoTraits(int round, int scriptIndex, int classIndex, int methodInfo, ABC abc, Traits traits, int traitsType, int scriptTraitIndex) {
         for (int j = 0; j < traits.traits.size(); j++) {
@@ -638,7 +951,7 @@ public class ABCExplorerDialog extends AppDialog {
         }
         return found;
     }
-    
+
     private void showMethodInfo(int methodInfo) {
         ABC abc = getSelectedAbc();
         for (int round = 1; round <= 2; round++) {
@@ -883,31 +1196,33 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private enum TreeType {
-        CONSTANT_INT("Integers", "int", TreeIcon.CONSTANT_INT),
-        CONSTANT_UINT("UnsignedIntegers", "uint", TreeIcon.CONSTANT_UINT),
-        CONSTANT_DOUBLE("Doubles", "dbl", TreeIcon.CONSTANT_DOUBLE),
-        CONSTANT_DECIMAL("Decimals", "dc", TreeIcon.CONSTANT_DECIMAL), //needs ABC decimal support
-        CONSTANT_FLOAT("Floats", "fl", TreeIcon.CONSTANT_FLOAT), //needs ABC float support
-        CONSTANT_FLOAT_4("Floats4", "fl4", TreeIcon.CONSTANT_FLOAT_4), //needs ABC float support
-        CONSTANT_STRING("Strings", "str", TreeIcon.CONSTANT_STRING),
-        CONSTANT_NAMESPACE("Namespaces", "ns", TreeIcon.CONSTANT_NAMESPACE),
-        CONSTANT_NAMESPACE_SET("NamespaceSets", "nss", TreeIcon.CONSTANT_NAMESPACE_SET),
-        CONSTANT_MULTINAME("Multinames", "mn", TreeIcon.CONSTANT_MULTINAME),
-        METHOD_INFO("MethodInfos", "mi", TreeIcon.METHOD_INFO),
-        METADATA_INFO("MetadataInfos", "md", TreeIcon.METADATA_INFO),
-        INSTANCE_INFO("InstanceInfos", "ii", TreeIcon.INSTANCE_INFO),
-        CLASS_INFO("ClassInfos", "ci", TreeIcon.CLASS_INFO),
-        SCRIPT_INFO("ScriptInfos", "si", TreeIcon.SCRIPT_INFO),
-        METHOD_BODY("MethodBodys", "mb", TreeIcon.METHOD_BODY);
+        CONSTANT_INT("Integers", "int", TreeIcon.CONSTANT_INT, ABCSimpleUsageDetector.ItemKind.INT),
+        CONSTANT_UINT("UnsignedIntegers", "uint", TreeIcon.CONSTANT_UINT, ABCSimpleUsageDetector.ItemKind.UINT),
+        CONSTANT_DOUBLE("Doubles", "dbl", TreeIcon.CONSTANT_DOUBLE, ABCSimpleUsageDetector.ItemKind.DOUBLE),
+        CONSTANT_DECIMAL("Decimals", "dc", TreeIcon.CONSTANT_DECIMAL, null), //needs ABC decimal support
+        CONSTANT_FLOAT("Floats", "fl", TreeIcon.CONSTANT_FLOAT, null), //needs ABC float support
+        CONSTANT_FLOAT_4("Floats4", "fl4", TreeIcon.CONSTANT_FLOAT_4, null), //needs ABC float support
+        CONSTANT_STRING("Strings", "str", TreeIcon.CONSTANT_STRING, ABCSimpleUsageDetector.ItemKind.STRING),
+        CONSTANT_NAMESPACE("Namespaces", "ns", TreeIcon.CONSTANT_NAMESPACE, ABCSimpleUsageDetector.ItemKind.NAMESPACE),
+        CONSTANT_NAMESPACE_SET("NamespaceSets", "nss", TreeIcon.CONSTANT_NAMESPACE_SET, ABCSimpleUsageDetector.ItemKind.NAMESPACESET),
+        CONSTANT_MULTINAME("Multinames", "mn", TreeIcon.CONSTANT_MULTINAME, ABCSimpleUsageDetector.ItemKind.MULTINAME),
+        METHOD_INFO("MethodInfos", "mi", TreeIcon.METHOD_INFO, ABCSimpleUsageDetector.ItemKind.METHODINFO),
+        METADATA_INFO("MetadataInfos", "md", TreeIcon.METADATA_INFO, ABCSimpleUsageDetector.ItemKind.METADATAINFO),
+        INSTANCE_INFO("InstanceInfos", "ii", TreeIcon.INSTANCE_INFO, ABCSimpleUsageDetector.ItemKind.CLASS),
+        CLASS_INFO("ClassInfos", "ci", TreeIcon.CLASS_INFO, ABCSimpleUsageDetector.ItemKind.CLASS),
+        SCRIPT_INFO("ScriptInfos", "si", TreeIcon.SCRIPT_INFO, null),
+        METHOD_BODY("MethodBodys", "mb", TreeIcon.METHOD_BODY, ABCSimpleUsageDetector.ItemKind.METHODBODY);
 
         private final String name;
         private final String abbreviation;
         private final TreeIcon icon;
+        private final ABCSimpleUsageDetector.ItemKind usageKind;
 
-        TreeType(String name, String abbreviation, TreeIcon icon) {
+        TreeType(String name, String abbreviation, TreeIcon icon, ABCSimpleUsageDetector.ItemKind usageKind) {
             this.name = name;
             this.abbreviation = abbreviation;
             this.icon = icon;
+            this.usageKind = usageKind;
         }
 
         public String getName() {
@@ -925,6 +1240,10 @@ public class ABCExplorerDialog extends AppDialog {
         @Override
         public String toString() {
             return name;
+        }
+
+        public ABCSimpleUsageDetector.ItemKind getUsageKind() {
+            return usageKind;
         }
     }
 
@@ -2233,20 +2552,23 @@ public class ABCExplorerDialog extends AppDialog {
     public static class ExplorerTreeCellRenderer extends DefaultTreeCellRenderer {
 
         Map<String, ImageIcon> iconCache = new HashMap<>();
+        boolean semiTransparent = false;
+        private final ABCExplorerDialog dialog;
 
-        public ExplorerTreeCellRenderer() {
+        public ExplorerTreeCellRenderer(ABCExplorerDialog dialog) {
             setUI(new BasicLabelUI());
             setOpaque(false);
             if (View.isOceanic()) {
                 setBackgroundNonSelectionColor(Color.white);
             }
+            this.dialog = dialog;
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            /*if (semiTransparent) {
+            if (semiTransparent) {
                 if (getIcon() != null) {
                     Color color = getBackground();
                     Graphics2D g2d = (Graphics2D) g;
@@ -2254,7 +2576,7 @@ public class ABCExplorerDialog extends AppDialog {
                     g2d.setComposite(AlphaComposite.SrcOver);
                     g2d.fillRect(0, 0, getWidth(), getHeight());
                 }
-            }*/
+            }
         }
 
         @Override
@@ -2294,7 +2616,17 @@ public class ABCExplorerDialog extends AppDialog {
                 setIcon(null);
             }
 
-            //semitransparent = true;
+            semiTransparent = false;
+            if (value instanceof ValueWithIndex) {
+                if (dialog.usageDetector != null) {
+                    ValueWithIndex vwi = (ValueWithIndex) value;
+                    if (vwi.getType().getUsageKind() != null) {
+                        List<String> usages = dialog.usageDetector.getUsages(vwi.getType().getUsageKind(), vwi.getIndex());
+                        semiTransparent = usages.isEmpty();
+                    }
+                }
+
+            }
             return this;
         }
     }

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -870,5 +871,5 @@ public class AVM2ConstantPool implements Cloneable {
         for (int i = 0; i < constant_multiname.size(); i++) {
             Multiname.checkTypeNameCyclic(this, i);
         }
-    }
+    }        
 }
