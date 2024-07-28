@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.usages.multinames;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.usages.Usage;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -26,7 +27,7 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public abstract class MultinameUsage {
+public abstract class MultinameUsage implements Usage {
 
     protected final ABC abc;
 
@@ -45,6 +46,7 @@ public abstract class MultinameUsage {
         return multinameIndex;
     }
 
+    @Override
     public ABC getAbc() {
         return abc;
     }
@@ -124,4 +126,14 @@ public abstract class MultinameUsage {
     }
 
     public abstract boolean collides(MultinameUsage other);
+
+    @Override
+    public int getIndex() {
+        return multinameIndex;
+    }
+
+    @Override
+    public String getKind() {
+        return "multiname";
+    }        
 }

@@ -18,6 +18,10 @@ All notable changes to this project will be documented in this file.
 - Set class to character mapping tool (via SymbolClass) context menu on characters
 - [#2189] Search bar in replace character (+ replace references) window
 - [#2011], [#2215] Option to ignore frame background color when exporting (make transparent)
+- ABC Explorer - list of usages of all items
+- ABC Explorer - items with zero usages are semi-transparent
+- ABC Explorer - copy path to clipboard
+- ABC Explorer - Go to path via `Ctrl + G`
 
 ### Fixed
 - Debugger - getting children of top level variables
