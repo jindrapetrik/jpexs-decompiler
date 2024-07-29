@@ -61,6 +61,8 @@ All notable changes to this project will be documented in this file.
 - [PR193] Quoting JAR file in ffdec.sh
 - Refreshing class/exportname association on SymbolClass/ExportAssets deletion
 - Outputstreams position calculation (ABCOutputStream, ...)
+- [#2260] Reading end of file on old GFX format (1.x)
+- [#2260] DefineExternalImage on old GFX format (1.x)
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3441,6 +3443,7 @@ Major version of SWF to XML export changed to 2.
 [#2257]: https://www.free-decompiler.com/flash/issues/2257
 [#2253]: https://www.free-decompiler.com/flash/issues/2253
 [#2239]: https://www.free-decompiler.com/flash/issues/2239
+[#2260]: https://www.free-decompiler.com/flash/issues/2260
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123

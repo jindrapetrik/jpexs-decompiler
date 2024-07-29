@@ -19,11 +19,10 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.TagInfo;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
@@ -33,12 +32,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
-import javax.imageio.ImageIO;
-import net.npe.dds.DDSReader;
 
 /**
  *
@@ -56,10 +50,15 @@ public class DefineExternalImage extends AbstractGfxImageTag {
 
     public int targetHeight;
 
+    //I guess this probably depends on ExporterInfo version - version 1 probably has shortFormat    
+    public boolean shortFormat = false;
+        
     public String exportName;
 
+    @Conditional(value = "shortFormat", revert = true)    
     public String fileName;   
-
+    
+    
     @HideInRawEdit
     private SerializableImage serImage;
 
@@ -79,7 +78,9 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         sos.writeUI16(targetWidth);
         sos.writeUI16(targetHeight);
         sos.writeNetString(exportName);
-        sos.writeNetString(fileName);
+        if (!shortFormat) {
+            sos.writeNetString(fileName);
+        }
     }
 
     /**
@@ -96,6 +97,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
 
     public DefineExternalImage(SWF swf) {
         super(swf, ID, NAME, null);
+        shortFormat = false;
         exportName = "";
         fileName = "";
         targetWidth = 1;
@@ -111,7 +113,12 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         targetWidth = sis.readUI16("targetWidth");
         targetHeight = sis.readUI16("targetHeight");
         exportName = sis.readNetString("exportName");
-        fileName = sis.readNetString("fileName");
+        if (sis.available() > 0) {
+            fileName = sis.readNetString("fileName");            
+            shortFormat = false;
+        } else {
+            shortFormat = true;
+        }
     }
 
     private void createFailedImage() {
@@ -161,8 +168,31 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         return new Dimension(targetWidth, targetHeight);
     }
 
+    private String getFilename() {
+        if (shortFormat) {
+            //Just guessing how this may work...
+            String extension = ".dds";
+            switch (bitmapFormat) {
+                case BITMAP_FORMAT_DDS:
+                case BITMAP_FORMAT2_DDS:
+                    extension = ".dds";
+                    break;
+                case BITMAP_FORMAT_TGA:
+                case BITMAP_FORMAT2_TGA:
+                    extension = ".tga";
+                    break;
+                case BITMAP_FORMAT2_JPEG:
+                    extension = ".jpg";
+                    break;
+            }
+            return exportName + extension;
+        }
+        return fileName;
+    }
+    
     private void initImage() {
-        if (Objects.equals(cachedImageFilename, fileName)
+        String fname = getFilename();
+        if (Objects.equals(cachedImageFilename, fname)
                 && serImage != null && (serImage.getWidth() == targetWidth && serImage.getHeight() == targetHeight)) {
             return;
         }
@@ -173,7 +203,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
             return;
         }
 
-        BufferedImage bufImage = getExternalBufferedImage(fileName, bitmapFormat);
+        BufferedImage bufImage = getExternalBufferedImage(fname, bitmapFormat);
         if (bufImage == null) {
             createFailedImage();
             return;
@@ -182,7 +212,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         bufImage.getGraphics().drawImage(scaled, 0, 0, null);
         serImage = new SerializableImage(bufImage);
-        cachedImageFilename = fileName;                        
+        cachedImageFilename = fname;
     }
 
     @Override
@@ -194,8 +224,10 @@ public class DefineExternalImage extends AbstractGfxImageTag {
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
         
-        tagInfo.addInfo("general", "exportName", exportName);
-        tagInfo.addInfo("general", "fileName", fileName);
+        tagInfo.addInfo("general", "exportName", exportName);        
+        if (!shortFormat) {
+            tagInfo.addInfo("general", "fileName", fileName);
+        }
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
         switch (bitmapFormat) {
             case BITMAP_FORMAT_DEFAULT:

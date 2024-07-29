@@ -2189,7 +2189,42 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
                 default: { // FWS, GFX
                     if (allowUncompressed) {
-                        Helper.copyStream(is, os, fileSize - 8);
+                        //In old versions of GFX format (I saw it in 1.02), the fileSize field 
+                        // does not contain size of header (signature + version + filesize = 8 bytes)
+                        if (header.gfx && is.available() >= fileSize) {
+                            final InputStream fis = is;
+                            
+                            //pass to outputstream all we read
+                            InputStream copyIs = new InputStream() {                                
+                                @Override
+                                public int read() throws IOException {
+                                    int value = fis.read();
+                                    os.write(value);
+                                    return value;
+                                }
+                            };
+                            //Use special constructor to pass InputStream
+                            SWFInputStream sis = new SWFInputStream(copyIs);
+                            sis.readRECT("displayRect");
+                            sis.readFIXED8("frameRate");
+                            sis.readUI16("frameCount");
+                            int tagIDTagLength = sis.readUI16("tagIDTagLength");
+                            long tagLength = (tagIDTagLength & 0x003F);
+                            if (tagLength == 0x3f) {
+                                sis.readSI32("tagLength");                                
+                            }
+                            int tagID = (tagIDTagLength) >> 6;
+                            if (tagID == ExporterInfo.ID) {
+                                int exporterVersion = sis.readUI16("exporterInfo");
+                                if (exporterVersion < 0x200) { //assuming version 2 corrected this
+                                    Helper.copyStream(is, os, fileSize - sis.getPos());
+                                }
+                            } else {
+                                Helper.copyStream(is, os, fileSize - 8 - sis.getPos());
+                            }
+                        } else {
+                            Helper.copyStream(is, os, fileSize - 8);
+                        }
                     } else {
                         throw new IOException("SWF is not compressed");
                     }
