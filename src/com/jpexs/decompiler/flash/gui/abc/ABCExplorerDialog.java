@@ -38,10 +38,14 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.usages.simple.ABCOptimizer;
 import com.jpexs.decompiler.flash.abc.usages.simple.ABCSimpleUsageDetector;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
@@ -87,10 +91,12 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
@@ -129,6 +135,8 @@ public class ABCExplorerDialog extends AppDialog {
 
     private ABCSimpleUsageDetector usageDetector = null;
     
+    private JButton optimizeButton = new JButton(View.getIcon("optimize16"));        
+    
     private JTable usagesTable = new JTable(new DefaultTableModel()) {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -141,8 +149,8 @@ public class ABCExplorerDialog extends AppDialog {
         this.mainPanel = mainPanel;
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(new JLabel(translate("abc")));
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topLeftPanel.add(new JLabel(translate("abc")));
         int selectedIndex = 0;
         int frame = 1;
         if (openable instanceof SWF) {
@@ -178,7 +186,7 @@ public class ABCExplorerDialog extends AppDialog {
             Dimension abcComboBoxSize = new Dimension(500, abcComboBox.getPreferredSize().height);
             abcComboBox.setMinimumSize(abcComboBoxSize);
             abcComboBox.setPreferredSize(abcComboBoxSize);
-            topPanel.add(abcComboBox);
+            topLeftPanel.add(abcComboBox);
             abcComboBox.addActionListener(this::abcComboBoxActionPerformed);
 
         } else if (openable instanceof ABC) {
@@ -199,7 +207,17 @@ public class ABCExplorerDialog extends AppDialog {
         };
 
         tagInfoLabel = new JLabel();
-        topPanel.add(tagInfoLabel);
+        topLeftPanel.add(tagInfoLabel);
+        
+        optimizeButton.setToolTipText(translate("button.optimize"));
+        optimizeButton.addActionListener(this::optimizeActionPerformed);
+        
+        JPanel topRightPanel = new JPanel(new FlowLayout());
+        topRightPanel.add(optimizeButton);
+        
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(topLeftPanel, BorderLayout.WEST);
+        topPanel.add(topRightPanel, BorderLayout.EAST);
 
         mainTabbedPane = new JTabbedPane();
         cpTabbedPane = new JTabbedPane();
@@ -426,6 +444,9 @@ public class ABCExplorerDialog extends AppDialog {
         ABCSimpleUsageDetector newUsageDetector = new ABCSimpleUsageDetector(getSelectedAbc());
         newUsageDetector.detect(); 
         usageDetector = newUsageDetector;
+        int zeroUsages = newUsageDetector.getZeroUsagesCount();
+        optimizeButton.setText("(" + zeroUsages + ")");
+        optimizeButton.setEnabled(zeroUsages > 0);
     }
 
     private JTree getCurrentTree() {
@@ -2628,6 +2649,26 @@ public class ABCExplorerDialog extends AppDialog {
 
             }
             return this;
+        }
+    }
+    
+    private void optimizeActionPerformed(ActionEvent e) {
+        ABC abc = getSelectedAbc();
+        if (abc != null) {
+            if (ViewMessages.showConfirmDialog(this, translate("warning.optimize"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningAbcOptimize, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+                return;
+            }
+            int mainIndex = mainTabbedPane.getSelectedIndex();
+            int cpIndex = cpTabbedPane.getSelectedIndex();
+            ABCOptimizer optimizer = new ABCOptimizer();
+            optimizer.optimize(abc);           
+            if (cpIndex > -1) {
+                cpTabbedPane.setSelectedIndex(cpIndex);
+            }
+            if (mainIndex > -1) {
+                mainTabbedPane.setSelectedIndex(mainIndex);
+            }
+            Main.getMainFrame().getPanel().refreshTree();
         }
     }
 }

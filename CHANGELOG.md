@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - ABC Explorer - items with zero usages are semi-transparent
 - ABC Explorer - copy path to clipboard
 - ABC Explorer - Go to path via `Ctrl + G`
+- Optimize ABC action (remove unused items) - available through ABC Explorer
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -57,6 +58,7 @@ All notable changes to this project will be documented in this file.
 - [#2239] Exporting TTF font on Linux
 - [PR193] Quoting JAR file in ffdec.sh
 - Refreshing class/exportname association on SymbolClass/ExportAssets deletion
+- Outputstreams position calculation (ABCOutputStream, ...)
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu

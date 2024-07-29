@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -26,5 +27,5 @@ public class NulStream extends OutputStream {
 
     @Override
     public void write(int i) {
-    }
+    }   
 }

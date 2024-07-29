@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.File;
 import java.io.IOException;
@@ -1161,8 +1162,7 @@ public class ABC implements Openable {
         for (int i = 0; i < bodies.size(); i++) {
             output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));
         }
-    }       
-    
+    }
 
     public List<MultinameUsage> findMultinameDefinition(int multinameIndex) {
         List<MultinameUsage> usages = findMultinameUsage(multinameIndex, false);
@@ -1184,7 +1184,7 @@ public class ABC implements Openable {
         }
         return ret;
     }
-    
+
     public List<MultinameUsage> findMultinameUsage(int multinameIndex, boolean exactMatch) {
         MultinameUsageDetector det = new MultinameUsageDetector();
         List<Usage> retUsage = det.findMultinameUsage(this, multinameIndex, exactMatch);
@@ -1269,8 +1269,6 @@ public class ABC implements Openable {
             constants.getMultiname(multinameIndex).setDisplayNamespace(true);
         }
     }
-
-    
 
     public int findMethodInfoByName(int classId, String methodNameWithSuffix) {
         if (classId > -1) {
@@ -1728,10 +1726,7 @@ public class ABC implements Openable {
                 s--;
             }
         }
-        getSwf().clearAbcListCache();
-        getSwf().clearScriptCache();
-        getMethodIndexing();
-        getSwf().getAbcIndex().refreshAbc(this);
+        clearAllCaches();
 
         fireChanged();
     }
@@ -2275,5 +2270,13 @@ public class ABC implements Openable {
 
     public long getDataSize() {
         return dataSize;
-    }       
+    }
+
+    public void clearAllCaches() {
+        resetMethodIndexing();
+        getSwf().clearAbcListCache();
+        getSwf().clearScriptCache();
+        getMethodIndexing();
+        getSwf().getAbcIndex().refreshAbc(this);
+    }
 }
