@@ -273,6 +273,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.FakeMemoryInputStream;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.MemoryInputStream;
@@ -282,6 +283,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -384,6 +386,19 @@ public class SWFInputStream implements AutoCloseable {
         this(swf, data, 0L, data.length);
     }
 
+    /**
+     * HACK: Special constructor to handle old GFX format
+     * - DO NOT USE for normal purposes - it won't read tags, etc...
+     * @param is 
+     */
+    public SWFInputStream(InputStream is) throws IOException {
+        this.swf = null;
+        this.startingPos = 0;
+        this.data = null;
+        this.limit = Integer.MAX_VALUE;
+        this.is = new FakeMemoryInputStream(is);
+    }
+    
     public SWF getSwf() {
         return swf;
     }
@@ -810,9 +825,12 @@ public class SWFInputStream implements AutoCloseable {
      * @return ByteArrayRange object
      * @throws IOException
      */
-    public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {
+    public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {        
         if (count <= 0) {
             return ByteArrayRange.EMPTY;
+        }
+        if (data == null) {
+            throw new RuntimeException("Data not available - use constructor with data rather than inputstream");
         }
 
         newDumpLevel(name, "bytes", specialType, specialValue);
@@ -1599,6 +1617,9 @@ public class SWFInputStream implements AutoCloseable {
      * @throws java.lang.InterruptedException
      */
     public Tag readTag(Timelined timelined, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
+        if (data == null) {
+            throw new RuntimeException("Data not available - use constructor with data rather than inputstream");
+        }
         int tagIDTagLength = readUI16("tagIDTagLength");
         int tagID = (tagIDTagLength) >> 6;
 
