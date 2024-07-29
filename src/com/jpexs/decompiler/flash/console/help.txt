@@ -272,6 +272,11 @@ alias /?
     <outfile>: Where to save merged file
     <swffile>: Input SWF file
 
+-abcclean <infile> <outfile>
+    Cleans specified ABC file by removing all unused items from the ABC.
+    <infile>: Input ABC (.abc extension) or SWF file (.swf or .gfx)
+    <outfile>: Where to save result
+
 -swf2exe <exportMode> <outfile> <swffile>
     Export SWF to executable file.
     <exportMode>: wrapper|projector_win||projector_mac|projector_linux
