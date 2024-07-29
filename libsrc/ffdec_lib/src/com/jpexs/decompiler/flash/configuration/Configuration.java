@@ -1007,7 +1007,7 @@ public final class Configuration {
     
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static ConfigurationItem<Boolean> warningAbcOptimize = null;
+    public static ConfigurationItem<Boolean> warningAbcClean = null;
     
     private enum OSId {
         WINDOWS, OSX, UNIX

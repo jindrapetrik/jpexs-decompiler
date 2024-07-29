@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.usages.simple.ABCCleaner;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -314,6 +315,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem unpinOthersMenuItem;
 
     private JMenuItem abcExplorerMenuItem;
+    
+    private JMenuItem cleanAbcMenuItem;
 
     private JMenuItem replaceWithGifMenuItem;
 
@@ -453,6 +456,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
         abcExplorerMenuItem.setIcon(View.getIcon("abcexplorer16"));
         add(abcExplorerMenuItem);
+        
+        cleanAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cleanAbc"));
+        cleanAbcMenuItem.addActionListener(this::cleanAbcActionPerformed);
+        cleanAbcMenuItem.setIcon(View.getIcon("clean16"));
+        add(cleanAbcMenuItem);
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
@@ -1134,6 +1142,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithTagMenuItem.setVisible(false);
         replaceRefsWithTagMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
+        cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
@@ -1382,10 +1391,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof ABCContainerTag) {
                 abcExplorerMenuItem.setVisible(true);
+                cleanAbcMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof ABC) {
                 abcExplorerMenuItem.setVisible(true);
+                cleanAbcMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof ClassesListTreeModel) {
@@ -1396,6 +1407,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 SWF swf = (SWF) firstItem;
                 if (swf.isAS3()) {
                     abcExplorerMenuItem.setVisible(true);
+                    cleanAbcMenuItem.setVisible(true);
                 }
             }
 
@@ -2480,6 +2492,31 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
+    private void cleanAbcActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        if (item == null) {
+            return;
+        }
+        if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.cleanAbc"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningAbcClean, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+            return;
+        }
+        ABCCleaner cleaner = new ABCCleaner();
+        if (item instanceof ABCContainerTag) {
+            ABCContainerTag cnt = (ABCContainerTag) item;
+            cleaner.clean(cnt.getABC());
+        }
+        if (item instanceof ABC) {
+            cleaner.clean((ABC) item);
+        }
+        if (item instanceof SWF) {
+            SWF swf = (SWF) item;
+            for (ABCContainerTag cnt : swf.getAbcList()) {
+                cleaner.clean(cnt.getABC());
+            }
+        }
+        Main.getMainFrame().getPanel().refreshTree();
+    }
+    
     private void rawEditActionPerformed(ActionEvent evt) {
         TreeItem itemr = getCurrentItem();
         if (itemr == null) {

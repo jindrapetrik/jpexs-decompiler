@@ -22,7 +22,8 @@ All notable changes to this project will be documented in this file.
 - ABC Explorer - items with zero usages are semi-transparent
 - ABC Explorer - copy path to clipboard
 - ABC Explorer - Go to path via `Ctrl + G`
-- Optimize ABC action (remove unused items) - available through ABC Explorer
+- Clean ABC action (remove unused items)
+  available through context menu on ABC, ABCContainers, SWFs and in the ABC Explorer
 
 ### Fixed
 - Debugger - getting children of top level variables
