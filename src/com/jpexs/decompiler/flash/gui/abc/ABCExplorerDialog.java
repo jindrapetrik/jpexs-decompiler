@@ -38,7 +38,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.abc.usages.simple.ABCOptimizer;
+import com.jpexs.decompiler.flash.abc.usages.simple.ABCCleaner;
 import com.jpexs.decompiler.flash.abc.usages.simple.ABCSimpleUsageDetector;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -135,7 +135,7 @@ public class ABCExplorerDialog extends AppDialog {
 
     private ABCSimpleUsageDetector usageDetector = null;
     
-    private JButton optimizeButton = new JButton(View.getIcon("optimize16"));        
+    private JButton cleanButton = new JButton(View.getIcon("clean16"));        
     
     private JTable usagesTable = new JTable(new DefaultTableModel()) {
         @Override
@@ -209,11 +209,11 @@ public class ABCExplorerDialog extends AppDialog {
         tagInfoLabel = new JLabel();
         topLeftPanel.add(tagInfoLabel);
         
-        optimizeButton.setToolTipText(translate("button.optimize"));
-        optimizeButton.addActionListener(this::optimizeActionPerformed);
+        cleanButton.setToolTipText(translate("button.clean"));
+        cleanButton.addActionListener(this::cleanActionPerformed);
         
         JPanel topRightPanel = new JPanel(new FlowLayout());
-        topRightPanel.add(optimizeButton);
+        topRightPanel.add(cleanButton);
         
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(topLeftPanel, BorderLayout.WEST);
@@ -445,8 +445,8 @@ public class ABCExplorerDialog extends AppDialog {
         newUsageDetector.detect(); 
         usageDetector = newUsageDetector;
         int zeroUsages = newUsageDetector.getZeroUsagesCount();
-        optimizeButton.setText("(" + zeroUsages + ")");
-        optimizeButton.setEnabled(zeroUsages > 0);
+        cleanButton.setText("(" + zeroUsages + ")");
+        cleanButton.setEnabled(zeroUsages > 0);
     }
 
     private JTree getCurrentTree() {
@@ -2652,16 +2652,16 @@ public class ABCExplorerDialog extends AppDialog {
         }
     }
     
-    private void optimizeActionPerformed(ActionEvent e) {
+    private void cleanActionPerformed(ActionEvent e) {
         ABC abc = getSelectedAbc();
         if (abc != null) {
-            if (ViewMessages.showConfirmDialog(this, translate("warning.optimize"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningAbcOptimize, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
+            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("warning.cleanAbc"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningAbcClean, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION) {
                 return;
             }
             int mainIndex = mainTabbedPane.getSelectedIndex();
             int cpIndex = cpTabbedPane.getSelectedIndex();
-            ABCOptimizer optimizer = new ABCOptimizer();
-            optimizer.optimize(abc);           
+            ABCCleaner cleaner = new ABCCleaner();
+            cleaner.clean(abc);           
             if (cpIndex > -1) {
                 cpTabbedPane.setSelectedIndex(cpIndex);
             }

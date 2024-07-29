@@ -39,23 +39,19 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.NulStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public class ABCOptimizer {
+public class ABCCleaner {
 
-    public void optimize(ABC abc) {                
+    public void clean(ABC abc) {                
         ABCSimpleUsageDetector usageDetector = new ABCSimpleUsageDetector(abc);
         usageDetector.detect();
         Map<ABCSimpleUsageDetector.ItemKind, List<List<String>>> usages = usageDetector.getUsages();
@@ -78,21 +74,7 @@ public class ABCOptimizer {
                     pos++;
                 }
             }
-        }
-
-        /*
-        for (ABCSimpleUsageDetector.ItemKind kind : replaceMap.keySet()) {
-            System.err.println("---------");
-            System.err.println("" + kind + " map:");
-            for (int key : replaceMap.get(kind).keySet()) {
-                System.err.println(" " + key + " => " + replaceMap.get(kind).get(key));
-            }
-            System.err.println(" " + kind + " not referenced:");
-            for (int key : notReferencedIndices.get(kind)) {
-                System.err.println(" " + key);
-            }
-        }
-        System.err.println("===================");   */    
+        }        
         
         for (int i = 0; i < abc.script_info.size(); i++) {
             ScriptInfo m = abc.script_info.get(i);
