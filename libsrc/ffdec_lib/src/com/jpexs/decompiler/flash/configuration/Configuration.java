@@ -1005,6 +1005,10 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> lastExportTransparentBackground = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningAbcOptimize = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

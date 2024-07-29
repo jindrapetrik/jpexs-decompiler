@@ -46,29 +46,41 @@ import java.util.Stack;
 public class ABCSimpleUsageDetector {
 
     public static enum ItemKind {
-        INT,
-        UINT,
-        DOUBLE,
-        STRING,
-        NAMESPACE,
-        NAMESPACESET,
-        MULTINAME,
-        METADATAINFO,
-        METHODINFO,
-        METHODBODY,
-        CLASS
+        INT(true),
+        UINT(true),
+        DOUBLE(true),
+        STRING(true),
+        NAMESPACE(true),
+        NAMESPACESET(true),
+        MULTINAME(true),
+        METADATAINFO(false),
+        METHODINFO(false),
+        METHODBODY(false),
+        CLASS(false);
+        
+        private boolean reserveZeroIndex;
+        
+        private ItemKind (boolean reserveZeroIndex) {
+            this.reserveZeroIndex = reserveZeroIndex;
+        }
+        
+        public boolean hasReservedZeroIndex() {
+            return reserveZeroIndex;
+        }
     }
     
-    private final Map<ItemKind, List<List<String>>> usages = new HashMap<>();            
+    private final Map<ItemKind, List<List<String>>> usages = new HashMap<>();   
+    private final Map<ItemKind, List<Integer>> zeroUsages = new HashMap<>();
+        
     
     private final ABC abc;
     public ABCSimpleUsageDetector(ABC abc) {
         this.abc = abc;        
     }
     
-    private void initUsages(ItemKind kind, int itemCount, boolean atleastOne) {
+    private void initUsages(ItemKind kind, int itemCount) {
         List<List<String>> list = new ArrayList<>();
-        if (atleastOne && itemCount == 0) {
+        if (kind.hasReservedZeroIndex() && itemCount == 0) {
             itemCount = 1;
         } 
         for (int i = 0; i < itemCount; i++) {
@@ -80,17 +92,17 @@ public class ABCSimpleUsageDetector {
     public void detect() {
         usages.clear();
         
-        initUsages(ItemKind.INT, abc.constants.getIntCount(), true);
-        initUsages(ItemKind.UINT, abc.constants.getUIntCount(), true);
-        initUsages(ItemKind.DOUBLE, abc.constants.getDoubleCount(), true);
-        initUsages(ItemKind.STRING, abc.constants.getStringCount(), true);
-        initUsages(ItemKind.NAMESPACE, abc.constants.getNamespaceCount(), true);
-        initUsages(ItemKind.NAMESPACESET, abc.constants.getNamespaceSetCount(), true);
-        initUsages(ItemKind.MULTINAME, abc.constants.getMultinameCount(), true);
-        initUsages(ItemKind.METADATAINFO, abc.metadata_info.size(), false);
-        initUsages(ItemKind.METHODINFO, abc.method_info.size(), false);
-        initUsages(ItemKind.METHODBODY, abc.bodies.size(), false);
-        initUsages(ItemKind.CLASS, abc.class_info.size(), false);
+        initUsages(ItemKind.INT, abc.constants.getIntCount());
+        initUsages(ItemKind.UINT, abc.constants.getUIntCount());
+        initUsages(ItemKind.DOUBLE, abc.constants.getDoubleCount());
+        initUsages(ItemKind.STRING, abc.constants.getStringCount());
+        initUsages(ItemKind.NAMESPACE, abc.constants.getNamespaceCount());
+        initUsages(ItemKind.NAMESPACESET, abc.constants.getNamespaceSetCount());
+        initUsages(ItemKind.MULTINAME, abc.constants.getMultinameCount());
+        initUsages(ItemKind.METADATAINFO, abc.metadata_info.size());
+        initUsages(ItemKind.METHODINFO, abc.method_info.size());
+        initUsages(ItemKind.METHODBODY, abc.bodies.size());
+        initUsages(ItemKind.CLASS, abc.class_info.size());
         
         ABCWalker walker = new ABCWalker() {
             protected void handleUsageNamespace(int index, String usageDescription) {
@@ -417,6 +429,16 @@ public class ABCSimpleUsageDetector {
             }                        
         };
         walker.walkABC(abc, false);
+        
+        zeroUsages.clear();
+        for (ItemKind kind : usages.keySet()) {
+            zeroUsages.put(kind, new ArrayList<>());
+            for (int i = kind.hasReservedZeroIndex() ? 1 : 0; i < usages.get(kind).size(); i++) {
+                if (usages.get(kind).get(i).isEmpty()) {
+                    zeroUsages.get(kind).add(i);
+                }
+            }
+        }
     }
     
     /**
@@ -444,5 +466,25 @@ public class ABCSimpleUsageDetector {
     
     public List<List<String>> getUsages(ItemKind kind) {
         return Collections.unmodifiableList(usages.get(kind));
+    }
+
+    public Map<ItemKind, List<Integer>> getZeroUsages() {
+        return Collections.unmodifiableMap(zeroUsages);
+    }
+    
+    public List<Integer> getZeroUsages(ItemKind kind) {
+        return zeroUsages.get(kind);
+    }
+    
+    public int getZeroUsagesCount() {
+        int cnt = 0;
+        for (ItemKind kind : zeroUsages.keySet()) {
+            cnt += zeroUsages.get(kind).size();
+        }
+        return cnt;
+    }
+    
+    public int getZeroUsagesCount(ItemKind kind) {
+        return zeroUsages.get(kind).size();
     }
 }

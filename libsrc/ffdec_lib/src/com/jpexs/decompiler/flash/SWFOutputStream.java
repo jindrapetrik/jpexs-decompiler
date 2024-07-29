@@ -145,6 +145,13 @@ public class SWFOutputStream extends OutputStream {
         pos += b.length;
     }
 
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        alignByte();
+        os.write(b, off, len);
+        pos += len;
+    }
+    
     public void write(ByteArrayRange b) throws IOException {
         alignByte();
         os.write(b.getArray(), b.getPos(), b.getLength());

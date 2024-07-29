@@ -161,8 +161,10 @@ public final class AbcIndexing {
                 Integer builtInNs = builtInNsPerAbc.get(abc);
 
                 if (builtInNs == null) {
-                    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
-                    builtInNsPerAbc.put(abc, builtInIndex);
+                    //we need to avoid modifying the ABC
+                /*    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
+                    builtInNsPerAbc.put(abc, builtInIndex);*/
+                    builtInIndex = Integer.MIN_VALUE; //??
                 } else {
                     builtInIndex = builtInNs;
                 }

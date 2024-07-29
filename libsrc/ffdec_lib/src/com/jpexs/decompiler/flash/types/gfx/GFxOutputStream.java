@@ -117,6 +117,18 @@ public class GFxOutputStream extends OutputStream {
         pos++;
     }
 
+    @Override
+    public void write(byte[] b) throws IOException {
+        os.write(b);
+        pos += b.length;
+    }        
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        os.write(b, off, len);
+        pos += len;
+    }
+       
     /**
      * Writes SI32 (Signed 32bit integer) value to the stream
      *
