@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -41,6 +42,7 @@ import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.usages.simple.ABCCleaner;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -138,6 +140,7 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -339,7 +342,7 @@ public class CommandLineArgumentParser {
         printCmdLineUsageExamples(out, filter);
 
         System.out.println();
-        System.out.println("You can use special value \"/dev/stdin\" for input files to read data \r\nfrom standard input (even on Windows)");        
+        System.out.println("You can use special value \"/dev/stdin\" for input files to read data \r\nfrom standard input (even on Windows)");
     }
 
     private static void printCmdLineUsageExamples(PrintStream out, String filter) {
@@ -450,7 +453,7 @@ public class CommandLineArgumentParser {
         if (!exampleFound) {
             out.println("Sorry, no example found for command " + filter + ",\r\nLet us know in issue tracker when you need it.");
         }
-        
+
         AnsiConsole.systemUninstall();
 
         //out.println();
@@ -464,7 +467,7 @@ public class CommandLineArgumentParser {
      * @return paths to the file which should be opened or null
      * @throws java.io.IOException On error
      */
-    public static String[] parseArguments(String[] arguments) throws IOException {        
+    public static String[] parseArguments(String[] arguments) throws IOException {
         return parseArgumentsInternal(arguments);
     }
 
@@ -623,6 +626,9 @@ public class CommandLineArgumentParser {
             Translator.main(new String[]{});
         } else if (command.equals("swf2exe")) {
             parseSwf2Exe(args, charset);
+            System.exit(0);
+        } else if (command.equals("abcclean")) {
+            parseAbcClean(args, charset);
             System.exit(0);
         } else if (command.equals("abcmerge")) {
             parseAbcMerge(args, charset);
@@ -954,6 +960,22 @@ public class CommandLineArgumentParser {
             }
         }, charset);
 
+    }
+
+    private static void parseAbcClean(Stack<String> args, String charset) {
+        if (args.size() < 2) {
+            badArguments("abcclean");
+        }
+        final File inFile = new File(args.pop());
+        final File outFile = new File(args.pop());
+        
+        processModifyAbc(inFile, outFile, null, new AbcAction() {
+            @Override
+            public void abcAction(ABC abc, OutputStream stdout) throws IOException {
+                ABCCleaner cleaner = new ABCCleaner();
+                cleaner.clean(abc);
+            }
+        }, charset);
     }
 
     private static void parseSwf2Swc(Stack<String> args, String charset) {
@@ -1878,7 +1900,7 @@ public class CommandLineArgumentParser {
     private static void parseResourceDates(Stack<String> args) {
         CheckResources.checkTranslationDate(System.out);
     }
-    
+
     private static void parseHelp(Stack<String> args) {
         String filter = null;
         if (!args.isEmpty()) {
@@ -4613,6 +4635,11 @@ public class CommandLineArgumentParser {
         public void swfAction(SWF swf, OutputStream stdout) throws IOException;
     }
 
+    private static interface AbcAction {
+
+        public void abcAction(ABC abc, OutputStream stdout) throws IOException;
+    }
+
     private static void processReadSWF(File inFile, File stdOutFile, SwfAction action, String charset) {
         OutputStream stdout = null;
 
@@ -4689,6 +4716,101 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
+                System.exit(1);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Error", ex);
+                System.exit(1);
+            }
+
+            if (tmpFile != null) {
+                try {
+                    if (!inFile.delete()) {
+                        System.err.println("Cannot overwrite original file");
+                        System.exit(1);
+                    }
+                    if (!tmpFile.renameTo(inFile)) {
+                        System.err.println("Cannot rename tempfile to original file");
+                        System.exit(1);
+                    }
+                    tmpFile = null;
+                    System.out.println(inFile + " overwritten.");
+                } finally {
+                    if (tmpFile != null && tmpFile.exists()) {
+                        tmpFile.delete();
+                    }
+                }
+            }
+        } finally {
+            if (stdOutFile != null) {
+                if (stdout != null) {
+                    try {
+                        stdout.close();
+                    } catch (IOException ex) {
+                        //ignore
+                    }
+                }
+            }
+        }
+    }
+
+    private static void processModifyAbc(File inFile, File outFile, File stdOutFile, AbcAction action, String charset) {
+        
+        //It does not have .abc extension, assuming its SWF - process all its ABC tags
+        if (!inFile.getAbsolutePath().toLowerCase().endsWith(".abc")) {
+            SwfAction swfAction = new SwfAction() {
+                @Override
+                public void swfAction(SWF swf, OutputStream stdout) throws IOException {
+                    List<ABCContainerTag> abcList = swf.getAbcList();
+                    for (ABCContainerTag cnt : abcList) {
+                        action.abcAction(cnt.getABC(), stdout);
+                    }
+                }
+            };
+            processModifySWF(inFile, outFile, stdOutFile, swfAction, charset);
+            return;
+        }
+        
+        OutputStream stdout = null;
+
+        try {
+            if (stdOutFile != null) {
+                try {
+                    stdout = new FileOutputStream(stdOutFile);
+                } catch (FileNotFoundException ex) {
+                    System.err.println("File not found: " + ex.getMessage());
+                    System.exit(1);
+                }
+            } else {
+                stdout = System.out;
+            }
+
+            File tmpFile = null;
+            if (inFile.equals(outFile)) {
+                try {
+                    tmpFile = File.createTempFile("ffdec_modify_", ".abc");
+                    outFile = tmpFile;
+                } catch (IOException ex) {
+                    System.err.println("Unable to create temp file");
+                    System.exit(1);
+                }
+            }
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile); FileOutputStream fos = new FileOutputStream(outFile)) {
+                SWF dummySwf = new SWF();
+                dummySwf.setFileTitle(inFile.getName());
+                FileAttributesTag fileAttributes = new FileAttributesTag(dummySwf);
+                fileAttributes.actionScript3 = true;
+                dummySwf.addTag(fileAttributes);
+                fileAttributes.setTimelined(dummySwf);
+                DoABC2Tag doABC2Tag = new DoABC2Tag(dummySwf);
+                dummySwf.addTag(doABC2Tag);
+                doABC2Tag.setTimelined(dummySwf);
+                dummySwf.clearModified();
+                ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, inFile.getName(), null);
+                doABC2Tag.setABC(abc);
+                action.abcAction(abc, stdout);
+                abc.saveTo(fos);
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found: " + ex.getMessage());
                 System.exit(1);
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Error", ex);
