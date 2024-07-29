@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - ABC Explorer - items with zero usages are semi-transparent
 - ABC Explorer - copy path to clipboard
 - ABC Explorer - Go to path via `Ctrl + G`
-- Clean ABC action (remove unused items)
+- [#2243] Clean ABC action (remove unused items)
   available through context menu on ABC, ABCContainers, SWFs and in the ABC Explorer
 
 ### Fixed
@@ -3420,6 +3420,7 @@ Major version of SWF to XML export changed to 2.
 [#2189]: https://www.free-decompiler.com/flash/issues/2189
 [#2011]: https://www.free-decompiler.com/flash/issues/2011
 [#2215]: https://www.free-decompiler.com/flash/issues/2215
+[#2243]: https://www.free-decompiler.com/flash/issues/2243
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
