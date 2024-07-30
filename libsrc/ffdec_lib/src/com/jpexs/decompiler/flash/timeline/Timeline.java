@@ -967,7 +967,7 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(swf, dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
+                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
             } else {
                 // todo: show one time warning
             }
@@ -1357,12 +1357,12 @@ public class Timeline {
                     exporter.createClipPath(mat, clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
-                    drawable.toSVG(swf, exporter, layer.ratio, clrTrans, level + 1);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 } else {
                     if (createNew) {
                         exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                        drawable.toSVG(swf, exporter, layer.ratio, clrTrans, level + 1);
+                        drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                         exporter.endGroup();
                     }
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));

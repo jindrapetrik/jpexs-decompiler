@@ -2577,7 +2577,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (ch instanceof FontTag) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("function ").append(getTypePrefix(ch)).append(c).append("(ctx,ch,textColor){\r\n");
-                ((FontTag) ch).toHtmlCanvas(fswf, sb, 1);
+                ((FontTag) ch).toHtmlCanvas(sb, 1);
                 sb.append("}\r\n\r\n");
                 fos.write(Utf8Helper.getBytes(sb.toString()));
             } else {
@@ -2591,7 +2591,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
                 if (ch instanceof DrawableTag) {
                     StringBuilder sb = new StringBuilder();
-                    ((DrawableTag) ch).toHtmlCanvas(fswf, sb, 1);
+                    ((DrawableTag) ch).toHtmlCanvas(sb, 1);
                     fos.write(Utf8Helper.getBytes(sb.toString()));
                 }
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));

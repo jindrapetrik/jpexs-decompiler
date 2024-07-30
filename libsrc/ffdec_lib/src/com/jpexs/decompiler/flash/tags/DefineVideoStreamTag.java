@@ -334,7 +334,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     }
 
     @Override
-    public synchronized void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         
         if (renderingPaused || !SimpleMediaPlayer.isAvailable()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
@@ -419,11 +419,11 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     }
 
     @Override
-    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
     }
 
     @Override
-    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
     }
 
     @Override
