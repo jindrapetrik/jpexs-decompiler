@@ -242,33 +242,33 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     public void setSoundRate(int soundRate) {
         this.soundRate = soundRate;
     }
-    
+
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
-    }      
-    
+    }
+
     @Override
     public int getInitialLatency() {
         if (soundFormat == SoundFormat.FORMAT_MP3) {
             SWFInputStream sis;
             try {
                 sis = new SWFInputStream(null, soundData.getRangeData(0, 2));
-                return sis.readSI16("seekSamples"); 
+                return sis.readSI16("seekSamples");
             } catch (IOException ex) {
                 //ignore
-            }                   
+            }
         }
         return 0;
     }
-    
+
     private boolean isMp3HigherThan160Kbps() {
         if (soundFormat != SoundFormat.FORMAT_MP3) {
             return false;
         }
         try {
-            SWFInputStream sis = new SWFInputStream(swf, soundData.getRangeData());                    
-            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);                      
+            SWFInputStream sis = new SWFInputStream(swf, soundData.getRangeData());
+            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
             if (!s.frames.isEmpty()) {
                 MP3FRAME frame = s.frames.get(0);
                 int bitRate = frame.getBitRate() / 1000;

@@ -57,41 +57,41 @@ public class ABCSimpleUsageDetector {
         METHODINFO(false),
         METHODBODY(false),
         CLASS(false);
-        
+
         private boolean reserveZeroIndex;
-        
-        private ItemKind (boolean reserveZeroIndex) {
+
+        private ItemKind(boolean reserveZeroIndex) {
             this.reserveZeroIndex = reserveZeroIndex;
         }
-        
+
         public boolean hasReservedZeroIndex() {
             return reserveZeroIndex;
         }
     }
-    
-    private final Map<ItemKind, List<List<String>>> usages = new HashMap<>();   
+
+    private final Map<ItemKind, List<List<String>>> usages = new HashMap<>();
     private final Map<ItemKind, List<Integer>> zeroUsages = new HashMap<>();
-        
-    
+
     private final ABC abc;
+
     public ABCSimpleUsageDetector(ABC abc) {
-        this.abc = abc;        
+        this.abc = abc;
     }
-    
+
     private void initUsages(ItemKind kind, int itemCount) {
         List<List<String>> list = new ArrayList<>();
         if (kind.hasReservedZeroIndex() && itemCount == 0) {
             itemCount = 1;
-        } 
+        }
         for (int i = 0; i < itemCount; i++) {
             list.add(new ArrayList<>());
         }
         usages.put(kind, list);
     }
-        
+
     public void detect() {
         usages.clear();
-        
+
         initUsages(ItemKind.INT, abc.constants.getIntCount());
         initUsages(ItemKind.UINT, abc.constants.getUIntCount());
         initUsages(ItemKind.DOUBLE, abc.constants.getDoubleCount());
@@ -103,7 +103,7 @@ public class ABCSimpleUsageDetector {
         initUsages(ItemKind.METHODINFO, abc.method_info.size());
         initUsages(ItemKind.METHODBODY, abc.bodies.size());
         initUsages(ItemKind.CLASS, abc.class_info.size());
-        
+
         ABCWalker walker = new ABCWalker() {
             protected void handleUsageNamespace(int index, String usageDescription) {
                 if (!handleUsage(ItemKind.NAMESPACE, index, usageDescription)) {
@@ -133,7 +133,7 @@ public class ABCSimpleUsageDetector {
                 if (!handleUsage(ItemKind.MULTINAME, index, usageDescription)) {
                     return;
                 }
-                Multiname m = abc.constants.getMultiname(index);                        
+                Multiname m = abc.constants.getMultiname(index);
                 if (m == null) {
                     return;
                 }
@@ -153,15 +153,15 @@ public class ABCSimpleUsageDetector {
                     }
                 }
             }
-            
+
             protected void handleUsageMethodInfo(int index, String usageDescription) {
                 if (!handleUsage(ItemKind.METHODINFO, index, usageDescription)) {
                     return;
                 }
-                
-                MethodInfo m = abc.method_info.get(index);                
+
+                MethodInfo m = abc.method_info.get(index);
                 handleUsage(ItemKind.STRING, m.name_index, usageDescription + "/name");
-                
+
                 if (m.flagHas_paramnames()) {
                     for (int i = 0; i < m.paramNames.length; i++) {
                         handleUsage(ItemKind.STRING, m.paramNames[i], usageDescription + "/param_names/pn" + i);
@@ -172,31 +172,31 @@ public class ABCSimpleUsageDetector {
                         handleUsageValueKind(m.optional[i].value_kind, m.optional[i].value_index, usageDescription + "/optional/op" + i);
                     }
                 }
-                
+
                 for (int i = 0; i < m.param_types.length; i++) {
                     handleUsageMultiname(m.param_types[i], usageDescription + "/param_types/pt" + i);
                 }
-                
-                handleUsageMultiname(m.ret_type, usageDescription + "/return_type");                
-                
+
+                handleUsageMultiname(m.ret_type, usageDescription + "/return_type");
+
                 int bodyIndex = abc.findBodyIndex(index);
                 if (bodyIndex > -1) {
                     handleUsageMethodBody(bodyIndex, usageDescription + "/method_body");
-                }                 
+                }
             }
 
             protected void handleUsageMethodBody(int index, String usageDescription) {
                 if (!handleUsage(ItemKind.METHODBODY, index, usageDescription)) {
                     return;
                 }
-                MethodBody body = abc.bodies.get(index);                
+                MethodBody body = abc.bodies.get(index);
                 for (int i = 0; i < body.exceptions.length; i++) {
                     handleUsageMultiname(body.exceptions[i].name_index, usageDescription + "/exceptions/ex" + i + "/name");
                     handleUsageMultiname(body.exceptions[i].type_index, usageDescription + "/exceptions/ex" + i + "/type");
                 }
                 List<AVM2Instruction> code = body.getCode().code;
                 for (int i = 0; i < code.size(); i++) {
-                    AVM2Instruction ins = code.get(i);                    
+                    AVM2Instruction ins = code.get(i);
                     for (int operandIndex = 0; operandIndex < ins.definition.operands.length; operandIndex++) {
                         int operand = ins.operands[operandIndex];
                         String operandDescription = usageDescription + "/code/ins" + i + "/op" + operandIndex;
@@ -228,10 +228,10 @@ public class ABCSimpleUsageDetector {
                     }
                 }
             }
-            
+
             @Override
-            protected void handleScript(ABC abc, int index) {                
-                
+            protected void handleScript(ABC abc, int index) {
+
             }
 
             @Override
@@ -243,9 +243,8 @@ public class ABCSimpleUsageDetector {
                     description += "/instance_info/traits/t" + traitIndex;
                 }
                 description += "/metadata/md" + index;
-                
+
                 //?? classIndex
-                
                 if (!handleUsage(ItemKind.METADATAINFO, index, description)) {
                     return;
                 }
@@ -256,8 +255,8 @@ public class ABCSimpleUsageDetector {
                 }
                 for (int i = 0; i < md.values.length; i++) {
                     handleUsage(ItemKind.STRING, md.values[i], description + "/pairs/p" + i + "/value");
-                }                
-            }    
+                }
+            }
 
             @Override
             protected void handleTraitClass(ABC abc, TraitClass trait, int scriptIndex, int scriptTraitIndex) {
@@ -265,7 +264,7 @@ public class ABCSimpleUsageDetector {
                 if (!handleUsage(ItemKind.CLASS, trait.class_info, description)) {
                     return;
                 }
-               
+
                 InstanceInfo ii = abc.instance_info.get(trait.class_info);
                 if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) != 0) {
                     handleUsageNamespace(ii.protectedNS, description + "/instance_info/protected_ns");
@@ -274,22 +273,21 @@ public class ABCSimpleUsageDetector {
                 handleUsageMultiname(ii.super_index, description + "/instance_info/super");
                 for (int i = 0; i < ii.interfaces.length; i++) {
                     handleUsageMultiname(ii.interfaces[i], description + "/instance_info/interfaces/in" + i);
-                }                                
+                }
                 /*
                 handleUsageMethodInfo(abc.class_info.get(trait.class_info).cinit_index, description + "/class_info/cinit");
                 handleUsageMethodInfo(abc.instance_info.get(trait.class_info).iinit_index, description + "/instance_info/iinit");
-                */
+                 */
             }
-                        
-            @Override
-            protected void handleTraitMethodGetterSetter(ABC abc, TraitMethodGetterSetter trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, ABCWalker.WalkType walkType) {                
-                handleTraitMethodBase(abc, trait, scriptIndex, scriptTraitIndex, classIndex, traitIndex, walkType);
-            }   
 
-            
+            @Override
+            protected void handleTraitMethodGetterSetter(ABC abc, TraitMethodGetterSetter trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, ABCWalker.WalkType walkType) {
+                handleTraitMethodBase(abc, trait, scriptIndex, scriptTraitIndex, classIndex, traitIndex, walkType);
+            }
+
             protected void handleTraitMethodBase(ABC abc, Trait trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, ABCWalker.WalkType walkType) {
-                String description = "";                
-                if (scriptIndex > -1) { 
+                String description = "";
+                if (scriptIndex > -1) {
                     description += "si" + scriptIndex + "/traits/t" + scriptTraitIndex;
                     if (walkType == WalkType.Class && traitIndex > -1) {
                         description += "/class_info/traits/t" + traitIndex;
@@ -303,13 +301,12 @@ public class ABCSimpleUsageDetector {
                         description += "ii" + classIndex + "/instance_info/traits/t" + traitIndex;
                     }
                 }
-                
+
                 //description += " " + trait.getKindToStr();
-                
                 handleUsageMultiname(trait.name_index, description + "/name");
                 //handleUsageMethodInfo(trait.method_info, description + "/method_info");
             }
-            
+
             @Override
             protected void handleTraitFunction(ABC abc, TraitFunction trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, ABCWalker.WalkType walkType) {
                 handleTraitMethodBase(abc, trait, scriptIndex, scriptTraitIndex, classIndex, traitIndex, walkType);
@@ -336,14 +333,14 @@ public class ABCSimpleUsageDetector {
                     case ValueKind.CONSTANT_ExplicitNamespace:
                     case ValueKind.CONSTANT_StaticProtectedNs:
                     case ValueKind.CONSTANT_PrivateNs:
-                        handleUsage(ItemKind.NAMESPACE, value_index, description);                        
+                        handleUsage(ItemKind.NAMESPACE, value_index, description);
                         break;
                 }
             }
-            
+
             @Override
             protected void handleTraitSlotConst(ABC abc, TraitSlotConst trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, int bodyTraitIndex, ABCWalker.WalkType walkType, Stack<Integer> callStack) {
-                
+
                 String description = "";
                 if (callStack.size() > 1) {
                     if (bodyTraitIndex != -1) {
@@ -352,13 +349,13 @@ public class ABCSimpleUsageDetector {
                     }
                 } else if (scriptIndex > -1) {
                     description += "si" + scriptIndex + "/traits/t" + scriptTraitIndex;
-                    
+
                     if (walkType == WalkType.Class && traitIndex > -1) {
                         description += "/class_info/traits/t" + traitIndex;
                     } else if (walkType == WalkType.Instance && traitIndex > -1) {
-                        description += "/instance_info/traits/t" + traitIndex;                
-                    } 
-                    
+                        description += "/instance_info/traits/t" + traitIndex;
+                    }
+
                     if (bodyTraitIndex != -1) {
                         description += "/method_info/method_body/traits/t" + bodyTraitIndex;
                     }
@@ -366,17 +363,17 @@ public class ABCSimpleUsageDetector {
                     if (walkType == WalkType.Class && traitIndex > -1) {
                         description += "ci" + classIndex + "/class_info/traits/t" + traitIndex;
                     } else if (walkType == WalkType.Instance && traitIndex > -1) {
-                        description += "ii" + classIndex + "/instance_info/traits/t" + traitIndex;                
+                        description += "ii" + classIndex + "/instance_info/traits/t" + traitIndex;
                     } else if (bodyTraitIndex > -1) {
-                        description += "mb" + bodyIndex + "/traits/t" + bodyTraitIndex; 
+                        description += "mb" + bodyIndex + "/traits/t" + bodyTraitIndex;
                     }
-                }                                                      
-                
+                }
+
                 //description += " " + trait.getKindToStr();
                 handleUsageMultiname(trait.name_index, description + "/name");
                 handleUsageMultiname(trait.type_index, description + "/type");
                 handleUsageValueKind(trait.value_kind, trait.value_index, description + "/value_index");
-            }                                    
+            }
 
             @Override
             protected void handleMethodInfo(ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, ABCWalker.WalkType walkType, boolean initializer, Stack<Integer> callStack) {
@@ -384,7 +381,7 @@ public class ABCSimpleUsageDetector {
                     int prevMethod = callStack.get(callStack.size() - 2);
                     handleUsageMethodInfo(index, "mi" + prevMethod + "/method_body/code");
                     return;
-                }                
+                }
                 if (initializer) {
                     switch (walkType) {
                         case Class:
@@ -404,13 +401,13 @@ public class ABCSimpleUsageDetector {
                         case Script:
                             handleUsageMethodInfo(index, "si" + scriptIndex + "/init");
                             break;
-                            
-                    }                    
+
+                    }
                     return;
                 }
-                
-                String description = "";                
-                if (scriptIndex > -1) { 
+
+                String description = "";
+                if (scriptIndex > -1) {
                     description += "si" + scriptIndex + "/traits/t" + scriptTraitIndex;
                     if (walkType == WalkType.Class && traitIndex > -1) {
                         description += "/class_info/traits/t" + traitIndex;
@@ -426,10 +423,10 @@ public class ABCSimpleUsageDetector {
                 }
                 description += "/method_info";
                 handleUsageMethodInfo(index, description);
-            }                        
+            }
         };
         walker.walkABC(abc, false);
-        
+
         zeroUsages.clear();
         for (ItemKind kind : usages.keySet()) {
             zeroUsages.put(kind, new ArrayList<>());
@@ -440,9 +437,9 @@ public class ABCSimpleUsageDetector {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @param kind
      * @param index
      * @param usageDescription
@@ -452,18 +449,18 @@ public class ABCSimpleUsageDetector {
 
         List<String> kindList = usages.get(kind).get(index);
         kindList.add(usageDescription);
-        
+
         return kindList.size() == 1;
     }
 
     public Map<ItemKind, List<List<String>>> getUsages() {
         return Collections.unmodifiableMap(usages);
     }
-    
+
     public List<String> getUsages(ItemKind kind, int index) {
         return Collections.unmodifiableList(usages.get(kind).get(index));
     }
-    
+
     public List<List<String>> getUsages(ItemKind kind) {
         return Collections.unmodifiableList(usages.get(kind));
     }
@@ -471,11 +468,11 @@ public class ABCSimpleUsageDetector {
     public Map<ItemKind, List<Integer>> getZeroUsages() {
         return Collections.unmodifiableMap(zeroUsages);
     }
-    
+
     public List<Integer> getZeroUsages(ItemKind kind) {
         return zeroUsages.get(kind);
     }
-    
+
     public int getZeroUsagesCount() {
         int cnt = 0;
         for (ItemKind kind : zeroUsages.keySet()) {
@@ -483,7 +480,7 @@ public class ABCSimpleUsageDetector {
         }
         return cnt;
     }
-    
+
     public int getZeroUsagesCount(ItemKind kind) {
         return zeroUsages.get(kind).size();
     }

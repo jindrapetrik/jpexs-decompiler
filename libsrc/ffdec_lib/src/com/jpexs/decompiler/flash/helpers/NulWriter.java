@@ -99,7 +99,7 @@ public class NulWriter extends GraphTextWriter {
     public NulWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         stringAdded = true;
         return this;
-    }    
+    }
 
     @Override
     public GraphTextWriter appendWithData(String str, HighlightData data) {
@@ -130,7 +130,7 @@ public class NulWriter extends GraphTextWriter {
         stringAdded = true;
         return this;
     }
-    
+
     @Override
     public NulWriter append(String str, long offset, long fileOffset) {
         stringAdded = true;

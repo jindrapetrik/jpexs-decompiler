@@ -64,7 +64,7 @@ public class ActionConstantPool extends Action {
         super(0x88, 0, charset);
         boolean first = true;
         while (true) {
-            boolean valueRequired = false;        
+            boolean valueRequired = false;
             ASMParsedSymbol symb = lexer.lex();
             if (!first && symb.type == ASMParsedSymbol.TYPE_COMMA) {
                 symb = lexer.lex();
@@ -78,7 +78,7 @@ public class ActionConstantPool extends Action {
                 }
                 lexer.pushback(symb);
                 break;
-            }                 
+            }
             first = false;
         }
     }

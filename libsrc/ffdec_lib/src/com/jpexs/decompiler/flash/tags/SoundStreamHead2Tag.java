@@ -265,11 +265,11 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
         ret.put("cid", "" + virtualCharacterId);
         return ret;
     }
-    
+
     @Override
     public String getUniqueId() {
         return "" + virtualCharacterId;
-    }        
+    }
 
     //getNeededCharacters intentionally not defined
     @Override
@@ -296,12 +296,12 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
     }
-    
+
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
     }
-        
+
     @Override
     public int getInitialLatency() {
         return latencySeek;

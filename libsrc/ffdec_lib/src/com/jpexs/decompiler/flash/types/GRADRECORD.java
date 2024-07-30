@@ -38,7 +38,7 @@ public class GRADRECORD implements Serializable {
     public float getRatioFloat() {
         return ((float) ratio) / 255.0f;
     }
-    
+
     public MORPHGRADRECORD toMorphGradRecord() {
         MORPHGRADRECORD morphGradRecord = new MORPHGRADRECORD();
         morphGradRecord.startColor = new RGBA(color);
@@ -47,7 +47,7 @@ public class GRADRECORD implements Serializable {
         morphGradRecord.endRatio = ratio;
         return morphGradRecord;
     }
-    
+
     public MORPHGRADRECORD toMorphGradRecord(GRADRECORD endGradRecord) {
         MORPHGRADRECORD morphGradRecord = new MORPHGRADRECORD();
         morphGradRecord.startColor = new RGBA(color);
@@ -86,6 +86,5 @@ public class GRADRECORD implements Serializable {
         }
         return Objects.equals(this.color, other.color);
     }
-    
-    
+
 }

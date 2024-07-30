@@ -66,7 +66,7 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
     public abstract boolean isShiftJIS();
 
     public abstract boolean isAnsi();
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

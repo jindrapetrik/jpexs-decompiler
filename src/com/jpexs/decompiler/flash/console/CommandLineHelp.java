@@ -37,15 +37,16 @@ import org.fusesource.jansi.AnsiConsole;
  * @author JPEXS
  */
 public class CommandLineHelp {
+
     private static Map<String, List<Command>> commands = new LinkedHashMap<>();
     private static Map<String, Option> preOptions = new LinkedHashMap<>();
     private static String preface = null;
     private static Map<String, String> aliasMap = new HashMap<>();
-    
+
     static {
-        parse(); 
+        parse();
     }
-    
+
     private static String getPreface(String command, String arguments) {
         String ret = preface;
         if (command != null) {
@@ -55,32 +56,33 @@ public class CommandLineHelp {
         ret = ret.replace("Executable:", "@|bold,underline Executable|@:");
         return ret;
     }
-    
+
     private static String hilight(String str) {
         str = str.replaceAll("<[a-zA-Z_0-9]+>", "@|italic $0|@");
         str = str.replaceAll("(^|[ \\[\\(\\|\n])(-[a-zA-Z_0-9]+)", "$1@|yellow $2|@");
         str = str.replaceAll("@\\|yellow (-[a-zA-Z_0-9]+)\\|@ command", "@|bold $1|@ command");
-        
+
         return str;
     }
-    
+
     private static String indentArguments(String arguments, String commandName) {
-        StringBuilder sb = new StringBuilder();        
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < commandName.length(); i++) {
             sb.append(" ");
         }
         sb.append(" ");
-        return arguments.replace("\r\n", "\r\n" + sb.toString());        
+        return arguments.replace("\r\n", "\r\n" + sb.toString());
     }
-    
+
     private static class Command {
+
         String name;
         String customSynopsis;
         String arguments;
         String header;
         String description;
         List<String> aliases;
-        
+
         List<Option> preOptions = new ArrayList<>();
 
         public Command(String name, String customSynopsis, String arguments, String header, String description, List<String> aliases) {
@@ -95,8 +97,8 @@ public class CommandLineHelp {
         @Override
         public String toString() {
             return name + " " + header;
-        }        
-        
+        }
+
         public String getHeader(int padWidth) {
             StringBuilder sb = new StringBuilder();
             StringBuilder sbRaw = new StringBuilder();
@@ -106,43 +108,42 @@ public class CommandLineHelp {
                 List<String> aliasesBold = new ArrayList<>();
                 for (String alias : aliases) {
                     aliasesBold.add("@|bold " + alias + "|@");
-                }                
+                }
                 sb.append(" | ").append(String.join(" | ", aliasesBold));
                 sbRaw.append(" | ").append(String.join(" | ", aliases));
             }
-            while(sbRaw.length() < padWidth - 2) {
+            while (sbRaw.length() < padWidth - 2) {
                 sb.append(" ");
                 sbRaw.append(" ");
             }
             sb.append("  ");
             sbRaw.append("  ");
-            
+
             if (sbRaw.length() > padWidth) {
                 sb.append("\r\n");
                 for (int i = 0; i < padWidth; i++) {
                     sb.append(" ");
                 }
-            }            
+            }
             sb.append(header);
-            
+
             return sb.toString();
         }
-                
 
         public String getHelp(boolean includePreOptions, boolean includePreface) {
             StringBuilder sb = new StringBuilder();
-            
+
             if (includePreface) {
                 sb.append(header).append("\r\n");
             }
-            
+
             String synopsis;
             String hilightedArguments = "";
             String hilightedName = "";
             if (customSynopsis != null) {
                 synopsis = customSynopsis;
             } else {
-                hilightedName = "@|bold " + name + "|@ ";                
+                hilightedName = "@|bold " + name + "|@ ";
                 hilightedArguments = hilight(indentArguments(arguments, name));
                 synopsis = hilightedName + hilightedArguments;
             }
@@ -153,18 +154,18 @@ public class CommandLineHelp {
                     sb.append("@|bold,underline Aliases|@:");
                     for (String alias : aliases) {
                         sb.append("\r\n@|bold ").append(alias).append("|@");
-                    }                
-                }            
+                    }
+                }
             } else {
                 sb.append(synopsis);
                 if (!aliases.isEmpty()) {
                     for (String alias : aliases) {
                         sb.append("\r\nalias @|bold ").append(alias).append("|@");
-                    }                
-                }            
+                    }
+                }
             }
             if (!includePreface) {
-                sb.append("\r\n");            
+                sb.append("\r\n");
                 sb.append(indent(header));
             }
             if (!description.isEmpty()) {
@@ -180,59 +181,60 @@ public class CommandLineHelp {
                 sb.append("@|bold,underline Pre-options|@:");
                 for (Option opt : preOptions) {
                     sb.append("\r\n");
-                    sb.append(opt.getHelp(false)).append("\r\n");                    
+                    sb.append(opt.getHelp(false)).append("\r\n");
                 }
             }
             return sb.toString();
         }
-        
+
         public void addPreOption(Option option) {
             preOptions.add(option);
-        }        
+        }
     }
-    
+
     private static String indent(String text) {
         String indent = "    ";
         return indent + rtrim(text.replace("\r\n", "\r\n" + indent));
     }
-    
+
     private static String rtrim(String text) {
-        return text.replaceAll("\\s+$","");
+        return text.replaceAll("\\s+$", "");
     }
-    
+
     private static class Option {
+
         String name;
         String arguments;
         String appliesTo;
-        String description;        
+        String description;
 
         public Option(String name, String arguments, String appliesTo, String description) {
             this.name = name;
             this.arguments = arguments;
             this.appliesTo = appliesTo;
             this.description = description;
-        } 
+        }
 
         public String getHelp(boolean getAppliesTos) {
             StringBuilder sb = new StringBuilder();
             sb.append("@|yellow ").append(name).append("|@").append(" ").append(hilight(arguments)).append("\r\n");
-            if (getAppliesTos) {                          
+            if (getAppliesTos) {
                 sb.append(indent("Applies to: " + appliesTo.replaceAll("-[a-zA-Z_0-9]+", "@|bold $0|@"))).append("\r\n");
             }
             sb.append(indent(hilight(description)));
-            
+
             return sb.toString();
         }
-        
+
         @Override
         public String toString() {
             return name;
-        }               
+        }
     }
-    
+
     private static void parse() {
-        InputStream is = CommandLineHelp.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/console/help.txt");            
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(is, Utf8Helper.charset))) {
+        InputStream is = CommandLineHelp.class.getClassLoader().getResourceAsStream("com/jpexs/decompiler/flash/console/help.txt");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, Utf8Helper.charset))) {
             String s;
             boolean commandsSection = false;
             boolean optionsSection = false;
@@ -261,11 +263,11 @@ public class CommandLineHelp {
                     commandsSection = false;
                     continue;
                 }
-                
+
                 if (prefaceSection) {
                     prefaceBuilder.append(s).append("\r\n");
                 }
-                
+
                 if (commandsSection) {
                     if (s.isEmpty()) {
                         if (itemName != null) {
@@ -315,7 +317,7 @@ public class CommandLineHelp {
                         }
                     }
                 }
-                
+
                 if (optionsSection) {
                     if (s.isEmpty()) {
                         if (itemName != null) {
@@ -348,7 +350,7 @@ public class CommandLineHelp {
                             itemName = s;
                             arguments = "";
                         }
-                        descriptionBuffer.setLength(0);                        
+                        descriptionBuffer.setLength(0);
                         appliesToSection = true;
                     } else if (s.startsWith("    ")) {
                         if (appliesToSection && s.startsWith("    Applies to: ")) {
@@ -364,13 +366,13 @@ public class CommandLineHelp {
             Logger.getLogger(CommandLineHelp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static void printCmdLineUsage(PrintStream out, String filter) {
         AnsiConsole.systemInstall();
         if (filter == null) {
             out.println(getPreface(null, null));
             out.println();
-        
+
             out.println("@|bold,underline Global pre-options|@:");
             for (Option opt : preOptions.values()) {
                 if ("*".equals(opt.appliesTo)) {
@@ -378,7 +380,7 @@ public class CommandLineHelp {
                 }
             }
             out.println();
-            
+
             out.println("@|bold,underline Commands:|@");
             for (String name : commands.keySet()) {
                 if ("main".equals(name)) {
@@ -386,13 +388,13 @@ public class CommandLineHelp {
                 }
                 List<Command> list = commands.get(name);
                 for (Command c : list) {
-                    out.println(c.getHeader(20));                
+                    out.println(c.getHeader(20));
                 }
-            }            
+            }
         } else if ("all".equals(filter)) {
             out.println(getPreface(null, null));
             out.println();
-                    
+
             out.println("@|bold,underline Commands:|@");
             for (String name : commands.keySet()) {
                 if ("main".equals(name)) {
@@ -403,21 +405,21 @@ public class CommandLineHelp {
                     out.println(c.getHelp(false, false));
                     out.println();
                 }
-            }  
-            
+            }
+
             out.println("@|bold,underline Pre-options|@:");
             for (Option opt : preOptions.values()) {
-                out.println(opt.getHelp(true));                 
+                out.println(opt.getHelp(true));
             }
             out.println();
-        } else {            
-            
+        } else {
+
             if (aliasMap.containsKey("-" + filter)) {
                 filter = aliasMap.get("-" + filter).substring(1);
             } else if (aliasMap.containsKey(filter)) {
                 filter = aliasMap.get(filter).substring(1);
             }
-            
+
             if (commands.containsKey("-" + filter.toLowerCase())) {
                 boolean first = true;
                 for (Command c : commands.get("-" + filter.toLowerCase())) {
@@ -438,8 +440,8 @@ public class CommandLineHelp {
         }
         AnsiConsole.systemUninstall();
     }
-    
-    public static void main(String[] args) {                       
+
+    public static void main(String[] args) {
         printCmdLineUsage(System.out, "export");
     }
 }

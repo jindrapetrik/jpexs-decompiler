@@ -324,14 +324,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private volatile Map<Integer, CharacterTag> characters;
-    
+
     @Internal
     private volatile Map<Integer, CharacterTag> charactersWithImported;
 
-    
     @Internal
     private volatile Map<CharacterIdTag, Integer> characterToId;
-    
+
     @Internal
     private volatile Map<Integer, DefineExternalImage2> externalImages2;
 
@@ -424,10 +423,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private Map<String, Integer> exportNameToCharacter = new HashMap<>();
-    
+
     @Internal
     private Map<String, Integer> importedNameToCharacter = new HashMap<>();
-    
+
     @Internal
     private AbcIndexing abcIndex;
 
@@ -435,17 +434,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private int numAbcIndexDependencies = 0;
 
     private volatile Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
-    
+
     @Internal
     private ExporterInfo exporterInfo = null;
-    
+
     @Internal
     public String debuggerPackage = null;
-    
+
     private Map<Integer, SWF> importedCharacterSourceSwfs = new HashMap<>();
     private Map<Integer, Integer> importedCharacterIds = new HashMap<>();
-    
-    
+
     private static AbcIndexing playerGlobalAbcIndex;
 
     private static AbcIndexing airGlobalAbcIndex;
@@ -489,7 +487,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         return false;
     }
-    
+
     public static AbcIndexing getPlayerGlobalAbcIndex() {
         return playerGlobalAbcIndex;
     }
@@ -588,7 +586,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public void updateCharacters() {
         characters = null;
         charactersWithImported = null;
-        characterToId = null;        
+        characterToId = null;
         characterIdTags = null;
         externalImages2 = null;
     }
@@ -666,9 +664,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         di.getChildInfos().clear();
     }
-        
-    public Map<Integer, CharacterTag> getCharacters(boolean withImported) {        
-        if (characters == null) {            
+
+    public Map<Integer, CharacterTag> getCharacters(boolean withImported) {
+        if (characters == null) {
             synchronized (this) {
                 if (characters == null) {
                     if (destroyed) {
@@ -684,9 +682,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
                         SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
                         charsWithImported.put(importedCharacterId, importedSwf.getCharacter(exportedCharacterId));
-                        charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));                                                
+                        charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
                         //FIXME? eimages
-                        
+
                         charsWithImported.get(importedCharacterId).setImported(true, true);
                         for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
                             if (chi instanceof Tag) {
@@ -698,15 +696,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     for (int id : charsWithImported.keySet()) {
                         charToId.put(charsWithImported.get(id), id);
                     }
-                    for (int id : charIdtags.keySet()) { 
+                    for (int id : charIdtags.keySet()) {
                         for (CharacterIdTag ch : charIdtags.get(id)) {
                             charToId.put(ch, id);
                         }
                     }
-                    
+
                     characters = Collections.unmodifiableMap(chars);
                     charactersWithImported = Collections.unmodifiableMap(charsWithImported);
-                    characterToId = Collections.unmodifiableMap(charToId);                            
+                    characterToId = Collections.unmodifiableMap(charToId);
                     characterIdTags = Collections.unmodifiableMap(charIdtags);
                     externalImages2 = Collections.unmodifiableMap(eimages);
                 }
@@ -735,7 +733,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         return characterIdTags.get(characterId);
     }
-      
+
     public CharacterIdTag getCharacterIdTag(int characterId, int tagId) {
         List<CharacterIdTag> characterIdTags = getCharacterIdTags(characterId);
         if (characterIdTags != null) {
@@ -873,12 +871,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         int charId = classToCharacter.get(className);
         return getCharacter(charId);
     }
-    
+
     public CharacterTag getCharacterByExportName(String exportName) {
         int charId;
         if (importedNameToCharacter.containsKey(exportName)) {
             charId = importedNameToCharacter.get(exportName);
-        } else if (exportNameToCharacter.containsKey(exportName)){ 
+        } else if (exportNameToCharacter.containsKey(exportName)) {
             charId = exportNameToCharacter.get(exportName);
         } else {
             return null;
@@ -936,8 +934,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * This gets real character id of a character tag on this SWF.
-     * Normal .getCharacterId method od the CharacterTag does not work for imported characters
+     * This gets real character id of a character tag on this SWF. Normal
+     * .getCharacterId method od the CharacterTag does not work for imported
+     * characters
+     *
      * @param tag
      * @return Character id or -1 if not found
      */
@@ -950,7 +950,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         return characterToId.get(tag);
     }
-    
+
     public FontTag getFont(int fontId) {
         CharacterTag characterTag = getCharacters(true).get(fontId);
         if (characterTag instanceof FontTag) {
@@ -1286,7 +1286,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private byte[] saveToByteArray(boolean includeImported) throws IOException {
         return saveToByteArray(gfx, includeImported);
     }
-    
+
     private byte[] saveToByteArray(boolean gfx, boolean includeImported) throws IOException {
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
@@ -1313,7 +1313,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         return data;
-    }   
+    }
 
     @Override
     public boolean isModified() {
@@ -1580,25 +1580,25 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                 SWF iSwf = resolver.resolveUrl(importTag.getUrl());
                 if (iSwf != null) {
-                    
+
                     Map<Integer, String> importedIdToNameMap = importTag.getAssets();
-                    
+
                     Map<String, Integer> exportedNameToIdsMap = new HashMap<>();
-                    
+
                     for (Tag t2 : iSwf.tags) {
                         if (t2 instanceof ExportAssetsTag) {
                             ExportAssetsTag sc = (ExportAssetsTag) t2;
                             for (int i = 0; i < sc.names.size(); i++) {
-                               exportedNameToIdsMap.put(sc.names.get(i), sc.tags.get(i));
-                            }                           
-                        }                        
+                                exportedNameToIdsMap.put(sc.names.get(i), sc.tags.get(i));
+                            }
+                        }
                     }
-                    
+
                     for (int importedId : importedIdToNameMap.keySet()) {
                         String importedName = importedIdToNameMap.get(importedId);
                         if (exportedNameToIdsMap.containsKey(importedName)) {
                             int exportedId = exportedNameToIdsMap.get(importedName);
-                            importedCharacterSourceSwfs.put(importedId, iSwf);                                                       
+                            importedCharacterSourceSwfs.put(importedId, iSwf);
                             importedCharacterIds.put(importedId, exportedId);
                             importedNameToCharacter.put(importedName, importedId);
                         }
@@ -1823,7 +1823,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
     }
-    
+
     /**
      * Compress SWF file
      *
@@ -1938,12 +1938,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             return false;
         }
         return true;
-    }    
+    }
 
     /**
      * Encrypts Harman AIR encryption
      */
-    public static boolean encrypt(InputStream is, OutputStream os) throws IOException {                
+    public static boolean encrypt(InputStream is, OutputStream os) throws IOException {
         byte[] hdr = new byte[8];
 
         // SWFheader: signature, version and fileSize
@@ -1952,7 +1952,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         decodeHeader(hdr);
-        
+
         byte[] encrypted;
         try {
             encrypted = HarmanSwfEncrypt.encrypt(is, hdr);
@@ -1962,9 +1962,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         os.write(encrypted);
         return true;
     }
-    
+
     /**
-     * Decrypts Harman AIR encryption    
+     * Decrypts Harman AIR encryption
      */
     public static boolean decrypt(InputStream is, OutputStream os) throws IOException {
         byte[] hdr = new byte[8];
@@ -2020,7 +2020,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         header.gfx = headerData[1] == 'F' && headerData[2] == 'X';
         return header;
     }
-    
+
     public static boolean decompress(InputStream fis, OutputStream fos) {
         try {
             decompress(fis, fos, false);
@@ -2051,13 +2051,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 case 'c':
                 case 'z':
                 case 'f':
-                    header.encrypted = true;  
+                    header.encrypted = true;
                     byte[] decrypted;
                     try {
                         decrypted = HarmanSwfEncrypt.decrypt(is, hdr);
                     } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
                         throw new SwfOpenException(AppResources.translate("error.swf.decryptionProblem"));
-                    }                    
+                    }
                     is = new ByteArrayInputStream(decrypted);
                     break;
 
@@ -2107,9 +2107,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         // does not contain size of header (signature + version + filesize = 8 bytes)
                         if (header.gfx && is.available() >= fileSize) {
                             final InputStream fis = is;
-                            
+
                             //pass to outputstream all we read
-                            InputStream copyIs = new InputStream() {                                
+                            InputStream copyIs = new InputStream() {
                                 @Override
                                 public int read() throws IOException {
                                     int value = fis.read();
@@ -2125,7 +2125,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                             int tagIDTagLength = sis.readUI16("tagIDTagLength");
                             long tagLength = (tagIDTagLength & 0x003F);
                             if (tagLength == 0x3f) {
-                                sis.readSI32("tagLength");                                
+                                sis.readSI32("tagLength");
                             }
                             int tagID = (tagIDTagLength) >> 6;
                             if (tagID == ExporterInfo.ID) {
@@ -2304,12 +2304,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (realItem instanceof ASMSource && (exportAll || exportNode)) {
             String pathNoExportFilenames2 = pathNoExportFilenames;
             String pathExportFilenames2 = pathExportFilenames;
-            String path = exportFileNames ? pathExportFilenames : pathNoExportFilenames;            
-            
+            String path = exportFileNames ? pathExportFilenames : pathNoExportFilenames;
+
             int ppos = 1;
             while (asmsToExport.containsKey(path)) {
                 ppos++;
-                pathNoExportFilenames2 = pathNoExportFilenames +  "_" + ppos;
+                pathNoExportFilenames2 = pathNoExportFilenames + "_" + ppos;
                 pathExportFilenames2 = pathExportFilenames + "[" + ppos + "]";
                 path = exportFileNames ? pathExportFilenames2 : pathNoExportFilenames2;
             }
@@ -2321,24 +2321,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (treeItem instanceof TagScript) {
             TagScript tagScript = (TagScript) treeItem;
             for (TreeItem subItem : tagScript.getFrames()) {
-                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, 
-                    pathExportFilenames + File.separator + getASMPath(true, subItem),
-                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport,
+                        pathExportFilenames + File.separator + getASMPath(true, subItem),
+                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
                 );
             }
         } else if (treeItem instanceof FrameScript) {
             FrameScript frameScript = (FrameScript) treeItem;
             Frame parentFrame = frameScript.getFrame();
             for (TreeItem subItem : parentFrame.actionContainers) {
-                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport, 
-                    pathExportFilenames + File.separator + getASMPath(true, subItem),
-                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)                
+                getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
+                        pathExportFilenames + File.separator + getASMPath(true, subItem),
+                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
                 );
             }
             for (TreeItem subItem : parentFrame.actions) {
                 getASMs(exportFileNames, getASMWrapToTagScript(subItem), nodesToExport, exportAll || exportNode, asmsToExport,
-                    pathExportFilenames + File.separator + getASMPath(true, subItem),
-                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                        pathExportFilenames + File.separator + getASMPath(true, subItem),
+                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
                 );
             }
         } else if (treeItem instanceof AS2Package) {
@@ -2347,16 +2347,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 if ((subItem instanceof AS2Package) && ((AS2Package) subItem).isDefaultPackage()) {
                     getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, pathExportFilenames, pathNoExportFilenames);
                 } else {
-                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, 
-                        pathExportFilenames + File.separator + getASMPath(true, subItem),
-                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport,
+                            pathExportFilenames + File.separator + getASMPath(true, subItem),
+                            pathNoExportFilenames + File.separator + getASMPath(false, subItem)
                     );
                 }
             }
             for (TreeItem subItem : as2Package.scripts.values()) {
                 getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport,
-                    pathExportFilenames + File.separator + getASMPath(true, subItem),
-                    pathNoExportFilenames + File.separator + getASMPath(false, subItem)
+                        pathExportFilenames + File.separator + getASMPath(true, subItem),
+                        pathNoExportFilenames + File.separator + getASMPath(false, subItem)
                 );
             }
         }
@@ -3196,7 +3196,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return new AffineTransform(mat.getScaleXFloat(), mat.getRotateSkew0Float(),
                 mat.getRotateSkew1Float(), mat.getScaleYFloat(),
                 mat.translateX, mat.translateY);
-    }   
+    }
 
     public void putToCache(String key, SerializableImage img) {
         if (Configuration.useFrameCache.get()) {
@@ -3300,7 +3300,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 swf.as3Cache.remove(pack);
             }
         }
-    }   
+    }
 
     public static boolean isActionListCached(ASMSource src) {
         if (src != null) {
@@ -3346,7 +3346,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         return null;
     }
-    
+
     public SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {
             return frameCache.get(key);
@@ -3360,7 +3360,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             return soundCache.get(key);
         }
         return null;
-    }   
+    }
 
     public static HighlightedText getFromCache(ScriptPack pack) {
         if (pack != null) {
@@ -3384,7 +3384,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         return null;
     }
-    
+
     public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
         synchronized (src) {
             SWF swf = src.getSwf();
@@ -3560,8 +3560,6 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         return image;
     }
-
-    
 
     public boolean removeCharacterFromTimeline(int characterId, Timeline timeline, TagRemoveListener listener) {
         Set<Integer> chars = new HashSet<>();
@@ -3800,7 +3798,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         setModified(true);
         tags.add(index, tag);
         updateCharacters();
-    }   
+    }
 
     public int indexOfTag(Tag tag) {
         return tags.indexOf(tag);
@@ -3945,7 +3943,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
             ((Tag) tag).setModified(true);
         }
-    }    
+    }
 
     /**
      * Injects debugline and debugfile instructions to AS3 P-code (lines of
@@ -3972,7 +3970,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param decompileDir Directory to set file information paths
      */
-    public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {                
+    public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
@@ -3981,14 +3979,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
             i++;
             informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
-            if (s.isSimple) {       
+            if (s.isSimple) {
                 try {
                     s.injectDebugInfo(decompileDir);
                 } catch (Throwable t) {
                     Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Errorr injecting debug info", t);
                 }
             }
-        }        
+        }
     }
 
     /**
@@ -4022,7 +4020,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) throws InterruptedException {
         enableDebugging(injectAS3Code, decompileDir, telemetry, false);
     }
-    
+
     /**
      * Enables debugging. Adds tags to enable debugging and injects debugline
      * and debugfile instructions to AS3 code. Optionally enables Telemetry
@@ -4506,7 +4504,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             updateCharacters();
         }
     }
-    
+
     @Override
     public void replaceTag(int index, Tag newTag) {
         removeTag(index);
@@ -4610,5 +4608,5 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public SWF getSwf() {
         return this;
-    }    
+    }
 }

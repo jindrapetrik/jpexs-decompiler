@@ -275,7 +275,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 @Override
                 public boolean canAdd() {
                     return swfType.canAdd();
-                }                                
+                }
             };
         } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -907,8 +907,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if (val instanceof byte[]) {
                     valStr += " = " + ((byte[]) val).length + " byte";
                 } else if (val instanceof ByteArrayRange) {
-                    valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";                    
-                } else {             
+                    valStr += " = " + ((ByteArrayRange) val).getLength() + " byte";
+                } else {
                     valStr += " = " + colorAdd + val.toString() + enumAdd;
                 }
             }
@@ -973,7 +973,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                     typeStr += "]";
                     bracketsDetected = true;
-                }               
+                }
             }
 
             String arrayBrackets = "";
@@ -1470,7 +1470,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                     fieldMap.put(sf, swf.hasStrippedShapesFromFonts());
                                 } else {
                                     fieldMap.put(sf, true);
-                                }                                
+                                }
                             }
                         }
                         if (!ev.eval(fieldMap, parentTagId)) {
@@ -1529,7 +1529,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         if (swfArray != null && !swfArray.countField().isEmpty()) {
             countFieldName = swfArray.countField();
         }
-        
+
         if (countFieldName != null) { //Fields with same countField must be enlarged too
             Field[] fields = obj.getClass().getDeclaredFields();
             List<Integer> sameFlds = new ArrayList<>();
@@ -1545,7 +1545,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         JOptionPane.showMessageDialog(this, "This field is abstract, cannot be instantiated, sorry."); //TODO!!!
                         return;
                     }
-                }                
+                }
             }
             for (int f : sameFlds) {
                 ReflectionTools.addToField(obj, fields[f], index, true, cls);
@@ -1625,7 +1625,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 if (fieldSwfArray != null && !fieldSwfArray.countField().isEmpty()) {
                     fieldCountFieldName = fieldSwfArray.countField();
                 }
-                
+
                 if (fieldCountFieldName != null && fieldCountFieldName.equals(countFieldName)) {
                     ReflectionTools.removeFromField(obj, fields[f], index);
                 }

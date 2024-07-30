@@ -28,7 +28,6 @@ import javax.swing.SwingConstants;
 /*
  * Taken from https://github.com/tips4java/tips4java/blob/main/source/ScrollablePanel.java
  */
-
 /**
  * A panel that implements the Scrollable interface. This class allows you to
  * customize the scrollable features by using newly provided setter methods so
@@ -157,7 +156,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
     public IncrementInfo getScrollableBlockIncrement(int orientation) {
         return orientation == SwingConstants.HORIZONTAL ? horizontalBlock : verticalBlock;
     }
-    
+
     @Override
     public int getScrollableBlockIncrement(
             Rectangle visible, int orientation, int direction) {
@@ -219,7 +218,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
     public IncrementInfo getScrollableUnitIncrement(int orientation) {
         return orientation == SwingConstants.HORIZONTAL ? horizontalUnit : verticalUnit;
     }
-    
+
     @Override
     public int getScrollableUnitIncrement(
             Rectangle visible, int orientation, int direction) {
@@ -275,7 +274,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
     @Override
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
-    }   
+    }
 
     protected int getScrollableIncrement(IncrementInfo info, int distance) {
         if (info.getIncrement() == IncrementType.PIXELS) {

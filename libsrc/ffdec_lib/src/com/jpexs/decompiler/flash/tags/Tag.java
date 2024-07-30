@@ -150,15 +150,15 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public Map<String, String> getNameProperties() {
         return new LinkedHashMap<>();
     }
-        
+
     public String getName() {
-        StringBuilder sb = new StringBuilder();        
+        StringBuilder sb = new StringBuilder();
         sb.append(tagName);
-        
+
         Map<String, String> props = getNameProperties();
         if (!props.isEmpty()) {
             sb.append(" (");
-            List<String> parts = new ArrayList<>();                    
+            List<String> parts = new ArrayList<>();
             for (String key : props.keySet()) {
                 parts.add(key + ": " + props.get(key));
             }
@@ -478,7 +478,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return originalRange != null && isModified();
     }
 
-    public void undo() throws InterruptedException, IOException {        
+    public void undo() throws InterruptedException, IOException {
         if (originalRange == null) { //If the tag is newly created in GUI it has no original data
             return;
         }
@@ -496,7 +496,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     @Override
     public String toString() {
         return getName();
-    }    
+    }
 
     /**
      * Gets data bytes
@@ -790,7 +790,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
         return swf.getCharset();
     }
-    
+
     public String getUniqueId() {
         return null;
     }

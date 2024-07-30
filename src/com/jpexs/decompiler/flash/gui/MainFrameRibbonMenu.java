@@ -176,7 +176,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             SWF swf;
             if (openable == null) {
                 swf = null;
-            } else if (openable instanceof SWF) {                
+            } else if (openable instanceof SWF) {
                 swf = (SWF) openable;
             } else {
                 swf = ((ABC) openable).getSwf();
@@ -513,7 +513,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 } else if (o instanceof JComponent) {
                     band.addRibbonComponent(new JRibbonComponent((JComponent) o));
                     cnt++;
-                }                
+                }
             }
             if (cnt > 0) {
                 if (parts.length != 3) {

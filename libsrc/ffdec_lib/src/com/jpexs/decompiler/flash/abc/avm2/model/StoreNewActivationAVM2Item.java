@@ -24,13 +24,14 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- * Store new Activation object. This exists just for the purpose of passing 
- * activation register to the GraphTextWriter to correctly be read 
- * by debug info injector.
+ * Store new Activation object. This exists just for the purpose of passing
+ * activation register to the GraphTextWriter to correctly be read by debug info
+ * injector.
+ *
  * @author JPEXS
  */
 public class StoreNewActivationAVM2Item extends AVM2Item {
-    
+
     public int regIndex;
 
     public StoreNewActivationAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
@@ -47,7 +48,7 @@ public class StoreNewActivationAVM2Item extends AVM2Item {
     public boolean needsSemicolon() {
         return false;
     }
-    
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         HighlightData hd = new HighlightData();
@@ -69,5 +70,5 @@ public class StoreNewActivationAVM2Item extends AVM2Item {
     @Override
     public boolean isEmpty() {
         return true;
-    }            
+    }
 }

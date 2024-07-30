@@ -88,7 +88,7 @@ public class Font4Exporter {
                     exportFont(st, settings.mode, file);
                 }, handler).run();
 
-                Set<String> classNames = st.getClassNames();                    
+                Set<String> classNames = st.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ext));
@@ -98,7 +98,7 @@ public class Font4Exporter {
                         ret.add(classFile);
                     }
                     file.delete();
-                } else {                
+                } else {
                     ret.add(file);
                 }
 

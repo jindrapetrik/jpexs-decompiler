@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Special MemoryInputStream that is not a MemoryInputStream in fact.
- * Input stream to handle some edge cases
+ * Special MemoryInputStream that is not a MemoryInputStream in fact. Input
+ * stream to handle some edge cases
+ *
  * @author JPEXS
  */
 public class FakeMemoryInputStream extends MemoryInputStream {
@@ -29,12 +30,12 @@ public class FakeMemoryInputStream extends MemoryInputStream {
     private long pos;
 
     private final int maxLength;
-    
+
     private final InputStream is;
-    
+
     public FakeMemoryInputStream(InputStream is) throws IOException {
         super(new byte[0]);
-        this.maxLength = Integer.MAX_VALUE; 
+        this.maxLength = Integer.MAX_VALUE;
         this.is = is;
     }
 
@@ -63,7 +64,7 @@ public class FakeMemoryInputStream extends MemoryInputStream {
 
     @Override
     public int read() throws IOException {
-        if (pos < maxLength) {            
+        if (pos < maxLength) {
             pos++;
             return is.read();
         }

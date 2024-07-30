@@ -190,7 +190,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final DebugPanel debugPanel;
 
     private final JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
-    
+
     private final JLabel flexLabel = new JLabel(AppStrings.translate("action.edit.flex"));
 
     private final JLabel infoNotEditableLabel;
@@ -248,7 +248,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_AIR);
         } else {
             libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
-        }        
+        }
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -293,7 +293,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         public long traitId;
 
         private List<VariableNode> childs;
-        
+
         public List<Variable> traits = new ArrayList<>();
 
         @Override
@@ -357,13 +357,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             if ("".equals(var.name)) {
                 return;
-            }            
+            }
             InGetVariable igv;
 
             Long objectId = varToObjectId(var);
-            
+
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
-            
+
             if (parentObjectId == 0 && objectId != 0L) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
             } else {
@@ -440,11 +440,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
         if (var.vType == VariableType.OBJECT) {
             return (Long) var.value;
-        } 
+        }
         if (var.vType == VariableType.MOVIECLIP) {
             return (Long) var.value;
         }
-        return 0L;        
+        return 0L;
     }
 
     public static class VariablesTableModel implements MyTreeTableModel {
@@ -963,7 +963,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         iconsPanel.add(deobfuscateButton);
         iconsPanel.add(deobfuscateOptionsButton);
-        
+
         JButton breakpointListButton = new JButton(View.getIcon("breakpointlist16"));
         breakpointListButton.setMargin(new Insets(5, 5, 5, 5));
         breakpointListButton.addActionListener(this::breakPointListButtonActionPerformed);
@@ -1108,7 +1108,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        
+
         decompiledTextArea.changeContentType("text/actionscript3");
         decompiledTextArea.setFont(Configuration.getSourceFont());
 
@@ -1603,9 +1603,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         saveDecompiledButton.setVisible(val);
         saveDecompiledButton.setEnabled(false);
         editDecompiledButton.setVisible(!val);
-        
+
         boolean useFlex = Configuration.useFlexAs3Compiler.get();
-        
+
         experimentalLabel.setVisible(!useFlex && !val);
         flexLabel.setVisible(useFlex && !val);
         cancelDecompiledButton.setVisible(val);
@@ -1660,8 +1660,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         return (TreeItem) scriptsPath.getLastPathComponent();
     }
 
-    
-    
     private void saveDecompiled(boolean refreshTree) {
         final ABC localAbc = abc;
         int oldIndex = pack.scriptIndex;
@@ -1672,8 +1670,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             TreeItem scriptNode = getScriptNodeForPack(pack);
 
             String as = decompiledTextArea.getText();
-            
-            
+
             localAbc.replaceScriptPack(scriptReplacer, pack, as, Main.getDependencies(pack.abc.getSwf()));
             scriptReplacer.deinitReplacement(pack);
             lastDecompiled = as;
@@ -1898,7 +1895,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         }
     }
-    
+
     private void breakPointListButtonActionPerformed(ActionEvent evt) {
         Main.showBreakpointsList();
     }

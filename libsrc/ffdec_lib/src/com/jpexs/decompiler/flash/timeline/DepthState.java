@@ -79,7 +79,7 @@ public class DepthState {
     private final SWF swf;
 
     public Frame frame;
-    
+
     public Frame placeFrame;
 
     public PlaceObjectTypeTag placeObjectTag;
@@ -253,6 +253,6 @@ public class DepthState {
         if (!Objects.equals(this.clipActions, other.clipActions)) {
             return false;
         }
-        return Arrays.equals(this.amfData, other.amfData);        
-    }        
+        return Arrays.equals(this.amfData, other.amfData);
+    }
 }

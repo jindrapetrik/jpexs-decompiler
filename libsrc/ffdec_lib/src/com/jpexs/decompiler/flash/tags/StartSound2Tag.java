@@ -80,7 +80,7 @@ public class StartSound2Tag extends Tag {
         sos.writeString(soundClassName);
         sos.writeSOUNDINFO(soundInfo);
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

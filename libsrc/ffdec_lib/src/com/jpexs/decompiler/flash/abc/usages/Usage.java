@@ -23,9 +23,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
  * @author JPEXS
  */
 public interface Usage {
+
     public ABC getAbc();
-    
+
     public int getIndex();
-    
+
     public String getKind();
 }

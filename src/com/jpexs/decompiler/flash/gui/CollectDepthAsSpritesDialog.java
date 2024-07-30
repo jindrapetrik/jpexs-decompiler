@@ -43,13 +43,13 @@ public class CollectDepthAsSpritesDialog extends AppDialog {
     private final JButton okButton = new JButton(translate("button.ok"));
 
     private final JButton cancelButton = new JButton(translate("button.cancel"));
-    
+
     private final JList<Integer> depthsList;
 
     private final JCheckBox replaceCheckBox;
 
     private final JCheckBox offsetCheckBox;
-    
+
     private final JCheckBox firstMatrixCheckBox;
 
     private int result = ERROR_OPTION;
@@ -61,21 +61,21 @@ public class CollectDepthAsSpritesDialog extends AppDialog {
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
         cnt.add(new JLabel(translate("collect.depths")));
-        
+
         depthsList = new JList<>();
         depthsList.setVisibleRowCount(7);
         depthsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        
+
         JScrollPane listScroller = new FasterScrollPane(depthsList);
         listScroller.setPreferredSize(new Dimension(400, 200));
         cnt.add(listScroller);
-        
+
         replaceCheckBox = new JCheckBox(translate("collect.replace"));
         cnt.add(replaceCheckBox);
-        
+
         offsetCheckBox = new JCheckBox(translate("collect.offset"));
         cnt.add(offsetCheckBox);
-        
+
         firstMatrixCheckBox = new JCheckBox(translate("collect.matrix"));
         cnt.add(firstMatrixCheckBox);
 
@@ -112,20 +112,20 @@ public class CollectDepthAsSpritesDialog extends AppDialog {
 
         return depthsList.getSelectedValuesList();
     }
-    
+
     public boolean getReplace() {
         return replaceCheckBox.isSelected();
     }
-    
+
     public boolean getOffset() {
         return offsetCheckBox.isSelected();
     }
-    
+
     public boolean getEnsureFirstMatrix() {
         return firstMatrixCheckBox.isSelected();
     }
 
-    public int showDialog(Collection<Integer> depths) {        
+    public int showDialog(Collection<Integer> depths) {
         depthsList.setListData(depths.toArray(new Integer[depths.size()]));
         depthsList.setVisibleRowCount(7);
         setVisible(true);

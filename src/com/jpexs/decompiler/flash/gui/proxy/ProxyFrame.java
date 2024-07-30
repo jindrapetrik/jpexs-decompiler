@@ -722,7 +722,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
 
         return result;
     }
-    
+
     @Override
     public void setVisible(boolean b) {
         if (b == true) {

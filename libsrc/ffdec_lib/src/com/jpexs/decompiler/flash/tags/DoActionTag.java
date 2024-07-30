@@ -61,7 +61,7 @@ public class DoActionTag extends Tag implements ASMSource {
 
     @Internal
     private String scriptName = "-";
-    
+
     @Internal
     private String exportedScriptName = "-";
 
@@ -261,12 +261,12 @@ public class DoActionTag extends Tag implements ASMSource {
             return new ArrayList<>();
         }
     }
-    
+
     @Override
     public String getExportedScriptName() {
         return exportedScriptName;
     }
-    
+
     @Override
     public void setExportedScriptName(String scriptName) {
         this.exportedScriptName = scriptName;

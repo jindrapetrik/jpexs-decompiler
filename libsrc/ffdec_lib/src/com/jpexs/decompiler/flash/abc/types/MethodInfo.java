@@ -87,7 +87,7 @@ public class MethodInfo {
     public void setFlagIgnore_Rest() {
         flags |= FLAG_IGNORE_REST;
     }
-    
+
     public void setFlagIgnore_Rest(boolean val) {
         if (val) {
             setFlagIgnore_Rest();
@@ -95,7 +95,7 @@ public class MethodInfo {
             unsetFlagIgnore_Rest();
         }
     }
-    
+
     public void unsetFlagIgnore_Rest() {
         if (flagIgnore_rest()) {
             flags -= FLAG_IGNORE_REST;
@@ -146,8 +146,6 @@ public class MethodInfo {
         }
     }
 
-    
-
     public void unsetFlagNeed_rest() {
         if (flagNeed_rest()) {
             flags -= FLAG_NEED_REST;
@@ -157,7 +155,7 @@ public class MethodInfo {
     public void setFlagNeed_rest() {
         flags |= FLAG_NEED_REST;
     }
-    
+
     public void setFlagNeed_rest(boolean val) {
         if (val) {
             setFlagNeed_rest();
@@ -165,8 +163,6 @@ public class MethodInfo {
             unsetFlagNeed_rest();
         }
     }
-
-    
 
     public void unsetFlagHas_optional() {
         if (flagHas_optional()) {
@@ -177,14 +173,14 @@ public class MethodInfo {
     public void setFlagHas_optional() {
         flags |= FLAG_HAS_OPTIONAL;
     }
-    
+
     public void setFlagHas_optional(boolean val) {
         if (val) {
             setFlagHas_optional();
         } else {
             unsetFlagHas_optional();
         }
-    }  
+    }
 
     public void unsetFlagHas_paramnames() {
         if (flagHas_paramnames()) {
@@ -195,7 +191,7 @@ public class MethodInfo {
     public void setFlagHas_paramnames() {
         flags |= FLAG_HAS_PARAMNAMES;
     }
-    
+
     public void setFlagHas_paramnames(boolean val) {
         if (val) {
             setFlagHas_paramnames();

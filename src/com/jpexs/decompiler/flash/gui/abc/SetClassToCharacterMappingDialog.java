@@ -20,9 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppDialog;
-import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
-import static com.jpexs.decompiler.flash.gui.AppDialog.ERROR_OPTION;
-import static com.jpexs.decompiler.flash.gui.AppDialog.OK_OPTION;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -69,11 +66,11 @@ import javax.swing.event.DocumentListener;
  *
  * @author JPEXS
  */
-public class SetClassToCharacterMappingDialog  extends AppDialog {
-    
+public class SetClassToCharacterMappingDialog extends AppDialog {
+
     private final JButton proceedButton = new JButton(translate("button.proceed"));
     private final JButton cancelButton = new JButton(translate("button.cancel"));
-    
+
     private final JTextField classNameTextField = new JTextField(30);
     private final JTextField parentClassNameTextField = new JTextField(30);
     private String selectedClass = null;
@@ -85,58 +82,54 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
     private int result = ERROR_OPTION;
 
     private final SWF swf;
-    
+
     private final int characterId;
-    
+
     private int characterFrame = -1;
-    
-    
 
     private int abcCount = 0;
-    
+
     private int symbolClassCount = 0;
-        
+
     private ABCContainerTag foundInAbcContainer = null;
-    
+
     private final List<ABCContainerTag> abcContainers = new ArrayList<>();
-    
+
     private int abcFrame = -1;
-    
+
     private boolean createClass = false;
-    
+
     private final JPanel classFoundOrNotOrErrorPanel;
-    
+
     private final JLabel errorLabel = new JLabel();
 
-    private final JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("class.notfound.create.abc.where.existing"));    
+    private final JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("class.notfound.create.abc.where.existing"));
     private final JRadioButton newAbcTagRadioButton = new JRadioButton(translate("class.notfound.create.abc.where.new"));
-    
+
     private final JRadioButton createClassRadioButton = new JRadioButton(translate("class.notfound.create"));
     private final JRadioButton onlySetClassNameRadioButton = new JRadioButton(translate("class.notfound.onlySetClassName"));
 
     private final JRadioButton existingSymbolClassTagRadioButton = new JRadioButton(translate("class.notfound.onlySetClassName.symbolClass.where.existing"));
     private final JRadioButton newSymbolClassTagRadioButton = new JRadioButton(translate("class.notfound.onlySetClassName.symbolClass.where.new"));
 
-    
-    private final static String CLASS_NOT_FOUND_CARD = "Class not found panel";
-    private final static String CLASS_FOUND_CARD = "Class found panel";        
-    private final static String ERROR_CARD = "Error panel";
-    
-    private final static String CREATE_CLASS_CARD = "Create class panel";
-    private final static String DO_NOT_CREATE_CLASS_CARD = "Do not create class panel"; 
-    
-    private final static Map<Class<?>, String> tagTypeToParentClass = new HashMap<>();
-    
-    
+    private static final String CLASS_NOT_FOUND_CARD = "Class not found panel";
+    private static final String CLASS_FOUND_CARD = "Class found panel";
+    private static final String ERROR_CARD = "Error panel";
+
+    private static final String CREATE_CLASS_CARD = "Create class panel";
+    private static final String DO_NOT_CREATE_CLASS_CARD = "Do not create class panel";
+
+    private static final Map<Class<?>, String> tagTypeToParentClass = new HashMap<>();
+
     static {
         tagTypeToParentClass.put(SoundTag.class, "flash.media.Sound");
         tagTypeToParentClass.put(ImageTag.class, "flash.display.Bitmap");
         tagTypeToParentClass.put(FontTag.class, "flash.text.Font");
-        tagTypeToParentClass.put(DefineFont4Tag.class, "flash.text.Font");        
+        tagTypeToParentClass.put(DefineFont4Tag.class, "flash.text.Font");
         tagTypeToParentClass.put(DefineBinaryDataTag.class, "flash.utils.ByteArray");
-        tagTypeToParentClass.put(DefineSpriteTag.class, "flash.display.Sprite");        
+        tagTypeToParentClass.put(DefineSpriteTag.class, "flash.display.Sprite");
     }
-       
+
     public static String getParentClassFromCharacter(CharacterTag ch) {
         for (Class<?> cls : tagTypeToParentClass.keySet()) {
             if (cls.isAssignableFrom(ch.getClass())) {
@@ -145,20 +138,20 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
         }
         return null;
     }
-    
+
     public SetClassToCharacterMappingDialog(Window owner, SWF swf, int characterId) {
         super(owner);
-        
+
         this.swf = swf;
         this.characterId = characterId;
-        
+
         CharacterTag ch = swf.getCharacter(characterId);
         if (ch == null) {
             throw new RuntimeException("Character " + characterId + " not found");
         }
-        
+
         parentClassNameTextField.setText(getParentClassFromCharacter(ch));
-        
+
         int frame = 1;
         for (Tag t : swf.getTags()) {
             if (t == ch) {
@@ -183,102 +176,96 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 frame++;
             }
         }
-        
-        
-        
-        LinkedHashSet<String> classNames = ch.getClassNames();        
-        
+
+        LinkedHashSet<String> classNames = ch.getClassNames();
+
         if (classNames.size() == 1) {
             classNameTextField.setText(classNames.iterator().next());
         }
 
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
-        
+
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
-        
-        
-        
+
         JPanel classFoundPanel = new JPanel();
         classFoundPanel.setLayout(new BoxLayout(classFoundPanel, BoxLayout.Y_AXIS));
-        
+
         JLabel classFoundLabel = new JLabel(translate("class.found"));
         classFoundPanel.add(classFoundLabel);
         JLabel symbolClassApropriateLabel = new JLabel(translate("symbolClassAppropriate"));
         classFoundPanel.add(symbolClassApropriateLabel);
-        
+
         JPanel classNotFoundPanel = new JPanel();
         classNotFoundPanel.setLayout(new BoxLayout(classNotFoundPanel, BoxLayout.Y_AXIS));
         JLabel notFoundLabel = new JLabel(translate("class.notfound"));
         classNotFoundPanel.add(notFoundLabel);
         JLabel createAskLabel = new JLabel(translate("class.notfound.createAsk"));
         classNotFoundPanel.add(createAskLabel);
-        
+
         ButtonGroup doCreateClassButtonGroup = new ButtonGroup();
         doCreateClassButtonGroup.add(createClassRadioButton);
         doCreateClassButtonGroup.add(onlySetClassNameRadioButton);
-        
+
         JPanel createNewClassAsk = new JPanel(new FlowLayout());
         createNewClassAsk.add(createClassRadioButton);
         createNewClassAsk.add(onlySetClassNameRadioButton);
         createClassRadioButton.setSelected(true);
         classNotFoundPanel.add(createNewClassAsk);
-        
-        
+
         JPanel createNewClassPanel = new JPanel();
         createNewClassPanel.setLayout(new BoxLayout(createNewClassPanel, BoxLayout.Y_AXIS));
-        
+
         JLabel parentClassNameLabel = new JLabel(translate("class.notfound.create.parentType"));
-        createNewClassPanel.add(parentClassNameLabel);        
+        createNewClassPanel.add(parentClassNameLabel);
         createNewClassPanel.add(parentClassNameTextField);
-        
+
         JLabel abcWhereLabel = new JLabel(translate("class.notfound.create.abc.where"));
-        createNewClassPanel.add(abcWhereLabel);        
+        createNewClassPanel.add(abcWhereLabel);
         ButtonGroup abcTargetButtonGroup = new ButtonGroup();
         abcTargetButtonGroup.add(existingAbcTagRadioButton);
         abcTargetButtonGroup.add(newAbcTagRadioButton);
         existingAbcTagRadioButton.setSelected(true);
-        
+
         JPanel abcTargetPanel = new JPanel(new FlowLayout());
         abcTargetPanel.add(existingAbcTagRadioButton);
         abcTargetPanel.add(newAbcTagRadioButton);
-       
-        createNewClassPanel.add(abcTargetPanel);                
-        
+
+        createNewClassPanel.add(abcTargetPanel);
+
         JLabel symbolClassApropriate2Label = new JLabel(translate("symbolClassAppropriate"));
         classFoundPanel.add(symbolClassApropriate2Label);
         createNewClassPanel.add(symbolClassApropriate2Label);
-        
-        
+
         JPanel doNotCreateNewClassPanel = new JPanel();
         doNotCreateNewClassPanel.setLayout(new BoxLayout(doNotCreateNewClassPanel, BoxLayout.Y_AXIS));
-        
+
         ButtonGroup whereToStoreMappingButtonGroup = new ButtonGroup();
         whereToStoreMappingButtonGroup.add(existingSymbolClassTagRadioButton);
         whereToStoreMappingButtonGroup.add(newSymbolClassTagRadioButton);
         doNotCreateNewClassPanel.add(new JLabel(translate("class.notfound.onlySetClassName.symbolClass.where")));
-                        
+
         JPanel whereToStoreMappingPanel = new JPanel(new FlowLayout());
         whereToStoreMappingPanel.add(existingSymbolClassTagRadioButton);
         whereToStoreMappingPanel.add(newSymbolClassTagRadioButton);
         doNotCreateNewClassPanel.add(whereToStoreMappingPanel);
         existingSymbolClassTagRadioButton.setSelected(true);
-        
+
         setCentralAlignment(doNotCreateNewClassPanel);
         setCentralAlignment(createNewClassPanel);
-        
+
         JPanel createNewClassAskCards = new JPanel(new CardLayout());
         createNewClassAskCards.add(createNewClassPanel, CREATE_CLASS_CARD);
         createNewClassAskCards.add(doNotCreateNewClassPanel, DO_NOT_CREATE_CLASS_CARD);
-        
+
         classNotFoundPanel.add(createNewClassAskCards);
-        
+
         ChangeListener createClassSwitched = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 CardLayout cl = (CardLayout) createNewClassAskCards.getLayout();
-                if (createClassRadioButton.isSelected()) {                    
+                if (createClassRadioButton.isSelected()) {
                     cl.show(createNewClassAskCards, CREATE_CLASS_CARD);
                 } else {
                     cl.show(createNewClassAskCards, DO_NOT_CREATE_CLASS_CARD);
@@ -286,10 +273,10 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 checkEnabled();
             }
         };
-        
+
         createClassRadioButton.addChangeListener(createClassSwitched);
         onlySetClassNameRadioButton.addChangeListener(createClassSwitched);
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         proceedButton.addActionListener(this::okButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
@@ -302,38 +289,35 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
 
         JPanel errorPanel = new JPanel(new FlowLayout());
         errorPanel.add(errorLabel);
-        
-        
+
         setCentralAlignment(classFoundPanel);
         setCentralAlignment(classNotFoundPanel);
         setCentralAlignment(errorPanel);
-        
+
         classFoundOrNotOrErrorPanel = new JPanel(new CardLayout());
         classFoundOrNotOrErrorPanel.add(classFoundPanel, CLASS_FOUND_CARD);
         classFoundOrNotOrErrorPanel.add(classNotFoundPanel, CLASS_NOT_FOUND_CARD);
         classFoundOrNotOrErrorPanel.add(errorPanel, ERROR_CARD);
-        
+
         cnt.add(classFoundOrNotOrErrorPanel);
-                
+
         cnt.add(buttonsPanel);
-        
-        setCentralAlignment((JComponent)cnt);
-        
+
+        setCentralAlignment((JComponent) cnt);
+
         if (abcCount == 0) {
             newAbcTagRadioButton.setSelected(true);
             //abcTargetPanel.setVisible(false);    
             newAbcTagRadioButton.setEnabled(false);
             existingAbcTagRadioButton.setEnabled(false);
         }
-        
+
         if (symbolClassCount == 0) {
             newSymbolClassTagRadioButton.setSelected(true);
             newSymbolClassTagRadioButton.setEnabled(false);
             existingSymbolClassTagRadioButton.setEnabled(false);
         }
 
-
-        
         existingSymbolClassTagRadioButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -346,7 +330,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 checkEnabled();
             }
         });
-        
+
         existingAbcTagRadioButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -359,7 +343,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 checkEnabled();
             }
         });
-        
+
         classNameTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -383,9 +367,9 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
         setModal(true);
         setResizable(false);
         View.setWindowIcon(this);
-        View.centerScreen(this);        
+        View.centerScreen(this);
     }
-    
+
     private void setCentralAlignment(JComponent container) {
         Component[] components = container.getComponents();
         for (Component component : components) {
@@ -394,13 +378,13 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
             }
         }
     }
-    
-    private void checkEnabled() {       
+
+    private void checkEnabled() {
 
         boolean ok = true;
-        
+
         String newClassName = classNameTextField.getText();
-        
+
         if (newClassName.isEmpty()) {
             ok = false;
             errorLabel.setText("");
@@ -426,40 +410,40 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
             }
         }
 
-        CardLayout cl = (CardLayout) classFoundOrNotOrErrorPanel.getLayout();                
-            
+        CardLayout cl = (CardLayout) classFoundOrNotOrErrorPanel.getLayout();
+
         if (ok) {
             List<String> classNames = new ArrayList<>();
             classNames.add(newClassName);
             foundInAbcContainer = null;
             try {
                 List<ScriptPack> scriptPacks = swf.getScriptPacksByClassNames(classNames);
-                if (!scriptPacks.isEmpty()) {                    
+                if (!scriptPacks.isEmpty()) {
                     ABC foundInAbc = scriptPacks.get(0).abc; //Assume there is only single pack with the class
-                        
+
                     boolean foundContainer = false;
                     for (ABCContainerTag cnt : abcContainers) {
                         if (cnt.getABC() == foundInAbc) {
                             foundInAbcContainer = cnt;
                             break;
                         }
-                    }                    
+                    }
                 }
             } catch (Exception ex) {
                 //ignore
             }
-            
+
             if (foundInAbcContainer != null) {
-                cl.show(classFoundOrNotOrErrorPanel, CLASS_FOUND_CARD);                
+                cl.show(classFoundOrNotOrErrorPanel, CLASS_FOUND_CARD);
             } else {
                 cl.show(classFoundOrNotOrErrorPanel, CLASS_NOT_FOUND_CARD);
-                
+
                 if (createClassRadioButton.isSelected()) {
                     if (existingAbcTagRadioButton.isSelected() && abcCount == 1) {
                         proceedButton.setText(translate("button.ok"));
                     } else {
                         proceedButton.setText(translate("button.proceed"));
-                    }       
+                    }
                 } else {
                     if (existingSymbolClassTagRadioButton.isSelected() && symbolClassCount == 1) {
                         proceedButton.setText(translate("button.ok"));
@@ -469,10 +453,10 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 }
             }
         } else {
-            cl.show(classFoundOrNotOrErrorPanel,ERROR_CARD);
+            cl.show(classFoundOrNotOrErrorPanel, ERROR_CARD);
             proceedButton.setText(translate("button.ok"));
         }
-        
+
         proceedButton.setEnabled(ok);
     }
 
@@ -499,7 +483,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                     }
                     selectedPosition = selectTagPositionDialog.getSelectedTag();
                     selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
-                }  
+                }
             } else {
                 if (existingSymbolClassTagRadioButton.isSelected()) {
                     SelectTagOfTypeDialog selectSymbolClassDialog = new SelectTagOfTypeDialog(owner, swf, SymbolClassTag.class, "SymbolClass", characterFrame);
@@ -517,13 +501,12 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                     }
                     selectedPosition = selectTagPositionDialog.getSelectedTag();
                     selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
-                }  
+                }
             }
         } else {
             selectedAbcContainer = foundInAbcContainer;
-        }              
-              
-        
+        }
+
         if (selectedAbcContainer != null) {
             int frame = 1;
             for (Tag t : swf.getTags()) {
@@ -536,7 +519,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
                 }
             }
         }
-        
+
         createClass = foundInAbcContainer == null && createClassRadioButton.isSelected();
 
         result = OK_OPTION;
@@ -569,7 +552,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
         selectedSymbolClassTag = null;
         foundInAbcContainer = null;
         createClass = false;
-        abcFrame = -1;        
+        abcFrame = -1;
         setVisible(true);
         return result;
     }
@@ -589,7 +572,7 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
     public SymbolClassTag getSelectedSymbolClassTag() {
         return selectedSymbolClassTag;
     }
-        
+
     public Timelined getSelectedTimelined() {
         return selectedTimelined;
     }
@@ -600,16 +583,16 @@ public class SetClassToCharacterMappingDialog  extends AppDialog {
 
     public boolean isClassFound() {
         return foundInAbcContainer != null;
-    }              
+    }
 
     public int getCharacterFrame() {
         return characterFrame;
-    }      
+    }
 
     public int getAbcFrame() {
         return abcFrame;
-    }        
-    
+    }
+
     public boolean doCreateClass() {
         return createClass;
     }

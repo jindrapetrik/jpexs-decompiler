@@ -100,7 +100,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         lexOptionalComma(lexer);
         int numParams = (int) lexLong(lexer);
         for (int i = 0; i < numParams; i++) {
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);

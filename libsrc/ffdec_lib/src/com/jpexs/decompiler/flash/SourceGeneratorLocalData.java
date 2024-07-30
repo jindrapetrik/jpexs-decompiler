@@ -84,7 +84,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public List<List<Long>> catchesOpenedLoops = new ArrayList<>();
     public List<Integer> catchesTempRegs = new ArrayList<>();
-    
+
     public String documentClass;
 
     public boolean secondRun = false;

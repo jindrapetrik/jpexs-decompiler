@@ -114,7 +114,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         }
         path.setAttribute("fill", "#ff0000");
     }
-    
+
     public String getPattern(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean smooth) {
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
@@ -138,7 +138,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 pattern.setAttribute("width", "" + width);
                 pattern.setAttribute("height", "" + height);
                 pattern.setAttribute("viewBox", "0 0 " + width + " " + height);
-                pattern.setAttribute("ffdec:smoothed", smooth ? "true" : "false");                
+                pattern.setAttribute("ffdec:smoothed", smooth ? "true" : "false");
                 if (matrix != null) {
                     matrix = matrix.clone();
                     matrix.rotateSkew0 *= zoom / SWF.unitDivisor;
@@ -259,7 +259,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
         // QR decomposition
         double translateX = roundPixels400(matrix.translateX * zoom / SWF.unitDivisor);
-        double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);       
+        double translateY = roundPixels400(matrix.translateY * zoom / SWF.unitDivisor);
         double a = matrix.scaleX;
         double b = matrix.rotateSkew0;
         double c = matrix.rotateSkew1;
@@ -474,18 +474,18 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     @Override
     public void lineBitmapStyle(int bitmapId, Matrix matrix, Matrix matrixEnd, boolean repeat, boolean smooth, ColorTransform colorTransform) {
-        path.removeAttribute("stroke-opacity");       
-        
-        String patternId = getPattern(bitmapId, matrix, matrixEnd, smooth);        
+        path.removeAttribute("stroke-opacity");
+
+        String patternId = getPattern(bitmapId, matrix, matrixEnd, smooth);
         path.setAttribute("ffdec:stroke-bitmapId", "" + bitmapId);
-        
+
         if (patternId != null) {
             path.setAttribute("style", "stroke:url(#" + patternId + ")");
             return;
         }
         path.setAttribute("stroke", "#ff0000");
     }
-    
+
     protected double roundPixels400(double pixels) {
         return Math.round(pixels * 10000) / 10000.0;
     }

@@ -30,7 +30,7 @@ public final class DotId {
     static final Pattern RESERVED_PATTERN = Pattern.compile("^" + String.join("|", RESERVED_WORDS) + "$", Pattern.CASE_INSENSITIVE);
     static final Pattern NUMERAL_PATTERN = Pattern.compile("^[-]?(.[0-9]+|[0-9]+(.[0-9]*)?)$");
     static final String IDENTIFIER_FIRST_CHARS = "a-zA-Z\\u0200-\\u0377_";
-    static final  String IDENTIFIER_NEXT_CHARS = IDENTIFIER_FIRST_CHARS + "0-9";
+    static final String IDENTIFIER_NEXT_CHARS = IDENTIFIER_FIRST_CHARS + "0-9";
     static final String CH = "^[" + IDENTIFIER_FIRST_CHARS + "][" + IDENTIFIER_NEXT_CHARS + "]*$";
     static final Pattern IDENTIFIER_PATTERN = Pattern.compile(CH);
 

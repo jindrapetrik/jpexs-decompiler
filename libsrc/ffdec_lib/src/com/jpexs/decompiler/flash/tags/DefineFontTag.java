@@ -56,10 +56,10 @@ public class DefineFontTag extends FontTag {
 
     @Internal
     private FontInfoTag fontInfoTag = null;
-    
+
     @Internal
     public long unknownGfx;
-    
+
     @Internal
     public boolean strippedShapes = false;
 
@@ -92,7 +92,7 @@ public class DefineFontTag extends FontTag {
         glyphShapeTable = new ArrayList<>();
 
         strippedShapes = swf.hasStrippedShapesFromFonts();
-        
+
         if (!strippedShapes && sis.available() > 0) {
             long pos = sis.getPos();
             int firstOffset = sis.readUI16("firstOffset");
@@ -136,7 +136,7 @@ public class DefineFontTag extends FontTag {
             sos.write(baos2.toByteArray());
         } else {
             sos.writeUI32(unknownGfx);
-        }        
+        }
     }
 
     @Override

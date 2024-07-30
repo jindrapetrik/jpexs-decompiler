@@ -73,14 +73,14 @@ public class TagStub extends Tag {
     public String toString() {
         return tagName + " [ID = " + id + "]";
     }
-    
+
     @Override
-    public Map<String, String> getNameProperties() {        
+    public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
         if (classes.containsKey(id)) {
             ret.put("tcl", classes.get(id).getName());
-        }        
+        }
         ret.put("tid", "" + id);
         return ret;
     }

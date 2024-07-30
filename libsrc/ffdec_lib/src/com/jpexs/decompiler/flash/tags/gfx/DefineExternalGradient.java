@@ -87,24 +87,24 @@ public class DefineExternalGradient extends Tag {
         gradientSize = sis.readUI16("gradientSize");
         fileName = sis.readNetString("fileName");
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         ret.put("gid", "" + getUniqueId());
         return ret;
     }
-    
+
     @Override
     public String getUniqueId() {
         return "g" + gradientId;
-    }  
-    
+    }
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
-        tagInfo.addInfo("general", "fileName", fileName);        
+
+        tagInfo.addInfo("general", "fileName", fileName);
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapsFormat);
         switch (bitmapsFormat) {
             case BITMAP_FORMAT_DEFAULT:

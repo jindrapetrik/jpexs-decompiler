@@ -72,13 +72,13 @@ public class LoadMovieActionItem extends ActionItem {
         writer.append(",");
         targetString.toString(writer, localData);
         return writer.append(methodStr).append(")");
-    }   
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);

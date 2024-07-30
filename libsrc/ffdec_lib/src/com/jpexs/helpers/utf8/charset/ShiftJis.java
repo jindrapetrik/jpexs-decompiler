@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 public class ShiftJis extends AbstractCharsetConverter {
 
     private static final Charset SHIFT_JIS_ENCODING = Charset.forName("Shift_JIS");
-    
+
     @Override
     public int toUnicode(int codePoint) {
         byte[] b;
@@ -31,19 +31,18 @@ public class ShiftJis extends AbstractCharsetConverter {
             b = new byte[]{(byte) codePoint};
         }
 
-        
         return new String(b, SHIFT_JIS_ENCODING).charAt(0);
     }
 
     @Override
-    public int fromUnicode(int codePoint) {        
+    public int fromUnicode(int codePoint) {
         byte[] b = ("" + (char) codePoint).getBytes(SHIFT_JIS_ENCODING);
         int r = 0;
         for (int i = 0; i < b.length; i++) {
             int v = b[b.length - 1 - i] & 0xff;
             r = r + (v << (8 * i));
         }
-        return r;        
+        return r;
     }
 
 }

@@ -372,12 +372,12 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
             return new ArrayList<>();
         }
     }
-    
+
     @Override
     public String getExportedScriptName() {
         return exportedScriptName;
     }
-    
+
     @Override
     public void setExportedScriptName(String scriptName) {
         this.exportedScriptName = scriptName;

@@ -64,15 +64,15 @@ public class ShapeImporter {
     public Tag importImage(MorphShapeTag mst, byte[] newData) throws IOException {
         return importImage((Tag) mst, newData, 0, true);
     }
-  
+
     public Tag importImage(MorphShapeTag mst, byte[] newData, int tagType, boolean fill) throws IOException {
         return importImage((Tag) mst, newData, tagType, fill);
     }
-        
+
     public Tag importImage(ShapeTag st, byte[] newData, int tagType, boolean fill) throws IOException {
         return importImage((Tag) st, newData, tagType, fill);
     }
-    
+
     private Tag importImage(Tag st, byte[] newData, int tagType, boolean fill) throws IOException {
         ImageTag imageTag = addImage(st, newData, tagType);
         st.setModified(true);
@@ -215,12 +215,12 @@ public class ShapeImporter {
             if (tag instanceof ShapeTag) {
                 ShapeTag shapeTag = (ShapeTag) tag;
                 List<File> existingFilesForShapeTag = new ArrayList<>();
-                
+
                 List<String> classNameExpectedFileNames = new ArrayList<>();
                 for (String className : shapeTag.getClassNames()) {
-                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));
                 }
-                
+
                 for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForShapeTag.add(f);

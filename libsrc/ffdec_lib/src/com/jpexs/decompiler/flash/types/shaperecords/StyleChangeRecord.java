@@ -149,7 +149,7 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public void calculateBits() {
         moveBits = SWFOutputStream.getNeededBitsS(moveDeltaX, moveDeltaY);
     }
-    
+
     @Override
     public boolean isTooLarge() {
         if (!stateMoveTo) {
@@ -225,6 +225,5 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
         return Objects.equals(this.lineStyles, other.lineStyles);*/
         return true;
     }
-    
-    
+
 }

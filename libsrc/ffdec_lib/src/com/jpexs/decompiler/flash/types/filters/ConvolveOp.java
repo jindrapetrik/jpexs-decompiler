@@ -54,7 +54,7 @@ public class ConvolveOp implements BufferedImageOp, RasterOp {
         this.srcY = srcY;
         this.srcWidth = srcWidth;
         this.srcHeight = srcHeight;
-    }   
+    }
 
     @Override
     public BufferedImage createCompatibleDestImage(BufferedImage src,

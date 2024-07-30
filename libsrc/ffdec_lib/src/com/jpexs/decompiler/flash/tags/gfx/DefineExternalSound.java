@@ -247,8 +247,8 @@ public class DefineExternalSound extends CharacterTag implements SoundTag {
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
-    }    
-            
+    }
+
     @Override
     public int getInitialLatency() {
         return 0;

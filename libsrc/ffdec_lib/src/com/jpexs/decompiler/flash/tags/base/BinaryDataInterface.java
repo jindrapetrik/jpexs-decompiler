@@ -35,7 +35,7 @@ public interface BinaryDataInterface extends Exportable {
 
     public void detectPacker();
 
-    public Packer getUsedPacker();       
+    public Packer getUsedPacker();
 
     public void setDataBytes(ByteArrayRange data);
 

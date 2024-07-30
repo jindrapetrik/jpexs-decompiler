@@ -65,5 +65,5 @@ public class SoundInfoSoundCacheEntry {
         }
         return Objects.equals(this.soundTag, other.soundTag);
     }
-    
+
 }

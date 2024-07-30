@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,16 +49,15 @@ public class ExporterInfo extends Tag {
 
     public String swfName;
 
-    public List<Long> codeOffsets;  
+    public List<Long> codeOffsets;
 
     public static final int FLAG_CONTAINS_GLYPH_TEXTURES = 1;
 
     public static final int FLAG_GLYPHS_STRIPPED_FROM_DEFINEFONT = 2;
 
     public static final int FLAG_GRADIENT_IMAGES_EXPORTED = 4;
-    
-    public static final int FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT = 16;
 
+    public static final int FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT = 16;
 
     /**
      * Gets data bytes
@@ -118,22 +117,22 @@ public class ExporterInfo extends Tag {
             }
         }
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
+
         tagInfo.addInfo("general", "version", version);
         tagInfo.addInfo("general", "flags", "0x" + Long.toHexString(flags));
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
         String fileFormatStr = FileFormatType.fileFormatToString(bitmapFormat);
         if (fileFormatStr != null) {
             bitmapFormatStr = fileFormatStr + " (" + bitmapFormat + ")";
-        } 
+        }
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
         tagInfo.addInfo("general", "prefix", prefix);
         tagInfo.addInfo("general", "swfName", swfName);
-        
+
         if (codeOffsets != null) {
             List<String> codeOffsetsStr = new ArrayList<>();
             for (long codeOffset : codeOffsets) {
@@ -143,7 +142,7 @@ public class ExporterInfo extends Tag {
             tagInfo.addInfo("general", "codeOffsets", String.join(", ", codeOffsetsStr));
         }
     }
-    
+
     public boolean hasFlagShapesStrippedFromDefineFont() {
         return (flags & FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT) == FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT;
     }

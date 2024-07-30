@@ -1240,10 +1240,8 @@ public class Translator extends JFrame implements ItemListener {
         public String toString() {
             String[] parts = locale.split("_");
             Locale loc;
-            
-            
-            
-            if (parts.length == 2) {                                
+
+            if (parts.length == 2) {
                 loc = View.createLocale(parts[0], parts[1]);
             } else {
                 loc = View.createLocale(parts[0]);

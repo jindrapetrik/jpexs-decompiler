@@ -416,7 +416,7 @@ public class DefineEditTextTag extends TextTag {
                             case "b":
                                 style = style.clone();
                                 style.bold = true;
-                                styles.add(style);                                
+                                styles.add(style);
                                 break;
                             case "i":
                                 style = style.clone();
@@ -441,33 +441,33 @@ public class DefineEditTextTag extends TextTag {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
                                         int fontSize = Integer.parseInt(size);
-                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);                                        
+                                        style.fontHeight = (int) Math.round(fontSize * SWF.unitDivisor);
                                     } else {
                                         int fontSizeDelta = (int) Math.round(Integer.parseInt(size.substring(1)) * SWF.unitDivisor);
                                         if (firstChar == '+') {
                                             style.fontHeight = style.fontHeight + fontSizeDelta;
                                         } else {
                                             style.fontHeight = style.fontHeight - fontSizeDelta;
-                                        }                                        
+                                        }
                                     }
                                     style.fontLeading = leading;
                                 }
                                 String face = unescape(attributes.getValue("face"));
-                                 
+
                                 if (face != null && face.length() > 0) {
-                                    style.fontFace = face;                                    
+                                    style.fontFace = face;
                                 }
-                                
+
                                 String letterspacing = unescape(attributes.getValue("letterSpacing"));
                                 if (letterspacing != null && letterspacing.length() > 0) {
                                     style.letterSpacing = Double.parseDouble(letterspacing);
                                 }
-                                
+
                                 String kerning = unescape(attributes.getValue("kerning"));
                                 if (kerning != null && kerning.length() > 0) {
                                     style.kerning = kerning.equals("1");
                                 }
-                                                                
+
                                 styles.add(style);
                                 break;
                             case "br":
@@ -1018,7 +1018,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {    
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
         render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
     }
 
@@ -1122,16 +1122,16 @@ public class DefineEditTextTag extends TextTag {
         }
 
         textModel.calculateTextWidths();
-        
+
         Set<Integer> noIndentLineIndices = new HashSet<>();
-        
+
         List<List<SameStyleTextRecord>> lines;
         if (multiline && wordWrap) {
             lines = new ArrayList<>();
             for (Paragraph paragraph : textModel.paragraphs) {
                 List<SameStyleTextRecord> line = new ArrayList<>();
                 int lineLength = 0;
-                for (Word word : paragraph.words) {       
+                for (Word word : paragraph.words) {
                     int indentVal = noIndentLineIndices.contains(lines.size()) ? 0 : indent;
                     int maxLineWidth = bounds.getWidth() - leftMargin - indentVal;
                     if (word.width > maxLineWidth) {
@@ -1143,11 +1143,11 @@ public class DefineEditTextTag extends TextTag {
                                 int ga = gc.glyphEntry.glyphAdvance;
                                 indentVal = noIndentLineIndices.contains(lines.size()) ? 0 : indent;
                                 maxLineWidth = bounds.getWidth() - leftMargin - indentVal;
-                                if (lineLength + ga > maxLineWidth) {                                    
+                                if (lineLength + ga > maxLineWidth) {
                                     recs.add(rec);
                                     line.addAll(recs);
-                                    lines.add(line);                                
-                                    
+                                    lines.add(line);
+
                                     recs = new ArrayList<>();
                                     SameStyleTextRecord rec2 = new SameStyleTextRecord();
                                     rec2.style = rec.style.clone();
@@ -1156,27 +1156,27 @@ public class DefineEditTextTag extends TextTag {
                                     for (int g2 = g; g2 < glen; g2++) {
                                         rec2.glyphEntries.add(rec.glyphEntries.remove(g));
                                     }
-                                    rec2.calculateTextWidths();                                    
+                                    rec2.calculateTextWidths();
                                     rec.calculateTextWidths();
-                                    
+
                                     rec = rec2;
                                     g = 0;
-                                    
-                                    noIndentLineIndices.add(lines.size());                                
-                                    line = new ArrayList<>();                                                                
-                                    lineLength = 0;                                   
+
+                                    noIndentLineIndices.add(lines.size());
+                                    line = new ArrayList<>();
+                                    lineLength = 0;
                                 }
                                 lineLength += ga;
-                            }                            
+                            }
                             recs.add(rec);
                         }
                         if (!recs.isEmpty()) {
-                            line.addAll(recs);                            
+                            line.addAll(recs);
                         }
                     } else if (lineLength + word.width <= maxLineWidth) {
                         line.addAll(word.records);
                         lineLength += word.width;
-                    } else {                        
+                    } else {
                         lines.add(line);
                         noIndentLineIndices.add(lines.size());
                         line = new ArrayList<>();
@@ -1251,12 +1251,12 @@ public class DefineEditTextTag extends TextTag {
             firstLine = false;
             yOffset += currentOffset;
             int alignOffset = 0;
-            
+
             int currentIndent = 0;
             if (!noIndentLineIndices.contains(k)) {
                 currentIndent = indent;
             }
-            
+
             switch (align) {
                 case ALIGN_LEFT:
                     alignOffset = 0;
@@ -1270,7 +1270,7 @@ public class DefineEditTextTag extends TextTag {
                 case ALIGN_JUSTIFY:
                     // todo;
                     break;
-            }            
+            }
             for (SameStyleTextRecord tr : line) {
                 tr.xOffset = alignOffset;
                 alignOffset += tr.width;
@@ -1290,9 +1290,9 @@ public class DefineEditTextTag extends TextTag {
                 }
                 if (tr.style.font != null) {
                     fid = swf.getCharacterId(tr.style.font);
-                }               
-                                
-                tr2.styleFlagsHasFont = fid != 0;                
+                }
+
+                tr2.styleFlagsHasFont = fid != 0;
                 tr2.fontId = fid;
                 tr2.textHeight = tr.style.fontHeight;
                 if (tr.style.textColor != null) {

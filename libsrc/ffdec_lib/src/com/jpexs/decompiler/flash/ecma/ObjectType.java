@@ -66,7 +66,7 @@ public class ObjectType implements Callable {
 
     public Object toPrimitive() {
         return toString();
-    }   
+    }
 
     public Object valueOf() {
         return EcmaScript.toNumber(toString());

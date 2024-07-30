@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 
 /**
  * All File formats supported and/or used by GFx.
- * 
+ *
  * @author JPEXS
  */
 public class FileFormatType {

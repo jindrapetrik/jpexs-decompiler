@@ -147,9 +147,9 @@ public class ExportDialog extends AppDialog {
     private JTextField zoomTextField = new JTextField();
 
     private JCheckBox embedCheckBox;
-    
+
     private JCheckBox resampleWavCheckBox;
-    
+
     private JCheckBox transparentFrameBackgroundCheckBox;
 
     public <E> E getValue(Class<E> option) {
@@ -176,11 +176,11 @@ public class ExportDialog extends AppDialog {
     public boolean isEmbedEnabled() {
         return embedCheckBox.isSelected();
     }
-    
+
     public boolean isResampleWavEnabled() {
         return resampleWavCheckBox.isSelected();
     }
-    
+
     public boolean isTransparentFrameBackgroundEnabled() {
         return transparentFrameBackgroundCheckBox.isSelected();
     }
@@ -306,7 +306,7 @@ public class ExportDialog extends AppDialog {
         top += selectAllCheckBox.getHeight();
 
         List<Class> visibleOptionClasses = new ArrayList<>();
-        
+
         boolean zoomable = false;
         for (int i = 0; i < optionNames.length; i++) {
             Class c = optionClasses[i];
@@ -340,7 +340,7 @@ public class ExportDialog extends AppDialog {
             if (Arrays.asList(zoomClasses).contains(c)) {
                 zoomable = true;
             }
-            
+
             visibleOptionClasses.add(c);
 
             JLabel lab = new JLabel(translate(optionNames[i]));
@@ -380,14 +380,13 @@ public class ExportDialog extends AppDialog {
             }
             if (Configuration.lastExportEnableEmbed.get()) {
                 embedCheckBox.setSelected(true);
-            }            
+            }
         }
-        
+
         resampleWavCheckBox = new JCheckBox(translate("resampleWav"));
         resampleWavCheckBox.setVisible(false);
 
-
-        if (embedCheckBox.isVisible() ||visibleOptionClasses.contains(SoundExportMode.class)) {        
+        if (embedCheckBox.isVisible() || visibleOptionClasses.contains(SoundExportMode.class)) {
             top += 2;
             resampleWavCheckBox.setVisible(true);
             comboPanel.add(resampleWavCheckBox);
@@ -402,17 +401,17 @@ public class ExportDialog extends AppDialog {
                 w = resampleWavCheckBox.getWidth() + 10;
             }
         }
-        
+
         transparentFrameBackgroundCheckBox = new JCheckBox(translate("transparentFrameBackground"));
         transparentFrameBackgroundCheckBox.setVisible(false);
         if (visibleOptionClasses.contains(FrameExportMode.class)) {
-            top += 2;            
+            top += 2;
             transparentFrameBackgroundCheckBox.setVisible(true);
             comboPanel.add(transparentFrameBackgroundCheckBox);
             if (Configuration.lastExportTransparentBackground.get()) {
                 transparentFrameBackgroundCheckBox.setSelected(true);
             }
-            
+
             transparentFrameBackgroundCheckBox.setBounds(10, top, transparentFrameBackgroundCheckBox.getPreferredSize().width, transparentFrameBackgroundCheckBox.getPreferredSize().height);
             top += transparentFrameBackgroundCheckBox.getHeight();
 

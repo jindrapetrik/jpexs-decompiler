@@ -74,7 +74,7 @@ public class DecompilerPool {
                 writer.endFunction();
 
                 writer.finishHilights();
-                
+
                 HighlightedText result = new HighlightedText(writer);
                 SWF swf = src.getSwf();
                 if (swf != null) {

@@ -148,7 +148,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public SoundExportFormat getExportFormat() {        
+    public SoundExportFormat getExportFormat() {
         if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
             if (getInitialLatency() > 0 || isMp3HigherThan160Kbps()) {
                 return SoundExportFormat.WAV;
@@ -278,7 +278,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     @Override
     public String getUniqueId() {
         return "" + virtualCharacterId;
-    }        
+    }
 
     //getNeededCharacters intentionally not defined
     @Override
@@ -305,12 +305,12 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
     }
-    
+
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
     }
-                
+
     @Override
     public int getInitialLatency() {
         return latencySeek;

@@ -48,7 +48,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
         this.parent = parent;
         this.data = data;
     }
-    
+
     @Override
     public boolean unpack(Packer packer) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -67,12 +67,12 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     @Override
     public PackedBinaryData getSub() {
         return sub;
-    }        
-    
+    }
+
     public BinaryDataInterface getParent() {
         return parent;
-    }            
-    
+    }
+
     @Override
     public Openable getOpenable() {
         return swf;
@@ -81,25 +81,25 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     @Override
     public SWF getSwf() {
         return swf;
-    }   
-    
+    }
+
     @Override
     public void setModified(boolean value) {
-        modified = value;  
+        modified = value;
         if (value) {
-            parent.setModified(value);        
+            parent.setModified(value);
         } else {
             if (sub != null) {
                 sub.setModified(false);
             }
         }
     }
-    
+
     @Override
     public boolean isModified() {
         return modified;
     }
-    
+
     @Override
     public boolean isSwfData() {
         try {
@@ -114,12 +114,12 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
         }
         return false;
     }
-        
+
     @Override
     public Packer getUsedPacker() {
         return usedPacker;
     }
-    
+
     @Override
     public void detectPacker() {
         for (Packer packer : DefineBinaryDataTag.getAvailablePackers()) {
@@ -133,12 +133,12 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     @Override
     public ByteArrayRange getDataBytes() {
         return data;
-    }    
+    }
 
     @Override
     public void setDataBytes(ByteArrayRange data) {
         this.data = data;
-        setModified(true);        
+        setModified(true);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     @Override
     public String toString() {
         return "(Data - " + parent.getUsedPacker().getName() + ")";
-    }        
+    }
 
     @Override
     public void setInnerSwf(SWF swf) {
@@ -190,7 +190,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
             packed = (PackedBinaryData) packed.parent;
         }
         return packed.parent;
-    }            
+    }
 
     @Override
     public String getExportFileName() {
@@ -200,7 +200,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
             parts.add(0, ((PackedBinaryData) binaryData).parent.getUsedPacker().getIdentifier());
             binaryData = ((PackedBinaryData) binaryData).parent;
         }
-        
+
         parts.add(0, binaryData.getExportFileName());
         return String.join("_", parts);
     }
@@ -213,10 +213,10 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
             parts.add(0, ((PackedBinaryData) binaryData).parent.getUsedPacker().getIdentifier());
             binaryData = ((PackedBinaryData) binaryData).parent;
         }
-        
+
         parts.add(0, binaryData.getCharacterExportFileName());
         return String.join("_", parts);
-    }        
+    }
 
     @Override
     public String getName() {
@@ -226,10 +226,10 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
             parts.add(0, ((PackedBinaryData) binaryData).parent.getUsedPacker().getName());
             binaryData = ((PackedBinaryData) binaryData).parent;
         }
-        
+
         parts.add(0, binaryData.getName());
         return String.join(" / ", parts);
-    }        
+    }
 
     @Override
     public String getClassExportFileName(String className) {
@@ -239,8 +239,8 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
             parts.add(0, binaryData.getStoragesPathIdentifier());
             binaryData = ((PackedBinaryData) binaryData).parent;
         }
-        
+
         parts.add(0, binaryData.getClassExportFileName(className));
         return String.join("_", parts);
-    }        
+    }
 }

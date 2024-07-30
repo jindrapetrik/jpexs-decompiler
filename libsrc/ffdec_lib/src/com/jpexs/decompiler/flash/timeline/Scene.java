@@ -26,10 +26,11 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class Scene implements TreeItem {
+
     private SWF swf;
     public int startFrame;
     public int endFrame;
-    public String name;        
+    public String name;
 
     public Scene(SWF swf, int startFrame, int endFrame, String name) {
         this.swf = swf;
@@ -37,11 +38,11 @@ public class Scene implements TreeItem {
         this.endFrame = endFrame;
         this.name = name;
     }
-    
+
     public int getSceneFrameCount() {
-        return endFrame  - startFrame + 1;
+        return endFrame - startFrame + 1;
     }
-    
+
     public SceneFrame getSceneFrame(int sceneFrameIndex) {
         if (sceneFrameIndex >= getSceneFrameCount()) {
             throw new IndexOutOfBoundsException("Invalid sceneframe index");
@@ -57,7 +58,7 @@ public class Scene implements TreeItem {
     @Override
     public boolean isModified() {
         return false; //??
-    }    
+    }
 
     @Override
     public int hashCode() {
@@ -88,5 +89,5 @@ public class Scene implements TreeItem {
     @Override
     public String toString() {
         return name;
-    }        
+    }
 }

@@ -117,7 +117,7 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
     public ABC getABC() {
         return abc;
     }
-  
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

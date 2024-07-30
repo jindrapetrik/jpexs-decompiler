@@ -55,7 +55,7 @@ public class SoundTagPlayer implements MediaDisplay {
     private boolean paused = false;
 
     private boolean closed = false;
-    
+
     private boolean resample = false;
 
     private final Object playLock = new Object();
@@ -77,7 +77,7 @@ public class SoundTagPlayer implements MediaDisplay {
     private long lengthInMicroSec = 0;
 
     private double microsecPerByte = 0;
-    
+
     private double microsecPerByteResampled = 0;
 
     private double positionMicrosec = 0;
@@ -85,7 +85,7 @@ public class SoundTagPlayer implements MediaDisplay {
     private Long newPositionMicrosec = null;
 
     private byte[] wavData = null;
-    
+
     private byte[] wavDataResampled = null;
 
     private boolean active = false;
@@ -169,9 +169,9 @@ public class SoundTagPlayer implements MediaDisplay {
         }, 100, 100);
 
         if (!async) {
-            setPausedFlag(true);            
+            setPausedFlag(true);
         }
-        
+
         this.resample = resample;
 
         thread = new Thread("Sound tag player") {
@@ -196,7 +196,7 @@ public class SoundTagPlayer implements MediaDisplay {
             }
         };
         thread.start();
-    }                    
+    }
 
     private void openSound(SOUNDINFO soundInfo, SoundTag tag, boolean resample) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SWF swf = (SWF) tag.getOpenable();
@@ -206,12 +206,12 @@ public class SoundTagPlayer implements MediaDisplay {
             List<ByteArrayRange> soundData = tag.getRawSoundData();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             tag.getSoundFormat().createWav(soundInfo, soundData, baos, tag.getInitialLatency(), false);
-            wavData = baos.toByteArray();            
+            wavData = baos.toByteArray();
             swf.putToCache(soundInfo, tag, false, wavData);
             baos = new ByteArrayOutputStream();
             tag.getSoundFormat().createWav(soundInfo, soundData, baos, tag.getInitialLatency(), true);
-            wavDataResampled = baos.toByteArray();            
-            swf.putToCache(soundInfo, tag, true, wavDataResampled);            
+            wavDataResampled = baos.toByteArray();
+            swf.putToCache(soundInfo, tag, true, wavDataResampled);
         }
 
         long soundLength44 = 0;
@@ -220,7 +220,7 @@ public class SoundTagPlayer implements MediaDisplay {
         int sampleLen = (isUnCompressed ? (tag.getSoundSize() ? 2 : 1) : 2) * (tag.getSoundFormat().stereo ? 2 : 1);
         switch (tag.getSoundRate()) {
             case 0: //5.5kHz
-                soundLength44 = 8 * tag.getTotalSoundSampleCount();                
+                soundLength44 = 8 * tag.getTotalSoundSampleCount();
                 microsecPerByte = 1000000d / (5512.5d * sampleLen);
                 break;
             case 1: //11kHz
@@ -232,12 +232,12 @@ public class SoundTagPlayer implements MediaDisplay {
                 microsecPerByte = 1000000d / (22050d * sampleLen);
                 break;
             case 3: //44kHz
-                soundLength44 = tag.getTotalSoundSampleCount();  
+                soundLength44 = tag.getTotalSoundSampleCount();
                 microsecPerByte = 1000000d / (44100d * sampleLen);
                 break;
         }
-        
-        microsecPerByteResampled = 1000000d / (44100d * sampleLen);           
+
+        microsecPerByteResampled = 1000000d / (44100d * sampleLen);
         lengthInMicroSec = soundLength44 * 1000000 / 44100;
 
         synchronized (playLock) {
@@ -283,7 +283,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private void reloadAudioStream() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         audioStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(resample ? wavDataResampled : wavData));
-        
+
         if (sourceLine != null) {
             sourceLine.drain();
             sourceLine.stop();
@@ -463,10 +463,10 @@ public class SoundTagPlayer implements MediaDisplay {
             loopCount = loop ? Integer.MAX_VALUE : 1;
         }
     }
-    
+
     public void setResample(boolean resample) {
-        this.resample = resample;        
-        rewind();        
+        this.resample = resample;
+        rewind();
     }
 
     @Override
@@ -555,5 +555,5 @@ public class SoundTagPlayer implements MediaDisplay {
     @Override
     public boolean isMutable() {
         return true;
-    }        
+    }
 }

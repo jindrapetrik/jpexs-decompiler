@@ -91,7 +91,7 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
             String newValue = getText();
             if (Objects.equals(oldValue, newValue)) {
                 return false;
-            }            
+            }
             Object val;
             if (type.equals(double.class) || type.equals(Double.class)) {
                 val = Double.valueOf(getText());
@@ -146,7 +146,7 @@ public class FloatEditor extends JTextField implements GenericTagEditor {
     @Override
     public void validateValue() {
     }
-    
+
     @Override
     public Object getObject() {
         return obj;

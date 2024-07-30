@@ -31,12 +31,13 @@ import javax.swing.event.DocumentListener;
 
 /**
  * App that converts between FLA and SVG paths.
+ *
  * @author JPEXS
  */
 public class PathConverterApp {
 
     private static boolean updating = false;
-    
+
     public static void main(String[] args) {
         JFrame fr = new JFrame();
         fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,7 +61,7 @@ public class PathConverterApp {
             public void changedUpdate(DocumentEvent e) {
                 update();
             }
-            
+
             private void update() {
                 if (updating) {
                     return;
@@ -70,31 +71,30 @@ public class PathConverterApp {
                 String newText = t1.getText();
                 newText = newText.replaceAll(" *<Edge .* edges=\"", "");
                 newText = newText.replaceAll("\"/>", "");
-                
-                
+
                 StringBuffer resultString = new StringBuffer();
                 Pattern regex = Pattern.compile("#([A-F0-9]+)\\.([A-F0-9]+)");
                 Matcher m = regex.matcher(newText);
                 while (m.find()) {
                     int p1 = Integer.parseInt(m.group(1), 16);
                     int p2 = Integer.parseInt(m.group(2), 16);
-                    
+
                     if ((p1 & 0x800000) > 0) {
                         p1 = 0xFF000000 | p1;
                     }
-                    
+
                     DecimalFormat df = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
                     df.setGroupingUsed(false);
-                    String strValue = "" + df.format((double) p1 + p2 / 256.0);                    
+                    String strValue = "" + df.format((double) p1 + p2 / 256.0);
                     m.appendReplacement(resultString, strValue);
                 }
                 m.appendTail(resultString);
-                
+
                 newText = resultString.toString();
-                
+
                 t2.setText(newText.replace("!", "M").replace("|", "L").replace("[", "Q"));
                 updating = false;
-            }            
+            }
         });
         t2.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -111,7 +111,7 @@ public class PathConverterApp {
             public void changedUpdate(DocumentEvent e) {
                 update();
             }
-            
+
             private void update() {
                 if (updating) {
                     return;
@@ -119,7 +119,7 @@ public class PathConverterApp {
                 updating = true;
                 t1.setText(t2.getText().replace("M", "!").replace("L", "|").replace("Q", "["));
                 updating = false;
-            }            
+            }
         });
         cnt.add(new JScrollPane(t1));
         cnt.add(new JScrollPane(t2));

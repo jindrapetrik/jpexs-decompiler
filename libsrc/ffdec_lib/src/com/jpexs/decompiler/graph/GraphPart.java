@@ -134,7 +134,7 @@ public class GraphPart implements Serializable {
                 next.setNumblocks(numBlocks);
             }
         }
-    }    
+    }
 
     private boolean leadsToRecursive(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -357,7 +357,7 @@ public class GraphPart implements Serializable {
 
     public boolean containsIP(int ip) {
         return (ip >= start) && (ip <= end);
-    }    
+    }
 
     public int getHeight() {
         return end - start + 1;

@@ -266,7 +266,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     public String toString() {
         return toRawString();
     }
-    
+
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
         if (isNull) {
             return "";

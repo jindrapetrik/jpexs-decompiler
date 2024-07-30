@@ -172,7 +172,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         }
 
         return cnt;
-    } 
+    }
 
     public List<Long> getOffsets() {
         List<Long> ret = new ArrayList<>();

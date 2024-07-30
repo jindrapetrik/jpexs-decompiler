@@ -149,7 +149,7 @@ public class ImageExporter {
                         }, handler).run();
                     }
                 }
-                Set<String> classNames = imageTag.getClassNames();                    
+                Set<String> classNames = imageTag.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + "." + ImageHelper.getImageFormatString(fileFormat)));
@@ -166,7 +166,7 @@ public class ImageExporter {
                     if (alphaPngFile.exists()) {
                         alphaPngFile.delete();
                     }
-                } else {                
+                } else {
                     ret.add(file);
                 }
 

@@ -45,15 +45,14 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
     public abstract List<SoundStreamFrameRange> getRanges();
 
-    
-    protected boolean isMp3HigherThan160Kbps() {        
+    protected boolean isMp3HigherThan160Kbps() {
         List<SoundStreamFrameRange> ranges = getRanges();
         if (ranges.isEmpty()) {
             return false;
         }
         try {
             SWFInputStream sis = new SWFInputStream(swf, ranges.get(0).blocks.get(0).streamSoundData.getRangeData());
-            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);                      
+            MP3SOUNDDATA s = new MP3SOUNDDATA(sis, false);
             if (!s.frames.isEmpty()) {
                 MP3FRAME frame = s.frames.get(0);
                 int bitRate = frame.getBitRate() / 1000;

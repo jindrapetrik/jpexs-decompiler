@@ -104,7 +104,7 @@ public class InstanceInfo {
                         fileName = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
                     }
                     fileName = Helper.makeFileName(fileName);
-            
+
                     if (ct instanceof DefineBinaryDataTag) {
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ".bin\", mimeType=\"application/octet-stream\")]").newLine();
                     }

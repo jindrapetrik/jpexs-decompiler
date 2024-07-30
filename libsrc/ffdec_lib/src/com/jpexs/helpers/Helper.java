@@ -129,7 +129,7 @@ public class Helper {
         }
         sb.append("]");
         return sb.toString();
-    }    
+    }
 
     /**
      * Formats specified address to four numbers xxxx (or five numbers when
@@ -596,7 +596,7 @@ public class Helper {
 
     public static String byteToHex(byte b) {
         return hexStringCache[b & 0xff];
-    }   
+    }
 
     public static String format(String str, int len) {
         if (len <= str.length()) {
@@ -787,15 +787,15 @@ public class Helper {
         return baos.toByteArray();
     }
 
-    public static void copyStreamEx(InputStream is, OutputStream os) throws IOException {        
+    public static void copyStreamEx(InputStream is, OutputStream os) throws IOException {
         final int bufSize = 4096;
         byte[] buf = new byte[bufSize];
         int cnt = 0;
         while ((cnt = is.read(buf)) > 0) {
             os.write(buf, 0, cnt);
-        }        
+        }
     }
-    
+
     public static void copyStream(InputStream is, OutputStream os) {
         try {
             final int bufSize = 4096;
@@ -1079,7 +1079,7 @@ public class Helper {
     public static String bytesToHexString(byte[] bytes) {
         return bytesToHexString(bytes, 0);
     }
-    
+
     public static String bytesToHexString(byte[] bytes, int start) {
         StringBuilder sb = new StringBuilder();
         if (start < bytes.length) {
@@ -1109,7 +1109,7 @@ public class Helper {
         }
         return sb.toString();
     }
-    
+
     public static String byteArrayToHex(byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
         for (byte b : data) {
@@ -1118,7 +1118,7 @@ public class Helper {
 
         return sb.toString();
     }
-    
+
     public static GraphTextWriter byteArrayToHex(GraphTextWriter writer, byte[] data, int bytesPerRow, int groupSize, boolean addChars, boolean showAddress) {
 
         /* // hex data from decompiled actions
@@ -1328,7 +1328,7 @@ public class Helper {
             }
             return ret.toString();
         }
-        
+
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

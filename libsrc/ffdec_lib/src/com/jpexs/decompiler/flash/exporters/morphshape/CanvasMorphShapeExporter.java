@@ -45,7 +45,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
     protected static final String DRAW_COMMAND_L = "L";
 
     protected static final String DRAW_COMMAND_Q = "Q";
-    
+
     protected static final String DRAW_COMMAND_Z = "Z";
 
     protected String currentDrawCommand = "";

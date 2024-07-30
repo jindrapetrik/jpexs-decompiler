@@ -77,12 +77,12 @@ public class MovieImporter {
             if (tag instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag movieTag = (DefineVideoStreamTag) tag;
                 List<File> existingFilesForMovieTag = new ArrayList<>();
-                
+
                 List<String> classNameExpectedFileNames = new ArrayList<>();
                 for (String className : movieTag.getClassNames()) {
-                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));
                 }
-                
+
                 for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForMovieTag.add(f);
@@ -302,16 +302,16 @@ public class MovieImporter {
                 }
             }
             if (placeDepth == -1) {
-                placeDepth = maxPlaceDepth + 1;                
+                placeDepth = maxPlaceDepth + 1;
                 startFrame = 0;
             }
             int numTimelineFrames = timelined == null ? 0 : timelined.getFrameCount();
 
             int importLastFrame = -1;
             if (timelined != null) {
-                
+
                 boolean placeWithCharacterIdFound = false;
-                ReadOnlyTagList tagList1 = timelined.getTags();                
+                ReadOnlyTagList tagList1 = timelined.getTags();
                 for (int p = 0; p < tagList1.size(); p++) {
                     Tag t = tagList1.get(p);
                     if (t instanceof PlaceObjectTypeTag) {
@@ -330,10 +330,10 @@ public class MovieImporter {
                             placeObject.placeFlagMove = false;
                             timelined.addTag(p, placeObject);
                             break;
-                        }                        
+                        }
                     }
                 }
-                
+
                 VideoFrameTag lastVideoFrame = null;
                 for (FLVTAG ftag : videoTags) {
                     videoData = ((VIDEODATA) ftag.data);
@@ -381,9 +381,9 @@ public class MovieImporter {
                             PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
                             if (place.getDepth() == placeDepth) {
                                 placeFound = true;
-                            }                            
+                            }
                         }
-                        if (t instanceof ShowFrameTag) {                            
+                        if (t instanceof ShowFrameTag) {
                             swfFrameNum++;
                             if (!placeFound) {
                                 PlaceObject2Tag placeObject = new PlaceObject2Tag(swf);

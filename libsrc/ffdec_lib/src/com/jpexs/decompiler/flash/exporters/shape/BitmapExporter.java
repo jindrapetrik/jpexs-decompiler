@@ -249,7 +249,7 @@ public class BitmapExporter extends ShapeExporterBase {
         finalizePath();
         if (color == null) {
             fillPaint = defaultColor;
-        } else {            
+        } else {
             fillPaint = color.toColor();
         }
     }
@@ -261,18 +261,18 @@ public class BitmapExporter extends ShapeExporterBase {
         if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
             cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
         }
-        
+
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
         int lastRatio = -1;
         for (int i = 0; i < gradientRecords.length; i++) {
             if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
                 if (lastRatio < 255) {
-                    lastRatio++;          
+                    lastRatio++;
                 }
             } else {
                 if (gradientRecords[i].ratio > lastRatio) {
-                    lastRatio = gradientRecords[i].ratio;      
+                    lastRatio = gradientRecords[i].ratio;
                 } else if (lastRatio < 255) {
                     lastRatio++;
                 }
@@ -281,7 +281,7 @@ public class BitmapExporter extends ShapeExporterBase {
             colors.add(gradientRecords[i].color.toColor());
             if (lastRatio == 255) {
                 break;
-            }                    
+            }
         }
 
         if (colors.size() == 1) {
@@ -308,12 +308,12 @@ public class BitmapExporter extends ShapeExporterBase {
                 cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 break;
         }
-        
+
         switch (type) {
             case FILLSTYLE.LINEAR_GRADIENT:
                 fillPaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
                 break;
-            case FILLSTYLE.RADIAL_GRADIENT:            
+            case FILLSTYLE.RADIAL_GRADIENT:
                 fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point(0, 0), ratiosArr, colorsArr, cm, cstype, new AffineTransform());
                 break;
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
@@ -361,12 +361,12 @@ public class BitmapExporter extends ShapeExporterBase {
         finalizePath();
         linePaint = null;
         lineTransform = null;
-        
+
         if (thickness == 0) {
             lineColor = null;
             return;
         }
-        
+
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -438,18 +438,18 @@ public class BitmapExporter extends ShapeExporterBase {
         if (interpolationMethod == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE) {
             cstype = MultipleGradientPaint.ColorSpaceType.LINEAR_RGB;
         }
-        
+
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
         int lastRatio = -1;
         for (int i = 0; i < gradientRecords.length; i++) {
             if ((i > 0) && (gradientRecords[i - 1].ratio == gradientRecords[i].ratio)) {
                 if (lastRatio < 255) {
-                    lastRatio++;          
+                    lastRatio++;
                 }
             } else {
                 if (gradientRecords[i].ratio > lastRatio) {
-                    lastRatio = gradientRecords[i].ratio;      
+                    lastRatio = gradientRecords[i].ratio;
                 } else if (lastRatio < 255) {
                     lastRatio++;
                 }
@@ -458,7 +458,7 @@ public class BitmapExporter extends ShapeExporterBase {
             colors.add(gradientRecords[i].color.toColor());
             if (lastRatio == 255) {
                 break;
-            }                    
+            }
         }
 
         if (colors.size() == 1) {
@@ -472,7 +472,7 @@ public class BitmapExporter extends ShapeExporterBase {
             ratiosArr[i] = ratios.get(i);
         }
         Color[] colorsArr = colors.toArray(new Color[colors.size()]);
-        
+
         MultipleGradientPaint.CycleMethod cm = MultipleGradientPaint.CycleMethod.NO_CYCLE;
         switch (spreadMethod) {
             case GRADIENT.SPREAD_PAD_MODE:
@@ -485,19 +485,19 @@ public class BitmapExporter extends ShapeExporterBase {
                 cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 break;
         }
-        
+
         switch (type) {
-            case FILLSTYLE.LINEAR_GRADIENT:            
-                linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);                
+            case FILLSTYLE.LINEAR_GRADIENT:
+                linePaint = new LinearGradientPaint(POINT_NEG16384_0, POINT_16384_0, ratiosArr, colorsArr, cm, cstype, IDENTITY_TRANSFORM);
                 break;
             case FILLSTYLE.RADIAL_GRADIENT:
-                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);                
+                linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
                 break;
             case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
                 linePaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point((int) (focalPointRatio * 16384), 0), ratiosArr, colorsArr, cm, cstype, AffineTransform.getTranslateInstance(0, 0));
                 break;
         }
-        
+
         lineTransform = matrix.toTransform();
     }
 

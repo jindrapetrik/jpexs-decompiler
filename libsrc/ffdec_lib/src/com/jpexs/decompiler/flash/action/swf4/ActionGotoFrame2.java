@@ -104,10 +104,10 @@ public class ActionGotoFrame2 extends Action {
     public ActionGotoFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9F, -1, charset);
         sceneBiasFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         playFlag = lexBoolean(lexer);
         if (sceneBiasFlag) {
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
             sceneBias = (int) lexLong(lexer);
         }
     }

@@ -90,9 +90,9 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
     public abstract void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions);
 
     public abstract void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix);
-    
+
     public abstract void setPlaceFlagMove(boolean placeFlagMove);
-    
+
     public boolean placeEquals(PlaceObjectTypeTag other) {
         if (getDepth() != other.getDepth()) {
             return false;
@@ -147,7 +147,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
             if (ch != null) {
                 charId = ch.getCharacterId();
                 ret.put("chid", "" + charId);
-            }            
+            }
         } else {
             String exportName = swf.getExportName(charId);
             if (charId > -1) {
@@ -157,7 +157,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
                 ret.put("exp", exportName);
             }
         }
-         
+
         int depth = getDepth();
         ret.put("dpt", "" + depth);
         int clipDepth = getClipDepth();
@@ -165,7 +165,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
             ret.put("cdp", "" + clipDepth);
         }
         return ret;
-    }        
+    }
 
     @Override
     public String getExportFileName() {

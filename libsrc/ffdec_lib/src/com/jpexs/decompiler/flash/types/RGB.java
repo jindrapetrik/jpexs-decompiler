@@ -51,7 +51,7 @@ public class RGB implements Serializable {
         this.green = color.green;
         this.blue = color.blue;
     }
-    
+
     public RGB(int red, int green, int blue) {
         this.red = red;
         this.green = green;
@@ -142,6 +142,5 @@ public class RGB implements Serializable {
         }
         return this.blue == other.blue;
     }
-    
-    
+
 }

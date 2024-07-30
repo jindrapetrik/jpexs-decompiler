@@ -378,7 +378,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
 
         super.setText(highlightedText.text);
-        setCaretPosition(0);        
+        setCaretPosition(0);
     }
 
     @Override
@@ -641,10 +641,10 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 Flasm3Lexer lexer = new Flasm3Lexer(new StringReader(curLine));
                 ParsedSymbol symb = lexer.lex();
                 while (symb.type == ParsedSymbol.TYPE_LABEL) {
-                    symb = lexer.lex();                                
+                    symb = lexer.lex();
                 }
                 if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                    String insName = (String) symb.value;                                
+                    String insName = (String) symb.value;
                     int argumentToHilight = -1;
                     int column = 0;
                     try {
@@ -653,9 +653,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                         column = caretPosition - rowStart;
                     } catch (BadLocationException ex) {
                         //ignore
-                    }            
+                    }
                     symb = lexer.lex();
-                    if (symb.pos <= column) {                                                              
+                    if (symb.pos <= column) {
                         argumentToHilight++;
                         int parentLevel = 0;
                         Stack<Integer> parentsStack = new Stack<>();
@@ -664,8 +664,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                                 break;
                             }
                             if (symb.type == ParsedSymbol.TYPE_PARENT_OPEN
-                                    || symb.type == ParsedSymbol.TYPE_BRACKET_OPEN
-                                ) {
+                                    || symb.type == ParsedSymbol.TYPE_BRACKET_OPEN) {
                                 parentsStack.push(symb.type);
                                 parentLevel++;
                             }
@@ -691,7 +690,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                                 argumentToHilight++;
                             }
                             symb = lexer.lex();
-                        }                                
+                        }
                     }
                     if (AVM2Code.instructionAliases.containsKey(insName)) {
                         insName = AVM2Code.instructionAliases.get(insName);
@@ -707,7 +706,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 }
             } catch (IOException | AVM2ParseException iex) {
                 //ignore
-            }            
+            }
         }
         String pathDocs = As3PCodeOtherDocs.getDocsForPath(pathNoTrait, nightMode);
         if (pathDocs == null) {

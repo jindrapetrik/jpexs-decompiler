@@ -259,13 +259,13 @@ public class ImageTagBufferedImage extends BufferedImage {
     @Override
     public ImageProducer getSource() {
         return image.getSource();
-    }    
+    }
 
     @Override
     public int getWidth(ImageObserver observer) {
         return image.getWidth(observer);
     }
-    
+
     @Override
     public int getWidth() {
         return image.getWidth();

@@ -46,5 +46,5 @@ public class DebugAdapter implements DebugListener {
     public byte[] onRequestBytes(String clientId) {
         return null;
     }
-    
+
 }

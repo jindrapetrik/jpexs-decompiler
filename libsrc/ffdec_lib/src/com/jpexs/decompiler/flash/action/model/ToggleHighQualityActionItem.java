@@ -48,13 +48,13 @@ public class ToggleHighQualityActionItem extends ActionItem {
     @Override
     public boolean hasReturnValue() {
         return false;
-    }  
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);

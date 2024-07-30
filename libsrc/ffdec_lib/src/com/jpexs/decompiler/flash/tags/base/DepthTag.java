@@ -21,7 +21,8 @@ package com.jpexs.decompiler.flash.tags.base;
  * @author JPEXS
  */
 public interface DepthTag {
+
     public int getDepth();
-    
+
     public void setDepth(int depth);
 }

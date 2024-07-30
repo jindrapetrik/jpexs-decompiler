@@ -174,12 +174,12 @@ public class SpriteImporter {
             if (tag instanceof DefineSpriteTag) {
                 DefineSpriteTag spriteTag = (DefineSpriteTag) tag;
                 List<File> existingFilesForSpriteTag = new ArrayList<>();
-                
+
                 List<String> classNameExpectedFileNames = new ArrayList<>();
                 for (String className : spriteTag.getClassNames()) {
-                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));
                 }
-                
+
                 for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForSpriteTag.add(f);

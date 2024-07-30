@@ -43,7 +43,7 @@ public interface MediaDisplay extends Closeable {
     public boolean isPlaying();
 
     public void setLoop(boolean loop);
-    
+
     public void setResample(boolean resample);
 
     public void gotoFrame(int frame);

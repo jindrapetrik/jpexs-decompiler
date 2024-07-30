@@ -360,7 +360,7 @@ public class View {
     public static void centerScreen(Window f) {
         centerScreen(f, false);
     }
-    
+
     public static void centerScreen(Window f, boolean mainWindow) {
         int topLeftX;
         int topLeftY;
@@ -802,94 +802,103 @@ public class View {
     public static boolean isOceanic() {
         return SubstanceLookAndFeel.getCurrentSkin() instanceof OceanicSkin;
     }
-    
+
     /**
-     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java 8.
+     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java
+     * 8.
+     *
      * @param editor
      * @param pt
-     * @return 
+     * @return
      */
-    public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {        
-        try {        
+    public static int textComponentViewToModel(JTextComponent editor, Point2D pt) {
+        try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel2D", Point2D.class).invoke(editor, pt);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             //method does not exist, we must be on Java8
         }
-        
+
         //Try older method
         Point p = new Point((int) Math.round(pt.getX()), (int) Math.round(pt.getY()));
-        try {        
+        try {
             return (int) (Integer) JTextComponent.class.getDeclaredMethod("viewToModel", Point.class).invoke(editor, p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             return 0;
         }
     }
-    
+
     /**
-     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java 8.
+     * This calls JTextComponent.viewToModel2D on Java 9+ or viewToModel on Java
+     * 8.
+     *
      * @param editor
      * @param pt
-     * @return 
+     * @return
      */
     public static int textComponentViewToModel(JTextComponent editor, Point pt) {
         Point2D p2d = new Point2D.Double(pt.x, pt.y);
         return textComponentViewToModel(editor, p2d);
     }
-    
+
     /**
-     * This calls JTextComponent.modelToView2D on Java 9+ or modelToView on Java 8.
+     * This calls JTextComponent.modelToView2D on Java 9+ or modelToView on Java
+     * 8.
+     *
      * @param editor
      * @param pos
-     * @return 
-     * @throws javax.swing.text.BadLocationException 
+     * @return
+     * @throws javax.swing.text.BadLocationException
      */
-    public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {                
-        try {        
+    public static Rectangle2D textComponentModelToView(JTextComponent editor, int pos) throws BadLocationException {
+        try {
             return (Rectangle2D) JTextComponent.class.getDeclaredMethod("modelToView2D", int.class).invoke(editor, pos);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             //method does not exist, we must be on Java8
         }
-        
+
         //Try older method
-        try {        
+        try {
             return (Rectangle) JTextComponent.class.getDeclaredMethod("modelToView", int.class).invoke(editor, pos);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);            
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
-    
+
     /**
      * This calls TextUI.modelToView2D on Java 9+ or modelToView on Java 8.
+     *
      * @param textUi
      * @param t
      * @param pos
      * @param bias
-     * @return 
-     * @throws javax.swing.text.BadLocationException 
+     * @return
+     * @throws javax.swing.text.BadLocationException
      */
     public static Rectangle2D textUIModelToView(TextUI textUi, JTextComponent t, int pos, Position.Bias bias) throws BadLocationException {
-        try {        
+        try {
             return (Rectangle2D) TextUI.class.getDeclaredMethod("modelToView2D", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             //method does not exist, we must be on Java8
         }
-        
+
         //Try older method
         try {
             return (Rectangle) TextUI.class.getDeclaredMethod("modelToView", JTextComponent.class, int.class, Position.Bias.class).invoke(textUi, t, pos, bias);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             return null;
-        }        
+        }
     }
-    
+
     /**
-     * Creates locale using Locale.of on Java19, using constructor on older Javas.
+     * Creates locale using Locale.of on Java19, using constructor on older
+     * Javas.
+     *
      * @param language
      * @param country
-     * @return 
+     * @return
      */
     public static Locale createLocale(String language, String country) {
         try {
@@ -903,11 +912,13 @@ public class View {
             }
         }
     }
-    
+
     /**
-     * Creates locale using Locale.of on Java19, using constructor on older Javas.
+     * Creates locale using Locale.of on Java19, using constructor on older
+     * Javas.
+     *
      * @param language
-     * @return 
+     * @return
      */
     public static Locale createLocale(String language) {
         try {

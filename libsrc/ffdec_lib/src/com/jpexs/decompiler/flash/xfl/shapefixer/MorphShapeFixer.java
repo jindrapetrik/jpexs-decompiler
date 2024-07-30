@@ -69,15 +69,15 @@ public class MorphShapeFixer extends ShapeFixer {
         mergeSamePathsWithOppositeFillstyles(shapes, fillStyles0, fillStyles1, lineStyles, layers);
     }
 
-    
     /**
-     * shape 1 [FS0:A, FS1:-, LS:n], shape 2 [FS0:-, FS1:B, LS:n]  
-     * => shape 1 [FS0:A, FS1:B], remove shape 2
+     * shape 1 [FS0:A, FS1:-, LS:n], shape 2 [FS0:-, FS1:B, LS:n] => shape 1
+     * [FS0:A, FS1:B], remove shape 2
+     *
      * @param shapes
      * @param fillStyles0
      * @param fillStyles1
      * @param lineStyles
-     * @param layers 
+     * @param layers
      */
     private void mergeSamePathsWithOppositeFillstyles(
             List<List<BezierEdge>> shapes,
@@ -101,32 +101,28 @@ public class MorphShapeFixer extends ShapeFixer {
                     continue;
                 }
                 boolean doRemove = false;
-                if (
-                    fillStyles0.get(i1) != 0 && fillStyles1.get(i1) == 0
-                        && fillStyles1.get(i2) != 0 && fillStyles0.get(i2) == 0
-                    ) {
+                if (fillStyles0.get(i1) != 0 && fillStyles1.get(i1) == 0
+                        && fillStyles1.get(i2) != 0 && fillStyles0.get(i2) == 0) {
                     fillStyles1.set(i1, fillStyles1.get(i2));
                     doRemove = true;
-                } else if (
-                    fillStyles1.get(i1) != 0 && fillStyles0.get(i1) == 0
-                        && fillStyles0.get(i2) != 0 && fillStyles1.get(i2) == 0
-                ) {
+                } else if (fillStyles1.get(i1) != 0 && fillStyles0.get(i1) == 0
+                        && fillStyles0.get(i2) != 0 && fillStyles1.get(i2) == 0) {
                     fillStyles0.set(i1, fillStyles0.get(i2));
-                    doRemove = true;                   
+                    doRemove = true;
                 }
-                
+
                 if (doRemove) {
                     shapes.remove(i2);
                     fillStyles0.remove(i2);
                     fillStyles1.remove(i2);
                     lineStyles.remove(i2);
                     layers.remove(i2);
-                    i2--;                    
+                    i2--;
                 }
             }
         }
     }
-    
+
     private boolean isEmptyPath(List<BezierEdge> path) {
         for (BezierEdge be : path) {
             if (!be.isEmpty()) {
@@ -267,8 +263,7 @@ public class MorphShapeFixer extends ShapeFixer {
                     px = r.getX() + r.getWidth() * Math.random();
                     py = r.getY() + r.getHeight() * Math.random();
                 } while (!region.contains(px, py));*/
-                
-                
+
                 PathIterator pi = region.getPathIterator(null);
                 Rectangle2D bounds = region.getBounds2D();
                 double centerX = bounds.getCenterX();
@@ -289,15 +284,15 @@ public class MorphShapeFixer extends ShapeFixer {
                             break;
                         case PathIterator.SEG_QUADTO:
                             x = points[2];
-                            y = points[3];                            
+                            y = points[3];
                     }
-                    
+
                     numPoints++;
                     double p = Math.sqrt((centerX - x) * (centerX - x) + (centerY - y) * (centerY - y));
                     double x1 = (centerX - x) * 0.1 / p;
                     double y1 = (centerY - y) * 0.1 / p;
-                    if (path.contains(x + x1, y + y1)) {                        
-                        numContains++;                        
+                    if (path.contains(x + x1, y + y1)) {
+                        numContains++;
                     } else {
                         numNotContains++;
                     }

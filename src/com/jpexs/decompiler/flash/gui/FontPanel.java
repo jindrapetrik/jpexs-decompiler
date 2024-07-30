@@ -615,7 +615,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
             }
         }
     }
-    
+
     public boolean fontEmbed(TreeItem item, boolean create) {
         if (item == null) {
             return false;

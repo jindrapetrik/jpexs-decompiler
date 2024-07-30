@@ -38,7 +38,7 @@ public class ScriptExportSettings {
     public boolean exportEmbed;
 
     public boolean exportEmbedFlaMode;
-    
+
     public boolean resampleWav;
 
     public ScriptExportSettings(

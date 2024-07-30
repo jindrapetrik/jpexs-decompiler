@@ -46,8 +46,8 @@ public class DebuggerTools {
 
     public static final String DEBUGGER_PACKAGE = "com.jpexs.decompiler.flash.debugger";
 
-    private static volatile Debugger debugger;        
-    
+    private static volatile Debugger debugger;
+
     private static ScriptPack getDebuggerScriptPack(SWF swf) {
         List<ABC> allAbcList = new ArrayList<>();
         for (ABCContainerTag ac : swf.getAbcList()) {
@@ -262,9 +262,7 @@ public class DebuggerTools {
                     ft.useNetwork = true;
                     ft.setModified(true);
                 }
-                
-                
-                
+
                 //Add call to DebugConnection.initClient("") to the document class
                 /*String documentClass = swf.getDocumentClass();
                 if (documentClass != null) {
@@ -301,8 +299,7 @@ public class DebuggerTools {
                         }
                     }
                 }
-                */
-
+                 */
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error while attaching debugger", ex);
                 //ignore

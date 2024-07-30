@@ -251,7 +251,7 @@ public abstract class GraphTextWriter {
         }
         return this;
     }
-    
+
     public GraphTextWriter addCurrentMethodData(HighlightData data) {
         return this;
     }

@@ -62,7 +62,7 @@ public class ConfigurationDirectorySelection extends JPanel {
         JFileChooser fc = new JFileChooser();
         fc.setSelectedFile(new File(current));
         fc.setMultiSelectionEnabled(false);
-        fc.setCurrentDirectory(new File((String) config.get()));       
+        fc.setCurrentDirectory(new File((String) config.get()));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setAcceptAllFileFilterUsed(false);
         int returnVal = fc.showOpenDialog(Main.getDefaultMessagesComponent());

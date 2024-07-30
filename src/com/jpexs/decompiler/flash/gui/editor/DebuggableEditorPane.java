@@ -40,7 +40,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     private static final Color BG_RULER_COLOR = new Color(0xe9, 0xe8, 0xe2);
 
     private static Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
-    
+
     private static final Color BG_STACK_COLOR = new Color(0xe7, 0xe1, 0xef);
 
     private static final Color FG_BREAKPOINT_COLOR = null;
@@ -50,9 +50,9 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     private static final Color BG_IP_COLOR = new Color(0xbd, 0xe6, 0xaa);
 
     private static final Color FG_IP_COLOR = null;
-    
+
     private static final Color FG_STACK_COLOR = null;
-    
+
     private static final int PRIORITY_STACK = 30;
 
     private static final int PRIORITY_IP = 0;
@@ -68,15 +68,15 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     public static final LineMarker IP_MARKER = new LineMarker(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
 
     public static final LineMarker INVALID_BREAKPOINT_MARKER = new LineMarker(FG_INVALID_BREAKPOINT_COLOR, BG_INVALID_BREAKPOINT_COLOR, PRIORITY_INVALID_BREAKPOINT);
-    
+
     public static final LineMarker STACK_MARKER = new LineMarker(FG_STACK_COLOR, BG_STACK_COLOR, PRIORITY_STACK);
 
     protected String scriptName = null;
-    
+
     protected String breakPointScriptName = null;
 
     private LineNumbersBreakpointsRuler ruler;
-    
+
     private boolean showMarkers = true;
 
     public DebuggableEditorPane() {
@@ -157,7 +157,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
     public boolean isShowMarkers() {
         return showMarkers;
-    }        
+    }
 
     @Override
     public void setText(String t) {
@@ -171,7 +171,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
     public String getBreakPointScriptName() {
         return breakPointScriptName;
-    }        
+    }
 
     @Override
     public void paintLineMarker(Graphics g, int line, int x, int lineY, int textY, int lineHeight, boolean currentLine, int maxLines) {
@@ -221,7 +221,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             g.setColor(BG_IP_COLOR);
             g.fillPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);
             g.setColor(Color.black);
-            g.drawPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);            
+            g.drawPolygon(new int[]{mx, mx + 10, mx}, new int[]{textY - 10, textY - 5, textY}, 3);
         }
         if (currentLine) {
             g.setColor(UIManager.getColor("List.selectionForeground"));

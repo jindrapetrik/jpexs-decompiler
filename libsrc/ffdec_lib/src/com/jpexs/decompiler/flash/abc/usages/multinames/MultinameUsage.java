@@ -135,5 +135,5 @@ public abstract class MultinameUsage implements Usage {
     @Override
     public String getKind() {
         return "multiname";
-    }        
+    }
 }

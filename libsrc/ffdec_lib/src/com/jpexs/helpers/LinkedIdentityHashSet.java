@@ -25,25 +25,27 @@ import java.util.Set;
 
 /**
  * Identity hash set which maintains insertion order.
+ *
  * @author JPEXS
  * @param <E>
  */
 public class LinkedIdentityHashSet<E> implements Set<E> {
 
     private class MyObj {
+
         private final Object obj;
 
         public MyObj(Object obj) {
             this.obj = obj;
-        }       
-        
+        }
+
         @Override
         public int hashCode() {
             return System.identityHashCode(obj);
-        }                
+        }
 
         @Override
-        @SuppressWarnings("unchecked")    
+        @SuppressWarnings("unchecked")
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
@@ -56,18 +58,18 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
             }
             final MyObj other = (MyObj) obj;
             return this.obj == other.obj;
-        }             
+        }
     }
-    
+
     private final Set<MyObj> set = new LinkedHashSet<>();
 
     public LinkedIdentityHashSet() {
     }
-    
+
     public LinkedIdentityHashSet(Collection<? extends E> c) {
         addAll(c);
     }
-    
+
     @Override
     public int size() {
         return set.size();
@@ -76,7 +78,7 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
     @Override
     public boolean isEmpty() {
         return set.isEmpty();
-    }    
+    }
 
     @Override
     public boolean contains(Object o) {
@@ -85,7 +87,7 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
 
     @Override
     public Iterator<E> iterator() {
-        final Iterator<MyObj> setIterator = set.iterator();    
+        final Iterator<MyObj> setIterator = set.iterator();
         return new Iterator<E>() {
             @Override
             public boolean hasNext() {
@@ -93,7 +95,7 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
             }
 
             @Override
-            @SuppressWarnings("unchecked")    
+            @SuppressWarnings("unchecked")
             public E next() {
                 return (E) setIterator.next().obj;
             }
@@ -109,9 +111,9 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
         }
         return objs;
     }
-    
+
     @Override
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
         T[] ret = prepareArray(a);
         Object[] objs = set.toArray();
@@ -120,7 +122,7 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
         }
         return ret;
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T[] prepareArray(T[] a) {
         int size = this.set.size();
@@ -135,7 +137,7 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
 
     @Override
     public boolean add(E e) {
-        return set.add(new MyObj(e));        
+        return set.add(new MyObj(e));
     }
 
     @Override
@@ -188,5 +190,5 @@ public class LinkedIdentityHashSet<E> implements Set<E> {
     @Override
     public void clear() {
         set.clear();
-    }    
+    }
 }

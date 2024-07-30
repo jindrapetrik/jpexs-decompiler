@@ -57,7 +57,7 @@ public class ConfigurationItem<T> {
         hasValue = true;
         this.defaultValue = defaultValue;
         this.value = value;
-    }    
+    }
 
     public T get() {
         if (!hasValue) {

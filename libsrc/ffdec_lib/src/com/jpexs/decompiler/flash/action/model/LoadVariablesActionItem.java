@@ -72,7 +72,7 @@ public class LoadVariablesActionItem extends ActionItem {
         writer.append(",");
         targetString.toString(writer, localData);
         return writer.append(methodStr).append(")");
-    }    
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
@@ -83,7 +83,7 @@ public class LoadVariablesActionItem extends ActionItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);
     }
-    
+
     private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         String charset = asGenerator.getCharset();

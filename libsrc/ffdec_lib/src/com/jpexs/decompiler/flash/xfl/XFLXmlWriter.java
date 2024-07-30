@@ -131,13 +131,13 @@ public class XFLXmlWriter implements XMLStreamWriter {
         tagsStack.add(localName);
         startElementClosed = false;
         newLineNeeded = false;
-    }   
+    }
 
     private void writeEmptyElementInternal(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         writeStartElement(prefix, localName, namespaceURI);
         writeEndElement();
     }
-    
+
     @Override
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
         writeEmptyElementInternal(getPrefix(namespaceURI), localName, namespaceURI);
@@ -183,7 +183,6 @@ public class XFLXmlWriter implements XMLStreamWriter {
         writeEndElement();
     }
 
-    
     public void writeElementValue(String localName, String value) throws XMLStreamException {
         writeStartElement(localName);
         writeCharacters(value);
@@ -314,7 +313,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     @Override
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-    }  
+    }
 
     public void writeCharactersRaw(String text) throws XMLStreamException {
         closeStartElement();
@@ -326,7 +325,7 @@ public class XFLXmlWriter implements XMLStreamWriter {
         closeStartElement();
         append(escapeText(text));
     }
-    
+
     @Override
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
         writeCharacters(new String(text, start, len));

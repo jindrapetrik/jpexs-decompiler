@@ -92,7 +92,7 @@ public class EcmaScript {
             return object_defaultValue((ObjectType) o, prefferedType);
         }
         return Undefined.INSTANCE; //??
-    }   
+    }
 
     public static Object object_get(ObjectType o, String p) {
         //TODO: isDataDesciptor, etc. ECMA 8.12.3
@@ -281,12 +281,12 @@ public class EcmaScript {
             }
             return 0;
         }
-    }        
+    }
 
     public static boolean strictEquals(Object x, Object y) {
         return strictEquals(false, x, y);
     }
-    
+
     public static boolean strictEquals(boolean as2, Object x, Object y) {
         if (type(x) != type(y)) {
             return false;

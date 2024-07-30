@@ -94,11 +94,11 @@ public class RECT implements Serializable {
     public Point getBottomRight() {
         return new Point(Xmax, Ymax);
     }
-        
+
     public void calculateBits() {
         nbits = SWFOutputStream.getNeededBitsS(Xmin, Xmax, Ymin, Ymax);
     }
-    
+
     public boolean isTooLarge() {
         calculateBits();
         return !SWFOutputStream.fitsInUB(5, nbits);

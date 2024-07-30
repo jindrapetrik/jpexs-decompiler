@@ -73,13 +73,13 @@ public class LoadVariablesNumActionItem extends ActionItem {
         writer.append(",");
         num.toString(writer, localData);
         return writer.append(methodStr).append(")");
-    }    
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);

@@ -55,7 +55,7 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return modified;
     }
-    
+
     public MORPHFILLSTYLEARRAY toMorphFillStyleArray() {
         MORPHFILLSTYLEARRAY morphFillStyleArray = new MORPHFILLSTYLEARRAY();
         morphFillStyleArray.fillStyles = new MORPHFILLSTYLE[fillStyles.length];

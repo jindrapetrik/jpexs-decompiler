@@ -82,7 +82,7 @@ public class ShapeFixer {
         }
 
     }
-    
+
     protected void beforeHandle(
             int shapeNum,
             List<List<BezierEdge>> shapes,
@@ -94,10 +94,9 @@ public class ShapeFixer {
             LINESTYLEARRAY baseLineStyles,
             List<FILLSTYLEARRAY> fillStyleLayers,
             List<LINESTYLEARRAY> lineStyleLayers
-    ) {        
+    ) {
     }
-    
-    
+
     private void detectOverlappingEdges(
             List<List<BezierEdge>> shapes,
             List<Integer> fillStyles0,
@@ -125,7 +124,7 @@ public class ShapeFixer {
                 }
                 oldpct = pct;
             }*/
-            
+
             loopj1:
             for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
                 BezierEdge be1 = shapes.get(i1).get(j1);
@@ -199,12 +198,12 @@ public class ShapeFixer {
                                 || be1.getEndPoint().equals(be2.getEndPoint())) && (t1Ref.size() == 1)) {
                             continue;
                         }
-                        
+
                         if (t1Ref.size() == 2) {
                             if ((t1Ref.get(0) == 0 || t1Ref.get(0) == 1)
-                                && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
+                                    && (t2Ref.get(0) == 0 || t2Ref.get(0) == 1)) {
                                 continue;
-                            } 
+                            }
                         }
 
                         if (DEBUG_PRINT) {
@@ -314,13 +313,13 @@ public class ShapeFixer {
                         }
 
                         j1--;
-                        continue loopj1;                        
+                        continue loopj1;
                     }
                 }
             }
         }
-    }            
-    
+    }
+
     private void splitToLayers(
             List<SHAPERECORD> records,
             List<List<BezierEdge>> shapes,
@@ -329,10 +328,10 @@ public class ShapeFixer {
             List<Integer> lineStyles,
             List<Integer> layers,
             List<FILLSTYLEARRAY> fillStyleLayers,
-            List<LINESTYLEARRAY> lineStyleLayers                        
-    ) {        
+            List<LINESTYLEARRAY> lineStyleLayers
+    ) {
         List<BezierEdge> currentShape = new ArrayList<>();
-        
+
         int fillStyle0 = 0;
         int fillStyle1 = 0;
         int lineStyle = 0;
@@ -403,7 +402,7 @@ public class ShapeFixer {
             y = rec.changeY(y);
         }
     }
-    
+
     private List<ShapeRecordAdvanced> combineLayers(
             List<List<BezierEdge>> shapes,
             List<Integer> fillStyles0,
@@ -411,7 +410,7 @@ public class ShapeFixer {
             List<Integer> lineStyles,
             List<Integer> layers,
             List<FILLSTYLEARRAY> fillStyleLayers,
-            List<LINESTYLEARRAY> lineStyleLayers   
+            List<LINESTYLEARRAY> lineStyleLayers
     ) {
         List<ShapeRecordAdvanced> ret = new ArrayList<>();
         int layer = -1;
@@ -473,16 +472,16 @@ public class ShapeFixer {
         List<Integer> layers = new ArrayList<>();
         List<FILLSTYLEARRAY> fillStyleLayers = new ArrayList<>();
         List<LINESTYLEARRAY> lineStyleLayers = new ArrayList<>();
-        
+
         splitToLayers(records, shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);
-        
+
         beforeHandle(shapeNum, shapes, fillStyles0, fillStyles1, lineStyles, layers, baseFillStyles, baseLineStyles, fillStyleLayers, lineStyleLayers);
-        
+
         if (Configuration.flaExportFixShapes.get()) {
             detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers);
         }
-        
-        return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);        
+
+        return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);
     }
 
     private ShapeRecordAdvanced bezierToAdvancedRecord(BezierEdge be) {

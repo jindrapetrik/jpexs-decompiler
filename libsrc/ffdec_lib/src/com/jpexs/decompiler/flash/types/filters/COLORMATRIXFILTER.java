@@ -38,7 +38,7 @@ public class COLORMATRIXFILTER extends FILTER {
      */
     @SWFType(BasicType.FLOAT)
     @SWFArray(count = 20)
-    public float[] matrix = new float[] {
+    public float[] matrix = new float[]{
         1, 0, 0, 0, 0,
         0, 1, 0, 0, 0,
         0, 0, 1, 0, 0,

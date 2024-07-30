@@ -51,7 +51,7 @@ public class MochiCryptPacker32Bit implements Packer {
         } catch (IOException ex) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -131,5 +131,5 @@ public class MochiCryptPacker32Bit implements Packer {
     @Override
     public String getIdentifier() {
         return "mochicrypt32";
-    }        
+    }
 }

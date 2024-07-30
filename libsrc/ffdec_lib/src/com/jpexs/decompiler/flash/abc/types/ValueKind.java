@@ -94,7 +94,7 @@ public class ValueKind {
                 return CONSTANT_StaticProtectedNs;
         }
         return 0;
-    }    
+    }
 
     public boolean isNamespace() {
         switch (value_kind) {

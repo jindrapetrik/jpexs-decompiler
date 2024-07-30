@@ -126,10 +126,8 @@ public class CallMethodActionItem extends ActionItem {
                 } else {
                     scriptObject.toString(writer, localData);
                 }
-                if (
-                    !(((DirectValueActionItem) methodName).value instanceof RegisterNumber)
-                        && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))
-                ) {
+                if (!(((DirectValueActionItem) methodName).value instanceof RegisterNumber)
+                        && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
                     writer.append(".");
                     methodName.toStringNoQuotes(writer, localData);
                 } else {

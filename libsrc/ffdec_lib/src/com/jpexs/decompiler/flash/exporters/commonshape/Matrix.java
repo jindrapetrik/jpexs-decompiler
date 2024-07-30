@@ -43,17 +43,17 @@ public final class Matrix implements Cloneable {
         mat.scale(scale);
         return mat;
     }
-        
+
     public static Matrix getScaleInstance(double scaleX, double scaleY) {
         Matrix mat = new Matrix();
         mat.scale(scaleX, scaleY);
         return mat;
     }
-    
+
     public static Matrix getRotateInstance(double rotateAngle) {
         return getRotateInstance(rotateAngle, 0, 0);
     }
-    
+
     public static Matrix getRotateInstance(double rotateAngle, double tx, double ty) {
         double angleRad = -rotateAngle * Math.PI / 180;
         Matrix mat = new Matrix();
@@ -65,7 +65,7 @@ public final class Matrix implements Cloneable {
                 .concatenate(getTranslateInstance(-tx, -ty));
         return mat;
     }
-    
+
     public static Matrix getSkewXInstance(double skewAngle) {
         double angleRad = skewAngle * Math.PI / 180;
         Matrix mat = new Matrix();
@@ -148,7 +148,6 @@ public final class Matrix implements Cloneable {
         return new java.awt.Point((int) p.x, (int) p.y);
     }
 
-    
     public Point transform(double x, double y) {
         Point result = new Point(
                 scaleX * x + rotateSkew1 * y + translateX,
@@ -164,7 +163,7 @@ public final class Matrix implements Cloneable {
         Point p = transform(point.x, point.y);
         return new java.awt.Point((int) p.x, (int) p.y);
     }
-    
+
     public Point2D transform(Point2D point) {
         Point p = transform(point.getX(), point.getY());
         return new Point2D.Double(p.x, p.y);

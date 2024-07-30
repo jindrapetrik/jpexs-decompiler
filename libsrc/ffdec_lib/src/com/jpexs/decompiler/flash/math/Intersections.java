@@ -166,7 +166,6 @@ public class Intersections {
         return intersectPolylinePolyline(a, b);
     }
 
-    
     public static boolean rectIntersection(Rectangle2D r1, Rectangle2D r2) {
         double xmin = Math.max(r1.getX(), r2.getX());
         double xmax1 = r1.getX() + r1.getWidth();
@@ -183,8 +182,8 @@ public class Intersections {
         }
         return false;
     }
-    
-    public static Rectangle2D getBBox(Point2D ...points) {
+
+    public static Rectangle2D getBBox(Point2D... points) {
         double minX = Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE;
@@ -206,8 +205,8 @@ public class Intersections {
 
         return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
-    
-    public static List<Point2D> intersectBezier2Bezier2(Point2D a1, Point2D a2, Point2D a3, Point2D b1, Point2D b2, Point2D b3) {      
+
+    public static List<Point2D> intersectBezier2Bezier2(Point2D a1, Point2D a2, Point2D a3, Point2D b1, Point2D b2, Point2D b3) {
         Point2D pa;
         Point2D pb;
         List<Point2D> result = new ArrayList<>();
@@ -259,7 +258,7 @@ public class Intersections {
             Samples where this happens:
             M 6369  13040 Q 6380 13030 6427 13018 and M 6338 13099 Q 6358 13050 6369 13040
             M 6369 13040 Q 6380 13030 6427 13018 and M 6338 13099 Q 6358 13050 6369 13040
-            */
+             */
             roots = new ArrayList<>();
         }
         for (double s : roots) {

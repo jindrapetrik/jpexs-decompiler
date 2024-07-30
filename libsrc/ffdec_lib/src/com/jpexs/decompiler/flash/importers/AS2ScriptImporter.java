@@ -88,16 +88,16 @@ public class AS2ScriptImporter {
                     asm.setActions(par.actionsFromString(txt, asm.getSwf().getCharset()));
                 } catch (ValueTooLargeException ex) {
                     logger.log(Level.SEVERE, "Script or some of its functions are too large, file: {0}", fileName);
-                    errored = true;                    
+                    errored = true;
                 } catch (ActionParseException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
-                    errored = true;                    
+                    errored = true;
                 } catch (CompilationException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
-                    errored = true;                    
+                    errored = true;
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
-                    errored = true;                    
+                    errored = true;
                 } catch (InterruptedException ex) {
                     return importCount;
                 } catch (Exception ex) {
@@ -172,7 +172,7 @@ public class AS2ScriptImporter {
                     logger.log(Level.SEVERE, null, ex);
                     errored = true;
                 }
-                
+
                 if (!errored) {
                     asm.setModified();
                     importCount++;

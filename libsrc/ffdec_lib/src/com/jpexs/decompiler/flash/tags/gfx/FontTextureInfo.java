@@ -41,7 +41,7 @@ public class FontTextureInfo extends Tag {
     public static final String NAME = "FontTextureInfo";
 
     public int textureID;
-    
+
     public int unknownID;
 
     public int textureFormat;
@@ -65,7 +65,7 @@ public class FontTextureInfo extends Tag {
     public static final int TEXTURE_FORMAT_TGA = 1;
 
     public static final int TEXTURE_FORMAT_DDS = 2;
-    
+
     //It looks like gfxexport produces TEXTURE_FORMAT2_* values for format,
     //but BITMAP_FORMAT_* works the same way
     public static final int TEXTURE_FORMAT2_JPEG = 10;
@@ -76,7 +76,7 @@ public class FontTextureInfo extends Tag {
 
     public static final int UNKNOWN_IS_SINGLE = 0;
     public static final int UNKNOWN_IS_MULTIPLE = 6;
-    
+
     /**
      * Gets data bytes
      *
@@ -144,31 +144,31 @@ public class FontTextureInfo extends Tag {
         int numFonts = sis.readUI16("numFonts");
         fonts = new FONTINFO[numFonts];
         mis = sis.getBaseStream();
-        misStartPos = mis.getPos();        
+        misStartPos = mis.getPos();
         for (int i = 0; i < numFonts; i++) {
             GFxInputStream gis = new GFxInputStream(mis);
             gis.dumpInfo = sis.dumpInfo;
             fonts[i] = new FONTINFO(gis);
         }
-        sis.skipBytes(mis.getPos() - misStartPos);       
+        sis.skipBytes(mis.getPos() - misStartPos);
     }
-        
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         ret.put("chid", "" + getUniqueId());
         return ret;
     }
-    
+
     @Override
     public String getUniqueId() {
         return "ft" + textureID;
-    }  
-    
+    }
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
+
         tagInfo.addInfo("general", "textureId", textureID);
         String textureFormatStr = "0x" + Integer.toHexString(textureFormat);
         switch (textureFormat) {

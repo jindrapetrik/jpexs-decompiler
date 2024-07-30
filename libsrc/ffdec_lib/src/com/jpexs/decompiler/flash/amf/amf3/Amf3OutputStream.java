@@ -193,8 +193,8 @@ public class Amf3OutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         os.write(b, off, len);
-    }            
-    
+    }
+
     private void writeArray(ArrayType val, Map<String, ObjectTypeSerializeHandler> serializers, List<String> stringTable, List<Traits> traitsTable, List<Object> objectTable) throws IOException, NoSerializerExistsException {
         int objectIndex = objectTable.indexOf(val);
         if (objectIndex == -1) {

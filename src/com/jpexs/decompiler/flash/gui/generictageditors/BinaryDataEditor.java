@@ -195,7 +195,7 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
     public void added() {
 
     }
-    
+
     @Override
     public Object getObject() {
         return obj;

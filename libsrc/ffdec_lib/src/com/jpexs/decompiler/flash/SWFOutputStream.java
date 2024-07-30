@@ -151,7 +151,7 @@ public class SWFOutputStream extends OutputStream {
         os.write(b, off, len);
         pos += len;
     }
-    
+
     public void write(ByteArrayRange b) throws IOException {
         alignByte();
         os.write(b.getArray(), b.getPos(), b.getLength());
@@ -419,15 +419,15 @@ public class SWFOutputStream extends OutputStream {
         if (!fitsInUB(nBits, value)) {
             throw new ValueTooLargeException("UB[" + nBits + "]", value);
         }
-        writeNBInternal(nBits, value, "UB");                
+        writeNBInternal(nBits, value, "UB");
     }
-    
+
     public static boolean fitsInSB(int nBits, long value) {
         long min = -1L << (nBits - 1);
         long max = (1L << (nBits - 1)) - 1;
         return value >= min && value <= max;
     }
-    
+
     public static boolean fitsInUB(int nBits, long value) {
         long min = 0;
         long max = (1L << nBits) - 1;
@@ -454,7 +454,7 @@ public class SWFOutputStream extends OutputStream {
      * @param value Signed value to write
      * @throws IOException
      */
-    public void writeSB(int nBits, long value) throws IOException {        
+    public void writeSB(int nBits, long value) throws IOException {
         if (!fitsInSB(nBits, value)) {
             throw new ValueTooLargeException("SB[" + nBits + "]", value);
         }
@@ -530,7 +530,7 @@ public class SWFOutputStream extends OutputStream {
         for (Tag tag : tags) {
             tag.writeTag(this);
         }
-    }   
+    }
 
     /**
      * Calculates number of bits needed for representing signed value
@@ -564,7 +564,7 @@ public class SWFOutputStream extends OutputStream {
         }
         return nBits;
     }
-    
+
     /**
      * Calculates number of bits needed for representing unsigned value
      *
@@ -680,7 +680,7 @@ public class SWFOutputStream extends OutputStream {
 
             writeUB(5, nBits);
             writeFB(nBits, value.rotateSkew0);
-            writeFB(nBits, value.rotateSkew1);            
+            writeFB(nBits, value.rotateSkew1);
         }
         int NTranslateBits = 0;
         NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
@@ -1386,17 +1386,17 @@ public class SWFOutputStream extends OutputStream {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
-    public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {                        
+    public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {
         calculateSHAPEFillLineBits(value);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
     }
-    
+
     private void calculateSHAPEFillLineBits(SHAPE value) {
         int numFillBits = 0;
         int numLineBits = 0;
-        
+
         for (SHAPERECORD r : value.shapeRecords) {
             if (r instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) r;
@@ -1407,22 +1407,22 @@ public class SWFOutputStream extends OutputStream {
                     numFillBits = Math.max(numFillBits, getNeededBitsU(scr.fillStyle1));
                 }
                 if (scr.stateLineStyle) {
-                    numLineBits = Math.max(numLineBits, getNeededBitsU(scr.lineStyle));                
+                    numLineBits = Math.max(numLineBits, getNeededBitsU(scr.lineStyle));
                 }
                 if (scr.stateNewStyles) {
                     break;
-                }                
+                }
             }
         }
         if (Configuration._debugCopy.get()) {
             numFillBits = Math.max(numFillBits, value.numFillBits);
             numLineBits = Math.max(numLineBits, value.numLineBits);
         }
-        
+
         value.numFillBits = numFillBits;
         value.numLineBits = numLineBits;
     }
-        
+
     /**
      * Writes SHAPEWITHSTYLE value to the stream
      *
@@ -1433,7 +1433,7 @@ public class SWFOutputStream extends OutputStream {
     public void writeSHAPEWITHSTYLE(SHAPEWITHSTYLE value, int shapeNum) throws IOException {
         writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
         writeLINESTYLEARRAY(value.lineStyles, shapeNum);
-        calculateSHAPEFillLineBits(value);        
+        calculateSHAPEFillLineBits(value);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
@@ -1715,7 +1715,8 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Writes MORPHFOCALGRADIENT value to the stream.
      *
-     * <p>Undocumented feature
+     * <p>
+     * Undocumented feature
      *
      * @param value MORPHGRADIENT value
      * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...

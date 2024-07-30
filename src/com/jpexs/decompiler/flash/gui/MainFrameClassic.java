@@ -72,7 +72,7 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
         int maxWidth = bounds.width - (insets.left + insets.right);
         int maxHeight = bounds.height - (insets.top + insets.bottom);
-        
+
         if (w > maxWidth) {
             w = maxWidth;
         }

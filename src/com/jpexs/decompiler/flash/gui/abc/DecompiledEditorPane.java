@@ -916,7 +916,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
                     if (decompileNeeded) {
                         //long timeBefore = System.currentTimeMillis();
-                        setShowMarkers(false);                            
+                        setShowMarkers(false);
                         View.execInEventDispatch(() -> {
                             setText("// " + AppStrings.translate("work.decompiling") + "...");
                         });
@@ -925,7 +925,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                         //long timeAfter = System.currentTimeMillis();
                         //long delta = timeAfter - timeBefore;
                         //System.err.println("Finished in " + Helper.formatTimeSec(delta));
-                        setShowMarkers(true);                            
+                        setShowMarkers(true);
                         View.execInEventDispatch(() -> {
                             setSourceCompleted(scriptLeaf, htext);
                         });
@@ -952,7 +952,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                             if (ex instanceof ExecutionException) {
                                 cause = ex.getCause();
                             }
-                            setShowMarkers(false);                            
+                            setShowMarkers(false);
                             if (cause instanceof CancellationException) {
                                 setText("// " + AppStrings.translate("work.canceled"));
                             } else {
@@ -970,7 +970,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 Main.startWork(AppStrings.translate("work.decompiling") + "...", worker);
             }
         } else {
-            setShowMarkers(true);                            
+            setShowMarkers(true);
             setSourceCompleted(scriptLeaf, decompiledText);
         }
     }

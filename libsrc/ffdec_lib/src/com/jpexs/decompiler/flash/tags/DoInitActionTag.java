@@ -69,7 +69,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
     @Internal
     private String scriptName = "-";
-    
+
     @Internal
     private String exportedScriptName = "-";
 
@@ -237,14 +237,13 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         return pathParts[pathParts.length - 1];
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         String expName = swf == null ? "" : swf.getExportName(spriteId);
-        
+
         Map<String, String> ret = super.getNameProperties();
         ret.put("sid", "" + spriteId);
-        
+
         if (expName == null || expName.isEmpty()) {
             return ret;
         }
@@ -252,7 +251,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
         //ret.put("exp", pathParts[pathParts.length - 1]);   
         ret.put("exp", expName);
         return ret;
-    }        
+    }
 
     @Override
     public GraphTextWriter getActionSourcePrefix(GraphTextWriter writer) {
@@ -302,12 +301,12 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             return new ArrayList<>();
         }
     }
-    
+
     @Override
     public String getExportedScriptName() {
         return exportedScriptName;
     }
-    
+
     @Override
     public void setExportedScriptName(String scriptName) {
         this.exportedScriptName = scriptName;

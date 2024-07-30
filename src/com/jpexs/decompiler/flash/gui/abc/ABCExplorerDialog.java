@@ -134,14 +134,14 @@ public class ABCExplorerDialog extends AppDialog {
     private Runnable packListener;
 
     private ABCSimpleUsageDetector usageDetector = null;
-    
-    private JButton cleanButton = new JButton(View.getIcon("clean16"));        
-    
+
+    private JButton cleanButton = new JButton(View.getIcon("clean16"));
+
     private JTable usagesTable = new JTable(new DefaultTableModel()) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
-        }        
+        }
     };
 
     public ABCExplorerDialog(Window owner, MainPanel mainPanel, Openable openable, ABC abc) {
@@ -208,24 +208,24 @@ public class ABCExplorerDialog extends AppDialog {
 
         tagInfoLabel = new JLabel();
         topLeftPanel.add(tagInfoLabel);
-        
+
         cleanButton.setToolTipText(translate("button.clean"));
         cleanButton.addActionListener(this::cleanActionPerformed);
-        
+
         JPanel topRightPanel = new JPanel(new FlowLayout());
         topRightPanel.add(cleanButton);
-        
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(topLeftPanel, BorderLayout.WEST);
         topPanel.add(topRightPanel, BorderLayout.EAST);
 
         mainTabbedPane = new JTabbedPane();
         cpTabbedPane = new JTabbedPane();
-        
+
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn(translate("usages").replace("%item%", "-"));
         usagesTable.setModel(model);
-        
+
         usagesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -237,15 +237,15 @@ public class ABCExplorerDialog extends AppDialog {
                     String path = (String) usagesTable.getModel().getValueAt(row, 0);
                     selectPath(path);
                 }
-            }            
+            }
         });
-        
+
         usagesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    int row = usagesTable.rowAtPoint( e.getPoint() );
-                    int column = usagesTable.columnAtPoint( e.getPoint() );
+                    int row = usagesTable.rowAtPoint(e.getPoint());
+                    int column = usagesTable.columnAtPoint(e.getPoint());
                     if (!usagesTable.isRowSelected(row)) {
                         usagesTable.changeSelection(row, column, false, false);
                     }
@@ -259,7 +259,7 @@ public class ABCExplorerDialog extends AppDialog {
                                 return;
                             }
                             selectPath((String) usagesTable.getModel().getValueAt(row, 0));
-                        }                        
+                        }
                     });
                     JMenuItem copyMenuItem = new JMenuItem(translate("copy.paths"), View.getIcon("copy16"));
                     copyMenuItem.addActionListener(new ActionListener() {
@@ -268,10 +268,10 @@ public class ABCExplorerDialog extends AppDialog {
                             int[] rows = usagesTable.getSelectedRows();
                             List<String> values = new ArrayList<>();
                             for (int row : rows) {
-                                values.add((String)usagesTable.getModel().getValueAt(row, 0));
+                                values.add((String) usagesTable.getModel().getValueAt(row, 0));
                             }
                             copyToClipboard(String.join("\r\n", values));
-                        }                        
+                        }
                     });
                     JMenuItem copyAllMenuItem = new JMenuItem(translate("copy.paths.all"), View.getIcon("copy16"));
                     copyAllMenuItem.addActionListener(new ActionListener() {
@@ -279,27 +279,27 @@ public class ABCExplorerDialog extends AppDialog {
                         public void actionPerformed(ActionEvent e) {
                             List<String> values = new ArrayList<>();
                             for (int row = 0; row < usagesTable.getModel().getRowCount(); row++) {
-                                values.add((String)usagesTable.getModel().getValueAt(row, 0));
+                                values.add((String) usagesTable.getModel().getValueAt(row, 0));
                             }
                             copyToClipboard(String.join("\r\n", values));
-                        }                        
+                        }
                     });
                     popupMenu.add(hilightMenuItem);
                     popupMenu.add(copyMenuItem);
                     popupMenu.add(copyAllMenuItem);
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());                                        
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
-            }            
+            }
         });
-        
+
         JPanel centralPanel = new JPanel(new BorderLayout());
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(new FasterScrollPane(usagesTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);        
+        rightPanel.add(new FasterScrollPane(usagesTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
         //rightPanel.add(calculateUsagesButton, BorderLayout.SOUTH);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mainTabbedPane, rightPanel);
         splitPane.setDividerLocation(800);
-        centralPanel.add(splitPane);        
-        
+        centralPanel.add(splitPane);
+
         cnt.add(topPanel, BorderLayout.NORTH);
         cnt.add(centralPanel, BorderLayout.CENTER);
 
@@ -310,12 +310,12 @@ public class ABCExplorerDialog extends AppDialog {
                 abcComboBoxActionPerformed(null);
             }
         }
-        
+
         JRootPane rootPane = getRootPane();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK);
         InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = rootPane.getActionMap();
-        
+
         inputMap.put(keyStroke, "ctrlGAction");
         actionMap.put("ctrlGAction", new AbstractAction() {
             @Override
@@ -327,7 +327,7 @@ public class ABCExplorerDialog extends AppDialog {
                 selectPath(path);
             }
         });
-        
+
         setSize(1024, 600);
         setTitle(translate("title") + " - " + openable.getTitleOrShortFileName());
         List<Image> images = new ArrayList<>();
@@ -364,11 +364,11 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private void abcComboBoxActionPerformed(ActionEvent e) {
-        usageDetector = null;   
-        DefaultTableModel model = new DefaultTableModel();                                
+        usageDetector = null;
+        DefaultTableModel model = new DefaultTableModel();
         model.addColumn(translate("usages").replace("%item%", "-"));
         usagesTable.setModel(model);
-        
+
         int index = abcComboBox == null ? 0 : abcComboBox.getSelectedIndex();
         if (index == -1) {
             return;
@@ -435,14 +435,14 @@ public class ABCExplorerDialog extends AppDialog {
         mainTabbedPane.addTab("mb (" + abc.bodies.size() + ")", View.getIcon(TreeType.METHOD_BODY.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_BODY));
 
         abc.removeChangeListener(packListener);
-        abc.addChangeListener(packListener);   
+        abc.addChangeListener(packListener);
         refreshUsages();
         repaint();
     }
-    
+
     private void refreshUsages() {
         ABCSimpleUsageDetector newUsageDetector = new ABCSimpleUsageDetector(getSelectedAbc());
-        newUsageDetector.detect(); 
+        newUsageDetector.detect();
         usageDetector = newUsageDetector;
         int zeroUsages = newUsageDetector.getZeroUsagesCount();
         cleanButton.setText("(" + zeroUsages + ")");
@@ -460,7 +460,7 @@ public class ABCExplorerDialog extends AppDialog {
         JTree tree = (JTree) fasterScrollPane.getViewport().getView();
         return tree;
     }
-    
+
     private String getCurrentPath() {
         JTree tree = getCurrentTree();
         TreePath tp = tree.getSelectionPath();
@@ -487,10 +487,10 @@ public class ABCExplorerDialog extends AppDialog {
                 key = sv.getTitle();
             } else {
                 break;
-            }       
+            }
             pathParts.add(key);
         }
-        return String.join("/", pathParts);    
+        return String.join("/", pathParts);
     }
 
     public void selectTrait(int scriptIndex, int classIndex, int traitIndex, int traitType) {
@@ -549,11 +549,11 @@ public class ABCExplorerDialog extends AppDialog {
         if (selectedType == null) {
             return;
         }
-        
+
         if (mainTabbedPane.getTabCount() == 0) {
             return;
         }
-        
+
         int stringOffset = 0;
         if (getSelectedAbc().hasDecimalSupport()) {
             stringOffset = 1;
@@ -573,7 +573,7 @@ public class ABCExplorerDialog extends AppDialog {
             case CONSTANT_DOUBLE:
                 mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(2);
-                break;                
+                break;
             case CONSTANT_DECIMAL:
                 if (!getSelectedAbc().hasDecimalSupport()) {
                     return;
@@ -594,21 +594,21 @@ public class ABCExplorerDialog extends AppDialog {
                 }
                 mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(4);
-                break;                
+                break;
             case CONSTANT_STRING:
-                mainTabbedPane.setSelectedIndex(0);                
+                mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(3 + stringOffset);
                 break;
             case CONSTANT_NAMESPACE:
-                mainTabbedPane.setSelectedIndex(0);                
+                mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(4 + stringOffset);
                 break;
             case CONSTANT_NAMESPACE_SET:
-                mainTabbedPane.setSelectedIndex(0);                
+                mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(5 + stringOffset);
                 break;
             case CONSTANT_MULTINAME:
-                mainTabbedPane.setSelectedIndex(0);                
+                mainTabbedPane.setSelectedIndex(0);
                 cpTabbedPane.setSelectedIndex(6 + stringOffset);
                 break;
             case METHOD_INFO:
@@ -624,16 +624,16 @@ public class ABCExplorerDialog extends AppDialog {
                 mainTabbedPane.setSelectedIndex(4);
                 break;
             case SCRIPT_INFO:
-                mainTabbedPane.setSelectedIndex(5);                
+                mainTabbedPane.setSelectedIndex(5);
                 break;
             case METHOD_BODY:
                 mainTabbedPane.setSelectedIndex(6);
                 break;
         }
-        
+
         selectPath(getCurrentTree(), path);
     }
-    
+
     private void selectPath(JTree tree, String path) {
         String[] parts = path.split("/");
         TreeModel model = tree.getModel();
@@ -671,7 +671,7 @@ public class ABCExplorerDialog extends AppDialog {
                     parent = child;
                     continue loopp;
                 }
-            }            
+            }
         }
         TreePath treePath = new TreePath(treePathObjectsList.toArray(new Object[treePathObjectsList.size()]));
         tree.setSelectionPath(treePath);
@@ -715,14 +715,14 @@ public class ABCExplorerDialog extends AppDialog {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultTableModel model = new DefaultTableModel();
-                                
+
                 if (tree.getSelectionCount() != 1 || usageDetector == null) {
                     //usagesList.setModel(new DefaultListModel<>());
                     model.addColumn(translate("usages").replace("%item%", "-"));
                     usagesTable.setModel(model);
-                    return;                
+                    return;
                 }
-                
+
                 Object selection = tree.getLastSelectedPathComponent();
 
                 if (selection instanceof ValueWithIndex) {
@@ -734,14 +734,14 @@ public class ABCExplorerDialog extends AppDialog {
                         //usagesList.setModel(model);                   
                         model.addColumn(translate("usages").replace("%item%", vwi.type.getAbbreviation() + vwi.index + ": " + vwi.getDescription()));
                         for (String usage : newUsages) {
-                            model.addRow(new Object[] {usage});
+                            model.addRow(new Object[]{usage});
                         }
-                    usagesTable.setModel(model);
+                        usagesTable.setModel(model);
                     } else {
-                        model.addColumn(translate("usages").replace("%item%", "-"));                        
+                        model.addColumn(translate("usages").replace("%item%", "-"));
                     }
                 } else {
-                    model.addColumn(translate("usages").replace("%item%", "-"));                    
+                    model.addColumn(translate("usages").replace("%item%", "-"));
                 }
                 usagesTable.setModel(model);
             }
@@ -771,11 +771,9 @@ public class ABCExplorerDialog extends AppDialog {
         if (tree.getSelectionCount() != 1) {
             return null;
         }
-        
-        
-        
+
         Object selection = tree.getLastSelectedPathComponent();
-                
+
         if (selection instanceof ValueWithIndex) {
             ValueWithIndex vwi = (ValueWithIndex) selection;
             if (vwi.getType() == TreeType.SCRIPT_INFO) {
@@ -815,12 +813,12 @@ public class ABCExplorerDialog extends AppDialog {
                     break;
             }
         }
-               
-        if (selection != null) {            
+
+        if (selection != null) {
             JMenuItem copyMenuItem = new JMenuItem(translate("copy.path"), View.getIcon("copy16"));
             copyMenuItem.addActionListener(this::copyPathActionPerformed);
             menu.add(copyMenuItem);
-        
+
             JMenuItem copyRowMenuItem = new JMenuItem(translate("copy.row"), View.getIcon("copy16"));
             copyRowMenuItem.addActionListener(this::copyRowActionPerformed);
             menu.add(copyRowMenuItem);
@@ -877,9 +875,9 @@ public class ABCExplorerDialog extends AppDialog {
     }
 
     private void copyPathActionPerformed(ActionEvent e) {
-        copyToClipboard(getCurrentPath());             
+        copyToClipboard(getCurrentPath());
     }
-    
+
     private void copyRowActionPerformed(ActionEvent e) {
         Object selection = getCurrentTree().getLastSelectedPathComponent();
         if (selection != null) {
@@ -2651,7 +2649,7 @@ public class ABCExplorerDialog extends AppDialog {
             return this;
         }
     }
-    
+
     private void cleanActionPerformed(ActionEvent e) {
         ABC abc = getSelectedAbc();
         if (abc != null) {
@@ -2661,7 +2659,7 @@ public class ABCExplorerDialog extends AppDialog {
             int mainIndex = mainTabbedPane.getSelectedIndex();
             int cpIndex = cpTabbedPane.getSelectedIndex();
             ABCCleaner cleaner = new ABCCleaner();
-            cleaner.clean(abc);           
+            cleaner.clean(abc);
             if (cpIndex > -1) {
                 cpTabbedPane.setSelectedIndex(cpIndex);
             }

@@ -21,5 +21,5 @@ package com.jpexs.decompiler.flash.importers.morphshape;
  * @author JPEXS
  */
 public class StyleMismatchException extends Exception {
-    
+
 }

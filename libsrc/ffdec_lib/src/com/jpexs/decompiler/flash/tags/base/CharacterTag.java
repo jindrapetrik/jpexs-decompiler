@@ -48,7 +48,6 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         classNames.add(className);
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -57,13 +56,13 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             ret.put("chid", "" + chid);
         }
         if (exportName != null) {
-            ret.put ("exp", Helper.escapePCodeString(exportName));
+            ret.put("exp", Helper.escapePCodeString(exportName));
         }
         if (!classNames.isEmpty()) {
             ret.put("cls", Helper.joinEscapePCodeString(", ", classNames));
         }
         return ret;
-    }       
+    }
 
     @Override
     public String getExportFileName() {
@@ -115,5 +114,5 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             return null;
         }
         return "" + getCharacterId();
-    }        
+    }
 }

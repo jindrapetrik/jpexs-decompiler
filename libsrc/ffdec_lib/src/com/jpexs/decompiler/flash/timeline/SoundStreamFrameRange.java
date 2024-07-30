@@ -32,15 +32,16 @@ import java.util.List;
  * @author JPEXS
  */
 public class SoundStreamFrameRange implements TreeItem, SoundTag {
+
     public int startFrame;
     public int endFrame;
-    public List<SoundStreamBlockTag> blocks = new ArrayList<>();        
-    
+    public List<SoundStreamBlockTag> blocks = new ArrayList<>();
+
     private final SoundStreamHeadTypeTag head;
-    
+
     public SoundStreamFrameRange(SoundStreamHeadTypeTag head) {
         this.head = head;
-    }       
+    }
 
     @Override
     public Openable getOpenable() {
@@ -105,7 +106,7 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     public String getCharacterExportFileName() {
         return head.getCharacterExportFileName() + "_" + (startFrame + 1) + "-" + (endFrame + 1);
     }
-    
+
     @Override
     public String getName() {
         return "SoundStreamBlocks";
@@ -153,18 +154,18 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     @Override
     public String toString() {
         return "SoundStreamBlocks (frame " + (startFrame + 1) + " - " + (endFrame + 1) + ")";
-    }                
+    }
 
     @Override
     public boolean isReadOnly() {
         return head.isReadOnly();
-    }        
+    }
 
     @Override
     public String getFlaExportName() {
         return head.getFlaExportName() + "_" + (startFrame + 1) + "-" + (endFrame + 1);
-    }        
-    
+    }
+
     @Override
     public int getInitialLatency() {
         return 0;

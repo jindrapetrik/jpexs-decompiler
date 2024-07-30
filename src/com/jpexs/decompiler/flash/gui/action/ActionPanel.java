@@ -521,7 +521,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         } else {
             decompiledText = SWF.getFromCache(asm);
         }
-        
+
         HighlightedText fdecompiledText = decompiledText;
 
         setDecompiledEditMode(false);
@@ -550,13 +550,13 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
                         DisassemblyListener listener = getDisassemblyListener();
                         asm.addDisassemblyListener(listener);
-                        innerActions = asm.getActions();     
+                        innerActions = asm.getActions();
                         asm.removeDisassemblyListener(listener);
                     }
 
                     if (decompileNeeded) {
                         View.execInEventDispatch(() -> {
-                            decompiledEditor.setShowMarkers(false);                                
+                            decompiledEditor.setShowMarkers(false);
                             setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
                         });
 
@@ -574,7 +574,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
                     return null;
                 }
-                                
+
                 @Override
                 protected void done() {
                     View.execInEventDispatch(() -> {
@@ -614,7 +614,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         if (decompiledText == null) {
             decompiledText = HighlightedText.EMPTY;
         }
-                
+
         editor.setShowMarkers(true);
         decompiledEditor.setShowMarkers(Configuration.decompile.get());
         lastASM = asm;
@@ -786,18 +786,16 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
 
         JPanel panCode = new JPanel(new BorderLayout());
-        
+
         //sourceTextArea.addDocsListener(docsPanel);
-        
         if (Configuration.displayAs12PCodeDocsPanel.get()) {
-            final DocsPanel docsPanel = new DocsPanel();     
+            final DocsPanel docsPanel = new DocsPanel();
             ScrollablePanel scrollablePanel = new ScrollablePanel(new BorderLayout());
             scrollablePanel.setScrollableWidth(ScrollablePanel.ScrollableSizeHint.FIT);
             scrollablePanel.setScrollableHeight(ScrollablePanel.ScrollableSizeHint.STRETCH);
             scrollablePanel.add(docsPanel, BorderLayout.CENTER);
             panCode.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new FasterScrollPane(editor), new FasterScrollPane(scrollablePanel), Configuration.guiActionDocsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
-            
-            
+
             editor.addCaretListener(new CaretListener() {
                 @Override
                 public void caretUpdate(CaretEvent e) {
@@ -807,14 +805,14 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         try {
                             ASMParsedSymbol symb = lexer.lex();
                             while (symb.type == ASMParsedSymbol.TYPE_LABEL) {
-                                symb = lexer.lex();                                
+                                symb = lexer.lex();
                             }
                             if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                                 String actionName = (String) symb.value;
                                 Color c = UIManager.getColor("EditorPane.background");
                                 int light = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
                                 boolean nightMode = light <= 128;
-                                
+
                                 int argumentToHilight = -1;
                                 int column = 0;
                                 try {
@@ -822,9 +820,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                                     column = e.getDot() - rowStart;
                                 } catch (BadLocationException ex) {
                                     //ignore
-                                }            
+                                }
                                 symb = lexer.lex();
-                                if (symb.pos <= column) {                                                              
+                                if (symb.pos <= column) {
                                     argumentToHilight++;
                                     while (symb.type != ASMParsedSymbol.TYPE_EOL && symb.type != ASMParsedSymbol.TYPE_EOF) {
                                         if (symb.pos >= column) {
@@ -834,17 +832,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                                             argumentToHilight++;
                                         }
                                         symb = lexer.lex();
-                                    }                                
+                                    }
                                 }
-                                
-                                
-                                
+
                                 String docs = As12PCodeDocs.getDocsForIns(actionName, true, true, nightMode, argumentToHilight);
                                 Point loc = editor.getLineLocation(editor.getLine() + 1);
                                 if (loc != null) {
                                     SwingUtilities.convertPointToScreen(loc, editor);
                                 }
-                                
+
                                 docsPanel.docs("action." + actionName, docs, loc);
                             } else {
                                 docsPanel.noDocs();
@@ -853,7 +849,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                             //ignore
                         }
                     }
-                }                
+                }
             });
         } else {
             panCode.add(new FasterScrollPane(editor), BorderLayout.CENTER);
@@ -954,7 +950,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         iconsPanel.add(deobfuscateButton);
         iconsPanel.add(deobfuscateOptionsButton);
-        
+
         JButton breakpointListButton = new JButton(View.getIcon("breakpointlist16"));
         breakpointListButton.setMargin(new Insets(5, 5, 5, 5));
         breakpointListButton.addActionListener(this::breakPointListButtonActionPerformed);
@@ -984,9 +980,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         debugPanel.setVisible(false);
 
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         setLayout(new BorderLayout());
-        
+
         if (Configuration.displayAs12PCodePanel.get()) {
             add(splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB, Configuration.guiActionSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         } else {
@@ -1099,7 +1095,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(menuItem.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
-    
+
     private void breakPointListButtonActionPerformed(ActionEvent evt) {
         Main.showBreakpointsList();
     }

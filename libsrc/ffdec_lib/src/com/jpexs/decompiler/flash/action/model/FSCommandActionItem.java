@@ -52,7 +52,7 @@ public class FSCommandActionItem extends ActionItem {
         writer.append("(");
         command.appendTry(writer, localData);
         return writer.append(")");
-    }    
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

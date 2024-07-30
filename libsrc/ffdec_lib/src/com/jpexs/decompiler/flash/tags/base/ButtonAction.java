@@ -45,7 +45,7 @@ public class ButtonAction implements ASMSource {
     List<DisassemblyListener> listeners = new ArrayList<>();
 
     private String scriptName = "-";
-    
+
     private String exportedScriptName = "-";
 
     private final DefineButtonTag buttonTag;
@@ -229,12 +229,12 @@ public class ButtonAction implements ASMSource {
             return new ArrayList<>();
         }
     }
-    
+
     @Override
     public String getExportedScriptName() {
         return exportedScriptName;
     }
-    
+
     @Override
     public void setExportedScriptName(String scriptName) {
         this.exportedScriptName = scriptName;

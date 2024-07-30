@@ -54,11 +54,10 @@ public class ReplaceCharacterDialog extends AppDialog {
     private final JButton cancelButton = new JButton(translate("button.cancel"));
 
     //private final JComboBox<ComboBoxItem<CharacterTag>> charactersComboBox = new JComboBox<>();
-    
     private final JList<ComboBoxItem<CharacterTag>> charactersListBox = new JList<>();
-    
+
     private final JTextField searchTextField = new JTextField(10);
-    
+
     private DefaultListModel<ComboBoxItem<CharacterTag>> fullModel = new DefaultListModel<>();
 
     private int result = ERROR_OPTION;
@@ -69,16 +68,16 @@ public class ReplaceCharacterDialog extends AppDialog {
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-                                
-        JPanel topPanel = new JPanel(new BorderLayout());        
+
+        JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(new JLabel(translate("replace.with")), BorderLayout.WEST);
-        
+
         JPanel searchPanel = new JPanel(new FlowLayout());
         JLabel iconSearchLabel = new JLabel(View.getIcon("search16"));
         searchPanel.add(iconSearchLabel);
         searchPanel.add(searchTextField);
         topPanel.add(searchPanel, BorderLayout.EAST);
-        
+
         cnt.add(topPanel, BorderLayout.NORTH);
 
         charactersListBox.setModel(new DefaultListModel<>());
@@ -97,12 +96,12 @@ public class ReplaceCharacterDialog extends AppDialog {
                 }
             }
         });
-        
+
         okButton.setEnabled(false);
 
         JScrollPane sc = new JScrollPane(charactersListBox);
-        sc.setPreferredSize(new Dimension(400,300));
-        
+        sc.setPreferredSize(new Dimension(400, 300));
+
         cnt.add(sc, BorderLayout.CENTER);
 
         charactersListBox.setCellRenderer(new CharacterTagListCellRenderer());
@@ -115,7 +114,6 @@ public class ReplaceCharacterDialog extends AppDialog {
 
         cnt.add(panButtons, BorderLayout.SOUTH);
 
-        
         searchTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -131,9 +129,9 @@ public class ReplaceCharacterDialog extends AppDialog {
             public void changedUpdate(DocumentEvent e) {
                 update();
             }
-            
+
             private void update() {
-                String searchedText = searchTextField.getText();                
+                String searchedText = searchTextField.getText();
                 ComboBoxItem<CharacterTag> selectedValue = charactersListBox.getSelectedValue();
                 DefaultListModel<ComboBoxItem<CharacterTag>> filteredModel = new DefaultListModel<>();
                 int newSelectedIndex = -1;
@@ -147,16 +145,16 @@ public class ReplaceCharacterDialog extends AppDialog {
                         }
                     }
                 }
-                charactersListBox.setModel(filteredModel);                
+                charactersListBox.setModel(filteredModel);
                 if (newSelectedIndex != -1) {
                     charactersListBox.setSelectedIndex(newSelectedIndex);
                 }
-            }            
+            }
         });
-        
+
         setModalityType(ModalityType.APPLICATION_MODAL);
         View.setWindowIcon(this);
-        setTitle(translate("dialog.title"));        
+        setTitle(translate("dialog.title"));
         pack();
         View.centerScreen(this);
     }
@@ -184,8 +182,8 @@ public class ReplaceCharacterDialog extends AppDialog {
     }
 
     public int showDialog(SWF swf, int selectedCharacterId) {
-        Map<Integer, CharacterTag> characters = swf.getCharacters(false);                        
-        fullModel =  new DefaultListModel<>();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
+        fullModel = new DefaultListModel<>();
         fullModel.clear();
         for (Integer key : characters.keySet()) {
             CharacterTag character = characters.get(key);
@@ -193,7 +191,7 @@ public class ReplaceCharacterDialog extends AppDialog {
                 continue;
             }
             int characterId = character.getCharacterId();
-            if (characterId != selectedCharacterId) {                
+            if (characterId != selectedCharacterId) {
                 fullModel.addElement(new ComboBoxItem<>(character.getName(), character));
             }
         }

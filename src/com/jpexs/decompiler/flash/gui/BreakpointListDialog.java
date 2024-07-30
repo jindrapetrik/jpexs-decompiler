@@ -46,27 +46,27 @@ import javax.swing.table.DefaultTableModel;
  * @author JPEXS
  */
 public class BreakpointListDialog extends AppDialog {
+
     private SWF swf;
     private JTable table = new JTable();
     private List<Breakpoint> breakpointList = new ArrayList<>();
     private Timer refreshTimer = null;
     private static final int REFRESH_TIMEOUT = 1000;
-    
-    
+
     private class Breakpoint {
+
         public String scriptName;
         public int line;
 
         public Breakpoint(String scriptName, int line) {
             this.scriptName = scriptName;
             this.line = line;
-        }                     
+        }
     }
-    
-    
+
     public BreakpointListDialog(Window owner, SWF swf) {
         super(owner);
-        
+
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title") + " - " + swf.getShortFileName());
         this.swf = swf;
@@ -79,47 +79,45 @@ public class BreakpointListDialog extends AppDialog {
                     int row = table.rowAtPoint(e.getPoint());
                     if (table.getSelectedRow() != -1 && row != -1) {
                         gotoButtonActionPerformed(null);
-                    }                    
+                    }
                 }
-            }            
+            }
         });
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         cnt.add(new JScrollPane(table), BorderLayout.CENTER);
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        
+
         JButton gotoButton = new JButton(translate("button.goto"));
         gotoButton.addActionListener(this::gotoButtonActionPerformed);
         buttonsPanel.add(gotoButton);
-        
+
         JButton removeButton = new JButton(translate("button.remove"));
         removeButton.addActionListener(this::removeButtonActionPerformed);
         buttonsPanel.add(removeButton);
-        
+
         JButton removeAllButton = new JButton(translate("button.removeAll"));
         removeAllButton.addActionListener(this::removeAllButtonActionPerformed);
         buttonsPanel.add(removeAllButton);
-        
+
         JButton closeButton = new JButton(translate("button.close"));
         closeButton.addActionListener(this::closeButtonActionPerformed);
         buttonsPanel.add(closeButton);
-        
+
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
-                
+
         refresh();
-        
+
         setSize(500, 300);
-        
+
         //View.setWindowIcon(this);
         List<Image> images = new ArrayList<>();
         images.add(View.loadImage("breakpointlist16"));
         setIconImages(images);
         View.centerScreen(this);
     }
-        
-    
-    
+
     private Breakpoint getSelected() {
         int row = table.getSelectedRow();
         if (row == -1) {
@@ -127,11 +125,11 @@ public class BreakpointListDialog extends AppDialog {
         }
         return breakpointList.get(row);
     }
-    
+
     private void closeButtonActionPerformed(ActionEvent evt) {
         setVisible(false);
     }
-    
+
     private void removeButtonActionPerformed(ActionEvent evt) {
         Breakpoint breakpoint = getSelected();
         if (breakpoint == null) {
@@ -141,8 +139,7 @@ public class BreakpointListDialog extends AppDialog {
         refreshMarkers();
         refresh();
     }
-    
-    
+
     private void refreshMarkers() {
         if (swf.isAS3()) {
             Main.getMainFrame().getPanel().getABCPanel().decompiledTextArea.refreshMarkers();
@@ -152,13 +149,13 @@ public class BreakpointListDialog extends AppDialog {
             Main.getMainFrame().getPanel().getActionPanel().editor.refreshMarkers();
         }
     }
-    
+
     private void removeAllButtonActionPerformed(ActionEvent evt) {
         Main.getDebugHandler().clearBreakPoints(swf);
         refreshMarkers();
         refresh();
     }
-    
+
     private void gotoButtonActionPerformed(ActionEvent evt) {
         Breakpoint breakpoint = getSelected();
         if (breakpoint == null) {
@@ -184,26 +181,25 @@ public class BreakpointListDialog extends AppDialog {
             int abcIndex = Integer.parseInt(m.group("abc"));
             int bodyIndex = Integer.parseInt(m.group("body"));
             ABC abc = swf.getAbcList().get(abcIndex).getABC();
-            methodIndex = abc.bodies.get(bodyIndex).method_info;            
+            methodIndex = abc.bodies.get(bodyIndex).method_info;
         }
-        
-        
+
         Main.getMainFrame().getPanel().gotoScriptLine(swf, breakpoint.scriptName, breakpoint.line, classIndex, traitIndex, methodIndex, breakpoint.scriptName.startsWith("#PCODE"));
     }
-    
-    public void refresh() {                
+
+    public void refresh() {
         DefaultTableModel defaultTableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
-            }            
+            }
         };
         defaultTableModel.addColumn(translate("breakpoint.scriptName"));
         defaultTableModel.addColumn(translate("breakpoint.line"));
-        defaultTableModel.addColumn(translate("breakpoint.status"));        
-        
+        defaultTableModel.addColumn(translate("breakpoint.status"));
+
         Map<String, Set<Integer>> breakpoints = Main.getDebugHandler().getAllBreakPoints(swf, false);
-        
+
         List<Breakpoint> newBreakpointList = new ArrayList<>();
         for (String scriptName : breakpoints.keySet()) {
             for (int line : breakpoints.get(scriptName)) {
@@ -242,12 +238,12 @@ public class BreakpointListDialog extends AppDialog {
                         @Override
                         public void run() {
                             refresh();
-                        }                        
-                    });                   
+                        }
+                    });
                 }
-                
+
             }, REFRESH_TIMEOUT, REFRESH_TIMEOUT);
         }
         super.setVisible(b);
-    }        
+    }
 }

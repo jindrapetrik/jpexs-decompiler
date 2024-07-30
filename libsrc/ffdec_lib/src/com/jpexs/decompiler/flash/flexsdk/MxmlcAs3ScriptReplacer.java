@@ -135,19 +135,19 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
 
         try {
             //Compile it (and subclasses stubs)
-            List<String> args = new ArrayList<>(Arrays.asList("-strict=false", 
+            List<String> args = new ArrayList<>(Arrays.asList("-strict=false",
                     "-include-inheritance-dependencies-only",
                     "-warnings=false",
                     "-library-path", swcFile.getAbsolutePath()));
-            
+
             for (File depSwcFile : dependenciesSwcFiles) {
                 args.add("-library-path");
                 args.add(depSwcFile.getAbsolutePath());
             }
 
             args.addAll(Arrays.asList("-source-path", tempDir.getAbsolutePath(),
-                    "-output", compiledSwfFile.getAbsolutePath(), 
-                    "-debug=true", 
+                    "-output", compiledSwfFile.getAbsolutePath(),
+                    "-debug=true",
                     scriptFileToCompile.getAbsolutePath()));
             mxmlc(args);
         } catch (MxmlcException ex1) {
@@ -290,7 +290,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
 
             //Make copy without the old script
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();                                                
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             SWF swfCopy = recompileSWF(swf);
 
             List<ABC> modAbcs = new ArrayList<>();
@@ -333,7 +333,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             //Flex then uses the code already present in the SWC, no need to decompile it (hurray!)
             SwfToSwcExporter swcExport = new SwfToSwcExporter();
             swcExport.exportSwf(swfCopy, swcFile, true);
-            
+
             dependenciesSwcFiles = new ArrayList<>();
             int i = 0;
             for (SWF depSwf : dependencies) {
@@ -341,7 +341,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
                 File depSwcFile = new File(tempDir, "dep" + i + ".swc");
                 swcExport.exportSwf(depSwf, depSwcFile, false);
                 dependenciesSwcFiles.add(depSwcFile);
-            }            
+            }
         } catch (IOException iex) {
             //ignore
         } catch (InterruptedException ex) {

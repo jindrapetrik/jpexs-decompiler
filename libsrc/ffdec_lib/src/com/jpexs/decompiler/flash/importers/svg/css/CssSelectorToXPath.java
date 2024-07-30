@@ -476,7 +476,7 @@ public class CssSelectorToXPath {
                     if (depth == 0) {
                         return ++i + offset;
                     }
-                    //fallthrough (?)
+                //fallthrough (?)
                 default:
                     offset = 0;
             }

@@ -33,10 +33,10 @@ public class MxmlcRunner {
     public static String getMxmlcPath(String flexSdkPath) {
         boolean isWin = System.getProperty("os.name").toLowerCase().contains("win");
         String path = flexSdkPath + File.separator + "bin" + File.separator + "mxmlc";
-        
+
         String exePath = path + ".exe";
         String batPath = path + ".bat";
-        
+
         if (isWin) {
             if (new File(exePath).exists()) {
                 return exePath;
@@ -47,7 +47,7 @@ public class MxmlcRunner {
         } else {
             if (new File(path).exists()) {
                 return exePath;
-            }            
+            }
         }
         return null;
     }

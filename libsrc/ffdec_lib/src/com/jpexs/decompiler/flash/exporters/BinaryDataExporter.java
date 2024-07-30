@@ -53,7 +53,7 @@ public class BinaryDataExporter {
         }
         return exportBinaryData(handler, outdir, binaryDatas, settings, evl);
     }
-    
+
     public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<BinaryDataInterface> binaryDatas, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (Thread.currentThread().isInterrupted()) {
@@ -75,8 +75,8 @@ public class BinaryDataExporter {
 
         int currentIndex = 1;
         for (final BinaryDataInterface t : binaryDatas) {
-            if (evl != null) {               
-                evl.handleExportingEvent("binarydata", currentIndex, count, t.getName());                
+            if (evl != null) {
+                evl.handleExportingEvent("binarydata", currentIndex, count, t.getName());
             }
 
             String ext = t.getInnerSwf() == null ? ".bin" : ".swf";
@@ -86,10 +86,10 @@ public class BinaryDataExporter {
                     fos.write(t.getDataBytes().getRangeData());
                 }
             }, handler).run();
-            
+
             DefineBinaryDataTag bdt = (DefineBinaryDataTag) t.getTopLevelBinaryData();
 
-            Set<String> classNames = bdt.getClassNames();                    
+            Set<String> classNames = bdt.getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
                     File classFile = new File(outdir + File.separator + Helper.makeFileName(t.getClassExportFileName(className) + ext));
@@ -99,7 +99,7 @@ public class BinaryDataExporter {
                     ret.add(classFile);
                 }
                 file.delete();
-            } else {                
+            } else {
                 ret.add(file);
             }
 
@@ -111,7 +111,7 @@ public class BinaryDataExporter {
                 evl.handleExportedEvent("binarydata", currentIndex, count, t.getName());
             }
 
-            currentIndex++;            
+            currentIndex++;
         }
 
         return ret;

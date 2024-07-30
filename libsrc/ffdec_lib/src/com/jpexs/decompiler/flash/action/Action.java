@@ -330,10 +330,10 @@ public abstract class Action implements GraphSourceItem {
         ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_BOOLEAN) {
             throw new ActionParseException("Boolean expected", lex.yyline());
-        }        
+        }
         return (Boolean) symb.value;
     }
-    
+
     protected void lexOptionalComma(FlasmLexer lex) throws IOException, ActionParseException {
         ASMParsedSymbol symb = lex.lex();
         if (symb.type != ASMParsedSymbol.TYPE_COMMA) {

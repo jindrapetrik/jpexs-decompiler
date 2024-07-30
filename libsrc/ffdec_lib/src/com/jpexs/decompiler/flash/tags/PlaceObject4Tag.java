@@ -707,7 +707,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public void setPlaceFlagMove(boolean placeFlagMove) {
         this.placeFlagMove = placeFlagMove;
     }
-    
+
     @Override
     public boolean hasImage() {
         return placeFlagHasImage;

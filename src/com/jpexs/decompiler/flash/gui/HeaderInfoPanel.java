@@ -84,7 +84,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JSpinner versionEditor = new JSpinner();
 
     private final JCheckBox gfxCheckBox = new JCheckBox();
-    
+
     private final JCheckBox encryptedCheckBox = new JCheckBox();
 
     private final JPanel frameRateEditorPanel = new JPanel();
@@ -162,7 +162,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         encryptedCheckBox.addChangeListener((ChangeEvent e) -> {
             validateHeader();
         });
-        
+
         gfxCheckBox.addChangeListener((ChangeEvent e) -> {
             validateHeader();
         });
@@ -247,7 +247,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(versionEditorPanel, "1,2");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.encrypted")), "0,3");
         propertiesPanel.add(encryptedLabel, "1,3");
-        propertiesPanel.add(encryptedCheckBox, "1,3");        
+        propertiesPanel.add(encryptedCheckBox, "1,3");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.gfx")), "0,4");
         propertiesPanel.add(gfxLabel, "1,4");
         propertiesPanel.add(gfxCheckBox, "1,4");
@@ -364,10 +364,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
         encryptedLabel.setText(swf.encrypted ? AppStrings.translate("yes") : AppStrings.translate("no"));
         encryptedCheckBox.setSelected(swf.encrypted);
-       
+
         gfxLabel.setText(swf.gfx ? AppStrings.translate("yes") : AppStrings.translate("no"));
         gfxCheckBox.setSelected(swf.gfx);
-                
+
         fileSizeLabel.setText(Long.toString(swf.fileSize));
 
         frameRateLabel.setText(Float.toString(swf.frameRate));
@@ -408,7 +408,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         });
         encryptedCheckBox.addChangeListener((ChangeEvent e) -> {
             setModified();
-        });        
+        });
         gfxCheckBox.addChangeListener((ChangeEvent e) -> {
             setModified();
         });
@@ -498,7 +498,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
             resultStr += AppStrings.translate("header.warning.unsupportedGfxCompression") + " ";
             result = false;
         }
-        
+
         if (gfx && encrypted) {
             resultStr += AppStrings.translate("header.warning.unsupportedGfxEncryption") + " ";
             result = false;

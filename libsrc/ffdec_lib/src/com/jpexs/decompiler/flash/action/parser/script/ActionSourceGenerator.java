@@ -89,10 +89,8 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     private String charset;
 
-    
     private long uniqLast = 0;
 
-    
     public ActionSourceGenerator(int swfVersion, List<String> constantPool, String charset) {
         this.constantPool = constantPool;
         this.swfVersion = swfVersion;
@@ -103,13 +101,11 @@ public class ActionSourceGenerator implements SourceGenerator {
         uniqLast++;
         return "" + uniqLast;
     }
-    
-    
+
     public String getCharset() {
         return charset;
     }
-    
-    
+
     private List<Action> generateToActionList(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {
         return toActionList(generate(localData, commands));
     }
@@ -117,7 +113,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     private List<Action> generateToActionList(SourceGeneratorLocalData localData, GraphTargetItem command) throws CompilationException {
         return toActionList(command.toSource(localData, this));
     }
-    
+
     public List<Action> toActionList(List<GraphSourceItem> items) {
         List<Action> ret = new ArrayList<>();
         for (GraphSourceItem s : items) {
@@ -185,8 +181,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         return ret;
     }
-    
-    
+
     private void fixLoop(List<Action> code, int breakOffset) {
         fixLoop(code, breakOffset, Integer.MAX_VALUE);
     }
@@ -208,8 +203,7 @@ public class ActionSourceGenerator implements SourceGenerator {
             }
         }
     }
-    
-    
+
     public HashMap<String, Integer> getRegisterVars(SourceGeneratorLocalData localData) {
         return localData.registerVars;
     }
@@ -363,7 +357,7 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     public int getSwfVersion() {
         return swfVersion;
-    }   
+    }
 
     public List<String> getConstantPool() {
         return constantPool;
@@ -386,8 +380,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         }
         return new ActionPush(new ConstantIndex(index), charset);
     }
-    
-    
+
     @Override
     public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException {
         List<GraphSourceItem> ret = item.toSource(localData, this);
@@ -605,7 +598,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(new ActionPop());
         return ret;
     }
-    
+
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FalseItem item) throws CompilationException {
         return GraphTargetItem.toSourceMerge(localData, this, new ActionPush(Boolean.FALSE, charset));
@@ -888,7 +881,6 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.add(acontinue);
         return ret;
     }
-
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException {

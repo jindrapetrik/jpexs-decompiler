@@ -2051,10 +2051,10 @@ public class AVM2Graph extends Graph {
     protected void processOther(List<GraphTargetItem> list, long lastLoopId) {
         if (list.isEmpty()) {
             return;
-        }    
-        
+        }
+
         int pos = list.size() - 1;
-        
+
         if (list.get(pos) instanceof ContinueItem) {
             if (((ContinueItem) list.get(pos)).loopId != lastLoopId) {
                 return;
@@ -2064,9 +2064,9 @@ public class AVM2Graph extends Graph {
                 return;
             }
         }
-                                
+
         //Remove continues from all branches of try...catch block if its continue to parent loop
-        if (list.get(pos) instanceof TryAVM2Item) {                
+        if (list.get(pos) instanceof TryAVM2Item) {
             TryAVM2Item ta = (TryAVM2Item) list.get(pos);
             for (List<GraphTargetItem> cc : ta.catchCommands) {
                 if (!cc.isEmpty()) {
@@ -2094,9 +2094,9 @@ public class AVM2Graph extends Graph {
                     }
                 }
             }
-        }        
+        }
     }
-       
+
     @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);

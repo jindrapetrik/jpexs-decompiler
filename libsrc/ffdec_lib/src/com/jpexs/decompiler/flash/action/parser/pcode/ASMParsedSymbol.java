@@ -23,7 +23,7 @@ package com.jpexs.decompiler.flash.action.parser.pcode;
 public class ASMParsedSymbol {
 
     public int pos;
-    
+
     public int type;
 
     public Object value;
@@ -61,7 +61,7 @@ public class ASMParsedSymbol {
     public static final int TYPE_EOL = 16;
 
     public static final int TYPE_CONSTANT_LITERAL = 17;
-    
+
     public static final int TYPE_COMMA = 18;
 
     public ASMParsedSymbol(int pos, int type, Object value) {
@@ -78,5 +78,5 @@ public class ASMParsedSymbol {
     @Override
     public String toString() {
         return "symbol[type=" + type + ", value=" + value + "]";
-    }        
+    }
 }
