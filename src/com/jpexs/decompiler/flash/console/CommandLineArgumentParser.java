@@ -968,7 +968,7 @@ public class CommandLineArgumentParser {
         }
         final File inFile = new File(args.pop());
         final File outFile = new File(args.pop());
-        
+
         processModifyAbc(inFile, outFile, null, new AbcAction() {
             @Override
             public void abcAction(ABC abc, OutputStream stdout) throws IOException {
@@ -4425,11 +4425,11 @@ public class CommandLineArgumentParser {
                 switch (key.toLowerCase()) {
                     case "version":
                         try {
-                        version = Integer.valueOf(value);
-                    } catch (NumberFormatException nfe) {
-                        badArguments("header");
-                    }
-                    break;
+                            version = Integer.valueOf(value);
+                        } catch (NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
                     case "gfx":
                         gfx = parseBooleanConfigValue(value);
                         if (gfx == null) {
@@ -4519,18 +4519,18 @@ public class CommandLineArgumentParser {
                         break;
                     case "framecount":
                         try {
-                        frameCount = Integer.valueOf(value);
-                    } catch (NumberFormatException nfe) {
-                        badArguments("header");
-                    }
-                    break;
+                            frameCount = Integer.valueOf(value);
+                        } catch (NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
                     case "framerate":
                         try {
-                        frameRate = Float.valueOf(value);
-                    } catch (NumberFormatException nfe) {
-                        badArguments("header");
-                    }
-                    break;
+                            frameRate = Float.valueOf(value);
+                        } catch (NumberFormatException nfe) {
+                            badArguments("header");
+                        }
+                        break;
                     default:
                         badArguments("header");
                 }
@@ -4754,7 +4754,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void processModifyAbc(File inFile, File outFile, File stdOutFile, AbcAction action, String charset) {
-        
+
         //It does not have .abc extension, assuming its SWF - process all its ABC tags
         if (!inFile.getAbsolutePath().toLowerCase().endsWith(".abc")) {
             SwfAction swfAction = new SwfAction() {
@@ -4769,7 +4769,7 @@ public class CommandLineArgumentParser {
             processModifySWF(inFile, outFile, stdOutFile, swfAction, charset);
             return;
         }
-        
+
         OutputStream stdout = null;
 
         try {

@@ -229,8 +229,8 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
                     } catch (BadLocationException ex) {
                         //ignore
                     }
-                }                
-            });            
+                }
+            });
         }
     }
 
@@ -523,7 +523,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
                 Rectangle2D r = com.jpexs.decompiler.flash.gui.View.textUIModelToView(mapper, c, offs0, Position.Bias.Forward);
                 FontMetrics fm = g.getFontMetrics();
-                fgStyle.drawText(seg, (int) r.getX(), (int) r.getY() + fm.getAscent(), g, null, offs0);               
+                fgStyle.drawText(seg, (int) r.getX(), (int) r.getY() + fm.getAscent(), g, null, offs0);
 
             } catch (BadLocationException e) {
                 // can't render

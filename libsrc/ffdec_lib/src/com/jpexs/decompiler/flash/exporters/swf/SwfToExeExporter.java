@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class SwfToExeExporter {
+
     public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {

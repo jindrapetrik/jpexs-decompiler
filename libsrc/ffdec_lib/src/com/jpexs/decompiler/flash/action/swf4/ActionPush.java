@@ -265,7 +265,7 @@ public class ActionPush extends Action {
         super(0x96, 0, charset);
         this.constantPool = constantPool;
         values = new ArrayList<>();
-        int count = 0;        
+        int count = 0;
         loop:
         while (true) {
             boolean valueExpected = false;
@@ -346,14 +346,14 @@ public class ActionPush extends Action {
             ret = value.toString();
         }
         return ret;
-    }    
+    }
 
     public GraphTextWriter paramsToString(GraphTextWriter writer) {
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
                 writer.appendNoHilight(", ");
             }
-            writer.append(toString(i), getAddress() + i + 1, getFileOffset());           
+            writer.append(toString(i), getAddress() + i + 1, getFileOffset());
         }
         return writer;
     }
@@ -374,10 +374,10 @@ public class ActionPush extends Action {
         }
         return ret;
     }
-    
+
     @Override
     public String toString() {
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);       
+        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         toString(writer);
         writer.finishHilights();
         return writer.toString();

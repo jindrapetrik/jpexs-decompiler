@@ -63,26 +63,26 @@ public class Filtering {
         if (radiusY == 0) {
             radiusY = 1;
         }
-        
+
         long limit = Configuration.boxBlurPixelsLimit.get() * 10000L;
-        
+
         if ((long) w * (long) h > limit) {
             return;
         }
-        
-        while (((long) radiusY * (long) radiusX * (long) w *  (long) h) > limit) {
+
+        while (((long) radiusY * (long) radiusX * (long) w * (long) h) > limit) {
             // decrease radius
             if (radiusY > 1) {
                 radiusY--;
             }
             if (radiusX > 1) {
                 radiusX--;
-            }            
+            }
         }
-                
+
         int radiusXHalf = radiusX / 2;
         int radiusYHalf = radiusY / 2;
-        double divisor = radiusX * radiusY;                        
+        double divisor = radiusX * radiusY;
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
@@ -113,7 +113,7 @@ public class Filtering {
                         sumA += a;
                         sumR += r;
                         sumG += g;
-                        sumB += b;                                              
+                        sumB += b;
                     }
                 }
                 int da = (int) Math.floor(sumA / divisor);
@@ -132,7 +132,7 @@ public class Filtering {
                     db = 255;
                 }
 
-                newColors[index] = RGBA.toInt(dr, dg, db, da);                
+                newColors[index] = RGBA.toInt(dr, dg, db, da);
             }
         }
         for (int y = 0; y < h; y++) {

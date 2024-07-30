@@ -21,5 +21,5 @@ package com.jpexs.decompiler.flash.docs;
  * @author JPEXS
  */
 public class DocsParseException extends Exception {
-    
+
 }

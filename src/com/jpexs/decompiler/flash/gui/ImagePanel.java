@@ -262,7 +262,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean frozen = false;
 
     private boolean muted = false;
-    
+
     private boolean resample = false;
 
     private boolean mutable = false;
@@ -347,7 +347,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             listener.pointsUpdated(points);
         }
     }
-    
+
     private void fireStatusChanged(String status) {
         for (MediaDisplayListener listener : listeners) {
             listener.statusChanged(status);
@@ -437,11 +437,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         pointEditPanel.setVisible(false);
         redraw();
     }
-    
+
     public void setStatus(String status) {
         fireStatusChanged(status);
     }
-    
+
     public void setNoStatus() {
         fireStatusChanged("");
     }
@@ -754,7 +754,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private Point2D dragStart = null;
 
         private Point2D selectionEnd = null;
-        
+
         private boolean canInvert = true;
 
         private Rectangle2D getSelectionRect() {
@@ -938,7 +938,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             RECT timRect = timelined.getRect();
                             axisX = (int) Math.round(offsetPoint.getX());
                             axisY = (int) Math.round(offsetPoint.getY());
-                            if (canInvert) {                            
+                            if (canInvert) {
                                 g2.setComposite(BlendComposite.Invert);
                             } else {
                                 g2.setComposite(AlphaComposite.SrcOver);
@@ -2378,7 +2378,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (!muted && button != null && freeTransformDepth == -1) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
-                            CharacterTag soundCharTag =  swf.getCharacter(sounds.buttonSoundChar3);
+                            CharacterTag soundCharTag = swf.getCharacter(sounds.buttonSoundChar3);
                             if (soundCharTag instanceof SoundTag) {
                                 playSound((SoundTag) soundCharTag, sounds.buttonSoundInfo3, timer);
                             }
@@ -2421,7 +2421,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 drawFrame(thisTimer, true);
             }
         }
-    }   
+    }
 
     public Timelined getTimelined() {
         return timelined;
@@ -2484,11 +2484,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private synchronized void updateScrollBars() {
         if (!zoomAvailable) {
             View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                horizontalScrollBar.setVisible(false);
-                verticalScrollBar.setVisible(false);
-            }
+                @Override
+                public void run() {
+                    horizontalScrollBar.setVisible(false);
+                    verticalScrollBar.setVisible(false);
+                }
             });
             return;
         }
@@ -2552,7 +2552,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized void zoom(Zoom zoom) {
         zoom(zoom, false);
     }
-    
+
     private synchronized void zoom(Zoom zoom, boolean useCursor) {
         if (!zoomAvailable) {
             return;
@@ -2935,7 +2935,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
-        
+
         int width = (int) (viewRect.getWidth() * zoom);
         int height = (int) (viewRect.getHeight() * zoom);
         if (width == 0) {
@@ -3569,7 +3569,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 @Override
-                public void statusChanged(String status) {                    
+                public void statusChanged(String status) {
                 }
             });
 

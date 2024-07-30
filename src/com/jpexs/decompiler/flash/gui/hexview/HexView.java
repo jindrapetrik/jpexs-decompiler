@@ -313,7 +313,7 @@ public class HexView extends JTable {
         selectionStart = -1;
         selectionEnd = -1;
         getModel().fireTableDataChanged();
-    }   
+    }
 
     private int getIdxByColAndRow(int row, int col) {
         int idx = -1;

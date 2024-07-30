@@ -120,7 +120,7 @@ public class MATRIX implements Serializable {
 
     public Point apply(Point p) {
         Point ret = new Point();
-        ret.x = (int) (p.x * (hasScale ? scaleX : 1) + p.y * (hasRotate ? rotateSkew1  : 0) + translateX);
+        ret.x = (int) (p.x * (hasScale ? scaleX : 1) + p.y * (hasRotate ? rotateSkew1 : 0) + translateX);
         ret.y = (int) (p.x * (hasRotate ? rotateSkew0 : 0) + p.y * (hasScale ? scaleY : 1) + translateY);
         return ret;
     }
@@ -135,7 +135,7 @@ public class MATRIX implements Serializable {
         return new RECT(Xmin, Xmax, Ymin, Ymax);
 
     }
-    
+
     private int fromFloat(double f) {
         return (int) (f * (1 << 16));
     }

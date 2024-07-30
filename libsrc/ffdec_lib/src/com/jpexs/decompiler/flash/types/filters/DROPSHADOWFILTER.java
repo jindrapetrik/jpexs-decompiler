@@ -54,7 +54,7 @@ public class DROPSHADOWFILTER extends FILTER {
      * Radian angle of the drop shadow
      */
     @SWFType(BasicType.FIXED)
-    public double angle = 45  * Math.PI / 180;
+    public double angle = 45 * Math.PI / 180;
 
     /**
      * Distance of the drop shadow

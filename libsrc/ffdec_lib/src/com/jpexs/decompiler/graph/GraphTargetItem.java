@@ -287,7 +287,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public boolean needsSemicolon() {
         return true;
-    }    
+    }
 
     public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "Boolean");

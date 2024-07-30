@@ -331,13 +331,12 @@ public class SoundImporter {
         ByteArrayInputStream bais = uncompressedSoundData == null ? null : new ByteArrayInputStream(uncompressedSoundData);
 
         List<SoundStreamFrameRange> ranges = streamHead.getRanges();
-        
+
         List<SoundStreamBlockTag> existingBlocks = new ArrayList<>();
         for (SoundStreamFrameRange range : ranges) {
             existingBlocks.addAll(range.blocks);
         }
-        
-        
+
         int startFrame = 0;
         Timelined timelined = streamHead.getTimelined();
         if (!existingBlocks.isEmpty()) {
@@ -523,14 +522,14 @@ public class SoundImporter {
         for (SoundTag tag : soundTags) {
             int characterId = tag.getCharacterId();
             List<File> existingFilesForSoundTag = new ArrayList<>();
-            
+
             List<String> classNameExpectedFileNames = new ArrayList<>();
             if (tag instanceof CharacterTag) {
                 for (String className : ((CharacterTag) tag).getClassNames()) {
-                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));
                 }
             }
-                
+
             for (File f : allFiles) {
                 if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                     existingFilesForSoundTag.add(f);

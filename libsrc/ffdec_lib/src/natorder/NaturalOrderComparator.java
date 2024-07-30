@@ -23,21 +23,18 @@ package natorder;
  misrepresented as being the original software.
  3. This notice may not be removed or altered from any source distribution.
  */
-
 import java.util.*;
 
-public class NaturalOrderComparator implements Comparator
-{
-    int compareRight(String a, String b)
-    {
+public class NaturalOrderComparator implements Comparator {
+
+    int compareRight(String a, String b) {
         int bias = 0, ia = 0, ib = 0;
 
         // The longest run of digits wins. That aside, the greatest
         // value wins, but we can't know that it will until we've scanned
         // both numbers to know that they have the same magnitude, so we
         // remember it in BIAS.
-        for (;; ia++, ib++)
-        {
+        for (;; ia++, ib++) {
             char ca = charAt(a, ia);
             char cb = charAt(b, ib);
 
@@ -64,8 +61,7 @@ public class NaturalOrderComparator implements Comparator
         }
     }
 
-    public int compare(Object o1, Object o2)
-    {
+    public int compare(Object o1, Object o2) {
         String a = o1.toString();
         String b = o2.toString();
 
@@ -127,7 +123,7 @@ public class NaturalOrderComparator implements Comparator
             ++ib;
         }
     }
-    
+
     static boolean isDigit(char c) {
         return Character.isDigit(c) || c == '.' || c == ',';
     }
@@ -135,24 +131,25 @@ public class NaturalOrderComparator implements Comparator
     static char charAt(String s, int i) {
         return i >= s.length() ? 0 : s.charAt(i);
     }
-    
-    static int compareEqual(String a, String b, int nza, int nzb) {
-        if (nza - nzb != 0)
-            return nza - nzb;
 
-        if (a.length() == b.length())
+    static int compareEqual(String a, String b, int nza, int nzb) {
+        if (nza - nzb != 0) {
+            return nza - nzb;
+        }
+
+        if (a.length() == b.length()) {
             return a.compareTo(b);
+        }
 
         return a.length() - b.length();
     }
 
     @SuppressWarnings("unchecked") // JPEXS    
-    public static void main(String[] args)
-    {
-        String[] strings = new String[] { "1-2", "1-02", "1-20", "10-20", "fred", "jane", "pic01",
+    public static void main(String[] args) {
+        String[] strings = new String[]{"1-2", "1-02", "1-20", "10-20", "fred", "jane", "pic01",
             "pic2", "pic02", "pic02a", "pic3", "pic4", "pic 4 else", "pic 5", "pic05", "pic 5",
             "pic 5 something", "pic 6", "pic   7", "pic100", "pic100a", "pic120", "pic121",
-            "pic02000", "tom", "x2-g8", "x2-y7", "x2-y08", "x8-y8" };
+            "pic02000", "tom", "x2-g8", "x2-y7", "x2-y08", "x8-y8"};
 
         List orig = Arrays.asList(strings);
 
@@ -170,10 +167,10 @@ public class NaturalOrderComparator implements Comparator
         shuffle3000(scrambled);
 
         compareSymmetric();
-        
+
         floatsWithCommas();
     }
-    
+
     @SuppressWarnings("unchecked") // JPEXS
     static void shuffle3000(List<? extends Object> scrambled) {
         Collections.shuffle(scrambled, new Random(3000));
@@ -195,7 +192,7 @@ public class NaturalOrderComparator implements Comparator
 
         System.out.println(compare1 + " == " + compare2);
     }
-    
+
     @SuppressWarnings("unchecked") // JPEXS    
     static void floatsWithCommas() {
         List<String> unSorted = Arrays.asList("0.9", "1.0c", "1.2", "1.3", "0.6", "1.1", "0.7", "0.3", "1.0b", "1.0", "0.8");

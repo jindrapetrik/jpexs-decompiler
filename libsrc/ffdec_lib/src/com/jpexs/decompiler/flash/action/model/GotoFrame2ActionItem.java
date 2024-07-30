@@ -84,13 +84,13 @@ public class GotoFrame2ActionItem extends ActionItem {
         List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(frame.getNeededSources());
         return ret;
-    }    
+    }
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);

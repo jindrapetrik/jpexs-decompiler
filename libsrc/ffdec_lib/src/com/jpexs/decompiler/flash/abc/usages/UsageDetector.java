@@ -24,12 +24,12 @@ import java.util.List;
  * @author JPEXS
  */
 public interface UsageDetector {
-    
+
     public void filterUsages(ABC abc, UsagesFilter filter);
-    
+
     public List<Usage> findUsages(ABC abc, int index);
-    
+
     public List<List<Usage>> findAllUsage(ABC abc);
-    
+
     public String getKind();
 }

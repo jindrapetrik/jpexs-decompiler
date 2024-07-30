@@ -87,5 +87,5 @@ public class DefineShape2Tag extends ShapeTag {
     @Override
     public int getWindingRule() {
         return WIND_EVEN_ODD;
-    }    
+    }
 }

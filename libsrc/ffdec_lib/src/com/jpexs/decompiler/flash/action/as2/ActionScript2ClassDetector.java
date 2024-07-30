@@ -622,7 +622,7 @@ public class ActionScript2ClassDetector {
                                                 func.isSetter = true;
 
                                                 if (FunctionActionItem.DECOMPILE_GET_SET) {
-                                                    
+
                                                     AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                                                         @Override
                                                         public void visit(GraphTargetItem item) {
@@ -640,7 +640,7 @@ public class ActionScript2ClassDetector {
                                                     for (GraphTargetItem ti : func.actions) {
                                                         ti.visitRecursively(visitor);
                                                     }
-                                                    
+
                                                     //There is return getter added at the end of every setter, gotta remove it, since it won't compile
                                                     //as setter must not return a value
                                                     if (!func.actions.isEmpty()) {
@@ -734,7 +734,7 @@ public class ActionScript2ClassDetector {
                 DirectValueActionItem classBaseName = new DirectValueActionItem(classNamePath.get(classNamePath.size() - 1));
                 ((FunctionActionItem) constructor).calculatedFunctionName = classBaseName;
                 traits.add(0, new MyEntry<>(classBaseName, constructor));
-                
+
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                     @Override
                     public void visit(GraphTargetItem item) {
@@ -751,7 +751,7 @@ public class ActionScript2ClassDetector {
                 };
                 for (GraphTargetItem ti : ((FunctionActionItem) constructor).actions) {
                     ti.visitRecursively(visitor);
-                }                
+                }
             } else {
                 //throw new AssertException("No constructor found");
             }

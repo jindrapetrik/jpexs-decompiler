@@ -26,7 +26,7 @@ import java.util.Properties;
 public class ApplicationInfo {
 
     public static final String APPLICATION_NAME = "JPEXS Free Flash Decompiler";
-    
+
     public static final String CLI_APPLICATION_NAME = "@|blue JPEXS|@ @|green Free|@ @|red Flash Decompiler|@";
 
     public static final String SHORT_APPLICATION_NAME = "FFDec";
@@ -50,7 +50,7 @@ public class ApplicationInfo {
     public static boolean nightly = false;
 
     public static String cliApplicationVerName;
-    
+
     public static String applicationVerName;
 
     public static String shortApplicationVerName;

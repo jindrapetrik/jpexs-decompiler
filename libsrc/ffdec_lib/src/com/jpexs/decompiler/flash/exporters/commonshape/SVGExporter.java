@@ -61,7 +61,7 @@ public class SVGExporter {
     protected static final String sNamespace = "http://www.w3.org/2000/svg";
 
     protected static final String xlinkNamespace = "http://www.w3.org/1999/xlink";
-    
+
     protected static final String ffdecNamespace = "https://www.free-decompiler.com/flash";
 
     protected Document _svg;
@@ -112,7 +112,7 @@ public class SVGExporter {
                     svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
                 }
                 createDefGroup(bounds, null, zoom);
-                
+
                 if (backgroundColor != null) {
                     Element rect = _svg.createElement("rect");
                     rect.setAttribute("fill", new RGBA(backgroundColor).toHexRGB());
@@ -127,12 +127,12 @@ public class SVGExporter {
                 }
             }
             svgRoot.setAttribute("ffdec:objectType", objectType);
-                        
+
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(SVGExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         gradients = new ArrayList<>();
-    }        
+    }
 
     private Element getDefs() {
         if (_svgDefs == null) {
@@ -248,7 +248,6 @@ public class SVGExporter {
         Attr attr = _svg.createAttribute("style");
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }*/
-
     private String addClip(String path) {
         lastClipId++;
         Element clipPathElement = _svg.createElement("clipPath");
@@ -474,7 +473,7 @@ public class SVGExporter {
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
         return addUse(transform, boundRect, href, instanceName, scalingRect, null, null, BlendMode.NORMAL, new ArrayList<>());
     }
-    
+
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName, int blendMode, List<FILTER> filters) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
             addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName, blendMode, filters);

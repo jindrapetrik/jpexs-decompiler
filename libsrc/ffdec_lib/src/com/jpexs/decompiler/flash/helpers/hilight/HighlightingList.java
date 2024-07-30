@@ -35,15 +35,14 @@ public class HighlightingList extends ArrayList<Highlighting> {
 
     public boolean isFinished() {
         return finished;
-    }        
+    }
 
-    
     private void checkWriteAccess() {
         if (finished) {
             throw new RuntimeException("Cannot add to readonly list");
         }
     }
-    
+
     @Override
     public boolean add(Highlighting e) {
         checkWriteAccess();
@@ -114,8 +113,8 @@ public class HighlightingList extends ArrayList<Highlighting> {
     public void clear() {
         checkWriteAccess();
         super.clear();
-    }                                            
-           
+    }
+
     @Override
     public int hashCode() {
         return System.identityHashCode(this);
@@ -124,5 +123,5 @@ public class HighlightingList extends ArrayList<Highlighting> {
     @Override
     public boolean equals(Object o) {
         return o == this;
-    }     
+    }
 }

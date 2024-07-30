@@ -48,8 +48,8 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
-import com.jpexs.decompiler.flash.gui.abc.SetClassToCharacterMappingDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.abc.SetClassToCharacterMappingDialog;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.packers.Packer;
@@ -64,7 +64,6 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -76,7 +75,6 @@ import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
-import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
@@ -86,7 +84,6 @@ import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -142,10 +139,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -177,9 +172,9 @@ public class TagTreeContextMenu extends JPopupMenu {
     private final MainPanel mainPanel;
 
     private JMenuItem setClassToCharacterMappingMenuItem;
-    
+
     private JMenuItem expandRecursiveMenuItem;
-    
+
     private JMenuItem collapseRecursiveMenuItem;
 
     private JMenuItem removeMenuItem;
@@ -251,7 +246,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenu copyTagToMenu;
 
     private JMenu copyTagToWithDependenciesMenu;
-    
+
     private JMenu copyTagToReplaceByClassMenu;
 
     private JMenu copyFrameToMenu;
@@ -271,9 +266,9 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem pasteInsideMenuItem;
 
     private JMenu applyUnpackerMenu;
-    
+
     private JMenuItem openSWFInsideTagMenuItem;
-        
+
     private JMenuItem addAs12ScriptMenuItem;
 
     private JMenuItem addAs12FrameScriptMenuItem;
@@ -295,7 +290,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInTagListViewTagMenuItem;
 
     private JMenuItem showInHexDumpViewTagMenuItem;
-    
+
     private JMenuItem showInFramesFolderMenuItem;
 
     private JMenuItem addFramesMenuItem;
@@ -315,7 +310,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem unpinOthersMenuItem;
 
     private JMenuItem abcExplorerMenuItem;
-    
+
     private JMenuItem cleanAbcMenuItem;
 
     private JMenuItem replaceWithGifMenuItem;
@@ -344,13 +339,13 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
-        this.mainPanel = mainPanel;       
-        
+        this.mainPanel = mainPanel;
+
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         add(expandRecursiveMenuItem);
-        
+
         collapseRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.collapseAll"));
         collapseRecursiveMenuItem.addActionListener(this::collapseRecursiveActionPerformed);
         collapseRecursiveMenuItem.setIcon(View.getIcon("collapse16"));
@@ -446,7 +441,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
-        
+
         setClassToCharacterMappingMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setClassToCharacterMapping")); //FIXME
         setClassToCharacterMappingMenuItem.addActionListener(this::setClassToCharacterMappingActionPerformed);
         setClassToCharacterMappingMenuItem.setIcon(View.getIcon("asclass16"));
@@ -456,7 +451,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
         abcExplorerMenuItem.setIcon(View.getIcon("abcexplorer16"));
         add(abcExplorerMenuItem);
-        
+
         cleanAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cleanAbc"));
         cleanAbcMenuItem.addActionListener(this::cleanAbcActionPerformed);
         cleanAbcMenuItem.setIcon(View.getIcon("clean16"));
@@ -561,7 +556,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInHexDumpViewTagMenuItem.addActionListener(this::showInHexDumpViewActionPerformed);
         showInHexDumpViewTagMenuItem.setIcon(View.getIcon("viewhex16"));
         add(showInHexDumpViewTagMenuItem);
-                        
+
         addTagInsideMenu = new JMenu(mainPanel.translate("contextmenu.addTagInside"));
         addTagInsideMenu.setIcon(View.getIcon("addtag16"));
         add(addTagInsideMenu);
@@ -617,7 +612,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyTagToWithDependenciesMenu = new JMenu(mainPanel.translate("contextmenu.copyTagWithDependencies"));
         copyTagToWithDependenciesMenu.setIcon(View.getIcon("copy16"));
         add(copyTagToWithDependenciesMenu);
-        
+
         copyTagToReplaceByClassMenu = new JMenu(mainPanel.translate("contextmenu.copyTagToReplaceByClass"));
         copyTagToReplaceByClassMenu.setIcon(View.getIcon("copy16"));
         add(copyTagToReplaceByClassMenu);
@@ -668,20 +663,20 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         applyUnpackerMenu = new JMenu(mainPanel.translate("contextmenu.applyUnpacker"));
         applyUnpackerMenu.setIcon(View.getIcon("openinside16"));
-        
+
         for (Packer packer : DefineBinaryDataTag.getAvailablePackers()) {
             JMenuItem packerMenuItem = new JMenuItem(packer.getName());
             packerMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     applyUnpackerActionPerformed(packer);
-                }                
+                }
             });
             applyUnpackerMenu.add(packerMenuItem);
         }
-        
+
         add(applyUnpackerMenu);
-        
+
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         openSWFInsideTagMenuItem.setIcon(View.getIcon("openinside16"));
         openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
@@ -1009,7 +1004,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (chtag.getExportName() == null) {
                         allSelectedIsTagWithExportName = false;
                     }
-                    
+
                 }
             } else {
                 if (item instanceof TagScript) {
@@ -1368,7 +1363,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     setClassToCharacterMappingMenuItem.setVisible(true);
                 }
             }
-            
+
             if (tree.getModel().getChildCount(firstItem) > 0) {
                 expandRecursiveMenuItem.setVisible(true);
                 collapseRecursiveMenuItem.setVisible(true);
@@ -1444,7 +1439,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     || (firstItem instanceof TagScript)) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
             }
-            
+
             if ((firstItem instanceof Scene) || (firstItem instanceof SceneFrame)) {
                 showInFramesFolderMenuItem.setVisible(true);
             }
@@ -1555,7 +1550,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             copyTagToMenu.setVisible(true);
             copyTagToWithDependenciesMenu.setVisible(true);
-        }        
+        }
         if (allSelectedIsFrameInSameTimeline) {
             /*JMenuItem copyFrameToSubClipboardMenuItem = new JMenuItem(AppStrings.translate("contextmenu.clipboard.frame") + " (CTRL+C)", View.getIcon("clipboard16"));
             copyFrameToSubClipboardMenuItem.addActionListener(new ActionListener() {
@@ -1584,7 +1579,7 @@ public class TagTreeContextMenu extends JPopupMenu {
              */
         }
 
-        if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {            
+        if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
             for (OpenableList targetSwfList : swfs) {
                 if ((targetSwfList.size() == 1) && (targetSwfList.get(0) == singleSwf)) {
                     continue;
@@ -1606,7 +1601,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (allSelectedIsTagWithClassName) {
                 copyTagToReplaceByClassMenu.setText(AppStrings.translate("contextmenu.copyTagToReplaceByClass"));
-            }            
+            }
             if (allSelectedIsTagWithExportName) {
                 copyTagToReplaceByClassMenu.setText(AppStrings.translate("contextmenu.copyTagToReplaceByExportName"));
             }
@@ -1614,7 +1609,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsBinaryData) {
             applyUnpackerMenu.setVisible(true);
-            
+
             boolean anyInnerSwf = false;
             for (TreeItem item : items) {
                 BinaryDataInterface binary = (BinaryDataInterface) item;
@@ -1625,7 +1620,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
 
-            openSWFInsideTagMenuItem.setVisible(anyInnerSwf);            
+            openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
         }
 
         for (TreeItem item : items) {
@@ -1774,11 +1769,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (item instanceof SWF) {
             return;
         }
-        
+
         if (item instanceof Scene) {
             return;
-        }        
-        
+        }
+
         if (item instanceof SceneFrame) {
             return;
         }
@@ -2128,17 +2123,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         Timelined timelined = selectPositionDialog.getSelectedTimelined();
         copyOrMoveTags(new LinkedHashSet<TreeItem>(items), false, timelined, position);
     }
-    
+
     private class AlterCharacterTag extends CharacterTag {
 
         private int characterId;
-        
+
         public AlterCharacterTag(SWF swf, int characterId) {
             super(swf, 10000, "Alter", new ByteArrayRange(new byte[]{}));
             this.characterId = characterId;
         }
 
-        
         @Override
         public void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
         }
@@ -2155,20 +2149,20 @@ public class TagTreeContextMenu extends JPopupMenu {
         @Override
         public void setCharacterId(int characterId) {
             this.characterId = characterId;
-        }        
+        }
     }
-    
+
     private void copyTagToReplaceByClassOrExportNameActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
         Set<SWF> sourceSwfs = new LinkedHashSet<>();
         try {
             List<Tag> newTags = new ArrayList<>();
             Map<Integer, Integer> changedCharacterIds = new HashMap<>();
-            
+
             Map<Tag, Tag> classMappedAlterTags = new HashMap<>();
             Map<Tag, CharacterTag> classMappedTags = new HashMap<>();
-            
+
             Set<TreeItem> ignoredItems = new LinkedIdentityHashSet<>();
-                
+
             for (TreeItem item : items) {
                 Tag tag = (Tag) item;
                 if (tag.getSwf() == null) {
@@ -2176,30 +2170,29 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
                 Timelined realTargetTimelined;
                 CharacterTag targetSameNameCharacter = null;
-                
-                
+
                 CharacterTag chtag = (CharacterTag) tag;
-                
+
                 for (String className : chtag.getClassNames()) {
                     targetSameNameCharacter = targetSwf.getCharacterByClass(className);
                     if (targetSameNameCharacter != null) {
                         break;
                     }
                 }
-                
+
                 if (targetSameNameCharacter == null && chtag.getExportName() != null) {
-                    targetSameNameCharacter = targetSwf.getCharacterByExportName(chtag.getExportName());                    
+                    targetSameNameCharacter = targetSwf.getCharacterByExportName(chtag.getExportName());
                 }
-                                
+
                 if (targetSameNameCharacter == null) {
                     ignoredItems.add(item);
                     continue;
                 }
-                
+
                 realTargetTimelined = targetSameNameCharacter.getTimelined();
-                
+
                 AlterCharacterTag alterTag = new AlterCharacterTag(targetSwf, targetSameNameCharacter.getCharacterId());
-                
+
                 Set<Integer> needed = new LinkedHashSet<>();
                 targetSameNameCharacter.getNeededCharacters(needed, targetSwf);
                 int ind = realTargetTimelined.indexOfTag(targetSameNameCharacter);
@@ -2213,7 +2206,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 classMappedTags.put(tag, targetSameNameCharacter);
             }
             items.removeAll(ignoredItems);
-            
+
             Set<TreeItem> allDeps = new LinkedIdentityHashSet<>();
             allDeps.addAll(items);
             Map<TreeItem, Tag> depToItem = new HashMap<>();
@@ -2229,10 +2222,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             allDeps.removeAll(items);
             allDeps.addAll(items);
-            
+
             Set<TreeItem> itemsSet = new LinkedIdentityHashSet<>();
             itemsSet.addAll(items);
-            
+
             for (TreeItem item : allDeps) {
                 Tag tag = (Tag) item;
                 if (tag.getSwf() == null) {
@@ -2243,15 +2236,15 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 Timelined realTargetTimelined;
                 Tag realPosition;
-                
+
                 if (itemsSet.contains(tag)) {
                     realTargetTimelined = classMappedAlterTags.get(tag).getTimelined();
                     realPosition = classMappedAlterTags.get(tag);
                 } else {
                     realTargetTimelined = classMappedAlterTags.get(depToItem.get(tag)).getTimelined();
                     realPosition = classMappedAlterTags.get(depToItem.get(tag));
-                }                                                
-                                                                
+                }
+
                 ReadOnlyTagList tags = realTargetTimelined.getTags();
                 int positionInt = realPosition == null ? tags.size() : tags.indexOf(realPosition);
 
@@ -2259,7 +2252,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 copyTag.setSwf(targetSwf, true);
                 copyTag.setTimelined(realTargetTimelined);
                 if (!itemsSet.contains(tag)
-                    && (tag instanceof CharacterTag)) {
+                        && (tag instanceof CharacterTag)) {
                     CharacterTag characterTag = (CharacterTag) copyTag;
                     int oldCharacterId = characterTag.getCharacterId();
                     int newCharacterId = checkUniqueCharacterId(copyTag);
@@ -2276,10 +2269,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 targetSwf.updateCharacters();
                 targetSwf.getCharacters(true); // force rebuild character id cache
                 copyTag.setModified(true);
-                newTags.add(copyTag);                
+                newTags.add(copyTag);
                 if (itemsSet.contains(tag)) {
-                    mainPanel.replaceItemPin(classMappedTags.get(tag), copyTag); 
-                }                
+                    mainPanel.replaceItemPin(classMappedTags.get(tag), copyTag);
+                }
             }
             for (int oldCharacterId : changedCharacterIds.keySet()) {
                 int newCharacterId = changedCharacterIds.get(oldCharacterId);
@@ -2364,7 +2357,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         mainPanel.refreshTree();
     }
-    
+
     private void openSwfInsideActionPerformed(ActionEvent evt) {
         List<TreeItem> sel = getSelectedItems();
         List<BinaryDataInterface> binaryDatas = new ArrayList<>();
@@ -2375,7 +2368,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
 
-        mainPanel.loadFromBinaryTag(binaryDatas);        
+        mainPanel.loadFromBinaryTag(binaryDatas);
     }
 
     private void replaceWithTagActionPerformed(ActionEvent evt) {
@@ -2516,7 +2509,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         Main.getMainFrame().getPanel().refreshTree();
     }
-    
+
     private void rawEditActionPerformed(ActionEvent evt) {
         TreeItem itemr = getCurrentItem();
         if (itemr == null) {
@@ -2538,8 +2531,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         HasCharacterId hasCharacterId = (HasCharacterId) itemj;
         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), ((SWF) itemj.getOpenable()).getCharacter(hasCharacterId.getCharacterId()));
-    }   
-    
+    }
+
     /*
     How set class to character mapping work in AS3:
     a) a character is selected
@@ -2571,7 +2564,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     I. if there is previously assigned classname, find associated SymbolClass and remove the mapping from it
     II. if the previous Symbolclass is empty, remove it
     III. add new character mapping to new SymbolClass determined
-    */
+     */
     private void setClassToCharacterMappingActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
         SWF swf = ch.getSwf();
@@ -2579,15 +2572,15 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (d.showDialog() != AppDialog.OK_OPTION) {
             return;
         }
-        
+
         int abcFrame = d.getAbcFrame();
         int characterFrame = d.getCharacterFrame();
-                        
+
         SymbolClassTag selectedSymbolClass = d.getSelectedSymbolClassTag();
         ABCContainerTag selectedAbcContainer = d.getSelectedAbcContainer();
         String className = d.getSelectedClass();
         String parentClassName = d.getSelectedParentClass();
-              
+
         if (!d.isClassFound() && !d.doCreateClass() && selectedSymbolClass == null) { //we selected position of new SymbolClass
             selectedSymbolClass = new SymbolClassTag(swf);
             selectedSymbolClass.setTimelined(swf);
@@ -2596,21 +2589,21 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.addTag(selectedSymbolClass);
             } else {
                 swf.addTag(swf.indexOfTag(pos), selectedSymbolClass);
-            }            
+            }
         }
-        
+
         if (!d.isClassFound() && d.doCreateClass()) {
             if (d.getSelectedAbcContainer() == null) {
                 selectedAbcContainer = new DoABC2Tag(swf);
-                ((Tag)selectedAbcContainer).setTimelined(swf);
+                ((Tag) selectedAbcContainer).setTimelined(swf);
                 Tag pos = d.getSelectedPosition();
                 if (pos == null) {
                     swf.addTag((Tag) selectedAbcContainer);
                 } else {
                     swf.addTag(swf.indexOfTag(pos), (Tag) selectedAbcContainer);
-                } 
+                }
             }
-            
+
             String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
             String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
             String fileName = className.replace(".", "/");
@@ -2638,9 +2631,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
             }
 
-            ((Tag) selectedAbcContainer).setModified(true);            
+            ((Tag) selectedAbcContainer).setModified(true);
         }
-        
+
         if (selectedSymbolClass == null) {
             int symbolClassFrame = Math.max(abcFrame, characterFrame);
             int frame = 1;
@@ -2668,8 +2661,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.addTag(symbolClassPos, selectedSymbolClass);
             }
         }
-        
-        
+
         //remove previously assigned name
         ReadOnlyTagList tags = swf.getTags();
         for (int j = 0; j < tags.size(); j++) {
@@ -2687,16 +2679,16 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-        
+
         selectedSymbolClass.tags.add(ch.getCharacterId());
         selectedSymbolClass.names.add(className);
-        
+
         swf.clearAllCache();
         swf.assignClassesToSymbols();
         swf.setModified(true);
-        mainPanel.refreshTree(swf); 
+        mainPanel.refreshTree(swf);
     }
-    
+
     private void expandRecursiveActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
         TreePath path = tree.getFullModel().getTreePath(getCurrentItem());
@@ -2705,7 +2697,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         View.expandTreeNodes(tree, path, true);
     }
-    
+
     private void collapseRecursiveActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
         TreePath path = tree.getFullModel().getTreePath(getCurrentItem());
@@ -3501,7 +3493,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
 
-        if (tagsToRemove.size() > 0 || itemsToRemove.size() > 0 ||  framesToRemove.size() > 0) {
+        if (tagsToRemove.size() > 0 || itemsToRemove.size() > 0 || framesToRemove.size() > 0) {
             String confirmationMessage;
             if (tagsToRemove.size() + itemsToRemove.size() + framesToRemove.size() == 1) {
                 Object toRemove;
@@ -3636,7 +3628,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                         }
                                     }
                                 }
-                            }                                                        
+                            }
 
                             if (item instanceof TreeItem) {
                                 mainPanel.unpinItem((TreeItem) item);
@@ -3663,24 +3655,23 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
 
                         for (Tag tag : tagsToRemove) {
-                            
-                            
+
                             SWF swf = tag.getSwf();
-                            
+
                             if (tag instanceof SymbolClassTag) {
                                 swfToAssignClassesToSymbols.add(swf);
                             }
-                            
+
                             if (tag instanceof ExportAssetsTag) {
                                 swfToAssignExportNamesToSymbols.add(swf);
                             }
-                            
+
                             if (!tagsToRemoveBySwf.containsKey(swf)) {
                                 tagsToRemoveBySwf.put(swf, new ArrayList<>());
                             }
 
                             tagsToRemoveBySwf.get(swf).add(tag);
-                            mainPanel.unpinItem(tag);                                                        
+                            mainPanel.unpinItem(tag);
                         }
 
                         for (SWF swf : tagsToRemoveBySwf.keySet()) {
@@ -3708,25 +3699,25 @@ public class TagTreeContextMenu extends JPopupMenu {
                         for (SWF swf : swfsToClearCache) {
                             swf.clearAllCache();
                         }
-                        
+
                         for (SWF swf : swfToAssignClassesToSymbols) {
                             swf.assignClassesToSymbols();
                         }
-                        
-                        for (SWF swf: swfToAssignExportNamesToSymbols) {
+
+                        for (SWF swf : swfToAssignExportNamesToSymbols) {
                             swf.assignExportNamesToSymbols();
                         }
-                        
+
                         if (!framesToRemove.isEmpty()) {
                             Timelined tim = framesToRemove.get(0).timeline.timelined;
                             SWF swf = tim.getSwf();
                             removeFrames(new LinkedHashSet<>(framesToRemove));
-                            
+
                             swf.resetTimelines(tim);
                             swf.clearImageCache();
                             tim.setFrameCount(tim.getTimeline().getFrameCount());
-                            
-                            mainPanel.refreshTree(swf);                            
+
+                            mainPanel.refreshTree(swf);
                         }
                     }
                 };
@@ -3745,7 +3736,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void undoTagActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
-        List<TreeItem> sel = getSelectedItems();    
+        List<TreeItem> sel = getSelectedItems();
         Set<SWF> computeSWFs = new LinkedIdentityHashSet<>();
 
         for (TreeItem item : sel) {
@@ -3753,7 +3744,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 try {
                     Tag tag = (Tag) item;
                     tag.undo();
-                    SWF swf = tag.getSwf();                                        
+                    SWF swf = tag.getSwf();
                     swf.clearAllCache();
                     if (tag instanceof Timelined) {
                         ((Timelined) tag).resetTimeline();
@@ -3766,7 +3757,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             ((Timelined) parentCharacter).resetTimeline();
                         }
                     }
-                    computeSWFs.add(swf);                    
+                    computeSWFs.add(swf);
                     tree.getFullModel().updateNode(item);
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -3776,9 +3767,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         for (SWF swf : computeSWFs) {
             swf.computeDependentCharacters();
-            swf.computeDependentFrames();                    
+            swf.computeDependentFrames();
         }
-        
+
         mainPanel.repaintTree();
     }
 
@@ -3882,7 +3873,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             logger.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void showInFramesFolderActionPerformed(ActionEvent evt) {
         TreeItem item = getCurrentItem();
         if (item instanceof SceneFrame) {
@@ -4097,7 +4088,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     SWF swf = (SWF) targetOpenable;
                     if (!as12 && !swf.isAS3()) {
                         continue;
-                    }            
+                    }
                     if (!as3 && swf.isAS3()) {
                         continue;
                     }
@@ -4157,14 +4148,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         });
         swfItem.setIcon(View.getIcon("flash16"));
         menu.add(swfItem);
-        
+
         Map<String, SWF> binaryMap = mainPanel.getSwfsMap(targetSwf);
         for (String key : binaryMap.keySet()) {
             addCopyMoveToFramesMenus(kind, menu, items, key, binaryMap.get(key));
-        }        
+        }
     }
-    
-    
 
     private void attachTagActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl, TreeNodeType createNodeType) {
         int id = -1;
@@ -4360,7 +4349,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (dialog.showDialog(originalDepths) != CollectDepthAsSpritesDialog.OK_OPTION) {
             return;
         }
-        
+
         Frame first = frames.get(0);
         Frame afterLast = null;
 
@@ -4417,7 +4406,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (!(t instanceof DepthTag)) {
                         continue;
                     }
-                    
+
                     int depth = ((DepthTag) t).getDepth();
 
                     if (!sprites.containsKey(depth)) {
@@ -4459,7 +4448,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         if (!(t instanceof PlaceObjectTypeTag)) {
                             continue;
                         }
-                        
+
                         PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) t;
                         MATRIX m = placeTag.getMatrix();
 
@@ -4499,10 +4488,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private int getPreviousMatrix(int frameIndex, Map<Integer, MATRIX> prevMatrixAtDepth, PlaceObjectTypeTag target, Timeline timeline) {
         int depth = target.getDepth();
-        
+
         for (; frameIndex > -1; frameIndex--) {
             if (prevMatrixAtDepth.containsKey(depth)) {
                 break;
@@ -4529,10 +4518,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             target.setPlaceFlagMove(true);
             target.setMatrix(new MATRIX(prevMatrix));
         }
-        
+
         return frameIndex;
     }
-    
+
     private void offsetSprite(DefineSpriteTag sprite, int dx, int dy) {
         for (Tag t : sprite.getTags()) {
             if (!(t instanceof PlaceObjectTypeTag)) {
@@ -4548,7 +4537,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
     }
-    
+
     private void replaceSprite(DefineSpriteTag sprite, Timelined timelined, SWF swf, int depth, Frame first, Frame afterLast, boolean offset, int dx, int dy) {
         // Add new tag for the new sprite
         PlaceObject2Tag place = new PlaceObject2Tag(swf);
@@ -4571,7 +4560,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (afterLast == null) {
             return;
         }
-        
+
         MATRIX lastMatrix = null;
         ReadOnlyTagList sTags = sprite.getTags();
 
@@ -4582,7 +4571,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (!(t instanceof PlaceObjectTypeTag)) {
                 continue;
             }
-            
+
             PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
             lastMatrix = tplace.getMatrix();
 
@@ -4599,7 +4588,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (!(t instanceof PlaceObjectTypeTag)) {
                 continue;
             }
-            
+
             PlaceObjectTypeTag tplace = (PlaceObjectTypeTag) t;
             if (tplace.getDepth() == place.depth && tplace.getMatrix() == null) {
                 tplace.setMatrix(new MATRIX(lastMatrix));
@@ -4619,28 +4608,27 @@ public class TagTreeContextMenu extends JPopupMenu {
     public void copyOrMoveFrames(Set<TreeItem> items, boolean move, Timelined targetTimelined, int position) {
         if (items.isEmpty()) {
             return;
-        }                
-        
+        }
+
         Timelined sourceTimelined = ((Frame) items.iterator().next()).timeline.timelined;
-        
+
         final boolean USE_REMOVE_TAG = false;
-                                
+
         int positionMinus = 0;
-        
-        
+
         int posPrevFrame = position - 1;
-        
+
         int posTargetFrame = position;
         if (move && sourceTimelined == targetTimelined) {
-            Set<Integer> removedFrames = new LinkedHashSet<>();            
+            Set<Integer> removedFrames = new LinkedHashSet<>();
             for (TreeItem item : items) {
                 Frame frame = (Frame) item;
                 int removedFrameNum = frame.frame + 1;
                 removedFrames.add(removedFrameNum);
                 if (removedFrameNum < position) {
                     positionMinus++;
-                }                
-            }            
+                }
+            }
             while (removedFrames.contains(posPrevFrame)) {
                 posPrevFrame--;
             }
@@ -4648,24 +4636,24 @@ public class TagTreeContextMenu extends JPopupMenu {
                 posTargetFrame++;
             }
         }
-        
+
         Frame targetFrame = targetTimelined.getTimeline().getFrame(posTargetFrame - 1);
-        
+
         Frame prevTargetFrame;
         if (posPrevFrame == 0) {
             prevTargetFrame = null;
         } else {
             prevTargetFrame = targetTimelined.getTimeline().getFrame(posPrevFrame - 1);
         }
-                        
+
         int positionAfterDelete = position - positionMinus;
-                                        
+
         if (move) {
             removeFrames(items);
         }
         boolean endsWithShowframe = false;
-        ShowFrameTag prevShowFrame = null;                
-        int f = 1;        
+        ShowFrameTag prevShowFrame = null;
+        int f = 1;
         for (int i = 0; i < targetTimelined.getTags().size(); i++) {
             Tag t = targetTimelined.getTags().get(i);
             endsWithShowframe = false;
@@ -4677,12 +4665,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-                
+
         SWF swf = targetTimelined.getSwf();
-        
+
         List<Tag> newFrameTags = new ArrayList<>();
-        
-        int prevShowFrameIndex;        
+
+        int prevShowFrameIndex;
         if (targetFrame == null) {
             if (!endsWithShowframe) {
                 ShowFrameTag showFrame = new ShowFrameTag(swf);
@@ -4692,7 +4680,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         } else {
             prevShowFrameIndex = targetTimelined.getTags().indexOf(prevShowFrame);
         }
-        
+
         Frame frame = null;
         for (TreeItem item : items) {
             frame = (Frame) item;
@@ -4703,7 +4691,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (int depth : allDepths) {
                 DepthState sourceState = frame.layers.get(depth);
                 DepthState prevTargetState = prevTargetFrame == null ? null : prevTargetFrame.layers.get(depth);
-                
+
                 if (prevTargetState != null && sourceState != null && prevTargetState.equals(sourceState)) {
                     //empty
                 } else if (sourceState != null) {
@@ -4736,7 +4724,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
             }
-            
+
             ShowFrameTag showFrame = new ShowFrameTag(swf);
             newFrameTags.add(showFrame);
             prevTargetFrame = frame;
@@ -4751,10 +4739,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (sourceState == null && targetState == null) {
                     continue;
                 }
-                if (sourceState != null && targetState != null 
+                if (sourceState != null && targetState != null
                         && sourceState.equals(targetState)
-                        && targetState.placeFrame.frame == targetFrame.frame
-                    ) {
+                        && targetState.placeFrame.frame == targetFrame.frame) {
                     targetTimelined.removeTag(targetState.placeObjectTag);
                 } else if (targetState == null) {
                     RemoveObject2Tag rem = new RemoveObject2Tag(swf);
@@ -4762,9 +4749,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     newFrameTags.add(rem);
                 } else if (targetState.placeFrame.frame < targetFrame.frame
                         && sourceState != null
-                        && !sourceState.equals(targetState)
-                ) {
-                    PlaceObjectTypeTag fullPlace = targetState.toPlaceObjectTag(depth);                    
+                        && !sourceState.equals(targetState)) {
+                    PlaceObjectTypeTag fullPlace = targetState.toPlaceObjectTag(depth);
                     if (USE_REMOVE_TAG) {
                         RemoveObject2Tag rem = new RemoveObject2Tag(swf);
                         rem.depth = depth;
@@ -4778,7 +4764,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         PlaceObjectTypeTag fullPlace = targetState.toPlaceObjectTag(depth);
                         fullPlace.setTimelined(targetTimelined);
                         fullPlace.setPlaceFlagMove(true);
-                        
+
                         targetTimelined.replaceTag(targetState.placeObjectTag, fullPlace);
                     } else {
                         targetState.placeObjectTag.setPlaceFlagMove(true);
@@ -4786,7 +4772,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-        
+
         for (int i = prevShowFrameIndex + 1; i < targetTimelined.getTags().size(); i++) {
             Tag t = targetTimelined.getTags().get(i);
             if (t instanceof RemoveTag) {
@@ -4797,31 +4783,30 @@ public class TagTreeContextMenu extends JPopupMenu {
                 break;
             }
         }
-        
-        
+
         int pos = prevShowFrameIndex + 1;
         for (Tag t : newFrameTags) {
             t.setTimelined(targetTimelined);
             targetTimelined.addTag(pos, t);
             pos++;
-        }                                
-        
+        }
+
         fixDefineBeforeUsage(swf);
         fixHeaderTags(swf);
         swf.resetTimelines(targetTimelined);
         swf.clearImageCache();
         targetTimelined.setFrameCount(targetTimelined.getTimeline().getFrameCount());
         swf.resetTimelines(sourceTimelined);
-        sourceTimelined.setFrameCount(sourceTimelined.getTimeline().getFrameCount());        
-                
+        sourceTimelined.setFrameCount(sourceTimelined.getTimeline().getFrameCount());
+
         mainPanel.refreshTree(swf);
     }
-    
-    private int moveCharacter(SWF swf, int usageIndex, int characterId) {       
+
+    private int moveCharacter(SWF swf, int usageIndex, int characterId) {
         int i = 0;
         for (int j = 0; j < swf.getTags().size(); j++) {
             Tag t2 = swf.getTags().get(j);
-            if ((t2 instanceof CharacterIdTag) 
+            if ((t2 instanceof CharacterIdTag)
                     && !(t2 instanceof PlaceObjectTypeTag)
                     && !(t2 instanceof RemoveTag)) {
                 CharacterIdTag chit = (CharacterIdTag) t2;
@@ -4834,10 +4819,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         return i;
     }
-    
+
     /**
      * Move tags usually placed in the first frame to the first frame
-     * @param swf 
+     *
+     * @param swf
      */
     private void fixHeaderTags(SWF swf) {
         List<Tag> headerTags = new ArrayList<>();
@@ -4846,8 +4832,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if ((t instanceof FileAttributesTag)
                     || (t instanceof SetBackgroundColorTag)
                     || (t instanceof ExporterInfo)
-                    || (t instanceof MetadataTag)
-                ) {
+                    || (t instanceof MetadataTag)) {
                 swf.removeTag(i);
                 headerTags.add(t);
                 i--;
@@ -4857,7 +4842,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.addTag(i, headerTags.get(i));
         }
     }
-        
+
     private boolean fixDefineBeforeUsage(SWF swf) {
         ReadOnlyTagList tags = swf.getTags();
         Set<Integer> walkedSprites = new HashSet<>();
@@ -4902,22 +4887,22 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
                         }
                     }
-                }            
+                }
             }
         }
         return changed;
     }
-    
+
     private void removeFrames(Set<TreeItem> items) {
         if (items.isEmpty()) {
             return;
         }
         final boolean USE_REMOVE_TAG = false;
-        
+
         Timelined sourceTimelined = ((Frame) items.iterator().next()).timeline.timelined;
         Timeline sourceTimeline = sourceTimelined.getTimeline();
         SWF swf = sourceTimelined.getSwf();
-        
+
         List<ShowFrameTag> frameTags = new ArrayList<>();
         Set<Integer> framesToDelete = new TreeSet<>();
         boolean deleteLastFrame = false;
@@ -4931,7 +4916,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 deleteLastFrame = true;
             }
         }
-        
+
         int f = 1;
         int lastNotDeletedFrameNum = 0;
         int numtagsInFrame = 0;
@@ -4948,14 +4933,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                             break;
                         }
                         if (isFrameTagToDelete(t2)) {
-                            sourceTimelined.removeTag(i);                            
+                            sourceTimelined.removeTag(i);
                         }
                     }
                 } else {
                     lastNotDeletedFrameNum = f;
                 }
-                if (framesToDelete.contains(f) 
-                        && !framesToDelete.contains(f + 1) 
+                if (framesToDelete.contains(f)
+                        && !framesToDelete.contains(f + 1)
                         && i + 1 + 1 < sourceTimelined.getTags().size()) {
                     Frame lastNotDeletedFrame = lastNotDeletedFrameNum == 0 ? null : sourceTimeline.getFrame(lastNotDeletedFrameNum - 1);
                     Frame nextFrame = sourceTimeline.getFrame(f + 1 - 1);
@@ -4978,13 +4963,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                         for (int depth : allDepths) {
                             DepthState lastDepthstate = lastNotDeletedFrame == null ? null : lastNotDeletedFrame.layers.get(depth);
                             DepthState nextDepthstate = nextFrame.layers.get(depth);
-                            if (nextDepthstate != null 
+                            if (nextDepthstate != null
                                     && lastDepthstate == null
-                                    && nextDepthstate.placeObjectTag.flagMove()
-                                    ) {
+                                    && nextDepthstate.placeObjectTag.flagMove()) {
                                 nextDepthstate.placeObjectTag.setPlaceFlagMove(false);
                                 nextDepthstate.placeObjectTag.setModified(true);
-                            } else if (nextDepthstate != null 
+                            } else if (nextDepthstate != null
                                     && nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame
                                     && nextDepthstate.placeFrame.frame > lastNotDeletedFrameNum - 1) {
                                 //the place was deleted                                                      
@@ -5000,10 +4984,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                                         placeFull.setPlaceFlagMove(true);
                                     }
                                 }
-                                i++;                                                        
+                                i++;
                                 sourceTimelined.addTag(i, placeFull);
                                 placeFull.setTimelined(sourceTimelined);
-                            } else if (lastDepthstate != null 
+                            } else if (lastDepthstate != null
                                     && nextDepthstate != null
                                     && !lastDepthstate.equals(nextDepthstate)) {
                                 if (nextDepthstate.placeFrame.frame < nextDepthstate.frame.frame) {
@@ -5027,7 +5011,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 i++;
                                 sourceTimelined.addTag(i, rem);
                                 rem.setTimelined(sourceTimelined);
-                            }                        
+                            }
                         }
                     }
                 }
@@ -5037,21 +5021,22 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (numtagsInFrame > 0 && deleteLastFrame) {
             for (int i = sourceTimelined.getTags().size(); i >= 0; i--) {
                 Tag t2 = sourceTimelined.getTags().get(i);
-                if (t2 instanceof ShowFrameTag) {                    
+                if (t2 instanceof ShowFrameTag) {
                     break;
                 }
                 if (isFrameTagToDelete(t2)) {
                     sourceTimelined.removeTag(i);
                 }
-            }      
+            }
         }
         //WARNING: this method does not reset timeline and does not set frame count. Caller must do it.
     }
-    
+
     /**
      * Which of tags in a frame are deleted when deleting a frame
+     *
      * @param tag
-     * @return 
+     * @return
      */
     private boolean isFrameTagToDelete(Tag tag) {
         return (tag instanceof PlaceObjectTypeTag)
@@ -5060,7 +5045,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 || (tag instanceof StartSoundTag)
                 || (tag instanceof StartSound2Tag)
                 || (tag instanceof SoundStreamBlockTag)
-                || (tag instanceof DoActionTag);                                
+                || (tag instanceof DoActionTag);
     }
 
     public void copyOrMoveTags(Set<TreeItem> items, boolean move, Timelined targetTimelined, Tag position) {
@@ -5079,7 +5064,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 Timelined realTargetTimelined = targetTimelined;
                 Tag realPosition = position;
-                
+
                 if (!Configuration.allowPlacingDefinesIntoSprites.get()) {
                     //do not place Define tags in DefineSprites
                     if ((tag instanceof CharacterTag) && (targetTimelined instanceof DefineSpriteTag)) {
@@ -5185,7 +5170,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void removeAloneCharacters(Set<Integer> aloneCharacterIds, SWF swf) {
         for (int ch : aloneCharacterIds) {
             CharacterTag ct = swf.getCharacter(ch);
@@ -5373,7 +5358,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
 
-                try ( FileOutputStream fos = new FileOutputStream(fileName)) {
+                try (FileOutputStream fos = new FileOutputStream(fileName)) {
                     container.getABC().saveTo(fos);
                 }
 

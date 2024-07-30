@@ -67,7 +67,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
 
     @Internal
     public Packer usedPacker;
-    
+
     @Internal
     private PackedBinaryData sub;
 
@@ -80,7 +80,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     public static Packer[] getAvailablePackers() {
         return PACKERS;
     }
-    
+
     /**
      * Constructor
      *
@@ -100,7 +100,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     public PackedBinaryData getSub() {
         return sub;
     }
-    
+
     @Override
     public boolean unpack(Packer packer) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -115,7 +115,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
         usedPacker = packer;
         return true;
     }
-    
+
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         tag = sis.readUI16("tag");
@@ -212,7 +212,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     @Override
     public Packer getUsedPacker() {
         return usedPacker;
-    }    
+    }
 
     @Override
     public void setDataBytes(ByteArrayRange data) {
@@ -223,7 +223,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     public ByteArrayRange getDataBytes() {
         return binaryData;
     }
-    
+
     @Override
     public boolean pack() {
         if (sub == null) {
@@ -241,7 +241,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
         setDataBytes(new ByteArrayRange(baos.toByteArray()));
         return true;
     }
-    
+
     @Override
     public void setInnerSwf(SWF swf) {
         this.innerSwf = swf;
@@ -255,17 +255,17 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     @Override
     public String getPathIdentifier() {
         return "DefineBinaryData (" + getCharacterId() + ")";
-    }           
+    }
 
     @Override
     public String getStoragesPathIdentifier() {
         return "binaryData[" + getCharacterId() + "]";
-    }        
+    }
 
     @Override
     public BinaryDataInterface getTopLevelBinaryData() {
         return this;
-    }    
+    }
 
     @Override
     public void setModified(boolean value) {
@@ -275,7 +275,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
                 sub.setModified(false);
             }
         }
-    }    
+    }
 
     @Override
     public String getClassExportFileName(String className) {

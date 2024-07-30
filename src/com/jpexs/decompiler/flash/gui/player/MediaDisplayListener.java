@@ -25,6 +25,6 @@ public interface MediaDisplayListener {
     public void mediaDisplayStateChanged(MediaDisplay source);
 
     public void playingFinished(MediaDisplay source);
-    
+
     public void statusChanged(String status);
 }

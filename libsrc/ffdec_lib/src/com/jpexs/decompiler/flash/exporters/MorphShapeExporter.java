@@ -109,7 +109,7 @@ public class MorphShapeExporter {
                 final File fileStart = new File(outdir + File.separator + characterID + ".start" + settings.getFileExtension());
                 final File fileEnd = new File(outdir + File.separator + characterID + ".end" + settings.getFileExtension());
                 MorphShapeTag mst = (MorphShapeTag) t;
-                    
+
                 new RetryTask(() -> {
                     switch (settings.mode) {
                         case SVG_START_END:
@@ -171,7 +171,7 @@ public class MorphShapeExporter {
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), fileStart);
                             }
-                            
+
                             st = mst.getEndShapeTag();
                             rect = st.getRect();
                             newWidth = (int) (rect.getWidth() * settings.zoom / SWF.unitDivisor) + 1;
@@ -194,7 +194,7 @@ public class MorphShapeExporter {
                             } else {
                                 BMPFile.saveBitmap(img.getBufferedImage(), fileEnd);
                             }
-                            break;                            
+                            break;
                         case CANVAS:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 int deltaX = -Math.min(mst.getStartBounds().Xmin, mst.getEndBounds().Xmin);
@@ -221,9 +221,8 @@ public class MorphShapeExporter {
                             break;
                     }
                 }, handler).run();
-                
-                
-                Set<String> classNames = mst.getClassNames();                    
+
+                Set<String> classNames = mst.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
@@ -233,17 +232,17 @@ public class MorphShapeExporter {
                             Files.copy(file.toPath(), classFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         }, handler).run();
                         ret.add(classFile);
-                        
+
                         if (fileStart.exists()) {
                             new RetryTask(() -> {
                                 Files.copy(fileStart.toPath(), classFileStart.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            }, handler).run();                           
+                            }, handler).run();
                         }
-                        
+
                         if (fileEnd.exists()) {
                             new RetryTask(() -> {
                                 Files.copy(fileEnd.toPath(), classFileEnd.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            }, handler).run();                            
+                            }, handler).run();
                         }
                     }
                     file.delete();
@@ -253,10 +252,10 @@ public class MorphShapeExporter {
                     if (fileEnd.exists()) {
                         fileEnd.delete();
                     }
-                } else {                
+                } else {
                     ret.add(file);
                 }
-                
+
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }

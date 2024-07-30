@@ -197,9 +197,9 @@ public class SelectTagPositionDialog extends AppDialog {
         }
 
         boolean wasMinFrame = minFrame <= 1;
-        
+
         for (Tag t : tim.getTags()) {
-            
+
             if (wasMinFrame) {
                 MyTreeNode node = new MyTreeNode();
                 node.setData(t);
@@ -218,13 +218,13 @@ public class SelectTagPositionDialog extends AppDialog {
                 f++;
                 if (f >= minFrame) {
                     wasMinFrame = true;
-                    
+
                     frameNode = new MyTreeNode();
                     labels = new ArrayList<>();
                     frameNode.setData(new MyFrame(f, labels));
                     frameNode.setParent(root);
                     root.addChild(frameNode);
-                }                
+                }
             }
         }
         if (frameNode.isLeaf()) {
@@ -285,7 +285,7 @@ public class SelectTagPositionDialog extends AppDialog {
     public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites) {
         this(parent, swf, allowInsideSprites, null, 1);
     }
-    
+
     public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites, String newTypeName, int minFrame) {
         this(parent, swf, null, null, allowInsideSprites, false, newTypeName, minFrame);
     }

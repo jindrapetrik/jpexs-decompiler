@@ -59,6 +59,7 @@ import java.util.Set;
  * @author JPEXS
  */
 public class SoundExporter {
+
     public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<SoundTag> sounds = new ArrayList<>();
         for (Tag t : tags) {
@@ -68,8 +69,8 @@ public class SoundExporter {
         }
         return exportSounds(handler, outdir, sounds, settings, evl);
     }
-    
-    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<SoundTag> tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {    
+
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<SoundTag> tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (Thread.currentThread().isInterrupted()) {
             return ret;
@@ -127,7 +128,7 @@ public class SoundExporter {
                     ret.add(classFile);
                 }
                 file.delete();
-            } else {                
+            } else {
                 ret.add(file);
             }
 
@@ -139,7 +140,7 @@ public class SoundExporter {
                 evl.handleExportedEvent("sound", currentIndex, tags.size(), st.getName());
             }
 
-            currentIndex++;            
+            currentIndex++;
         }
         return ret;
     }
@@ -178,11 +179,11 @@ public class SoundExporter {
                 } else {
                     blocks = ((SoundStreamFrameRange) st).blocks;
                 }
-                
+
                 SoundStreamFrameRange sh = (SoundStreamFrameRange) st;
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
-                
+
                 int ms = (int) (1000.0 / ((Tag) st).getSwf().frameRate);
                 for (int b = 0; b < blocks.size(); b++) {
                     byte[] data = blocks.get(b).streamSoundData.getRangeData();

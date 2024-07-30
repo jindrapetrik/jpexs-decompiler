@@ -122,7 +122,7 @@ public class As3PCodeDocs extends AbstractDocs {
 
         String stack = def.hasFlag(AVM2InstructionFlag.UNKNOWN_STACK) ? getProperty("ui.unknown") : stackBefore + "<span class=\"stack-to\">" + getProperty("ui.stack.to") + "</span>" + stackAfter;
         String operandsDoc = def.hasFlag(AVM2InstructionFlag.UNKNOWN_OPERANDS) ? getProperty("ui.unknown") : getProperty("instruction." + insName + ".operands");
-        
+
         if (standalone) {
             sb.append("<body class=\"");
             if (nightMode) {
@@ -146,7 +146,7 @@ public class As3PCodeDocs extends AbstractDocs {
             sb.append(" ").append(getProperty("ui.unknown")).append(NEWLINE);
         } else if (ui && insName.equals("lookupswitch")) {
             sb.append(" ");
-            sb.append("<span class=\"instruction-operands\">"); 
+            sb.append("<span class=\"instruction-operands\">");
             sb.append(getProperty("instruction.lookupswitch.operands.ui"));
             sb.append("</span>");
         } else {
@@ -155,7 +155,7 @@ public class As3PCodeDocs extends AbstractDocs {
             if (def.operands.length > 0) {
                 sb.append(" ");
             }
-            sb.append("<span class=\"instruction-operands\">");            
+            sb.append("<span class=\"instruction-operands\">");
             for (int i = 0; i < def.operands.length; i++) {
                 int op = def.operands[i];
                 String opDoc = operandsDocs[i];

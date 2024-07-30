@@ -36,7 +36,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
 
     public CoerceAIns() {
         super(0x82, "coerce_a", new int[]{}, true);
-    }    
+    }
 
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {

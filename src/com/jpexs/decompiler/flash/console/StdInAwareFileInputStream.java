@@ -45,7 +45,7 @@ public class StdInAwareFileInputStream extends InputStream implements AutoClosea
 
     public StdInAwareFileInputStream(String file) throws FileNotFoundException {
         this(new File(file));
-    }   
+    }
 
     @Override
     public int available() throws IOException {
@@ -66,7 +66,7 @@ public class StdInAwareFileInputStream extends InputStream implements AutoClosea
     public void close() throws IOException {
         is.close();
     }
-    
+
     @Override
     public int read() throws IOException {
         return is.read();

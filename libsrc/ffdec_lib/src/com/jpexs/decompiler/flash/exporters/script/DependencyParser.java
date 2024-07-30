@@ -83,8 +83,8 @@ public class DependencyParser {
             if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
                 return;
             }
-            dependencies.add(dep);            
-        }        
+            dependencies.add(dep);
+        }
     }
 
     public static void parseDependenciesFromMultiname(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {

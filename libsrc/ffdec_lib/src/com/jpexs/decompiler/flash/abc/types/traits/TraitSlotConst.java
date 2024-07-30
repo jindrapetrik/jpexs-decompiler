@@ -69,7 +69,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     @Override
     public int getSlotIndex() {
         return slot_id;
-    }    
+    }
 
     public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
@@ -150,7 +150,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
         return false;
     }
-    
+
     @Override
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";

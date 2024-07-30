@@ -871,5 +871,5 @@ public class AVM2ConstantPool implements Cloneable {
         for (int i = 0; i < constant_multiname.size(); i++) {
             Multiname.checkTypeNameCyclic(this, i);
         }
-    }        
+    }
 }

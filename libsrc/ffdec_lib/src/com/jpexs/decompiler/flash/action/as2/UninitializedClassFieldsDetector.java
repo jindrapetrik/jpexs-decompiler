@@ -322,8 +322,7 @@ public class UninitializedClassFieldsDetector {
                                 || (item instanceof CallMethodActionItem)
                                 || (item instanceof NewMethodActionItem)
                                 || (item instanceof DeleteActionItem)
-                                || (item instanceof GetMemberActionItem)
-                        ) {
+                                || (item instanceof GetMemberActionItem)) {
                             List<String> path = getFullPath(item);
                             if (path != null) {
                                 List<String> parent = new ArrayList<>(path);
@@ -336,7 +335,7 @@ public class UninitializedClassFieldsDetector {
                                     if (!containsTrait(classTraits, classInheritance, className, name) && (!result.containsKey(className) || !result.get(className).containsKey(name))) {
                                         if (!result.containsKey(className)) {
                                             result.put(className, new LinkedHashMap<>());
-                                        }                                        
+                                        }
                                         Variable v = new Variable(true, name, null, className);
                                         result.get(className).put(name, v);
                                     }

@@ -87,7 +87,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
         }
         return modified;
     }
-    
+
     public MORPHLINESTYLEARRAY toMorphLineStyleArray() {
         MORPHLINESTYLEARRAY morphLineStyleArray = new MORPHLINESTYLEARRAY();
         if (lineStyles != null) {

@@ -144,7 +144,7 @@ public final class MethodBody implements Cloneable {
         }
     }
 
-    public synchronized AVM2Code getCode() {        
+    public synchronized AVM2Code getCode() {
         if (code == null) {
             AVM2Code avm2Code;
             try {
@@ -170,7 +170,7 @@ public final class MethodBody implements Cloneable {
 
     public void markOffsets() {
         getCode().markOffsets();
-    }    
+    }
 
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
         return getCode().removeDeadCode(this);
@@ -205,7 +205,7 @@ public final class MethodBody implements Cloneable {
      */
     public void replaceInstruction(int pos, AVM2Instruction instruction) {
         getCode().replaceInstruction(pos, instruction, this);
-    }    
+    }
 
     public void insertAll(int pos, List<AVM2Instruction> list) {
         for (AVM2Instruction ins : list) {
@@ -336,8 +336,7 @@ public final class MethodBody implements Cloneable {
             }
         }
     }
-    
-    
+
     @Override
     public String toString() {
         String s = "";

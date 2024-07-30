@@ -35,27 +35,27 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public abstract class ABCWalker {     
-    
+public abstract class ABCWalker {
+
     public static enum WalkType {
         Orphan,
         Script,
         Class,
         Instance
     }
-    
-    public final void walkABC(ABC abc, boolean walkOrphanItems) {               
+
+    public final void walkABC(ABC abc, boolean walkOrphanItems) {
         Set<Integer> handledClasses = new HashSet<>();
         Set<Integer> handledMethodInfos = new HashSet<>();
         Set<Integer> handledMethodBodies = new HashSet<>();
-        
+
         for (int i = 0; i < abc.script_info.size(); i++) {
             handleScript(abc, i);
             ScriptInfo si = abc.script_info.get(i);
             optionalHandleMethodInfo(handledMethodBodies, handledMethodInfos, abc, si.init_index, i, -1, -1, -1, WalkType.Script, true, new Stack<>());
             walkTraits(abc, si.traits, i, -1, -1, -1, -1, handledMethodBodies, handledMethodInfos, handledClasses, WalkType.Script, new Stack<>());
         }
-        
+
         if (walkOrphanItems) {
             for (int i = 0; i < abc.method_info.size(); i++) {
                 optionalHandleMethodInfo(handledMethodBodies, handledMethodInfos, abc, i, -1, -1, -1, -1, WalkType.Orphan, false, new Stack<>());
@@ -64,31 +64,31 @@ public abstract class ABCWalker {
             for (int i = 0; i < abc.bodies.size(); i++) {
                 optionalHandleMethodBody(handledMethodBodies, handledMethodInfos, abc, i, -1, -1, -1, -1, WalkType.Orphan, false, new Stack<>());
             }
-            
+
             for (int i = 0; i < abc.class_info.size(); i++) {
                 optionalHandleClass(handledClasses, handledMethodBodies, handledMethodInfos, abc, i, -1, -1, -1, WalkType.Orphan);
             }
         }
     }
-    
+
     private boolean optionalHandleClass(Set<Integer> handledClasses, Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int traitIndex, WalkType walkType) {
         if (handledClasses.contains(index)) {
             return false;
-        }        
+        }
         handleClass(abc, index, scriptIndex, traitIndex, walkType);
-        
+
         optionalHandleMethodInfo(handledMethodBodies, handledMethodInfos, abc, abc.instance_info.get(index).iinit_index, scriptIndex, scriptTraitIndex, index, -1, WalkType.Instance, true, new Stack<>());
         walkTraits(abc, abc.instance_info.get(index).instance_traits, scriptIndex, scriptTraitIndex, index, -1, -1, handledMethodBodies, handledMethodInfos, handledClasses, WalkType.Instance, new Stack<>());
         optionalHandleMethodInfo(handledMethodBodies, handledMethodInfos, abc, abc.class_info.get(index).cinit_index, scriptIndex, scriptTraitIndex, index, -1, WalkType.Class, true, new Stack<>());
         walkTraits(abc, abc.class_info.get(index).static_traits, scriptIndex, scriptTraitIndex, index, -1, -1, handledMethodBodies, handledMethodInfos, handledClasses, WalkType.Class, new Stack<>());
-        
+
         return true;
     }
-    
+
     private void optionalHandleMethodInfo(Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
         if (handledMethodInfos.contains(index)) {
             return;
-        }        
+        }
         handledMethodInfos.add(index);
         if (callStack != null) {
             if (callStack.contains(index)) {
@@ -105,7 +105,7 @@ public abstract class ABCWalker {
             callStack.pop();
         }
     }
-    
+
     private void optionalHandleMethodBody(Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
         if (handledMethodBodies.contains(index)) {
             return;
@@ -122,10 +122,11 @@ public abstract class ABCWalker {
         }
         walkTraits(abc, abc.bodies.get(index).traits, scriptIndex, scriptTraitIndex, classIndex, traitIndex, index, handledMethodBodies, handledMethodInfos, handledMethodInfos, walkType, callStack);
     }
+
     private void walkTraits(ABC abc, Traits traits, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, Set<Integer> handledClasses, WalkType walkType, Stack<Integer> callStack) {
-        
+
         int bodyTraitIndex = -1;
-        
+
         for (int i = 0; i < traits.traits.size(); i++) {
             if (classIndex == -1) {
                 scriptTraitIndex = i;
@@ -136,8 +137,8 @@ public abstract class ABCWalker {
             if (bodyIndex != -1) {
                 bodyTraitIndex = i;
             }
-            Trait t = traits.traits.get(i);    
-            if ((t.kindFlags & Trait.ATTR_Metadata) > 0) { 
+            Trait t = traits.traits.get(i);
+            if ((t.kindFlags & Trait.ATTR_Metadata) > 0) {
                 for (int m = 0; m < t.metadata.length; m++) {
                     handleMetadataInfo(abc, t.metadata[m], t, scriptIndex, scriptTraitIndex, classIndex, i, m, walkType);
                 }
@@ -164,40 +165,40 @@ public abstract class ABCWalker {
             }
         }
     }
-   
+
     protected void handleMethodInfo(ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
-        
+
     }
-    
+
     protected void handleMethodBody(ABC abc, int index, int scriptIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer) {
-        
+
     }
-        
+
     protected void handleClass(ABC abc, int index, int scriptIndex, int traitIndex, WalkType walkType) {
-        
+
     }
-    
+
     protected void handleScript(ABC abc, int index) {
-        
+
     }
-    
+
     protected void handleTraitSlotConst(ABC abc, TraitSlotConst trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, int bodyTraitIndex, WalkType walkType, Stack<Integer> callStack) {
-        
-    }           
-    
+
+    }
+
     protected void handleTraitMethodGetterSetter(ABC abc, TraitMethodGetterSetter trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType) {
-        
+
     }
-    
+
     protected void handleTraitFunction(ABC abc, TraitFunction trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType) {
-        
+
     }
-    
+
     protected void handleTraitClass(ABC abc, TraitClass trait, int scriptIndex, int scriptTraitIndex) {
-        
+
     }
-    
+
     protected void handleMetadataInfo(ABC abc, int index, Trait trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int traitMetadataIndex, WalkType walkType) {
-        
+
     }
 }

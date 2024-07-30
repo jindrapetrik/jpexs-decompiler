@@ -26,6 +26,7 @@ import java.util.Objects;
  * @author JPEXS
  */
 public class SceneFrame implements TreeItem {
+
     private final SWF swf;
     private final Scene scene;
     private final int realFrameIndex;
@@ -34,12 +35,12 @@ public class SceneFrame implements TreeItem {
         this.swf = swf;
         this.scene = scene;
         this.realFrameIndex = realFrameIndex;
-    }            
-    
+    }
+
     public int getSceneFrameIndex() {
         return realFrameIndex - scene.startFrame;
     }
-    
+
     public Frame getFrame() {
         return swf.getTimeline().getFrame(realFrameIndex);
     }
@@ -83,5 +84,5 @@ public class SceneFrame implements TreeItem {
             return false;
         }
         return Objects.equals(this.scene, other.scene);
-    }    
+    }
 }

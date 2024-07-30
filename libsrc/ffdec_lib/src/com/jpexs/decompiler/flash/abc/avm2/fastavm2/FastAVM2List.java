@@ -58,8 +58,8 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
         size = code.size();
         getJumps(avm2code, actionItemMap);
-    }   
-    
+    }
+
     public final AVM2InstructionItem insertItemBefore(AVM2InstructionItem item, AVM2Instruction action) {
         AVM2InstructionItem newItem = new AVM2InstructionItem(action);
         return insertItemBefore(item, newItem);
@@ -77,8 +77,8 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
     public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2Instruction action) {
         AVM2InstructionItem newItem = new AVM2InstructionItem(action);
         return insertItemAfter(item, newItem);
-    }    
-    
+    }
+
     public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2InstructionItem newItem) {
         if (item == null && firstItem == null) {
             firstItem = newItem;

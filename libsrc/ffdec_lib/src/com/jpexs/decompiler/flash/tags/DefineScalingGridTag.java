@@ -212,7 +212,6 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         }
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

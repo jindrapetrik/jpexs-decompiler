@@ -66,9 +66,9 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     protected ByteArrayRange shapeData;
 
     private final int markerSize = 10;
-    
+
     public static final int WIND_EVEN_ODD = 0;
-    
+
     public static final int WIND_NONZERO = 1;
 
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
@@ -79,7 +79,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     public void load() {
         getShapes();
     }
-    
+
     public abstract int getWindingRule();
 
     public abstract int getShapeNum();

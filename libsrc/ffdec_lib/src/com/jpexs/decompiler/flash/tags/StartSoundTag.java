@@ -93,11 +93,11 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         soundId = characterId;
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         ret.put("cid", "" + soundId);
         return ret;
-    }        
+    }
 }

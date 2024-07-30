@@ -98,7 +98,7 @@ public final class BinaryPanel extends JPanel {
             hexEditor.setData(data, null, null);
             boolean isSwfData = binaryData.isSwfData();
             if (isSwfData) {
-                swfOrPackedDataInsideLabel.setText(AppStrings.translate("binarydata.swfInside"));                
+                swfOrPackedDataInsideLabel.setText(AppStrings.translate("binarydata.swfInside"));
             } else {
                 binaryData.detectPacker();
                 if (binaryData.getUsedPacker() != null) {

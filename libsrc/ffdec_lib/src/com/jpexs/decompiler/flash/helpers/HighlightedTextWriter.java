@@ -66,7 +66,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
         instructionHilights.finish();
         specialHilights.finish();
     }
-    
+
     public HighlightedTextWriter(CodeFormatting formatting, boolean hilight) {
         super(formatting);
         this.hilight = hilight;
@@ -193,7 +193,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
         appendNoHilight(text);
         return end(HighlightType.SPECIAL);
     }
-    
+
     @Override
     public HighlightedTextWriter appendWithData(String str, HighlightData data) {
         Highlighting h = null;
@@ -310,7 +310,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
     private HighlightedTextWriter start(HighlightData data, HighlightType type) {
         if (hilight) {
             Highlighting h = new Highlighting(sb.length() - newLineCount, data, type, null);
-            hilightStack.add(h);            
+            hilightStack.add(h);
         }
         return this;
     }
@@ -378,7 +378,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
             appendNoHilight(formatting.indentString);
         }
     }
-    
+
     @Override
     public GraphTextWriter addCurrentMethodData(HighlightData data) {
         for (int i = hilightStack.size() - 1; i >= 0; i--) {

@@ -86,7 +86,7 @@ public class CurvedEdgeRecord extends SHAPERECORD {
             numBits = 0;
         }
     }
-    
+
     @Override
     public boolean isTooLarge() {
         calculateBits();
@@ -126,6 +126,5 @@ public class CurvedEdgeRecord extends SHAPERECORD {
         }
         return this.anchorDeltaY == other.anchorDeltaY;
     }
-    
-    
+
 }

@@ -118,7 +118,7 @@ public class StraightEdgeRecord extends SHAPERECORD {
             }
         }
     }
-    
+
     @Override
     public boolean isTooLarge() {
         calculateBits();
@@ -158,6 +158,5 @@ public class StraightEdgeRecord extends SHAPERECORD {
         }
         return this.deltaY == other.deltaY;
     }
-    
-    
+
 }

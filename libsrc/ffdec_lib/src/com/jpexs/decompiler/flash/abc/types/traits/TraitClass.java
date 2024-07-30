@@ -78,8 +78,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return slot_id;
     }
 
-    
-
     @Override
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         super.getDependencies(abcIndex, scriptIndex, -1, false, customNs, abc, dependencies, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames, uses);
@@ -122,7 +120,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "Class " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
-    
+
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 

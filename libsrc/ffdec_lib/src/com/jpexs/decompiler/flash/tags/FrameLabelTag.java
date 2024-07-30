@@ -88,7 +88,6 @@ public class FrameLabelTag extends Tag {
         return namedAnchor;
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -96,6 +95,6 @@ public class FrameLabelTag extends Tag {
             ret.put("name", name);
         }
         return ret;
-    }    
+    }
 
 }

@@ -86,12 +86,11 @@ public class StraightEdge implements IEdge {
     @Override
     public IEdge sameWithNewFillStyle(int newFillStyleIdx) {
         return new StraightEdge(fromX, fromY, toX, toY, lineStyleIdx, newFillStyleIdx);
-    }        
+    }
 
     @Override
     public IEdge reverse() {
         return new StraightEdge(toX, toY, fromX, fromY, lineStyleIdx, getFillStyleIdx());
     }
-    
-    
+
 }

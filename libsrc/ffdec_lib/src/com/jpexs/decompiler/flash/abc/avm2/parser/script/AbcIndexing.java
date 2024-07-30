@@ -162,7 +162,7 @@ public final class AbcIndexing {
 
                 if (builtInNs == null) {
                     //we need to avoid modifying the ABC
-                /*    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
+                    /*    builtInIndex = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
                     builtInNsPerAbc.put(abc, builtInIndex);*/
                     builtInIndex = Integer.MIN_VALUE; //??
                 } else {

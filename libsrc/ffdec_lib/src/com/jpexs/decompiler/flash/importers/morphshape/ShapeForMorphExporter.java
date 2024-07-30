@@ -54,7 +54,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
     private int currentSegmentCount = 0;
     private int currentLineStyle = -1;
     private int currentFillStyle = -1;
-    
+
     public List<FILLSTYLE> fillStyles = new ArrayList<>();
     public List<LINESTYLE2> lineStyles = new ArrayList<>();
 
@@ -128,7 +128,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
                     }
                 }
             }
-            
+
             if (w > 0) {
                 //clockwise                
             } else {
@@ -385,7 +385,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
             return;
         }
         BezierEdge be = new BezierEdge(lastX, lastY, x, y);
-        
+
         currentPointsSum.x += x; // - lastX;
         currentPointsSum.y += y; // - lastY;
 
@@ -399,27 +399,27 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        
+
         if (anchorX == lastX && anchorY == lastY) {
             return;
         }
-        
+
         BezierEdge be = new BezierEdge(lastX, lastY, controlX, controlY, anchorX, anchorY);
 
         currentShape.add(be);
-        
+
         currentPointsSum.x += anchorX; // - lastX;
         currentPointsSum.y += anchorY; // - lastY;
-        
+
         lastX = anchorX;
         lastY = anchorY;
         currentBezierLengths.add(be.length());
-     
+
         currentSegmentCount++;
     }
 
     private double roundPct(double pct) {
         double precision = 1000000d;
         return Math.round(pct * precision) / precision;
-    }        
+    }
 }

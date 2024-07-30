@@ -143,7 +143,7 @@ import java.util.logging.Logger;
  */
 public class ASMParser {
 
-    private static final Logger logger = Logger.getLogger(ASMParser.class.getName());    
+    private static final Logger logger = Logger.getLogger(ASMParser.class.getName());
 
     private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
         Action a = null;

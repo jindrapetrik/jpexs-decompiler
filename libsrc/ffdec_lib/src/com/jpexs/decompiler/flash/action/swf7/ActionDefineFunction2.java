@@ -145,32 +145,32 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     public ActionDefineFunction2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8E, -1, charset);
         functionName = lexString(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         int numParams = (int) lexLong(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         registerCount = (int) lexLong(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadParentFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadRootFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         suppressSuperFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadSuperFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         suppressArgumentsFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadArgumentsFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         suppressThisFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadThisFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
+        lexOptionalComma(lexer);
         preloadGlobalFlag = lexBoolean(lexer);
         for (int i = 0; i < numParams; i++) {
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
             paramRegisters.add((int) lexLong(lexer));
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);

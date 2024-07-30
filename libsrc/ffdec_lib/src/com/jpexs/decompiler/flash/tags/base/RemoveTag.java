@@ -33,8 +33,8 @@ public abstract class RemoveTag extends Tag implements DepthTag {
 
     @Override
     public Map<String, String> getNameProperties() {
-        String exportName = swf.getExportName(getCharacterId());       
-        
+        String exportName = swf.getExportName(getCharacterId());
+
         Map<String, String> ret = super.getNameProperties();
         if (getCharacterId() != -1) {
             ret.put("chid", "" + getCharacterId());
@@ -43,9 +43,9 @@ public abstract class RemoveTag extends Tag implements DepthTag {
             ret.put("exp", exportName);
         }
         ret.put("dpt", "" + getDepth());
-        
+
         return ret;
-    }        
+    }
 
     @Override
     public String getExportFileName() {

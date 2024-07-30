@@ -46,7 +46,7 @@ public class HighlightData implements Cloneable, Serializable {
     public int regIndex = -1;
 
     public int namespaceIndex = -1;
-    
+
     public int activationRegIndex = -1;
 
     public boolean isStatic = false;

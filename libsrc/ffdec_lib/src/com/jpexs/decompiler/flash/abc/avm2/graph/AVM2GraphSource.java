@@ -122,7 +122,7 @@ public class AVM2GraphSource extends GraphSource {
     public int adr2pos(long adr) {
         return code.adr2pos(adr);
     }
-    
+
     @Override
     public int adr2pos(long adr, boolean nearest) {
         return code.adr2pos(adr, true);
@@ -131,5 +131,5 @@ public class AVM2GraphSource extends GraphSource {
     @Override
     public long pos2adr(int pos) {
         return code.pos2adr(pos);
-    }   
+    }
 }

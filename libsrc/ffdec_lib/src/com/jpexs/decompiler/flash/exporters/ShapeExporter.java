@@ -164,8 +164,8 @@ public class ShapeExporter {
                             break;
                     }
                 }, handler).run();
-                
-                Set<String> classNames = st.getClassNames();                    
+
+                Set<String> classNames = st.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + settings.getFileExtension()));
@@ -175,7 +175,7 @@ public class ShapeExporter {
                         ret.add(classFile);
                     }
                     file.delete();
-                } else {                
+                } else {
                     ret.add(file);
                 }
 

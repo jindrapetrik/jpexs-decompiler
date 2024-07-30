@@ -52,7 +52,7 @@ import javax.swing.border.BevelBorder;
  *
  * @author JPEXS
  */
-public class LinkDialog extends JDialog {  
+public class LinkDialog extends JDialog {
 
     private MainPanel mainPanel;
 

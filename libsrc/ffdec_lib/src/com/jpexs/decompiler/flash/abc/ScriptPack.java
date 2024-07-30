@@ -378,14 +378,15 @@ public class ScriptPack extends AS3ClassTreeItem {
     }
 
     private class Label {
+
         public long addr;
 
         public Label(long addr) {
             this.addr = addr;
         }
-        
+
     }
-    
+
     /**
      * Injects debugfile, debugline instructions into the code.
      *
@@ -445,7 +446,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (!bodyToFunctionName.containsKey(bodyIndex)) {
                         bodyToFunctionName.put(bodyIndex, method.getProperties().localName);
                     }
-                    
+
                     bodyToActivationReg.put(bodyIndex, method.getProperties().activationRegIndex);
                     int pos = -1;
                     int regIndex = -1;
@@ -464,7 +465,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         if (instrOffset == -1) {
                             lonelyBody.add(bodyIndex);
                             break blk;
-                        }                        
+                        }
                         try {
                             pos = abc.bodies.get(bodyIndex).getCode().adr2pos(instrOffset);
                         } catch (ConvertException cex) {
@@ -480,7 +481,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                         }
                         //int origPos = bodyLineToPos.get(bodyIndex).containsKey(line) ? bodyLineToPos.get(bodyIndex).get(line) : -1;
 
-                        bodyToPosToLine.get(bodyIndex).put(pos, line);                        
+                        bodyToPosToLine.get(bodyIndex).put(pos, line);
                         bodyLineToPos.get(bodyIndex).put(line, pos);
                     } else {
                         lonelyBody.add(bodyIndex);
@@ -520,7 +521,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 + cls.replace(";", "{{semicolon}}")
                 + ".as";
         filename = filename.replaceAll("\\{(invalid_utf8=[0-9]+)\\}", "[$1]");
-        
+
         //Remove debug info from lonely bodies
         for (int bodyIndex : lonelyBody) {
             if (!bodyToPosToLine.keySet().contains(bodyIndex)) {
@@ -561,7 +562,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
             List<Object> code2 = new ArrayList<>();
-            
+
             int dpos = 0;
             code2.add(new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
             dpos++;
@@ -582,7 +583,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     activationRegName = bodyToFunctionName.get(bodyIndex) + "$0";
                 }
                 code2.add(new AVM2Instruction(0, AVM2Instructions.Debug, new int[]{1, abc.constants.getStringId(activationRegName, true), activationReg - 1, bodyLine}));
-            }        
+            }
             List<Integer> pos = new ArrayList<>(bodyToPosToLine.get(bodyIndex).keySet());
             Collections.sort(pos);
             Collections.reverse(pos);
@@ -598,9 +599,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                 if (delIns.contains(code.get(i))) {
                     continue;
                 }
-                code2.add(code.get(i));                
+                code2.add(code.get(i));
             }
-            for (int i : pos) {               
+            for (int i : pos) {
                 int line = bodyToPosToLine.get(bodyIndex).get(i);
                 if (addedLines.contains(line)) {
                     continue;
@@ -624,9 +625,9 @@ public class ScriptPack extends AS3ClassTreeItem {
                     Label lab = (Label) obj;
                     mapOffsets.put(lab.addr, adr);
                 }
-            }                        
+            }
             code.clear();
-            
+
             adr = 0;
             for (int i = 0; i < code2.size(); i++) {
                 Object obj = code2.get(i);
@@ -650,13 +651,13 @@ public class ScriptPack extends AS3ClassTreeItem {
                         if (mapOffsets.containsKey(targetAddr)) {
                             changedAddr = mapOffsets.get(targetAddr);
                             changedOperand = (int) (changedAddr - adr);
-                            ins.operands[0] = changedOperand;                        
+                            ins.operands[0] = changedOperand;
                         } else {
                             logger.log(Level.WARNING, "Invalid jump target in script {0}, bodyIndex {1}", new Object[]{toString(), bodyIndex});
                         }
                         for (int k = 2; k < ins.operands.length; k++) {
                             targetAddr = ins.getAddress() + ins.operands[k];
-                            if (mapOffsets.containsKey(targetAddr)) {                        
+                            if (mapOffsets.containsKey(targetAddr)) {
                                 changedAddr = mapOffsets.get(targetAddr);
                                 changedOperand = (int) (changedAddr - adr);
                                 ins.operands[k] = changedOperand;
@@ -680,12 +681,12 @@ public class ScriptPack extends AS3ClassTreeItem {
                 ex.start = (int) lstart;
                 ex.target = (int) ltarget;
                 ex.end = (int) lend;
-            }                        
+            }
             b.setModified();
         }
-        
-        ((Tag) abc.parentTag).setModified(true);        
-    }        
+
+        ((Tag) abc.parentTag).setModified(true);
+    }
 
     public void injectPCodeDebugInfo(int abcIndex) {
 
@@ -718,7 +719,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     Trait trait;
                     int traitIndex = -10;
                     if (trt != null && cls != null) {
-                        traitIndex = (int) trt.getProperties().index;                       
+                        traitIndex = (int) trt.getProperties().index;
                     }
                     bodyToIdentifier.put(bodyIndex, "abc:" + abcIndex + ",script:" + scriptIndex + ",class:" + classIndex + ",trait:" + traitIndex + ",method:" + methodIndex + ",body:" + bodyIndex);
                     break;

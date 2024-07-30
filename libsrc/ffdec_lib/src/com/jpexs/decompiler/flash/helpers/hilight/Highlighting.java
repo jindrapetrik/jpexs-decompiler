@@ -88,12 +88,12 @@ public class Highlighting implements Serializable {
     public static Highlighting searchPos(HighlightingList list, long pos) {
         return searchPos(list, pos, -1, -1);
     }
-    
-    public static Highlighting searchPos(HighlightingList list, long pos, long from, long to) { 
+
+    public static Highlighting searchPos(HighlightingList list, long pos, long from, long to) {
         return searchPosNew(list, pos, from, to);
     }
 
-    public static Highlighting searchPosNew(HighlightingList list, long pos, long from, long to) {  
+    public static Highlighting searchPosNew(HighlightingList list, long pos, long from, long to) {
         Highlighting[] hmap = posToHighlightMap(list);
         if (pos > -1) {
             if (pos >= hmap.length) {
@@ -115,9 +115,7 @@ public class Highlighting implements Serializable {
         }
         return null;
     }
-    
-    
-    
+
     /*public static Highlighting searchPosOld(HighlightingList list, long pos, long from, long to) {                
         
         Highlighting ret = null;
@@ -145,9 +143,8 @@ public class Highlighting implements Serializable {
 
         return ret;
     }*/
-    
     private static final Map<HighlightingList, Highlighting[]> listToPosMap = new WeakHashMap<>();
-    
+
     private static Highlighting[] posToHighlightMap(HighlightingList list) {
         if (list.isEmpty()) {
             return new Highlighting[0];

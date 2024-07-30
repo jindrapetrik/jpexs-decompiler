@@ -155,8 +155,6 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         needed.addAll(tags);
     }
 
-    
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -165,6 +163,6 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
             ret.put("ex", "" + names.get(0));
         }
         return ret;
-    }        
-    
+    }
+
 }

@@ -478,6 +478,6 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     @Override
     public void setResample(boolean resample) {
-        
+
     }
 }

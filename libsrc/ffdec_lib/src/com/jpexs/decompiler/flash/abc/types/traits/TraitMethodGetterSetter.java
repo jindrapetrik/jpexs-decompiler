@@ -54,7 +54,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         abc.constants.getMultiname(name_index).deleted = d;
         abc.method_info.get(method_info).delete(abc, d);
-    }   
+    }
 
     @Override
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
@@ -128,7 +128,7 @@ public class TraitMethodGetterSetter extends Trait {
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
-    
+
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 

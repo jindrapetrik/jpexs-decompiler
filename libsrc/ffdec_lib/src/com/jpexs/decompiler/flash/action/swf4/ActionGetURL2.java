@@ -110,24 +110,24 @@ public class ActionGetURL2 extends Action {
 
     public ActionGetURL2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9A, -1, charset);
-        
+
         ASMParsedSymbol symb = lexer.lex();
         boolean sendVarsMethodLast = false;
         if (symb.type == ASMParsedSymbol.TYPE_BOOLEAN) { //backwards compatibility. In 19.1.0 up to 20.0.0 sendVarsMethod is first
-            sendVarsMethodLast = true;            
+            sendVarsMethodLast = true;
         }
         lexer.pushback(symb);
         if (!sendVarsMethodLast) {
             sendVarsMethod = (int) lexLong(lexer);
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
         }
         loadVariablesFlag = lexBoolean(lexer);
-        lexOptionalComma(lexer);        
-        loadTargetFlag = lexBoolean(lexer);                
+        lexOptionalComma(lexer);
+        loadTargetFlag = lexBoolean(lexer);
         if (sendVarsMethodLast) {
-            lexOptionalComma(lexer);        
+            lexOptionalComma(lexer);
             sendVarsMethod = (int) lexLong(lexer);
-        }        
+        }
     }
 
     @Override

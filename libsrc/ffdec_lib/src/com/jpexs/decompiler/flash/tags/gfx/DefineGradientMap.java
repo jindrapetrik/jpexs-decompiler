@@ -77,16 +77,16 @@ public class DefineGradientMap extends Tag {
             indices[i] = sis.readUI16("index");
         }
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
+
         List<String> indicesStr = new ArrayList<>();
         for (int index : indices) {
             indicesStr.add("" + index);
         }
-        
+
         tagInfo.addInfo("general", "indices", String.join(", ", indicesStr));
     }
 }

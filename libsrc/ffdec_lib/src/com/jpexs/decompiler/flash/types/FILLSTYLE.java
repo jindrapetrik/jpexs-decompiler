@@ -295,6 +295,5 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
         return Objects.equals(this.bitmapMatrix, other.bitmapMatrix);
     }
-    
-    
+
 }

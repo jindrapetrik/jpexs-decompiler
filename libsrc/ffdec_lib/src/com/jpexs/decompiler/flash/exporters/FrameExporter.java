@@ -166,7 +166,7 @@ public class FrameExporter {
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true);
         return exportFrames(handler, outdir, swf, containerId, frames, fes, evl);
     }
-    
+
     private class MyFrameIterator implements Iterator<BufferedImage> {
 
         private int pos = 0;
@@ -174,11 +174,11 @@ public class FrameExporter {
         private final List<Integer> fframes;
         private final EventListener evl;
         private final boolean usesTransparency;
-        private final Color backgroundColor;        
+        private final Color backgroundColor;
         private final FrameExportSettings settings;
-        
+
         public MyFrameIterator(
-                Timeline tim, 
+                Timeline tim,
                 List<Integer> fframes,
                 final EventListener evl,
                 boolean usesTransparency,
@@ -196,7 +196,7 @@ public class FrameExporter {
         public void reset() {
             pos = 0;
         }
-        
+
         @Override
         public boolean hasNext() {
             if (Thread.currentThread().isInterrupted()) {
@@ -233,7 +233,7 @@ public class FrameExporter {
             }
 
             return result;
-        }       
+        }
     }
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
@@ -252,13 +252,13 @@ public class FrameExporter {
             paths.add("");
         } else {
             tim0 = ((Timelined) swf.getCharacter(containerId)).getTimeline();
-            
+
             Set<String> classNames = swf.getCharacter(containerId).getClassNames();
             if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                 for (String className : classNames) {
                     paths.add(File.separator + Helper.makeFileName(className));
                 }
-            } else {            
+            } else {
                 paths.add(File.separator + Helper.makeFileName(swf.getCharacter(containerId).getExportFileName()));
             }
         }
@@ -274,13 +274,12 @@ public class FrameExporter {
         }
 
         final List<File> foutdirs = new ArrayList<>();
-        
+
         for (String path : paths) {
             File foutdir = new File(outdir + path);
             foutdirs.add(foutdir);
-            Path.createDirectorySafe(foutdir);            
+            Path.createDirectorySafe(foutdir);
         }
-        
 
         final List<Integer> fframes = frames;
 
@@ -310,7 +309,7 @@ public class FrameExporter {
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
-                            
+
                             tim.toSVG(frame, 0, null, 0, exporter, null, 0);
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
@@ -517,13 +516,13 @@ public class FrameExporter {
                             ret.add(f);
                         }, handler).run();
                     }
-                }        
+                }
                 break;
             case PNG:
                 for (File foutdir : foutdirs) {
                     frameImages.reset();
                     for (int i = 0; frameImages.hasNext(); i++) {
-                        final int fi = i;                    
+                        final int fi = i;
                         new RetryTask(() -> {
                             File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
                             BufferedImage img = frameImages.next();
@@ -877,7 +876,7 @@ public class FrameExporter {
                         }
 
                         if (filter instanceof CONVOLUTIONFILTER) {
-                            CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) filter;                            
+                            CONVOLUTIONFILTER cf = (CONVOLUTIONFILTER) filter;
                             float[] matrix2 = new float[cf.matrixX * cf.matrixY];
                             for (int y = 0; y < cf.matrixY; y++) {
                                 for (int x = 0; x < cf.matrixX; x++) {

@@ -23,17 +23,17 @@ import java.lang.reflect.Field;
  * @author JPEXS
  */
 public class IdType {
-    
+
     private static final int IDTYPE_BIT_SWF = 0; // Id comes from SWF File.
     private static final int IDTYPE_BIT_STATIC = 1; // Id assigned uniquely during loading.
     private static final int IDTYPE_BIT_EXPORT = 2; // Id assigned uniquely during export.
-        
+
     public static final int IDTYPE_NONE = 0;
     public static final int IDTYPE_INTERNALCONSTANT = 0 | IDTYPE_BIT_STATIC;
     public static final int IDTYPE_GRADIENTIMAGE = 4 | IDTYPE_BIT_STATIC;
     public static final int IDTYPE_DYNFONTIMAGE = 8 | IDTYPE_BIT_STATIC;
     public static final int IDTYPE_FONTIMAGE = 4 | IDTYPE_BIT_EXPORT;
-    
+
     public static String idTypeToString(int idType) {
         try {
             for (Field f : IdType.class.getDeclaredFields()) {

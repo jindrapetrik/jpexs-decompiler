@@ -37,7 +37,7 @@ public interface Packer {
      * work
      */
     public Boolean suitableForBinaryData(DefineBinaryDataTag dataTag);
-    
+
     /**
      * Is this data packed with this packer?
      *
@@ -75,6 +75,6 @@ public interface Packer {
      * @return
      */
     public String getName();
-    
+
     public String getIdentifier();
 }

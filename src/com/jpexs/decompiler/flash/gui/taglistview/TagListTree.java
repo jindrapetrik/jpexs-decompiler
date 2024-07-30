@@ -65,7 +65,7 @@ public class TagListTree extends AbstractTagTree {
     @Override
     public TagListTreeModel getFullModel() {
         return (TagListTreeModel) super.getFullModel();
-    }   
+    }
 
     class TreeTransferHandler extends TransferHandler {
 

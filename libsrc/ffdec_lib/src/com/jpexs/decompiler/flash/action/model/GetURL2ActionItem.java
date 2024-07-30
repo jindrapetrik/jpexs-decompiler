@@ -83,12 +83,12 @@ public class GetURL2ActionItem extends ActionItem {
         ret.addAll(targetString.getNeededSources());
         return ret;
     }
-    
+
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false);
     }
-    
+
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);

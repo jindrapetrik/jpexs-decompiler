@@ -426,7 +426,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         autoClose = true;
                         if (lineStyle instanceof LINESTYLE2) {
                             LINESTYLE2 lineStyle2 = (LINESTYLE2) lineStyle;
-                            
+
                             if (lineStyle2.noClose) {
                                 autoClose = false;
                             }

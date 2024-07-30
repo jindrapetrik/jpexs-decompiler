@@ -39,7 +39,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
      * Gradient colors
      */
     @SWFArray(value = "color", countField = "numColors")
-    public RGBA[] gradientColors = new RGBA[] {
+    public RGBA[] gradientColors = new RGBA[]{
         new RGBA(255, 255, 255, 0),
         new RGBA(Color.BLACK)
     };
@@ -49,7 +49,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
      */
     @SWFType(value = BasicType.UI8)
     @SWFArray(value = "ratio", countField = "numColors")
-    public int[] gradientRatio = new int[] {
+    public int[] gradientRatio = new int[]{
         0, 255
     };
 
@@ -69,7 +69,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
      * Radian angle of the gradient glow
      */
     @SWFType(BasicType.FIXED)
-    public double angle = 45  * Math.PI / 180;
+    public double angle = 45 * Math.PI / 180;
 
     /**
      * Distance of the gradient glow
@@ -150,7 +150,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     public double getDeltaY() {
         return blurY + Math.abs(distance * Math.sin(angle));
     }
-    
+
     @Override
     public String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in) {
         return null; //NOT SUPPORTED

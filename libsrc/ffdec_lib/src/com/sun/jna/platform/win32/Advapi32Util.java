@@ -75,10 +75,10 @@ public abstract class Advapi32Util {
         public String fqn;
     }
 
-    
     public static boolean registryKeyExists(HKEY root, String key) {
         return registryKeyExists(root, key, false);
     }
+
     /**
      * Checks whether a registry key exists.
      *
@@ -103,6 +103,7 @@ public abstract class Advapi32Util {
     public static boolean registryValueExists(HKEY root, String key, String value) {
         return registryValueExists(root, key, value, false);
     }
+
     /**
      * Checks whether a registry value exists.
      *
@@ -149,6 +150,7 @@ public abstract class Advapi32Util {
     public static String registryGetStringValue(HKEY root, String key, String value) {
         return registryGetStringValue(root, key, value, false);
     }
+
     /**
      * Get a registry REG_SZ value.
      *

@@ -16,14 +16,14 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.tags.gfx.enums.IdType;
-import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
+import com.jpexs.decompiler.flash.tags.gfx.enums.IdType;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
@@ -202,7 +202,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     public boolean importSupported() {
         return false;
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -216,26 +216,26 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
             return super.getUniqueId();
         }
         return "i" + imageID;
-    }        
+    }
 
     @Override
     public void setCharacterId(int characterId) {
 
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
+
         tagInfo.addInfo("general", "exportName", exportName);
         tagInfo.addInfo("general", "fileName", fileName);
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
         String fileFormatStr = FileFormatType.fileFormatToString(bitmapFormat);
         if (fileFormatStr != null) {
             bitmapFormatStr = fileFormatStr + " (" + bitmapFormat + ")";
-        } 
+        }
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
-        
+
         if (idType != IdType.IDTYPE_NONE) {
             tagInfo.addInfo("general", "imageId", imageID);
         }

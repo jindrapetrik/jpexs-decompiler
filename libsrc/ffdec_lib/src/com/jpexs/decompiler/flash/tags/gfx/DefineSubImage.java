@@ -191,8 +191,8 @@ public class DefineSubImage extends AbstractGfxImageTag {
                 && Objects.equals(cachedX2, (Integer) x2)
                 && Objects.equals(cachedY1, (Integer) y1)
                 && Objects.equals(cachedY2, (Integer) y2)
-                && serImage != null 
-                && serImage.getWidth() == targetWidth 
+                && serImage != null
+                && serImage.getWidth() == targetWidth
                 && serImage.getHeight() == targetHeight) {
             return;
         }
@@ -201,14 +201,14 @@ public class DefineSubImage extends AbstractGfxImageTag {
             serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
             serImage.fillTransparent();
             return;
-        } 
-            
+        }
+
         BufferedImage bufImage = getExternalBufferedImage(image.fileName, bitmapFormat);
         if (bufImage == null) {
             createFailedImage();
             return;
         }
-            
+
         Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
         bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
@@ -217,13 +217,13 @@ public class DefineSubImage extends AbstractGfxImageTag {
         cachedX1 = x1;
         cachedX2 = x2;
         cachedY1 = y1;
-        cachedY2 = y2;                         
+        cachedY2 = y2;
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
+
         tagInfo.addInfo("general", "imageId", imageId);
         tagInfo.addInfo("general", "x1", x1);
         tagInfo.addInfo("general", "y1", y1);

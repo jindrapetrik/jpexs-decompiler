@@ -147,7 +147,7 @@ public class StringEditor extends JTextArea implements GenericTagEditor {
     @Override
     public void validateValue() {
     }
-    
+
     @Override
     public Object getObject() {
         return obj;

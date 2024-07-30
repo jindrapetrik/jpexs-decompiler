@@ -23,6 +23,6 @@ package com.jpexs.decompiler.flash.importers;
 public interface ScriptImporterProgressListener {
 
     public void scriptImported();
-    
+
     public void scriptImportError();
 }

@@ -205,7 +205,7 @@ public class GraphPrecontinueDetector {
         for (Node n : node.next) {
             populateNodes(n, populated);
         }
-    }    
+    }
 
     private boolean handleWhile(List<Node> headNodes) {
         Set<Node> visited = new HashSet<>();
@@ -290,7 +290,7 @@ public class GraphPrecontinueDetector {
         }
         return result;
     }
-    
+
     private boolean joinNodes(List<Node> headNodes) {
         Set<Node> visited = new HashSet<>();
         Reference<Integer> numChanged = new Reference<>(0);
@@ -354,7 +354,7 @@ public class GraphPrecontinueDetector {
 
         return result;
     }
-    
+
     private boolean checkIfs(List<Node> headNodes) {
         Set<Node> visited = new HashSet<>();
         Reference<Integer> numChanged = new Reference<>(0);
@@ -364,7 +364,7 @@ public class GraphPrecontinueDetector {
             headNodes.set(h, newHeadNode);
         }
         return numChanged.getVal() > 0;
-    }    
+    }
 
     private Node checkIfs(Node node, Set<Node> visited, Reference<Integer> numIfs) {
         if (visited.contains(node)) {

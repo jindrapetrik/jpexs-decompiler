@@ -175,8 +175,8 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class ActionScript2Parser {   
-    
+public class ActionScript2Parser {
+
     public static final List<String> BUILTIN_CASTS = Arrays.asList(new String[]{
         "flash.display.BitmapData",
         "flash.external.ExternalInterface",

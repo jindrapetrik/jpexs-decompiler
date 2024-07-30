@@ -121,15 +121,13 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.textID = characterId;
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         ret.put("tid", "" + textID);
         return ret;
     }
-    
-    
 
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {

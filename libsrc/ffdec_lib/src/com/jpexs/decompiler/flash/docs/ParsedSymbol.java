@@ -21,6 +21,7 @@ package com.jpexs.decompiler.flash.docs;
  * @author JPEXS
  */
 public class ParsedSymbol {
+
     public static int TYPE_EOF = 0;
     public static int TYPE_IDENTIFIER = 1;
     public static int TYPE_COLON = 2;
@@ -30,7 +31,7 @@ public class ParsedSymbol {
     public static int TYPE_COMMA = 6;
     public static int TYPE_PIPE = 7;
     public static int TYPE_STAR = 8;
-    
+
     public final int type;
     public final String value;
 
@@ -42,5 +43,5 @@ public class ParsedSymbol {
     @Override
     public String toString() {
         return "symbol[type=" + type + ", value=" + value + "]";
-    }        
+    }
 }

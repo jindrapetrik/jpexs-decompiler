@@ -216,7 +216,7 @@ public class Main {
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
     public static CancellableWorker swfPrepareWorker = null;
-    
+
     public static String currentDebuggerPackage = null;
 
     public static boolean isSwfAir(Openable openable) {
@@ -290,7 +290,6 @@ public class Main {
         return runProcess != null && !runProcessDebug;
     }
 
-   
     public static synchronized void debugExportByteArray(Variable v, OutputStream os) throws IOException {
         try {
             long objectId = 0L;
@@ -300,7 +299,7 @@ public class Main {
             Object oldPos = getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
             int length = (int) (double) (Double) getDebugHandler().getVariable(objectId, "length", false, true).parent.value;
-            
+
             for (int i = 0; i < length; i++) {
                 int b = (int) (double) (Double) getDebugHandler().callFunction(false, "readByte", v, new ArrayList<>()).variables.get(0).value;
                 os.write(b);
@@ -310,7 +309,7 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static synchronized void debugImportByteArray(Variable v, InputStream is) throws IOException {
         try {
             long objectId = 0L;
@@ -320,7 +319,7 @@ public class Main {
             Double oldPos = (Double) getDebugHandler().getVariable(objectId, "position", false, true).parent.value;
             getDebugHandler().setVariable(objectId, "length", VariableType.NUMBER, 0);
             getDebugHandler().setVariable(objectId, "position", VariableType.NUMBER, 0);
-            
+
             int length = 0;
             int b;
             while ((b = is.read()) > -1) {
@@ -524,15 +523,14 @@ public class Main {
                 //ignore, return instrSWF
             }
             instrSWF.removeEventListener(prepEventListner);
-            
+
             //instrSWF = super.prepare(instrSWF);
-            
             if (!DebuggerTools.hasDebugger(instrSWF)) {
                 DebuggerTools.switchDebugger(instrSWF);
             }
             DebuggerTools.injectDebugLoader(instrSWF);
             currentDebuggerPackage = instrSWF.debuggerPackage;
-            
+
             return instrSWF;
         }
     }
@@ -715,11 +713,11 @@ public class Main {
     public static synchronized String getIpClass() {
         return getDebugHandler().getBreakScriptName();
     }
-    
+
     public static synchronized List<Integer> getStackLines() {
         return getDebugHandler().getStackLines();
     }
-    
+
     public static synchronized List<String> getStackClasses() {
         return getDebugHandler().getStackScripts();
     }
@@ -846,7 +844,7 @@ public class Main {
         }
         proxyFrame.setVisible(true);
         proxyFrame.setState(Frame.NORMAL);
-    }   
+    }
 
     public static void continueWork(String name) {
         continueWork(name, -1);
@@ -885,7 +883,7 @@ public class Main {
     public static void startWork(String name, CancellableWorker worker) {
         startWork(name, -1, worker);
     }
-    
+
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
         long nowTime = System.currentTimeMillis();
@@ -1350,7 +1348,6 @@ public class Main {
                 /*if (swf.encrypted) {
                     hasEncrypted = true;
                 }*/
-
                 swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -1416,10 +1413,9 @@ public class Main {
 
             });
         }*/
-
         return result;
     }
-    
+
     public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {
@@ -1660,13 +1656,13 @@ public class Main {
 
             final SWF fswf = firstSWF;
             final Openable fopenable = firstOpenable;
-            View.execInEventDispatch(() -> {                
+            View.execInEventDispatch(() -> {
                 if (mainFrame == null) {
                     Main.startWork(AppStrings.translate("work.creatingwindow") + "...", null);
                     ensureMainFrame();
                 }
-                loadingDialog.setVisible(false);            
-                
+                loadingDialog.setVisible(false);
+
                 if (mainFrame != null) {
                     mainFrame.setVisible(true);
                 }
@@ -1772,7 +1768,7 @@ public class Main {
         Cache.clearAll();
         initGui();
         reloadSWFs();
-    }   
+    }
 
     public static void newFile() {
         View.checkAccess();
@@ -1884,7 +1880,7 @@ public class Main {
 
         return openFile(newSourceInfos, executeAfterOpen, null);
     }
-    
+
     public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
         View.checkAccess();
 
@@ -2417,8 +2413,8 @@ public class Main {
                 watcherWorker.execute();
             }
 
-            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {                
-                
+            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {
+
                 @Override
                 public void onLoaderBytes(String clientId, byte[] data) {
                     String hash = md5(data);
@@ -2444,7 +2440,7 @@ public class Main {
                             openFile(osi);
                         }
                     });
-                }    
+                }
             });
 
             try {
@@ -2620,26 +2616,26 @@ public class Main {
         UIManager.put("ColorChooser.sampleText", AppStrings.translate("ColorChooser.sampleText"));
 
     }
-    
-    public static String getDefaultCharacterEncoding() { 
+
+    public static String getDefaultCharacterEncoding() {
         // Creating an array of byte type chars and
         // passing random  alphabet as an argument.abstract
         // Say alphabet be 'w'
-        byte[] byte_array = { 'w' };
- 
+        byte[] byte_array = {'w'};
+
         // Creating an object of InputStream
         InputStream instream
-            = new ByteArrayInputStream(byte_array);
- 
+                = new ByteArrayInputStream(byte_array);
+
         // Now, opening new file input stream reader
         InputStreamReader streamreader
-            = new InputStreamReader(instream);
+                = new InputStreamReader(instream);
         String defaultCharset = streamreader.getEncoding();
- 
+
         // Returning default character encoding
         return defaultCharset;
     }
-    
+
     private static void initLookAndFeel() {
         if (Configuration.useRibbonInterface.get()) {
             View.setLookAndFeel();
@@ -2663,7 +2659,7 @@ public class Main {
             }
         }
     }
-       
+
     public static void initJna() {
         if (Platform.isWindows()) {
             String jnaTempDir = Configuration.jnaTempDirectory.get();
@@ -2672,18 +2668,18 @@ public class Main {
             } else {
                 jnaTempDir = System.getProperty("java.io.tmpdir");
             }
-            
+
             try {
                 com.sun.jna.Native.toByteArray(""); //Trigger JNA.Native class static initializer, which will load the DLL
             } catch (UnsatisfiedLinkError error) {
                 initLookAndFeel();
-                ViewMessages.showMessageDialog(null, 
-                        "Cannot read JNA DLL file from current Temporary directory:\r\n" 
-                                + jnaTempDir + "\r\n"
-                                + "The reason is probably Unicode characters in the path or in your username.\r\n"
-                                + "In the following dialog, please specify new temporary directory path,\r\n"
-                                + "which DOES NOT contain any special Unicode characters. (Only basic latin supported)\r\n"
-                                + "Then application restart is required.",
+                ViewMessages.showMessageDialog(null,
+                        "Cannot read JNA DLL file from current Temporary directory:\r\n"
+                        + jnaTempDir + "\r\n"
+                        + "The reason is probably Unicode characters in the path or in your username.\r\n"
+                        + "In the following dialog, please specify new temporary directory path,\r\n"
+                        + "which DOES NOT contain any special Unicode characters. (Only basic latin supported)\r\n"
+                        + "Then application restart is required.",
                         "FFDec JNA Error", JOptionPane.ERROR_MESSAGE);
                 View.execInEventDispatch(new Runnable() {
                     @Override
@@ -2699,9 +2695,9 @@ public class Main {
                         } else {
                             System.exit(1);
                         }
-                    }                    
-                });                
-            }       
+                    }
+                });
+            }
         }
     }
 
@@ -2803,7 +2799,7 @@ public class Main {
      * @param args the command line arguments
      * @throws IOException On error
      */
-    public static void main(String[] args) throws IOException {    
+    public static void main(String[] args) throws IOException {
         decodeLaunch5jArgs(args);
         setSessionLoaded(false);
 
@@ -2850,7 +2846,7 @@ public class Main {
                     } else {
                         for (String fileToOpen : filesToOpen) {
                             openFile(fileToOpen, null);
-                        }                        
+                        }
                     }
                 });
             }
@@ -3311,9 +3307,9 @@ public class Main {
 
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
-        }        
+        }
     }
-    
+
     public static List<SWF> getDependencies(SWF swf) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
         List<SWF> dependencies = new ArrayList<>();
@@ -3325,7 +3321,7 @@ public class Main {
         }
         return dependencies;
     }
-    
+
     public static void showBreakpointsList() {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
         getMainFrame().getPanel().showBreakpointlistDialog(swf);

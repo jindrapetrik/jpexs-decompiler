@@ -38,8 +38,8 @@ public class GRADIENTBEVELFILTER extends FILTER {
     /**
      * Gradient colors
      */
-    @SWFArray(value = "color", countField = "numColors")    
-    public RGBA[] gradientColors = new RGBA[] {
+    @SWFArray(value = "color", countField = "numColors")
+    public RGBA[] gradientColors = new RGBA[]{
         new RGBA(Color.WHITE),
         new RGBA(255, 0, 0, 0),
         new RGBA(Color.BLACK)
@@ -49,8 +49,8 @@ public class GRADIENTBEVELFILTER extends FILTER {
      * Gradient ratios
      */
     @SWFType(value = BasicType.UI8)
-    @SWFArray(value = "ratio", countField = "numColors")    
-    public int[] gradientRatio = new int[] {
+    @SWFArray(value = "ratio", countField = "numColors")
+    public int[] gradientRatio = new int[]{
         0, 128, 255
     };
 
@@ -70,7 +70,7 @@ public class GRADIENTBEVELFILTER extends FILTER {
      * Radian angle of the gradient bevel
      */
     @SWFType(BasicType.FIXED)
-    public double angle = 45  * Math.PI / 180;
+    public double angle = 45 * Math.PI / 180;
 
     /**
      * Distance of the gradient bevel

@@ -447,7 +447,7 @@ public abstract class StaticTextTag extends TextTag {
                                     throw new TextParseException("Invalid scaley value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
-                            
+
                             case "scalexf":
                                 try {
                                     textMatrix.scaleX = Float.parseFloat(paramValue);
@@ -464,7 +464,7 @@ public abstract class StaticTextTag extends TextTag {
                                     throw new TextParseException("Invalid scaleyf value - float number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
-                                
+
                             case "rotateskew0":
                                 try {
                                     textMatrix.rotateSkew0 = MATRIX.toFloat(Integer.parseInt(paramValue));
@@ -523,7 +523,7 @@ public abstract class StaticTextTag extends TextTag {
                                     }
                                 } catch (NumberFormatException nfe) {
                                     throw new TextParseException("Invalid space value - number expected. Found: " + paramValue, lexer.yyline());
-                                }                                
+                                }
                                 break;
                             default:
                                 throw new TextParseException("Unrecognized parameter name: " + paramName, lexer.yyline());
@@ -647,7 +647,7 @@ public abstract class StaticTextTag extends TextTag {
             advance = (int) Math.round(((double) textHeight * (font.getGlyphAdvance(glyphIndex) + kerningAdjustment)) / (font.getDivider() * 1024.0));
         } else {
             String fontName = font.getSystemFontName();
-            advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));            
+            advance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), (int) (textHeight / SWF.unitDivisor), c, nextChar));
         }
 
         return advance;
@@ -661,7 +661,7 @@ public abstract class StaticTextTag extends TextTag {
         if (glyphEntries.size() < 2) {
             return 0;
         }
-        
+
         int numMin = 0;
         for (int i = 0; i < glyphEntries.size() - 1; i++) {
             GLYPHENTRY glyph = glyphEntries.get(i);
@@ -685,7 +685,7 @@ public abstract class StaticTextTag extends TextTag {
             if (letterSpacing < minLetterSpacing) {
                 minLetterSpacing = letterSpacing;
                 numMin = 1;
-            }            
+            }
         }
         if (minLetterSpacing < 0 && numNegatives < glyphEntries.size() / 2) { //a hack, use negative letterspacing only when 50% letters use it
             minLetterSpacing = 0;
@@ -758,7 +758,7 @@ public abstract class StaticTextTag extends TextTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-    
+
         staticTextToSVG(swf, textRecords, getTextNum(), exporter, getRect(), textMatrix, colorTransform, 1);
     }
 

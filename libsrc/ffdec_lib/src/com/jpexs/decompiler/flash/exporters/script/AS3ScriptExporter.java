@@ -574,7 +574,7 @@ public class AS3ScriptExporter {
                                 st.getNeededCharactersDeep(neededCharacters);
                                 neededCharacters.add(st.spriteId);
                             }
-                            for (int n : neededCharacters) {                                
+                            for (int n : neededCharacters) {
                                 CharacterTag ct = (CharacterTag) swf.getCharacter(n);
                                 if (ct == null) {
                                     continue;

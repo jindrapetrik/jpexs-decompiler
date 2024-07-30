@@ -55,7 +55,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public int getSlotIndex() {
         return slot_id;
-    }    
+    }
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {

@@ -58,7 +58,7 @@ public class UnknownTag extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.write(unknownData);
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

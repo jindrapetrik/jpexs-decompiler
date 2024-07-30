@@ -111,7 +111,7 @@ public class DefineMorphShapeTag extends MorphShapeTag {
     public int getShapeNum() {
         return 1;
     }
-    
+
     @Override
     public ShapeTag getShapeTagAtRatio(int ratio) {
         DefineShape3Tag ret = new DefineShape3Tag(swf);

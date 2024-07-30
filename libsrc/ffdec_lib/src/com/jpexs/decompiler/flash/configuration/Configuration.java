@@ -66,7 +66,7 @@ public final class Configuration {
     public static final Level logLevel;
 
     public static boolean showStat;
-        
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> openMultipleFiles = null;
@@ -930,85 +930,85 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> displayAs12PCodeDocsPanel = null;
-    
+
     @ConfigurationDefaultDouble(0.85)
     @ConfigurationName("gui.action.splitPane.docs.dividerLocationPercent")
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiActionDocsSplitPaneDividerLocationPercent = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> rememberLastScreen = null;
-    
+
     @ConfigurationDefaultInt(-1)
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenIndex = null;
-    
+
     @ConfigurationDefaultInt(-1)
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenX = null;
-    
+
     @ConfigurationDefaultInt(-1)
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenY = null;
-    
+
     @ConfigurationDefaultInt(-1)
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenWidth = null;
-    
+
     @ConfigurationDefaultInt(-1)
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastMainWindowScreenHeight = null;
-                
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> displayAs12PCodePanel = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> displayAs3PCodePanel = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> flaExportUseMappedFontLayout = null;
-    
+
     @ConfigurationDefaultInt(3)
     @ConfigurationName("formatting.tab.size")
     @ConfigurationCategory("format")
     public static ConfigurationItem<Integer> tabSize = null;
-    
+
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> boxBlurPixelsLimit = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> as3ExportNamesUseClassNamesOnly = null;
-        
+
     @ConfigurationDefaultString("")
     @ConfigurationDirectory
     public static ConfigurationItem<String> jnaTempDirectory = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> flaExportFixShapes = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> lastExportResampleWav = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> previewResampleSound = null;
-    
+
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> lastExportTransparentBackground = null;
-    
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningAbcClean = null;
-    
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

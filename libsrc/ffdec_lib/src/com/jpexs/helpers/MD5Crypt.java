@@ -62,7 +62,7 @@ public class MD5Crypt {
             sb.append(SALT_CHARS.charAt(rnd.nextInt(SALT_CHARS.length())));
         }
         return sb.toString();
-    }      
+    }
 
     public static String cryptApache(String password, int saltLength) {
         return crypt(password, generateSalt(saltLength), MAGIC_APACHE);
@@ -71,7 +71,7 @@ public class MD5Crypt {
     public static String cryptApache(String password, String salt) {
         return crypt(password, salt, MAGIC_APACHE);
     }
-    
+
     public static String crypt(String password, int saltLength, String magic) {
         return crypt(password, generateSalt(saltLength), magic);
     }
@@ -79,7 +79,7 @@ public class MD5Crypt {
     public static String crypt(String password, int saltLength) {
         return crypt(password, generateSalt(saltLength), MAGIC);
     }
-    
+
     public static String crypt(String password, String salt) {
         return crypt(password, salt, MAGIC);
     }

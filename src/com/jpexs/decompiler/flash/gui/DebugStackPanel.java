@@ -46,8 +46,7 @@ public class DebugStackPanel extends JPanel {
     private int[] classIndices = new int[0];
     private int[] methodIndices = new int[0];
     private int[] traitIndices = new int[0];
-    
-    
+
     public DebugStackPanel() {
         stackTable = new JTable();
         Main.getDebugHandler().addFrameChangeListener(new DebuggerHandler.FrameChangeListener() {
@@ -81,7 +80,6 @@ public class DebugStackPanel extends JPanel {
         });
 
         //JLabel titleLabel = new JLabel(AppStrings.translate("callStack.header"), JLabel.CENTER);
-
         setLayout(new BorderLayout());
         //add(titleLabel, BorderLayout.NORTH);
         add(new FasterScrollPane(stackTable), BorderLayout.CENTER);
@@ -127,7 +125,7 @@ public class DebugStackPanel extends JPanel {
             int f = info.files.get(i);
             data[i][0] = Main.getDebugHandler().moduleToString(f);
             data[i][1] = info.lines.get(i);
-            data[i][2] = info.stacks.get(i);      
+            data[i][2] = info.stacks.get(i);
             Integer newClassIndex = Main.getDebugHandler().moduleToClassIndex(f);
             newClassIndices[i] = newClassIndex == null ? -1 : newClassIndex;
             Integer newMethodIndex = Main.getDebugHandler().moduleToMethodIndex(f);
@@ -135,12 +133,11 @@ public class DebugStackPanel extends JPanel {
             Integer newTraitIndex = Main.getDebugHandler().moduleToTraitIndex(f);;
             newTraitIndices[i] = newTraitIndex == null ? -1 : newTraitIndex;
         }
-        
 
         DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
             AppStrings.translate("callStack.header.file"),
             AppStrings.translate("callStack.header.line"),
-            AppStrings.translate("stack.header.item")            
+            AppStrings.translate("stack.header.item")
         }) {
             @Override
             public boolean isCellEditable(int row, int column) {

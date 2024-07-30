@@ -139,14 +139,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return currentFinId++;
     }
 
-    
     private long uniqLast = 0;
 
     public String uniqId() {
         uniqLast++;
         return "" + uniqLast;
     }
-    
+
     public static int resolveType(SourceGeneratorLocalData localData, GraphTargetItem item, AbcIndexing abcIndex) throws CompilationException {
         int name_index = 0;
         GraphTargetItem typeItem = null;
@@ -247,7 +246,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.add(ins(AVM2Instructions.Pop));
         return ret;
     }
-    
+
     private AVM2Instruction ins(int instructionCode, int... operands) {
         return new AVM2Instruction(0, instructionCode, operands);
     }
@@ -1819,7 +1818,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         mbCode.add(ins(AVM2Instructions.PushScope));
 
         int traitScope = 1;
-        
+
         String documentClassStr = localData.documentClass;
         DottedChain documentClass = null;
         if (documentClassStr != null && !documentClassStr.isEmpty()) {
@@ -1833,13 +1832,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 TraitClass tc = (TraitClass) t;
                 DottedChain className = tc.getName(abc).getNameWithNamespace(abc.constants, true);
 
-                
-                
                 List<Integer> parents = new ArrayList<>();
                 if (documentClass != null && documentClass.equals(className)) {
                     mbCode.add(ins(AVM2Instructions.GetScopeObject, 0));
                 } else {
-                    int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};                
+                    int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};
                     mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
                 }
                 traitScope++;
@@ -2035,7 +2032,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ci = ci.parent;
         }
     }
-    
+
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FalseItem item) throws CompilationException {
         return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.PushFalse));
@@ -2926,13 +2923,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
         if (localData.isStatic && item.toString().equals(currentFullClassName)) {
-            return Arrays.asList(ins(AVM2Instructions.GetLocal0));   
+            return Arrays.asList(ins(AVM2Instructions.GetLocal0));
         } else if (globalSlotId > 0) {
             return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetGlobalScope), ins(AVM2Instructions.GetSlot, globalSlotId));
         } else {
             return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetLex, resolveType(localData, item, abcIndex)));
         }
-    }   
+    }
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException {

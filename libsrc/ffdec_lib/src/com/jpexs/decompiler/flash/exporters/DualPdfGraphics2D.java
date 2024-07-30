@@ -133,7 +133,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
         boolean ok2 = pdfGraphics.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
         return ok1 && ok2;
     }
-    
+
     @Override
     public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
         imageGraphics.drawRenderedImage(img, xform);
@@ -383,7 +383,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
     public void clipRect(int x, int y, int width, int height) {
         imageGraphics.clearRect(x, y, width, height);
         pdfGraphics.clipRect(x, y, width, height);
-    }    
+    }
 
     @Override
     public Shape getClip() {
@@ -395,7 +395,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
         imageGraphics.setClip(x, y, width, height);
         pdfGraphics.setClip(x, y, width, height);
     }
-    
+
     @Override
     public void setClip(Shape clip) {
         imageGraphics.setClip(clip);
@@ -478,7 +478,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         imageGraphics.fillPolygon(xPoints, yPoints, nPoints);
         pdfGraphics.fillPolygon(xPoints, yPoints, nPoints);
-    }    
+    }
 
     @Override
     public void dispose() {
@@ -609,8 +609,8 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                     int spacing = entry.glyphAdvance - calcAdvance;
                     char ch = font.glyphToChar(entry.glyphIndex);
                     if (spacing != 0) {
-                        text.append(currentChar);                        
-                        drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);                                               
+                        text.append(currentChar);
+                        drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
                         text = new StringBuilder();
                         x = x + deltaX + entry.glyphAdvance;
                         deltaX = 0;

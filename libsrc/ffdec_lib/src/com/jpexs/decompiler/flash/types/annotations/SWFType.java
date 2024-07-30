@@ -48,6 +48,6 @@ public @interface SWFType {
 
     //Count to add to countField
     int countAdd() default 0;
-    
+
     boolean canAdd() default true;
 }

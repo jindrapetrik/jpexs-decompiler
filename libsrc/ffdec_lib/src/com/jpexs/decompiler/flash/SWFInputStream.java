@@ -387,9 +387,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * HACK: Special constructor to handle old GFX format
-     * - DO NOT USE for normal purposes - it won't read tags, etc...
-     * @param is 
+     * HACK: Special constructor to handle old GFX format - DO NOT USE for
+     * normal purposes - it won't read tags, etc...
+     *
+     * @param is
      */
     public SWFInputStream(InputStream is) throws IOException {
         this.swf = null;
@@ -398,7 +399,7 @@ public class SWFInputStream implements AutoCloseable {
         this.limit = Integer.MAX_VALUE;
         this.is = new FakeMemoryInputStream(is);
     }
-    
+
     public SWF getSwf() {
         return swf;
     }
@@ -825,7 +826,7 @@ public class SWFInputStream implements AutoCloseable {
      * @return ByteArrayRange object
      * @throws IOException
      */
-    public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {        
+    public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {
         if (count <= 0) {
             return ByteArrayRange.EMPTY;
         }
@@ -2871,7 +2872,7 @@ public class SWFInputStream implements AutoCloseable {
                 cer.controlDeltaX = (int) readSB(cer.numBits + 2, "controlDeltaX");
                 cer.controlDeltaY = (int) readSB(cer.numBits + 2, "controlDeltaY");
                 cer.anchorDeltaX = (int) readSB(cer.numBits + 2, "anchorDeltaX");
-                cer.anchorDeltaY = (int) readSB(cer.numBits + 2, "anchorDeltaY");               
+                cer.anchorDeltaY = (int) readSB(cer.numBits + 2, "anchorDeltaY");
                 ret = cer;
             }
         }
@@ -3116,7 +3117,8 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one MORPHFOCALGRADIENT value from the stream.
      *
-     * <p>This is undocumented feature
+     * <p>
+     * This is undocumented feature
      *
      * @param name
      * @return MORPHGRADIENT value

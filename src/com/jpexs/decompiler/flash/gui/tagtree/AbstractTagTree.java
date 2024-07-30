@@ -178,11 +178,11 @@ public abstract class AbstractTagTree extends JTree {
     }
 
     public static Icon getIconFor(TreeItem val, boolean folderExpanded) {
-        
+
         if (val instanceof SoundStreamHeadTypeTag) {
             return View.getIcon("foldersounds16");
         }
-        
+
         TreeNodeType type = getTreeNodeType(val);
 
         if (type == TreeNodeType.FOLDER && folderExpanded) {
@@ -381,8 +381,8 @@ public abstract class AbstractTagTree extends JTree {
                 || (t instanceof FrameScript)
                 || (t instanceof SceneFrame)) {
             return TreeNodeType.FRAME;
-        }                
-        
+        }
+
         if (t instanceof Scene) {
             return TreeNodeType.SCENE;
         }
@@ -610,11 +610,10 @@ public abstract class AbstractTagTree extends JTree {
                 }
             }
 
-            if (d instanceof Tag 
-                    || d instanceof ASMSource 
+            if (d instanceof Tag
+                    || d instanceof ASMSource
                     || d instanceof BinaryDataInterface
-                    || d instanceof SoundStreamFrameRange
-                ) {
+                    || d instanceof SoundStreamFrameRange) {
                 TreeNodeType nodeType = TagTree.getTreeNodeType(d);
                 if (nodeType == TreeNodeType.IMAGE) {
                     ret.add(d);

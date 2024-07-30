@@ -417,8 +417,6 @@ public class DumpTree extends JTree {
         View.expandTreeNodes(this, path, true);
     }
 
-    
-
     private void saveUncompressedToFileButtonActionPerformed(ActionEvent evt) {
         saveToFileButtonActionPerformed(true);
     }

@@ -40,7 +40,7 @@ public class ABCOutputStream extends OutputStream {
 
     private final OutputStream os;
     private long position = 0L;
-    
+
     public ABCOutputStream(OutputStream os) {
         this.os = os;
     }
@@ -58,7 +58,7 @@ public class ABCOutputStream extends OutputStream {
     @Override
     public void write(byte[] data) throws IOException {
         os.write(data);
-        position += data.length;       
+        position += data.length;
     }
 
     @Override

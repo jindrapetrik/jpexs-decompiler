@@ -294,9 +294,9 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
 
     @Override
     public void setPlaceFlagMove(boolean placeFlagMove) {
-        
+
     }
-    
+
     @Override
     public boolean hasImage() {
         return false;

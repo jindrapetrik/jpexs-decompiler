@@ -175,7 +175,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             reload();
         }
         firstLoaded = true;
-    }   
+    }
 
     public boolean hasLayout() {
         return false;
@@ -210,7 +210,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
         return ret;
     }
-       
+
     @Override
     public String getExportFileName() {
         String result = super.getExportFileName();
@@ -431,7 +431,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-    
+
     }
 
     @Override
@@ -475,7 +475,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (PREVIEWSIZE * SWF.unitDivisor), 0, (int) (PREVIEWSIZE * SWF.unitDivisor));
     }
-    
+
     @Override
     public RECT getRectWithStrokes() {
         return getRect();

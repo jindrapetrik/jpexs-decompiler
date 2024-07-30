@@ -159,7 +159,6 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
         needed.add(buttonId);
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
@@ -170,7 +169,7 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
-                
+
         if (buttonSoundChar0 == characterId) {
             buttonSoundChar0 = 0;
             buttonSoundInfo0 = null;
@@ -191,7 +190,7 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
             buttonSoundInfo3 = null;
             modified = true;
         }
-        
+
         if (modified) {
             setModified(true);
         }
@@ -201,11 +200,11 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
     @Override
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
-        
+
         if (buttonId == oldCharacterId) {
             buttonId = newCharacterId;
             modified = true;
-        }        
+        }
         if (buttonSoundChar0 == oldCharacterId) {
             buttonSoundChar0 = newCharacterId;
             modified = true;
@@ -222,10 +221,10 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
             buttonSoundChar3 = newCharacterId;
             modified = true;
         }
-                
+
         if (modified) {
             setModified(true);
         }
         return modified;
-    }        
+    }
 }

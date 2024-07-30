@@ -27,7 +27,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
 
     @SWFType(BasicType.FIXED8)
     public float focalPoint;
-    
+
     @Override
     public boolean isCompatibleGradient(GRADIENT otherGradient) {
         if (interpolationMode != otherGradient.interpolationMode) {
@@ -41,7 +41,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
         }
         return true;
     }
-    
+
     @Override
     public MORPHGRADIENT toMorphGradient() {
         MORPHFOCALGRADIENT morphGradient = new MORPHFOCALGRADIENT();
@@ -53,10 +53,10 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
         }
         morphGradient.startFocalPoint = focalPoint;
         morphGradient.startFocalPoint = focalPoint;
-        
+
         return morphGradient;
     }
-    
+
     @Override
     public MORPHGRADIENT toMorphGradient(GRADIENT endGradient) {
         if (!isCompatibleGradient(endGradient)) {
@@ -68,7 +68,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
             morphGradient.gradientRecords[i] = gradientRecords[i].toMorphGradRecord(endGradient.gradientRecords[i]);
-        }        
+        }
         morphGradient.startFocalPoint = focalPoint;
         if (endGradient instanceof FOCALGRADIENT) {
             morphGradient.endFocalPoint = ((FOCALGRADIENT) endGradient).focalPoint;

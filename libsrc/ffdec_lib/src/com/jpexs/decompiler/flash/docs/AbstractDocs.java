@@ -65,7 +65,7 @@ public class AbstractDocs {
     protected static String meta(String name, String content) {
         return "\t\t<meta name=\"" + name + "\" content=\"" + content + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
-    
+
     protected static String meta(String name, Date content) {
         return "\t\t<meta name=\"" + name + "\" content=\"" + getISO8601StringForDate(content) + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
@@ -75,7 +75,7 @@ public class AbstractDocs {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.format(date);
     }
-    
+
     protected static String hilightArgument(String docs, int argumentIndex) {
         if (argumentIndex < 0) {
             return docs;
@@ -100,7 +100,7 @@ public class AbstractDocs {
                 symb = lexer.lex();
                 if (symb.type == ParsedSymbol.TYPE_BRACKET_OPEN) {
                     while (symb.type != ParsedSymbol.TYPE_BRACKET_CLOSE && symb.type != ParsedSymbol.TYPE_EOF) {
-                        symb = lexer.lex();                        
+                        symb = lexer.lex();
                     }
                     endPos = lexer.yychar() + 1;
                     break;

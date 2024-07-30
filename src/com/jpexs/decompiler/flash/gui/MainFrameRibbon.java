@@ -88,7 +88,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
         int maxWidth = bounds.width - (insets.left + insets.right);
         int maxHeight = bounds.height - (insets.top + insets.bottom);
-        
+
         if (w > maxWidth) {
             w = maxWidth;
         }
@@ -106,7 +106,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         }
         if (maximizedVertical) {
             state |= JFrame.MAXIMIZED_VERT;
-        }     
+        }
         setExtendedState(state);
 
         View.setWindowIcon(this);
@@ -185,19 +185,17 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             GraphicsConfiguration gc = View.getWindowDevice(MainFrameRibbon.this.getWindow()).getDefaultConfiguration();
 
             Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
-            Rectangle screenBounds = gc.getBounds();                
+            Rectangle screenBounds = gc.getBounds();
             Rectangle maxBounds = new Rectangle(
-                screenBounds.x + screenInsets.left,
-                screenBounds.y + screenInsets.top,
-                screenBounds.width - (screenInsets.left + screenInsets.right),
-                screenBounds.height - (screenInsets.top + screenInsets.bottom)
+                    screenBounds.x + screenInsets.left,
+                    screenBounds.y + screenInsets.top,
+                    screenBounds.width - (screenInsets.left + screenInsets.right),
+                    screenBounds.height - (screenInsets.top + screenInsets.bottom)
             );
             setMaximizedBounds(maxBounds);
         }
         super.setExtendedState(state);
     }
-    
-    
 
     private static void getApplicationMenuButtons(Component comp, List<JRibbonApplicationMenuButton> ret) {
         if (comp instanceof JRibbonApplicationMenuButton) {

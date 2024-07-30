@@ -536,6 +536,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             throw new RuntimeException();
         }
     }
-    
+
     public abstract boolean isTooLarge();
 }

@@ -31,12 +31,12 @@ public class As3ScriptReplaceException extends Exception {
         super(message);
         this.exceptionItems = new ArrayList<>();
     }
-    
+
     public As3ScriptReplaceException(List<As3ScriptReplaceExceptionItem> exceptionItems) {
         super("Script replace exception");
         this.exceptionItems = exceptionItems;
     }
-    
+
     public As3ScriptReplaceException(As3ScriptReplaceExceptionItem exceptionItem) {
         this.exceptionItems = new ArrayList<>();
         this.exceptionItems.add(exceptionItem);
@@ -57,7 +57,7 @@ public class As3ScriptReplaceException extends Exception {
     @Override
     public String getLocalizedMessage() {
         return getMessage();
-    }   
+    }
 
     public List<As3ScriptReplaceExceptionItem> getExceptionItems() {
         return exceptionItems;

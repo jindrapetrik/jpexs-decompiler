@@ -350,7 +350,7 @@ public class TagTree extends AbstractTagTree {
             String expName = tag.getSwf().getExportName(tag.getCharacterId());
             if (expName != null && !expName.isEmpty()) {
                 String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
-                return pathParts[pathParts.length - 1];  
+                return pathParts[pathParts.length - 1];
             }
         }
         if (value != null) {

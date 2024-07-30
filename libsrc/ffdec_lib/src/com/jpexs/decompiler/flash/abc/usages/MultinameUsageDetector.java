@@ -45,12 +45,12 @@ import java.util.List;
  * @author JPEXS
  */
 public class MultinameUsageDetector implements UsageDetector {
-    
+
     @Override
     public List<Usage> findUsages(ABC abc, int index) {
         return findMultinameUsage(abc, index, true);
     }
-    
+
     public List<Usage> findMultinameUsage(ABC abc, int multinameIndex, boolean exactMatch) {
         List<Usage> ret = new ArrayList<>();
         if (multinameIndex == 0) {
@@ -77,8 +77,8 @@ public class MultinameUsageDetector implements UsageDetector {
             }
         }
         return ret;
-    }        
-        
+    }
+
     @Override
     public List<List<Usage>> findAllUsage(ABC abc) {
         List<List<Usage>> ret = new ArrayList<>();
@@ -113,8 +113,8 @@ public class MultinameUsageDetector implements UsageDetector {
     @Override
     public String getKind() {
         return "string";
-    }        
-    
+    }
+
     private void findAllMultinameUsageInTraits(ABC abc, Traits traits, int traitsType, int scriptIndex, int classIndex, List<List<Usage>> ret, int parentTraitIndex) {
         for (int t = 0; t < traits.traits.size(); t++) {
             if (traits.traits.get(t) instanceof TraitClass) {
@@ -148,7 +148,7 @@ public class MultinameUsageDetector implements UsageDetector {
             }
         }
     }
-    
+
     private void checkAllMultinameUsedInMethod(ABC abc, int methodInfo, List<List<Usage>> ret, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         boolean[] foundMultinames = new boolean[abc.constants.getMultinameCount()];
         for (int p = 0; p < abc.method_info.get(methodInfo).param_types.length; p++) {
@@ -220,7 +220,6 @@ public class MultinameUsageDetector implements UsageDetector {
         return false;
     }
 
-    
     private void findMultinameUsageInTraits(ABC abc, Traits traits, int multinameIndex, boolean exactMatch, int traitsType, int scriptIndex, int classIndex, List<Usage> ret, int parentTraitIndex) {
         for (int t = 0; t < traits.traits.size(); t++) {
             if (traits.traits.get(t) instanceof TraitClass) {
@@ -239,7 +238,7 @@ public class MultinameUsageDetector implements UsageDetector {
                 }
                 checkMultinameUsedInMethod(abc, multinameIndex, exactMatch, abc.instance_info.get(c).iinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, true, null, -1);
                 checkMultinameUsedInMethod(abc, multinameIndex, exactMatch, abc.class_info.get(c).cinit_index, ret, -1/*FIXME*/, c, 0, TraitMultinameUsage.TRAITS_TYPE_CLASS, true, null, -1);
-                findMultinameUsageInTraits(abc,  abc.instance_info.get(c).instance_traits, multinameIndex, exactMatch, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, -1/*FIXME*/, c, ret, -1);
+                findMultinameUsageInTraits(abc, abc.instance_info.get(c).instance_traits, multinameIndex, exactMatch, TraitMultinameUsage.TRAITS_TYPE_INSTANCE, -1/*FIXME*/, c, ret, -1);
                 findMultinameUsageInTraits(abc, abc.class_info.get(c).static_traits, multinameIndex, exactMatch, TraitMultinameUsage.TRAITS_TYPE_CLASS, -1/*FIXME*/, c, ret, -1);
             }
             if (traits.traits.get(t) instanceof TraitSlotConst) {
@@ -261,7 +260,6 @@ public class MultinameUsageDetector implements UsageDetector {
         }
     }
 
-    
     private void checkMultinameUsedInMethod(ABC abc, int multinameIndex, boolean exactMatch, int methodInfo, List<Usage> ret, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         for (int p = 0; p < abc.method_info.get(methodInfo).param_types.length; p++) {
             if (isSameName(abc, multinameIndex, abc.method_info.get(methodInfo).param_types[p], exactMatch)) {
@@ -292,7 +290,7 @@ public class MultinameUsageDetector implements UsageDetector {
                 }
             }
         }
-    }   
+    }
 
     @Override
     public void filterUsages(ABC abc, UsagesFilter filter) {

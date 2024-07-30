@@ -94,7 +94,7 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     public void setCharacterId(int characterId) {
         this.buttonId = characterId;
     }
-   
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

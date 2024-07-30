@@ -102,10 +102,10 @@ public class DefineFont3Tag extends FontTag {
 
     @Conditional("fontFlagsHasLayout")
     public List<KERNINGRECORD> fontKerningTable;
-    
+
     @Internal
     public long unknownGfx;
-    
+
     @Internal
     public boolean strippedShapes = false;
 
@@ -143,7 +143,7 @@ public class DefineFont3Tag extends FontTag {
         fontName = sis.readNetString("fontName");
         int numGlyphs = sis.readUI16("numGlyphs");
         strippedShapes = swf.hasStrippedShapesFromFonts();
-        
+
         if (!strippedShapes) {
             long[] offsetTable = new long[numGlyphs];
             long pos = sis.getPos();

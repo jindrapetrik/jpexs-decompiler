@@ -52,7 +52,7 @@ public class FirstInstance {
     private static boolean canCommunicate = false;
     private static boolean inited = false;
 
-    public synchronized static void ensureInited() {
+    public static synchronized void ensureInited() {
         if (inited) {
             return;
         }

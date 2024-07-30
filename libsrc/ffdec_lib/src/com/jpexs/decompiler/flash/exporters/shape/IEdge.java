@@ -35,8 +35,8 @@ public interface IEdge {
     public int getFillStyleIdx();
 
     public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
-    
+
     public IEdge reverse();
-    
+
     public IEdge sameWithNewFillStyle(int newFillStyleIdx);
 }

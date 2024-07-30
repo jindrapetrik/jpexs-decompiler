@@ -101,7 +101,7 @@ public class ASM3Parser {
             return label + " at address " + offset;
         }
 
-    }   
+    }
 
     private static int checkMultinameIndex(AVM2ConstantPool constants, int index, int line) throws AVM2ParseException {
         if ((index < 0) || (index >= constants.getMultinameCount())) {
@@ -733,7 +733,7 @@ public class ASM3Parser {
         }
         return new ValueKind(value_index, value_kind);
     }
-    
+
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         return parse(abc, reader, trait, null, body, info);
     }

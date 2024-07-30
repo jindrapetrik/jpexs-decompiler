@@ -54,12 +54,12 @@ public class ImageImporter extends TagImporter {
     }
 
     /**
-     * 
+     *
      * @param it
      * @param newData
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public Tag importImage(ImageTag it, byte[] newData, int tagType) throws IOException {
         if (newData.length >= 2 && newData[0] == 'B' && newData[1] == 'M') {
@@ -78,16 +78,15 @@ public class ImageImporter extends TagImporter {
             }
         }
         if (tagType == -1) {
-            if (newData.length >= 4 
-                    && newData[0] == (byte) 0xff 
+            if (newData.length >= 4
+                    && newData[0] == (byte) 0xff
                     && newData[1] == (byte) 0xd8
                     && newData[2] == (byte) 0xff
-                    && newData[3] == (byte) 0xe0
-                ) {
+                    && newData[3] == (byte) 0xe0) {
                 tagType = DefineBitsJPEG2Tag.ID;
             } else {
                 tagType = DefineBitsLosslessTag.ID;
-            }            
+            }
         }
 
         if (it.getId() == tagType) {
@@ -237,10 +236,10 @@ public class ImageImporter extends TagImporter {
                 List<File> existingAlphaFilesForImageTag = new ArrayList<>();
                 List<String> classNameExpectedFileNames = new ArrayList<>();
                 for (String className : imageTag.getClassNames()) {
-                    classNameExpectedFileNames.add(Helper.makeFileName(className));                            
+                    classNameExpectedFileNames.add(Helper.makeFileName(className));
                 }
 
-                for (File f : allFiles) {                    
+                for (File f : allFiles) {
                     if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                         existingFilesForImageTag.add(f);
                     } else {

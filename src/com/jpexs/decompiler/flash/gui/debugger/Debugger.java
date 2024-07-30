@@ -46,22 +46,19 @@ public class Debugger {
     public static final int MSG_LOADER_BYTES = 2;
 
     public static final int MSG_DUMP_BYTEARRAY = 3;
-    
+
     public static final int MSG_REQUEST_BYTEARRAY = 4;
-    
-        
+
     private static final Set<DebugListener> listeners = new HashSet<>();
 
     private static Logger logger = Logger.getLogger(Debugger.class.getName());
-    
+
     private static boolean active = false;
 
     public static boolean isActive() {
         return active;
     }
-    
-    
-    
+
     public synchronized void addMessageListener(DebugListener l) {
         listeners.add(l);
     }
@@ -84,7 +81,6 @@ public class Debugger {
 
         private final Map<String, String> parameters = new HashMap<>();
 
-        
         public String getParameter(String name, String defValue) {
             if (parameters.containsKey(name)) {
                 return parameters.get(name);
@@ -133,7 +129,7 @@ public class Debugger {
             os.write(data.length & 0xff);
             os.write(data);
         }
-        
+
         private byte[] readBytes(InputStream is) throws IOException {
             int len = is.read();
             if (len == -1) {
@@ -187,8 +183,7 @@ public class Debugger {
         @Override
         public void run() {
             String clientName = Integer.toString(id);
-            try (InputStream is = s.getInputStream();
-                OutputStream os = s.getOutputStream()) {
+            try (InputStream is = s.getInputStream(); OutputStream os = s.getOutputStream()) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
                 int c;
@@ -227,25 +222,25 @@ public class Debugger {
                     }
                     while (true) {
                         int type = 0;
-                        logger.finer("reading type..."); 
+                        logger.finer("reading type...");
                         if (hasType) {
                             type = readType(is);
                         }
                         logger.log(Level.FINE, "received type {0}", type);
                         switch (type) {
                             case MSG_STRING:
-                                logger.finer("reading string...");                                
+                                logger.finer("reading string...");
                                 ret = readString(is);
-                                logger.finer("informing listeners..."); 
+                                logger.finer("informing listeners...");
                                 for (DebugListener l : listeners) {
                                     l.onMessage(clientName, ret);
                                 }
                                 logger.finer("listeners informed");
                                 break;
                             case MSG_LOADER_URL:
-                                logger.finer("reading string...");                                
+                                logger.finer("reading string...");
                                 ret = readString(is);
-                                logger.finer("informing listeners...");           
+                                logger.finer("informing listeners...");
                                 for (DebugListener l : listeners) {
                                     l.onLoaderURL(clientName, ret);
                                 }
@@ -254,7 +249,7 @@ public class Debugger {
                             case MSG_LOADER_BYTES:
                                 logger.finer("reading bytes...");
                                 byte[] retB = readBytes(is);
-                                logger.finer("informing listeners...");                                
+                                logger.finer("informing listeners...");
                                 for (DebugListener l : listeners) {
                                     l.onLoaderBytes(clientName, retB);
                                 }
@@ -263,14 +258,14 @@ public class Debugger {
                             case MSG_DUMP_BYTEARRAY:
                                 logger.finer("reading bytes...");
                                 byte[] retBa = readBytes(is);
-                                logger.finer("informing listeners...");                                
+                                logger.finer("informing listeners...");
                                 for (DebugListener l : listeners) {
                                     l.onDumpByteArray(clientName, retBa);
                                 }
                                 logger.finer("listeners informed");
                                 break;
                             case MSG_REQUEST_BYTEARRAY:
-                                logger.finer("checking listeners for data...");                                
+                                logger.finer("checking listeners for data...");
                                 boolean dataFound = false;
                                 for (DebugListener l : listeners) {
                                     byte[] data = l.onRequestBytes(clientName);

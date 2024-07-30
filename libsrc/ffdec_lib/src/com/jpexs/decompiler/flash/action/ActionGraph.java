@@ -364,7 +364,7 @@ public class ActionGraph extends Graph {
                     checkedLoop = null;
                 }
             }
-            
+
             EnumerateActionItem enumerateItem = null;
             BinaryOpItem comparisonOp = null;
             //for..in inside switch before break
@@ -379,7 +379,7 @@ public class ActionGraph extends Graph {
                                 EqActionItem eq = (EqActionItem) checkedCondition;
                                 if (eq.rightSide instanceof DirectValueActionItem) {
                                     DirectValueActionItem dv = (DirectValueActionItem) eq.rightSide;
-                                    if (dv.value == Null.INSTANCE) {   
+                                    if (dv.value == Null.INSTANCE) {
                                         GraphTargetItem en = list.get(t - 1);
                                         if (en instanceof EnumerateActionItem) {
                                             enumerateItem = (EnumerateActionItem) en;
@@ -406,13 +406,13 @@ public class ActionGraph extends Graph {
                             enumerateItem = (EnumerateActionItem) en;
                             if (ne.leftSide instanceof StoreRegisterActionItem) {
                                 comparisonOp = ne;
-                            }                            
+                            }
                         }
                     }
                 }
             }
             if (comparisonOp != null) {
-                                    
+
                 if (checkedBody != null && (!checkedBody.isEmpty()) && (checkedBody.get(0) instanceof SetTypeActionItem)) {
                     SetTypeActionItem sti = (SetTypeActionItem) checkedBody.get(0);
 

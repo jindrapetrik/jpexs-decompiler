@@ -61,14 +61,14 @@ public class FLVOutputStream extends OutputStream {
         alignByte();
         os.write(b);
         pos += b.length;
-    }        
+    }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         alignByte();
         os.write(b, off, len);
         pos += len;
-    }        
+    }
 
     private void alignByte() throws IOException {
         if (bitPos > 0) {

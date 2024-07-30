@@ -803,7 +803,7 @@ public class ActionScript3Parser {
                         if (classNameStr == null) {
                             isStatic = true;
                         }
-                        
+
                         s = lex();
                         if (s.type == SymbolType.NAMESPACESUFFIX) {
                             namespace = new NamespaceItem((Integer) s.value);
@@ -838,7 +838,7 @@ public class ActionScript3Parser {
                             t = st;
                         } else {
                             t = ft;
-                        }                       
+                        }
                         //NOTE: Looks like TraitFunction does not work in FlashPlayer - use MethodTrait instead
                         /*else {
                          t = function(metadata, pkg, isInterface, new Reference<Boolean>(false), importedClasses, namespace, thisType, openedNamespaces, fname, false, new ArrayList<AssignableAVM2Item>());
@@ -1894,7 +1894,7 @@ public class ActionScript3Parser {
 
         return ret;
 
-    }    
+    }
 
     /*private GraphTargetItem expressionRemainder(TypeItem thisType, String pkg, Reference<Boolean> needsActivation, List<NamespaceItem> openedNamespaces, GraphTargetItem expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables, List<DottedChain> importedClasses) throws IOException, AVM2ParseException {
      GraphTargetItem ret = null;
@@ -1949,7 +1949,7 @@ public class ActionScript3Parser {
         }
         return arrCnt;
     }
-    
+
     private GraphTargetItem expression(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables, boolean allowComma) throws IOException, AVM2ParseException, InterruptedException {
         return expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, allowRemainder, variables, allowComma);
     }

@@ -276,7 +276,7 @@ public class Multiname {
             }
         }
         return kindStr;
-    }    
+    }
 
     public static String namespaceToString(AVM2ConstantPool constants, int index) {
         if (index == 0) {
@@ -338,7 +338,7 @@ public class Multiname {
         }
         return constants.getMultiname(index).toString(constants, fullyQualifiedNames);
     }
-    
+
     @Override
     public String toString() {
         String kindStr = getKindStr();

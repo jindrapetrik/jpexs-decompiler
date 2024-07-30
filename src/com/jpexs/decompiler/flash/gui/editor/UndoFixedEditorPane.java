@@ -163,9 +163,9 @@ public class UndoFixedEditorPane extends JEditorPane {
                         ((SyntaxDocument) doc).setIgnoreUpdate(false);
                     }
 
-                    doc.putProperty(PlainDocument.tabSizeAttribute, Configuration.tabSize.get());                    
+                    doc.putProperty(PlainDocument.tabSizeAttribute, Configuration.tabSize.get());
                     doc.putProperty("jpexs:useTabs", Configuration.indentUseTabs.get());
-                    
+
                     setDocument(doc);
                 } catch (BadLocationException | IOException ex) {
                     Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.SEVERE, null, ex);

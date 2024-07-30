@@ -207,7 +207,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         saveButton.setEnabled(false);
         editButton.setVisible(!val);
         cancelButton.setVisible(val);
-        selectedLabel.setIcon(val ? View.getIcon("editing16") : null);        
+        selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
     }
 
     public void showCard(final String name, final Trait trait, int traitIndex, ABC abc) {

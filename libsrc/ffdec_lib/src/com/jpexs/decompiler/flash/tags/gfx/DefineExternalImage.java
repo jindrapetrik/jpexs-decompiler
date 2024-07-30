@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
-import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
@@ -53,13 +53,12 @@ public class DefineExternalImage extends AbstractGfxImageTag {
 
     //I guess this probably depends on ExporterInfo version - version 1 probably has shortFormat    
     public boolean shortFormat = false;
-        
+
     public String exportName;
 
-    @Conditional(value = "shortFormat", revert = true)    
-    public String fileName;   
-    
-    
+    @Conditional(value = "shortFormat", revert = true)
+    public String fileName;
+
     @HideInRawEdit
     private SerializableImage serImage;
 
@@ -115,7 +114,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         targetHeight = sis.readUI16("targetHeight");
         exportName = sis.readNetString("exportName");
         if (sis.available() > 0) {
-            fileName = sis.readNetString("fileName");            
+            fileName = sis.readNetString("fileName");
             shortFormat = false;
         } else {
             shortFormat = true;
@@ -176,7 +175,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         }
         return fileName;
     }
-    
+
     private void initImage() {
         String fname = getFilename();
         if (Objects.equals(cachedImageFilename, fname)
@@ -206,12 +205,12 @@ public class DefineExternalImage extends AbstractGfxImageTag {
     public boolean importSupported() {
         return false;
     }
-    
+
     @Override
     public void getTagInfo(TagInfo tagInfo) {
         super.getTagInfo(tagInfo);
-        
-        tagInfo.addInfo("general", "exportName", exportName);        
+
+        tagInfo.addInfo("general", "exportName", exportName);
         if (!shortFormat) {
             tagInfo.addInfo("general", "fileName", fileName);
         }
@@ -219,7 +218,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         String fileFormatStr = FileFormatType.fileFormatToString(bitmapFormat);
         if (fileFormatStr != null) {
             bitmapFormatStr = fileFormatStr + " (" + bitmapFormat + ")";
-        }        
+        }
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
     }
 }

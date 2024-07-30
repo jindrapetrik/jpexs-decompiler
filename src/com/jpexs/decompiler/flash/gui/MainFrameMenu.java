@@ -161,7 +161,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 try {
                     openable.saveTo(baos);
                     SWF swf = (SWF) openable;
-                    byte[] data = baos.toByteArray();                    
+                    byte[] data = baos.toByteArray();
                     swf.binaryData.setDataBytes(new ByteArrayRange(data));
                     swf.binaryData.setModified(true);
                     swf.binaryData.getTopLevelBinaryData().pack();
@@ -1356,7 +1356,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.flattenASPackages.addListener(configListenerFlattenASPackages = (Boolean newValue) -> {
             setMenuChecked("/settings/flattenASPackages", newValue);
         });
-     
+
         if (Platform.isWindows()) {
             setMenuChecked("/settings/associate", ContextMenuTools.isAddedToContextMenu());
         }

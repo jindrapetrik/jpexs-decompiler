@@ -93,7 +93,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
     public static final String FOLDER_OTHERS = "others";
 
     public static final String FOLDER_SCRIPTS = "scripts";
-    
+
     public static final String FOLDER_SCENES = "scenes";
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
@@ -266,7 +266,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
             frames.add(timeline.getFrame(i));
         }
         List<TreeItem> scenes = new ArrayList<>();
-        
+
         List<Scene> sceneList = timeline.getScenes();
         scenes.addAll(sceneList);
 
@@ -435,7 +435,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     return newPath;
                 }
             }
-            
+
             if (obj instanceof FolderItem && n instanceof FolderItem) {
                 // FolderItems are always recreated, so compare them by name and swf
                 FolderItem nds = (FolderItem) n;
@@ -696,7 +696,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof SoundStreamHeadTypeTag) {
             SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) parentNode;
             return head.getRanges().get(index);
-        } 
+        }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
     }
@@ -715,7 +715,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof SWF) {
             return mappedSize + getSwfFolders((SWF) parentNode).size();
         } else if (parentNode instanceof Scene) {
-            return mappedSize + ((Scene) parentNode).getSceneFrameCount();            
+            return mappedSize + ((Scene) parentNode).getSceneFrameCount();
         } else if (parentNode instanceof HeaderItem) {
             return mappedSize + 0;
         } else if (parentNode instanceof FolderItem) {

@@ -243,11 +243,11 @@ public class FolderListPanel extends JPanel {
                     String s;
                     if (treeItem instanceof Tag) {
                         Tag t = (Tag) treeItem;
-                        String uniqueId = t.getUniqueId();                                                
+                        String uniqueId = t.getUniqueId();
                         s = ((Tag) treeItem).getTagName();
                         if (uniqueId != null) {
                             s = s + " (" + uniqueId + ")";
-                        }                        
+                        }
                     } else {
                         s = treeItem.toString();
                     }

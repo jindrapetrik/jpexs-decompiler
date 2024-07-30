@@ -92,7 +92,6 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
         this.fontId = characterId;
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();

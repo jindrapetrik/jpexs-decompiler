@@ -148,7 +148,7 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
                 } else {
                     max <<= 30;
                 }
-                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);            
+                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);
                 break;
             case SI32:
                 m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
@@ -242,5 +242,5 @@ public class NumberEditor extends JSpinner implements GenericTagEditor {
     @Override
     public Object getObject() {
         return obj;
-    }        
+    }
 }

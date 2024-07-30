@@ -128,8 +128,8 @@ public class Timeline {
     private boolean initialized = false;
 
     private Map<String, Integer> labelToFrame = new HashMap<>();
-    
-    private List<Scene> scenes = new ArrayList<>();            
+
+    private List<Scene> scenes = new ArrayList<>();
 
     public static final int DRAW_MODE_ALL = 0;
     public static final int DRAW_MODE_SHAPES = 1;
@@ -148,9 +148,9 @@ public class Timeline {
     }
 
     /**
-     * 
+     *
      * @param index 0-based frame index
-     * @return 
+     * @return
      */
     public synchronized Frame getFrame(int index) {
         ensureInitialized();
@@ -285,7 +285,7 @@ public class Timeline {
         frame.layersChanged = true;
         boolean newFrameNeeded = false;
         scenes = new ArrayList<>();
-        Scene prevScene = null;                
+        Scene prevScene = null;
         for (Tag t : timelined.getTags()) {
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
@@ -305,9 +305,9 @@ public class Timeline {
                         prevScene.endFrame = ioffset - 1;
                     }
                     prevScene = currentScene;
-                }                
+                }
             }
-            
+
             if (t instanceof ASMSourceContainer) {
                 ASMSourceContainer asmSourceContainer = (ASMSourceContainer) t;
                 if (!asmSourceContainer.getSubItems().isEmpty()) {
@@ -382,7 +382,7 @@ public class Timeline {
                     } else {
                         fl.key = characterId != -1 || className != null;
                     }
-                    
+
                     if (po.flagMove()) {
                         MATRIX matrix2 = po.getMatrix();
                         if (matrix2 != null) {
@@ -439,7 +439,7 @@ public class Timeline {
                         fl.clipDepth = po.getClipDepth();
                         fl.isVisible = po.isVisible();
                     }
-                }               
+                }
 
             } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
@@ -463,7 +463,7 @@ public class Timeline {
         if (newFrameNeeded) {
             frames.add(frame);
         }
-        
+
         if (prevScene != null) {
             prevScene.endFrame = frames.size() - 1;
         }
@@ -620,7 +620,7 @@ public class Timeline {
                 ranges = new ArrayList<>();
                 range = new SoundStreamFrameRange(head);
                 range.startFrame = -1;
-                range.endFrame = -1;  
+                range.endFrame = -1;
                 numFramesNoSound = MIN_NUM_FRAMES_NO_SOUND;
                 soundStreamRanges.put(containerId, ranges);
                 continue;
@@ -635,13 +635,13 @@ public class Timeline {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 populateSoundStreamBlocks(sprite.getCharacterId(), sprite.getTags());
             }
-            
+
             if (t instanceof ShowFrameTag) {
                 frame++;
                 if (frameHasSound) {
                     numFramesNoSound = 0;
                 } else {
-                    numFramesNoSound++;                    
+                    numFramesNoSound++;
                 }
                 frameHasSound = false;
                 if (sceneOffsets.contains(frame) && range != null) {
@@ -661,20 +661,20 @@ public class Timeline {
                 continue;
             }
 
-            if (t instanceof SoundStreamBlockTag) {                
+            if (t instanceof SoundStreamBlockTag) {
                 if (numFramesNoSound >= MIN_NUM_FRAMES_NO_SOUND && range.endFrame > -1) {
                     ranges.add(range);
                     range = new SoundStreamFrameRange(head);
                     range.startFrame = -1;
-                    range.endFrame = -1;  
-                }               
+                    range.endFrame = -1;
+                }
                 range.blocks.add((SoundStreamBlockTag) t);
                 if (range.startFrame == -1) {
                     range.startFrame = frame;
                 }
                 range.endFrame = frame;
                 frameHasSound = true;
-            }            
+            }
         }
         if (range != null && ranges != null && range.endFrame > -1) {
             ranges.add(range);
@@ -850,7 +850,7 @@ public class Timeline {
 
         double deltaXMax = 0;
         double deltaYMax = 0;
-            
+
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
             for (FILTER filter : filters) {
@@ -949,7 +949,7 @@ public class Timeline {
             if (blendMode > 1) {
                 clrTrans2 = null;
             }
-            
+
             if (filters != null && !filters.isEmpty()) {
                 clrTrans2 = null;
             }
@@ -1133,7 +1133,7 @@ public class Timeline {
             }
 
             if (clipChanged) {
-                if (clips.size() > 0) {                    
+                if (clips.size() > 0) {
                     Area clip = null;
                     if (prevClip != null) {
                         clip = new Area(prevClip);
@@ -1543,7 +1543,7 @@ public class Timeline {
 
         return false;
     }
-    
+
     public List<Scene> getScenes() {
         ensureInitialized();
         return new ArrayList<>(scenes);

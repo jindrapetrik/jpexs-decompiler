@@ -62,9 +62,9 @@ public class GRADIENT implements Serializable {
     public static final int INTERPOLATION_RESERVED2 = 3;
 
     @SWFArray(value = "record")
-    public GRADRECORD[] gradientRecords = new GRADRECORD[0];        
-    
-    public boolean isCompatibleGradient(GRADIENT otherGradient) {                
+    public GRADRECORD[] gradientRecords = new GRADRECORD[0];
+
+    public boolean isCompatibleGradient(GRADIENT otherGradient) {
         if (interpolationMode != otherGradient.interpolationMode) {
             return false;
         }
@@ -76,7 +76,7 @@ public class GRADIENT implements Serializable {
         }
         return true;
     }
-    
+
     public MORPHGRADIENT toMorphGradient() {
         MORPHGRADIENT morphGradient = new MORPHGRADIENT();
         morphGradient.interPolationMode = interpolationMode;
@@ -87,7 +87,7 @@ public class GRADIENT implements Serializable {
         }
         return morphGradient;
     }
-    
+
     public MORPHGRADIENT toMorphGradient(GRADIENT endGradient) {
         if (!isCompatibleGradient(endGradient)) {
             return null;
@@ -140,6 +140,5 @@ public class GRADIENT implements Serializable {
         }
         return Arrays.deepEquals(this.gradientRecords, other.gradientRecords);
     }
-    
-    
+
 }

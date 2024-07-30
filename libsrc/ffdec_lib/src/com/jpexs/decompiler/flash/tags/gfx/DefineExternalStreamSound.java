@@ -239,14 +239,14 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public String getCharacterExportFileName() {
         return "" + getCharacterId();
     }
-    
+
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
         ret.put("chid", "" + virtualCharacterId);
         return ret;
     }
-    
+
     @Override
     public String getUniqueId() {
         return "" + virtualCharacterId;
@@ -263,12 +263,12 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", sampleCount);
     }
-    
+
     @Override
     public String getFlaExportName() {
         return "sound" + getCharacterId();
     }
-            
+
     @Override
     public int getInitialLatency() {
         return 0;

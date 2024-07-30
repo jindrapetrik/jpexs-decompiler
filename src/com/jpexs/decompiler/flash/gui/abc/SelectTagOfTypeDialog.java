@@ -56,7 +56,7 @@ public class SelectTagOfTypeDialog extends AppDialog {
             if (t instanceof ShowFrameTag) {
                 frame++;
             }
-            
+
             if (frame >= minFrame) {
                 if (tagType.isAssignableFrom(t.getClass())) {
                     tagComboBox.addItem(new ComboItem(pos, t, frame));

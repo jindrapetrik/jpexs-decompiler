@@ -142,8 +142,8 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     @Override
     public void setWidth(int width) {
         this.width = width;
-    }        
-    
+    }
+
     public boolean isCompatibleLineStyle(LINESTYLE2 otherLineStyle, SWF swf) {
         if (startCapStyle != otherLineStyle.startCapStyle) {
             return false;
@@ -151,15 +151,15 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         if (endCapStyle != otherLineStyle.endCapStyle) {
             return false;
         }
-        
+
         if (joinStyle != otherLineStyle.joinStyle) {
             return false;
         }
-        
+
         if (hasFillFlag != otherLineStyle.hasFillFlag) {
             return false;
         }
-        
+
         if (noVScaleFlag != otherLineStyle.noVScaleFlag) {
             return false;
         }
@@ -172,16 +172,16 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         if (miterLimitFactor != otherLineStyle.miterLimitFactor) {
             return false;
         }
-        
+
         if (hasFillFlag) {
             if (!fillType.isCompatibleFillStyle(otherLineStyle.fillType, swf)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     public MORPHLINESTYLE2 toMorphLineStyle2() {
         MORPHLINESTYLE2 morphLineStyle2 = new MORPHLINESTYLE2();
         morphLineStyle2.startWidth = width;
@@ -209,11 +209,11 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         if (!isCompatibleLineStyle(endLineStyle, swf)) {
             return null;
         }
-        
+
         MORPHLINESTYLE2 morphLineStyle2 = new MORPHLINESTYLE2();
         morphLineStyle2.startWidth = width;
         morphLineStyle2.endWidth = endLineStyle.width;
-        morphLineStyle2.startCapStyle = startCapStyle;        
+        morphLineStyle2.startCapStyle = startCapStyle;
         morphLineStyle2.joinStyle = joinStyle;
         morphLineStyle2.hasFillFlag = hasFillFlag;
         morphLineStyle2.noHScaleFlag = noHScaleFlag;
@@ -303,6 +303,5 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         }
         return Objects.equals(this.fillType, other.fillType);
     }
-    
-    
+
 }

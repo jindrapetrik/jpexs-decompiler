@@ -94,7 +94,7 @@ public class MovieExporter {
                     }
                 }, handler).run();
 
-                Set<String> classNames = videoStream.getClassNames();                    
+                Set<String> classNames = videoStream.getClassNames();
                 if (Configuration.as3ExportNamesUseClassNamesOnly.get() && !classNames.isEmpty()) {
                     for (String className : classNames) {
                         File classFile = new File(outdir + File.separator + Helper.makeFileName(className + ".flv"));
@@ -104,10 +104,10 @@ public class MovieExporter {
                         ret.add(classFile);
                     }
                     file.delete();
-                } else {                
+                } else {
                     ret.add(file);
                 }
-                
+
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }

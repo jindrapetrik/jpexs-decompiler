@@ -2415,7 +2415,7 @@ public class AVM2Code implements Cloneable {
         }, body);
         code.remove(pos);
         //checkValidOffsets(body);
-    }   
+    }
 
     /**
      * Replaces instruction by another. Properly handles offsets. Note: If

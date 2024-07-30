@@ -111,7 +111,7 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         write(val & 0xff);
         write((val >> 8) & 0xff);
         return true;
-    }   
+    }
 
     @Override
     public boolean writeUI8(int val) throws IOException {
@@ -215,22 +215,22 @@ public abstract class AbstractDataStream implements DataStreamInterface {
         switch (pad8) {
             case 1:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 2:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 3:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 4:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 5:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 6:
                 write(0);
-                //fallthrough
+            //fallthrough
             case 7:
                 write(0);
         }

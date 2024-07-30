@@ -131,7 +131,7 @@ public class ClipboardPanel extends JPanel {
             clearButton.setToolTipText(AppStrings.translate("clipboard.clear.frame"));
         } else {
             label.setToolTipText(AppStrings.translate("clipboard.hint"));
-            clearButton.setToolTipText(AppStrings.translate("clipboard.clear"));  
+            clearButton.setToolTipText(AppStrings.translate("clipboard.clear"));
         }
         setVisible(clipboardSize > 0);
     }

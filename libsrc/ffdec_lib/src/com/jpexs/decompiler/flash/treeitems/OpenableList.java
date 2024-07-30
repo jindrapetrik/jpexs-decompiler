@@ -85,12 +85,12 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
     @Override
     public <T> T[] toArray(T[] ts) {
         return items.toArray(ts);
-    }      
+    }
 
     @Override
     public boolean containsAll(Collection<?> clctn) {
         return items.containsAll(clctn);
-    }    
+    }
 
     @Override
     public boolean removeAll(Collection<?> clctn) {

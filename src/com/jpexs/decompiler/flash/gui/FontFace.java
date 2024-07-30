@@ -47,11 +47,11 @@ public class FontFace implements Comparable<FontFace> {
     public boolean isBold() {
         return toString().toLowerCase().contains("bold");
     }
-    
+
     public boolean isItalic() {
         return toString().toLowerCase().contains("italic");
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 7;

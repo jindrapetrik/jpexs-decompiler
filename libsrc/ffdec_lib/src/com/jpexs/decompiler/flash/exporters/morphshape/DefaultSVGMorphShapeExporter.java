@@ -72,7 +72,7 @@ public abstract class DefaultSVGMorphShapeExporter extends MorphShapeExporterBas
             pathData.append("Z");
             pathDataEnd.append("Z");
         }
-        finalizePath();          
+        finalizePath();
     }
 
     @Override

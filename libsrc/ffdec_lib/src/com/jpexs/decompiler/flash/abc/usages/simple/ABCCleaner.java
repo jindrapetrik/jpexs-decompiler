@@ -51,7 +51,7 @@ import java.util.Map;
  */
 public class ABCCleaner {
 
-    public void clean(ABC abc) {                
+    public void clean(ABC abc) {
         ABCSimpleUsageDetector usageDetector = new ABCSimpleUsageDetector(abc);
         usageDetector.detect();
         Map<ABCSimpleUsageDetector.ItemKind, List<List<String>>> usages = usageDetector.getUsages();
@@ -74,8 +74,8 @@ public class ABCCleaner {
                     pos++;
                 }
             }
-        }        
-        
+        }
+
         for (int i = 0; i < abc.script_info.size(); i++) {
             ScriptInfo m = abc.script_info.get(i);
             m.init_index = handleReplace(ABCSimpleUsageDetector.ItemKind.METHODINFO, m.init_index, replaceMap);
@@ -300,7 +300,7 @@ public class ABCCleaner {
         if (abc.parentTag != null) {
             ((Tag) abc.parentTag).setModified(true);
         }
-        abc.fireChanged();        
+        abc.fireChanged();
     }
 
     private int handleReplace(ABCSimpleUsageDetector.ItemKind kind, int index, Map<ABCSimpleUsageDetector.ItemKind, Map<Integer, Integer>> replaceMap) {
@@ -376,6 +376,5 @@ public class ABCCleaner {
             }
         }
     }
-    
-    
+
 }

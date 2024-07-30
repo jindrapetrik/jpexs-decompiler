@@ -164,7 +164,7 @@ public class As12PCodeDocs extends AbstractDocs {
             }
         }
         return identName.toString();
-    }   
+    }
 
     public static String getDocsForIns(String insName, boolean ui, boolean standalone, boolean nightMode, int argumentToHilight) {
         insName = insName.toLowerCase();

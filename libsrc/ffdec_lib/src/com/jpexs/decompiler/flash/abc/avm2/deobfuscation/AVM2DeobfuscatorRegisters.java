@@ -299,7 +299,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
                         public int adr2pos(long adr) {
                             return code.adr2pos(adr);
                         }
-                        
+
                         @Override
                         public int adr2pos(long adr, boolean nearest) {
                             return code.adr2pos(adr, nearest);

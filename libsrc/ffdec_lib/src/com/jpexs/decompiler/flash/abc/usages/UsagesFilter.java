@@ -21,5 +21,6 @@ package com.jpexs.decompiler.flash.abc.usages;
  * @author JPEXS
  */
 public interface UsagesFilter {
+
     public int filterUsage(int originalIndex);
 }

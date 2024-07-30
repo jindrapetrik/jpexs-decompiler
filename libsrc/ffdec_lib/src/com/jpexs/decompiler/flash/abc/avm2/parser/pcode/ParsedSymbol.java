@@ -23,7 +23,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 public class ParsedSymbol {
 
     public int pos;
-    
+
     public int type;
 
     public Object value;

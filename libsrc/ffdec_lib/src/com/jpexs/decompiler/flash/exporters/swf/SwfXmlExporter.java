@@ -158,7 +158,7 @@ public class SwfXmlExporter {
 
             if (isListItem) {
                 writer.writeStartElement(name);
-                writer.writeCharacters(stringValue);                
+                writer.writeCharacters(stringValue);
                 writer.writeEndElement();
             } else {
                 writer.writeAttribute(name, stringValue);

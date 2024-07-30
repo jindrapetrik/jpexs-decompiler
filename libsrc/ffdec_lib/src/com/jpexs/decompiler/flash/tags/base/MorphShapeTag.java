@@ -77,7 +77,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         super(swf, id, name, data);
     }
 
-    public abstract int getShapeNum();    
+    public abstract int getShapeNum();
 
     @Override
     public RECT getRectWithStrokes() {
@@ -151,7 +151,7 @@ public abstract class MorphShapeTag extends DrawableTag {
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
-    
+
     @Override
     public RECT getRect() {
         return getRect(new HashSet<>());
@@ -189,18 +189,18 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     public SHAPE getEndEdges() {
         return endEdges;
-    }   
-    
+    }
+
     public abstract ShapeTag getShapeTagAtRatio(int ratio);
-    
+
     public ShapeTag getStartShapeTag() {
         return getShapeTagAtRatio(0);
     }
-    
+
     public ShapeTag getEndShapeTag() {
         return getShapeTagAtRatio(65535);
     }
-    
+
     public SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
@@ -342,7 +342,7 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-    
+
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);

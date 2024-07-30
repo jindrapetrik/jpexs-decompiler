@@ -35,22 +35,22 @@ import java.util.Stack;
 public class BezierEdge implements Serializable {
 
     public List<Point2D> points = new ArrayList<>(3);
-    
+
     private List<Point2D> revPoints = new ArrayList<>();
-    
+
     private int hash;
-    
+
     private int revHash;
-    
+
     private Rectangle2D bbox;
 
     private boolean empty;
-    
+
     public BezierEdge(List<Point2D> points) {
         this.points = points;
         calcParams();
     }
-        
+
     @Override
     public BezierEdge clone() {
         return new BezierEdge(new ArrayList<>(points));
@@ -127,17 +127,15 @@ public class BezierEdge implements Serializable {
             }
         }
 
-                        
-        this.bbox = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);       
+        this.bbox = new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
         this.hash = points.hashCode();
-        
+
         revPoints = new ArrayList<>();
         for (int i = points.size() - 1; i >= 0; i--) {
             revPoints.add(points.get(i));
         }
         this.revHash = revPoints.hashCode();
-        
-        
+
         empty = true;
         Point2D p1 = getBeginPoint();
         for (int i = 1; i < points.size(); i++) {
@@ -147,7 +145,7 @@ public class BezierEdge implements Serializable {
             }
         }
     }
-    
+
     public Rectangle2D bbox() {
         return bbox;
     }
@@ -398,7 +396,7 @@ public class BezierEdge implements Serializable {
         right.setVal(new BezierEdge(rightPoints));
     }
 
-    public BezierEdge reverse() {        
+    public BezierEdge reverse() {
         return new BezierEdge(revPoints);
     }
 
@@ -430,7 +428,7 @@ public class BezierEdge implements Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {        
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -446,7 +444,7 @@ public class BezierEdge implements Serializable {
         }
         return Objects.equals(this.points, other.points);
     }
-    
+
     public boolean equalsReverse(BezierEdge other) {
         if (hash != other.revHash) {
             return false;
@@ -538,8 +536,8 @@ public class BezierEdge implements Serializable {
         System.err.println("t1 is " + t1);
         System.err.println("t2 is " + t2);
         System.err.println("intersections is " + ps);
-*/
-        /*Shape r1 = new Rectangle2D.Double(0, 0, 200, 100);
+         */
+ /*Shape r1 = new Rectangle2D.Double(0, 0, 200, 100);
         GeneralPath r2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
         r2.moveTo(0, 0);
         r2.lineTo(100, 0);
@@ -573,9 +571,8 @@ public class BezierEdge implements Serializable {
         //a1.exclusiveOr(a2);
                 
         
-        */
-        
-        /*GeneralPath p1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+         */
+ /*GeneralPath p1 = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
         p1.moveTo(0, 0);
         p1.lineTo(200, 0);
         p1.lineTo(200, 200);
@@ -590,10 +587,8 @@ public class BezierEdge implements Serializable {
         p1.closePath();
 
         System.err.println("cont:" + p1.contains(100, 100));
-        System.err.println("cont:" + p1.contains(150, 150));  */                       
-        
+        System.err.println("cont:" + p1.contains(150, 150));  */
         //System.err.println("minDist = " + minDist+", maxDist = "+ maxDist);
-        
         //System.err.println("eArea = " + Areas.calcArea(a1));
 
         /*Point2D c = new Point2D.Double(

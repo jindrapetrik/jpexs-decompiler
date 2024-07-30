@@ -61,7 +61,7 @@ public class DebugLogDialog extends AppDialog {
             public void onMessage(String clientId, String msg) {
                 log(translate("msg.header").replace("%clientid%", clientId) + msg);
             }
-            
+
             @Override
             public void onLoaderURL(String clientId, String url) {
                 log(translate("msg.header").replace("%clientid%", clientId) + " LOADURL:" + url);
@@ -75,7 +75,7 @@ public class DebugLogDialog extends AppDialog {
             @Override
             public void onDumpByteArray(String clientId, byte[] data) {
                 log(translate("msg.header").replace("%clientid%", clientId) + " DUMPBYTEARRAY: " + data.length + "B");
-            }                             
+            }
         });
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());

@@ -46,7 +46,7 @@ class SvgStyle {
     private final SvgImporter importer;
 
     private final Map<String, Element> idMap;
-    
+
     private final Map<String, Integer> cachedBitmaps;
 
     private final double epsilon = 0.001;
@@ -171,7 +171,7 @@ class SvgStyle {
     public double getFillOpacity() {
         return getValue(element, "fill-opacity");
     }
-    
+
     public String getFillRule() {
         return getValue(element, "fill-rule");
     }
@@ -211,7 +211,7 @@ class SvgStyle {
     public double getStopOpacity() {
         return getValue(element, "stop-opacity");
     }
-    
+
     public String getVectorEffect() {
         return getValue(element, "vector-effect");
     }
@@ -563,7 +563,7 @@ class SvgStyle {
 
         if (mPat.matches()) {
             String elementId = mPat.group(1);
-            Element e = idMap.get(elementId);            
+            Element e = idMap.get(elementId);
             if (e != null) {
                 if (cachedBitmaps.containsKey(elementId)) {
                     SvgBitmapFill bitmapFill = new SvgBitmapFill();
@@ -583,9 +583,9 @@ class SvgStyle {
                     } else {
                         bitmapFill.smoothed = true;
                     }
-                    return bitmapFill;                    
+                    return bitmapFill;
                 }
-            
+
                 String tagName = e.getTagName();
                 if ("linearGradient".equals(tagName)) {
                     SvgFill ret = parseGradient(idMap, e);
@@ -602,14 +602,14 @@ class SvgStyle {
                     NodeList childNodes = e.getChildNodes();
                     for (int i = 0; i < childNodes.getLength(); i++) {
                         if (childNodes.item(i) instanceof Element) {
-                            
+
                             if ("animateTransform".equals(((Element) childNodes.item(i)).getTagName())) {
                                 continue;
                             }
-                            
-                            if (element != null) {                                
+
+                            if (element != null) {
                                 element = null;
-                                break;                                
+                                break;
                             }
 
                             element = (Element) childNodes.item(i);

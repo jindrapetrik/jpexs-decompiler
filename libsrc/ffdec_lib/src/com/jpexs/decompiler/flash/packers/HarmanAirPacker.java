@@ -43,7 +43,7 @@ public class HarmanAirPacker implements Packer {
             return false;
         }
         return null;
-    }        
+    }
 
     @Override
     public boolean decrypt(InputStream is, OutputStream os) throws IOException {
@@ -75,5 +75,5 @@ public class HarmanAirPacker implements Packer {
     @Override
     public String getIdentifier() {
         return "harmanair";
-    }        
+    }
 }

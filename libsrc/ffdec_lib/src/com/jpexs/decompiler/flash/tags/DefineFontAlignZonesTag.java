@@ -114,7 +114,6 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
         this.fontID = characterId;
     }
 
-    
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
