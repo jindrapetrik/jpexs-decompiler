@@ -102,7 +102,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         fileName = "";
         targetWidth = 1;
         targetHeight = 1;
-        bitmapFormat = BITMAP_FORMAT_DDS;
+        bitmapFormat = FileFormatType.FILE_DDS;
         createFailedImage();
     }
 
@@ -171,21 +171,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
     private String getFilename() {
         if (shortFormat) {
             //Just guessing how this may work...
-            String extension = ".dds";
-            switch (bitmapFormat) {
-                case BITMAP_FORMAT_DDS:
-                case BITMAP_FORMAT2_DDS:
-                    extension = ".dds";
-                    break;
-                case BITMAP_FORMAT_TGA:
-                case BITMAP_FORMAT2_TGA:
-                    extension = ".tga";
-                    break;
-                case BITMAP_FORMAT2_JPEG:
-                    extension = ".jpg";
-                    break;
-            }
-            return exportName + extension;
+            return exportName + "." + FileFormatType.fileFormatExtension(bitmapFormat);
         }
         return fileName;
     }
@@ -229,26 +215,10 @@ public class DefineExternalImage extends AbstractGfxImageTag {
             tagInfo.addInfo("general", "fileName", fileName);
         }
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
-        switch (bitmapFormat) {
-            case BITMAP_FORMAT_DEFAULT:
-                bitmapFormatStr = "default (0)";
-                break;
-            case BITMAP_FORMAT_TGA:
-                bitmapFormatStr = "TGA (1)";
-                break;
-            case BITMAP_FORMAT_DDS:
-                bitmapFormatStr = "DDS (2)";
-                break;
-            case BITMAP_FORMAT2_JPEG:
-                bitmapFormatStr = "JPEG (10)";
-                break;
-            case BITMAP_FORMAT2_TGA:
-                bitmapFormatStr = "TGA (13)";
-                break;
-            case BITMAP_FORMAT2_DDS:
-                bitmapFormatStr = "DDS (14)";
-                break;
-        }
+        String fileFormatStr = FileFormatType.fileFormatToString(bitmapFormat);
+        if (fileFormatStr != null) {
+            bitmapFormatStr = fileFormatStr + " (" + bitmapFormat + ")";
+        }        
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
     }
 }
