@@ -195,7 +195,7 @@ public class ShapeImporter {
     public int bulkImport(File shapesDir, SWF swf, boolean noFill, boolean printOut) {
         SvgImporter svgImporter = new SvgImporter();
 
-        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int shapeCount = 0;
         List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
         File[] allFiles = shapesDir.listFiles(new FilenameFilter() {

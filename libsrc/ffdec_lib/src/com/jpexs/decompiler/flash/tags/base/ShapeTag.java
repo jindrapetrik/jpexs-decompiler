@@ -194,7 +194,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         BitmapExporter.export(getWindingRule(), getShapeNum(), swf, getShapes(), null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes, canUseSmoothing);
         if (Configuration._debugMode.get()) { // show control points
             List<GeneralPath> paths = PathExporter.export(getWindingRule(), getShapeNum(), swf, getShapes());
@@ -238,13 +238,13 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
         SVGShapeExporter shapeExporter = new SVGShapeExporter(getWindingRule(), getShapeNum(), swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 
     @Override
-    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
         CanvasShapeExporter cse = new CanvasShapeExporter(getWindingRule(), getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());

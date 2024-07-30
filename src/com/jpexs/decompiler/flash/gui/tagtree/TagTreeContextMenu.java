@@ -2274,7 +2274,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 targetSwf.updateCharacters();
-                targetSwf.getCharacters(); // force rebuild character id cache
+                targetSwf.getCharacters(true); // force rebuild character id cache
                 copyTag.setModified(true);
                 newTags.add(copyTag);                
                 if (itemsSet.contains(tag)) {
@@ -5132,7 +5132,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     realTargetTimelined.addTag(positionInt, copyTag);
 
                     targetSwf.updateCharacters();
-                    targetSwf.getCharacters(); // force rebuild character id cache
+                    targetSwf.getCharacters(true); // force rebuild character id cache
                     copyTag.setModified(true);
                     newTags.add(copyTag);
                     if (move) {

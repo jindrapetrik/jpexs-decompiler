@@ -207,6 +207,7 @@ import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -323,7 +324,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private volatile Map<Integer, CharacterTag> characters;
+    
+    @Internal
+    private volatile Map<Integer, CharacterTag> charactersWithImported;
 
+    
+    @Internal
+    private volatile Map<CharacterIdTag, Integer> characterToId;
+    
     @Internal
     private volatile Map<Integer, DefineExternalImage2> externalImages2;
 
@@ -418,6 +426,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private Map<String, Integer> exportNameToCharacter = new HashMap<>();
     
     @Internal
+    private Map<String, Integer> importedNameToCharacter = new HashMap<>();
+    
+    @Internal
     private AbcIndexing abcIndex;
 
     @Internal
@@ -430,7 +441,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     
     @Internal
     public String debuggerPackage = null;
-
+    
+    private Map<Integer, SWF> importedCharacterSourceSwfs = new HashMap<>();
+    private Map<Integer, Integer> importedCharacterIds = new HashMap<>();
+    
+    
     private static AbcIndexing playerGlobalAbcIndex;
 
     private static AbcIndexing airGlobalAbcIndex;
@@ -572,6 +587,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public void updateCharacters() {
         characters = null;
+        charactersWithImported = null;
+        characterToId = null;        
         characterIdTags = null;
         externalImages2 = null;
     }
@@ -628,6 +645,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         clearAbcListCache();
 
         characters = null;
+        charactersWithImported = null;
+        characterToId = null;
         characterIdTags = null;
         externalImages2 = null;
 
@@ -647,31 +666,59 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         di.getChildInfos().clear();
     }
-
-    public Map<Integer, CharacterTag> getCharacters() {
-        if (characters == null) {
+        
+    public Map<Integer, CharacterTag> getCharacters(boolean withImported) {        
+        if (characters == null) {            
             synchronized (this) {
                 if (characters == null) {
                     if (destroyed) {
                         return new HashMap<>();
                     }
                     Map<Integer, CharacterTag> chars = new HashMap<>();
+                    Map<Integer, CharacterTag> charsWithImported = new HashMap<>();
                     Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
                     Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
                     parseCharacters(getTags(), eimages, chars, charIdtags);
+                    charsWithImported.putAll(chars);
+                    for (int importedCharacterId : importedCharacterIds.keySet()) {
+                        int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
+                        SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
+                        charsWithImported.put(importedCharacterId, importedSwf.getCharacter(exportedCharacterId));
+                        charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));                                                
+                        //FIXME? eimages
+                        
+                        charsWithImported.get(importedCharacterId).setImported(true, true);
+                        for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
+                            if (chi instanceof Tag) {
+                                ((Tag) chi).setImported(true, true);
+                            }
+                        }
+                    }
+                    Map<CharacterIdTag, Integer> charToId = new IdentityHashMap<>();
+                    for (int id : charsWithImported.keySet()) {
+                        charToId.put(charsWithImported.get(id), id);
+                    }
+                    for (int id : charIdtags.keySet()) { 
+                        for (CharacterIdTag ch : charIdtags.get(id)) {
+                            charToId.put(ch, id);
+                        }
+                    }
+                    
                     characters = Collections.unmodifiableMap(chars);
+                    charactersWithImported = Collections.unmodifiableMap(charsWithImported);
+                    characterToId = Collections.unmodifiableMap(charToId);                            
                     characterIdTags = Collections.unmodifiableMap(charIdtags);
                     externalImages2 = Collections.unmodifiableMap(eimages);
                 }
             }
         }
 
-        return characters;
+        return withImported ? charactersWithImported : characters;
     }
 
     public Map<Integer, DefineExternalImage2> getExternalImages2() {
         if (externalImages2 == null) {
-            getCharacters();
+            getCharacters(true);
         }
         return externalImages2;
     }
@@ -683,12 +730,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public List<CharacterIdTag> getCharacterIdTags(int characterId) {
         if (characterIdTags == null) {
-            getCharacters();
+            getCharacters(true);
         }
 
         return characterIdTags.get(characterId);
     }
-
+      
     public CharacterIdTag getCharacterIdTag(int characterId, int tagId) {
         List<CharacterIdTag> characterIdTags = getCharacterIdTags(characterId);
         if (characterIdTags != null) {
@@ -760,7 +807,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             for (int chId : dependents2) {
                 if (!visited.contains(chId)) {
                     visited.add(chId);
-                    if (getCharacters().containsKey(chId)) {
+                    if (getCharacters(true).containsKey(chId)) {
                         deps = getDependentCharacters().get(chId);
                         if (deps != null) {
                             dependents2.addAll(deps);
@@ -774,7 +821,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         Set<Integer> dependents = new LinkedHashSet<>();
         for (Integer chId : dependents2) {
-            if (getCharacters().containsKey(chId)) {
+            if (getCharacters(true).containsKey(chId)) {
                 dependents.add(chId);
             }
         }
@@ -816,7 +863,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public CharacterTag getCharacter(int characterId) {
-        return getCharacters().get(characterId);
+        return getCharacters(true).get(characterId);
     }
 
     public CharacterTag getCharacterByClass(String className) {
@@ -828,15 +875,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
     
     public CharacterTag getCharacterByExportName(String exportName) {
-        if (!exportNameToCharacter.containsKey(exportName)) {
-            return null;            
+        int charId;
+        if (importedNameToCharacter.containsKey(exportName)) {
+            charId = importedNameToCharacter.get(exportName);
+        } else if (exportNameToCharacter.containsKey(exportName)){ 
+            charId = exportNameToCharacter.get(exportName);
+        } else {
+            return null;
         }
-        int charId = exportNameToCharacter.get(exportName);
         return getCharacter(charId);
     }
 
     public String getExportName(int characterId) {
-        CharacterTag characterTag = getCharacters().get(characterId);
+        CharacterTag characterTag = getCharacters(true).get(characterId);
         String exportName = characterTag != null ? characterTag.getExportName() : null;
         return exportName;
     }
@@ -884,8 +935,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return null;
     }
 
+    /**
+     * This gets real character id of a character tag on this SWF.
+     * Normal .getCharacterId method od the CharacterTag does not work for imported characters
+     * @param tag
+     * @return Character id or -1 if not found
+     */
+    public int getCharacterId(CharacterIdTag tag) {
+        if (characterToId == null) {
+            getCharacters(true);
+        }
+        if (!characterToId.containsKey(tag)) {
+            return -1;
+        }
+        return characterToId.get(tag);
+    }
+    
     public FontTag getFont(int fontId) {
-        CharacterTag characterTag = getCharacters().get(fontId);
+        CharacterTag characterTag = getCharacters(true).get(fontId);
         if (characterTag instanceof FontTag) {
             return (FontTag) characterTag;
         }
@@ -898,7 +965,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public ImageTag getImage(int imageId) {
-        CharacterTag characterTag = getCharacters().get(imageId);
+        CharacterTag characterTag = getCharacters(true).get(imageId);
         if (characterTag instanceof ImageTag) {
             return (ImageTag) characterTag;
         }
@@ -911,7 +978,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public DefineSoundTag getSound(int soundId) {
-        CharacterTag characterTag = getCharacters().get(soundId);
+        CharacterTag characterTag = getCharacters(true).get(soundId);
         if (characterTag instanceof DefineSoundTag) {
             return (DefineSoundTag) characterTag;
         }
@@ -924,7 +991,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public TextTag getText(int textId) {
-        CharacterTag characterTag = getCharacters().get(textId);
+        CharacterTag characterTag = getCharacters(true).get(textId);
         if (characterTag instanceof TextTag) {
             return (TextTag) characterTag;
         }
@@ -996,7 +1063,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public int getNextCharacterId() {
         int max = 0;
-        Set<Integer> ids = new HashSet<>(getCharacters().keySet());
+        Set<Integer> ids = new HashSet<>(getCharacters(false).keySet());
         for (Tag t : tags) {
             if (t instanceof ImportTag) {
                 ids.addAll(((ImportTag) t).getAssets().keySet());
@@ -1505,7 +1572,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
     }
 
-    private void resolveImported(UrlResolver resolver) {
+    private synchronized void resolveImported(UrlResolver resolver) {
         for (int p = 0; p < tags.size(); p++) {
             Tag t = tags.get(p);
             if (t instanceof ImportTag) {
@@ -1513,186 +1580,33 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                 SWF iSwf = resolver.resolveUrl(importTag.getUrl());
                 if (iSwf != null) {
-                    Map<Integer, String> exportedMap1 = new HashMap<>();
-                    Map<Integer, String> classesMap1 = new HashMap<>();
-
+                    
+                    Map<Integer, String> importedIdToNameMap = importTag.getAssets();
+                    
+                    Map<String, Integer> exportedNameToIdsMap = new HashMap<>();
+                    
                     for (Tag t2 : iSwf.tags) {
                         if (t2 instanceof ExportAssetsTag) {
                             ExportAssetsTag sc = (ExportAssetsTag) t2;
-                            Map<Integer, String> m2 = sc.getTagToNameMap();
-                            for (int key : m2.keySet()) {
-                                if (!exportedMap1.containsKey(key)) {
-                                    exportedMap1.put(key, m2.get(key));
-                                }
-                            }
-                        }
-                        if (t2 instanceof SymbolClassTag) {
-                            SymbolClassTag sc = (SymbolClassTag) t2;
-                            Map<Integer, String> m2 = sc.getTagToNameMap();
-                            for (int key : m2.keySet()) {
-                                if (!classesMap1.containsKey(key)) {
-                                    classesMap1.put(key, m2.get(key));
-                                }
-                            }
-                        }
+                            for (int i = 0; i < sc.names.size(); i++) {
+                               exportedNameToIdsMap.put(sc.names.get(i), sc.tags.get(i));
+                            }                           
+                        }                        
                     }
-                    Map<String, Integer> exportedMap2 = new HashMap<>();
-                    for (int k : exportedMap1.keySet()) {
-                        exportedMap2.put(exportedMap1.get(k), k);
-                    }
-
-                    Map<String, Integer> classesMap2 = new HashMap<>();
-                    for (int k : classesMap1.keySet()) {
-                        classesMap2.put(classesMap1.get(k), k);
-                    }
-
-                    Map<Integer, String> importedMap1 = importTag.getAssets();
-                    Map<String, Integer> importedMap2 = new HashMap<>();
-                    for (int k : importedMap1.keySet()) {
-                        importedMap2.put(importedMap1.get(k), k);
-                    }
-
-                    int pos = 0;
-                    Set<Integer> importedCharIds = new HashSet<>();
-                    Set<Integer> importedTagPos = new HashSet<>();
-                    List<CharacterTag> importedCharacters = new ArrayList<>();
-                    for (String key : importedMap2.keySet()) {
-                        if (!exportedMap2.containsKey(key)) {
-                            continue; //?
-                        }
-                        int exportedId = exportedMap2.get(key);
-                        int importedId = importedMap2.get(key);
-                        int ip = 0;
-                        for (Tag cht : iSwf.tags) {
-                            if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
-
-                                importedCharIds.add(exportedId);
-                                Tag chtCopy = null;
-                                try {
-                                    chtCopy = cht.cloneTag();
-                                    CharacterIdTag ch = (CharacterIdTag) chtCopy;
-                                    ch.setCharacterId(importedId);
-                                    setImportedDeep(chtCopy, false);
-
-                                    tags.add(p + 1 + pos, chtCopy);
-                                } catch (InterruptedException | IOException ex) {
-                                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-
-                                importedTagPos.add(ip);
-                                if (cht instanceof CharacterTag) {
-                                    importedCharacters.add((CharacterTag) chtCopy);
-                                    String exportName = ((CharacterTag) cht).getExportName();
-                                    LinkedHashSet<String> classNames = ((CharacterTag) cht).getClassNames();
-                                    if (exportName != null) {
-                                        importedTagToExportNameMapping.put(importedId, exportName);
-                                    }
-                                    if (!classNames.isEmpty()) {
-                                        importedTagToClassesMapping.put(importedId, classNames);
-                                    }
-                                } else {
-                                    chtCopy.setTimelined(this);
-                                    chtCopy.setSwf(this);
-                                }
-                                pos++;
-                            }
-                            ip++;
-                        }
-                    }
-
-                    int newId = getNextCharacterId();
-                    pos = 0;
-                    for (String key : classesMap2.keySet()) {
-                        int exportedId = classesMap2.get(key);
-                        int importedId = newId++;
-                        int ip = 0;
-                        for (Tag cht : iSwf.tags) {
-                            if (!importedTagPos.contains(ip) && (cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
-
-                                importedCharIds.add(exportedId);
-                                Tag chtCopy = null;
-                                try {
-                                    chtCopy = cht.cloneTag();
-                                    CharacterIdTag ch = (CharacterIdTag) chtCopy;
-                                    ch.setCharacterId(importedId);
-                                    setImportedDeep(chtCopy, false);
-
-                                    tags.add(p + 1 + pos, chtCopy);
-                                } catch (InterruptedException | IOException ex) {
-                                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                if (cht instanceof CharacterTag) {
-                                    importedCharacters.add((CharacterTag) chtCopy);
-                                    String exportName = ((CharacterTag) cht).getExportName();
-                                    LinkedHashSet<String> classNames = ((CharacterTag) cht).getClassNames();
-                                    if (exportName != null) {
-                                        importedTagToExportNameMapping.put(importedId, exportName);
-                                    }
-                                    if (!classNames.isEmpty()) {
-                                        importedTagToClassesMapping.put(importedId, classNames);
-                                    }
-                                } else {
-                                    chtCopy.setSwf(this);
-                                    chtCopy.setTimelined(this);
-                                }
-                                pos++;
-                            }
-                            ip++;
-                        }
-                    }
-
-                    pos = 0;
-                    for (CharacterTag ich : importedCharacters) {
-                        Set<Integer> needed = new LinkedHashSet<>();
-                        ich.getNeededCharactersDeep(needed);
-                        Map<Integer, Integer> replaceCharactersMap = new HashMap<>();
-                        for (int n : needed) {
-                            if (importedCharIds.contains(n)) {
-                                continue;
-                            }
-                            CharacterTag cht = iSwf.getCharacter(n);
-                            int importedId = newId++;
-                            CharacterTag chtCopy = null;
-                            try {
-                                chtCopy = (CharacterTag) cht.cloneTag();
-                            } catch (InterruptedException | IOException ex) {
-                                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            chtCopy.setSwf(this);
-                            replaceCharactersMap.put(n, importedId);
-                            chtCopy.setCharacterId(importedId);
-                            setImportedDeep(chtCopy, true);
-                            tags.add(p + 1 + pos, chtCopy);
-                            pos++;
-                        }
-
-                        Map<Integer, Integer> replaceCharactersMap2 = new HashMap<>();
-
-                        //first map to non existing ids
-                        int iNewId = iSwf.getNextCharacterId();
-                        for (int from : replaceCharactersMap.keySet()) {
-                            int to = iNewId++;
-                            replaceCharactersMap2.put(to, replaceCharactersMap.get(from));
-                            ich.replaceCharacter(from, to);
-                        }
-
-                        for (int from : replaceCharactersMap2.keySet()) {
-                            int to = replaceCharactersMap2.get(from);
-                            ich.replaceCharacter(from, to);
-                        }
-                        //ich.setModified(false);
-                        setSwfDeep(ich);
-                        ich.setTimelined(this);
-                    }
-                    updateCharacters();
-                    for (CharacterTag ich : importedCharacters) {
-                        if (ich instanceof DefineSpriteTag) {
-                            ((DefineSpriteTag) ich).resetTimeline();
+                    
+                    for (int importedId : importedIdToNameMap.keySet()) {
+                        String importedName = importedIdToNameMap.get(importedId);
+                        if (exportedNameToIdsMap.containsKey(importedName)) {
+                            int exportedId = exportedNameToIdsMap.get(importedName);
+                            importedCharacterSourceSwfs.put(importedId, iSwf);                                                       
+                            importedCharacterIds.put(importedId, exportedId);
+                            importedNameToCharacter.put(importedName, importedId);
                         }
                     }
                 }
             }
         }
+        updateCharacters();
     }
 
     private void setSwfDeep(Tag t) {
@@ -2663,7 +2577,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (ch instanceof FontTag) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("function ").append(getTypePrefix(ch)).append(c).append("(ctx,ch,textColor){\r\n");
-                ((FontTag) ch).toHtmlCanvas(sb, 1);
+                ((FontTag) ch).toHtmlCanvas(fswf, sb, 1);
                 sb.append("}\r\n\r\n");
                 fos.write(Utf8Helper.getBytes(sb.toString()));
             } else {
@@ -2677,7 +2591,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 fos.write(Utf8Helper.getBytes("function " + getTypePrefix(ch) + c + "(ctx,ctrans,frame,ratio,time){\r\n"));
                 if (ch instanceof DrawableTag) {
                     StringBuilder sb = new StringBuilder();
-                    ((DrawableTag) ch).toHtmlCanvas(sb, 1);
+                    ((DrawableTag) ch).toHtmlCanvas(fswf, sb, 1);
                     fos.write(Utf8Helper.getBytes(sb.toString()));
                 }
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
@@ -3351,6 +3265,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public void clearAllCache() {
         characters = null;
+        charactersWithImported = null;
+        characterToId = null;
         characterIdTags = null;
         externalImages2 = null;
         timeline = null;
@@ -3857,13 +3773,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public ReadOnlyTagList getLocalTags() {
-        List<Tag> localTags = new ArrayList<>();
+        /*List<Tag> localTags = new ArrayList<>();
         for (Tag t : tags) {
             if (!t.isImported()) {
                 localTags.add(t);
             }
-        }
-        return new ReadOnlyTagList(localTags);
+        }*/
+        return new ReadOnlyTagList(tags);
     }
 
     /**

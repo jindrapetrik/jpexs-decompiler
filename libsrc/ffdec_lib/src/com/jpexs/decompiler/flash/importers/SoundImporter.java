@@ -483,7 +483,7 @@ public class SoundImporter {
 
     public int bulkImport(File soundDir, SWF swf, boolean printOut) {
 
-        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int soundCount = 0;
         List<String> extensions = Arrays.asList("mp3", "wav");
         File[] allFiles = soundDir.listFiles(new FilenameFilter() {

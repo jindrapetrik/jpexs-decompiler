@@ -2340,7 +2340,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(SpriteExportMode.class)) {
             SpriteExportSettings ses = new SpriteExportSettings(export.getValue(SpriteExportMode.class), export.getZoom());
-            for (CharacterTag c : swf.getCharacters().values()) {
+            for (CharacterTag c : swf.getCharacters(false).values()) {
                 if (c instanceof DefineSpriteTag) {
                     frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, ses, evl);
                 }
@@ -2349,7 +2349,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(ButtonExportMode.class)) {
             ButtonExportSettings bes = new ButtonExportSettings(export.getValue(ButtonExportMode.class), export.getZoom());
-            for (CharacterTag c : swf.getCharacters().values()) {
+            for (CharacterTag c : swf.getCharacters(false).values()) {
                 if (c instanceof ButtonTag) {
                     frameExporter.exportButtonFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME), swf, c.getCharacterId(), null, bes, evl);
                 }
@@ -2453,7 +2453,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(SpriteExportMode.class)) {
             for (SpriteExportMode exportMode : SpriteExportMode.values()) {
                 SpriteExportSettings ses = new SpriteExportSettings(exportMode, export.getZoom());
-                for (CharacterTag c : swf.getCharacters().values()) {
+                for (CharacterTag c : swf.getCharacters(false).values()) {
                     if (c instanceof DefineSpriteTag) {
                         frameExporter.exportSpriteFrames(handler, Path.combine(selFile, SpriteExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, ses, evl);
                     }
@@ -2464,7 +2464,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(ButtonExportMode.class)) {
             for (ButtonExportMode exportMode : ButtonExportMode.values()) {
                 ButtonExportSettings bes = new ButtonExportSettings(exportMode, export.getZoom());
-                for (CharacterTag c : swf.getCharacters().values()) {
+                for (CharacterTag c : swf.getCharacters(false).values()) {
                     if (c instanceof ButtonTag) {
                         frameExporter.exportButtonFrames(handler, Path.combine(selFile, ButtonExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, c.getCharacterId(), null, bes, evl);
                     }
@@ -4462,7 +4462,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             @Override
             public boolean handle(TextTag textTag, final FontTag font, final char character) {
-                String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
+                String fontName = font.getSwf().sourceFontNamesMap.get(font.getCharacterId());
                 if (fontName == null) {
                     fontName = font.getFontName();
                 }
@@ -5601,17 +5601,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if ((treeItem instanceof BUTTONRECORD) && (!((BUTTONRECORD) treeItem).getSwf().getCyclicCharacters().contains(((BUTTONRECORD) treeItem).characterId))) {
             BUTTONRECORD buttonRecord = (BUTTONRECORD) treeItem;
             previewPanel.setParametersPanelVisible(false);
-            SWF swf = new SWF(buttonRecord.getSwf().getCharset());
+            SWF origSwf = ((SWF)treeItem.getOpenable());
+            /*SWF swf = new SWF(buttonRecord.getSwf().getCharset());
             swf.frameCount = 1;
             swf.frameRate = buttonRecord.getSwf().frameRate;
             swf.displayRect = buttonRecord.getTag().getRect();
+            swf.gfx = origSwf.gfx;
+            swf.setFile(origSwf.getFile()); // For GFX to properly load
             if (swf.getBackgroundColor() != null) {
                 SetBackgroundColorTag setBackgroundColorTag = new SetBackgroundColorTag(swf, swf.getBackgroundColor().backgroundColor);
                 swf.addTag(setBackgroundColorTag);
                 setBackgroundColorTag.setTimelined(swf);
-            }
+            }*/
             CharacterTag character = buttonRecord.getSwf().getCharacter(buttonRecord.characterId);
-            Set<Integer> needed = new LinkedHashSet<>();
+            /*Set<Integer> needed = new LinkedHashSet<>();
             character.getNeededCharactersDeep(needed);
             needed.remove(buttonRecord.characterId);
             needed.add(buttonRecord.characterId);
@@ -5628,16 +5631,110 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 neededCharacter.setTimelined(swf);
                 swf.addTag(neededCharacter);
             }
+*/
+            Timelined tim = new Timelined() {
+                
+                ReadOnlyTagList cachedTags = null;
+                
+                @Override
+                public SWF getSwf() {
+                    return origSwf;
+                }
 
-            PlaceObject3Tag placeTag = buttonRecord.toPlaceObject();
-            placeTag.setSwf(swf);
+                @Override
+                public Timeline getTimeline() {
+                    return new Timeline(origSwf, this, Integer.MAX_VALUE,buttonRecord.getTag().getRect());
+                }
 
-            swf.addTag(placeTag);
-            placeTag.setTimelined(swf);
-            ShowFrameTag showFrameTag = new ShowFrameTag(swf);
-            swf.addTag(showFrameTag);
-            showFrameTag.setTimelined(swf);
-            previewPanel.showImagePanel(swf, swf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+                @Override
+                public void resetTimeline() {
+                    
+                }
+
+                @Override
+                public void setModified(boolean value) {
+                
+                }
+
+                @Override
+                public ReadOnlyTagList getTags() {
+                    if (cachedTags == null) {
+                        List<Tag> tags = new ArrayList<>();
+                        PlaceObject3Tag placeTag = buttonRecord.toPlaceObject();
+                        placeTag.setSwf(origSwf);
+                        placeTag.setTimelined(this);
+                        tags.add(placeTag);
+
+                        ShowFrameTag showFrameTag = new ShowFrameTag(origSwf);
+                        showFrameTag.setTimelined(this);
+                        tags.add(showFrameTag);
+                        cachedTags = new ReadOnlyTagList(tags);
+                    }
+                    return cachedTags;
+                }
+
+                @Override
+                public void removeTag(int index) {
+                }
+
+                @Override
+                public void removeTag(Tag tag) {
+                }
+
+                @Override
+                public void addTag(Tag tag) {
+                }
+
+                @Override
+                public void addTag(int index, Tag tag) {
+                }
+
+                @Override
+                public void replaceTag(int index, Tag newTag) {
+                }
+
+                @Override
+                public void replaceTag(Tag oldTag, Tag newTag) {
+                }
+
+                @Override
+                public int indexOfTag(Tag tag) {
+                    return getTags().indexOf(tag);
+                }
+
+                @Override
+                public void setFrameCount(int frameCount) {
+                }
+
+                @Override
+                public int getFrameCount() {
+                    return 1;
+                }
+
+                @Override
+                public RECT getRect() {
+                    return buttonRecord.getTag().getRect();
+                }
+
+                @Override
+                public RECT getRect(Set<BoundedTag> added) {
+                    return getRect();
+                }
+
+                @Override
+                public RECT getRectWithStrokes() {
+                    return getRect();
+                }
+            };
+            
+            
+
+            //swf.addTag(placeTag);
+            //placeTag.setTimelined(origSwf);
+            //ShowFrameTag showFrameTag = new ShowFrameTag(swf);
+            //swf.addTag(showFrameTag);
+            //showFrameTag.setTimelined(swf);
+            previewPanel.showImagePanel(tim, origSwf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
         } else if (treeItem instanceof DefineFont4Tag) {
             previewPanel.showGenericTagPanel((Tag) treeItem);
         } else {

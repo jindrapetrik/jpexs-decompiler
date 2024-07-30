@@ -2932,7 +2932,7 @@ public class CommandLineArgumentParser {
                         CharacterTag characterTag = null;
                         if (characterId == -1) {
                             //replacing soundstreamhead on main timeline
-                        } else if (swf.getCharacters().containsKey(characterId)) {
+                        } else if (swf.getCharacters(false).containsKey(characterId)) {
                             characterTag = swf.getCharacter(characterId);
                         } else {
                             System.err.println("CharacterId does not exist");
@@ -3163,7 +3163,7 @@ public class CommandLineArgumentParser {
                         System.err.println("ImageId should be integer");
                         badArguments("replacealpha");
                     }
-                    if (!swf.getCharacters().containsKey(imageId)) {
+                    if (!swf.getCharacters(false).containsKey(imageId)) {
                         System.err.println("ImageId does not exist");
                         System.exit(1);
                     }
@@ -3219,7 +3219,7 @@ public class CommandLineArgumentParser {
                         System.err.println("CharacterId should be integer");
                         badArguments("replacecharacter");
                     }
-                    if (!swf.getCharacters().containsKey(characterId)) {
+                    if (!swf.getCharacters(false).containsKey(characterId)) {
                         System.err.println("CharacterId does not exist");
                         System.exit(1);
                     }
@@ -3234,7 +3234,7 @@ public class CommandLineArgumentParser {
                         System.err.println("NewCharacterId should be integer");
                         badArguments("replacecharacter");
                     }
-                    if (!swf.getCharacters().containsKey(newCharacterId)) {
+                    if (!swf.getCharacters(false).containsKey(newCharacterId)) {
                         System.err.println("NewCharacterId does not exist");
                         System.exit(1);
                     }
@@ -3337,7 +3337,7 @@ public class CommandLineArgumentParser {
                     System.err.println("CharacterId should be integer");
                     badArguments("convert");
                 }
-                if (!swf.getCharacters().containsKey(characterId)) {
+                if (!swf.getCharacters(false).containsKey(characterId)) {
                     System.err.println("CharacterId does not exist");
                     System.exit(1);
                 }
@@ -3535,7 +3535,7 @@ public class CommandLineArgumentParser {
                         System.err.println("CharacterId should be integer");
                         badArguments("removecharacter");
                     }
-                    if (!swf.getCharacters().containsKey(characterId)) {
+                    if (!swf.getCharacters(false).containsKey(characterId)) {
                         System.err.println("CharacterId does not exist");
                         System.exit(1);
                     }
@@ -3808,7 +3808,7 @@ public class CommandLineArgumentParser {
 
                 @Override
                 public boolean handle(TextTag textTag, final FontTag font, final char character) {
-                    String fontName = font.getSwf().sourceFontNamesMap.get(font.getFontId());
+                    String fontName = font.getSwf().sourceFontNamesMap.get(font.getCharacterId());
                     if (fontName == null) {
                         fontName = font.getFontName();
                     }
@@ -4222,7 +4222,7 @@ public class CommandLineArgumentParser {
         pw.println("[tags]");
         pw.println("tagCount=" + swf.getTags().size());
         pw.println("hasEndTag=" + swf.hasEndTag);
-        pw.println("characterCount=" + (swf.getCharacters().size()));
+        pw.println("characterCount=" + (swf.getCharacters(true).size()));
         pw.println("maxCharacterId=" + (swf.getNextCharacterId() - 1));
         pw.println();
 

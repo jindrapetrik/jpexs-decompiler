@@ -57,7 +57,7 @@ import java.util.logging.Logger;
 public class MovieImporter {
 
     public int bulkImport(File moviesDir, SWF swf, boolean printOut) {
-        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int movieCount = 0;
         List<String> extensions = Arrays.asList("flv");
         File[] allFiles = moviesDir.listFiles(new FilenameFilter() {

@@ -2906,7 +2906,7 @@ public class XFLConverter {
                 statusStack.pushStatus(t.toString());
                 SWF swf = t.getSwf();
                 FontTag font = (FontTag) t;
-                int fontId = font.getFontId();
+                int fontId = font.getCharacterId();
                 DefineFontNameTag fontNameTag = (DefineFontNameTag) swf.getCharacterIdTag(fontId, DefineFontNameTag.ID);
                 String fontName = fontNameTag == null ? null : fontNameTag.fontName;
                 if (fontName == null) {
@@ -5576,7 +5576,7 @@ public class XFLConverter {
                         }
                     }
                     if (u instanceof FontTag) {
-                        if (((FontTag) u).getFontId() == det.fontId) {
+                        if (((FontTag) u).getCharacterId()== det.fontId) {
                             ft = (FontTag) u;
                         }
                     }
@@ -5694,7 +5694,7 @@ public class XFLConverter {
                                 if (f.equals(ft.getFontNameIntag())) {
                                     for (Tag u : tags) {
                                         if (u instanceof DefineFontNameTag) {
-                                            if (((DefineFontNameTag) u).fontId == ft.getFontId()) {
+                                            if (((DefineFontNameTag) u).fontId == ft.getCharacterId()) {
                                                 fontName = ((DefineFontNameTag) u).fontName;
                                             }
                                         }

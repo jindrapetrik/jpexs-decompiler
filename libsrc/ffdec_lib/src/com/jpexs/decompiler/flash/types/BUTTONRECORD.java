@@ -150,7 +150,7 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     @Override
     public String toString() {
-        return "BUTTONRECORD (" + characterId + ") Depth:" + placeDepth + " State:" + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : ""));
+        return "BUTTONRECORD (chid: " + characterId + ", dpt: " + placeDepth + ", state: " + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : "")).trim() + ")";
     }
 
     @Override

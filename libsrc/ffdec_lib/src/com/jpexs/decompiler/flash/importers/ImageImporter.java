@@ -194,7 +194,7 @@ public class ImageImporter extends TagImporter {
 
     public int bulkImport(File imagesDir, SWF swf, boolean printOut) {
         int count = 0;
-        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
         List<String> alphaExtensions = Arrays.asList("png");
         File[] allFiles = imagesDir.listFiles(new FilenameFilter() {

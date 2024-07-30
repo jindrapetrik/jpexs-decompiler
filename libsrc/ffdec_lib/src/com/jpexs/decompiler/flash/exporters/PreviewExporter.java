@@ -456,7 +456,7 @@ public class PreviewExporter {
 
                     int countGlyphsTotal = ft.getGlyphShapeTable().size();
                     int countGlyphs = Math.min(SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW, countGlyphsTotal);
-                    int fontId = ft.getFontId();
+                    int fontId = swf.getCharacterId(ft);
                     int cols = (int) Math.ceil(Math.sqrt(countGlyphs));
                     int rows = (int) Math.ceil(((float) countGlyphs) / ((float) cols));
                     if (rows == 0) {
