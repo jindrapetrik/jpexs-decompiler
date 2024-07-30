@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file.
   available through context menu on ABC, ABCContainers, SWFs and in the ABC Explorer,
   `-abcclean` command on CLI
 - GFX - better fileformat detection
-- GFX - DefineExternalImage2 - IdType field recognition
+- GFX - DefineExternalImage2, FontTextureInfo - IdType field recognition
 
 ### Fixed
 - Debugger - getting children of top level variables
