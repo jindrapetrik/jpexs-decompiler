@@ -1013,21 +1013,21 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        render(swf, TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
     }
 
     @Override
-    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-        render(swf, TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {    
+        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
     }
 
     @Override
-    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
-        render(swf, TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
     }
 
-    private void render(SWF swf, TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);

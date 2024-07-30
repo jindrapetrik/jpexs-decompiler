@@ -425,16 +425,17 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
-    public synchronized void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         SHAPERECORD.shapeListToImage(ShapeTag.WIND_EVEN_ODD, 1, swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 
     @Override
-    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+    
     }
 
     @Override
-    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         List<SHAPE> shapes = getGlyphShapeTable();
         result.append("\tdefaultFill = textColor;\r\n");
         result.append("\tswitch(ch){\r\n");

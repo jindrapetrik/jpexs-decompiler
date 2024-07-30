@@ -109,7 +109,7 @@ public class ShapeExporter {
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
-                                st.toSVG(st.getSwf(), exporter, -2, new CXFORMWITHALPHA(), 0);
+                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -130,7 +130,7 @@ public class ShapeExporter {
                             }
                             Matrix m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(st.getSwf(), 0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else {

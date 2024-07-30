@@ -93,12 +93,12 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         getTimeline().toImage(frame, time, renderContext, image, fullImage, isClip, transformation, strokeTransformation, absoluteTransformation, colorTransform, unzoom, sameImage, viewRect, fullTransformation, scaleStrokes, drawMode, blendMode, canUseSmoothing);
     }
 
     @Override
-    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
         getTimeline().toSVG(0, 0, null, 0, exporter, colorTransform, level + 1);
     }
 
@@ -110,7 +110,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         getTimeline().toHtmlCanvas(result, unitDivisor, Arrays.asList(0)); //TODO: handle states?
     }
 
