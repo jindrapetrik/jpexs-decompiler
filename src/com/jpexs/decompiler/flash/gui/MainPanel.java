@@ -5601,37 +5601,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if ((treeItem instanceof BUTTONRECORD) && (!((BUTTONRECORD) treeItem).getSwf().getCyclicCharacters().contains(((BUTTONRECORD) treeItem).characterId))) {
             BUTTONRECORD buttonRecord = (BUTTONRECORD) treeItem;
             previewPanel.setParametersPanelVisible(false);
-            SWF origSwf = ((SWF)treeItem.getOpenable());
-            /*SWF swf = new SWF(buttonRecord.getSwf().getCharset());
-            swf.frameCount = 1;
-            swf.frameRate = buttonRecord.getSwf().frameRate;
-            swf.displayRect = buttonRecord.getTag().getRect();
-            swf.gfx = origSwf.gfx;
-            swf.setFile(origSwf.getFile()); // For GFX to properly load
-            if (swf.getBackgroundColor() != null) {
-                SetBackgroundColorTag setBackgroundColorTag = new SetBackgroundColorTag(swf, swf.getBackgroundColor().backgroundColor);
-                swf.addTag(setBackgroundColorTag);
-                setBackgroundColorTag.setTimelined(swf);
-            }*/
-            CharacterTag character = buttonRecord.getSwf().getCharacter(buttonRecord.characterId);
-            /*Set<Integer> needed = new LinkedHashSet<>();
-            character.getNeededCharactersDeep(needed);
-            needed.remove(buttonRecord.characterId);
-            needed.add(buttonRecord.characterId);
-
-            for (int n : needed) {
-                CharacterTag neededCharacter;
-                try {
-                    neededCharacter = (CharacterTag) buttonRecord.getSwf().getCharacter(n).cloneTag();
-                } catch (InterruptedException | IOException ex) {
-                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    return;
-                }
-                neededCharacter.setSwf(swf);
-                neededCharacter.setTimelined(swf);
-                swf.addTag(neededCharacter);
-            }
-*/
+            SWF origSwf = ((SWF)treeItem.getOpenable());            
             Timelined tim = new Timelined() {
                 
                 ReadOnlyTagList cachedTags = null;
@@ -5725,15 +5695,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 public RECT getRectWithStrokes() {
                     return getRect();
                 }
-            };
-            
-            
-
-            //swf.addTag(placeTag);
-            //placeTag.setTimelined(origSwf);
-            //ShowFrameTag showFrameTag = new ShowFrameTag(swf);
-            //swf.addTag(showFrameTag);
-            //showFrameTag.setTimelined(swf);
+            };                        
             previewPanel.showImagePanel(tim, origSwf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
         } else if (treeItem instanceof DefineFont4Tag) {
             previewPanel.showGenericTagPanel((Tag) treeItem);

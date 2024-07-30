@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFHeader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -43,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -52,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -2746,93 +2749,113 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             item = ((TagScript) item).getTag();
         }
 
-        //previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         CharacterTag displayedCharacter = (CharacterTag) item;
+        
+        CharacterTag placedCharacter = displayedCharacter;        
+        SWF origSwf = placedCharacter.getSwf();
+        RECT rect = origSwf.getRect();
+        if (displayedCharacter instanceof BoundedTag) {
+            rect = ((BoundedTag) displayedCharacter).getRect();
+        }
+        final RECT frect = rect;
+        Timelined tim = new Timelined() {                
+            ReadOnlyTagList cachedTags = null;
 
-        SWF fSwf = new SWF(displayedCharacter.getSwf().getCharset());
-        fSwf.frameCount = 1;
-        fSwf.frameRate = displayedCharacter.getSwf().frameRate;
-        fSwf.displayRect = displayedCharacter.getSwf().getRect();
-        CharacterTag character = displayedCharacter;
-        Set<Integer> needed = new LinkedHashSet<>();
-        CharacterTag placedCharacter = displayedCharacter;
-        if (displayedCharacter instanceof ButtonTag) {
-            ButtonTag buttonTag = (ButtonTag) displayedCharacter;
-            List<BUTTONRECORD> records = buttonTag.getRecords();
-            for (BUTTONRECORD rec : records) {
-                if (rec.buttonStateUp) {
-                    displayedCharacter.getSwf().getCharacter(rec.characterId).getNeededCharactersDeep(needed);
-                    needed.add(rec.characterId);
+            @Override
+            public SWF getSwf() {
+                return origSwf;
+            }
+
+            @Override
+            public Timeline getTimeline() {
+                return new Timeline(origSwf, this, Integer.MAX_VALUE, frect);
+            }
+
+            @Override
+            public void resetTimeline() {
+
+            }
+
+            @Override
+            public void setModified(boolean value) {
+
+            }
+
+            @Override
+            public ReadOnlyTagList getTags() {
+                if (cachedTags == null) {
+                    List<Tag> tags = new ArrayList<>();
+                    PlaceObject3Tag placeTag = new PlaceObject3Tag(origSwf);
+                    placeTag.depth = 1;
+                    placeTag.characterId = placedCharacter.getCharacterId();
+                    placeTag.placeFlagHasCharacter = true;
+
+                    placeTag.matrix = new MATRIX();
+                    placeTag.setTimelined(this);
+                    tags.add(placeTag);
+                    ShowFrameTag showFrameTag = new ShowFrameTag(origSwf);
+                    showFrameTag.setTimelined(this);
+                    tags.add(showFrameTag);
+                    cachedTags = new ReadOnlyTagList(tags);
                 }
+                return cachedTags;
             }
-        } else {
-            displayedCharacter.getNeededCharactersDeep(needed);
-            needed.remove(displayedCharacter.getCharacterId());
-            needed.add(displayedCharacter.getCharacterId());
-        }
 
-        for (int n : needed) {
-            CharacterTag neededCharacter;
-            try {
-                neededCharacter = (CharacterTag) displayedCharacter.getSwf().getCharacter(n).cloneTag();
-            } catch (InterruptedException | IOException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-                return;
+            @Override
+            public void removeTag(int index) {
             }
-            neededCharacter.setSwf(fSwf);
-            neededCharacter.setTimelined(fSwf);
-            fSwf.addTag(neededCharacter);
-        }
 
-        if (displayedCharacter instanceof ButtonTag) {
-            DefineSpriteTag sprite = new DefineSpriteTag(fSwf);
-            sprite.frameCount = 1;
-            ButtonTag buttonTag = (ButtonTag) displayedCharacter;
-            List<BUTTONRECORD> records = buttonTag.getRecords();
-            for (BUTTONRECORD rec : records) {
-                if (rec.buttonStateUp) {
-                    PlaceObject3Tag p = rec.toPlaceObject();
-                    p.setSwf(fSwf);
-                    sprite.addTag(p);
-                    p.setTimelined(sprite);
-                }
+            @Override
+            public void removeTag(Tag tag) {
             }
-            ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
-            sprite.addTag(showFrameTag);
-            showFrameTag.setTimelined(sprite);
-            fSwf.addTag(sprite);
-            sprite.setTimelined(fSwf);
 
-            placedCharacter = sprite;
-        }
+            @Override
+            public void addTag(Tag tag) {
+            }
 
-        DefineSpriteTag sprite2 = new DefineSpriteTag(fSwf);
-        sprite2.frameCount = 1;
-        PlaceObject3Tag placeTag = new PlaceObject3Tag(fSwf);
-        placeTag.depth = 1;
-        placeTag.characterId = placedCharacter.getCharacterId();
-        placeTag.placeFlagHasCharacter = true;
+            @Override
+            public void addTag(int index, Tag tag) {
+            }
 
-        placeTag.matrix = new MATRIX();
-        placeTag.setTimelined(sprite2);
-        sprite2.addTag(placeTag);
-        ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
-        sprite2.addTag(showFrameTag);
-        showFrameTag.setTimelined(sprite2);
+            @Override
+            public void replaceTag(int index, Tag newTag) {
+            }
 
-        PlaceObject3Tag placeTag2 = new PlaceObject3Tag(fSwf);
-        placeTag2.depth = 1;
-        placeTag2.characterId = sprite2.getCharacterId();
-        placeTag2.placeFlagHasCharacter = true;
+            @Override
+            public void replaceTag(Tag oldTag, Tag newTag) {
+            }
 
-        placeTag2.matrix = new MATRIX();
-        fSwf.addTag(placeTag2);
-        placeTag2.setTimelined(fSwf);
-        showFrameTag = new ShowFrameTag(fSwf);
-        fSwf.addTag(showFrameTag);
-        showFrameTag.setTimelined(fSwf);
+            @Override
+            public int indexOfTag(Tag tag) {
+                return getTags().indexOf(tag);
+            }
 
-        imagePanel.setTimelined(sprite2, fSwf, 0, true, true, true, true, true, false, true);
+            @Override
+            public void setFrameCount(int frameCount) {
+            }
+
+            @Override
+            public int getFrameCount() {
+                return 1;
+            }
+
+            @Override
+            public RECT getRect() {
+                return frect;
+            }
+
+            @Override
+            public RECT getRect(Set<BoundedTag> added) {
+                return getRect();
+            }
+
+            @Override
+            public RECT getRectWithStrokes() {
+                return getRect();
+            }
+        };
+
+        imagePanel.setTimelined(tim, origSwf, 0, true, true, true, true, true, false, true);
         imagePanel.selectDepth(-1);
 
         replaceSpriteButton.setVisible(false);
@@ -2852,7 +2875,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                imagePanel.freeTransformDepth(placeTag2.getDepth());
+                imagePanel.freeTransformDepth(1);
                 imageTransformPanel.load();
             }
         }, 40); //add some delay before controls are hidden
