@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
@@ -639,6 +640,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
         ReadOnlyTagList tags = tim.getTags();
         for (int i = tags.indexOf(this) - 1; i >= 0; i--) {
+            if (tags.get(i) instanceof ImportTag) {
+                ImportTag it = (ImportTag) tags.get(i);
+                needed2.removeAll(it.getAssets().keySet());
+                if (needed2.isEmpty()) {
+                    return needed2;
+                }
+            }
             if (tags.get(i) instanceof CharacterTag) {
                 int charId = ((CharacterTag) tags.get(i)).getCharacterId();
                 needed2.remove(charId);
@@ -670,9 +678,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if (swf == null) {
                 return;
             }
-            if (swf.getCharacters().containsKey(characterId) && !swf.getCyclicCharacters().contains(characterId)) {
+            if (swf.getCharacters(true).containsKey(characterId) && !swf.getCyclicCharacters().contains(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
                 CharacterTag character = swf.getCharacter(characterId);
+                if (character.isImported()) {
+                    continue;
+                }
                 character.getNeededCharacters(needed4, swf);
                 List<Integer> newItems = new ArrayList<>();
                 for (int n : needed4) {
@@ -695,7 +706,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if (swf == null) {
                 return;
             }
-            if (swf.getCharacters().containsKey(characterId)) {
+            if (swf.getCharacters(true).containsKey(characterId)) {
                 needed.add(characterId);
             }
         }

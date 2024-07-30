@@ -230,7 +230,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
 
         if (replaced) {
             if (ViewMessages.showConfirmDialog(FontPanel.this, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                int fontId = ft.getFontId();
+                int fontId = ft.getCharacterId();
                 SWF swf = ft.getSwf();
                 for (Tag tag : swf.getTags()) {
                     if (tag instanceof TextTag) {
@@ -678,8 +678,8 @@ public class FontPanel extends JPanel implements TagEditorPanel {
             FontTag f = (FontTag) item;
             SWF swf = f.getSwf();
             String selectedName = ((FontFace) fontFaceSelection.getSelectedItem()).font.getFontName(Locale.ENGLISH);
-            swf.sourceFontNamesMap.put(f.getFontId(), selectedName);
-            Configuration.addFontPair(swf.getShortPathTitle(), f.getFontId(), f.getFontNameIntag(), selectedName);
+            swf.sourceFontNamesMap.put(f.getCharacterId(), selectedName);
+            Configuration.addFontPair(swf.getShortPathTitle(), f.getCharacterId(), f.getFontNameIntag(), selectedName);
         }
     }
 

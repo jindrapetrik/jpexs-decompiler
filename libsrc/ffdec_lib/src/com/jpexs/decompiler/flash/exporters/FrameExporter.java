@@ -641,8 +641,8 @@ public class FrameExporter {
         return ret;
     }
 
-    private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
-        int fontId = font.getFontId();
+    private static void drawText(SWF swf, float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
+        int fontId = swf.getCharacterId(font);
         PDFGraphics g2 = (PDFGraphics) g;
         if (existingFonts.containsKey(fontId)) {
             g2.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));

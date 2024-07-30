@@ -65,6 +65,8 @@ All notable changes to this project will be documented in this file.
 - Outputstreams position calculation (ABCOutputStream, ...)
 - [#2260] Reading end of file on old GFX format (1.x)
 - [#2260] DefineExternalImage on old GFX format (1.x)
+- fontFace html attribute in DefineEditText can be also an exportName
+- BUTTONRECORD preview not showing in situations like GFX or importAssets
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -72,7 +74,8 @@ All notable changes to this project will be documented in this file.
 - Information in the tag node title now has abbreviated prefix of type for each bit of info. 
   Example: `DefineSprite (chid: 27, cls: pkg.MySprite)` instead of `DefineSprite (27, pkg.MySprite)`
 - Information in the tag node title - separated exportName from assigned class
-
+- ImportAssets tag reorganized - now imported items are not in the tag tree, but when referenced it works
+  
 ## [20.1.0] - 2023-12-30
 ### Added
 - Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3

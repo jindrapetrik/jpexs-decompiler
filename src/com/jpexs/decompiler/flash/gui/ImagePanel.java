@@ -2823,10 +2823,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+        textTag.toImage(textTag.getSwf(), 0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
+            newTextTag.toImage(textTag.getSwf(), 0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, false);
         }
 
         iconPanel.setImg(image);
@@ -3376,7 +3376,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     List<String> soundClasses = new ArrayList<>();
                     List<SOUNDINFO> soundInfos = new ArrayList<>();
                     timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
-                    for (int cid : swf.getCharacters().keySet()) {
+                    for (int cid : swf.getCharacters(true).keySet()) {
                         CharacterTag c = swf.getCharacter(cid);
                         for (int k = 0; k < soundClasses.size(); k++) {
                             String cls = soundClasses.get(k);

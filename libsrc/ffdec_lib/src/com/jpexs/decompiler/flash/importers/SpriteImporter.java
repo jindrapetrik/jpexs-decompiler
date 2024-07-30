@@ -154,7 +154,7 @@ public class SpriteImporter {
     }
 
     public int bulkImport(File spritesDir, SWF swf, boolean printOut) {
-        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int spriteCount = 0;
         List<String> extensions = Arrays.asList("gif");
         File[] allFiles = spritesDir.listFiles(new FilenameFilter() {

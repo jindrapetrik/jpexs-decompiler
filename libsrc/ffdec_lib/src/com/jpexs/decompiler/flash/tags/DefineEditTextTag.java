@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -516,7 +517,12 @@ public class DefineEditTextTag extends TextTag {
                         String txt = unescape(new String(ch, start, length));
                         TextStyle style = styles.peek();
                         if (style.fontFace != null && useOutlines) {
-                            style.font = swf.getFontByNameInTag(style.fontFace, style.bold, style.italic);
+                            CharacterTag ct = swf.getCharacterByExportName(style.fontFace);
+                            if (ct != null && (ct instanceof FontTag)) {
+                                style.font = (FontTag) ct;
+                            } else {
+                                style.font = swf.getFontByNameInTag(style.fontFace, style.bold, style.italic);
+                            }
                             if (style.font == null) {
                                 style.fontFace = null;
                             }
@@ -974,7 +980,7 @@ public class DefineEditTextTag extends TextTag {
             List<CharacterWithStyle> chs = getTextWithStyle();
             for (CharacterWithStyle ch : chs) {
                 if (ch.style.font != null) {
-                    needed.add(ch.style.font.getFontId());
+                    needed.add(swf.getCharacterId(ch.style.font));
                 }
             }
         }
@@ -1007,21 +1013,21 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
-        render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
+    public void toImage(SWF swf, int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+        render(swf, TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
     }
 
     @Override
-    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
-        render(TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
+    public void toSVG(SWF swf, SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) {
+        render(swf, TextRenderMode.SVG, null, exporter, null, new Matrix(), colorTransform, 1);
     }
 
     @Override
-    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
+    public void toHtmlCanvas(SWF swf, StringBuilder result, double unitDivisor) {
+        render(swf, TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor);
     }
 
-    private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
+    private void render(SWF swf, TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom) {
         if (border) {
             // border is always black, fill color is always white?
             RGB borderColor = new RGBA(Color.black);
@@ -1039,7 +1045,7 @@ public class DefineEditTextTag extends TextTag {
             }
         }
         if (hasText) {
-            List<TEXTRECORD> allTextRecords = getTextRecords();
+            List<TEXTRECORD> allTextRecords = getTextRecords(swf);
             switch (renderMode) {
                 case BITMAP:
                     staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
@@ -1054,7 +1060,7 @@ public class DefineEditTextTag extends TextTag {
         }
     }
 
-    public List<TEXTRECORD> getTextRecords() {
+    public List<TEXTRECORD> getTextRecords(SWF swf) {
         DynamicTextModel textModel = new DynamicTextModel();
         List<CharacterWithStyle> txt = getTextWithStyle();
         TextStyle lastStyle = null;
@@ -1279,11 +1285,11 @@ public class DefineEditTextTag extends TextTag {
                 if (fontClass != null) {
                     FontTag ft = swf.getFontByClass(fontClass);
                     if (ft != null) {
-                        fid = ft.getFontId();                        
+                        fid = swf.getCharacterId(ft);
                     }
                 }
                 if (tr.style.font != null) {
-                    fid = tr.style.font.getFontId();
+                    fid = swf.getCharacterId(tr.style.font);
                 }               
                                 
                 tr2.styleFlagsHasFont = fid != 0;                

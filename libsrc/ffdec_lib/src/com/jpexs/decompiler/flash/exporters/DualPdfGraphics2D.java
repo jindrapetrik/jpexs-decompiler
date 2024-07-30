@@ -610,7 +610,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                     char ch = font.glyphToChar(entry.glyphIndex);
                     if (spacing != 0) {
                         text.append(currentChar);                        
-                        drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);                                               
+                        drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);                                               
                         text = new StringBuilder();
                         x = x + deltaX + entry.glyphAdvance;
                         deltaX = 0;
@@ -626,14 +626,14 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                 }
             }
             if (text.length() > 0) {
-                drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
+                drawText(swf, x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
             }
             x = x + deltaX;
         }
     }
 
-    private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, PDFGraphics g) {
-        int fontId = font.getFontId();
+    private static void drawText(SWF swf, float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, PDFGraphics g) {
+        int fontId = swf.getCharacterId(font);
         if (existingFonts.containsKey(fontId)) {
             g.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));
         } else {

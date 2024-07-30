@@ -184,11 +184,14 @@ public class ReplaceCharacterDialog extends AppDialog {
     }
 
     public int showDialog(SWF swf, int selectedCharacterId) {
-        Map<Integer, CharacterTag> characters = swf.getCharacters();                        
+        Map<Integer, CharacterTag> characters = swf.getCharacters(false);                        
         fullModel =  new DefaultListModel<>();
         fullModel.clear();
         for (Integer key : characters.keySet()) {
             CharacterTag character = characters.get(key);
+            if (character.isImported()) {
+                continue;
+            }
             int characterId = character.getCharacterId();
             if (characterId != selectedCharacterId) {                
                 fullModel.addElement(new ComboBoxItem<>(character.getName(), character));

@@ -56,7 +56,7 @@ public class GfxConvertor {
 
     public DefineFont2Tag convertDefineCompactedFont(DefineCompactedFont compactedFont) {
         DefineFont2Tag ret = new DefineFont2Tag(compactedFont.getSwf());
-        ret.fontID = compactedFont.getFontId();
+        ret.fontID = compactedFont.getCharacterId();
         ret.fontFlagsBold = compactedFont.isBold();
         ret.fontFlagsItalic = compactedFont.isItalic();
         ret.fontFlagsWideOffsets = true;

@@ -120,7 +120,7 @@ public class MorphShapeExporter {
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
-                                mst.getStartShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                mst.getStartShapeTag().toSVG(mst.getSwf(), exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileEnd))) {
@@ -130,7 +130,7 @@ public class MorphShapeExporter {
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect, settings.zoom, "shape");
-                                mst.getEndShapeTag().toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                mst.getEndShapeTag().toSVG(mst.getSwf(), exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -142,7 +142,7 @@ public class MorphShapeExporter {
                                 rect.xMin *= settings.zoom;
                                 rect.yMin *= settings.zoom;
                                 SVGExporter exporter = new SVGExporter(rect, settings.zoom, "morphshape");
-                                mst.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                                mst.toSVG(mst.getSwf(), exporter, -2, new CXFORMWITHALPHA(), 0);
                                 fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                             }
                             break;
@@ -165,7 +165,7 @@ public class MorphShapeExporter {
                             }
                             Matrix m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(st.getSwf(), 0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileStart);
                             } else {
@@ -188,7 +188,7 @@ public class MorphShapeExporter {
                             }
                             m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
+                            st.toImage(st.getSwf(), 0, 0, 0, new RenderContext(), img, img, false, m, m, m, m, new CXFORMWITHALPHA(), unzoom, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0, true);
                             if (settings.mode == MorphShapeExportMode.PNG_START_END) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, fileEnd);
                             } else {

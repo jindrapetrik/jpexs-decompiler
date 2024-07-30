@@ -124,7 +124,7 @@ public class InstanceInfo {
                         FontTag ft = (FontTag) ct;
 
                         boolean hasFontAlignZones = false;
-                        List<CharacterIdTag> sameIdTags = ft.getSwf().getCharacterIdTags(ft.getFontId());
+                        List<CharacterIdTag> sameIdTags = ft.getSwf().getCharacterIdTags(abc.getSwf().getCharacterId(ft));
                         for (CharacterIdTag sit : sameIdTags) {
                             if (sit instanceof DefineFontAlignZonesTag) {
                                 hasFontAlignZones = true;
