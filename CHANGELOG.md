@@ -65,8 +65,9 @@ All notable changes to this project will be documented in this file.
 - Outputstreams position calculation (ABCOutputStream, ...)
 - [#2260] Reading end of file on old GFX format (1.x)
 - [#2260] DefineExternalImage on old GFX format (1.x)
-- fontFace html attribute in DefineEditText can be also an exportName
+- Font face html attribute in DefineEditText can be also an exportName
 - BUTTONRECORD preview not showing in situations like GFX or importAssets
+- FreeTransform not showing in situations like GFX or importAssets
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
