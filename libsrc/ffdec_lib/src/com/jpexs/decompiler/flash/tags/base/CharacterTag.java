@@ -52,7 +52,10 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     @Override
     public Map<String, String> getNameProperties() {
         Map<String, String> ret = super.getNameProperties();
-        ret.put("chid", "" + getCharacterId());
+        int chid = getCharacterId();
+        if (chid > -1) {
+            ret.put("chid", "" + chid);
+        }
         if (exportName != null) {
             ret.put ("exp", Helper.escapePCodeString(exportName));
         }

@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.tags.gfx.enums.IdType;
+import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.TagInfo;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
@@ -33,13 +33,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
-import javax.imageio.ImageIO;
-import net.npe.dds.DDSReader;
 
 /**
  *
@@ -53,16 +48,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
 
     public int imageID;
 
-    public static final int UNKNOWN_IS_STANDALONE = 0;
-    public static final int UNKNOWN_HAS_SUBIMAGES = 9;
-
-    /**
-     * Special unknown field. This seems to have value of 9 when it has
-     * DefineSubImages and in this case, imageId is not treated as a
-     * characterId. If it has value of 0, this tag is threated as standalone
-     * external image - standard character.
-     */
-    public int unknownID;
+    public int idType;
 
     public int bitmapFormat;
 
@@ -91,7 +77,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(imageID);
-        sos.writeUI16(unknownID);
+        sos.writeUI16(idType);
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
         sos.writeUI16(targetHeight);
@@ -112,7 +98,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     public DefineExternalImage2(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
-        characterID = unknownID == 0 ? imageID : - 1;
+        characterID = idType == IdType.IDTYPE_NONE ? imageID : - 1;
     }
 
     public DefineExternalImage2(SWF swf) {
@@ -121,7 +107,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
         fileName = "";
         targetWidth = 1;
         targetHeight = 1;
-        unknownID = UNKNOWN_HAS_SUBIMAGES;
+        idType = IdType.IDTYPE_NONE;
         bitmapFormat = FileFormatType.FILE_DDS;
         characterID = -1;
         createFailedImage();
@@ -130,7 +116,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         imageID = sis.readUI16("imageID");
-        unknownID = sis.readUI16("unknownID");
+        idType = sis.readUI16("idType");
         bitmapFormat = sis.readUI16("bitmapFormat");
         targetWidth = sis.readUI16("targetWidth");
         targetHeight = sis.readUI16("targetHeight");
@@ -226,7 +212,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
 
     @Override
     public String getUniqueId() {
-        if (unknownID == 0) {
+        if (idType == IdType.IDTYPE_NONE) {
             return super.getUniqueId();
         }
         return "i" + imageID;
@@ -250,8 +236,9 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
         } 
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
         
-        if (unknownID != 0) {
+        if (idType != IdType.IDTYPE_NONE) {
             tagInfo.addInfo("general", "imageId", imageID);
         }
+        tagInfo.addInfo("general", "idType", IdType.idTypeToString(idType) + " (" + idType + ")");
     }
 }
