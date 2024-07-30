@@ -122,7 +122,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
         targetWidth = 1;
         targetHeight = 1;
         unknownID = UNKNOWN_HAS_SUBIMAGES;
-        bitmapFormat = BITMAP_FORMAT2_DDS;
+        bitmapFormat = FileFormatType.FILE_DDS;
         characterID = -1;
         createFailedImage();
     }
@@ -244,26 +244,10 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
         tagInfo.addInfo("general", "exportName", exportName);
         tagInfo.addInfo("general", "fileName", fileName);
         String bitmapFormatStr = "0x" + Integer.toHexString(bitmapFormat);
-        switch (bitmapFormat) {
-            case BITMAP_FORMAT_DEFAULT:
-                bitmapFormatStr = "default (0)";
-                break;
-            case BITMAP_FORMAT_TGA:
-                bitmapFormatStr = "TGA (1)";
-                break;
-            case BITMAP_FORMAT_DDS:
-                bitmapFormatStr = "DDS (2)";
-                break;
-            case BITMAP_FORMAT2_JPEG:
-                bitmapFormatStr = "JPEG (10)";
-                break;
-            case BITMAP_FORMAT2_TGA:
-                bitmapFormatStr = "TGA (13)";
-                break;
-            case BITMAP_FORMAT2_DDS:
-                bitmapFormatStr = "DDS (14)";
-                break;
-        }
+        String fileFormatStr = FileFormatType.fileFormatToString(bitmapFormat);
+        if (fileFormatStr != null) {
+            bitmapFormatStr = fileFormatStr + " (" + bitmapFormat + ")";
+        } 
         tagInfo.addInfo("general", "bitmapFormat", bitmapFormatStr);
         
         if (unknownID != 0) {

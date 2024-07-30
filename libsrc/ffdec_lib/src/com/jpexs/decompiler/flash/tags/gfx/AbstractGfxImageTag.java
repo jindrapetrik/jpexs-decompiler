@@ -33,22 +33,7 @@ import net.npe.dds.DDSReader;
  * @author JPEXS
  */
 public abstract class AbstractGfxImageTag extends ImageTag {
-    
-    public static final int BITMAP_FORMAT_DEFAULT = 0;
-
-    public static final int BITMAP_FORMAT_TGA = 1;
-
-    public static final int BITMAP_FORMAT_DDS = 2;
-    
-    //It looks like gfxexport produces BITMAP_FORMAT2_* values for format,
-    //but BITMAP_FORMAT_* works the same way
-    public static final int BITMAP_FORMAT2_JPEG = 10;
-
-    public static final int BITMAP_FORMAT2_TGA = 13;
-
-    public static final int BITMAP_FORMAT2_DDS = 14;
-    
-    
+                      
     public AbstractGfxImageTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -81,8 +66,7 @@ public abstract class AbstractGfxImageTag extends ImageTag {
         }
         
         if (fileName.toLowerCase().endsWith(".tga")
-                || bitmapFormat == BITMAP_FORMAT2_TGA 
-                || bitmapFormat == BITMAP_FORMAT_TGA) {
+                || bitmapFormat == FileFormatType.FILE_TGA) {
             TgaSupport.init();
         }
         
