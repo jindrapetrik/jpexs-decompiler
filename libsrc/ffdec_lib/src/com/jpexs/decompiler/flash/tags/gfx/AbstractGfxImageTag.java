@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;

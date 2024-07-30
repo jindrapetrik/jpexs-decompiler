@@ -188,6 +188,7 @@ import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
+import com.jpexs.decompiler.flash.tags.gfx.enums.IdType;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -6133,7 +6134,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ImageTag imageTagCopy = (ImageTag) imageTag.cloneTag();
             imageTagCopy.setSwf(swf);
             int imageCharId = imageTag.getCharacterId();
-            if ((imageTag instanceof DefineExternalImage2) && (((DefineExternalImage2) imageTag).unknownID > 0)) {
+            if ((imageTag instanceof DefineExternalImage2) && (((DefineExternalImage2) imageTag).idType != IdType.IDTYPE_NONE)) {
                 imageCharId = swf.getNextCharacterId();
                 imageTagCopy.characterID = imageCharId;
             }
