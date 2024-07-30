@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.tags.gfx.enums.ExportFlagConstants;
 import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
@@ -49,15 +50,7 @@ public class ExporterInfo extends Tag {
 
     public String swfName;
 
-    public List<Long> codeOffsets;
-
-    public static final int FLAG_CONTAINS_GLYPH_TEXTURES = 1;
-
-    public static final int FLAG_GLYPHS_STRIPPED_FROM_DEFINEFONT = 2;
-
-    public static final int FLAG_GRADIENT_IMAGES_EXPORTED = 4;
-
-    public static final int FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT = 16;
+    public List<Long> codeOffsets;   
 
     /**
      * Gets data bytes
@@ -144,6 +137,6 @@ public class ExporterInfo extends Tag {
     }
 
     public boolean hasFlagShapesStrippedFromDefineFont() {
-        return (flags & FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT) == FLAG_SHAPES_STRIPPED_FROM_DEFINEFONT;
+        return (flags & ExportFlagConstants.EXF_GLYPHS_STRIPPED) == ExportFlagConstants.EXF_GLYPHS_STRIPPED;
     }
 }
