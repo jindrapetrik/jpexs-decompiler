@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - [PR194] Support for XDG base directory specification (env variable `XDG_CONFIG_HOME`)
 - FLA export - ImportAssets/2 tag support
 - FLA export - export in frame 1 flag support
+- [#2260] GFX - Configure path resolving dialog for file paths that use prefixes like `data:`
 
 ### Fixed
 - Debugger - getting children of top level variables
