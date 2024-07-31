@@ -1061,9 +1061,24 @@ public final class Configuration {
                     String path = "Library/Application Support/" + applicationId + "/";
                     directory = new File(userHome, path);
                 } else {
-                    // ${userHome}/.${applicationId}/
-                    String path = "." + applicationId + "/";
-                    directory = new File(userHome, path);
+                    File xdgConfigHome = null;
+                    try {
+                        String xdgConfigHomeEV = System.getenv("XDG_CONFIG_HOME");
+                        if ((xdgConfigHomeEV != null) && (xdgConfigHomeEV.length() > 0)) {
+                            xdgConfigHome = new File(xdgConfigHomeEV);
+                        }
+                    } catch (SecurityException ignore) {
+                        //ignored
+                    }
+                    if ((xdgConfigHome != null) && xdgConfigHome.isDirectory()) {
+                        // ${xdgConfigHome}/${applicationId}
+                        String path = applicationId + "/";
+                        directory = new File(xdgConfigHome, path);
+                    } else {
+                        // ${userHome}/.config/${applicationId}
+                        String path = ".config/" + applicationId + "/";
+                        directory = new File(userHome, path);
+                    }
                 }
             } else {
                 //no home, then use application directory
