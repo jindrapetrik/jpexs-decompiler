@@ -1062,6 +1062,7 @@ public final class Configuration {
                     directory = new File(userHome, path);
                 } else {
                     File xdgConfigHome = null;
+                    File oldConfigDir = new File(userHome, "." + applicationId + "/");
                     try {
                         String xdgConfigHomeEV = System.getenv("XDG_CONFIG_HOME");
                         if ((xdgConfigHomeEV != null) && (xdgConfigHomeEV.length() > 0)) {
@@ -1074,6 +1075,9 @@ public final class Configuration {
                         // ${xdgConfigHome}/${applicationId}
                         String path = applicationId + "/";
                         directory = new File(xdgConfigHome, path);
+                    } else if (oldConfigDir.isDirectory()) {
+                        // ${userHome}/.${applicationId}
+                        directory = oldConfigDir;
                     } else {
                         // ${userHome}/.config/${applicationId}
                         String path = ".config/" + applicationId + "/";
