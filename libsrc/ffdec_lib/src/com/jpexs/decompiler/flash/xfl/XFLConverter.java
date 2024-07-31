@@ -5251,7 +5251,7 @@ public class XFLConverter {
             publishSettings.writeElementValue("StreamUse8kSampleRate", 0);
             publishSettings.writeElementValue("EventUse8kSampleRate", 0);
             publishSettings.writeElementValue("UseNetwork", useNetwork ? 1 : 0);
-            publishSettings.writeElementValue("DocumentClass", characterClasses.containsKey(0) ? characterClasses.get(0) : "");
+            publishSettings.writeElementValue("DocumentClass", documentClass == null ? "" : documentClass);
             publishSettings.writeElementValue("AS3Strict", 2);
             publishSettings.writeElementValue("AS3Coach", 4);
             publishSettings.writeElementValue("AS3AutoDeclare", 4096);
