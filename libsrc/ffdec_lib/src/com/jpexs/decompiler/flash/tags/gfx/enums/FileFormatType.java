@@ -24,10 +24,10 @@ import java.lang.reflect.Field;
  * @author JPEXS
  */
 public class FileFormatType {
-    // SWF file formats.
-
-    public static final int FILE_SWF = 0;
-    public static final int FILE_GFX = 1;
+    /*public static final int FILE_SWF = 0;
+    public static final int FILE_GFX = 1;*/
+    
+    public static final int FILE_DEFAULT = 0;
 
     // Image formats supported by Flash.        
     public static final int FILE_JPEG = 10;
