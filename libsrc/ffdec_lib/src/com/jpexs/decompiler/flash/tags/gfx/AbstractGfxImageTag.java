@@ -53,6 +53,8 @@ public abstract class AbstractGfxImageTag extends ImageTag {
     protected BufferedImage getExternalBufferedImage(String fileName, int bitmapFormat) {
         Path imagePath = null;
         
+        fileName = fileName.replace("\\", "/");
+        
         try {
             imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));        
         } catch (InvalidPathException ip) {
