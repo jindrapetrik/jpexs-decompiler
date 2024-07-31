@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
   `-abcclean` command on CLI
 - GFX - better fileformat detection
 - GFX - DefineExternalImage2, FontTextureInfo - IdType field recognition
+- [PR194] Support for XDG base directory specification (env variable `XDG_CONFIG_HOME`)
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -76,6 +77,7 @@ All notable changes to this project will be documented in this file.
   Example: `DefineSprite (chid: 27, cls: pkg.MySprite)` instead of `DefineSprite (27, pkg.MySprite)`
 - Information in the tag node title - separated exportName from assigned class
 - ImportAssets tag reorganized - now imported items are not in the tag tree, but when referenced it works
+- [PR194] Default directory for storing config on Linux changed to `~/.config/FFDec`, when `~/.FFDec` does not exist yet
   
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -4467,6 +4469,7 @@ Major version of SWF to XML export changed to 2.
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
+[PR194]: https://github.com/jindrapetrik/jpexs-decompiler/pull/194
 [PR191]: https://github.com/jindrapetrik/jpexs-decompiler/pull/191
 [PR193]: https://github.com/jindrapetrik/jpexs-decompiler/pull/193
 [PR176]: https://github.com/jindrapetrik/jpexs-decompiler/pull/176
