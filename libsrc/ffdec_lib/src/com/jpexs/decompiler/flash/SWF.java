@@ -417,7 +417,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
 
     @Internal
-    private Map<String, Integer> classToCharacter = new HashMap<>();
+    private Map<String, Integer> classToCharacterId = new HashMap<>();
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
@@ -426,7 +426,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private Map<String, Integer> importedNameToCharacter = new HashMap<>();
-
+        
     @Internal
     private AbcIndexing abcIndex;
 
@@ -442,7 +442,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public String debuggerPackage = null;
 
     private Map<Integer, SWF> importedCharacterSourceSwfs = new HashMap<>();
+    
+    private Map<String, String> importedClassSourceUrls = new HashMap<>();
+    
     private Map<Integer, Integer> importedCharacterIds = new HashMap<>();
+    
+    private Map<String, CharacterTag> importedClassToCharacter = new HashMap<>();
 
     private static AbcIndexing playerGlobalAbcIndex;
 
@@ -865,11 +870,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public CharacterTag getCharacterByClass(String className) {
-        if (!classToCharacter.containsKey(className)) {
-            return null;
+        if (importedClassToCharacter.containsKey(className)) {
+            return importedClassToCharacter.get(className);
         }
-        int charId = classToCharacter.get(className);
-        return getCharacter(charId);
+        if (classToCharacterId.containsKey(className)) {
+            int charId = classToCharacterId.get(className);
+            return getCharacter(charId);
+        }
+        return null;
     }
 
     public CharacterTag getCharacterByExportName(String exportName) {
@@ -888,6 +896,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         CharacterTag characterTag = getCharacters(true).get(characterId);
         String exportName = characterTag != null ? characterTag.getExportName() : null;
         return exportName;
+    }
+    
+    public String getClassSourceUrl(String className) {
+        return importedClassSourceUrls.get(className);
     }
 
     public FontTag getFontByClass(String fontClass) {
@@ -1592,6 +1604,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 exportedNameToIdsMap.put(sc.names.get(i), sc.tags.get(i));
                             }
                         }
+                        if (t2 instanceof SymbolClassTag) {
+                            SymbolClassTag sc = (SymbolClassTag) t2;
+                            for (int i = 0; i < sc.names.size(); i++) {
+                                importedClassToCharacter.put(sc.names.get(i), iSwf.getCharacter(sc.tags.get(i)));
+                                importedClassSourceUrls.put(sc.names.get(i), importTag.getUrl());
+                            }
+                        }
                     }
 
                     for (int importedId : importedIdToNameMap.keySet()) {
@@ -1816,10 +1835,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        classToCharacter.clear();
+        classToCharacterId.clear();
         for (int ch : classes.keySet()) {
             for (String cls : classes.get(ch)) {
-                classToCharacter.put(cls, ch);
+                classToCharacterId.put(cls, ch);
             }
         }
     }
