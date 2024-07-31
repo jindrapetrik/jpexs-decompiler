@@ -29,4 +29,5 @@ public class CustomConfigurationKeys {
     public static final String KEY_LOADED_IMPORT_ASSETS = "loadedImportAssets";
     public static final String KEY_ABC_DEPENDENCIES = "abcDependencies";
     public static final String KEY_BREAKPOINTS = "breakpoints";
+    public static final String KEY_PATH_RESOLVING = "pathResolving";
 }

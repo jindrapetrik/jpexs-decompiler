@@ -172,7 +172,7 @@ public class DefineExternalImage extends AbstractGfxImageTag {
         if (shortFormat) {
             //Just guessing how this may work...
             return exportName + "." + FileFormatType.fileFormatExtension(bitmapFormat);
-        }
+        }        
         return fileName;
     }
 

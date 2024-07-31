@@ -17,6 +17,9 @@
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
@@ -24,6 +27,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.imageio.ImageIO;
@@ -47,9 +51,50 @@ public abstract class AbstractGfxImageTag extends ImageTag {
     }
 
     protected BufferedImage getExternalBufferedImage(String fileName, int bitmapFormat) {
-        Path imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
+        Path imagePath = null;
+        
+        try {
+            imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));        
+        } catch (InvalidPathException ip) {
+            //ignore
+        }
         if (imagePath == null || !imagePath.toFile().exists()) {
-            return null;
+            
+            SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(getSwf().getShortPathTitle());
+            if (cc == null) {
+                return null;
+            }
+            String paths = cc.getCustomData(CustomConfigurationKeys.KEY_PATH_RESOLVING, "");
+            if (paths.trim().isEmpty()) {
+                return null;
+            }
+            String[] rows = paths.trim().split("\r\n");
+            boolean found = false;
+            for (String row : rows) {
+                String prefix = "";
+                String searchPath;
+                if (row.contains("|")) {
+                    prefix = row.substring(0, row.indexOf("|"));                            
+                    searchPath = row.substring(row.indexOf("|") + 1);
+                } else {
+                    searchPath = row;
+                }
+                String fileNameNoPrefix = fileName;
+                if (!prefix.isEmpty() && fileName.startsWith(prefix)) {
+                    fileNameNoPrefix = fileName.substring(prefix.length());
+                }
+                if (!searchPath.isEmpty()) {
+                    Path newImagePath = Paths.get(searchPath).resolve(fileNameNoPrefix);
+                    if (newImagePath.toFile().exists()) {
+                        found = true;
+                        imagePath = newImagePath;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                return null;
+            }                           
         }
 
         byte[] imageData;

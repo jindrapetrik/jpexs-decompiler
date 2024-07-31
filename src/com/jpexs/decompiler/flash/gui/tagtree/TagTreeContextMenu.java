@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.gui.ClipboardType;
 import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.SelectFramePositionDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
@@ -171,6 +172,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private final MainPanel mainPanel;
 
+    private JMenuItem configurePathResolvingMenuItem;
+    
     private JMenuItem setClassToCharacterMappingMenuItem;
 
     private JMenuItem expandRecursiveMenuItem;
@@ -368,6 +371,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         add(changeCharsetMenu);
 
+        configurePathResolvingMenuItem = new JMenuItem(mainPanel.translate("contextmenu.configurePathResolving"));
+        configurePathResolvingMenuItem.addActionListener(this::configurePathResolvingActionPerformed);
+        configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
+        add(configurePathResolvingMenuItem);
+        
+        
         removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove") + " (DEL)");
         removeMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, false);
@@ -1125,6 +1134,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         unpinAllMenuItem.setVisible(false);
         unpinOthersMenuItem.setVisible(false);
 
+        configurePathResolvingMenuItem.setVisible(false);
         removeMenuItem.setVisible(canRemove);
         removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
         cloneMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
@@ -1403,6 +1413,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (swf.isAS3()) {
                     abcExplorerMenuItem.setVisible(true);
                     cleanAbcMenuItem.setVisible(true);
+                }
+                if (swf.gfx) {
+                    configurePathResolvingMenuItem.setVisible(true);
                 }
             }
 
@@ -5315,6 +5328,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.repaintTree();
     }
 
+    
+    public void configurePathResolvingActionPerformed(ActionEvent evt) {
+        SWF item = (SWF) getCurrentItem();        
+        PathResolvingDialog dialog = new PathResolvingDialog(item, Main.getDefaultDialogsOwner());
+        dialog.showDialog();
+    }
+    
     public void changeCharsetActionPerformed(ActionEvent evt) {
         SWF item = (SWF) getCurrentItem();
         String newCharset = ((JMenuItem) evt.getSource()).getText();
