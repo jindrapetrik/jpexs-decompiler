@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - GFX - DefineExternalImage2, FontTextureInfo - IdType field recognition
 - [PR194] Support for XDG base directory specification (env variable `XDG_CONFIG_HOME`)
 - FLA export - ImportAssets/2 tag support
+- FLA export - export in frame 1 flag support
 
 ### Fixed
 - Debugger - getting children of top level variables
