@@ -34,21 +34,17 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.treeitems.Openable;
-import com.jpexs.helpers.LinkedIdentityHashSet;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -66,7 +62,7 @@ import javax.swing.event.DocumentListener;
  *
  * @author JPEXS
  */
-public class SetClassToCharacterMappingDialog extends AppDialog {
+public class As3ClassLinkageDialog extends AppDialog {
 
     private final JButton proceedButton = new JButton(translate("button.proceed"));
     private final JButton cancelButton = new JButton(translate("button.cancel"));
@@ -139,7 +135,7 @@ public class SetClassToCharacterMappingDialog extends AppDialog {
         return null;
     }
 
-    public SetClassToCharacterMappingDialog(Window owner, SWF swf, int characterId) {
+    public As3ClassLinkageDialog(Window owner, SWF swf, int characterId) {
         super(owner);
 
         this.swf = swf;

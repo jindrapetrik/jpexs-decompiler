@@ -50,7 +50,7 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
 import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
-import com.jpexs.decompiler.flash.gui.abc.SetClassToCharacterMappingDialog;
+import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.packers.Packer;
@@ -174,7 +174,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem configurePathResolvingMenuItem;
     
-    private JMenuItem setClassToCharacterMappingMenuItem;
+    private JMenuItem setAs3ClassLinkageMenuItem;
 
     private JMenuItem expandRecursiveMenuItem;
 
@@ -451,10 +451,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
 
-        setClassToCharacterMappingMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setClassToCharacterMapping")); //FIXME
-        setClassToCharacterMappingMenuItem.addActionListener(this::setClassToCharacterMappingActionPerformed);
-        setClassToCharacterMappingMenuItem.setIcon(View.getIcon("asclass16"));
-        add(setClassToCharacterMappingMenuItem);
+        setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage")); //FIXME
+        setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
+        setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclass16"));
+        add(setAs3ClassLinkageMenuItem);
 
         abcExplorerMenuItem = new JMenuItem(mainPanel.translate("contextmenu.abcexplorer"));
         abcExplorerMenuItem.addActionListener(this::abcExplorerActionPerformed);
@@ -1126,7 +1126,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
-        setClassToCharacterMappingMenuItem.setVisible(false);
+        setAs3ClassLinkageMenuItem.setVisible(false);
         expandRecursiveMenuItem.setVisible(false);
         collapseRecursiveMenuItem.setVisible(false);
         pinMenuItem.setVisible(false);
@@ -1369,8 +1369,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if ((firstItem instanceof CharacterTag)) {
                 CharacterTag cht = (CharacterTag) firstItem;
-                if (cht.getSwf().isAS3() && SetClassToCharacterMappingDialog.getParentClassFromCharacter(cht) != null) {
-                    setClassToCharacterMappingMenuItem.setVisible(true);
+                if (cht.getSwf().isAS3() && As3ClassLinkageDialog.getParentClassFromCharacter(cht) != null) {
+                    setAs3ClassLinkageMenuItem.setVisible(true);
                 }
             }
 
@@ -2578,10 +2578,10 @@ public class TagTreeContextMenu extends JPopupMenu {
     II. if the previous Symbolclass is empty, remove it
     III. add new character mapping to new SymbolClass determined
      */
-    private void setClassToCharacterMappingActionPerformed(ActionEvent evt) {
+    private void setAs3ClassLinkageActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
         SWF swf = ch.getSwf();
-        SetClassToCharacterMappingDialog d = new SetClassToCharacterMappingDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
+        As3ClassLinkageDialog d = new As3ClassLinkageDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
         if (d.showDialog() != AppDialog.OK_OPTION) {
             return;
         }
