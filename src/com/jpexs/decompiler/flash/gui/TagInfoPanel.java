@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -80,7 +81,12 @@ public class TagInfoPanel extends JPanel {
 
                     TreeItem item = null;
                     if ("expand".equals(scheme)) {
-                        updateHtmlContent(true);
+                        if ("all".equals(strId)) {
+                            updateHtmlContent(true, false);
+                        } 
+                        if ("details".equals(strId)) {
+                            updateHtmlContent(true, true);
+                        }
                     } else if ("char".equals(scheme)) {
                         item = swf.getCharacter(id);
                     } else if ("frame".equals(scheme)) {
@@ -105,7 +111,7 @@ public class TagInfoPanel extends JPanel {
         buildHtmlContent();
     }
 
-    private void updateHtmlContent(boolean expand) {
+    private void updateHtmlContent(boolean expand, boolean showDetails) {
         String categoryName = "general";
         String result = "<html><body><table cellspacing='0' cellpadding='0'>";
         Boolean flipFlop = false;
@@ -177,13 +183,23 @@ public class TagInfoPanel extends JPanel {
                     if (!frameList && expand) {
                         String charName;
                         CharacterTag character = swf == null ? null : swf.getCharacter(id);
-                        if (swf == null || character == null) {
-                            charName = "???";
+                        
+                        if (showDetails) {
+                            if (swf == null || character == null) {
+                                charName = "???";
+                            } else {
+                                charName = Helper.escapeHTML(character.toString());
+                            }
+                            strValue += String.format("<a href='%s://%d'>%s</a><br>", scheme, id, charName, id);                        
                         } else {
-                            charName = character.getTagName();
-                        }
+                            if (swf == null || character == null) {
+                                charName = "???";
+                            } else {                           
+                                charName = character.getTagName();
+                            }
 
-                        strValue += String.format("<a href='%s://%d'>%s (%d)</a><br>", scheme, id, charName, id);
+                            strValue += String.format("<a href='%s://%d'>%s (%d)</a><br>", scheme, id, charName, id);
+                        }
                     } else {
                         strValue += String.format("<a href='%s://%d'>%d</a>, ", scheme, id, displayId);
                     }
@@ -192,8 +208,10 @@ public class TagInfoPanel extends JPanel {
                 value = strValue.substring(0, strValue.length() - 2);
 
                 if (!frameList && !expand) {
-                    value = value + " <a href='expand://all'>+</a>";
-                }
+                    value = value + " <a href='expand://all'>+</a>";                    
+                } else if (!frameList && expand && !showDetails) {
+                    value = value + "<br><a href='expand://details'>+</a>";
+                }                
             }
 
             result += "<td>" + value + "</td>";
@@ -207,7 +225,7 @@ public class TagInfoPanel extends JPanel {
     }
 
     private void buildHtmlContent() {
-        updateHtmlContent(false);
+        updateHtmlContent(false, false);
 
         Font font = UIManager.getFont("Table.font");
         String bodyRule = "body { font-family: " + font.getFamily() + ";"

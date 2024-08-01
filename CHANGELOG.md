@@ -32,6 +32,8 @@ All notable changes to this project will be documented in this file.
 - FLA export - ImportAssets/2 tag support
 - FLA export - export in frame 1 flag support
 - [#2260] GFX - Configure path resolving dialog for file paths that use prefixes like `data:`
+- [#2263] Expand one level more (`+` sign) for needed/dependent characters
+  in tag info panel to show full tag name as in tree
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -3436,6 +3438,8 @@ Major version of SWF to XML export changed to 2.
 [#2011]: https://www.free-decompiler.com/flash/issues/2011
 [#2215]: https://www.free-decompiler.com/flash/issues/2215
 [#2243]: https://www.free-decompiler.com/flash/issues/2243
+[#2260]: https://www.free-decompiler.com/flash/issues/2260
+[#2263]: https://www.free-decompiler.com/flash/issues/2263
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
@@ -3455,7 +3459,6 @@ Major version of SWF to XML export changed to 2.
 [#2257]: https://www.free-decompiler.com/flash/issues/2257
 [#2253]: https://www.free-decompiler.com/flash/issues/2253
 [#2239]: https://www.free-decompiler.com/flash/issues/2239
-[#2260]: https://www.free-decompiler.com/flash/issues/2260
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
