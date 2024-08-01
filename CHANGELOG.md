@@ -15,8 +15,9 @@ All notable changes to this project will be documented in this file.
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
-- Set AS3 class linkage dialog (uses SymbolClass tag) in the context menu for characters
-- Set AS1/2 linkage dialog (uses ExportAssets tag) in the context menu for characters
+- [#2210], [#1566], [#1742], [#1783], [#1787], [#2205], [#2210], [#2263]
+  Set AS1/2 linkage and AS3 class linkage dialog
+  (uses SymbolClass and ExportAssets tags) in the context menu for characters
 - [#2189] Search bar in replace character (+ replace references) window
 - [#2011], [#2215] Option to ignore frame background color when exporting (make transparent)
 - ABC Explorer - list of usages of all items
@@ -3436,12 +3437,18 @@ Major version of SWF to XML export changed to 2.
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
 [#2259]: https://www.free-decompiler.com/flash/issues/2259
+[#2210]: https://www.free-decompiler.com/flash/issues/2210
+[#1566]: https://www.free-decompiler.com/flash/issues/1566
+[#1742]: https://www.free-decompiler.com/flash/issues/1742
+[#1783]: https://www.free-decompiler.com/flash/issues/1783
+[#1787]: https://www.free-decompiler.com/flash/issues/1787
+[#2205]: https://www.free-decompiler.com/flash/issues/2205
+[#2263]: https://www.free-decompiler.com/flash/issues/2263
 [#2189]: https://www.free-decompiler.com/flash/issues/2189
 [#2011]: https://www.free-decompiler.com/flash/issues/2011
 [#2215]: https://www.free-decompiler.com/flash/issues/2215
 [#2243]: https://www.free-decompiler.com/flash/issues/2243
 [#2260]: https://www.free-decompiler.com/flash/issues/2260
-[#2263]: https://www.free-decompiler.com/flash/issues/2263
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174
