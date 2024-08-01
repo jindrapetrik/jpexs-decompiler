@@ -52,6 +52,19 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testBitwiseOperands() {
+        decompileMethod("classic", "testBitwiseOperands", "var a:int = 100;\r\n"
+                + "var b:int = a & 0x08FF;\r\n"
+                + "var c:int = 0x08FF & a;\r\n"
+                + "var d:int = a | 0x0480;\r\n"
+                + "var e:int = 0x0480 | a;\r\n"
+                + "var f:int = a ^ 0x0641;\r\n"
+                + "var g:int = 0x0641 ^ a;\r\n"
+                + "var h:int = ~0x0180;\r\n",
+                 false);
+    }
+
+    @Test
     public void testCallCall() {
         decompileMethod("classic", "testCallCall", "var o:* = new getDefinitionByName(\"Object\")();\r\n"
                 + "var o2:* = new (getDefinitionByName(\"Object\"))();\r\n",
@@ -182,7 +195,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"arr[call()] /= 5\");\r\n"
                 + "b[this.calc()] = b[this.calc()] / 5;\r\n"
                 + "trace(\"arr[call()][call()] &= 10;\");\r\n"
-                + "b[this.calc()][this.calc()] = b[this.calc()][this.calc()] & 10;\r\n"
+                + "b[this.calc()][this.calc()] = b[this.calc()][this.calc()] & 0x0A;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"

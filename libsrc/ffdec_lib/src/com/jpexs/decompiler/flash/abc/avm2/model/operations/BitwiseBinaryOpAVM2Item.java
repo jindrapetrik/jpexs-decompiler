@@ -16,46 +16,22 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
-import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnaryOpItem;
-import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class BitNotAVM2Item extends UnaryOpItem {
-
-    public BitNotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "~", "int");
-    }
-
-    @Override
-    public Object getResult() {
-        return ~((long) (double) value.getResultAsNumber());
-    }
-
-    @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, value,
-                new AVM2Instruction(0, AVM2Instructions.BitNot, null)
-        );
-    }
-
-    @Override
-    public GraphTargetItem returnType() {
-        return TypeItem.INT; //?
-        //return TypeItem.UNBOUNDED;
+public abstract class BitwiseBinaryOpAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
+    
+    public BitwiseBinaryOpAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
+        super(instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
     }
     
     @Override

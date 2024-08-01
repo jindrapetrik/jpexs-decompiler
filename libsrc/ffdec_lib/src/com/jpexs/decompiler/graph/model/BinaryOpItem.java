@@ -73,10 +73,10 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         int leftPrecedence = leftSide.getPrecedence();
         if (leftPrecedence > precedence && leftPrecedence != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
-            leftSide.toString(writer, localData, ""); //coerceLeft);
+            operandToString(leftSide, writer, localData);
             writer.append(")");
         } else {
-            leftSide.toString(writer, localData, ""); //coerceLeft);
+            operandToString(leftSide, writer, localData);
         }
 
         writer.append(" ");
@@ -86,12 +86,16 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         int rightPrecedence = rightSide.getPrecedence();
         if (rightPrecedence >= precedence && rightPrecedence != GraphTargetItem.NOPRECEDENCE) {
             writer.append("(");
-            rightSide.toString(writer, localData, ""); //coerceRight);
+            operandToString(rightSide, writer, localData);
             writer.append(")");
         } else {
-            rightSide.toString(writer, localData, ""); //coerceRight);
+            operandToString(rightSide, writer, localData);
         }
         return writer;
+    }
+    
+    protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        operand.toString(writer, localData, "");
     }
 
     @Override
