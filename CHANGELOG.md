@@ -79,6 +79,7 @@ All notable changes to this project will be documented in this file.
 - [#2237] AS3 direct editation - usages of import colliding with toplevel
   classes must be fully qualified
 - [#2234] AS1/2 postincrement/decrement inside DefineFunction2
+- AS3 PCode - pushbyte operand docs - signed byte
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
