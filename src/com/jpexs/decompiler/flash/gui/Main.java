@@ -535,7 +535,7 @@ public class Main {
         }
     }
 
-    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException, InterruptedException {
+    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, File tempFilesDir, List<File> tempFiles) throws IOException, InterruptedException {
         SWF instrSWF = null;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
@@ -550,12 +550,12 @@ public class Main {
                         String url = it.getUrl();
                         File importedFile = new File(origFile.getParentFile(), url);
                         if (importedFile.exists()) {
-                            File newTempFile = File.createTempFile("ffdec_run_import_", ".swf");
+                            File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
                             it.setUrl("./" + newTempFile.getName());
                             byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                             tempFiles.add(newTempFile);
-                            prepareSwf(prep, newTempFile, importedFile, tempFiles);
+                            prepareSwf(prep, newTempFile, importedFile, tempFilesDir, tempFiles);
                         }
                     }
                 }
@@ -566,6 +566,17 @@ public class Main {
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
             }
+        }
+    }
+    
+    private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {       
+        if (!tempFilesDir.isDirectory()) {
+            return File.createTempFile(prefix, suffix);
+        }
+        try {
+            return File.createTempFile(prefix, suffix, tempFilesDir);
+        } catch (IOException ex) {
+            return File.createTempFile(prefix, suffix);
         }
     }
 
@@ -602,10 +613,12 @@ public class Main {
         if (swf == null) {
             return;
         }
+        File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
+        
         File tempFile;
-        List<File> tempFiles = new ArrayList<>();
+        List<File> tempFiles = new ArrayList<>();                
         try {
-            tempFile = File.createTempFile("ffdec_run_", ".swf");
+            tempFile = createTempFileInDir(tempRunDir, "~ffdec_run_", ".swf");
 
             SWF swfToSave = swf;
             if (swf.gfx) {
@@ -615,7 +628,7 @@ public class Main {
                 swfToSave.saveTo(fos, false, swf.gfx);
             }
 
-            prepareSwf(new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
+            prepareSwf(new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -643,11 +656,12 @@ public class Main {
         if (swf == null) {
             return;
         }
-        debugHandler.setDebuggedSwf(swf);
+        debugHandler.setDebuggedSwf(swf);        
+        File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
         File tempFile = null;
 
         try {
-            tempFile = File.createTempFile("ffdec_debug_", ".swf");
+            tempFile = createTempFileInDir(tempRunDir, "~ffdec_debug_", ".swf");  
         } catch (Exception ex) {
             //ignored
         }
@@ -666,7 +680,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swfToSave.saveTo(fos, false, swf.gfx);
                     }
-                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
+                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
                     return null;
                 }
 
