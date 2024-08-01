@@ -463,7 +463,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Object obj = object;
 
         if (obj == null) {
-            String cname = localData.currentClass;
+            String cname = localData.currentClassBaseName;
             DottedChain pkgName = localData.pkg;
             Reference<String> outName = new Reference<>("");
             Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);

@@ -287,7 +287,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new CompilationException("Cannot assign", line);
     }
 
-    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClass, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {            
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
             //search for variable
@@ -358,14 +358,43 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
 
-        if (currentClass != null && !isProperty) {
-            DottedChain classChain = DottedChain.parseWithSuffix(currentClass);
+        //search same package classes
+        if (currentClassFullName != null && !isProperty) {
+            DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
             DottedChain pkg = classChain.getWithoutLast();
+            
+            if (!pkg.isTopLevel()) { //toplevel in next step
+                TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
+                AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
+                if (ci != null) {                    
+                    resolved = ti;
+                    for (int i = 1; i < name.size(); i++) {
+                        resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>());
+                        if (i == name.size() - 1) {
+                            ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                        }
+                    }
+                    return resolvedRoot = ti;
+                }
+            }
+        }
+        
+        //Search toplevel classes
+        if (currentClassFullName != null && !isProperty) {
+            DottedChain pkg = DottedChain.TOPLEVEL;
+            
             TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
-            if (ci != null) {
+            if (ci != null) {                
+                for (DottedChain imp : importedClasses) {
+                    String impName = imp.getLast();
+
+                    if (impName.equals(name.get(0))) {
+                        throw new CompilationException("The type \"" + name.get(0) +"\" exists on toplevel package and also as an import from different package. Please make it fully qualified so it matches the desired import.", line);
+                    }
+                }
                 resolved = ti;
                 for (int i = 1; i < name.size(); i++) {
                     resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>());
@@ -374,10 +403,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                     }
                 }
                 return resolvedRoot = ti;
-            }
-
-        }
-
+            }            
+        }               
+        
         //Search for types in imported classes
         if (!isProperty) {
             for (DottedChain imp : importedClasses) {
@@ -433,7 +461,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
             }
 
-            DottedChain classChain = DottedChain.parseWithSuffix(currentClass);
+            DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
             DottedChain pkg = classChain.getWithoutLast();
 
             //Search for types in opened namespaces
@@ -504,7 +532,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
 
         if (mustBeType) {
-            throw new CompilationException("Not a type", line);
+            throw new CompilationException(name.toPrintableString(true) + " is not an existing type", line);
         }
         resolved = null;
         GraphTargetItem ret = null;

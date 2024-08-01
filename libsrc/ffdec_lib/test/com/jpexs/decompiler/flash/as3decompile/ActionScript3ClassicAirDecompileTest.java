@@ -771,7 +771,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testForEachTry() {
-        decompileMethod("classic_air", "testForEachTry", "var list:* = {};\r\n"
+        decompileMethod("classic_air", "testForEachTry", "var list:Object = {};\r\n"
                 + "var b:Boolean = true;\r\n"
                 + "for each(var name in list)\r\n"
                 + "{\r\n"

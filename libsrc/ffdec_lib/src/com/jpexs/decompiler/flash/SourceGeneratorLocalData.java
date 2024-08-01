@@ -52,7 +52,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public int finallyRegister = -1;
 
-    public String currentClass; //FIXME! Suffixed or not?
+    public String currentClassBaseName; //FIXME! Suffixed or not?
 
     public String superClass = null;
 
@@ -90,7 +90,7 @@ public class SourceGeneratorLocalData implements Serializable {
     public boolean secondRun = false;
 
     public String getFullClass() {
-        return pkg == null ? currentClass : pkg.addWithSuffix(currentClass).toRawString();
+        return pkg == null ? currentClassBaseName : pkg.addWithSuffix(currentClassBaseName).toRawString();
     }
 
     public SourceGeneratorLocalData(HashMap<String, Integer> registerVars, Integer inFunction, Boolean inMethod, Integer forInLevel) {

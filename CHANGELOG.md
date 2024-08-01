@@ -76,6 +76,8 @@ All notable changes to this project will be documented in this file.
 - Font face html attribute in DefineEditText can be also an exportName
 - BUTTONRECORD preview not showing in situations like GFX or importAssets
 - FreeTransform not showing in situations like GFX or importAssets
+- [#2237] AS3 direct editation - usages of import colliding with toplevel
+  classes must be fully qualified
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3437,12 +3439,12 @@ Major version of SWF to XML export changed to 2.
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
 [#2259]: https://www.free-decompiler.com/flash/issues/2259
-[#2210]: https://www.free-decompiler.com/flash/issues/2210
 [#1566]: https://www.free-decompiler.com/flash/issues/1566
 [#1742]: https://www.free-decompiler.com/flash/issues/1742
 [#1783]: https://www.free-decompiler.com/flash/issues/1783
 [#1787]: https://www.free-decompiler.com/flash/issues/1787
 [#2205]: https://www.free-decompiler.com/flash/issues/2205
+[#2210]: https://www.free-decompiler.com/flash/issues/2210
 [#2263]: https://www.free-decompiler.com/flash/issues/2263
 [#2189]: https://www.free-decompiler.com/flash/issues/2189
 [#2011]: https://www.free-decompiler.com/flash/issues/2011
@@ -3468,6 +3470,7 @@ Major version of SWF to XML export changed to 2.
 [#2257]: https://www.free-decompiler.com/flash/issues/2257
 [#2253]: https://www.free-decompiler.com/flash/issues/2253
 [#2239]: https://www.free-decompiler.com/flash/issues/2239
+[#2237]: https://www.free-decompiler.com/flash/issues/2237
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123

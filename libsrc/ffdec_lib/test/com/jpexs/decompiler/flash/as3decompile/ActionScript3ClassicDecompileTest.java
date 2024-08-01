@@ -769,9 +769,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testForEachTry() {
-        decompileMethod("classic", "testForEachTry", "var name:* = undefined;\r\n"
-                + "var list:* = {};\r\n"
-                + "var b:* = true;\r\n"
+        decompileMethod("classic", "testForEachTry", "var name:String = null;\r\n"
+                + "var list:Object = {};\r\n"
+                + "var b:Boolean = true;\r\n"
                 + "for each(name in list)\r\n"
                 + "{\r\n"
                 + "try\r\n"
