@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
-- [#1566], [#1742], [#1783], [#1787], [#2205], [#2210], [#2263]
+- [#1566], [#1742], [#1783], [#1787], [#2205], [#2210], [#2246], [#2263]
   Set AS1/2 linkage and AS3 class linkage dialog
   (uses SymbolClass and ExportAssets tags) in the context menu for characters
 - [#2189] Search bar in replace character (+ replace references) window
@@ -3445,6 +3445,7 @@ Major version of SWF to XML export changed to 2.
 [#1787]: https://www.free-decompiler.com/flash/issues/1787
 [#2205]: https://www.free-decompiler.com/flash/issues/2205
 [#2210]: https://www.free-decompiler.com/flash/issues/2210
+[#2246]: https://www.free-decompiler.com/flash/issues/2246
 [#2263]: https://www.free-decompiler.com/flash/issues/2263
 [#2189]: https://www.free-decompiler.com/flash/issues/2189
 [#2011]: https://www.free-decompiler.com/flash/issues/2011
