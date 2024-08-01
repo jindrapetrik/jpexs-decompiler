@@ -2227,6 +2227,36 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testWhileSwitch() {
+        decompileMethod("classic_air", "testWhileSwitch", "var a:Boolean = true;\r\n"
+                + "var d:int = 5;\r\n"
+                + "var e:Boolean = true;\r\n"
+                + "var i:int = 0;\r\n"
+                + "while(i < 100)\r\n"
+                + "{\r\n"
+                + "trace(\"start\");\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "switch(d - 1)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"D1\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "if(e)\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "}\r\n"
+                + "i++;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testWhileTry() {
         decompileMethod("classic_air", "testWhileTry", "while(true)\r\n"
                 + "{\r\n"

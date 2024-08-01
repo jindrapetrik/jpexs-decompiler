@@ -130,6 +130,7 @@ package
         TestWhileBreak;
         TestWhileBreak2;
         TestWhileContinue;
+        TestWhileSwitch;
         TestWhileTry;
         TestWhileTry2;        
         TestXml;

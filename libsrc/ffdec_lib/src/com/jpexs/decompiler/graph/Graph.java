@@ -2278,6 +2278,7 @@ public class Graph {
             //List<GraphPart> loopContinues = getLoopsContinues(loops);
             boolean isLoop = false;
             Loop currentLoop = null;
+            List<GraphTargetItem> precontinueCommands = new ArrayList<>();
 
             boolean vCanHandleLoop = canHandleLoop(localData, part, loops, throwStates);
             Loop ignoredLoop = null;
@@ -2426,6 +2427,9 @@ public class Graph {
             List<GraphTargetItem> currentRet = ret;
             UniversalLoopItem loopItem = null;
             TranslateStack sPreLoop = stack;
+            LoopItem li = null;
+            boolean loopTypeFound = false;
+            boolean doWhileCandidate = false;
             if (isLoop) {
                 //makeAllCommands(currentRet, stack);
                 stack = (TranslateStack) stack.clone();
@@ -2440,6 +2444,52 @@ public class Graph {
                 //loopItem.commands=printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops);
                 currentRet.add(loopItem);
                 currentRet = loopItem.commands;
+                li = loopItem;
+
+                if (currentLoop.loopPreContinue != null) {
+                    GraphPart backup = currentLoop.loopPreContinue;
+                    currentLoop.loopPreContinue = null;
+                    List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
+                    stopPart2.add(currentLoop.loopContinue);
+                    List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
+                    stopPartKind2.add(StopPartKind.OTHER);
+                    Set<GraphPart> subVisited = new HashSet<>();
+                    precontinueCommands = printGraph(foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
+                    currentLoop.loopPreContinue = backup;
+                    checkContinueAtTheEnd(precontinueCommands, currentLoop);
+                    
+                    
+                    
+                    if (!precontinueCommands.isEmpty() && precontinueCommands.get(precontinueCommands.size() - 1) instanceof IfItem) {
+                        IfItem ifi = (IfItem) precontinueCommands.get(precontinueCommands.size() - 1);
+                        boolean ok = false;
+                        boolean invert = false;
+                        if (((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof BreakItem) && (((BreakItem) ifi.onTrue.get(0)).loopId == currentLoop.id))
+                                && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
+                            ok = true;
+                            invert = true;
+                        }
+                        if (((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onTrue.get(0)).loopId == currentLoop.id))
+                                && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof BreakItem) && (((BreakItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
+                            ok = true;
+                        }
+                        if (ok) {                            
+                            doWhileCandidate = true;
+                        }
+                    } 
+                    
+                    if (!doWhileCandidate) {
+                        for (GraphTargetItem item : precontinueCommands) {
+                            if (item instanceof Block) {
+                                currentLoop.loopPreContinue = null;
+                                break;
+                            }
+                        }
+                        if (currentLoop.loopPreContinue == null) {
+                            precontinueCommands.clear();
+                        }
+                    }
+                }
                 //return ret;
             }
 
@@ -2888,38 +2938,40 @@ public class Graph {
 
             }
             if (isLoop && loopItem != null && currentLoop != null) {
-
-                LoopItem li = loopItem;
-                boolean loopTypeFound = false;
-
-                boolean hasContinue = false;
+                
                 processIfs(loopItem.commands);
                 processSwitches(loopItem.commands, currentLoop.id);
                 processOther(loopItem.commands, currentLoop.id);
 
                 checkContinueAtTheEnd(loopItem.commands, currentLoop);
-                List<ContinueItem> continues = loopItem.getContinues();
-                for (ContinueItem c : continues) {
-                    if (c.loopId == currentLoop.id) {
-                        hasContinue = true;
-                        break;
-                    }
-                }
-                if (!hasContinue) {
-                    if (currentLoop.loopPreContinue != null) {
-                        List<GraphPart> stopContPart = new ArrayList<>();
-                        stopContPart.add(currentLoop.loopContinue);
-                        List<StopPartKind> stopContPartKind = new ArrayList<>();
-                        stopContPartKind.add(StopPartKind.OTHER);
-                        GraphPart precoBackup = currentLoop.loopPreContinue;
-                        currentLoop.loopPreContinue = null;
-                        printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, precoBackup, stopContPart, stopContPartKind, loops, throwStates, loopItem.commands, staticOperation, path, recursionLevel + 1);
-                        checkContinueAtTheEnd(loopItem.commands, currentLoop);
-                    }
-                }
-
-                //Loop with condition at the beginning (While)
+                
+                //DoWhile based on precontinue
                 if (!loopTypeFound && (!loopItem.commands.isEmpty())) {
+                    List<List<GraphTargetItem>> continueCommands1 = new ArrayList<>();
+                    getContinuesCommands(loopItem.commands, continueCommands1, currentLoop.id);
+                    if (!continueCommands1.isEmpty() && doWhileCandidate) {
+                        int index = ret.indexOf(loopItem);
+                        ret.remove(index);
+                        IfItem ifi = (IfItem) precontinueCommands.remove(precontinueCommands.size() - 1);
+                        List<GraphTargetItem> exprList = new ArrayList<>(precontinueCommands);
+                        boolean invert = false;
+                        if (((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof BreakItem) && (((BreakItem) ifi.onTrue.get(0)).loopId == currentLoop.id))
+                                && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
+                            invert = true;
+                        }
+                        
+                        GraphTargetItem expr = ifi.expression;
+                        if (invert) {
+                            expr = expr.invert(null);
+                        }
+                        exprList.add(expr);
+                        ret.add(index, li = new DoWhileItem(null, expr.getLineStartItem(), currentLoop, loopItem.commands, exprList));
+                        loopTypeFound = true;                        
+                    }
+                }
+                
+                //Loop with condition at the beginning (While)
+                if (!loopTypeFound && (!loopItem.commands.isEmpty())) {                   
                     if (loopItem.commands.get(0) instanceof IfItem) {
                         IfItem ifi = (IfItem) loopItem.commands.get(0);
 
@@ -2973,49 +3025,26 @@ public class Graph {
                             List<GraphTargetItem> finalComm = new ArrayList<>();
 
                             //findGotoTargets - comment this out:
-                            if (currentLoop.loopPreContinue != null) {
-                                GraphPart backup = currentLoop.loopPreContinue;
-                                currentLoop.loopPreContinue = null;
-                                List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                                stopPart2.add(currentLoop.loopContinue);
-                                List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
-                                stopPartKind2.add(StopPartKind.OTHER);
-                                List<GraphTargetItem> precoCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
-                                currentLoop.loopPreContinue = backup;
-                                checkContinueAtTheEnd(precoCommands, currentLoop);
-
+                            if (!precontinueCommands.isEmpty()) {
+                                
                                 List<List<GraphTargetItem>> continueCommands = new ArrayList<>();
                                 getContinuesCommands(commands, continueCommands, currentLoop.id);
 
                                 if (continueCommands.isEmpty()) {
-                                    commands.addAll(precoCommands);
-                                    precoCommands = new ArrayList<>();
+                                    commands.addAll(precontinueCommands);
+                                    precontinueCommands = new ArrayList<>();
 
                                     //Single continue and there is break/continue/return/throw at end of the commands
                                 } else if (!commands.isEmpty() && continueCommands.size() == 1) {
                                     GraphTargetItem lastItem = commands.get(commands.size() - 1);
                                     if ((lastItem instanceof BreakItem) || (lastItem instanceof ContinueItem) || (lastItem instanceof ExitItem)) {
-                                        continueCommands.get(0).addAll(continueCommands.get(0).size() - 1, precoCommands);
-                                        precoCommands = new ArrayList<>();
+                                        continueCommands.get(0).addAll(continueCommands.get(0).size() - 1, precontinueCommands);
+                                        precontinueCommands = new ArrayList<>();
                                     }
                                 }
 
-                                boolean isAllNotBlock = true;
-                                for (GraphTargetItem ti : precoCommands) {
-                                    if (ti instanceof Block) {
-                                        isAllNotBlock = false;
-                                        break;
-                                    }
-                                }
-                                if (isAllNotBlock) {
-                                    finalComm.addAll(precoCommands);
-                                } else {
-                                    commands.addAll(precoCommands);
-                                }
-                            }
-                            if (currentLoop.precontinueCommands != null) {
-                                finalComm.addAll(currentLoop.precontinueCommands);
-                            }
+                                finalComm.addAll(precontinueCommands);
+                            }                            
                             if (!finalComm.isEmpty()) {
                                 ret.add(index, li = new ForItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                             } else {
@@ -3028,6 +3057,10 @@ public class Graph {
                             loopTypeFound = true;
                         }
                     }
+                }
+                
+                if (!loopTypeFound && !precontinueCommands.isEmpty()) {
+                    loopItem.commands.addAll(precontinueCommands);
                 }
 
                 //Loop with condition at the end (Do..While)
@@ -3074,50 +3107,6 @@ public class Graph {
                             }
 
                             loopTypeFound = true;
-                        }
-                    }
-                }
-
-                if (!loopTypeFound) {
-                    if (currentLoop.loopPreContinue != null) {
-                        loopTypeFound = true;
-                        GraphPart backup = currentLoop.loopPreContinue;
-                        currentLoop.loopPreContinue = null;
-                        List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
-                        stopPart2.add(currentLoop.loopContinue);
-                        List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
-                        stopPartKind2.add(StopPartKind.OTHER);
-                        List<GraphTargetItem> finalComm = printGraph(foundGotos, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
-                        currentLoop.loopPreContinue = backup;
-                        checkContinueAtTheEnd(finalComm, currentLoop);
-
-                        if (!finalComm.isEmpty()) {
-                            if (finalComm.get(finalComm.size() - 1) instanceof IfItem) {
-                                IfItem ifi = (IfItem) finalComm.get(finalComm.size() - 1);
-                                boolean ok = false;
-                                boolean invert = false;
-                                if (((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof BreakItem) && (((BreakItem) ifi.onTrue.get(0)).loopId == currentLoop.id))
-                                        && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
-                                    ok = true;
-                                    invert = true;
-                                }
-                                if (((ifi.onTrue.size() == 1) && (ifi.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onTrue.get(0)).loopId == currentLoop.id))
-                                        && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof BreakItem) && (((BreakItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
-                                    ok = true;
-                                }
-                                if (ok) {
-                                    finalComm.remove(finalComm.size() - 1);
-                                    int index = ret.indexOf(loopItem);
-                                    ret.remove(index);
-                                    List<GraphTargetItem> exprList = new ArrayList<>(finalComm);
-                                    GraphTargetItem expr = ifi.expression;
-                                    if (invert) {
-                                        expr = expr.invert(null);
-                                    }
-                                    exprList.add(expr);
-                                    ret.add(index, li = new DoWhileItem(null, expr.getLineStartItem(), currentLoop, loopItem.commands, exprList));
-                                }
-                            }
                         }
                     }
                 }
