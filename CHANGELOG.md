@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
-- [#2210], [#1566], [#1742], [#1783], [#1787], [#2205], [#2210], [#2263]
+- [#1566], [#1742], [#1783], [#1787], [#2205], [#2210], [#2263]
   Set AS1/2 linkage and AS3 class linkage dialog
   (uses SymbolClass and ExportAssets tags) in the context menu for characters
 - [#2189] Search bar in replace character (+ replace references) window
