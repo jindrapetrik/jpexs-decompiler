@@ -371,6 +371,9 @@ public class GraphPrecontinueDetector {
             return node;
         }
         visited.add(node);
+        
+        //Note to my future self: Do not make this twoway ifs only since it may break && and || operations in expressions
+        
         /*
         if(a)
         {

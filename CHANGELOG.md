@@ -80,6 +80,7 @@ All notable changes to this project will be documented in this file.
   classes must be fully qualified
 - [#2234] AS1/2 postincrement/decrement inside DefineFunction2
 - AS3 PCode - pushbyte operand docs - signed byte
+- [#2226] Incorrect decompilation of continue statements in some cases
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3476,6 +3477,7 @@ Major version of SWF to XML export changed to 2.
 [#2239]: https://www.free-decompiler.com/flash/issues/2239
 [#2237]: https://www.free-decompiler.com/flash/issues/2237
 [#2234]: https://www.free-decompiler.com/flash/issues/2234
+[#2226]: https://www.free-decompiler.com/flash/issues/2226
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2228]: https://www.free-decompiler.com/flash/issues/2228
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
