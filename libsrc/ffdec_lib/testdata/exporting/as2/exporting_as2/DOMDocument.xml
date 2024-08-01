@@ -1,10 +1,10 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true">
      <symbols>
           <Include href="RectExport.xml" itemID="66aa6933-0000029e" lastModified="1722446214"/>
-          <Include href="RectExportInFrame1.xml" itemID="66aa6923-0000029b" lastModified="1722446315"/>
+          <Include href="RectExportInFrame1.xml" itemID="66aa6923-0000029b" lastModified="1722488159"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="10">
+          <DOMTimeline name="Scene 1">
                <layers>
                     <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
                          <frames>
@@ -25,7 +25,7 @@
                               </DOMFrame>
                               <DOMFrame index="10" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="RectExportInFrame1" selected="true" centerPoint3DX="184.45" centerPoint3DY="156.5">
+                                        <DOMSymbolInstance libraryItemName="RectExportInFrame1" centerPoint3DX="184.45" centerPoint3DY="156.5">
                                              <matrix>
                                                   <Matrix tx="111.95" ty="92"/>
                                              </matrix>
@@ -42,6 +42,8 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="718" publishTime="1722488180"/>
+          <PublishItem publishSize="719" publishTime="1722488169"/>
           <PublishItem publishSize="693" publishTime="1722446226"/>
      </publishHistory>
 </DOMDocument>
