@@ -174,9 +174,9 @@ public class TagTreeContextMenu extends JPopupMenu {
     private final MainPanel mainPanel;
 
     private JMenuItem configurePathResolvingMenuItem;
-    
+
     private JMenuItem setAsLinkageMenuItem;
-    
+
     private JMenuItem setAs3ClassLinkageMenuItem;
 
     private JMenuItem expandRecursiveMenuItem;
@@ -378,8 +378,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         configurePathResolvingMenuItem.addActionListener(this::configurePathResolvingActionPerformed);
         configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
         add(configurePathResolvingMenuItem);
-        
-        
+
         removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove") + " (DEL)");
         removeMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, false);
@@ -458,7 +457,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
         setAsLinkageMenuItem.setIcon(View.getIcon("asclass16"));
         add(setAsLinkageMenuItem);
-        
+
         setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage"));
         setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
         setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclass16"));
@@ -2585,7 +2584,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     New empty DefineSprite is created in frame 1, and its name in ExportAssets tag is set to "__Packages." + cls
                     New DoInitAction for the DefineSprite in frame 1 is created and it's filled with new cls Class code
     The Exportassets tag is modified with the new linkage identifier
-    */
+     */
     private void setAsLinkageActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
         SWF swf = ch.getSwf();
@@ -2597,7 +2596,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         String className = d.getSelectedClass();
         String classParent = d.getSelectedParentClass();
         ExportAssetsTag ea = d.getSelectedExportAssetsTag();
-        
+
         if (ea == null) {
             ea = new ExportAssetsTag(swf);
             ea.setTimelined(swf);
@@ -2607,7 +2606,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.addTag(swf.indexOfTag(d.getSelectedPosition()), ea);
             }
         }
-        
+
         if (!className.isEmpty()) {
             int frame = 1;
             int eaFrame = -1;
@@ -2616,7 +2615,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (int i = 0; i < tags.size(); i++) {
                 Tag t = tags.get(i);
                 if (t == ea) {
-                    eaFrame = frame;                    
+                    eaFrame = frame;
                 }
                 if (t instanceof ShowFrameTag) {
                     if (frame == eaFrame) {
@@ -2626,29 +2625,29 @@ public class TagTreeContextMenu extends JPopupMenu {
                     frame++;
                 }
             }
-            
+
             DoInitActionTag regDoInit = new DoInitActionTag(swf);
             regDoInit.spriteId = ch.getCharacterId();
             regDoInit.setTimelined(swf);
-            
+
             ActionScript2Parser regParser = new ActionScript2Parser(swf, regDoInit);
 
             String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
             DottedChain classDottedChain = new DottedChain(parts);
-            
+
             try {
                 List<Action> regActions = regParser.actionsFromString("Object.registerClass(\"" + Helper.escapePCodeString(identifier) + "\"," + classDottedChain.toPrintableString(false) + ");", swf.getCharset());
                 regDoInit.setActions(regActions);
             } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
                 //ignore
             }
-            
+
             swf.addTag(regInsertPos, regDoInit);
-            
+
             int insertPos = 0;
-            
+
             tags = swf.getTags();
-            
+
             for (int i = 0; i < tags.size(); i++) {
                 Tag t = tags.get(i);
                 if (t instanceof ShowFrameTag) {
@@ -2656,8 +2655,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     break;
                 }
             }
-            
-            
+
             int classCharacterId = swf.getNextCharacterId();
             DefineSpriteTag classSprite = new DefineSpriteTag(swf);
             classSprite.spriteId = classCharacterId;
@@ -2678,10 +2676,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             classDoInit.setTimelined(swf);
 
             ActionScript2Parser parser = new ActionScript2Parser(swf, classDoInit);
-            
+
             String[] partsParent = classParent.contains(".") ? classParent.split("\\.") : new String[]{classParent};
             DottedChain dcParent = new DottedChain(partsParent);
-           
+
             try {
                 List<Action> actions = parser.actionsFromString("class " + classDottedChain.toPrintableString(false) + (classParent.isEmpty() ? "" : " extends " + dcParent.toPrintableString(false)) + "{}", swf.getCharset());
                 classDoInit.setActions(actions);
@@ -2690,13 +2688,13 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             classSprite.setExportName(exportName);
-            
+
             swf.addTag(insertPos, classSprite);
             swf.addTag(insertPos + 1, classExportAssets);
             swf.addTag(insertPos + 2, classDoInit);
-            
-        }               
-                        
+
+        }
+
         boolean found = false;
         for (int i = ea.names.size() - 1; i >= 0; i--) {
             if (ea.tags.get(i) == ch.getCharacterId()) {
@@ -2717,12 +2715,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (ea.names.isEmpty()) {
             swf.removeTag(ea);
         }
-     
+
         swf.clearAllCache();
         swf.assignExportNamesToSymbols();
         swf.setModified(true);
         mainPanel.refreshTree(swf);
     }
+
     /*
     How set class to character mapping work in AS3:
     a) a character is selected
@@ -2770,7 +2769,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         SymbolClassTag selectedSymbolClass = d.getSelectedSymbolClassTag();
         ABCContainerTag selectedAbcContainer = d.getSelectedAbcContainer();
         String className = d.getSelectedClass();
-        
+
         if (className.isEmpty() && !ch.getClassNames().isEmpty()) {
             SymbolClassTag sct = d.getSelectedSymbolClassTag();
             for (int i = sct.tags.size() - 1; i >= 0; i--) {
@@ -2781,7 +2780,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (sct.names.isEmpty()) {
                 swf.removeTag(sct);
-            }            
+            }
         } else {
             String parentClassName = d.getSelectedParentClass();
 
@@ -5520,13 +5519,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.repaintTree();
     }
 
-    
     public void configurePathResolvingActionPerformed(ActionEvent evt) {
-        SWF item = (SWF) getCurrentItem();        
+        SWF item = (SWF) getCurrentItem();
         PathResolvingDialog dialog = new PathResolvingDialog(item, Main.getDefaultDialogsOwner());
         dialog.showDialog();
     }
-    
+
     public void changeCharsetActionPerformed(ActionEvent evt) {
         SWF item = (SWF) getCurrentItem();
         String newCharset = ((JMenuItem) evt.getSource()).getText();
