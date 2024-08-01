@@ -84,6 +84,8 @@ All notable changes to this project will be documented in this file.
 - Information in the tag node title - separated exportName from assigned class
 - ImportAssets tag reorganized - now imported items are not in the tag tree, but when referenced it works
 - [PR194] Default directory for storing config on Linux changed to `~/.config/FFDec`, when `~/.FFDec` does not exist yet
+- Run/Debug command - executed SWF temp files (`~ffdec_run...swf` etc.) are now generated
+  in the directory where original SWF resides to allow loading relative assets
   
 ## [20.1.0] - 2023-12-30
 ### Added
