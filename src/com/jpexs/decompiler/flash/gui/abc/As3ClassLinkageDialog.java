@@ -73,6 +73,7 @@ public class As3ClassLinkageDialog extends AppDialog {
     private String selectedParentClass = null;
     private ABCContainerTag selectedAbcContainer;
     private SymbolClassTag selectedSymbolClassTag;
+    private SymbolClassTag originalSymbolClassTag;
     private Tag selectedPosition;
     private Timelined selectedTimelined;
     private int result = ERROR_OPTION;
@@ -165,6 +166,10 @@ public class As3ClassLinkageDialog extends AppDialog {
                     abcContainers.add((ABCContainerTag) t);
                 }
                 if (t instanceof SymbolClassTag) {
+                    SymbolClassTag sc = (SymbolClassTag) t;
+                    if (sc.tags.contains(characterId)) {
+                        originalSymbolClassTag = sc;
+                    }
                     symbolClassCount++;
                 }
             }
@@ -240,12 +245,15 @@ public class As3ClassLinkageDialog extends AppDialog {
         ButtonGroup whereToStoreMappingButtonGroup = new ButtonGroup();
         whereToStoreMappingButtonGroup.add(existingSymbolClassTagRadioButton);
         whereToStoreMappingButtonGroup.add(newSymbolClassTagRadioButton);
-        doNotCreateNewClassPanel.add(new JLabel(translate("class.notfound.onlySetClassName.symbolClass.where")));
+        
+        if (originalSymbolClassTag == null) {
+            doNotCreateNewClassPanel.add(new JLabel(translate("class.notfound.onlySetClassName.symbolClass.where")));
 
-        JPanel whereToStoreMappingPanel = new JPanel(new FlowLayout());
-        whereToStoreMappingPanel.add(existingSymbolClassTagRadioButton);
-        whereToStoreMappingPanel.add(newSymbolClassTagRadioButton);
-        doNotCreateNewClassPanel.add(whereToStoreMappingPanel);
+            JPanel whereToStoreMappingPanel = new JPanel(new FlowLayout());
+            whereToStoreMappingPanel.add(existingSymbolClassTagRadioButton);
+            whereToStoreMappingPanel.add(newSymbolClassTagRadioButton);
+            doNotCreateNewClassPanel.add(whereToStoreMappingPanel);
+        }
         existingSymbolClassTagRadioButton.setSelected(true);
 
         setCentralAlignment(doNotCreateNewClassPanel);
@@ -381,10 +389,10 @@ public class As3ClassLinkageDialog extends AppDialog {
 
         String newClassName = classNameTextField.getText();
 
-        if (newClassName.isEmpty()) {
+        /*if (newClassName.isEmpty()) {
             ok = false;
             errorLabel.setText("");
-        }
+        }*/
 
         if (newClassName.endsWith(".")) {
             ok = false;
@@ -400,7 +408,7 @@ public class As3ClassLinkageDialog extends AppDialog {
             } else if (oldClassNames.size() == 1 && newClassName.equals(oldClassNames.iterator().next())) {
                 ok = false;
                 errorLabel.setText(translate("error.needToModify"));
-            } else if (swf.getCharacterByClass(newClassName) != null) {
+            } else if (!newClassName.isEmpty() && swf.getCharacterByClass(newClassName) != null) {
                 ok = false;
                 errorLabel.setText(translate("error.alreadyAssignedClass"));
             }
@@ -409,42 +417,48 @@ public class As3ClassLinkageDialog extends AppDialog {
         CardLayout cl = (CardLayout) classFoundOrNotOrErrorPanel.getLayout();
 
         if (ok) {
-            List<String> classNames = new ArrayList<>();
-            classNames.add(newClassName);
-            foundInAbcContainer = null;
-            try {
-                List<ScriptPack> scriptPacks = swf.getScriptPacksByClassNames(classNames);
-                if (!scriptPacks.isEmpty()) {
-                    ABC foundInAbc = scriptPacks.get(0).abc; //Assume there is only single pack with the class
+            if (newClassName.isEmpty()) {
+                proceedButton.setText(translate("button.ok"));
+                cl.show(classFoundOrNotOrErrorPanel, ERROR_CARD);
+                errorLabel.setText("");
+            } else {
+                List<String> classNames = new ArrayList<>();
+                classNames.add(newClassName);
+                foundInAbcContainer = null;
+                try {
+                    List<ScriptPack> scriptPacks = swf.getScriptPacksByClassNames(classNames);
+                    if (!scriptPacks.isEmpty()) {
+                        ABC foundInAbc = scriptPacks.get(0).abc; //Assume there is only single pack with the class
 
-                    boolean foundContainer = false;
-                    for (ABCContainerTag cnt : abcContainers) {
-                        if (cnt.getABC() == foundInAbc) {
-                            foundInAbcContainer = cnt;
-                            break;
+                        boolean foundContainer = false;
+                        for (ABCContainerTag cnt : abcContainers) {
+                            if (cnt.getABC() == foundInAbc) {
+                                foundInAbcContainer = cnt;
+                                break;
+                            }
                         }
                     }
+                } catch (Exception ex) {
+                    //ignore
                 }
-            } catch (Exception ex) {
-                //ignore
-            }
 
-            if (foundInAbcContainer != null) {
-                cl.show(classFoundOrNotOrErrorPanel, CLASS_FOUND_CARD);
-            } else {
-                cl.show(classFoundOrNotOrErrorPanel, CLASS_NOT_FOUND_CARD);
-
-                if (createClassRadioButton.isSelected()) {
-                    if (existingAbcTagRadioButton.isSelected() && abcCount == 1) {
-                        proceedButton.setText(translate("button.ok"));
-                    } else {
-                        proceedButton.setText(translate("button.proceed"));
-                    }
+                if (foundInAbcContainer != null) {
+                    cl.show(classFoundOrNotOrErrorPanel, CLASS_FOUND_CARD);
                 } else {
-                    if (existingSymbolClassTagRadioButton.isSelected() && symbolClassCount == 1) {
-                        proceedButton.setText(translate("button.ok"));
+                    cl.show(classFoundOrNotOrErrorPanel, CLASS_NOT_FOUND_CARD);
+
+                    if (createClassRadioButton.isSelected()) {
+                        if (existingAbcTagRadioButton.isSelected() && abcCount == 1) {
+                            proceedButton.setText(translate("button.ok"));
+                        } else {
+                            proceedButton.setText(translate("button.proceed"));
+                        }
                     } else {
-                        proceedButton.setText(translate("button.proceed"));
+                        if (originalSymbolClassTag != null || (existingSymbolClassTagRadioButton.isSelected() && symbolClassCount == 1)) {
+                            proceedButton.setText(translate("button.ok"));
+                        } else {
+                            proceedButton.setText(translate("button.proceed"));
+                        }
                     }
                 }
             }
@@ -461,46 +475,55 @@ public class As3ClassLinkageDialog extends AppDialog {
             return;
         }
         setVisible(false);
-        if (foundInAbcContainer == null) {
-            if (createClassRadioButton.isSelected()) {
-                if (existingAbcTagRadioButton.isSelected()) {
-                    SelectTagOfTypeDialog selectDoABCDialog = new SelectTagOfTypeDialog(owner, swf, ABCContainerTag.class, "DoABC", characterFrame);
-                    selectedAbcContainer = (ABCContainerTag) selectDoABCDialog.showDialog();
-                    if (selectedAbcContainer == null) {
-                        cancelButtonActionPerformed(evt);
-                        return;
+        boolean emptyClassName = classNameTextField.getText().isEmpty();
+        if (emptyClassName) {                    
+            selectedSymbolClassTag = originalSymbolClassTag;                
+        } else {
+            if (foundInAbcContainer == null) {
+                if (createClassRadioButton.isSelected()) {
+                    if (existingAbcTagRadioButton.isSelected()) {
+                        SelectTagOfTypeDialog selectDoABCDialog = new SelectTagOfTypeDialog(owner, swf, ABCContainerTag.class, "DoABC", characterFrame);
+                        selectedAbcContainer = (ABCContainerTag) selectDoABCDialog.showDialog();
+                        if (selectedAbcContainer == null) {
+                            cancelButtonActionPerformed(evt);
+                            return;
+                        }
                     }
-                }
-                if (newAbcTagRadioButton.isSelected()) {
-                    SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, false, "DoABC", characterFrame);
-                    if (selectTagPositionDialog.showDialog() != OK_OPTION) {
-                        cancelButtonActionPerformed(evt);
-                        return;
+                    if (newAbcTagRadioButton.isSelected()) {
+                        SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, false, "DoABC", characterFrame);
+                        if (selectTagPositionDialog.showDialog() != OK_OPTION) {
+                            cancelButtonActionPerformed(evt);
+                            return;
+                        }
+                        selectedPosition = selectTagPositionDialog.getSelectedTag();
+                        selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
                     }
-                    selectedPosition = selectTagPositionDialog.getSelectedTag();
-                    selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
+                } else {
+                    if (originalSymbolClassTag != null) {
+                        selectedSymbolClassTag = originalSymbolClassTag;
+                    } else {
+                        if (existingSymbolClassTagRadioButton.isSelected()) {
+                            SelectTagOfTypeDialog selectSymbolClassDialog = new SelectTagOfTypeDialog(owner, swf, SymbolClassTag.class, "SymbolClass", characterFrame);
+                            selectedSymbolClassTag = (SymbolClassTag) selectSymbolClassDialog.showDialog();
+                            if (selectedSymbolClassTag == null) {
+                                cancelButtonActionPerformed(evt);
+                                return;
+                            }
+                        }
+                        if (newSymbolClassTagRadioButton.isSelected()) {
+                            SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, false, "SymbolClass", characterFrame);
+                            if (selectTagPositionDialog.showDialog() != OK_OPTION) {
+                                cancelButtonActionPerformed(evt);
+                                return;
+                            }
+                            selectedPosition = selectTagPositionDialog.getSelectedTag();
+                            selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
+                        }
+                    }
                 }
             } else {
-                if (existingSymbolClassTagRadioButton.isSelected()) {
-                    SelectTagOfTypeDialog selectSymbolClassDialog = new SelectTagOfTypeDialog(owner, swf, SymbolClassTag.class, "SymbolClass", characterFrame);
-                    selectedSymbolClassTag = (SymbolClassTag) selectSymbolClassDialog.showDialog();
-                    if (selectedSymbolClassTag == null) {
-                        cancelButtonActionPerformed(evt);
-                        return;
-                    }
-                }
-                if (newSymbolClassTagRadioButton.isSelected()) {
-                    SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, false, "SymbolClass", characterFrame);
-                    if (selectTagPositionDialog.showDialog() != OK_OPTION) {
-                        cancelButtonActionPerformed(evt);
-                        return;
-                    }
-                    selectedPosition = selectTagPositionDialog.getSelectedTag();
-                    selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
-                }
+                selectedAbcContainer = foundInAbcContainer;
             }
-        } else {
-            selectedAbcContainer = foundInAbcContainer;
         }
 
         if (selectedAbcContainer != null) {
@@ -516,7 +539,7 @@ public class As3ClassLinkageDialog extends AppDialog {
             }
         }
 
-        createClass = foundInAbcContainer == null && createClassRadioButton.isSelected();
+        createClass = !emptyClassName && foundInAbcContainer == null && createClassRadioButton.isSelected();
 
         result = OK_OPTION;
         selectedClass = classNameTextField.getText();
