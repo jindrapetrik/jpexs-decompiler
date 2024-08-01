@@ -78,6 +78,7 @@ All notable changes to this project will be documented in this file.
 - FreeTransform not showing in situations like GFX or importAssets
 - [#2237] AS3 direct editation - usages of import colliding with toplevel
   classes must be fully qualified
+- [#2234] AS1/2 postincrement/decrement inside DefineFunction2
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3472,6 +3473,7 @@ Major version of SWF to XML export changed to 2.
 [#2253]: https://www.free-decompiler.com/flash/issues/2253
 [#2239]: https://www.free-decompiler.com/flash/issues/2239
 [#2237]: https://www.free-decompiler.com/flash/issues/2237
+[#2234]: https://www.free-decompiler.com/flash/issues/2234
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
