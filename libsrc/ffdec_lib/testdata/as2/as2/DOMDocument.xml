@@ -31,7 +31,7 @@
           <Include href="Tween 5.xml" itemIcon="1" loadImmediate="false" itemID="60429674-00000289" lastModified="1614976628"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="88">
+          <DOMTimeline name="Scene 1" currentFrame="89">
                <layers>
                     <DOMLayer name="Layer 16" color="#FF4F4F">
                          <frames>
@@ -3377,6 +3377,20 @@ function myFunc()
                                    </Actionscript>
                                    <elements/>
                               </DOMFrame>
+                              <DOMFrame index="89" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("bitwiseOperandsTest");
+
+var a = 100;
+var b = a & 0x08ff;
+var c = 0x08ff & a;
+var d = a | 0x0480;
+var e = 0x0480 | a;
+var f = a ^ 0x0641;
+var g = 0x0641 ^ a;]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
                </layers>
@@ -3384,6 +3398,9 @@ function myFunc()
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="108786" publishTime="1722543124"/>
+          <PublishItem publishSize="108700" publishTime="1722540660"/>
+          <PublishItem publishSize="108705" publishTime="1722540289"/>
           <PublishItem publishSize="108706" publishTime="1722540140"/>
           <PublishItem publishSize="108698" publishTime="1722538202"/>
           <PublishItem publishSize="108707" publishTime="1722538175"/>
@@ -3401,8 +3418,5 @@ function myFunc()
           <PublishItem publishSize="108238" publishTime="1678904397"/>
           <PublishItem publishSize="107972" publishTime="1667644454"/>
           <PublishItem publishSize="108067" publishTime="1667642777"/>
-          <PublishItem publishSize="107872" publishTime="1638135730"/>
-          <PublishItem publishSize="107854" publishTime="1638131849"/>
-          <PublishItem publishSize="107768" publishTime="1638096020"/>
      </publishHistory>
 </DOMDocument>

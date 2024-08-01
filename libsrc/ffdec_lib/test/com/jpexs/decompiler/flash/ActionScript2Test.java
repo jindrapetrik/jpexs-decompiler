@@ -2465,4 +2465,17 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"functionPostIncrementTest\");\r\n"
         );
     }
+
+    @Test
+    public void frame90_bitwiseOperandsTest() {
+        compareSrc(90, "trace(\"bitwiseOperandsTest\");\r\n"
+                + "var a = 100;\r\n"
+                + "var b = a & 0x08FF;\r\n"
+                + "var c = 0x08FF & a;\r\n"
+                + "var d = a | 0x0480;\r\n"
+                + "var e = 0x0480 | a;\r\n"
+                + "var f = a ^ 0x0641;\r\n"
+                + "var g = 0x0641 ^ a;\r\n"
+        );
+    }
 }

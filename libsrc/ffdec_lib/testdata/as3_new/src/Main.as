@@ -18,6 +18,7 @@ package
     {
         TestActivationArguments;
         TestArguments;
+        TestBitwiseOperands;
         TestCallCall;
         TestCallLocal;
         TestCatchFinally;

@@ -24,8 +24,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
-import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +31,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BitAndAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
+public class BitAndAVM2Item extends BitwiseBinaryOpAVM2Item {
 
     public BitAndAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&", "Number", "Number");
@@ -62,5 +60,5 @@ public class BitAndAVM2Item extends BinaryOpItem implements CompoundableBinaryOp
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.add(new AVM2Instruction(0, AVM2Instructions.BitAnd, null));
         return ret;
-    }
+    }        
 }

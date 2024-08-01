@@ -90,6 +90,7 @@ All notable changes to this project will be documented in this file.
 - [PR194] Default directory for storing config on Linux changed to `~/.config/FFDec`, when `~/.FFDec` does not exist yet
 - Run/Debug command - executed SWF temp files (`~ffdec_run...swf` etc.) are now generated
   in the directory where original SWF resides to allow loading relative assets
+- [#2228] AS1/2/3 bitwise operations use hexadecimal operands
   
 ## [20.1.0] - 2023-12-30
 ### Added
@@ -3475,6 +3476,7 @@ Major version of SWF to XML export changed to 2.
 [#2237]: https://www.free-decompiler.com/flash/issues/2237
 [#2234]: https://www.free-decompiler.com/flash/issues/2234
 [#2206]: https://www.free-decompiler.com/flash/issues/2206
+[#2228]: https://www.free-decompiler.com/flash/issues/2228
 [#2100]: https://www.free-decompiler.com/flash/issues/2100
 [#2123]: https://www.free-decompiler.com/flash/issues/2123
 [#2119]: https://www.free-decompiler.com/flash/issues/2119

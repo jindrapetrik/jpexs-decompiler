@@ -53,10 +53,10 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
         if (value != null) {
             if (value.getPrecedence() > precedence) {
                 writer.append("(");
-                value.toString(writer, localData, ""); //coerce);
+                operandToString(value, writer, localData);
                 writer.append(")");
             } else {
-                value.toString(writer, localData, ""); //coerce);
+                operandToString(value, writer, localData);
             }
         } else {
             writer.append("null");
@@ -145,5 +145,9 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     public int hashCode() {
         int hash = 3;
         return hash;
+    }
+    
+    protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        operand.toString(writer, localData, "");
     }
 }

@@ -52,6 +52,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testBitwiseOperands() {
+        decompileMethod("classic_air", "testBitwiseOperands", "var a:int = 100;\r\n"
+                + "var b:* = a & 0x08FF;\r\n"
+                + "var c:* = 0x08FF & a;\r\n"
+                + "var d:* = a | 0x0480;\r\n"
+                + "var e:* = 0x0480 | a;\r\n"
+                + "var f:* = a ^ 0x0641;\r\n"
+                + "var g:* = 0x0641 ^ a;\r\n"
+                + "var h:int = -385;\r\n",
+                 false);
+    }
+
+    @Test
     public void testCallCall() {
         decompileMethod("classic_air", "testCallCall", "var o:* = new getDefinitionByName(\"Object\");\r\n"
                 + "var o2:* = new (getDefinitionByName(\"Object\"))();\r\n",
