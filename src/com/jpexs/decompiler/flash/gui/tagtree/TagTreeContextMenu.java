@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.AsLinkageDialog;
 import com.jpexs.decompiler.flash.gui.ClipboardType;
 import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -173,6 +174,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private final MainPanel mainPanel;
 
     private JMenuItem configurePathResolvingMenuItem;
+    
+    private JMenuItem setAsLinkageMenuItem;
     
     private JMenuItem setAs3ClassLinkageMenuItem;
 
@@ -451,7 +454,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
 
-        setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage")); //FIXME
+        setAsLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAsLinkage"));
+        setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
+        setAsLinkageMenuItem.setIcon(View.getIcon("asclass16"));
+        add(setAsLinkageMenuItem);
+        
+        setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage"));
         setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
         setAs3ClassLinkageMenuItem.setIcon(View.getIcon("asclass16"));
         add(setAs3ClassLinkageMenuItem);
@@ -1126,6 +1134,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
+        setAsLinkageMenuItem.setVisible(false);
         setAs3ClassLinkageMenuItem.setVisible(false);
         expandRecursiveMenuItem.setVisible(false);
         collapseRecursiveMenuItem.setVisible(false);
@@ -1371,6 +1380,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 CharacterTag cht = (CharacterTag) firstItem;
                 if (cht.getSwf().isAS3() && As3ClassLinkageDialog.getParentClassFromCharacter(cht) != null) {
                     setAs3ClassLinkageMenuItem.setVisible(true);
+                }
+                if (!cht.getSwf().isAS3()) {
+                    String ename = cht.getExportName();
+                    if (ename == null || !ename.startsWith("__Packages.")) {
+                        setAsLinkageMenuItem.setVisible(true);
+                    }
                 }
             }
 
@@ -2547,12 +2562,174 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     /*
+    How setting AS linkage should work:
+    User selects linkage identifier (the one really stored in ExportAssets of the character)
+    If the file is AS1/2:
+            If exists DoInitAction tag for that character, that has Object.registerClass("oldLinkageIdentifier", cls)
+                    readonly class name is displayed
+                    readonly identifier is displayed
+                    exit
+            else
+                    (optional) User selects desired AS2 classname and parent class name to be created
+    If the linkage did not exist before (no ExportAssets had such id) and linkage identifier is not empty,
+            user can select whether to use existing ExportAssets tag (if some exists) or to create new
+
+    On pressing OK:
+    If the linkage did not exist before (no ExportAssets had such id) and the new identifier is not empty,
+            user selects existing ExportAssets tag via dialog or selects position for new
+                    if the dialog is cancelled, exit
+    If the file is AS1/2:
+            If the user choosed to create new class (cls is its fully qualified name)
+                    Frame of Exportassets is determined
+                    New DoInitAction for the character is created in the EA frame which has Object.registerClass("linkageIdentifier", cls) in code
+                    New empty DefineSprite is created in frame 1, and its name in ExportAssets tag is set to "__Packages." + cls
+                    New DoInitAction for the DefineSprite in frame 1 is created and it's filled with new cls Class code
+    The Exportassets tag is modified with the new linkage identifier
+    */
+    private void setAsLinkageActionPerformed(ActionEvent evt) {
+        CharacterTag ch = (CharacterTag) getCurrentItem();
+        SWF swf = ch.getSwf();
+        AsLinkageDialog d = new AsLinkageDialog(Main.getDefaultDialogsOwner(), swf, ch.getCharacterId());
+        if (d.showDialog() != AppDialog.OK_OPTION) {
+            return;
+        }
+        String identifier = d.getSelectedIdentifier();
+        String className = d.getSelectedClass();
+        String classParent = d.getSelectedParentClass();
+        ExportAssetsTag ea = d.getSelectedExportAssetsTag();
+        
+        if (ea == null) {
+            ea = new ExportAssetsTag(swf);
+            ea.setTimelined(swf);
+            if (d.getSelectedPosition() == null) {
+                swf.addTag(ea);
+            } else {
+                swf.addTag(swf.indexOfTag(d.getSelectedPosition()), ea);
+            }
+        }
+        
+        if (!className.isEmpty()) {
+            int frame = 1;
+            int eaFrame = -1;
+            int regInsertPos = -1;
+            ReadOnlyTagList tags = swf.getTags();
+            for (int i = 0; i < tags.size(); i++) {
+                Tag t = tags.get(i);
+                if (t == ea) {
+                    eaFrame = frame;                    
+                }
+                if (t instanceof ShowFrameTag) {
+                    if (frame == eaFrame) {
+                        regInsertPos = i;
+                        break;
+                    }
+                    frame++;
+                }
+            }
+            
+            DoInitActionTag regDoInit = new DoInitActionTag(swf);
+            regDoInit.spriteId = ch.getCharacterId();
+            regDoInit.setTimelined(swf);
+            
+            ActionScript2Parser regParser = new ActionScript2Parser(swf, regDoInit);
+
+            String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
+            DottedChain classDottedChain = new DottedChain(parts);
+            
+            try {
+                List<Action> regActions = regParser.actionsFromString("Object.registerClass(\"" + Helper.escapePCodeString(identifier) + "\"," + classDottedChain.toPrintableString(false) + ");", swf.getCharset());
+                regDoInit.setActions(regActions);
+            } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
+                //ignore
+            }
+            
+            swf.addTag(regInsertPos, regDoInit);
+            
+            int insertPos = 0;
+            
+            tags = swf.getTags();
+            
+            for (int i = 0; i < tags.size(); i++) {
+                Tag t = tags.get(i);
+                if (t instanceof ShowFrameTag) {
+                    insertPos = i;
+                    break;
+                }
+            }
+            
+            
+            int classCharacterId = swf.getNextCharacterId();
+            DefineSpriteTag classSprite = new DefineSpriteTag(swf);
+            classSprite.spriteId = classCharacterId;
+            classSprite.hasEndTag = true;
+            classSprite.setTimelined(swf);
+
+            String exportName = "__Packages." + className;
+
+            ExportAssetsTag classExportAssets = new ExportAssetsTag(swf);
+            classExportAssets.names = new ArrayList<>();
+            classExportAssets.names.add(exportName);
+            classExportAssets.tags = new ArrayList<>();
+            classExportAssets.tags.add(classCharacterId);
+            classExportAssets.setTimelined(swf);
+
+            DoInitActionTag classDoInit = new DoInitActionTag(swf);
+            classDoInit.spriteId = classCharacterId;
+            classDoInit.setTimelined(swf);
+
+            ActionScript2Parser parser = new ActionScript2Parser(swf, classDoInit);
+            
+            String[] partsParent = classParent.contains(".") ? classParent.split("\\.") : new String[]{classParent};
+            DottedChain dcParent = new DottedChain(partsParent);
+           
+            try {
+                List<Action> actions = parser.actionsFromString("class " + classDottedChain.toPrintableString(false) + (classParent.isEmpty() ? "" : " extends " + dcParent.toPrintableString(false)) + "{}", swf.getCharset());
+                classDoInit.setActions(actions);
+            } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
+                //ignore
+            }
+
+            classSprite.setExportName(exportName);
+            
+            swf.addTag(insertPos, classSprite);
+            swf.addTag(insertPos + 1, classExportAssets);
+            swf.addTag(insertPos + 2, classDoInit);
+            
+        }               
+                        
+        boolean found = false;
+        for (int i = ea.names.size() - 1; i >= 0; i--) {
+            if (ea.tags.get(i) == ch.getCharacterId()) {
+                if (identifier.isEmpty()) {
+                    ea.tags.remove(i);
+                    ea.names.remove(i);
+                } else {
+                    ea.names.set(i, identifier);
+                    found = true;
+                }
+            }
+        }
+        if (!identifier.isEmpty() && !found) {
+            ea.tags.add(ch.getCharacterId());
+            ea.names.add(identifier);
+        }
+        ea.setModified(true);
+        if (ea.names.isEmpty()) {
+            swf.removeTag(ea);
+        }
+     
+        swf.clearAllCache();
+        swf.assignExportNamesToSymbols();
+        swf.setModified(true);
+        mainPanel.refreshTree(swf);
+    }
+    /*
     How set class to character mapping work in AS3:
     a) a character is selected
     b) if the character already has assigned more than 1 class then exit with a message that user must do this manually
     c) new class name is entered, must be different than previous
     d) if new class name is already assigned to different character, exit
-    e) find the ABC, where class with that name is defined
+    e) if the classname is not empty find the ABC, where class with that name is defined
             if found
                     determine its frame
                     find nearest frame >= ABC frame, such that the character is defined in it (or is defined earlier in the file)
@@ -2569,14 +2746,15 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     otherwise create new SymbolClass in that frame
 
                     or suggest not creating class, set only its name
-                            choose whether to use existing Symbolclass or add new
-                            AFTER PRESSING OK:
-                            select existing SymbolClass or add new SymbolClass (on selected position). 
-                            (Selected frame for target SymbolClass must have defined the character in it or earlier in the file)
+                            if the character did not have assigned name before (= no SymbolClass used)
+                                choose whether to use existing Symbolclass or add new
+                                AFTER PRESSING OK:
+                                select existing SymbolClass or add new SymbolClass (on selected position). 
+                                (Selected frame for target SymbolClass must have defined the character in it or earlier in the file)
     AFTER PRESSING OK:
     I. if there is previously assigned classname, find associated SymbolClass and remove the mapping from it
-    II. if the previous Symbolclass is empty, remove it
-    III. add new character mapping to new SymbolClass determined
+    II. if the previous Symbolclass is empty and is not target SymbolClass, remove it
+    III. if the new classname is not empty, add new character mapping to new SymbolClass determined
      */
     private void setAs3ClassLinkageActionPerformed(ActionEvent evt) {
         CharacterTag ch = (CharacterTag) getCurrentItem();
@@ -2592,59 +2770,73 @@ public class TagTreeContextMenu extends JPopupMenu {
         SymbolClassTag selectedSymbolClass = d.getSelectedSymbolClassTag();
         ABCContainerTag selectedAbcContainer = d.getSelectedAbcContainer();
         String className = d.getSelectedClass();
-        String parentClassName = d.getSelectedParentClass();
-
-        if (!d.isClassFound() && !d.doCreateClass() && selectedSymbolClass == null) { //we selected position of new SymbolClass
-            selectedSymbolClass = new SymbolClassTag(swf);
-            selectedSymbolClass.setTimelined(swf);
-            Tag pos = d.getSelectedPosition();
-            if (pos == null) {
-                swf.addTag(selectedSymbolClass);
-            } else {
-                swf.addTag(swf.indexOfTag(pos), selectedSymbolClass);
+        
+        if (className.isEmpty() && !ch.getClassNames().isEmpty()) {
+            SymbolClassTag sct = d.getSelectedSymbolClassTag();
+            for (int i = sct.tags.size() - 1; i >= 0; i--) {
+                if (sct.tags.get(i) == ch.getCharacterId()) {
+                    sct.names.remove(i);
+                    sct.tags.remove(i);
+                }
             }
-        }
+            if (sct.names.isEmpty()) {
+                swf.removeTag(sct);
+            }            
+        } else {
+            String parentClassName = d.getSelectedParentClass();
 
-        if (!d.isClassFound() && d.doCreateClass()) {
-            if (d.getSelectedAbcContainer() == null) {
-                selectedAbcContainer = new DoABC2Tag(swf);
-                ((Tag) selectedAbcContainer).setTimelined(swf);
+            if (!d.isClassFound() && !d.doCreateClass() && selectedSymbolClass == null) { //we selected position of new SymbolClass
+                selectedSymbolClass = new SymbolClassTag(swf);
+                selectedSymbolClass.setTimelined(swf);
                 Tag pos = d.getSelectedPosition();
                 if (pos == null) {
-                    swf.addTag((Tag) selectedAbcContainer);
+                    swf.addTag(selectedSymbolClass);
                 } else {
-                    swf.addTag(swf.indexOfTag(pos), (Tag) selectedAbcContainer);
+                    swf.addTag(swf.indexOfTag(pos), selectedSymbolClass);
                 }
             }
 
-            String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
-            String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
-            String fileName = className.replace(".", "/");
-            String[] pkgParts = new String[0];
-            if (!pkg.isEmpty()) {
-                if (pkg.contains(".")) {
-                    pkgParts = pkg.split("\\.");
-                } else {
-                    pkgParts = new String[]{pkg};
+            if (!d.isClassFound() && d.doCreateClass()) {
+                if (d.getSelectedAbcContainer() == null) {
+                    selectedAbcContainer = new DoABC2Tag(swf);
+                    ((Tag) selectedAbcContainer).setTimelined(swf);
+                    Tag pos = d.getSelectedPosition();
+                    if (pos == null) {
+                        swf.addTag((Tag) selectedAbcContainer);
+                    } else {
+                        swf.addTag(swf.indexOfTag(pos), (Tag) selectedAbcContainer);
+                    }
                 }
-            }
-            try {
-                AbcIndexing abcIndex = swf.getAbcIndex();
-                abcIndex.selectAbc(selectedAbcContainer.getABC());
-                ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
-                DottedChain dc = new DottedChain(pkgParts);
-                String script = "package " + dc.toPrintableString(true) + " {"
-                        + (parentClassName.isEmpty() ? "" : "import " + parentClassName + ";")
-                        + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
-                        + " }"
-                        + "}";
-                parser.addScript(script, fileName, 0, 0, swf.getDocumentClass());
-            } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
-                Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
-            }
+                String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
+                String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
+                String fileName = className.replace(".", "/");
+                String[] pkgParts = new String[0];
+                if (!pkg.isEmpty()) {
+                    if (pkg.contains(".")) {
+                        pkgParts = pkg.split("\\.");
+                    } else {
+                        pkgParts = new String[]{pkg};
+                    }
+                }
+                try {
+                    AbcIndexing abcIndex = swf.getAbcIndex();
+                    abcIndex.selectAbc(selectedAbcContainer.getABC());
+                    ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
-            ((Tag) selectedAbcContainer).setModified(true);
+                    DottedChain dc = new DottedChain(pkgParts);
+                    String script = "package " + dc.toPrintableString(true) + " {"
+                            + (parentClassName.isEmpty() ? "" : "import " + parentClassName + ";")
+                            + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
+                            + " }"
+                            + "}";
+                    parser.addScript(script, fileName, 0, 0, swf.getDocumentClass());
+                } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
+                    Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
+                }
+
+                ((Tag) selectedAbcContainer).setModified(true);
+            }
         }
 
         if (selectedSymbolClass == null) {

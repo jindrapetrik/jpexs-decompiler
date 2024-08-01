@@ -17,12 +17,29 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.ActionTreeOperation;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -114,5 +131,108 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
             return null;
         }
         return "" + getCharacterId();
+    }
+    
+    private String getMembersToClassName(GraphTargetItem item) {
+        List<String> ret = new ArrayList<>();
+        while (item instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) item;
+            if (!(mem.memberName instanceof DirectValueActionItem)) {
+                return null;
+            }
+            DirectValueActionItem dv = ((DirectValueActionItem) mem.memberName);
+            if (!dv.isString()) {
+                return null;
+            }
+            ret.add(0, dv.getAsString());
+            item = mem.object;
+        }
+        if (!(item instanceof GetVariableActionItem)) {
+            return null;
+        }
+        GetVariableActionItem gv = (GetVariableActionItem) item;
+        if (!(gv.name instanceof DirectValueActionItem)) {
+            return null;
+        }
+        DirectValueActionItem dv = ((DirectValueActionItem) gv.name);
+        if (!dv.isString()) {
+            return null;
+        }
+        String varName = dv.getAsString();
+        ret.add(0, varName);
+        return String.join(".", ret);
+    }
+    
+    public String getAs2ClassName() {
+        String linkageIdentifier = getExportName();
+        if (linkageIdentifier == null) {
+            return null;
+        }
+        Reference<String> classNameRef = new Reference<>(null);        
+        for (Tag t : getSwf().getTags()) {
+            if (t instanceof DoInitActionTag) {
+                DoInitActionTag as = (DoInitActionTag) t;
+                if (as.spriteId == getCharacterId()) {
+                    GraphTextWriter writer = new NulWriter();
+                    try {
+                        List<ActionTreeOperation> ops = new ArrayList<>();
+                        ops.add(new ActionTreeOperation() {
+                            @Override
+                            public void run(List<GraphTargetItem> tree) {
+                                List<Integer> listToRemove = new ArrayList<>();
+                                List<String> newClassNames = new ArrayList<>();
+                                for (int i = 0; i < tree.size(); i++) {
+                                    GraphTargetItem item = tree.get(i);
+                                    if (!(item instanceof CallMethodActionItem)) {
+                                        continue;
+                                    }
+                                    CallMethodActionItem callMethod = (CallMethodActionItem) item;
+                                    if (!(callMethod.scriptObject instanceof GetVariableActionItem)) {
+                                        continue;
+                                    }
+                                    GetVariableActionItem methodObject = (GetVariableActionItem) callMethod.scriptObject;
+                                    if (!(methodObject.name instanceof DirectValueActionItem)) {
+                                        continue;
+                                    }
+                                    if (methodObject.name == null || !methodObject.name.toString().equals("Object")) {
+                                        continue;
+                                    }
+                                    if (!(callMethod.methodName instanceof DirectValueActionItem)) {
+                                        continue;
+                                    }
+                                    if (!callMethod.methodName.toString().equals("registerClass")) {
+                                        continue;
+                                    }
+                                    if (callMethod.arguments.size() != 2) {
+                                        continue;
+                                    }
+                                    if (!(callMethod.arguments.get(0) instanceof DirectValueActionItem)) {
+                                        continue;
+                                    }
+                                    if (linkageIdentifier != null && !linkageIdentifier.equals(callMethod.arguments.get(0).toString())) {
+                                        continue;
+                                    }
+                                    String className = getMembersToClassName(callMethod.arguments.get(1));
+                                    if (className == null) {
+                                        continue;
+                                    }
+                                    newClassNames.add(className);
+                                    listToRemove.add(i);
+                                }
+                                //There's only single one
+                                if (listToRemove.size() != 1) {
+                                    return;
+                                }
+                                classNameRef.setVal(newClassNames.get(0));
+                            }                            
+                        });
+                        as.getActionScriptSource(writer, null, ops);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(CharacterTag.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return classNameRef.getVal();
     }
 }
