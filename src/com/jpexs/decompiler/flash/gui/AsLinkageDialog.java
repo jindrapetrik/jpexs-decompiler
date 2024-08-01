@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Component;
@@ -35,7 +36,9 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -66,7 +69,7 @@ public class AsLinkageDialog extends AppDialog {
     private String selectedParentClass = null;
     private ExportAssetsTag originalExportAssetsTag;
     private ExportAssetsTag selectedExportAssetsTag;
-    private String originalClassName;
+    private String originalClassName;    
     private Tag selectedPosition;
     private Timelined selectedTimelined;
     private int result = ERROR_OPTION;
@@ -87,6 +90,8 @@ public class AsLinkageDialog extends AppDialog {
     private final JRadioButton newExportAssetsTagRadioButton = new JRadioButton(translate("linkage.notfound.exportAssets.where.new"));
 
     private static final Map<Class<?>, String> tagTypeToParentClass = new HashMap<>();
+    
+    private Set<String> existingNames = new HashSet<>();
 
     static {
         tagTypeToParentClass.put(SoundTag.class, "flash.media.Sound");
@@ -126,6 +131,14 @@ public class AsLinkageDialog extends AppDialog {
             }
             if (t instanceof ShowFrameTag) {
                 frame++;
+            }
+            if (t instanceof ExportAssetsTag) {
+                ExportAssetsTag ea = (ExportAssetsTag) t;
+                existingNames.addAll(ea.names);
+            }
+            if (t instanceof ImportTag) {
+                ImportTag it = (ImportTag) t;
+                existingNames.addAll(it.getAssets().values());
             }
         }
         frame = 1;
@@ -215,7 +228,7 @@ public class AsLinkageDialog extends AppDialog {
             }
         });      
 
-        classNameTextField.getDocument().addDocumentListener(new DocumentListener() {
+        DocumentListener updateDocumentListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 checkEnabled();
@@ -230,7 +243,11 @@ public class AsLinkageDialog extends AppDialog {
             public void changedUpdate(DocumentEvent e) {
                 checkEnabled();
             }
-        });
+        };
+        
+        identifierTextField.getDocument().addDocumentListener(updateDocumentListener);
+        classNameTextField.getDocument().addDocumentListener(updateDocumentListener);
+        parentClassNameTextField.getDocument().addDocumentListener(updateDocumentListener);
 
         classNameTextField.addActionListener(this::okButtonActionPerformed);
         checkEnabled();
@@ -254,6 +271,9 @@ public class AsLinkageDialog extends AppDialog {
 
         boolean ok = true;
 
+        CharacterTag ch = swf.getCharacter(characterId);
+                    
+        String oldIdentifier = ch.getExportName();
         String newIdentifier = identifierTextField.getText();
         String newClassName = classNameTextField.getText();
 
@@ -280,9 +300,14 @@ public class AsLinkageDialog extends AppDialog {
             proceedButton.setText(translate("button.ok"));
             errorLabel.setText("");
         }
+        
+        if (!newIdentifier.isEmpty() && oldIdentifier != null && !oldIdentifier.equals(newIdentifier) && existingNames.contains(newIdentifier)) {
+            ok = false;
+            proceedButton.setText(translate("button.ok"));
+            errorLabel.setText("");            
+        }
 
         if (ok) {
-            CharacterTag ch = swf.getCharacter(characterId);
             String oldClassName = ch.getAs2ClassName();
             if (oldClassName == null && newClassName != null && ch.getSwf().getCharacterByExportName("__Packages." + newClassName) != null) {
                 ok = false;
