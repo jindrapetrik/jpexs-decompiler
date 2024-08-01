@@ -2452,4 +2452,17 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"finish\");\r\n"
         );
     }
+
+    @Test
+    public void frame89_functionPostIncrementTest() {
+        compareSrc(89, "function myFunc()\r\n"
+                + "{\r\n"
+                + "var _loc2_ = 0;\r\n"
+                + "var _loc1_ = {};\r\n"
+                + "var _loc4_ = _loc1_[_loc2_++];\r\n"
+                + "var _loc3_ = _loc1_[_loc2_--];\r\n"
+                + "}\r\n"
+                + "trace(\"functionPostIncrementTest\");\r\n"
+        );
+    }
 }

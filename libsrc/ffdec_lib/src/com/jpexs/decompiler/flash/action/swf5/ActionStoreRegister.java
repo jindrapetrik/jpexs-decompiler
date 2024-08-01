@@ -42,6 +42,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.io.IOException;
 import java.util.HashMap;
@@ -148,7 +149,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
                 stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
-                stack.push(obj);
+                stack.push(new AnyItem()); //to avoid leaving popped item on output
                 return;
             }
         }
@@ -157,7 +158,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
                 stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
-                stack.push(obj);
+                stack.push(new AnyItem()); //to avoid leaving popped item on output
                 return;
             }
         }
