@@ -69,7 +69,7 @@ public class AsLinkageDialog extends AppDialog {
     private String selectedParentClass = null;
     private ExportAssetsTag originalExportAssetsTag;
     private ExportAssetsTag selectedExportAssetsTag;
-    private String originalClassName;    
+    private String originalClassName;
     private Tag selectedPosition;
     private Timelined selectedTimelined;
     private int result = ERROR_OPTION;
@@ -79,18 +79,18 @@ public class AsLinkageDialog extends AppDialog {
     private final int characterId;
 
     private int characterFrame = -1;
-    
+
     private int exportAssetsCount = 0;
 
     private final JLabel errorLabel = new JLabel();
-    
+
     private final JLabel parentClassNameLabel = new JLabel(translate("class.parentname"));
-            
+
     private final JRadioButton existingExportAssetsTagRadioButton = new JRadioButton(translate("linkage.notfound.exportAssets.where.existing"));
     private final JRadioButton newExportAssetsTagRadioButton = new JRadioButton(translate("linkage.notfound.exportAssets.where.new"));
 
     private static final Map<Class<?>, String> tagTypeToParentClass = new HashMap<>();
-    
+
     private Set<String> existingNames = new HashSet<>();
 
     static {
@@ -110,7 +110,7 @@ public class AsLinkageDialog extends AppDialog {
         }
         return null;
     }
-    
+
     public AsLinkageDialog(Window owner, SWF swf, int characterId) {
         super(owner);
 
@@ -123,7 +123,6 @@ public class AsLinkageDialog extends AppDialog {
         }
 
         //parentClassNameTextField.setText(getParentClassFromCharacter(ch));
-
         int frame = 1;
         for (Tag t : swf.getTags()) {
             if (t == ch) {
@@ -158,11 +157,11 @@ public class AsLinkageDialog extends AppDialog {
         }
 
         String originalIdentifier = ch.getExportName();
-        
-        identifierTextField.setText(originalIdentifier);        
-        
+
+        identifierTextField.setText(originalIdentifier);
+
         originalClassName = ch.getAs2ClassName();
-        
+
         if (originalClassName != null) {
             classNameTextField.setText(originalClassName);
             classNameTextField.setEnabled(false);
@@ -174,18 +173,18 @@ public class AsLinkageDialog extends AppDialog {
 
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
-        
+
         cnt.add(new JLabel(translate("identifier")));
         cnt.add(identifierTextField);
-        
+
         cnt.add(new JLabel(translate("classname")));
         cnt.add(classNameTextField);
         if (originalClassName == null) {
             cnt.add(parentClassNameLabel);
-            cnt.add(parentClassNameTextField);        
+            cnt.add(parentClassNameTextField);
         }
-        cnt.add(errorLabel);        
-        
+        cnt.add(errorLabel);
+
         if (originalClassName == null && originalExportAssetsTag == null) {
             ButtonGroup whereToStoreMappingButtonGroup = new ButtonGroup();
             whereToStoreMappingButtonGroup.add(existingExportAssetsTagRadioButton);
@@ -196,18 +195,18 @@ public class AsLinkageDialog extends AppDialog {
             whereToStoreMappingPanel.add(existingExportAssetsTagRadioButton);
             whereToStoreMappingPanel.add(newExportAssetsTagRadioButton);
             cnt.add(whereToStoreMappingPanel);
-            existingExportAssetsTagRadioButton.setSelected(true);        
+            existingExportAssetsTagRadioButton.setSelected(true);
         }
-        
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         proceedButton.addActionListener(this::okButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(proceedButton);
         buttonsPanel.add(cancelButton);
-        
+
         cnt.add(buttonsPanel);
 
-        setCentralAlignment((JComponent) cnt);       
+        setCentralAlignment((JComponent) cnt);
 
         if (exportAssetsCount == 0) {
             newExportAssetsTagRadioButton.setSelected(true);
@@ -226,7 +225,7 @@ public class AsLinkageDialog extends AppDialog {
             public void stateChanged(ChangeEvent e) {
                 checkEnabled();
             }
-        });      
+        });
 
         DocumentListener updateDocumentListener = new DocumentListener() {
             @Override
@@ -244,7 +243,7 @@ public class AsLinkageDialog extends AppDialog {
                 checkEnabled();
             }
         };
-        
+
         identifierTextField.getDocument().addDocumentListener(updateDocumentListener);
         classNameTextField.getDocument().addDocumentListener(updateDocumentListener);
         parentClassNameTextField.getDocument().addDocumentListener(updateDocumentListener);
@@ -272,7 +271,7 @@ public class AsLinkageDialog extends AppDialog {
         boolean ok = true;
 
         CharacterTag ch = swf.getCharacter(characterId);
-                    
+
         String oldIdentifier = ch.getExportName();
         String newIdentifier = identifierTextField.getText();
         String newClassName = classNameTextField.getText();
@@ -282,29 +281,29 @@ public class AsLinkageDialog extends AppDialog {
             proceedButton.setText(translate("button.ok"));
             errorLabel.setText("");
         }
-        
+
         if (!classNameTextField.isEnabled() && newIdentifier.isEmpty()) {
             ok = false;
             proceedButton.setText(translate("button.ok"));
             errorLabel.setText(translate("error.cannotRemoveIdentifierClassExists"));
         }
-        
+
         if (newClassName.endsWith(".")) {
             ok = false;
             proceedButton.setText(translate("button.ok"));
             errorLabel.setText("");
         }
-        
+
         if (newIdentifier.isEmpty() && !newClassName.isEmpty()) {
             ok = false;
             proceedButton.setText(translate("button.ok"));
             errorLabel.setText("");
         }
-        
+
         if (!newIdentifier.isEmpty() && oldIdentifier != null && !oldIdentifier.equals(newIdentifier) && existingNames.contains(newIdentifier)) {
             ok = false;
             proceedButton.setText(translate("button.ok"));
-            errorLabel.setText("");            
+            errorLabel.setText("");
         }
 
         if (ok) {
@@ -312,7 +311,7 @@ public class AsLinkageDialog extends AppDialog {
             if (oldClassName == null && newClassName != null && ch.getSwf().getCharacterByExportName("__Packages." + newClassName) != null) {
                 ok = false;
                 errorLabel.setText(translate("error.alreadyExistsClass"));
-            }            
+            }
         }
 
         if (ok) {
@@ -322,7 +321,7 @@ public class AsLinkageDialog extends AppDialog {
                 proceedButton.setText(translate("button.ok"));
             } else {
                 proceedButton.setText(translate("button.proceed"));
-            }                            
+            }
         } else {
             proceedButton.setText(translate("button.ok"));
         }
@@ -354,7 +353,7 @@ public class AsLinkageDialog extends AppDialog {
                 }
                 selectedPosition = selectTagPositionDialog.getSelectedTag();
                 selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
-            }        
+            }
         }
         result = OK_OPTION;
         selectedIdentifier = identifierTextField.getText();
@@ -412,6 +411,6 @@ public class AsLinkageDialog extends AppDialog {
 
     public String getSelectedIdentifier() {
         return selectedIdentifier;
-    }        
+    }
 
 }
