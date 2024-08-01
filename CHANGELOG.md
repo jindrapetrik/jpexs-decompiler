@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - [PR190] Collect depth as sprites
 - Updated Dutch translation
 - [#2259] Optional resampling sound to 44kHz on playback and on export
-- Set class to character mapping tool (via SymbolClass) context menu on characters
+- Set AS3 class linkage dialog (uses SymbolClass tag) in the context menu for characters
 - [#2189] Search bar in replace character (+ replace references) window
 - [#2011], [#2215] Option to ignore frame background color when exporting (make transparent)
 - ABC Explorer - list of usages of all items
