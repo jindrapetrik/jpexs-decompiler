@@ -41,7 +41,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     public List<GraphTargetItem> implementsOp;
 
-    public String className;
+    public String classBaseName;
 
     public GraphTargetItem iinit;
 
@@ -86,7 +86,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         this.metadata = metadata;
         this.importedClasses = importedClasses;
         this.pkg = pkg;
-        this.className = className;
+        this.classBaseName = className;
         this.traits = traits;
         this.extendsOp = extendsOp;
         this.implementsOp = implementsOp;

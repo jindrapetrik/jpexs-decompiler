@@ -79,7 +79,7 @@ public class CallAVM2Item extends AVM2Item {
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
             if (!localData.registerVars.containsKey(n.getVariableName())) {
-                String cname = localData.currentClass;
+                String cname = localData.currentClassBaseName;
                 DottedChain pkgName = localData.pkg;
                 GraphTargetItem obj = null;
                 Reference<String> outName = new Reference<>("");
@@ -121,7 +121,7 @@ public class CallAVM2Item extends AVM2Item {
             obj = prop.object;
             //For using this when appropriate: (Non ASC2 approach)
             /*if (obj == null) {
-                String cname = localData.currentClass;
+                String cname = localData.currentClassBaseName;
                 DottedChain pkgName = localData.pkg;
                 Reference<String> outName = new Reference<>("");
                 Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);

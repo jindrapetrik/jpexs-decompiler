@@ -4,9 +4,9 @@ package tests
 	{
 		public function run():*
 		{
-			 var list = {};
-             var b = true;
-             for each(var name in list)
+			 var list:Object = {};
+             var b:Boolean = true;
+             for each(var name:String in list)
              {
                 try
                 {

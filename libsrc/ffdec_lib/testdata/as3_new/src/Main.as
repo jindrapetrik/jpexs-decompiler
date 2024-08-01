@@ -139,6 +139,7 @@ package
         
         TestThisOutsideClass;
         TestImports;
+        TestImports2;
         TestInitializer;
         TestRegexpHilight;
         

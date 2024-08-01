@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class InterfaceAVM2Item extends AVM2Item {
 
-    public String name;
+    public String baseName;
 
     public List<GraphTargetItem> superInterfaces;
 
@@ -52,7 +52,7 @@ public class InterfaceAVM2Item extends AVM2Item {
         this.metadata = metadata;
         this.importedClasses = importedClasses;
         this.pkg = pkg;
-        this.name = name;
+        this.baseName = name;
         this.superInterfaces = superInterfaces;
         this.methods = traits;
         this.isFinal = isFinal;
