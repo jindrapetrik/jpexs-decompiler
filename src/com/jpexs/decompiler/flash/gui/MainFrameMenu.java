@@ -461,7 +461,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().exportFlashDevelopProject((SWF) openable);
+        mainFrame.getPanel().exportFlashDevelop((SWF) openable);
+    }
+    
+    protected void exportIdeaActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+
+        mainFrame.getPanel().exportIdea((SWF) openable);
     }
 
     protected void exportFlaActionPerformed(ActionEvent evt) {
@@ -1044,6 +1055,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
         setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking);
+        setMenuEnabled("_/exportIdea", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking);
         setMenuEnabled("_/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
@@ -1142,6 +1155,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addSeparator("_");
             addMenuItem("_/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportFlashDevelop", translate("menu.file.export.flashDevelop"), "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_TOP, null, true, null, false);
+            addMenuItem("_/exportIdea", translate("menu.file.export.idea"), "exportidea32", this::exportIdeaActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportAll", translate("menu.file.export.all"), "export32", this::exportAllActionPerformed, PRIORITY_TOP, null, true, null, false);
             addMenuItem("_/exportSelected", translate("menu.file.export.selection"), "exportsel32", this::exportSelectedActionPerformed, PRIORITY_TOP, null, true, null, false);
             addSeparator("_");
@@ -1175,6 +1189,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
         addMenuItem("/file/export/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/export/exportFlashDevelop", translate("menu.file.export.flashDevelop"), "exportflashdevelop32", this::exportFlashDevelopActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/file/export/exportIdea", translate("menu.file.export.idea"), "exportidea32", this::exportIdeaActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/export/exportXml", translate("menu.file.export.xml"), "exportxml32", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportAll", translate("menu.file.export.all"), "export16", this::exportAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+E"), false);
         addMenuItem("/file/export/exportSelected", translate("menu.file.export.selection"), "exportsel16", this::exportSelectedActionPerformed, PRIORITY_MEDIUM, null, true, null, false);

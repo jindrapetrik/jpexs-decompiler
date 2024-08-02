@@ -207,7 +207,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem exportJavaSourceMenuItem;
     
-    private JMenuItem exportFlashDevelopProjectMenuItem;
+    private JMenuItem exportFlaMenuItem;
+    
+    private JMenuItem exportFlashDevelopMenuItem;
+    
+    private JMenuItem exportIdeaMenuItem;
 
     private JMenuItem exportSwfXmlMenuItem;
 
@@ -485,10 +489,20 @@ public class TagTreeContextMenu extends JPopupMenu {
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
         add(jumpToCharacterMenuItem);
 
-        exportFlashDevelopProjectMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportFlashDevelopProject"));
-        exportFlashDevelopProjectMenuItem.addActionListener(this::exportFlashDevelopProjectActionPerformed);
-        exportFlashDevelopProjectMenuItem.setIcon(View.getIcon("exportflashdevelop16"));
-        add(exportFlashDevelopProjectMenuItem);
+        exportFlaMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportFla"));
+        exportFlaMenuItem.addActionListener(this::exportFlaActionPerformed);
+        exportFlaMenuItem.setIcon(View.getIcon("exportfla16"));
+        add(exportFlaMenuItem);
+        
+        exportFlashDevelopMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportFlashDevelop"));
+        exportFlashDevelopMenuItem.addActionListener(this::exportFlashDevelopActionPerformed);
+        exportFlashDevelopMenuItem.setIcon(View.getIcon("exportflashdevelop16"));
+        add(exportFlashDevelopMenuItem);
+        
+        exportIdeaMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportIdea"));
+        exportIdeaMenuItem.addActionListener(this::exportIdeaActionPerformed);
+        exportIdeaMenuItem.setIcon(View.getIcon("exportidea16"));
+        add(exportIdeaMenuItem);
         
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
         exportJavaSourceMenuItem.addActionListener(new ActionListener() {
@@ -1165,7 +1179,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
-        exportFlashDevelopProjectMenuItem.setVisible(false);
+        exportFlaMenuItem.setVisible(false);
+        exportFlashDevelopMenuItem.setVisible(false);
+        exportIdeaMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
 
@@ -1403,8 +1419,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof SWF) {
                 SWF swf = (SWF) firstItem;
+                exportFlaMenuItem.setVisible(true);
                 if (swf.isAS3()) {
-                    exportFlashDevelopProjectMenuItem.setVisible(true);
+                    exportFlashDevelopMenuItem.setVisible(true);
+                    exportIdeaMenuItem.setVisible(true);
                 }
             }
             
@@ -5419,10 +5437,19 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
     }
-
-    public void exportFlashDevelopProjectActionPerformed(ActionEvent evt) {
+    public void exportFlaActionPerformed(ActionEvent evt) {
         SWF swf = (SWF) getCurrentItem().getOpenable();
-        mainPanel.exportFlashDevelopProject(swf);
+        mainPanel.exportFla(swf);
+    }
+
+    public void exportFlashDevelopActionPerformed(ActionEvent evt) {
+        SWF swf = (SWF) getCurrentItem().getOpenable();
+        mainPanel.exportFlashDevelop(swf);
+    }
+    
+    public void exportIdeaActionPerformed(ActionEvent evt) {
+        SWF swf = (SWF) getCurrentItem().getOpenable();
+        mainPanel.exportIdea(swf);
     }
     
     public void importScriptsActionPerformed(ActionEvent evt) {
