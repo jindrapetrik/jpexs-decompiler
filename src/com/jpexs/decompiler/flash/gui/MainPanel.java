@@ -4624,6 +4624,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(true);
         updateMissingNeededCharacters();
         pinsPanel.refresh();
+        updateUiWithCurrentOpenable();        
     }
 
     public void refreshDecompiled() {
@@ -4921,8 +4922,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 try {
                     Tag newTag = new ImageImporter().importImage(it, data, create ? -1 : 0);
                     SWF swf = it.getSwf();
-                    if (newTag != null) {
-                        refreshTree(swf);
+                    refreshTree(swf);
+                    if (newTag != null) {                        
                         setTagTreeSelectedNode(getCurrentTree(), newTag);
                     }
                     swf.clearImageCache();
@@ -4963,8 +4964,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
                 SWF swf = st.getSwf();
-                if (newTag != null) {
-                    refreshTree(swf);
+                refreshTree(swf);
+                if (newTag != null) {                    
                     setTagTreeSelectedNode(getCurrentTree(), newTag);
                 }
 
@@ -6190,6 +6191,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree.repaint();
         tagListTree.repaint();
         reload(true);
+        updateUiWithCurrentOpenable();
     }
 
     public void showGenericTag(Tag tag) {

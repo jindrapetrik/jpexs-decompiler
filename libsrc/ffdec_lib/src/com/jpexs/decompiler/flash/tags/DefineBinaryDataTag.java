@@ -280,5 +280,5 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     @Override
     public String getClassExportFileName(String className) {
         return className;
-    }
+    }    
 }

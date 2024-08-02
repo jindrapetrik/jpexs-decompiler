@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - Export FLA context menu on SWFs
 - Window icons for various dialogs including save/open/export/import
 - [#873] Context menu items are organized with separators and the order is more intuitive
+- [#1644] Save all button - has priority over standard Save button
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -99,6 +100,9 @@ All notable changes to this project will be documented in this file.
 - Run/Debug command - executed SWF temp files (`~ffdec_run...swf` etc.) are now generated
   in the directory where original SWF resides to allow loading relative assets
 - [#2228] AS1/2/3 bitwise operations use hexadecimal operands
+- Save to EXE moved to tools tab
+- Save (not save as) button are now available only when there's anything to save
+  when the selected SWF is modified. Similar for Save all button.
 
 ### Removed
 - Proxy feature. It was not working since today almost every page uses HTTPS. Also Flash is limited in browsers.
@@ -3467,6 +3471,7 @@ Major version of SWF to XML export changed to 2.
 [#2260]: https://www.free-decompiler.com/flash/issues/2260
 [#1290]: https://www.free-decompiler.com/flash/issues/1290
 [#873]: https://www.free-decompiler.com/flash/issues/873
+[#1644]: https://www.free-decompiler.com/flash/issues/1644
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174

@@ -1300,7 +1300,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             mainPanel.clearEditingStatus();
             if (refreshTree) {
                 mainPanel.refreshTree(src.getSwf());
-            }
+            }            
         } catch (IOException ex) {
             //ignored
         } catch (ActionParseException ex) {
@@ -1339,6 +1339,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
             setDecompiledEditMode(false);
             mainPanel.clearEditingStatus();
+            if (refreshTree) {
+                mainPanel.refreshTree(src.getSwf());
+            }
         } catch (ValueTooLargeException ex) {
             ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {

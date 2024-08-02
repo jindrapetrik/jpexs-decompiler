@@ -1244,6 +1244,31 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             os.write(newCompressedData);
         }
     }
+    
+    public void saveNestedDefineBinaryData() {
+        Map<Integer, CharacterTag> chtags = getCharacters(false);
+        for (CharacterTag t : chtags.values()) {
+            if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag dbd = (DefineBinaryDataTag) t;
+                if (dbd.innerSwf != null && dbd.innerSwf.isModified()) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        SWF swf = (SWF) dbd.innerSwf;
+                        swf.saveNestedDefineBinaryData();
+                        swf.saveTo(baos);
+                        byte[] data = baos.toByteArray();
+                        swf.binaryData.setDataBytes(new ByteArrayRange(data));
+                        swf.binaryData.setModified(true);
+                        swf.binaryData.getTopLevelBinaryData().pack();
+                        dbd.innerSwf.clearModified();
+                    } catch (IOException ex) {
+                        Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                    }
+                    dbd.setModified(true);
+                }
+            }
+        }
+    }
 
     public byte[] getHeaderBytes() {
         return getHeaderBytes(compression, gfx, encrypted);
