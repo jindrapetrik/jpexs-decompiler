@@ -35,7 +35,7 @@ All notable changes to this project will be documented in this file.
 - [#2260] GFX - Configure path resolving dialog for file paths that use prefixes like `data:`
 - [#2263] Expand one level more (`+` sign) for needed/dependent characters
   in tag info panel to show full tag name as in tree
-- [#1290] Export to FlashDevelop project
+- [#1290], [#1809] Export to FlashDevelop project
 - [#1290] Export to IntelliJ IDEA project
 - Export FLA context menu on SWFs
 - Window icons for various dialogs including save/open/export/import
@@ -3470,6 +3470,7 @@ Major version of SWF to XML export changed to 2.
 [#2243]: https://www.free-decompiler.com/flash/issues/2243
 [#2260]: https://www.free-decompiler.com/flash/issues/2260
 [#1290]: https://www.free-decompiler.com/flash/issues/1290
+[#1809]: https://www.free-decompiler.com/flash/issues/1809
 [#873]: https://www.free-decompiler.com/flash/issues/873
 [#1644]: https://www.free-decompiler.com/flash/issues/1644
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
