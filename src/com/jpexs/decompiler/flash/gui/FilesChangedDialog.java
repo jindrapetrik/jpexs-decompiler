@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -150,8 +154,8 @@ public class FilesChangedDialog extends AppDialog {
         filesList.setModel(listModel);
     }
 
-    private void cancelButtonActionPerformed(ActionEvent evt) {
-        clearList();
+    private void cancelButtonActionPerformed(ActionEvent evt) {                                
+        clearList();                        
         setVisible(false);
     }
 }
