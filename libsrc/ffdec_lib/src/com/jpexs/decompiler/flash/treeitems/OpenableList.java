@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFContainerItem;
+import com.jpexs.decompiler.flash.abc.ABC;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -183,5 +185,18 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
             }
         }
         return false;
+    }
+    
+    public void setModified() {
+        for (Openable openable : this) {
+            if (openable instanceof SWF) {
+                SWF swf = (SWF) openable;
+                swf.setModified(true);
+            } 
+            if (openable instanceof ABC) {
+                ABC abc = (ABC) openable;
+                abc.getSwf().setModified(true);
+            }
+        }
     }
 }

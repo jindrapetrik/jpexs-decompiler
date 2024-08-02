@@ -2364,12 +2364,19 @@ public class Main {
                                         continue;
                                     }
 
-                                    for (OpenableSourceInfo info : sourceInfos) {
-                                        final String infoFile = info.getFile();
-                                        if (infoFile != null && new File(infoFile).equals(fullPath)) {
+                                    for (OpenableSourceInfo info : sourceInfos) {                                                                                                                                
+                                        final String infoFile = info.getFile();                                        
+                                        if (infoFile != null && new File(infoFile).equals(fullPath)) {                                                                                                                                    
+                                            for (OpenableList list :Main.getMainFrame().getPanel().getSwfs()) {
+                                                if (info == list.sourceInfo) {
+                                                    list.setModified();
+                                                }
+                                            }
+                                            
                                             View.execInEventDispatchLater(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    mainFrame.getPanel().refreshTree();
                                                     if (filesChangedDialog == null) {
                                                         filesChangedDialog = new FilesChangedDialog(Main.mainFrame.getWindow());
                                                     }
