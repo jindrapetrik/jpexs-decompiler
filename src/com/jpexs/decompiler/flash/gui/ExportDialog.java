@@ -453,7 +453,7 @@ public class ExportDialog extends AppDialog {
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "export");
         getRootPane().setDefaultButton(okButton);
         setModal(true);
         String pct = "" + Configuration.lastSelectedExportZoom.get() * 100;

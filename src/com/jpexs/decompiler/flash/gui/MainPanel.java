@@ -3317,7 +3317,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3426,10 +3426,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         
-        JFileChooser fc = new JFileChooser();
-        String selDir = Configuration.lastOpenDir.get();
-        fc.setCurrentDirectory(new File(selDir));
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("exportidea");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3502,7 +3499,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (swf == null) {
             return;
         }
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = View.getFileChooserWithIcon("exportfla");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
@@ -3658,7 +3655,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importMovie(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importMovies2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportMovieInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importmovie");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3718,7 +3715,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSound(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSounds2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSoundInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importsound");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3778,7 +3775,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSprite(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSprites"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSpriteInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importsprite");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3837,7 +3834,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importShape(final SWF swf, boolean noFill) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importshape");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3897,7 +3894,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importImage(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importimage");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -3955,7 +3952,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importText(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importtext");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4055,7 +4052,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
 
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importscript");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4149,7 +4146,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void importSymbolClass(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSymbolClass").replace("%file%", SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSymbolClassInfo);
 
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = View.getFileChooserWithIcon("importsymbolclass");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4165,8 +4162,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    private String selectExportDir() {
-        JFileChooser chooser = new JFileChooser();
+    private String selectExportDir(String icon) {
+        JFileChooser chooser = View.getFileChooserWithIcon(icon);
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.select.directory"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4191,7 +4188,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         final ExportDialog export = new ExportDialog(Main.getDefaultDialogsOwner(), sel);
         if (export.showExportDialog() == AppDialog.OK_OPTION) {
-            final String selFile = selectExportDir();
+            final String selFile = selectExportDir("export");
             if (selFile != null) {
                 final long timeBefore = System.currentTimeMillis();
 
@@ -4254,7 +4251,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         for (SWF item : swfs) {
             SWF swf = (SWF) item;
-            final String selFile = selectExportDir();
+            final String selFile = selectExportDir("exportjava");
             if (selFile != null) {
                 Main.startWork(translate("work.exporting") + "...", null);
 
@@ -4290,7 +4287,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfs) {
-            final String selFile = selectExportDir();
+            final String selFile = selectExportDir("exportxml");
             if (selFile != null) {
                 Main.startWork(translate("work.exporting") + "...", null);
 
@@ -4332,7 +4329,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfs) {
-            File selectedFile = showImportFileChooser("filter.xml|*.xml", false);
+            File selectedFile = showImportFileChooser("filter.xml|*.xml", false, "importxml");
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 try {
@@ -4848,25 +4845,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreeItem ti0 = items.get(0);
         File file = null;
         if (ti0 instanceof SoundTag) {
-            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false);
+            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false, "importsound");
         }
         if (ti0 instanceof ImageTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp", true);
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp", true, "importimage");
         }
         if (ti0 instanceof ShapeTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true, "importshape");
         }
         if (ti0 instanceof MorphShapeTag) {
             return replaceMorphShape((MorphShapeTag) ti0, create, true);
         }
         if (ti0 instanceof DefineVideoStreamTag) {
-            file = showImportFileChooser("filter.movies|*.flv", false);
+            file = showImportFileChooser("filter.movies|*.flv", false, "importmovie");
         }
         if (ti0 instanceof DefineBinaryDataTag) {
-            file = showImportFileChooser("", false);
+            file = showImportFileChooser("", false, "importbinarydata");
         }
         if (ti0 instanceof UnknownTag) {
-            file = showImportFileChooser("", false);
+            file = showImportFileChooser("", false, "importother");
         }
         if (file == null) {
             return false;
@@ -5018,7 +5015,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if (item instanceof DefineSpriteTag) {
             String filter = "filter.images|*.gif";
-            File selectedFile = showImportFileChooser(filter, false);
+            File selectedFile = showImportFileChooser(filter, false, "importsprite");
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 DefineSpriteTag sprite = (DefineSpriteTag) item;
@@ -5060,7 +5057,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
             String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
-            File selectedFile = showImportFileChooser(filter, true);
+            File selectedFile = showImportFileChooser(filter, true, "importshape");
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 byte[] data = null;
@@ -5110,7 +5107,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (item instanceof DefineBitsJPEG3Tag || item instanceof DefineBitsJPEG4Tag) {
             ImageTag it = (ImageTag) item;
             if (it.importSupported()) {
-                File selectedFile = showImportFileChooser("", false);
+                File selectedFile = showImportFileChooser("", false, "replacealpha");
                 if (selectedFile != null) {
                     File selfile = Helper.fixDialogFile(selectedFile);
                     byte[] data = Helper.readFile(selfile.getAbsolutePath());
@@ -5162,14 +5159,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         export(true, selected);
     }
 
-    public File showImportFileChooser(String filter, boolean imagePreview) {
-        return showImportFileChooser(filter, imagePreview, null);
+    public File showImportFileChooser(String filter, boolean imagePreview, String icon) {
+        return showImportFileChooser(filter, imagePreview, null, icon);
     }
 
-    public File showImportFileChooser(String filter, boolean imagePreview, String title) {
+    public File showImportFileChooser(String filter, boolean imagePreview, String title, String icon) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         if (imagePreview) {
             fc.setAccessory(new FileChooserImagePreview(fc));

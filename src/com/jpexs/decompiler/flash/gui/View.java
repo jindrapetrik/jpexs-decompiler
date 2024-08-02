@@ -29,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -67,6 +68,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -320,6 +322,17 @@ public class View {
         }
     }
 
+    /**
+     * Sets icon of the window. 
+     * @param f
+     * @param icon Icon identifier. Icon must exist in 16 and 32 variant
+     */
+    public static void setWindowIcon(Window f, String icon) {
+        List<Image> images = new ArrayList<>();
+        images.add(loadImage(icon + "16"));
+        images.add(loadImage(icon + "32"));
+        f.setIconImages(images);
+    }
     /**
      * Sets icon of specified frame to ASDec icon
      *
@@ -931,5 +944,18 @@ public class View {
                 return null;
             }
         }
+    }
+
+    public static JFileChooser getFileChooserWithIcon(String iconName) {
+        return new JFileChooser() {
+            
+            @Override
+            protected JDialog createDialog(Component parent) throws HeadlessException {
+                JDialog dialog = super.createDialog(parent);                
+                setWindowIcon(dialog, iconName);
+                dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+                return dialog;
+            }
+        };
     }
 }

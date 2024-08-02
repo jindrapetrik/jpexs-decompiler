@@ -120,7 +120,7 @@ public class BinaryDataEditor extends JPanel implements GenericTagEditor {
     }
 
     private void replaceActionPerformed(ActionEvent evt) {
-        File selectedFile = mainPanel.showImportFileChooser("", false);
+        File selectedFile = mainPanel.showImportFileChooser("", false, "importbinarydata");
         if (selectedFile != null) {
             File selfile = Helper.fixDialogFile(selectedFile);
             byte[] data = Helper.readFile(selfile.getAbsolutePath());
