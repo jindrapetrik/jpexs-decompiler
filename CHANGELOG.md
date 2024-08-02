@@ -36,6 +36,8 @@ All notable changes to this project will be documented in this file.
 - [#2263] Expand one level more (`+` sign) for needed/dependent characters
   in tag info panel to show full tag name as in tree
 - [#1290] Export to FlashDevelop project
+- [#1290] Export to IntelliJ IDEA project
+- Export FLA context menu on SWFs
 
 ### Fixed
 - Debugger - getting children of top level variables

@@ -89,6 +89,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
@@ -3311,7 +3312,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
     
     
-    public void exportFlashDevelopProject(final SWF swf) {
+    public void exportFlashDevelop(final SWF swf) {
         if (swf == null) {
             return;
         }
@@ -3397,6 +3398,115 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 protected void onStart() {
                     Main.startWork(translate("work.exporting.flashDevelop") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                    });
+
+                    if (Configuration.openFolderAfterFlaExport.get()) {
+                        try {
+                            Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }.execute();                           
+    }
+    
+    public void exportIdea(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
+        
+        JFileChooser fc = new JFileChooser();
+        String selDir = Configuration.lastOpenDir.get();
+        fc.setCurrentDirectory(new File(selDir));
+        if (!selDir.endsWith(File.separator)) {
+            selDir += File.separator;
+        }
+        String swfShortName = swf.getShortFileName();
+        if ("".equals(swfShortName)) {
+            swfShortName = "untitled.swf";
+        }
+        String fileName;
+        if (swfShortName.contains(".")) {
+            fileName = swfShortName.substring(0, swfShortName.lastIndexOf(".")) + ".iml";
+        } else {
+            fileName = swfShortName + ".iml";
+        }
+        
+        FileFilter f = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".iml"));
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.iml");
+            }
+        };
+        fc.setFileFilter(f);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setSelectedFile(new File(selDir + fileName));
+        
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }                
+                
+        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+        File sf = Helper.fixDialogFile(fc.getSelectedFile());
+        SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();
+        
+        String path = sf.getAbsolutePath();
+        if (path.endsWith(".iml")) {
+            path = path.substring(0, path.length() - ".iml".length());
+        }
+        path += ".iml";
+        
+        final String fpath = path;
+        
+        long timeBefore = System.currentTimeMillis();
+            new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Helper.freeMem();
+
+                    CancellableWorker w = this;
+
+                    ProgressListener prog = new ProgressListener() {
+                        @Override
+                        public void progress(int p) {
+                        }
+
+                        @Override
+                        public void status(String status) {
+                            Main.startWork(translate("work.exporting.idea") + "..." + status, w);
+                        }
+                    };
+                    EventListener evl = swf.getExportEventListener();
+                    try {
+                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+                        exporter.exportIntelliJIdeaProject(swf, new File(fpath), errorHandler, evl);   
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "IDEA export error", ex);
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }      
+                    Helper.freeMem();
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.exporting.idea") + "...", this);
                 }
 
                 @Override
