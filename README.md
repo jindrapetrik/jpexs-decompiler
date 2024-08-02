@@ -148,7 +148,6 @@ FFDec Application is licensed under the GNU GPL v3 (GPL-3.0-or-later) licence, s
 It uses modified code of these libraries:
 
 * [JSyntaxPane] (Code editor) - Apache License 2.0
-* [Muffin] (Proxy) - GPL
 
 And links also these libraries:
 
@@ -169,7 +168,6 @@ See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec libra
 [launch4j]: http://launch4j.sourceforge.net/
 [NSIS]: http://nsis.sourceforge.net/
 [JSyntaxPane]: https://code.google.com/p/jsyntaxpane/
-[Muffin]: https://web.archive.org/web/20171025082558/http://muffin.doit.org/ (original: http://muffin.doit.org/)
 [Java Native Access - JNA]: https://github.com/twall/jna
 [Insubstantial]: http://shemnon.com/speling/2011/04/insubstantial-62-release.html
 [javactivex]:https://github.com/jindrapetrik/javactivex

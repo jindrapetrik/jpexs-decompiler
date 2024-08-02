@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.LoadFromMemoryFrame;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
-import com.jpexs.decompiler.flash.gui.ModeFrame;
 import com.jpexs.decompiler.flash.gui.NewVersionDialog;
 import com.jpexs.decompiler.flash.gui.RenameDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
@@ -39,7 +38,6 @@ import com.jpexs.decompiler.flash.gui.SelectLanguageDialog;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.abc.NewTraitDialog;
 import com.jpexs.decompiler.flash.gui.abc.UsageFrame;
-import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -253,7 +251,6 @@ public class CheckResources {
             LoadFromMemoryFrame.class,
             LoadingDialog.class,
             MainFrame.class,
-            ModeFrame.class,
             NewVersionDialog.class,
             RenameDialog.class,
             ReplaceCharacterDialog.class,
@@ -265,8 +262,6 @@ public class CheckResources {
             DeobfuscationDialog.class,
             NewTraitDialog.class,
             UsageFrame.class,
-            // Proxy
-            ProxyFrame.class
         };
         return classes;
     }
