@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - [#1290] Export to FlashDevelop project
 - [#1290] Export to IntelliJ IDEA project
 - Export FLA context menu on SWFs
+- Window icons for various dialogs including save/open/export/import
 
 ### Fixed
 - Debugger - getting children of top level variables

@@ -108,7 +108,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         super(owner);
         initComponents(selectedCategory);
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "settings");
 
         //configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
         pack();

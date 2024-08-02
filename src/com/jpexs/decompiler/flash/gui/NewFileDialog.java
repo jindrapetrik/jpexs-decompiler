@@ -222,7 +222,7 @@ public class NewFileDialog extends AppDialog {
         pack();
         setResizable(false);
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        View.setWindowIcon(this, "newswf");
         setModal(true);
 
         widthEditor.setValue(550);

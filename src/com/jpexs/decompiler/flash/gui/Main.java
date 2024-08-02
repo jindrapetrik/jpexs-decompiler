@@ -1997,8 +1997,7 @@ public class Main {
     }
 
     public static boolean saveFileDialog(Openable openable, final SaveFileMode mode) {
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
+        
         String ext = ".swf";
         switch (mode) {
             case SAVE:
@@ -2011,6 +2010,9 @@ public class Main {
                 ext = ".exe";
                 break;
         }
+        
+        JFileChooser fc = View.getFileChooserWithIcon(mode == SaveFileMode.EXE ? "saveasexe" : "saveas");
+        fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
 
         FileFilter swfFilter = new FileFilter() {
             @Override
@@ -2175,7 +2177,7 @@ public class Main {
     public static boolean openFileDialog() {
         View.checkAccess();
 
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = View.getFileChooserWithIcon("open");
         if (Configuration.openMultipleFiles.get()) {
             fc.setMultiSelectionEnabled(true);
         }
