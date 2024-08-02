@@ -3429,50 +3429,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
-        if (!selDir.endsWith(File.separator)) {
-            selDir += File.separator;
-        }
-        String swfShortName = swf.getShortFileName();
-        if ("".equals(swfShortName)) {
-            swfShortName = "untitled.swf";
-        }
-        String fileName;
-        if (swfShortName.contains(".")) {
-            fileName = swfShortName.substring(0, swfShortName.lastIndexOf(".")) + ".iml";
-        } else {
-            fileName = swfShortName + ".iml";
-        }
-        
-        FileFilter f = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".iml"));
-            }
-
-            @Override
-            public String getDescription() {
-                return translate("filter.iml");
-            }
-        };
-        fc.setFileFilter(f);
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.setSelectedFile(new File(selDir + fileName));
-        
-        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("export.project.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
-        }                
-                
-        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-        File sf = Helper.fixDialogFile(fc.getSelectedFile());
-        SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();
-        
-        String path = sf.getAbsolutePath();
-        if (path.endsWith(".iml")) {
-            path = path.substring(0, path.length() - ".iml".length());
         }
-        path += ".iml";
+        final String fpath = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());                    
+        SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();                
         
-        final String fpath = path;
         
         long timeBefore = System.currentTimeMillis();
             new CancellableWorker() {
