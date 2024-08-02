@@ -49,7 +49,6 @@ import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
-import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -78,19 +77,12 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
-import java.awt.AWTException;
 import java.awt.Component;
-import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -143,7 +135,6 @@ import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -158,8 +149,6 @@ import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 public class Main {
 
     public static final String IMPORT_ASSETS_SEPARATOR = "{*sep*}";
-
-    protected static ProxyFrame proxyFrame;
 
     private static List<OpenableSourceInfo> sourceInfos = new ArrayList<>();
 
@@ -840,24 +829,6 @@ public class Main {
 
     public static boolean isWorking() {
         return working;
-    }
-
-    public static void startProxy(int port) {
-        if (proxyFrame == null) {
-            proxyFrame = new ProxyFrame(mainFrame);
-        }
-
-        proxyFrame.setPort(port);
-        addTrayIcon();
-        switchProxy();
-    }
-
-    public static void showProxy() {
-        if (proxyFrame == null) {
-            proxyFrame = new ProxyFrame(mainFrame);
-        }
-        proxyFrame.setVisible(true);
-        proxyFrame.setState(Frame.NORMAL);
     }
 
     public static void continueWork(String name) {
@@ -1761,11 +1732,6 @@ public class Main {
                     loadingDialog = null;
                 }
             }
-        }
-        if (proxyFrame != null) {
-            proxyFrame.setVisible(false);
-            proxyFrame.dispose();
-            proxyFrame = null;
         }
         if (loadFromMemoryFrame != null) {
             loadFromMemoryFrame.setVisible(false);
@@ -2934,79 +2900,6 @@ public class Main {
             if (trayIcon != null) {
                 tray.remove(trayIcon);
                 trayIcon = null;
-            }
-        }
-    }
-
-    public static void switchProxy() {
-        proxyFrame.switchState();
-        if (stopMenuItem != null) {
-            if (proxyFrame.isRunning()) {
-                stopMenuItem.setLabel(AppStrings.translate("proxy.stop"));
-            } else {
-                stopMenuItem.setLabel(AppStrings.translate("proxy.start"));
-            }
-        }
-    }
-
-    public static void addTrayIcon() {
-        if (trayIcon != null) {
-            return;
-        }
-        if (SystemTray.isSupported()) {
-            SystemTray tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(View.loadImage("proxy16"), ApplicationInfo.VENDOR + " " + ApplicationInfo.SHORT_APPLICATION_NAME + " " + AppStrings.translate("proxy"));
-            trayIcon.setImageAutoSize(true);
-            PopupMenu trayPopup = new PopupMenu();
-
-            ActionListener trayListener = new ActionListener() {
-                /**
-                 * Invoked when an action occurs.
-                 */
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (e.getActionCommand().equals("EXIT")) {
-                        Main.exit();
-                    }
-                    if (e.getActionCommand().equals("SHOW")) {
-                        Main.showProxy();
-                    }
-                    if (e.getActionCommand().equals("SWITCH")) {
-                        Main.switchProxy();
-                    }
-                }
-            };
-
-            MenuItem showMenuItem = new MenuItem(AppStrings.translate("proxy.show"));
-            showMenuItem.setActionCommand("SHOW");
-            showMenuItem.addActionListener(trayListener);
-            trayPopup.add(showMenuItem);
-            stopMenuItem = new MenuItem(AppStrings.translate("proxy.start"));
-            stopMenuItem.setActionCommand("SWITCH");
-            stopMenuItem.addActionListener(trayListener);
-            trayPopup.add(stopMenuItem);
-            trayPopup.addSeparator();
-            MenuItem exitMenuItem = new MenuItem(AppStrings.translate("exit"));
-            exitMenuItem.setActionCommand("EXIT");
-            exitMenuItem.addActionListener(trayListener);
-            trayPopup.add(exitMenuItem);
-
-            trayIcon.setPopupMenu(trayPopup);
-            trayIcon.addMouseListener(new MouseAdapter() {
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e)) {
-                        Main.showProxy();
-                    }
-                }
-            });
-            try {
-                tray.add(trayIcon);
-            } catch (AWTException ex) {
-                //ignored
             }
         }
     }

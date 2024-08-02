@@ -1914,17 +1914,8 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseProxy(Stack<String> args) {
-        int port = 55555;
-        String portStr = args.peek();
-        if (portStr != null && portStr.startsWith("-P")) {
-            args.pop();
-            try {
-                port = Integer.parseInt(portStr.substring(2));
-            } catch (NumberFormatException nex) {
-                System.err.println("Bad port number");
-            }
-        }
-        Main.startProxy(port);
+        System.err.println("Proxy functionalit was REMOVED");
+        System.exit(1);
     }
 
     private static List<String> parseSelectClass(Stack<String> args) {

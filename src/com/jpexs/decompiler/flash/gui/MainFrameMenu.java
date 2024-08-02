@@ -547,18 +547,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         return false;
     }
-
-    protected void showProxyActionPerformed(ActionEvent evt) {
-        if (Main.isWorking()) {
-            return;
-        }
-        if (mainFrame.getPanel().checkEdited()) {
-            return;
-        }
-
-        Main.showProxy();
-    }
-
+    
     protected boolean clearLog(ActionEvent evt) {
         ErrorLogFrame.getInstance().clearLog();
         return true;
@@ -1083,7 +1072,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/tools/replace", swfSelected);
         setMenuEnabled("/tools/timeline", swfSelected);
         setMenuEnabled("/tools/abcExplorer", isAs3);
-        setMenuEnabled("/tools/showProxy", !isWorking);
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
         /*setMenuEnabled("/tools/debugger/debuggerSwitch", hasAbc);
@@ -1277,7 +1265,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/tools/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
 
         addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abcexplorer32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);
-        addMenuItem("/tools/showProxy", translate("menu.tools.proxy"), "proxy16", this::showProxyActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         }

@@ -99,6 +99,9 @@ All notable changes to this project will be documented in this file.
 - Run/Debug command - executed SWF temp files (`~ffdec_run...swf` etc.) are now generated
   in the directory where original SWF resides to allow loading relative assets
 - [#2228] AS1/2/3 bitwise operations use hexadecimal operands
+
+### Removed
+- Proxy feature. It was not working since today almost every page uses HTTPS. Also Flash is limited in browsers.
   
 ## [20.1.0] - 2023-12-30
 ### Added
