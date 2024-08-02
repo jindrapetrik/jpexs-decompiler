@@ -327,7 +327,7 @@ public class FolderPreviewPanel extends JPanel {
             String key = "frame_" + fn.frame + "_" + timeline.id + "_" + zoom;
             imgSrc = swf.getFromCache(key);
             if (imgSrc == null) {
-                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, null, zoom, !Configuration.disableBitmapSmoothing.get());
+                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, swf.getBackgroundColor() == null ? null : swf.getBackgroundColor().backgroundColor.toColor(), zoom, !Configuration.disableBitmapSmoothing.get());
                 swf.putToCache(key, imgSrc);
             }
 
