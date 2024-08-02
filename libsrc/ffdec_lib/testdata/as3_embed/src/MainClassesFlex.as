@@ -9,17 +9,7 @@ package
      * @author JPEXS
      */
     public class MainClassesFlex extends Sprite
-    {                
-        TestBinaryData;
-        TestFont;
-        //TestFontCFF;
-        TestImage;
-        TestImageGrid;
-        TestImageSvg;
-        TestSameImage;
-        TestSound;
-        TestSwfSymbol;
-        
+    {                                
         public function MainClassesFlex()
         {
             if (stage) init();
@@ -29,7 +19,17 @@ package
         private function init(e:Event = null):void
         {
             removeEventListener(Event.ADDED_TO_STAGE, init);
-            // entry point
+            
+            
+            new TestBinaryData();
+            new TestFont();
+            //new TestFontCFF();
+            new TestImage();
+            new TestImageGrid();
+            new TestImageSvg();
+            new TestSameImage();
+            new TestSound();
+            new TestSwfSymbol();
         }    
     
     }

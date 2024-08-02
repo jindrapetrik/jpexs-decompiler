@@ -38,6 +38,8 @@ public class ConvertData {
     public boolean exportEmbed;
 
     public boolean exportEmbedFlaMode;
+    
+    public String assetsDir = "/_assets/";
 
     public ConvertData() {
         deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;

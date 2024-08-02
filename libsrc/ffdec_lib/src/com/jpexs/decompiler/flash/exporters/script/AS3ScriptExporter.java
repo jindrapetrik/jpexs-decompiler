@@ -70,6 +70,7 @@ import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -485,7 +486,7 @@ public class AS3ScriptExporter {
                 return ret;
             }
 
-            final String ASSETS_DIR = outdir + "/_assets/";
+            final String ASSETS_DIR = outdir + exportSettings.assetsDir;
             List<Tag> exportTagList = new ArrayList<>();
             List<DefineSpriteTag> spriteTagList = new ArrayList<>();
 
@@ -592,11 +593,9 @@ public class AS3ScriptExporter {
                                     dbj2.writeTag(sos2);
                                 } else {
                                     ct.writeTag(sos2);
-                                }
-                                for (String cls : ct.getClassNames()) {
-                                    symbolClassIds.add(ct.getCharacterId());
-                                    symbolClassNames.add(cls);
-                                }
+                                }                                
+                                symbolClassIds.add(ct.getCharacterId());
+                                symbolClassNames.add("symbol" + ct.getCharacterId());
                                 List<CharacterIdTag> cidTags = swf.getCharacterIdTags(n);
                                 for (CharacterIdTag t : cidTags) {
                                     if (t instanceof PlaceObjectTypeTag) {
@@ -609,10 +608,10 @@ public class AS3ScriptExporter {
                                 }
                             }
 
-                            SymbolClassTag sc = new SymbolClassTag(swf);
-                            sc.names = symbolClassNames;
-                            sc.tags = symbolClassIds;
-                            sc.writeTag(sos2);
+                            ExportAssetsTag ea = new ExportAssetsTag(swf);
+                            ea.names = symbolClassNames;
+                            ea.tags = symbolClassIds;
+                            ea.writeTag(sos2);
 
                             new ShowFrameTag(swf).writeTag(sos2);
                             new EndTag(swf).writeTag(sos2);

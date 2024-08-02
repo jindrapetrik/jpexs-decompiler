@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
@@ -217,6 +218,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.decompiler.flash.xfl.XFLXmlWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
@@ -225,6 +227,7 @@ import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.XmlPrettyFormat;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -3306,6 +3309,116 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
     }
+    
+    
+    public void exportFlashDevelopProject(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
+        
+        JFileChooser fc = new JFileChooser();
+        String selDir = Configuration.lastOpenDir.get();
+        fc.setCurrentDirectory(new File(selDir));
+        if (!selDir.endsWith(File.separator)) {
+            selDir += File.separator;
+        }
+        String swfShortName = swf.getShortFileName();
+        if ("".equals(swfShortName)) {
+            swfShortName = "untitled.swf";
+        }
+        String fileName;
+        if (swfShortName.contains(".")) {
+            fileName = swfShortName.substring(0, swfShortName.lastIndexOf(".")) + ".as3proj";
+        } else {
+            fileName = swfShortName + ".as3proj";
+        }
+        
+        FileFilter f = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".as3proj"));
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.as3proj");
+            }
+        };
+        fc.setFileFilter(f);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setSelectedFile(new File(selDir + fileName));
+        
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }                
+                
+        Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+        File sf = Helper.fixDialogFile(fc.getSelectedFile());
+        SwfFlashDevelopExporter exporter = new SwfFlashDevelopExporter();
+        
+        String path = sf.getAbsolutePath();
+        if (path.endsWith(".as3proj")) {
+            path = path.substring(0, path.length() - ".as3proj".length());
+        }
+        path += ".as3proj";
+        
+        final String fpath = path;
+        
+        long timeBefore = System.currentTimeMillis();
+            new CancellableWorker() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Helper.freeMem();
+
+                    CancellableWorker w = this;
+
+                    ProgressListener prog = new ProgressListener() {
+                        @Override
+                        public void progress(int p) {
+                        }
+
+                        @Override
+                        public void status(String status) {
+                            Main.startWork(translate("work.exporting.flashDevelop") + "..." + status, w);
+                        }
+                    };
+                    EventListener evl = swf.getExportEventListener();
+                    try {
+                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+                        exporter.exportFlashDevelopProject(swf, new File(fpath), errorHandler, evl);   
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "FlashDevelop export error", ex);
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    }      
+                    Helper.freeMem();
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.exporting.flashDevelop") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                    });
+
+                    if (Configuration.openFolderAfterFlaExport.get()) {
+                        try {
+                            Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }.execute();                           
+    }
 
     public void exportFla(final SWF swf) {
         if (swf == null) {
@@ -3855,6 +3968,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return r;
     }
 
+    
+    
     public void importScript(final Openable openable) {
         As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer(Main.isSwfAir(openable));
         if (as3ScriptReplacer == null) {

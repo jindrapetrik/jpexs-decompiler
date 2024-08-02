@@ -327,6 +327,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             convertData.ignoreFrameScripts = exportSettings.ignoreFrameScripts;
             convertData.exportEmbed = exportSettings.exportEmbed;
             convertData.exportEmbedFlaMode = exportSettings.exportEmbedFlaMode;
+            convertData.assetsDir = exportSettings.assetsDir;           
             toSource(abcIndex, writer2, abc.script_info.get(scriptIndex).traits.traits, convertData, exportSettings.mode, parallel, exportSettings.ignoreFrameScripts);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);

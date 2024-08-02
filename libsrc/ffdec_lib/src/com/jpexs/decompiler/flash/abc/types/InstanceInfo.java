@@ -91,9 +91,9 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
-    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
+    public GraphTextWriter getClassHeaderStr(String assetsDir, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
 
-        final String ASSETS_DIR = "/_assets/";
+        final String ASSETS_DIR = assetsDir; // "/_assets/";
         if (allowEmbed) {
             if (abc.getSwf() != null) {
                 String className = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
@@ -106,14 +106,15 @@ public class InstanceInfo {
                     fileName = Helper.makeFileName(fileName);
 
                     if (ct instanceof DefineBinaryDataTag) {
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ".bin\", mimeType=\"application/octet-stream\")]").newLine();
+                        DefineBinaryDataTag db = (DefineBinaryDataTag) ct;
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + (db.innerSwf != null ? ".swf" : ".bin")+ "\", mimeType=\"application/octet-stream\")]").newLine();
                     }
                     if (ct instanceof ImageTag) {
                         ImageTag it = (ImageTag) ct;
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSpriteTag) {
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + Helper.escapeActionScriptString(className) + "\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + "symbol" + ct.getCharacterId() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSoundTag) {
                         //should be mp3, otherwise it won't work. Should we convert this?

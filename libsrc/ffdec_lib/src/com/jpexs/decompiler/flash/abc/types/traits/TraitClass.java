@@ -108,7 +108,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
-        abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false, false /*??*/);
+        abc.instance_info.get(class_info).getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, false /*??*/);
         return writer;
     }
 
@@ -170,7 +170,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //class header
-        instanceInfo.getClassHeaderStr(writer, abc, fullyQualifiedNames, false, allowEmbed);
+        instanceInfo.getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, allowEmbed);
         writer.endTrait();
         writer.startBlock();
         writer.startClass(class_info);
