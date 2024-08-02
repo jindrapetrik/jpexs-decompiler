@@ -305,14 +305,17 @@ public class XFLXmlWriter implements XMLStreamWriter {
 
     @Override
     public void writeStartDocument() throws XMLStreamException {
+        writeStartDocument("utf-8", "1.0");
     }
 
     @Override
     public void writeStartDocument(String version) throws XMLStreamException {
+        writeStartDocument(version, "utf-8");
     }
 
     @Override
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+        append("<?xml version=\"" + escapeAttribute(version) + "\" encoding=\"" + escapeAttribute(encoding) + "\"?>");
     }
 
     public void writeCharactersRaw(String text) throws XMLStreamException {

@@ -9,9 +9,7 @@ package
      * @author JPEXS
      */
     public class MainAttributesFlex extends Sprite
-    {        
-        
-        TestEmbedFlex;
+    {                
         
         public function MainAttributesFlex()
         {
@@ -22,7 +20,8 @@ package
         private function init(e:Event = null):void
         {
             removeEventListener(Event.ADDED_TO_STAGE, init);
-            // entry point
+            
+            new TestEmbedFlex();
         }    
     
     }

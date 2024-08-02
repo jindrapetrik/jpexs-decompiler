@@ -206,6 +206,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem jumpToCharacterMenuItem;
 
     private JMenuItem exportJavaSourceMenuItem;
+    
+    private JMenuItem exportFlashDevelopProjectMenuItem;
 
     private JMenuItem exportSwfXmlMenuItem;
 
@@ -483,6 +485,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
         add(jumpToCharacterMenuItem);
 
+        exportFlashDevelopProjectMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportFlashDevelopProject"));
+        exportFlashDevelopProjectMenuItem.addActionListener(this::exportFlashDevelopProjectActionPerformed);
+        exportFlashDevelopProjectMenuItem.setIcon(View.getIcon("exportflashdevelop16"));
+        add(exportFlashDevelopProjectMenuItem);
+        
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
         exportJavaSourceMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -1158,6 +1165,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
+        exportFlashDevelopProjectMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
 
@@ -1393,6 +1401,13 @@ public class TagTreeContextMenu extends JPopupMenu {
                 collapseRecursiveMenuItem.setVisible(true);
             }
 
+            if (firstItem instanceof SWF) {
+                SWF swf = (SWF) firstItem;
+                if (swf.isAS3()) {
+                    exportFlashDevelopProjectMenuItem.setVisible(true);
+                }
+            }
+            
             if (firstItem instanceof HasCharacterId && !(firstItem instanceof CharacterTag)) {
                 jumpToCharacterMenuItem.setVisible(true);
             }
@@ -5405,6 +5420,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
+    public void exportFlashDevelopProjectActionPerformed(ActionEvent evt) {
+        SWF swf = (SWF) getCurrentItem().getOpenable();
+        mainPanel.exportFlashDevelopProject(swf);
+    }
+    
     public void importScriptsActionPerformed(ActionEvent evt) {
         Openable openable = getCurrentItem().getOpenable();
         SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();

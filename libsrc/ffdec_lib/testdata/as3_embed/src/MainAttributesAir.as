@@ -11,8 +11,6 @@ package
     public class MainAttributesAir extends Sprite
     {        
         
-        TestEmbedAir;
-        
         public function MainAttributesAir()
         {
             if (stage) init();
@@ -22,7 +20,8 @@ package
         private function init(e:Event = null):void
         {
             removeEventListener(Event.ADDED_TO_STAGE, init);
-            // entry point
+        
+            new TestEmbedAir();
         }    
     
     }

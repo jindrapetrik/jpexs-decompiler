@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - [#2260] GFX - Configure path resolving dialog for file paths that use prefixes like `data:`
 - [#2263] Expand one level more (`+` sign) for needed/dependent characters
   in tag info panel to show full tag name as in tree
+- [#1290] Export to FlashDevelop project
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -81,6 +82,7 @@ All notable changes to this project will be documented in this file.
 - [#2234] AS1/2 postincrement/decrement inside DefineFunction2
 - AS3 PCode - pushbyte operand docs - signed byte
 - [#2226] Incorrect decompilation of continue statements in some cases
+- AS3 Embedded assets export - assets.swf not working, incorrect binary data extension for swfs
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu
@@ -3456,6 +3458,7 @@ Major version of SWF to XML export changed to 2.
 [#2215]: https://www.free-decompiler.com/flash/issues/2215
 [#2243]: https://www.free-decompiler.com/flash/issues/2243
 [#2260]: https://www.free-decompiler.com/flash/issues/2260
+[#1290]: https://www.free-decompiler.com/flash/issues/1290
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174

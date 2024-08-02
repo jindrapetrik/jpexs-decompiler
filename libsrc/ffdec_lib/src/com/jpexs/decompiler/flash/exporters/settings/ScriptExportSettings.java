@@ -40,7 +40,9 @@ public class ScriptExportSettings {
     public boolean exportEmbedFlaMode;
 
     public boolean resampleWav;
-
+    
+    public String assetsDir;
+    
     public ScriptExportSettings(
             ScriptExportMode mode,
             boolean singleFile,
@@ -49,12 +51,27 @@ public class ScriptExportSettings {
             boolean exportEmbedFlaMode,
             boolean resampleWav
     ) {
+        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/");
+    }
+    
+    
+
+    public ScriptExportSettings(
+            ScriptExportMode mode,
+            boolean singleFile,
+            boolean ignoreFrameScripts,
+            boolean exportEmbed,
+            boolean exportEmbedFlaMode,
+            boolean resampleWav,
+            String assetsDir
+    ) {
         this.mode = mode;
         this.singleFile = singleFile;
         this.ignoreFrameScripts = ignoreFrameScripts;
         this.exportEmbed = exportEmbed;
         this.exportEmbedFlaMode = exportEmbedFlaMode;
         this.resampleWav = resampleWav;
+        this.assetsDir = assetsDir;
     }
 
     public String getFileExtension() {
