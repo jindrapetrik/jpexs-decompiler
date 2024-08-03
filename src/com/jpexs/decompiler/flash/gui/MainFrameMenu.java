@@ -178,11 +178,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 }
             } else if (openable.getFile() == null) {
                 saved = saveAs(openable, SaveFileMode.SAVEAS);
-            } else {
-                if (openable instanceof SWF) {
-                    SWF swf = (SWF) openable;
-                    swf.saveNestedDefineBinaryData();
-                }
+            } else {                
                 try {
                     Main.saveFile(openable, openable.getFile());
                     saved = true;

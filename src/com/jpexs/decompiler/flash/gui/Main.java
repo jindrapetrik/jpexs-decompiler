@@ -1480,6 +1480,10 @@ public class Main {
             if (mode == SaveFileMode.EXE) {
                 saveFileToExe((SWF) openable, exeExportMode, tmpFile);
             } else {
+                if (openable instanceof SWF) {
+                    SWF swf = (SWF) openable;
+                    swf.saveNestedDefineBinaryData();
+                }
                 try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
                     openable.saveTo(bos);
                 }
