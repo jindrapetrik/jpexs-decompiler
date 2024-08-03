@@ -58,12 +58,14 @@ public class FunctionAVM2Item extends AVM2Item {
     public boolean needsActivation;
 
     public boolean isInterface;
+    
+    public boolean isNative;
 
     public NamespaceItem pkg;
 
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
-    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean needsActivation, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
+    public FunctionAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean isNative, boolean needsActivation, boolean hasRest, int line, String functionName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
 
         super(null, null, NOPRECEDENCE);
         this.metadata = metadata;
@@ -79,6 +81,7 @@ public class FunctionAVM2Item extends AVM2Item {
         this.line = line;
         this.hasRest = hasRest;
         this.isInterface = isInterface;
+        this.isNative = isNative;
     }
 
     @Override

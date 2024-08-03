@@ -488,12 +488,12 @@ public class ActionScript3Parser {
         return ret;
     }
 
-    private MethodAVM2Item method(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
-        FunctionAVM2Item f = function(allOpenedNamespaces, metadata, pkg, isInterface, needsActivation, importedClasses, thisType, openedNamespaces, functionName, isMethod, variables);
-        return new MethodAVM2Item(allOpenedNamespaces, outsidePackage, isPrivate, f.metadata, f.pkg, f.isInterface, customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
+    private MethodAVM2Item method(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean isNative, String customAccess, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, boolean override, boolean isFinal, TypeItem thisType, List<NamespaceItem> openedNamespaces, boolean isStatic, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
+        FunctionAVM2Item f = function(allOpenedNamespaces, metadata, pkg, isInterface, isNative, needsActivation, importedClasses, thisType, openedNamespaces, functionName, isMethod, variables);
+        return new MethodAVM2Item(allOpenedNamespaces, outsidePackage, isPrivate, f.metadata, f.pkg, f.isInterface, f.isNative, customAccess, f.needsActivation, f.hasRest, f.line, override, isFinal, isStatic, functionName, f.paramTypes, f.paramNames, f.paramValues, f.body, f.subvariables, f.retType);
     }
 
-    private FunctionAVM2Item function(List<List<NamespaceItem>> allOpenedNamespaces, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, TypeItem thisType, List<NamespaceItem> openedNamespaces, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
+    private FunctionAVM2Item function(List<List<NamespaceItem>> allOpenedNamespaces, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean isNative, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, TypeItem thisType, List<NamespaceItem> openedNamespaces, String functionName, boolean isMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
 
         openedNamespaces = new ArrayList<>(openedNamespaces); //local copy
         allOpenedNamespaces.add(openedNamespaces);
@@ -562,7 +562,7 @@ public class ActionScript3Parser {
         subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "arguments", "", null, true, openedNamespaces, abcIndex));
         int parCnt = subvariables.size();
         Reference<Boolean> needsActivation2 = new Reference<>(false);
-        if (!isInterface) {
+        if (!isInterface && !isNative) {
             expectedType(SymbolType.CURLY_OPEN);
             body = commands(allOpenedNamespaces, thisType, pkg, needsActivation2, importedClasses, openedNamespaces, new Stack<>(), new HashMap<>(), new HashMap<>(), true, isMethod, 0, subvariables);
             expectedType(SymbolType.CURLY_CLOSE);
@@ -573,7 +573,7 @@ public class ActionScript3Parser {
         for (int i = 0; i < parCnt; i++) {
             subvariables.remove(0);
         }
-        return new FunctionAVM2Item(metadata, pkg, isInterface, needsActivation2.getVal(), hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
+        return new FunctionAVM2Item(metadata, pkg, isInterface, isNative, needsActivation2.getVal(), hasRest, line, functionName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }
 
     private List<Map.Entry<String, Map<String, String>>> parseMetadata() throws IOException, AVM2ParseException, InterruptedException {
@@ -651,6 +651,7 @@ public class ActionScript3Parser {
             boolean isStatic = false;
             boolean isFinal = false;
             boolean isPrivate = false;
+            boolean isNative = false;
 
             String customNs = null;
             String rawCustomNs = null;
@@ -666,7 +667,7 @@ public class ActionScript3Parser {
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
             s = lex();
 
-            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
+            while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -691,7 +692,10 @@ public class ActionScript3Parser {
                 } else if (s.type == SymbolType.NAMESPACE) {
                     break;
                 } else if (s.type == SymbolType.NATIVE) {
-                    throw new AVM2ParseException("Cannot compile native code", lexer.yyline());
+                    if (isNative) {
+                        throw new AVM2ParseException("Only one native keyword allowed", lexer.yyline());
+                    }
+                    isNative = true;
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
                     customNs = s.value.toString();
                     if (isInterface) {
@@ -797,7 +801,7 @@ public class ActionScript3Parser {
                         if (isInterface) {
                             throw new AVM2ParseException("Interface cannot have constructor", lexer.yyline());
                         }
-                        iinit.setVal(method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, pkg, false, customNs, iinitNeedsActivation, importedClasses, false, false, thisType, openedNamespaces, false, "", true, iinitVariables));
+                        iinit.setVal(method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, pkg, false, false, customNs, iinitNeedsActivation, importedClasses, false, false, thisType, openedNamespaces, false, "", true, iinitVariables));
                     } else {
                         GraphTargetItem t;
                         if (classNameStr == null) {
@@ -811,7 +815,8 @@ public class ActionScript3Parser {
                             lexer.pushback(s);
                         }
 
-                        MethodAVM2Item ft = method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, namespace, isInterface, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, new ArrayList<>());
+                        MethodAVM2Item ft;                        
+                        ft = method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, namespace, isInterface, isNative, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, new ArrayList<>());
 
                         if (isGetter) {
                             if (!ft.paramTypes.isEmpty()) {
@@ -831,10 +836,10 @@ public class ActionScript3Parser {
                             }
                         }
                         if (isGetter) {
-                            GetterAVM2Item g = new GetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                            GetterAVM2Item g = new GetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, isNative, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                             t = g;
                         } else if (isSetter) {
-                            SetterAVM2Item st = new SetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
+                            SetterAVM2Item st = new SetterAVM2Item(allOpenedNamespaces, outsidePackage, ft.isPrivate(), ft.metadata, ft.pkg, isInterface, isNative, customNs, ft.needsActivation, ft.hasRest, ft.line, ft.isOverride(), ft.isFinal(), isStatic, ft.functionName, ft.paramTypes, ft.paramNames, ft.paramValues, ft.body, ft.subvariables, ft.retType);
                             t = st;
                         } else {
                             t = ft;
@@ -997,6 +1002,7 @@ public class ActionScript3Parser {
             boolean isFinal = false;
             boolean isDynamic = false;
             boolean isPublic = false;
+            boolean isNative = false;
             NamespaceItem ns = packageInternalNs;
             while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC)) {
                 if (s.type == SymbolType.FINAL) {
@@ -1021,6 +1027,12 @@ public class ActionScript3Parser {
                         throw new AVM2ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }
                     isDynamic = true;
+                }
+                if (s.type == SymbolType.NATIVE) {
+                    if (isNative) {
+                        throw new AVM2ParseException("Only one native keyword allowed", lexer.yyline());
+                    }
+                    isNative = true;
                 }
                 s = lex();
             }
@@ -1108,7 +1120,7 @@ public class ActionScript3Parser {
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String fname = s.value.toString();
 
-                    traits.add(method(allOpenedNamespaces, !inPackage, false, metadata, ns, false, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, fname, true, new ArrayList<>()));
+                    traits.add(method(allOpenedNamespaces, !inPackage, false, metadata, ns, false, isNative, null, new Reference<>(false), importedClasses, false, isFinal, null, openedNamespaces, true, fname, true, new ArrayList<>()));
                     break;
                 case CONST:
                 case VAR:
@@ -1498,7 +1510,7 @@ public class ActionScript3Parser {
                     s = lexer.lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     needsActivation.setVal(true);
-                    ret = (function(allOpenedNamespaces, new ArrayList<>(), pkg, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables));
+                    ret = (function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables));
                     break;
                 case VAR:
                     s = lex();
@@ -2414,7 +2426,7 @@ public class ActionScript3Parser {
                     lexer.pushback(s);
                 }
                 needsActivation.setVal(true);
-                ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables);
+                ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, fname, false, variables);
                 allowMemberOrCall = true;
                 break;
             case NAN:
@@ -2481,7 +2493,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
                     needsActivation.setVal(true);
-                    ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables);
+                    ret = function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, ffname, false, variables);
                 } else if (s.type == SymbolType.LOWER_THAN) {
                     GraphTargetItem subtype = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
                     expectedType(SymbolType.GREATER_THAN);
