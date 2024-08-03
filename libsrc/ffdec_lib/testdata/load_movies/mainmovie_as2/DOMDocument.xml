@@ -1,0 +1,47 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[_root.createEmptyMovieClip("holder", 1);
+holder._x = 0;
+holder._y = 0;
+
+holder.loadMovie("external.swf");
+
+_root.onEnterFrame = function() {
+    if (holder.getBytesLoaded() > 0 && holder.getBytesLoaded() == holder.getBytesTotal()) {
+        trace("Successfully loaded.");
+        delete _root.onEnterFrame;
+    }
+};]]></script>
+                                   </Actionscript>
+                                   <elements>
+                                        <DOMStaticText width="286" height="33.25" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="88.95" ty="10.25"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Loaded SWF:</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="2711" publishTime="1722624971"/>
+     </publishHistory>
+</DOMDocument>
