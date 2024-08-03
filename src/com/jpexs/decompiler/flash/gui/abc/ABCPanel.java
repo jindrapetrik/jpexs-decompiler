@@ -618,6 +618,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 flagsStr.add("onlySWF9Up");
             }
             
+            if ((flags & VariableFlags.ONLY_SWF10_UP) > 0) {
+                flagsStr.add("onlySWF10Up");
+            }
+            
             for (Integer f : unknownFlags) {
                 if ((flags & f) > 0) {
                     flagsStr.add("unk" + f);
