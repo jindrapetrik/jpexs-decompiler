@@ -45,6 +45,7 @@ All notable changes to this project will be documented in this file.
 - Optimized (faster) context menu for large SWF trees
 - Optimized (faster) deleting items for large SWF trees
 - AS debugger - More varible flags
+- AS3 direct editation - edit files with native keyword
 
 ### Fixed
 - Debugger - getting children of top level variables
