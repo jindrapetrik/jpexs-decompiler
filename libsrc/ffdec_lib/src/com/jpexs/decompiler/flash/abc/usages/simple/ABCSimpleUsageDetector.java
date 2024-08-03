@@ -333,14 +333,14 @@ public class ABCSimpleUsageDetector {
                     case ValueKind.CONSTANT_ExplicitNamespace:
                     case ValueKind.CONSTANT_StaticProtectedNs:
                     case ValueKind.CONSTANT_PrivateNs:
-                        handleUsage(ItemKind.NAMESPACE, value_index, description);
+                        handleUsageNamespace(value_index, description);
                         break;
                 }
             }
 
             @Override
             protected void handleTraitSlotConst(ABC abc, TraitSlotConst trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, int bodyTraitIndex, ABCWalker.WalkType walkType, Stack<Integer> callStack) {
-
+            
                 String description = "";
                 if (callStack.size() > 1) {
                     if (bodyTraitIndex != -1) {
