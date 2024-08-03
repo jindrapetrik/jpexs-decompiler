@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - Exe export mode can be selected in in Save EXE dialog (select filetype) - wrapper or projectors
 - Optimized (faster) context menu for large SWF trees
 - Optimized (faster) deleting items for large SWF trees
+- AS debugger - DontDelete variable flag (0x2)
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -92,6 +93,7 @@ All notable changes to this project will be documented in this file.
 - [#2226] Incorrect decompilation of continue statements in some cases
 - AS3 Embedded assets export - assets.swf not working, incorrect binary data extension for swfs
 - Duplicate pack path message on compound scripts
+- AS1/2 debugger not getting variable details properly
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu

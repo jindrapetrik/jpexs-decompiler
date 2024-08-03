@@ -364,7 +364,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
 
-            if (parentObjectId == 0 && objectId != 0L) {
+            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+            
+            if (parentObjectId == 0 && objectId != 0L && isAS3) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
             } else {
                 igv = Main.getDebugHandler().getVariable(parentObjectId, var.name, true, useGetter);
@@ -578,7 +580,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         private String flagsToString(int flags) {
 
             Integer[] unknownFlags = new Integer[]{
-                2,
                 8,
                 16,
                 64,
@@ -597,6 +598,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             if ((flags & VariableFlags.DONT_ENUMERATE) > 0) {
                 flagsStr.add("dontEnumerate");
             }
+            
+            if ((flags & VariableFlags.DONT_DELETE) > 0) {
+                flagsStr.add("dontDelete");
+            }
+            
             for (Integer f : unknownFlags) {
                 if ((flags & f) > 0) {
                     flagsStr.add("unk" + f);
