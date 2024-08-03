@@ -19,25 +19,36 @@ package com.jpexs.decompiler.flash.gui.helpers;
 import com.jpexs.decompiler.flash.gui.AboutDialog;
 import com.jpexs.decompiler.flash.gui.AdvancedSettingsDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.AsLinkageDialog;
 import com.jpexs.decompiler.flash.gui.DebugLogDialog;
 import com.jpexs.decompiler.flash.gui.ErrorLogFrame;
 import com.jpexs.decompiler.flash.gui.ExportDialog;
+import com.jpexs.decompiler.flash.gui.FilesChangedDialog;
 import com.jpexs.decompiler.flash.gui.FontEmbedDialog;
 import com.jpexs.decompiler.flash.gui.FontPreviewDialog;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.LoadFromMemoryFrame;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
+import com.jpexs.decompiler.flash.gui.NewFileDialog;
 import com.jpexs.decompiler.flash.gui.NewVersionDialog;
+import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
 import com.jpexs.decompiler.flash.gui.RenameDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.ReplaceTraceDialog;
 import com.jpexs.decompiler.flash.gui.SearchDialog;
 import com.jpexs.decompiler.flash.gui.SearchResultsDialog;
+import com.jpexs.decompiler.flash.gui.SelectFramePositionDialog;
 import com.jpexs.decompiler.flash.gui.SelectLanguageDialog;
+import com.jpexs.decompiler.flash.gui.SelectTagOfTypeDialog;
+import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
+import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
+import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
+import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.gui.abc.NewTraitDialog;
 import com.jpexs.decompiler.flash.gui.abc.UsageFrame;
+import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -241,9 +252,11 @@ public class CheckResources {
         Class[] classes = new Class[]{
             AboutDialog.class,
             AdvancedSettingsDialog.class,
+            AsLinkageDialog.class,
             DebugLogDialog.class,
             ErrorLogFrame.class,
             ExportDialog.class,
+            FilesChangedDialog.class,
             FontEmbedDialog.class,
             FontPreviewDialog.class,
             GraphDialog.class,
@@ -251,17 +264,27 @@ public class CheckResources {
             LoadFromMemoryFrame.class,
             LoadingDialog.class,
             MainFrame.class,
+            NewFileDialog.class,            
             NewVersionDialog.class,
+            PathResolvingDialog.class,
             RenameDialog.class,
             ReplaceCharacterDialog.class,
             ReplaceTraceDialog.class,
             SearchDialog.class,
             SearchResultsDialog.class,
+            SelectFramePositionDialog.class,
             SelectLanguageDialog.class,
+            SelectTagOfTypeDialog.class,
+            SelectTagPositionDialog.class,            
             // ABC
+            ABCExplorerDialog.class,
+            AddClassDialog.class,
+            As3ClassLinkageDialog.class,
             DeobfuscationDialog.class,
             NewTraitDialog.class,
             UsageFrame.class,
+            // Action
+            AddScriptDialog.class
         };
         return classes;
     }
