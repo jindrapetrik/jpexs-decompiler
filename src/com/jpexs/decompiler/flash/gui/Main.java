@@ -1977,7 +1977,15 @@ public class Main {
                 break;
         }
         
-        JFileChooser fc = View.getFileChooserWithIcon(mode == SaveFileMode.EXE ? "saveasexe" : "saveas");
+
+        String icon = "save";
+        if (mode == SaveFileMode.SAVEAS) {
+            icon = "saveas";
+        }
+        if (mode == SaveFileMode.EXE) {
+            icon = "saveasexe";
+        }
+        JFileChooser fc = View.getFileChooserWithIcon(icon);
         fc.setCurrentDirectory(new File(Configuration.lastSaveDir.get()));
 
         FileFilter swfFilter = new FileFilter() {
@@ -2017,45 +2025,79 @@ public class Main {
         };
 
         ExeExportMode exeExportMode = null;
-        FileFilter exeFilter = null;
+        FileFilter wrapperFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".exe")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.exe.wrapper");
+            }
+        };
+        
+        FileFilter projectorWinFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".exe")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.exe.projectorWin");
+            }
+        };
+        
+        FileFilter projectorMacFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".dmg")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.exe.projectorMac");
+            }
+        };
+        
+        FileFilter projectorLinuxFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return true;
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.exe.projectorLinux");
+            }
+        };
         if (mode == SaveFileMode.EXE) {
             exeExportMode = Configuration.exeExportMode.get();
             if (exeExportMode == null) {
                 exeExportMode = ExeExportMode.WRAPPER;
-            }
-            String filterDescription = null;
+            }            
+            fc.addChoosableFileFilter(wrapperFilter);
+            fc.addChoosableFileFilter(projectorWinFilter);
+            fc.addChoosableFileFilter(projectorMacFilter);
+            fc.addChoosableFileFilter(projectorLinuxFilter);
+            
             switch (exeExportMode) {
                 case WRAPPER:
+                    fc.setFileFilter(wrapperFilter);
+                    break;
                 case PROJECTOR_WIN:
-                    ext = ".exe";
-                    filterDescription = "filter.exe";
+                    fc.setFileFilter(projectorWinFilter);
                     break;
                 case PROJECTOR_MAC:
-                    ext = ".dmg";
-                    filterDescription = "filter.dmg";
+                    fc.setFileFilter(projectorMacFilter);
                     break;
                 case PROJECTOR_LINUX:
                     // linux projector is compressed with tar.gz
                     // todo: decompress
-                    ext = "";
-                    filterDescription = "filter.linuxExe";
+                    fc.setFileFilter(projectorLinuxFilter);
                     break;
-            }
-
-            String fext = ext;
-            String ffilterDescription = filterDescription;
-            exeFilter = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(fext)) || (f.isDirectory());
-                }
-
-                @Override
-                public String getDescription() {
-                    return AppStrings.translate(ffilterDescription);
-                }
-            };
-            fc.setFileFilter(exeFilter);
+            }         
         } else if ((openable instanceof SWF) && ((SWF) openable).gfx) {
             fc.addChoosableFileFilter(swfFilter);
             fc.setFileFilter(gfxFilter);
@@ -2090,12 +2132,31 @@ public class Main {
                         fileName += ".abc";
                     }
                 }
-                if (selFilter == exeFilter) {
-                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)) {
-                        fileName += extension;
+                if (selFilter == wrapperFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".exe")) {
+                        fileName += ".exe";
                     }
+                    exeExportMode = ExeExportMode.WRAPPER;
+                }
+                if (selFilter == projectorWinFilter) {                    
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".exe")) {
+                        fileName += ".exe";
+                    }
+                    exeExportMode = ExeExportMode.PROJECTOR_WIN;
+                }
+                if (selFilter == projectorMacFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".dmg")) {
+                        fileName += ".dmg";
+                    }
+                    exeExportMode = ExeExportMode.PROJECTOR_MAC;
+                }
+                if (selFilter == projectorLinuxFilter) {
+                    exeExportMode = ExeExportMode.PROJECTOR_LINUX;
                 }
                 Main.saveFile(openable, fileName, mode, exeExportMode);
+                if (mode == SaveFileMode.EXE && exeExportMode != null) {
+                    Configuration.exeExportMode.set(exeExportMode);
+                }
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
