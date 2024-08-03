@@ -559,7 +559,7 @@ public class Main {
     }
     
     private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {       
-        if (!tempFilesDir.isDirectory()) {
+        if (tempFilesDir == null || !tempFilesDir.isDirectory()) {
             return File.createTempFile(prefix, suffix);
         }
         try {
