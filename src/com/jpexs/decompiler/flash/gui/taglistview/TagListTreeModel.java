@@ -39,9 +39,10 @@ import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreePath;
@@ -59,7 +60,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
     private Map<SWF, HeaderItem> swfHeaders = new HashMap<>();
 
     private final Map<ABCContainerTag, ClassesListTreeModel> abcTagsClassesTree = new WeakHashMap<>();
-    private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();
+    private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();            
 
     public TagListTreeModel(List<OpenableList> swfs) {
         this.swfs = swfs;
@@ -105,6 +106,14 @@ public class TagListTreeModel extends AbstractTagTreeModel {
 
     @Override
     public TreeItem getChild(Object parent, int index) {
+        TreeItem result = getChildInternal(parent, index);
+        if (result != null) {
+            itemToParentCache.put(result, (TreeItem) parent);
+        }
+        return result;
+    }
+    
+    private TreeItem getChildInternal(Object parent, int index) {    
         if (getChildCount(parent) == 0) {
             return null;
         }
@@ -323,6 +332,14 @@ public class TagListTreeModel extends AbstractTagTreeModel {
 
     @Override
     public List<? extends TreeItem> getAllChildren(Object parent) {
+        List<? extends TreeItem> ret = getAllChildrenInternal(parent);
+        for (TreeItem item : ret) {
+            itemToParentCache.put(item, (TreeItem) parent);
+        }
+        return ret;
+    }
+    
+    private List<? extends TreeItem> getAllChildrenInternal(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
             List<TreeItem> result = new ArrayList<>(swfs.size());
@@ -378,6 +395,47 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         return ret;
     }
 
+    
+    
+    @Override
+    protected void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result) {
+        for (TreeItem n : getAllChildren(parent)) {
+            List<TreeItem> newPath = new ArrayList<>();
+            newPath.addAll(path);
+            newPath.add(n);
+
+            for (TreeItem obj : objs) {
+                if (obj == n) { //Equals or == ???
+                    result.put(obj, newPath);
+                }
+            }
+
+            searchTreeItemMulti(objs, n, newPath, result);            
+        }
+    }
+    
+    @Override
+    protected void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result) {
+        for (TreeItem n : getAllChildren(parent)) {
+
+            for (TreeItem obj : objs) {
+                if (obj == n) { //Equals or == ???
+                    result.put(obj, parent);
+                    if (result.size() == objs.size()) {
+                        return;
+                    }
+        
+                }
+            }
+
+            searchTreeItemParentMulti(objs, n, result);
+            if (result.size() == objs.size()) {
+                return;
+            }
+        }
+    }
+    
+    
     @Override
     protected List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
@@ -386,7 +444,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             newPath.addAll(path);
             newPath.add(n);
 
-            if (Objects.equals(obj, n)) {
+            if (obj == n) { //Equals or == ???
                 return newPath;
             }
 

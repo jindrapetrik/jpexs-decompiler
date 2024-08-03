@@ -1158,14 +1158,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (parent == null) {
                 allSelectedSameParent = false;
             } else {
-                for (TreeItem item : items) {
-                    TreePath currentParent = model.getTreePath(item).getParentPath();
-
-                    if (!currentParent.equals(parent)) {
-                        allSelectedSameParent = false;
-                        break;
-                    }
-                }
+                Map<TreeItem, TreeItem> paths = model.getTreePathParentMulti(items);     
+                Set<TreeItem> parentSet = new LinkedIdentityHashSet<>();
+                parentSet.addAll(paths.values());
+                if (parentSet.size() != 1) { 
+                    allSelectedSameParent = false;
+                }                                                
             }
         }
 
