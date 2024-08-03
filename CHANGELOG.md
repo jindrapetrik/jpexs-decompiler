@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - [#1644] Save all button - has priority over standard Save button
 - Exe export mode can be selected in in Save EXE dialog (select filetype) - wrapper or projectors
 - Optimized (faster) context menu for large SWF trees
+- Optimized (faster) deleting items for large SWF trees
 
 ### Fixed
 - Debugger - getting children of top level variables

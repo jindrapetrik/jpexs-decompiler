@@ -3668,16 +3668,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private void populateScriptSubs(TreePath path, TreeItem item, List<TreePath> out) {
+    private void populateScriptSubs(TreeItem item, List<TreeItem> out) {
         List<? extends TreeItem> subs = getTree().getFullModel().getAllChildren(item);
         for (TreeItem t : subs) {
-            TreePath tPath = path.pathByAddingChild(t);
+            //TreePath tPath = path.pathByAddingChild(t);
             if ((t instanceof TagScript) && (((TagScript) t).getTag() instanceof ASMSource)) {
-                out.add(tPath);
+                out.add(t);
             } else if (t instanceof ASMSource) {
-                out.add(tPath);
+                out.add(t);
             } else {
-                populateScriptSubs(tPath, t, out);
+                populateScriptSubs(t, out);
             }
         }
     }
@@ -3691,13 +3691,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     public void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
-        List<TreePath> tps = new ArrayList<>();
-
         List<TreeItem> sel = getSelectedItems();
-        for (TreeItem treeItem : sel) {
-            tps.add(getTree().getFullModel().getTreePath(treeItem));
-        }
-
+        
         List<Tag> tagsToRemove = new ArrayList<>();
         List<Frame> framesToRemove = new ArrayList<>();
         List<Object> itemsToRemove = new ArrayList<>();
@@ -3706,26 +3701,25 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         TreeItem itemLast = null;
         int itemCountFix = 0;
-        for (int i = 0; i < tps.size(); i++) {
-            TreeItem item = (TreeItem) tps.get(i).getLastPathComponent();
+        for (int i = 0; i < sel.size(); i++) {
+            TreeItem item = sel.get(i); //TreeItem) tps.get(i).getLastPathComponent();
             if ((item instanceof FrameScript) || (item instanceof TagScript)) {
-                List<TreePath> subs = new ArrayList<>();
-                populateScriptSubs(tps.get(i), item, subs);
+                List<TreeItem> subs = new ArrayList<>();
+                populateScriptSubs(item, subs);
                 int cnt = 0;
-                for (TreePath tp : subs) {
-                    if (!tps.contains(tp)) {
+                for (TreeItem tp : subs) {
+                    if (!sel.contains(tp)) {
                         if (cnt > 0) {
                             itemCountFix--;
                         }
                         cnt++;
-                        tps.add(tp);
+                        sel.add(tp);
                         itemLast = item;
                     }
                 }
             }
         }
-        for (TreePath path : tps) {
-            TreeItem item = (TreeItem) path.getLastPathComponent();
+        for (TreeItem item : sel) {
             if (item instanceof AS3Package) {
                 itemsToRemove.add(item);
                 itemsToRemoveParents.add(new Object());
@@ -3750,10 +3744,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                 framesToRemove.add(frame);
             } else if (item instanceof BUTTONCONDACTION) {
                 itemsToRemove.add(item);
+                //This is slow. Let's hope users won't delete that much BUTTONCONDACTIONs
+                TreePath path = getTree().getFullModel().getTreePath(item);                
                 itemsToRemoveParents.add(((TagScript) path.getParentPath().getLastPathComponent()).getTag());
                 itemsToRemoveSprites.add(new Object());
             } else if (item instanceof CLIPACTIONRECORD) {
                 itemsToRemove.add(item);
+                //This is slow. Let's hope users won't delete that much CLIPACTIONRECORDs
+                TreePath path = getTree().getFullModel().getTreePath(item);
                 Object sprite = path.getParentPath().getParentPath().getParentPath().getLastPathComponent();
                 if (sprite instanceof TagScript) {
                     sprite = ((TagScript) sprite).getTag();
