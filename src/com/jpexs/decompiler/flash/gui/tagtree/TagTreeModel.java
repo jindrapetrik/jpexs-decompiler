@@ -401,7 +401,91 @@ public class TagTreeModel extends AbstractTagTreeModel {
     public Frame getFrame(SWF swf, Timelined t, int frame) {
         return searchForFrame(swf, swf, t, frame);
     }
+    
+    @Override
+    protected void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result) {
+        for (TreeItem n : getAllChildren(parent)) {
+            List<TreeItem> newPath = new ArrayList<>();
+            newPath.addAll(path);
+            newPath.add(n);
 
+            for (TreeItem obj : objs) {
+                if (searchMatches(n, obj)) {
+                    result.put(obj, newPath);
+                }
+            }
+
+            searchTreeItemMulti(objs, n, newPath, result);            
+        }     
+    }
+
+    
+    @Override
+    protected void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result) {
+        for (TreeItem n : getAllChildren(parent)) {
+
+            for (TreeItem obj : objs) {
+                if (searchMatches(n, obj)) { //Equals or == ???
+                    result.put(obj, parent);
+                }
+            }
+
+            searchTreeItemParentMulti(objs, n, result);            
+        }
+    }
+    
+    private boolean searchMatches(TreeItem n, TreeItem obj) {
+        if (n instanceof AS3Package) {
+            AS3Package pkg = (AS3Package) n;
+            if (obj instanceof AS3Package) {
+                AS3Package opkg = (AS3Package) obj;
+                if (Objects.equals(pkg.packageName, opkg.packageName) && pkg.getAbc() == opkg.getAbc()) {
+                    return true;
+                }
+            }
+        }
+
+        if (n instanceof AS3ClassTreeItem) {
+            AS3ClassTreeItem te = (AS3ClassTreeItem) n;
+            if (obj == te) {
+                return true;
+            }
+        }
+
+        if (obj instanceof SceneFrame && n instanceof SceneFrame) {
+            // SceneFrames are always recreated, so compare them by frame and swf
+            SceneFrame nds = (SceneFrame) n;
+            SceneFrame objs = (SceneFrame) obj;
+            if (objs.getFrame().frame == nds.getFrame().frame && objs.getOpenable() == nds.getOpenable()) {
+                return true;
+            }
+        }
+
+        if (obj instanceof FolderItem && n instanceof FolderItem) {
+            // FolderItems are always recreated, so compare them by name and swf
+            FolderItem nds = (FolderItem) n;
+            FolderItem objs = (FolderItem) obj;
+            if (objs.getName().equals(nds.getName()) && objs.swf == nds.swf) {
+                return true;
+            }
+        } else {
+
+            TreeItem objNoTs = obj;
+            if (obj instanceof TagScript) {
+                objNoTs = ((TagScript) obj).getTag();
+            }
+
+            TreeItem nNoTs = n;
+            if (n instanceof TagScript) {
+                nNoTs = ((TagScript) n).getTag();
+            }
+
+            if (objNoTs == nNoTs) {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     protected List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
@@ -410,54 +494,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             newPath.addAll(path);
             newPath.add(n);
 
-            if (n instanceof AS3Package) {
-                AS3Package pkg = (AS3Package) n;
-                if (obj instanceof AS3Package) {
-                    AS3Package opkg = (AS3Package) obj;
-                    if (Objects.equals(pkg.packageName, opkg.packageName) && pkg.getAbc() == opkg.getAbc()) {
-                        return newPath;
-                    }
-                }
-            }
-
-            if (n instanceof AS3ClassTreeItem) {
-                AS3ClassTreeItem te = (AS3ClassTreeItem) n;
-                if (obj == te) {
-                    return newPath;
-                }
-            }
-
-            if (obj instanceof SceneFrame && n instanceof SceneFrame) {
-                // SceneFrames are always recreated, so compare them by frame and swf
-                SceneFrame nds = (SceneFrame) n;
-                SceneFrame objs = (SceneFrame) obj;
-                if (objs.getFrame().frame == nds.getFrame().frame && objs.getOpenable() == nds.getOpenable()) {
-                    return newPath;
-                }
-            }
-
-            if (obj instanceof FolderItem && n instanceof FolderItem) {
-                // FolderItems are always recreated, so compare them by name and swf
-                FolderItem nds = (FolderItem) n;
-                FolderItem objs = (FolderItem) obj;
-                if (objs.getName().equals(nds.getName()) && objs.swf == nds.swf) {
-                    return newPath;
-                }
-            } else {
-
-                TreeItem objNoTs = obj;
-                if (obj instanceof TagScript) {
-                    objNoTs = ((TagScript) obj).getTag();
-                }
-
-                TreeItem nNoTs = n;
-                if (n instanceof TagScript) {
-                    nNoTs = ((TagScript) n).getTag();
-                }
-
-                if (objNoTs == nNoTs) {
-                    return newPath;
-                }
+            if (searchMatches(n, obj)) {
+                return newPath;
             }
 
             ret = searchTreeItem(obj, n, newPath);
@@ -520,6 +558,14 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
     @Override
     public List<? extends TreeItem> getAllChildren(Object parent) {
+        List<? extends TreeItem> ret = getAllChildrenInternal(parent);
+        for (TreeItem item : ret) {
+            itemToParentCache.put(item, (TreeItem) parent);
+        }
+        return ret;
+    }
+    
+    private List<? extends TreeItem> getAllChildrenInternal(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
         List<TreeItem> result = new ArrayList<>();
         if (parentNode instanceof CharacterTag) {
@@ -616,6 +662,14 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
     @Override
     public TreeItem getChild(Object parent, int index) {
+        TreeItem result = getChildInternal(parent, index);
+        if (result != null) {
+            itemToParentCache.put(result, (TreeItem) parent);
+        }
+        return result;
+    }
+    
+    private TreeItem getChildInternal(Object parent, int index) {
         if (getChildCount(parent) == 0) {
             return null;
         }

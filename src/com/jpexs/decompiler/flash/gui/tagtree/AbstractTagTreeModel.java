@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -45,6 +46,8 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     public abstract void updateSwfs(CollectionChangedEvent e);
 
     private Map<TreeItem, Integer> indices = new WeakHashMap<>();
+    
+    protected Map<TreeItem, TreeItem> itemToParentCache = new WeakHashMap<>();
 
     public final void calculateCollisions() {
         Map<TreeItem, Integer> indices = new WeakHashMap<>();
@@ -144,6 +147,47 @@ public abstract class AbstractTagTreeModel implements TreeModel {
 
     protected abstract List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path);
 
+    protected abstract void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result);
+    
+    protected abstract void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result);
+   
+    public Map<TreeItem, TreeItem> getTreePathParentMulti(List<TreeItem> objs) {           
+        Map<TreeItem, TreeItem> result = new IdentityHashMap<>();
+        for (TreeItem item : objs) {
+            if (itemToParentCache.containsKey(item)) {
+                result.put(item, itemToParentCache.get(item));
+            } else {
+                break;
+            }
+        }
+        if (result.size() == objs.size()) {
+            return result;
+        }
+                        
+        TreeItem root = getRoot();
+        //SLOW way
+        searchTreeItemParentMulti(objs, root, result);       
+        return result;
+    }
+   
+    
+    public Map<TreeItem, TreePath> getTreePathMulti(List<TreeItem> objs) {
+        TreeItem root = getRoot();        
+        List<TreeItem> path = new ArrayList<>();
+        path.add(root);
+        Map<TreeItem, List<TreeItem>> paths = new IdentityHashMap<>();
+        searchTreeItemMulti(objs, root, path, paths);
+
+        Map<TreeItem, TreePath> result = new IdentityHashMap<>();
+        for (TreeItem item : paths.keySet()) {
+            List<TreeItem> p = paths.get(item);
+            TreePath tp = new TreePath(p.toArray(new Object[p.size()]));
+            result.put(item, tp);
+        }
+        
+        return result;
+    }
+    
     public TreePath getTreePath(TreeItem obj) {
         List<TreeItem> path = new ArrayList<>();
         TreeItem root = getRoot();
