@@ -88,6 +88,7 @@ All notable changes to this project will be documented in this file.
 - AS3 PCode - pushbyte operand docs - signed byte
 - [#2226] Incorrect decompilation of continue statements in some cases
 - AS3 Embedded assets export - assets.swf not working, incorrect binary data extension for swfs
+- Duplicate pack path message on compound scripts
 
 ### Changed
 - [#2185] MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu

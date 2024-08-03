@@ -2228,9 +2228,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private List<ScriptPack> uniqueAS3Packs(List<ScriptPack> packs) {
         List<ScriptPack> ret = new ArrayList<>();
         Set<ClassPath> classPaths = new HashSet<>();
-        for (ScriptPack item : packs) {
+        for (ScriptPack item : packs) {           
             ClassPath key = item.getClassPath();
-            if (classPaths.contains(key)) {
+            if (classPaths.contains(key) && item.isSimple) {
                 logger.log(Level.SEVERE, "Duplicate pack path found ({0})!", key);
             } else {
                 classPaths.add(key);
