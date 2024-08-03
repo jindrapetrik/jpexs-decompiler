@@ -44,7 +44,7 @@ All notable changes to this project will be documented in this file.
 - Exe export mode can be selected in in Save EXE dialog (select filetype) - wrapper or projectors
 - Optimized (faster) context menu for large SWF trees
 - Optimized (faster) deleting items for large SWF trees
-- AS debugger - DontDelete variable flag (0x2)
+- AS debugger - More varible flags
 
 ### Fixed
 - Debugger - getting children of top level variables

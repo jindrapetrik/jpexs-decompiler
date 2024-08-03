@@ -17,18 +17,12 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.Variable;
-import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
-import com.jpexs.debugger.flash.messages.in.InGetVariable;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
-import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
-import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
-import com.jpexs.decompiler.flash.gui.debugger.Debugger;
-import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
 import de.hameister.treetable.MyTreeTableModel;
@@ -40,7 +34,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;

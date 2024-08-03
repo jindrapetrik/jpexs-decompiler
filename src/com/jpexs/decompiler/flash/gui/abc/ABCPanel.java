@@ -583,13 +583,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 8,
                 16,
                 64,
-                128,
-                256,
                 512,
-                1024,
                 2048,
-                4096,
-                8192,
                 16384,
                 32768
             };
@@ -601,6 +596,26 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             
             if ((flags & VariableFlags.DONT_DELETE) > 0) {
                 flagsStr.add("dontDelete");
+            }
+            
+            if ((flags & VariableFlags.ONLY_SWF6_UP) > 0) {
+                flagsStr.add("onlySWF6Up");
+            }
+            
+            if ((flags & VariableFlags.IGNORE_SWF6) > 0) {
+                flagsStr.add("ignoreSWF6");
+            }
+            
+            if ((flags & VariableFlags.ONLY_SWF7_UP) > 0) {
+                flagsStr.add("onlySWF7Up");
+            }
+            
+            if ((flags & VariableFlags.ONLY_SWF8_UP) > 0) {
+                flagsStr.add("onlySWF8Up");
+            }
+            
+            if ((flags & VariableFlags.ONLY_SWF9_UP) > 0) {
+                flagsStr.add("onlySWF9Up");
             }
             
             for (Integer f : unknownFlags) {
