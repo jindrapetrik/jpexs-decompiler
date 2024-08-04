@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
+import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
@@ -207,7 +208,15 @@ public class Main {
     public static CancellableWorker swfPrepareWorker = null;
 
     public static String currentDebuggerPackage = null;
+    
+    private static SWF runningSWF = null;
+    
+    private static SwfPreparation runningPreparation = null;
 
+    public static SWF getRunningSWF() {
+        return runningSWF;
+    }   
+    
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
         if (conf != null) {
@@ -250,6 +259,8 @@ public class Main {
             runTempFiles.clear();
 
             runProcess = null;
+            runningSWF = null;
+            runningPreparation = null;
         }
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().clearDebuggerColors();
@@ -418,13 +429,13 @@ public class Main {
 
     private static interface SwfPreparation {
 
-        public SWF prepare(SWF swf) throws InterruptedException;
+        public SWF prepare(SWF swf, String swfHash) throws InterruptedException;
     }
 
     private static class SwfRunPrepare implements SwfPreparation {
 
         @Override
-        public SWF prepare(SWF swf) throws InterruptedException {
+        public SWF prepare(SWF swf, String swfHash) throws InterruptedException {
             if (Configuration.autoOpenLoadedSWFs.get()) {
                 if (!DebuggerTools.hasDebugger(swf)) {
                     DebuggerTools.switchDebugger(swf);
@@ -444,7 +455,7 @@ public class Main {
         }
 
         @Override
-        public SWF prepare(SWF instrSWF) throws InterruptedException {
+        public SWF prepare(SWF instrSWF, String swfHash) throws InterruptedException {
             EventListener prepEventListner = new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -464,7 +475,7 @@ public class Main {
             instrSWF.addEventListener(prepEventListner);
             try {
                 File fTempFile = new File(instrSWF.getFile());
-                instrSWF.enableDebugging(true, new File("."), true, doPCode);
+                instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
                 FileOutputStream fos = new FileOutputStream(fTempFile);
                 instrSWF.saveTo(fos);
                 fos.close();
@@ -502,9 +513,9 @@ public class Main {
                             }
                         });
                         if (doPCode) {
-                            instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true));
+                            instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         } else {
-                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true));
+                            instrSWF.generateSwdFile(swdFile, getPackBreakPoints(true, swfHash), swfHash);
                         }
                     }
                 }
@@ -524,7 +535,7 @@ public class Main {
         }
     }
 
-    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, File tempFilesDir, List<File> tempFiles) throws IOException, InterruptedException {
+    private static void prepareSwf(String swfHash, SwfPreparation prep, File toPrepareFile, File origFile, File tempFilesDir, List<File> tempFiles) throws IOException, InterruptedException {
         SWF instrSWF = null;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
@@ -539,18 +550,18 @@ public class Main {
                         String url = it.getUrl();
                         File importedFile = new File(origFile.getParentFile(), url);
                         if (importedFile.exists()) {
-                            File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
+                                                        File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
                             it.setUrl("./" + newTempFile.getName());
-                            byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
+                            byte[] impData = Helper.readFile(importedFile.getAbsolutePath());                            
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                             tempFiles.add(newTempFile);
-                            prepareSwf(prep, newTempFile, importedFile, tempFilesDir, tempFiles);
+                            prepareSwf("imported_" + md5(impData),prep, newTempFile, importedFile, tempFilesDir, tempFiles);
                         }
                     }
                 }
             }
             if (prep != null) {
-                instrSWF = prep.prepare(instrSWF);
+                instrSWF = prep.prepare(instrSWF, swfHash);
             }
             try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
@@ -605,7 +616,7 @@ public class Main {
         File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
         
         File tempFile;
-        List<File> tempFiles = new ArrayList<>();                
+        List<File> tempFiles = new ArrayList<>();        
         try {
             tempFile = createTempFileInDir(tempRunDir, "~ffdec_run_", ".swf");
 
@@ -617,7 +628,7 @@ public class Main {
                 swfToSave.saveTo(fos, false, swf.gfx);
             }
 
-            prepareSwf(new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+            prepareSwf("main",new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -629,6 +640,8 @@ public class Main {
                 runTempFile = tempFile;
                 runTempFiles = tempFiles;
                 runProcessDebug = false;
+                runningSWF = swf;           
+                runningPreparation = new SwfRunPrepare();
             }
             runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
         }
@@ -645,7 +658,7 @@ public class Main {
         if (swf == null) {
             return;
         }
-        debugHandler.setDebuggedSwf(swf);        
+        debugHandler.setMainDebuggedSwf(swf);        
         File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
         File tempFile = null;
 
@@ -669,7 +682,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swfToSave.saveTo(fos, false, swf.gfx);
                     }
-                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+                    prepareSwf("main", new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
                     return null;
                 }
 
@@ -690,6 +703,8 @@ public class Main {
                         runProcessDebug = true;
                         runProcessDebugPCode = doPCode;
                         runTempFiles = tempFiles;
+                        runningSWF = swf;
+                        runningPreparation = new SwfDebugPrepare(doPCode);
                     }
                     Main.stopWork();
                     Main.startDebugger();
@@ -751,8 +766,8 @@ public class Main {
         }
     }
 
-    public static synchronized Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly) {
-        SWF swf = getMainFrame().getPanel().getCurrentSwf();
+    public static synchronized Map<String, Set<Integer>> getPackBreakPoints(boolean validOnly, String swfHash) {
+        SWF swf = Main.getSwfByHash(swfHash);
         return getDebugHandler().getAllBreakPoints(swf, validOnly);
     }
 
@@ -1515,7 +1530,7 @@ public class Main {
 
         private final OpenableSourceInfo[] sourceInfos;
 
-        private final Runnable executeAfterOpen;
+        private final OpenableOpened executeAfterOpen;
 
         private final int[] reloadIndices;
 
@@ -1527,11 +1542,11 @@ public class Main {
             this(sourceInfo, null, reloadIndex);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen) {
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
             this(sourceInfo, executeAfterOpen, -1);
         }
 
-        public OpenFileWorker(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+        public OpenFileWorker(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
             this.sourceInfos = new OpenableSourceInfo[]{sourceInfo};
             this.executeAfterOpen = executeAfterOpen;
             this.reloadIndices = new int[]{reloadIndex};
@@ -1541,11 +1556,11 @@ public class Main {
             this(sourceInfos, null, null);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, Runnable executeAfterOpen) {
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen) {
             this(sourceInfos, executeAfterOpen, null);
         }
 
-        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
+        public OpenFileWorker(OpenableSourceInfo[] sourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
             this.sourceInfos = sourceInfos;
             this.executeAfterOpen = executeAfterOpen;
             int[] indices = new int[sourceInfos.length];
@@ -1693,8 +1708,8 @@ public class Main {
                     mainFrame.getPanel().updateMissingNeededCharacters();
                 }
 
-                if (executeAfterOpen != null) {
-                    executeAfterOpen.run();
+                if (executeAfterOpen != null && fopenable != null) {
+                    executeAfterOpen.opened(fopenable);
                 }
             });
 
@@ -1841,13 +1856,13 @@ public class Main {
         return openFile(new OpenableSourceInfo[]{sourceInfo});
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen) {
         View.checkAccess();
 
         return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, Runnable executeAfterOpen, int reloadIndex) {
+    public static OpenFileResult openFile(OpenableSourceInfo sourceInfo, OpenableOpened executeAfterOpen, int reloadIndex) {
         View.checkAccess();
 
         return openFile(new OpenableSourceInfo[]{sourceInfo}, executeAfterOpen, new int[]{reloadIndex});
@@ -1859,13 +1874,13 @@ public class Main {
         return openFile(newSourceInfos, null);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen) {
         View.checkAccess();
 
         return openFile(newSourceInfos, executeAfterOpen, null);
     }
 
-    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
+    public static OpenFileResult openFile(OpenableSourceInfo[] newSourceInfos, OpenableOpened executeAfterOpen, int[] reloadIndices) {
         View.checkAccess();
 
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
@@ -2467,31 +2482,61 @@ public class Main {
                 watcherWorker.execute();
             }
 
-            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {
-
+            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {                
+                
                 @Override
-                public void onLoaderBytes(String clientId, byte[] data) {
-                    String hash = md5(data);
+                public boolean isModifyBytesSupported() {
+                    return true;
+                }
+                
+                @Override
+                public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener) {                
+                    
+                    final String hash = md5(inputData);
+                    OpenableOpened afterLoad = new OpenableOpened() {
+                        @Override
+                        public void opened(Openable openable) {
+                            try {
+                                SWF mainSWF = getRunningSWF();
+                                File tempRunDir = mainSWF.getFile() == null ? null : new File(mainSWF.getFile()).getParentFile();
+                                File tempFile = createTempFileInDir(tempRunDir, "~ffdec_loader_", ".swf");
+                                try(FileOutputStream fos = new FileOutputStream(tempFile)) {
+                                    fos.write(inputData);
+                                }
+                                prepareSwf("loaded_" + hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
+                                byte outputData[] = Helper.readFileEx(tempFile.getAbsolutePath());
+                                tempFile.delete();
+                                modifiedListener.dataModified(outputData);
+                            } catch (IOException ex) {
+                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }                        
+                    };
+                    
                     for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
                         for (int s = 0; s < sl.size(); s++) {
-                            String t = sl.get(s).getTitleOrShortFileName();
+                            Openable op = sl.get(s);
+                            String t = op.getTitleOrShortFileName();
                             if (t == null) {
                                 t = "";
                             }
                             if (t.endsWith(":" + hash)) { //this one is already opened
+                                afterLoad.opened(op);
                                 return;
                             }
                         }
                     }
-                    SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+                    SWF swf = Main.getRunningSWF();
 
                     String title = swf == null ? "?" : swf.getTitleOrShortFileName();
                     final String titleWithHash = title + ":" + hash;
                     View.execInEventDispatch(new Runnable() {
                         @Override
                         public void run() {
-                            OpenableSourceInfo osi = new OpenableSourceInfo(new ReReadableInputStream(new ByteArrayInputStream(data)), null, titleWithHash);
-                            openFile(osi);
+                            OpenableSourceInfo osi = new OpenableSourceInfo(new ReReadableInputStream(new ByteArrayInputStream(inputData)), null, titleWithHash);
+                            openFile(osi, afterLoad);
                         }
                     });
                 }
@@ -2511,7 +2556,14 @@ public class Main {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
-                                mainFrame.getPanel().gotoScriptLine(getMainFrame().getPanel().getCurrentSwf(), scriptName, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
+                                String hash = "main";
+                                String scriptNameNoHash = scriptName;
+                                if (scriptName.contains(":")) {
+                                    hash = scriptName.substring(0, scriptName.indexOf(":"));
+                                    scriptNameNoHash = scriptName.substring(scriptName.indexOf(":") + 1);
+                                }
+                                SWF swf = Main.getSwfByHash(hash);
+                                mainFrame.getPanel().gotoScriptLine(swf, scriptNameNoHash, line, classIndex, traitIndex, methodIndex, Main.isDebugPCode());
                             }
                         });
                     }
@@ -2944,7 +2996,7 @@ public class Main {
                 }
                 if (sourceInfos.length > 0) {
                     openingFiles = true;
-                    openFile(sourceInfos, () -> {
+                    openFile(sourceInfos, (Openable openable) -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
                         setSessionLoaded(true);
@@ -3306,5 +3358,46 @@ public class Main {
     public static void showBreakpointsList() {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
         getMainFrame().getPanel().showBreakpointlistDialog(swf);
+    }
+    
+    public static String getSwfHash(SWF swf) {
+        if (swf == getRunningSWF()) {
+            return "main";
+        }
+        String tit = swf.getTitleOrShortFileName();
+        if (tit != null && tit.contains(":")) {
+            return "loaded_" + tit.substring(tit.lastIndexOf(":") + 1);
+        }
+        return "";
+    }
+    
+    public static SWF getSwfByHash(String hash) {
+        if ("main".equals(hash)) {
+            SWF runningSwf = getRunningSWF();
+            if (runningSwf == null) {
+                return mainFrame.getPanel().getCurrentSwf();
+            }
+            return runningSwf;
+        }
+        if (!hash.startsWith("loaded_")) {
+            return null;
+        }
+        hash = hash.substring("loaded_".length());
+        for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
+            for (int s = 0; s < sl.size(); s++) {
+                Openable op = sl.get(s);
+                if (!(op instanceof SWF)) {
+                    continue;
+                }
+                String t = op.getTitleOrShortFileName();
+                if (t == null) {
+                    t = "";
+                }
+                if (t.endsWith(":" + hash)) { //this one is already opened
+                    return (SWF) op;
+                }
+            }
+        }
+        return null;
     }
 }

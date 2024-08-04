@@ -16,6 +16,7 @@
 		private static var name:String;
 		private static var failed:Boolean = false;
         private static var fillByteArrays = [];
+        private static var fillByteArraysEvents = [];
         private static var lenBytes:Array = [
             -1, -1, -1, -1
         ];
@@ -32,7 +33,8 @@
 		public static const MSG_LOADER_BYTES = 2;
 		public static const MSG_DUMP_BYTEARRAY = 3;			
 		public static const MSG_REQUEST_BYTEARRAY = 4;
-                
+        public static const MSG_LOADER_URL_INFO = 5;
+        public static const MSG_LOADER_MODIFY_BYTES = 6;        
 		
 		private static function sendQueue(){
 			var qo = q;
@@ -125,7 +127,7 @@
         
         private static function onSocketData(event:ProgressEvent):void {
 			while (s.bytesAvailable > 0) {
-				if (lenBytePos < 4) {
+                if (lenBytePos < 4) {
 					lenBytes[lenBytePos] = s.readUnsignedByte();
 					lenBytePos++;
 					if (lenBytePos == 4) {
@@ -136,9 +138,8 @@
 					var readLen:int = s.bytesAvailable <= len ? s.bytesAvailable : len;
 					s.readBytes(readBa, readBa.length, readLen);                
 					len -= readLen;
-					
-					if (len == 0) {                    
-						lenBytePos = 0;
+                    if (len == 0) {                 
+                        lenBytePos = 0;
 						var ba:ByteArray = fillByteArrays.pop();
 						var pos = ba.position;
 						ba.position = 0;					
@@ -149,6 +150,10 @@
 						} else {
 							ba.position = pos;
 						}
+                        var onComplete = fillByteArraysEvents.pop();                        
+                        if (onComplete != null) {
+                            onComplete.call(onComplete);
+                        }
 					}
 				}
 			}
@@ -162,6 +167,10 @@
 		
 		public static function writeLoaderBytes(data:ByteArray){
 			writeMsg(data,MSG_LOADER_BYTES);
+		}
+        
+        public static function modifyLoaderBytesWithUrl(data:ByteArray, outputData:ByteArray, url:String, onComplete:Function){
+            writeMsg({"inputData": data, "outputData": outputData, "url" : url, "onComplete" : onComplete},MSG_LOADER_MODIFY_BYTES);
 		}
 		
 		public static function writeCommaSeparatedToByteArray(s:String, ba:ByteArray) {
@@ -232,8 +241,14 @@
 						writeBytes(msg);
 						break;
 					case MSG_REQUEST_BYTEARRAY:
-						fillByteArrays.push(msg);
+                        fillByteArrays.push(msg);
 						break;
+                    case MSG_LOADER_MODIFY_BYTES:
+                        writeString(msg["url"]);
+                        writeBytes(msg["inputData"]);
+                        fillByteArraysEvents.push(msg["onComplete"]);
+						fillByteArrays.push(msg["outputData"]); 
+                        break;
 				}
 				s.flush();
 			}else{

@@ -3990,6 +3990,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * P-code)
      */
     public void injectAS3PcodeDebugInfo() throws InterruptedException {
+        injectAS3PcodeDebugInfo("main");
+    }
+    public void injectAS3PcodeDebugInfo(String swfHash) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
@@ -4000,7 +4003,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
             int abcIndex = s.allABCs.indexOf(s.abc);
             if (s.isSimple) {
-                s.injectPCodeDebugInfo(abcIndex);
+                s.injectPCodeDebugInfo(abcIndex, swfHash);
             }
         }
     }
@@ -4011,6 +4014,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param decompileDir Directory to set file information paths
      */
     public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {
+        injectAS3DebugInfo(decompileDir, "main");
+    }
+    
+    public void injectAS3DebugInfo(File decompileDir, String swfHash) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
@@ -4021,7 +4028,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
             if (s.isSimple) {
                 try {
-                    s.injectDebugInfo(decompileDir);
+                    s.injectDebugInfo(decompileDir, swfHash);
                 } catch (Throwable t) {
                     Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Errorr injecting debug info", t);
                 }
@@ -4072,12 +4079,17 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param pcodeLevel inject Pcode lines instead of decompiled lines
      */
     public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel) throws InterruptedException {
+        enableDebugging(injectAS3Code, decompileDir, telemetry, pcodeLevel, "main");
+    }
+    
+    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel, String swfHash) throws InterruptedException {
+
 
         if (injectAS3Code) {
             if (pcodeLevel) {
-                injectAS3PcodeDebugInfo();
+                injectAS3PcodeDebugInfo(swfHash);
             } else {
-                injectAS3DebugInfo(decompileDir);
+                injectAS3DebugInfo(decompileDir, swfHash);
             }
         }
 
@@ -4156,6 +4168,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException, InterruptedException {
+        return generatePCodeSwdFile(file, breakpoints, "main");
+    }
+    
+    public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints, String swfHash) throws IOException, InterruptedException {
         DebugIDTag dit = getDebugId();
         if (dit == null) {
             return false;
@@ -4180,7 +4196,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
             informListeners("generate_swd", name);
             moduleId++;
-            String sname = "#PCODE " + name;
+            String sname = swfHash + ":" + "#PCODE " + name;
             int bitmap = SWD.bitmapAction;
             items.add(new SWD.DebugScript(moduleId, bitmap, sname, ""));
 
@@ -4237,6 +4253,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
+        return generateSwdFile(file, breakpoints, "main");
+    }
+    
+    public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints, String swfHash) throws IOException {
         DebugIDTag dit = getDebugId();
         if (dit == null) {
             return false;
@@ -4299,7 +4319,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
 
                 //final String NONAME = "[No instance name assigned]";
-                String sname = name;
+                String sname = swfHash + ":" + name;
                 int bitmap = SWD.bitmapAction;
                 /* Matcher m;
                  int bitmap = SWD.bitmapAction;

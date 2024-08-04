@@ -47,4 +47,18 @@ public class DebugAdapter implements DebugListener {
         return null;
     }
 
+    @Override
+    public void onLoaderURLInfo(String clientId, String url) {
+
+    }
+
+    @Override
+    public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener) {
+        modifiedListener.dataModified(inputData);
+    }
+
+    @Override
+    public boolean isModifyBytesSupported() {
+        return false;
+    }     
 }

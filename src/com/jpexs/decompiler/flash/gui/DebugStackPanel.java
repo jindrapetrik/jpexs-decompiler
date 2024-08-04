@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
+import com.jpexs.decompiler.flash.SWF;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -43,6 +44,7 @@ public class DebugStackPanel extends JPanel {
 
     private int depth = 0;
 
+    private String[] swfHashes = new String[0];
     private int[] classIndices = new int[0];
     private int[] methodIndices = new int[0];
     private int[] traitIndices = new int[0];
@@ -90,9 +92,11 @@ public class DebugStackPanel extends JPanel {
                 if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
                     int row = stackTable.rowAtPoint(e.getPoint());
                     if (row >= 0) {
-                        String scriptName = (String) stackTable.getModel().getValueAt(row, 0);
-                        int line = (int) (Integer) stackTable.getModel().getValueAt(row, 1);
-                        Main.getMainFrame().getPanel().gotoScriptLine(Main.getMainFrame().getPanel().getCurrentSwf(),
+                        String swfHash = swfHashes[row];
+                        String scriptName = (String) stackTable.getModel().getValueAt(row, 1);
+                        int line = (int) (Integer) stackTable.getModel().getValueAt(row, 2);
+                        SWF swf = swfHash == null ? Main.getRunningSWF() : Main.getSwfByHash(swfHash);
+                        Main.getMainFrame().getPanel().gotoScriptLine(swf,
                                 scriptName, line, classIndices[row], traitIndices[row], methodIndices[row], Main.isDebugPCode());
                         Main.getDebugHandler().setDepth(row);
                     }
@@ -117,15 +121,24 @@ public class DebugStackPanel extends JPanel {
             return;
         }
         active = true;
-        Object[][] data = new Object[info.files.size()][3];
+        Object[][] data = new Object[info.files.size()][4];
+        String[] newSwfHashes = new String[info.files.size()];
         int[] newClassIndices = new int[info.files.size()];
         int[] newMethodIndices = new int[info.files.size()];
         int[] newTraitIndices = new int[info.files.size()];
         for (int i = 0; i < info.files.size(); i++) {
             int f = info.files.get(i);
-            data[i][0] = Main.getDebugHandler().moduleToString(f);
-            data[i][1] = info.lines.get(i);
-            data[i][2] = info.stacks.get(i);
+            String moduleName = Main.getDebugHandler().moduleToString(f);
+            String swfHash = null;
+            if (moduleName.contains(":")) {
+                swfHash = moduleName.substring(0, moduleName.indexOf(":"));
+                moduleName = moduleName.substring(moduleName.indexOf(":") + 1);
+            }
+            newSwfHashes[i] = swfHash;
+            data[i][0] = swfHash == null ? "unknown" : Main.getSwfByHash(swfHash).toString();
+            data[i][1] = moduleName;
+            data[i][2] = info.lines.get(i);
+            data[i][3] = info.stacks.get(i);
             Integer newClassIndex = Main.getDebugHandler().moduleToClassIndex(f);
             newClassIndices[i] = newClassIndex == null ? -1 : newClassIndex;
             Integer newMethodIndex = Main.getDebugHandler().moduleToMethodIndex(f);
@@ -135,6 +148,7 @@ public class DebugStackPanel extends JPanel {
         }
 
         DefaultTableModel tm = new DefaultTableModel(data, new Object[]{
+            AppStrings.translate("callStack.header.swf"),
             AppStrings.translate("callStack.header.file"),
             AppStrings.translate("callStack.header.line"),
             AppStrings.translate("stack.header.item")
@@ -146,6 +160,7 @@ public class DebugStackPanel extends JPanel {
 
         };
         stackTable.setModel(tm);
+        this.swfHashes = newSwfHashes;
         this.classIndices = newClassIndices;
         this.methodIndices = newMethodIndices;
         this.traitIndices = newTraitIndices;

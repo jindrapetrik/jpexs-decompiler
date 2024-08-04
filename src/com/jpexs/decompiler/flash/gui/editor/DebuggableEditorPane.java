@@ -137,15 +137,26 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
         }
         int ip = Main.getIp(breakPointScriptName);
         String ipPath = Main.getIpClass();
-        if (ip > 0 && ipPath != null && ipPath.equals(breakPointScriptName)) {
+        String ipHash = "main";
+        if (ipPath != null && ipPath.contains(":")) {
+            ipHash = ipPath.substring(0, ipPath.indexOf(":"));
+            ipPath = ipPath.substring(ipPath.indexOf(":") + 1);
+        }
+        String myhash = Main.getSwfHash(Main.getMainFrame().getPanel().getCurrentSwf());
+        if (ip > 0 && ipPath != null && ipHash.equals(myhash) && ipPath.equals(breakPointScriptName)) {
             addColorMarker(ip + firstLineOffset(), IP_MARKER);
         }
         List<Integer> stackLines = Main.getStackLines();
         List<String> stackClasses = Main.getStackClasses();
         for (int i = 1; i < stackClasses.size(); i++) {
             String cls = stackClasses.get(i);
+            String clsHash = "main";
+            if (cls.contains(":")) {
+                clsHash = cls.substring(0, cls.indexOf(":"));
+                cls = cls.substring(cls.indexOf(":") + 1);
+            }
             int line = stackLines.get(i);
-            if (cls.equals(breakPointScriptName)) {
+            if (clsHash.equals(myhash) && cls.equals(breakPointScriptName)) {
                 addColorMarker(line + firstLineOffset(), STACK_MARKER);
             }
         }

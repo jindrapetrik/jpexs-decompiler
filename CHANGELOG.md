@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - Optimized (faster) deleting items for large SWF trees
 - AS debugger - More varible flags
 - AS3 direct editation - edit files with native keyword
+- [#1383] AS Debugger - debugging nested SWFs (enable "Open loaded SWFs while playing")
 
 ### Fixed
 - Debugger - getting children of top level variables
@@ -3480,6 +3481,7 @@ Major version of SWF to XML export changed to 2.
 [#1809]: https://www.free-decompiler.com/flash/issues/1809
 [#873]: https://www.free-decompiler.com/flash/issues/873
 [#1644]: https://www.free-decompiler.com/flash/issues/1644
+[#1383]: https://www.free-decompiler.com/flash/issues/1383
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
 [#2174]: https://www.free-decompiler.com/flash/issues/2174

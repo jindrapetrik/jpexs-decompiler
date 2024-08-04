@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1432,6 +1433,37 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         setVisible(true);
     }
 
+    public void hilightScript(String nameIncludingSwfHash) {
+        if (!nameIncludingSwfHash.contains(":")) {
+            throw new RuntimeException("Script name should conatin swfHash");
+        }
+        String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
+        String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
+        Openable openable = null;
+        if (swfHash.equals("main")) {
+            openable = Main.getRunningSWF();
+        } else if (swfHash.startsWith("loaded_")) {
+            String hashToSearch = swfHash.substring("loaded_".length());
+            loop:for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
+                for (int s = 0; s < sl.size(); s++) {
+                    Openable op = sl.get(s);
+                    String t = op.getTitleOrShortFileName();
+                    if (t == null) {
+                        t = "";
+                    }
+                    if (t.endsWith(":" + hashToSearch)) { //this one is already opened
+                        openable = op;
+                        break loop;
+                    }
+                }
+            }
+        }
+        
+        if (openable != null) {
+            hilightScript(openable, name);
+        }
+    }
+    
     /**
      * Hilights specific script.
      *
