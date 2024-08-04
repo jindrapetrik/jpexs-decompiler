@@ -222,7 +222,7 @@ public class XFLConverter {
     /**
      * Adds "(depth xxx)" to layer name
      */
-    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
+    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = true;
 
     private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
@@ -1240,6 +1240,9 @@ public class XFLConverter {
     }
 
     private static String getSymbolName(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, CharacterTag tag, String kind) {
+        if (tag == null) {
+            return "null";
+        }
         if (characterNameMap.containsKey(tag)) {
             return characterNameMap.get(tag);
         }
@@ -2392,7 +2395,8 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+    private static void convertFrames(String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+        Logger.getLogger(XFLConverter.class.getName()).log(Level.FINE, "Converting frames of {0}", symbolName);
         boolean lastIn = false;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
@@ -2456,6 +2460,9 @@ public class XFLConverter {
                             shapeTweener = m;
                             shapeTween = false;
                         }
+                    }
+                    if (newCharId == -1 && newCharCls == null) {
+                        newCharacter = character;                        
                     }
                     character = newCharacter;
                     if (character != null) {
@@ -3534,6 +3541,7 @@ public class XFLConverter {
 
     private void convertTimelines(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
 
+        String symbolName = getSymbolName(lastImportedId, characterNameMap, swf, sprite);
         List<String> classNames = new ArrayList<>();
         //Searches for Object.registerClass("linkageIdentifier",mypkg.MyClass);        
         ActionTreeOperation getRegisterClassOp = new ActionTreeOperation() {
@@ -3889,7 +3897,7 @@ public class XFLConverter {
                             "color", randomOutlineColor(),
                             "layerType", "mask",
                             "locked", "true"});
-                        convertFrames(lastImportedId, characterNameMap, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, multiUsageMorphShapes, statusStack);
+                        convertFrames(symbolName, lastImportedId, characterNameMap, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, multiUsageMorphShapes, statusStack);
                         writer.writeEndElement();
 
                         int parentIndex = index;
@@ -3911,7 +3919,7 @@ public class XFLConverter {
                                         handledClips.add(po2);
 
                                         for (int ndx = po.getClipDepth() - 1; ndx > po2.getClipDepth(); ndx--) {
-                                            boolean nonEmpty = writeLayer(lastImportedId, characterNameMap, swf, index, depthToFramesList.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
+                                            boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
                                             for (int i = clipFrame; i <= lastFrame; i++) {
                                                 depthToFramesList.get(ndx).remove((Integer) i);
                                             }
@@ -3988,7 +3996,7 @@ public class XFLConverter {
                         }
 
                         for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                            boolean nonEmpty = writeLayer(lastImportedId, characterNameMap, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
+                            boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
                             for (int i = clipFrame; i <= lastFrame; i++) {
                                 depthToFramesList.get(nd).remove((Integer) i);
                             }
@@ -4025,7 +4033,7 @@ public class XFLConverter {
                     }
                 }
 
-                boolean nonEmpty = writeLayer(lastImportedId, characterNameMap, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
+                boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack);
                 if (nonEmpty) {
                     index++;
                 }
@@ -4064,7 +4072,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+    private boolean writeLayer(String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
@@ -4083,7 +4091,7 @@ public class XFLConverter {
         layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
         String layerAfter = "</DOMLayer>";
         int prevLength = writer.length();
-        convertFrames(lastImportedId, characterNameMap, swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, timelineTags, d, flaVersion, writer, multiUsageMorphShapes, statusStack);
+        convertFrames(symbolName, lastImportedId, characterNameMap, swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, timelineTags, d, flaVersion, writer, multiUsageMorphShapes, statusStack);
         statusStack.popStatus();
         return writer.length() != prevLength;
     }
