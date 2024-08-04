@@ -48,6 +48,10 @@ public class Debugger {
     public static final int MSG_DUMP_BYTEARRAY = 3;
 
     public static final int MSG_REQUEST_BYTEARRAY = 4;
+    
+    public static final int MSG_LOADER_URL_INFO = 5;
+    
+    public static final int MSG_LOADER_MODIFY_BYTES = 6; 
 
     private static final Set<DebugListener> listeners = new HashSet<>();
 
@@ -281,6 +285,62 @@ public class Debugger {
                                 if (!dataFound) {
                                     logger.finer("listener not found, writing empty array");
                                     writeBytes(os, new byte[0]);
+                                }
+                                os.flush();
+                                logger.finer("listeners checked");
+                                break;
+                            case MSG_LOADER_URL_INFO:                                
+                                logger.finer("reading string...");
+                                ret = readString(is);
+                                logger.finer("informing listeners...");
+                                for (DebugListener l : listeners) {
+                                    l.onLoaderURLInfo(clientName, ret);
+                                }
+                                logger.finer("listeners informed");
+                                break;
+                            case MSG_LOADER_MODIFY_BYTES:
+                                logger.finer("reading url(string)...");
+                                String url = readString(is);
+                                logger.finer("reading bytes...");
+                                byte[] inputBytes = readBytes(is);
+                                
+                                logger.finer("checking listeners for data...");
+                                boolean modifyDataFound = false;
+                                for (DebugListener l : listeners) {
+                                    if (l.isModifyBytesSupported()) {
+                                        l.onLoaderModifyBytes(clientName, inputBytes, url, new DebugLoaderDataModified() {
+                                            @Override
+                                            public void dataModified(byte[] data) {
+                                                if (data != null) {
+                                                    logger.finer("got modified data");
+                                                    logger.log(Level.FINER, "writing data.length = {0}", data.length);
+                                                    try {
+                                                        writeBytes(os, data);
+                                                        os.flush();
+                                                    } catch (IOException ex) {
+                                                        Logger.getLogger(Debugger.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+                                                    
+                                                    logger.finer("data written");                                                                                                        
+                                                } else {
+                                                    logger.finer("got empty modified data, writing original array");
+                                                    try {
+                                                        writeBytes(os, inputBytes);
+                                                    } catch (IOException ex) {
+                                                        Logger.getLogger(Debugger.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+                                                    logger.finer("data written");
+                                                }
+                                            }
+                                        });
+                                        modifyDataFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!modifyDataFound) {
+                                    logger.finer("listener not found, writing original array");
+                                    writeBytes(os, inputBytes);
+                                    logger.finer("data written");
                                 }
                                 os.flush();
                                 logger.finer("listeners checked");

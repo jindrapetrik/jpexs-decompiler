@@ -396,6 +396,10 @@ public class ScriptPack extends AS3ClassTreeItem {
      * http://securityevaluators.com/knowledge/flash/
      */
     public void injectDebugInfo(File directoryPath) {
+        injectDebugInfo(directoryPath, "main");
+    }
+    
+    public void injectDebugInfo(File directoryPath, String swfHash) {
         Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
         Map<Integer, Map<Integer, Integer>> bodyLineToPos = new HashMap<>();
         Map<Integer, Map<Integer, String>> bodyToRegToName = new HashMap<>();
@@ -517,6 +521,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         String cls = path.className;
         String filename = new File(directoryPath, path.packageStr.toFilePath()).getPath().replace(";", "{{semicolon}}")
                 + ";"
+                + swfHash + ":"
                 + pkg.replace(".", File.separator).replace(";", "{{semicolon}}")
                 + ";"
                 + cls.replace(";", "{{semicolon}}")
@@ -689,7 +694,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         ((Tag) abc.parentTag).setModified(true);
     }
 
-    public void injectPCodeDebugInfo(int abcIndex) {
+    public void injectPCodeDebugInfo(int abcIndex, String swfHash) {
 
         Map<Integer, String> bodyToIdentifier = new HashMap<>();
 
@@ -765,7 +770,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     i -= 2;
                 }
             }
-            String filename = "#PCODE " + bodyName + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
+            String filename = swfHash + ":" + "#PCODE " + bodyName + ";" + pkg.replace(".", File.separator) + ";" + cls + ".as";
 
             b.insertInstruction(0, new AVM2Instruction(0, AVM2Instructions.DebugFile, new int[]{abc.constants.getStringId(filename, true)}));
             b.setModified();

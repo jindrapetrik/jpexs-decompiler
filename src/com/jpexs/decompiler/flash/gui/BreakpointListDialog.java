@@ -176,7 +176,7 @@ public class BreakpointListDialog extends AppDialog {
             }
         }*/
         Pattern abcPcodePattern = Pattern.compile("^#PCODE abc:(?<abc>[0-9]+),body:(?<body>[0-9]+);.*");
-        Matcher m = abcPcodePattern.matcher(breakpoint.scriptName);
+        Matcher m = abcPcodePattern.matcher(breakpoint.scriptName);        
         if (m.matches()) {
             int abcIndex = Integer.parseInt(m.group("abc"));
             int bodyIndex = Integer.parseInt(m.group("body"));

@@ -14,29 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.debugger;
+package com.jpexs.decompiler.flash.gui;
+
+import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
  *
  * @author JPEXS
  */
-public interface DebugListener {
-
-    public void onMessage(String clientId, String msg);
-
-    public void onLoaderURL(String clientId, String url);
-    
-    public void onLoaderURLInfo(String clientId, String url);
-
-    public void onLoaderBytes(String clientId, byte[] data);
-
-    public void onDumpByteArray(String clientId, byte[] data);
-
-    public void onFinish(String clientId);
-
-    public byte[] onRequestBytes(String clientId);
-        
-    public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener);
-    
-    public boolean isModifyBytesSupported();
+public interface OpenableOpened {
+    public void opened(Openable openable);
 }

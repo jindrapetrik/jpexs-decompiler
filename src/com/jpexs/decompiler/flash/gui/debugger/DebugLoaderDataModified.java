@@ -20,23 +20,6 @@ package com.jpexs.decompiler.flash.gui.debugger;
  *
  * @author JPEXS
  */
-public interface DebugListener {
-
-    public void onMessage(String clientId, String msg);
-
-    public void onLoaderURL(String clientId, String url);
-    
-    public void onLoaderURLInfo(String clientId, String url);
-
-    public void onLoaderBytes(String clientId, byte[] data);
-
-    public void onDumpByteArray(String clientId, byte[] data);
-
-    public void onFinish(String clientId);
-
-    public byte[] onRequestBytes(String clientId);
-        
-    public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener);
-    
-    public boolean isModifyBytesSupported();
+public interface DebugLoaderDataModified {
+    public void dataModified(byte[] data);
 }

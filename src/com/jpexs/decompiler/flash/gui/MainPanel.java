@@ -2680,7 +2680,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     });
                 }
             });
-        }
+        }        
         gotoScriptName(swf, scriptName);
     }
 
@@ -2709,30 +2709,33 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
      });
 
      }*/
-    public void gotoScriptName(SWF swf, String scriptName) {
+    
+        
+    public void gotoScriptName(SWF mainSwf, String scriptNameWithSwfHash) {
         View.checkAccess();
 
-        if (swf == null) {
+        if (mainSwf == null) {
             return;
         }
-        if (swf.isAS3()) {
-            String rawScriptName = scriptName;
+        if (mainSwf.isAS3()) {
+            String rawScriptName = scriptNameWithSwfHash;
             if (rawScriptName.startsWith("#PCODE ")) {
                 rawScriptName = rawScriptName.substring(rawScriptName.indexOf(';') + 1);
             }
 
-            List<ABCContainerTag> abcList = swf.getAbcList();
-            if (!abcList.isEmpty()) {
-                ABCPanel abcPanel = getABCPanel();
-                abcPanel.setAbc(abcList.get(0).getABC());
-                abcPanel.hilightScript(swf, rawScriptName);
-            }
+            //List<ABCContainerTag> abcList = swf.getAbcList();
+            //abcPanel.setAbc(abcList.get(0).getABC());
+            //if (!abcList.isEmpty()) {
+            ABCPanel abcPanel = getABCPanel();
+                
+            abcPanel.hilightScript(mainSwf, rawScriptName);
+            //}
         } else {
-            String rawScriptName = scriptName;
+            String rawScriptName = scriptNameWithSwfHash;
             if (rawScriptName.startsWith("#PCODE ")) {
                 rawScriptName = rawScriptName.substring("#PCODE ".length());
             }
-            Map<String, ASMSource> asms = swf.getASMs(true);
+            Map<String, ASMSource> asms = mainSwf.getASMs(true);
             if (asms.containsKey(rawScriptName)) {
                 oldItem = null;
                 getCurrentTree().setSelectionPath(null);
