@@ -109,7 +109,7 @@ All notable changes to this project will be documented in this file.
   in the directory where original SWF resides to allow loading relative assets
 - [#2228] AS1/2/3 bitwise operations use hexadecimal operands
 - Save to EXE moved to tools tab
-- Save (not save as) button are now available only when there's anything to save
+- Save (not save as) button is now available only when there's anything to save
   when the selected SWF is modified. Similar for Save all button.
 
 ### Removed
