@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#2221] AS3 P-code - add new function button (creates methodinfo, methodbody)
 
 ## [21.0.0] - 2024-08-05
 ### Added
@@ -3463,6 +3465,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2221]: https://www.free-decompiler.com/flash/issues/2221
 [#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185

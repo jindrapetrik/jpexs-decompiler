@@ -1008,6 +1008,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningAbcClean = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningAddFunction = null;
+    
 
     private enum OSId {
         WINDOWS, OSX, UNIX
