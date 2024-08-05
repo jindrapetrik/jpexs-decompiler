@@ -79,7 +79,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private DebuggerCommands commands = null;
 
-    private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
+    //private List<InSwfInfo.SwfInfo> swfs = new ArrayList<>();
 
     private boolean paused = true;
 
@@ -396,6 +396,32 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
         invalidBreakPointMap.get(swf).get(scriptName).add(line);
     }
+    
+    private synchronized void markBreakPointConfirmed(SWF swf, String scriptName, int line) {
+        if (!confirmedPointMap.containsKey(swf)) {
+            confirmedPointMap.put(swf, new HashMap<>());
+        }
+        if (!confirmedPointMap.get(swf).containsKey(scriptName)) {
+            confirmedPointMap.get(swf).put(scriptName, new TreeSet<>());
+        }
+        confirmedPointMap.get(swf).get(scriptName).add(line);
+    }
+    
+    private synchronized void markBreakPointValid(SWF swf, String scriptName, int line) {
+        if (!invalidBreakPointMap.containsKey(swf)) {
+            return;
+        }
+        if (!invalidBreakPointMap.get(swf).containsKey(scriptName)) {
+            return;
+        }
+        invalidBreakPointMap.get(swf).get(scriptName).remove(line);
+        if (invalidBreakPointMap.get(swf).get(scriptName).isEmpty()) {
+            invalidBreakPointMap.get(swf).remove(scriptName);
+        }
+        if (invalidBreakPointMap.get(swf).isEmpty()) {
+            invalidBreakPointMap.remove(swf);
+        }
+    }
 
     private InFrame frame;
 
@@ -562,10 +588,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
     }
 
-    public List<InSwfInfo.SwfInfo> getSwfs() {
-        return swfs;
-    }
-
+    
     public void disconnect() {
         frame = null;
         pool = null;
@@ -673,7 +696,6 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
         });
 
-        swfs.clear();
         swfIndicesCommited.clear();
         swfIndicesNewToSwfHash.clear();
         
@@ -759,11 +781,12 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.WARNING, "SWF with hash {0} not found", swfHash);
                             } else {
                                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "adding {0} to debugSwfs", swfIndex);
+                                swfIndicesCommited.add(swfIndex);
                                 debuggedSwfs.add(swf);
                             }                            
                         } else {
                             Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "Swf index already commited");
-                        }
+                        }                                                                                                
                     }
                     con.dropMessage(sc);
                 }
@@ -804,8 +827,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             con.addMessageListener(new DebugMessageListener<InSwfInfo>() {
                 @Override
                 public void message(InSwfInfo t) {
-                    for (InSwfInfo.SwfInfo s : t.swfInfos) {
-                        swfs.add(s);
+                    /*for (InSwfInfo.SwfInfo s : t.swfInfos) {
                         View.execInEventDispatch(new Runnable() {
                             @Override
                             public void run() {
@@ -817,7 +839,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 }
                             }
                         });
-                    }
+                    }*/
                     con.dropMessage(t);
                 }
             });
@@ -845,13 +867,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                     Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "Breakpoint {0}:{1} submitted successfully", new Object[]{sname, isb.lines.get(i)});
                 }
             }
-
-            con.addMessageListener(new DebugMessageListener<InAskBreakpoints>() {
-                @Override
-                public void message(InAskBreakpoints message) {
-
-                }
-            });
+           
             con.addMessageListener(new DebugMessageListener<InContinue>() {
                 @Override
                 public void message(InContinue msg) {
@@ -864,6 +880,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }
                 }
             });
+            
             con.addMessageListener(new DebugMessageListener<InBreakAt>() {
                 @Override
                 public void message(InBreakAt message) {
@@ -897,18 +914,20 @@ public class DebuggerHandler implements DebugConnectionListener {
                             Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
                             //return;
                         }
-                        
-                       
-                        for (int i = 0; i < debuggedSwfs.size(); i++) {
-                            swfIndicesCommited.add(i);
-                        }
+                                                                       
                         
                         final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};
                         String reason = reasonInt < reasonNames.length ? reasonNames[reasonInt] : reasonNames[0];
 
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "break at {0}:{1}, reason: {2}", new Object[]{newBreakScriptName, message.line, reason});
-
-                        sendBreakPoints();
+                       
+                        try {
+                            sendBreakPoints();
+                        } catch (IOException ex) {
+                            //ignore
+                            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "send breakpoints exception: " + ex.getMessage());
+                        }
+                        
                         synchronized (DebuggerHandler.this) {
                             breakScriptName = newBreakScriptName;
                             breakIp = message.line;
@@ -1030,7 +1049,8 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
 
                 if (toAddBPointMap.containsKey(debuggedSwf)) {
-                    for (String scriptName : toAddBPointMap.get(debuggedSwf).keySet()) {
+                    Set<String> toAddScripts = new HashSet<>(toAddBPointMap.get(debuggedSwf).keySet());
+                    for (String scriptName : toAddScripts) {
                         if (scriptName.startsWith("#PCODE") != Main.isDebugPCode()) {
                             continue;
                         }
@@ -1038,16 +1058,19 @@ public class DebuggerHandler implements DebugConnectionListener {
                         int file = moduleIdOf(hash + ":" + scriptName);
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "module = {0}", file);
                         if (file > -1) {
-                            for (int line : toAddBPointMap.get(debuggedSwf).get(scriptName)) {
+                            Set<Integer> lines = new HashSet<>(toAddBPointMap.get(debuggedSwf).get(scriptName));
+                            for (int line : lines) {
                                 if (commands.addBreakPoint(file, line)) {
                                     Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "Breakpoint {0}:{1} submitted successfully", new Object[]{scriptName, line});
-                                    if (!confirmedPointMap.containsKey(debuggedSwf)) {
-                                        confirmedPointMap.put(debuggedSwf, new HashMap<>());
+                                    markBreakPointConfirmed(debuggedSwf, scriptName, line);
+                                    markBreakPointValid(debuggedSwf, scriptName, line);
+                                    toAddBPointMap.get(debuggedSwf).get(scriptName).remove(line);
+                                    if (toAddBPointMap.get(debuggedSwf).get(scriptName).isEmpty()) {
+                                        toAddBPointMap.get(debuggedSwf).remove(scriptName);                                        
                                     }
-                                    if (!confirmedPointMap.get(debuggedSwf).containsKey(scriptName)) {
-                                        confirmedPointMap.get(debuggedSwf).put(scriptName, new TreeSet<>());
+                                    if (toAddBPointMap.get(debuggedSwf).isEmpty()) {
+                                        toAddBPointMap.remove(debuggedSwf);
                                     }
-                                    confirmedPointMap.get(debuggedSwf).get(scriptName).add(line);
                                 } else {
                                     Logger.getLogger(DebuggerHandler.class.getName()).log(Level.INFO, "Breakpoint {0}:{1} unable to submit", new Object[]{scriptName, line});
                                     markBreakPointInvalid(debuggedSwf, scriptName, line);
@@ -1058,13 +1081,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 markBreakPointInvalid(debuggedSwf, scriptName, line);
                             }
                         }
-                    }
-                    Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "clearing toAddBps of {0}", hash);
-                    toAddBPointMap.get(debuggedSwf).clear();
-                    
-                    if (toAddBPointMap.get(debuggedSwf).isEmpty()) {
-                        toAddBPointMap.remove(debuggedSwf);
-                    }
+                    }                    
                 }
             }
         }

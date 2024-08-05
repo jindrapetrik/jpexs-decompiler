@@ -4,24 +4,24 @@ package
 	import flash.events.Event;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
-		
-	public class InnerMain extends Sprite 
+
+	public class InnerMain2 extends Sprite 
 	{
-		MyInnerClass;
+		MyInnerClass2;
 		
-		public function InnerMain() 
+		public function InnerMain2() 
 		{
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
-		private function init(e:Event = null):void
+		private function init(e:Event = null):void 
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
 			var textField:TextField = new TextField();
 
-			textField.text = "Main inner1.";
+			textField.text = "Main inner2.";
 
 			var textFormat:TextFormat = new TextFormat();
 			textFormat.size = 24;
@@ -32,7 +32,7 @@ package
 			addChild(textField);
 
 			textField.x = 50;
-			textField.y = 125;
+			textField.y = 100;
 		}
 		
 	}
