@@ -17,12 +17,20 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 /**
- *
+ * Basic interface for an item in the tag tree.
  * @author JPEXS
  */
 public interface TreeItem {
 
+    /**
+     * Gets openable which this item resides.
+     * @return 
+     */
     public Openable getOpenable();
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     public boolean isModified();
 }
