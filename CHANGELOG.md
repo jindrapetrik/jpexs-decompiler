@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [21.0.0] - 2024-08-05
 ### Added
 - StartSound and StartSound2 show characterId/class in the tag tree
@@ -3305,6 +3307,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.0...dev
 [21.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.1.0...version21.0.0
 [20.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.0.0...version20.1.0
 [20.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version19.1.2...version20.0.0
