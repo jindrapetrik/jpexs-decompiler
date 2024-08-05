@@ -234,227 +234,401 @@ import javax.crypto.NoSuchPaddingException;
 public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
-     * Default version of SWF file format
+     * Default version of SWF file format.
      */
     public static final int DEFAULT_VERSION = 10;
 
     /**
      * Maximum SWF file format version Needs to be fixed when SWF versions
-     * reaches this value
+     * reaches this value.
      */
     public static final int MAX_VERSION = 64;
 
     /**
-     * Tags inside of file
+     * Tags inside of file.
      */
     @SWFField
     private List<Tag> tags = new ArrayList<>();
 
+    /**
+     * Readonly view of tags of the file.
+     */
     @Internal
     public ReadOnlyTagList readOnlyTags;
 
+    /**
+     * Whether this SWF file has EndTag and the end of tag list.
+     */    
     public boolean hasEndTag = true;
 
     /**
-     * ExportRectangle for the display
+     * ExportRectangle for the display.
      */
     public RECT displayRect;
 
     /**
-     * Movie frame rate
+     * Movie frame rate.
      */
     public float frameRate;
 
     /**
-     * Number of frames in movie
+     * Number of frames in movie.
      */
     public int frameCount;
 
     /**
-     * Version of SWF
+     * Version of SWF.
      */
     public int version;
 
     /**
-     * Uncompressed size of the file
+     * Uncompressed size of the file.
      */
     @Internal
     public long fileSize;
 
     /**
-     * Used compression mode
+     * Used compression mode.
      */
     public SWFCompression compression = SWFCompression.NONE;
 
     /**
-     * Compressed size of the file (LZMA)
+     * Compressed size of the file (LZMA).
      */
     @Internal
     public long compressedSize;
 
     /**
-     * LZMA Properties
+     * LZMA Properties.
      */
     public byte[] lzmaProperties;
 
+    /**
+     * Uncompressed data.
+     */
     @Internal
     public byte[] uncompressedData;
 
+    /**
+     * Original uncompressedData before saving.
+     */
     @Internal
     public byte[] originalUncompressedData;
 
     /**
-     * ScaleForm GFx
+     * Whether this file is ScaleForm GFx.
      */
     public boolean gfx = false;
 
     /**
-     * HARMAN encryption
+     * Whether the file uses HARMAN encryption.
      */
     public boolean encrypted = false;
 
+    /**
+     * OpenableList which this SWF is part of.
+     */
     @Internal
     public OpenableList openableList;
 
+    /**
+     * File path from this SWF was loaded. Can be null.
+     */
     @Internal
     private String file;
 
+    /**
+     * File title. Can be null.
+     */
     @Internal
     private String fileTitle;
 
+    /**
+     * Map of characterId to CharacterTag for non-imported tags.
+     */
     @Internal
     private volatile Map<Integer, CharacterTag> characters;
 
+    /**
+     * Map of characterId to CharacterTag including imported tags.
+     * The CharacterTags.getCharacterId() does not neccessarily be
+     * the characterId in the map since there can be imported CharacterTags
+     * from other SWFs.
+     */    
     @Internal
     private volatile Map<Integer, CharacterTag> charactersWithImported;
 
+    /**
+     * Map of characterIdTags to characterId in this SWF file.
+     * It is not enough to call getCharacterId(), because there can be imported tags.s
+     */
     @Internal
     private volatile Map<CharacterIdTag, Integer> characterToId;
 
+    /**
+     * Map of imageId to DefineExternalImage2s.
+     */
     @Internal
     private volatile Map<Integer, DefineExternalImage2> externalImages2;
 
+    /**
+     * List of all CharacterId tags for specified characterId.
+     */
     @Internal
     private volatile Map<Integer, List<CharacterIdTag>> characterIdTags;
 
+    /**
+     * Map of characterId to Set of dependent characterIds.
+     */
     @Internal
     private volatile Map<Integer, Set<Integer>> dependentCharacters;
 
+    /**
+     * Map of characterId to Set of dependent frame numbers.
+     */
     @Internal
     private volatile Map<Integer, Set<Integer>> dependentFrames;
 
+    /**
+     * List of ABC container tags.
+     */
     @Internal
     private volatile List<ABCContainerTag> abcList;
 
+    /**
+     * JPEGTables tag
+     */
     @Internal
     private volatile JPEGTablesTag jtt;
 
+    /**
+     * Map of fontId to font name from which take new characters, 
+     * line spacing, etc.
+     */
     @Internal
     public Map<Integer, String> sourceFontNamesMap = new HashMap<>();
 
+    /**
+     * Pixel to twip conversion.
+     */
     public static final double unitDivisor = 20;
 
+    /**
+     * Logger.
+     */
     private static final Logger logger = Logger.getLogger(SWF.class.getName());
 
+    /**
+     * Modified flag.
+     */
     @Internal
     private boolean isModified;
 
+    /**
+     * Cached timeline.
+     */
     @Internal
     private Timeline timeline;
 
+    /**
+     * Dump info.
+     */
     @Internal
     public DumpInfoSwfNode dumpInfo;
 
+    /**
+     * Parent BinaryData which this SWF resides in.
+     */
     @Internal
     public BinaryDataInterface binaryData;
 
+    /**
+     * Map of deobfuscated names.
+     */
     @Internal
     private final HashMap<DottedChain, DottedChain> deobfuscated = new HashMap<>();
 
+    /**
+     * Deobfuscation.
+     */
     @Internal
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
+    /**
+     * Frame cache.
+     */
     @Internal
     private final Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame", true);
 
+    /**
+     * Rect cache.
+     */
     @Internal
     private final Cache<CharacterTag, RECT> rectCache = Cache.getInstance(true, true, "rect", true);
 
+    /**
+     * Shape export data cache.
+     */
     @Internal
     private final Cache<SHAPE, ShapeExportData> shapeExportDataCache = Cache.getInstance(true, true, "shapeExportData", true);
 
+    /**
+     * Sound cache.
+     */
     @Internal
     private final Cache<SoundInfoSoundCacheEntry, byte[]> soundCache = Cache.getInstance(false, false, "sound", true);
 
+    /**
+     * AS2 cache.
+     */
     @Internal
     public final AS2Cache as2Cache = new AS2Cache();
 
+    /**
+     * AS3 cache.
+     */
     @Internal
     public final AS3Cache as3Cache = new AS3Cache();
 
+    /**
+     * Cache of ASMSources with export filenames as scriptname.
+     */
     @Internal
     private Map<String, ASMSource> asmsCacheExportFilenames;
 
+    /**
+     * Cache of ASMSources with standard scriptnames.
+     */
     @Internal
     private Map<String, ASMSource> asmsCache;
 
+    /**
+     * SWF was already freed flag.
+     */
     @Internal
     private boolean destroyed = false;
 
+    /**
+     * Set of cyclic characterIds.
+     */
     @Internal
     private Set<Integer> cyclicCharacters = null;
 
+    /**
+     * Header modified flag.
+     */
     @Internal
     private boolean headerModified = false;
 
+    /**
+     * Charset for SWF files with version 5 and lower which do not use UTF-8.
+     */
     @Internal
     private String charset = "UTF-8";
 
+    /**
+     * Map of characterId to imported class sets.
+     */
     @Internal
-    private Map<Integer, LinkedHashSet<String>> importedTagToClassesMapping = new HashMap<>();
+    private final Map<Integer, LinkedHashSet<String>> importedTagToClassesMapping = new HashMap<>();
 
+    /**
+     * Map of characterId to imported name.
+     */
     @Internal
-    private Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
+    private final Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
 
+    /**
+     * Class to character id map.
+     */
     @Internal
-    private Map<String, Integer> classToCharacterId = new HashMap<>();
+    private final Map<String, Integer> classToCharacterId = new HashMap<>();
 
+    /**
+     * Decompiler pool.
+     */
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
+    /**
+     * Export name to characterId.
+     */
     @Internal
-    private Map<String, Integer> exportNameToCharacter = new HashMap<>();
+    private final Map<String, Integer> exportNameToCharacter = new HashMap<>();
 
+    /**
+     * Imported name to characterId.
+     */
     @Internal
-    private Map<String, Integer> importedNameToCharacter = new HashMap<>();
+    private final Map<String, Integer> importedNameToCharacter = new HashMap<>();
         
+    /**
+     * ABC indexing.
+     */
     @Internal
     private AbcIndexing abcIndex;
 
+    /**
+     * Number of ABCIndex dependencies.
+     */
     @Internal
     private int numAbcIndexDependencies = 0;
 
+    /**
+     * Uninitialized AS2 class traits.
+     * Class name to trait name to trait.
+     */
     private volatile Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> uninitializedAs2ClassTraits = null;
 
+    /**
+     * ExporterInfo tag.
+     */
     @Internal
     private ExporterInfo exporterInfo = null;
 
+    /**
+     * Name of debuggerPackage.
+     */
     @Internal
     public String debuggerPackage = null;
 
-    private Map<Integer, SWF> importedCharacterSourceSwfs = new HashMap<>();
+    /**
+     * Imported characterId to SWF map.
+     */
+    private final Map<Integer, SWF> importedCharacterSourceSwfs = new HashMap<>();
     
-    private Map<String, String> importedClassSourceUrls = new HashMap<>();
+    /**
+     * Imported class to imported URL map.
+     */
+    private final Map<String, String> importedClassSourceUrls = new HashMap<>();
     
-    private Map<Integer, Integer> importedCharacterIds = new HashMap<>();
+    /**
+     * Map of characterIds of this SWF file to characterIds of imported SWF file.
+     */
+    private final Map<Integer, Integer> importedCharacterIds = new HashMap<>();
     
-    private Map<String, CharacterTag> importedClassToCharacter = new HashMap<>();
+    /**
+     * Map of imported classes to characterTags.
+     */
+    private final Map<String, CharacterTag> importedClassToCharacter = new HashMap<>();
 
+    /**
+     * Playerglobal.swf ABCIndex
+     */
     private static AbcIndexing playerGlobalAbcIndex;
 
+    /**
+     * Airglobal.swf ABCIndex
+     */
     private static AbcIndexing airGlobalAbcIndex;
 
+    /**
+     * Prefix of exportname of DefineSprites of AS2 classes.
+     */
     public static final String AS2_PKG_PREFIX = "__Packages.";
 
+    /**
+     * Known SWF signatures.
+     */
     public static List<String> swfSignatures = Arrays.asList(
             "FWS", // Uncompressed Flash
             "CWS", // ZLib compressed Flash
@@ -468,12 +642,23 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     );
 
     /**
-     * Color to paint when there is an error (missing image, ...)
+     * Color to paint when there is an error (missing image, ...).
      */
     public static final Color ERROR_COLOR = Color.red;
 
+    /**
+     * Use AIR library
+     */
     public static final int LIBRARY_AIR = 0;
+    /**
+     * Use Flash library
+     */
     public static final int LIBRARY_FLASH = 1;
+    
+    /**
+     * Event listeners
+     */
+    private final HashSet<EventListener> listeners = new HashSet<>();
 
     /**
      * Sets main GFX exporterinfo tag
@@ -3103,7 +3288,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return subNodes;
     }
 
-    private final HashSet<EventListener> listeners = new HashSet<>();
+    ;
 
     /**
      * Adds event listener.
