@@ -1710,6 +1710,7 @@ public class Timeline {
 
     /**
      * Checks whether all frames are singleframe.
+     * Single frame = each frame has no animated parts inside.
      * @return 
      */
     public boolean isSingleFrame() {
@@ -1723,6 +1724,7 @@ public class Timeline {
 
     /**
      * Checks whether specified frame is single frame.
+     * Single frame = has no animated parts inside.
      * @param frame
      * @return 
      */
