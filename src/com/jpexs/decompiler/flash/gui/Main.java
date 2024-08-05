@@ -476,9 +476,9 @@ public class Main {
             try {
                 File fTempFile = new File(instrSWF.getFile());
                 instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
-                FileOutputStream fos = new FileOutputStream(fTempFile);
-                instrSWF.saveTo(fos);
-                fos.close();
+                try (FileOutputStream fos = new FileOutputStream(fTempFile)) {
+                    instrSWF.saveTo(fos);
+                }
                 if (!instrSWF.isAS3()) {
                     //Read again, because line file offsets changed with adding debug tags
                     //TODO: handle somehow without rereading?
@@ -550,7 +550,7 @@ public class Main {
                         String url = it.getUrl();
                         File importedFile = new File(origFile.getParentFile(), url);
                         if (importedFile.exists()) {
-                                                        File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
+                            File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
                             it.setUrl("./" + newTempFile.getName());
                             byte[] impData = Helper.readFile(importedFile.getAbsolutePath());                            
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
@@ -2503,15 +2503,18 @@ public class Main {
                                 try(FileOutputStream fos = new FileOutputStream(tempFile)) {
                                     fos.write(inputData);
                                 }
+                                Logger.getLogger(Main.class.getName()).log(Level.FINE, "preparing for load: {0}", hash);
                                 prepareSwf("loaded_" + hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
                                 byte outputData[] = Helper.readFileEx(tempFile.getAbsolutePath());
                                 tempFile.delete();
+                                Logger.getLogger(Main.class.getName()).log(Level.FINE, "calling datamodified");
                                 modifiedListener.dataModified(outputData);
                             } catch (IOException ex) {
                                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                             }
+                            Logger.getLogger(Main.class.getName()).log(Level.FINE, "finished opened method");                                
                         }                        
                     };
                     

@@ -350,18 +350,22 @@ public class Debugger {
                 }
 
             } catch (IOException ex) {
+                logger.log(Level.FINER, "IOException in injected debugger thread: {0}", ex.getMessage());
                 //ignore
             }
             try {
                 s.close();
             } catch (IOException ex) {
+                logger.log(Level.FINER, "Socked close exception in injected debugger thread: {0}", ex.getMessage());                
                 //ignore
             }
             finished = true;
             active = false;
+            logger.log(Level.FINER, "Calling onFinish");                                
             for (DebugListener l : listeners) {
                 l.onFinish(clientName);
             }
+            logger.log(Level.FINER, "Injected debugger finished");                    
         }
     }
 

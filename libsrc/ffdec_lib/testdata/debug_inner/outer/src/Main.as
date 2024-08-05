@@ -28,14 +28,17 @@ package
 			var byteArray:ByteArray = new binaryDataClass() as ByteArray;
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
+			//trace("loading innerSwf 1");
 			loader.loadBytes(byteArray);
 		}
 		
 		private function onLoaderComplete(event:Event):void {
 			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
 			var className:String = "MyInnerClass";
+			//trace("getting definition of " + className);		
 			var LoadedClass:Class = loaderInfo.applicationDomain.getDefinition(className) as Class;
 			var instance:* = new LoadedClass();
+			//trace("calling innerSwf 1 instance");
 			instance.run(this);
 		}
 		
