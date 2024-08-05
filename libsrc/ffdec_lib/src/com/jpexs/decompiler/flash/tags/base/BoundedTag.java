@@ -20,14 +20,27 @@ import com.jpexs.decompiler.flash.types.RECT;
 import java.util.Set;
 
 /**
- *
+ * An object which has bounds - rectangle.
  * @author JPEXS
  */
 public interface BoundedTag {
 
+    /**
+     * Gets rectangle bounds.
+     * @return 
+     */
     public RECT getRect();
 
+    /**
+     * Gets rectangle bounds with added boundedTags
+     * @param added
+     * @return 
+     */
     public RECT getRect(Set<BoundedTag> added);
 
+    /**
+     * Gets rectangle including strokes.
+     * @return 
+     */
     public RECT getRectWithStrokes();
 }

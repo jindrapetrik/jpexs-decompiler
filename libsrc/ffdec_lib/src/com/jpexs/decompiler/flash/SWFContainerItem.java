@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
- *
+ * Mark that this tree item contains a SWF file.
  * @author JPEXS
  */
 public interface SWFContainerItem extends TreeItem {

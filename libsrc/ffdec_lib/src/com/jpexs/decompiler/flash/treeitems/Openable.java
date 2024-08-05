@@ -20,30 +20,75 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * An item that can be loaded(opened) in FFDec. 
+ * For example SWF or ABC.
  * @author JPEXS
  */
 public interface Openable extends TreeItem {
 
+    /**
+     * Gets file title.
+     * @return 
+     */
     public String getFileTitle();
 
+    /**
+     * Gets title with path from root (like in nested SWFs)
+     * @return 
+     */
     public String getShortPathTitle();
 
+    /**
+     * Gets short file name based on file title and file.
+     * @return 
+     */
     public String getShortFileName();
 
+    /**
+     * Gets opened file.
+     * @return File or null
+     */
     public String getFile();
 
+    /**
+     * 
+     * @return 
+     */
     public String getTitleOrShortFileName();
 
+    /**
+     * Gets title of the file or short filename.
+     * @return file title or base file name when file title is null or "_" when file is null too
+     */
     public String getFullPathTitle();
 
+    /**
+     * Sets OpenableList which this Openable resides.
+     * @param openableList 
+     */
     public void setOpenableList(OpenableList openableList);
 
+    /**
+     * Gets OpenableList which this Openable resides.
+     * @return 
+     */
     public OpenableList getOpenableList();
 
+    /**
+     * Saves Openable to stream.     
+     * @param os
+     * @throws IOException 
+     */
     public void saveTo(OutputStream os) throws IOException;
 
+    /**
+     * Sets file.
+     * @param file 
+     */
     public void setFile(String file);
 
+    /**
+     * Clears modified flag from this item and all subitems.
+     */
     public void clearModified();
 }
