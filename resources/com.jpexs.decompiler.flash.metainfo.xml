@@ -1316,20 +1316,20 @@
 				<ul>
 					<li>Display object depth in flash panel</li>
 					<li>Show imported files on script import, able to cancel import</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/270">#270</a> AS3 show progress on deofuscating p-code</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1718">#1718</a> Show progress on injecting debug info / SWD generation (before Debugging)</li>
+					<li>#270 AS3 show progress on deofuscating p-code</li>
+					<li>#1718 Show progress on injecting debug info / SWD generation (before Debugging)</li>
 				</ul>
 				<p>Changed</p>
 				<ul>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1801">#1801</a> - Flex SDK links to Apache Flex</li>
+					<li>#1801 - Flex SDK links to Apache Flex</li>
 				</ul>
 				<p>Fixed</p>
 				<ul>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1761">#1761</a> AS3 - try..finally inside another structure like if</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1762">#1762</a> AS call on integer numbers parenthesis</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1762">#1762</a> S3 - Auto adding returnvoid/return undefined</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1762">#1762</a> S - switch detection (mostcommon pathpart)</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1763">#1763</a> AS3 - initialization of activation object in some cases</li>
+					<li>#1761 AS3 - try..finally inside another structure like if</li>
+					<li>#1762 AS call on integer numbers parenthesis</li>
+					<li>#1762 S3 - Auto adding returnvoid/return undefined</li>
+					<li>#1762 S - switch detection (mostcommon pathpart)</li>
+					<li>#1763 AS3 - initialization of activation object in some cases</li>
 					<li>AS3 - direct editation - arguments object on method with activation</li>
 					<li>AS3 - direct editation - bit not</li>
 					<li>AS3 - direct editation - call on local register</li>
@@ -1338,14 +1338,14 @@
 					<li>Incorrect position in Flash Player preview and SWF export</li>
 					<li>AS1/2 actioncontainers (like try) inside ifs</li>
 					<li>AS1/2 switch detection</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1766">#1766</a> AS3 - direct editation - namespaces on global level without leading colon</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1763">#1763</a> AS3 - function with activation - param assignment is not a declaration</li>
+					<li>#1766 AS3 - direct editation - namespaces on global level without leading colon</li>
+					<li>#1763 AS3 - function with activation - param assignment is not a declaration</li>
 					<li>AS3 - insert debug instruction to mark register names even with activation</li>
 					<li>AS3 - debugging in inner functions</li>
 					<li>AS1/2 - debugger - rewinding playback to apply breakpoints</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1773">#1773</a> - Auto set flagWideCodes on FontInfo wide character adding</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1769">#1769</a> - Do not mark getter+setter as colliding (#xxx suffix)</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1801">#1801</a> - Flex SDK not required on commandline when Flex compilation is disabled</li>
+					<li>#1773 - Auto set flagWideCodes on FontInfo wide character adding</li>
+					<li>#1769 - Do not mark getter+setter as colliding (#xxx suffix)</li>
+					<li>#1801 - Flex SDK not required on commandline when Flex compilation is disabled</li>
 					<li>Multiname - performance issues</li>
 				</ul>
 			</description>
@@ -1449,7 +1449,7 @@
 				<ul>
 					<li>AS1/2 handle declaration of registers in certain cases</li>
 					<li>AS1/2 setProperty, getProperty handling</li>
-					<li><a href="https://www.free-decompiler.com/flash/issues/1750">#1750</a> Application won't start when cannot access font file</li>
+					<li>#1750 Application won't start when cannot access font file</li>
 					<li>AS2 direct editation of classes - missing _global prefix</li>
 				</ul>
 			</description>
