@@ -2,7 +2,9 @@
 <component type="desktop-application">
 	<id>com.jpexs.decompiler.flash</id>
 	<name>JPEXS Free Flash Decompiler</name>
-	<developer_name>Jindra Petřík and contributors</developer_name>
+	<developer id="com.jpexs">
+		<name>Jindra Petřík and contributors</name>
+	</developer>
 	<summary>Decompile and edit SWF files</summary>
 	<launchable type="desktop-id">com.jpexs.decompiler.flash.desktop</launchable>
 	<metadata_license>CC0-1.0</metadata_license>
