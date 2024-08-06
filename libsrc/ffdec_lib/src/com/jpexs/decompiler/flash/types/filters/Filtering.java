@@ -33,7 +33,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.Kernel;
 
 /**
- *
+ * Filter application.
  * @author JPEXS
  */
 public class Filtering {
