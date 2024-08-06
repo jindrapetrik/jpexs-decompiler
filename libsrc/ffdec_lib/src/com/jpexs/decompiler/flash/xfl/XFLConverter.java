@@ -196,7 +196,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
+ * FLA / XFL converter of SWF files.
  * @author JPEXS
  */
 public class XFLConverter {
@@ -4560,6 +4560,22 @@ public class XFLConverter {
         return null;
     }
 
+    /**
+     * Converts SWF to FLA/XFL
+     * @param handler
+     * @param swf
+     * @param swfFileName
+     * @param outfile
+     * @param settings
+     * @param generator
+     * @param generatorVerName
+     * @param generatorVersion
+     * @param parallel
+     * @param flaVersion
+     * @param progressListener
+     * @throws IOException
+     * @throws InterruptedException 
+     */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
 
         FileAttributesTag fa = swf.getFileAttributes();
