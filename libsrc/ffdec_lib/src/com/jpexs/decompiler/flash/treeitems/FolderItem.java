@@ -21,19 +21,38 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import java.util.List;
 
 /**
- *
+ * A folder TreeItem - container for items.
  * @author JPEXS
  */
 public class FolderItem implements TreeItem {
 
+    /**
+     * SWF.
+     */
     public SWF swf;
 
+    /**
+     * ToString name.
+     */
     private final String str;
 
+    /**
+     * Name.
+     */
     private final String name;
 
+    /**
+     * Sub items.
+     */
     public final List<TreeItem> subItems;
 
+    /**
+     * Constructs FolderItem
+     * @param str ToString name
+     * @param name Name
+     * @param swf SWF
+     * @param subItems Sub items
+     */
     public FolderItem(String str, String name, SWF swf, List<TreeItem> subItems) {
         this.swf = swf;
         this.str = str;
@@ -41,20 +60,36 @@ public class FolderItem implements TreeItem {
         this.subItems = subItems;
     }
 
+    /**
+     * Gets name.
+     * @return 
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return str;
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         if (subItems == null) {
