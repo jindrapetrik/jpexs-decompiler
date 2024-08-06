@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.Stack;
 
 /**
- *
+ * Evaluates annotation conditions.
  * @author JPEXS
  */
 public class ConditionEvaluator {

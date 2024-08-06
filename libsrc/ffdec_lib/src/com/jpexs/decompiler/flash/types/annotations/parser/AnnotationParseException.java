@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.types.annotations.parser;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Exception on parsing annotations.
  * @author JPEXS
  */
 public class AnnotationParseException extends ParseException {
