@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * List of available enum values.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)

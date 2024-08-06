@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks array and list fields
+ * Marks array and list fields.
  *
  * @author JPEXS
  */

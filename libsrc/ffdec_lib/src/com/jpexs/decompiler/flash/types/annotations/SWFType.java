@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Maps basic java types (int,float,double) to SWF types (UI8,UI16...FLOAT)
+ * Maps basic java types (int,float,double) to SWF types (UI8,UI16...FLOAT).
  *
  * @author JPEXS
  */

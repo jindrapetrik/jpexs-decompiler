@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * The field is defined in SWF.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)

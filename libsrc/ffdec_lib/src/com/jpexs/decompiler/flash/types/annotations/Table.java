@@ -22,14 +22,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * The item is table of values.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Table {
 
+    /**
+     * Table name.
+     * @return 
+     */
     String value();
 
+    /**
+     * One item name.
+     * @return 
+     */
     String itemName() default "";
 }

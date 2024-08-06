@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.annotations;
 
 /**
- *
+ * Type of hash.
  * @author JPEXS
  */
 public enum HashType {

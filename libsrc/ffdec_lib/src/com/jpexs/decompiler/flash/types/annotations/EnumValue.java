@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Describes available value from enum
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -31,10 +31,21 @@ import java.lang.annotation.Target;
 @Repeatable(EnumValues.class)
 public @interface EnumValue {
 
+    /**
+     * Value.
+     * @return 
+     */
     int value();
 
+    /**
+     * Description.
+     * @return 
+     */
     String text();
 
-    // todo: check in generic tag editor
+    /**
+     * Minimum SWF version.
+     * TODO: check in generic tag editor
+     */
     int minSwfVersion() default 1;
 }

@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Target SWF version
+ * Target SWF version.
  *
  * @author JPEXS
  */

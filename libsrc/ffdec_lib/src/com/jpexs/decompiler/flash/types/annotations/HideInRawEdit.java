@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Hide in raw edit.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)
