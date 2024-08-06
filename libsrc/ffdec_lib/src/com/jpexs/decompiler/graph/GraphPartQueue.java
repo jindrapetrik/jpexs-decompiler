@@ -20,17 +20,24 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- *
+ * Queue of GraphPart objects.
  * @author JPEXS
  */
 public class GraphPartQueue extends LinkedList<GraphPart> {
 
     public Loop currentLoop;
 
+    /**
+     * Constructs a GraphPartQueue containing the elements of the specified collection.
+     * @param c
+     */
     public GraphPartQueue(Collection<? extends GraphPart> c) {
         super(c);
     }
 
+    /**
+     * Constructs an empty GraphPartQueue.
+     */
     public GraphPartQueue() {
     }
 }

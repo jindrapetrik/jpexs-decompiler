@@ -19,16 +19,26 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Second pass data for ActionScript 1/2 decompiler.
  * @author JPEXS
  */
 public class ActionSecondPassData extends SecondPassData {
 
+    /**
+     * List of parts for each switch statement
+     */
     List<List<GraphPart>> switchParts = new ArrayList<>();
+    /**
+     * List of onFalse parts for each switch statement
+     */
     List<List<GraphPart>> switchOnFalseParts = new ArrayList<>();
+    /**
+     * List of case expressions for each switch statement
+     */
     List<List<GraphTargetItem>> switchCaseExpressions = new ArrayList<>();
 }

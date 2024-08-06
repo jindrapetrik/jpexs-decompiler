@@ -16,31 +16,20 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
-import com.jpexs.decompiler.flash.abc.avm2.OffsetUpdater;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.types.ABCException;
-import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
+import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -58,62 +47,91 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Script pack class.
+ * A script pack is a collection of traits that are in the same script.
+ * It can be a simple script pack (contains only one externally visible definition)
+ * or a compound script pack (contains more than one externally visible definitions).
  * @author JPEXS
  */
 public class ScriptPack extends AS3ClassTreeItem {
 
+    /**
+     * Logger
+     */
     private static final Logger logger = Logger.getLogger(ScriptPack.class.getName());
 
+    /**
+     * ABC file
+     */
     public final ABC abc;
 
+    /**
+     * All ABC files
+     */
     public List<ABC> allABCs;
 
+    /**
+     * Script index
+     */
     public final int scriptIndex;
 
+    /**
+     * Trait indices
+     */
     public final List<Integer> traitIndices;
 
+    /**
+     * Class path
+     */
     private final ClassPath path;
 
     /**
-     * Is the scriptpack simple? ScriptPack can be either simple or compound.
+     * Whether the scriptpack is simple. ScriptPack can be either simple or compound.
      * Compound = Contains more than one externally visible definitions.
      */
     public boolean isSimple = false;
 
+    /**
+     * Whether the script initializer is empty
+     */
     public boolean scriptInitializerIsEmpty = false;
 
+    /**
+     * Gets openable.
+     * @return Openable
+     */
     @Override
     public Openable getOpenable() {
         return abc.getOpenable();
     }
 
+    /**
+     * Gets class path.
+     * @return Class path
+     */
     public ClassPath getClassPath() {
         return path;
     }
 
+    /**
+     * Constructs a new script pack.
+     * @param path Class path
+     * @param abc ABC file
+     * @param allAbcs All ABC files
+     * @param scriptIndex Script index
+     * @param traitIndices Trait indices
+     */
     public ScriptPack(ClassPath path, ABC abc, List<ABC> allAbcs, int scriptIndex, List<Integer> traitIndices) {
         super(path.className, path.namespaceSuffix, path);
         this.abc = abc;
@@ -123,6 +141,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         this.allABCs = allAbcs;
     }
 
+    /**
+     * Gets path package.
+     * @return Dotted chain
+     */
     public DottedChain getPathPackage() {
         DottedChain packageName = DottedChain.TOPLEVEL;
         for (int t : traitIndices) {
@@ -135,6 +157,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         return packageName;
     }
 
+    /**
+     * Gets public trait.
+     * @return Trait or null if not found
+     */
     public Trait getPublicTrait() {
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
@@ -146,6 +172,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         return null;
     }
 
+    /**
+     * Gets path script name.
+     * @return Script name
+     */
     public String getPathScriptName() {
         String scriptName = "script_" + scriptIndex;
         for (int t : traitIndices) {
@@ -158,6 +188,12 @@ public class ScriptPack extends AS3ClassTreeItem {
         return scriptName;
     }
 
+    /**
+     * Gets export file.
+     * @param directory Directory
+     * @param extension Extension including dot
+     * @return File
+     */
     public File getExportFile(String directory, String extension) {
 
         String scriptName = getPathScriptName();
@@ -167,6 +203,12 @@ public class ScriptPack extends AS3ClassTreeItem {
         return new File(fileName);
     }
 
+    /**
+     * Gets export file.
+     * @param directory Directory
+     * @param exportSettings Export settings
+     * @return File
+     */
     public File getExportFile(String directory, ScriptExportSettings exportSettings) {
         if (exportSettings.singleFile) {
             return null;
@@ -175,6 +217,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         return getExportFile(directory, exportSettings.getFileExtension());
     }
 
+    /**
+     * Converts the script pack.
+     * @param abcIndex Abc indexing
+     * @param writer Writer
+     * @param traits Traits
+     * @param convertData Convert data
+     * @param exportMode Export mode
+     * @param parallel Parallel
+     * @throws InterruptedException
+     */
     public void convert(AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
@@ -208,6 +260,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
     }
 
+    /**
+     * Append script to writer.
+     * @param abcIndex Abc indexing
+     * @param writer Writer
+     * @param traits Traits
+     * @param convertData Convert data
+     * @param exportMode Export mode
+     * @param parallel Parallel
+     * @throws InterruptedException
+     */
     private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         boolean first = true;
         //script initializer
@@ -269,6 +331,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
     }
 
+    /**
+     * Converts the script pack to source.
+     * @param abcIndex Abc indexing
+     * @param writer Writer
+     * @param traits Traits
+     * @param convertData Convert data
+     * @param exportMode Export mode
+     * @param parallel Parallel
+     * @param ignoreFrameScripts Whether to ignore frame scripts
+     * @throws InterruptedException
+     */
     public void toSource(AbcIndexing abcIndex, GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts) throws InterruptedException {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
@@ -310,6 +383,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         appendTo(abcIndex, writer, traits, convertData, exportMode, parallel);
     }
 
+    /**
+     * Exports the script pack.
+     * @param abcIndex Abc indexing
+     * @param file File
+     * @param exportSettings Export settings
+     * @param parallel Parallel
+     * @return File
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public File export(AbcIndexing abcIndex, File file, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
         if (!exportSettings.singleFile) {
             if (file.exists() && !Configuration.overwriteExistingFiles.get()) {
@@ -336,6 +419,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         return file;
     }
 
+    /**
+     * Hash code.
+     * @return Hash code
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -345,6 +432,11 @@ public class ScriptPack extends AS3ClassTreeItem {
         return hash;
     }
 
+    /**
+     * Equals.
+     * @param obj Object
+     * @return True if equals
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -363,6 +455,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         return Objects.equals(path, other.path);
     }
 
+    /**
+     * Gets modified flag.
+     * @return True if modified
+     */
     @Override
     public boolean isModified() {
         if (scriptIndex >= abc.script_info.size()) {
@@ -371,6 +467,9 @@ public class ScriptPack extends AS3ClassTreeItem {
         return abc.script_info.get(scriptIndex).isModified();
     }
 
+    /**
+     * Clears modified flag.
+     */
     public void clearModified() {
         if (scriptIndex >= abc.script_info.size()) {
             return;
@@ -378,10 +477,21 @@ public class ScriptPack extends AS3ClassTreeItem {
         abc.script_info.get(scriptIndex).setModified(false);
     }
 
+
+    /**
+     * Label with address.
+     */
     private class Label {
 
+        /**
+         * Address
+         */
         public long addr;
 
+        /**
+         * Constructs a new label.
+         * @param addr Address
+         */
         public Label(long addr) {
             this.addr = addr;
         }
@@ -398,7 +508,12 @@ public class ScriptPack extends AS3ClassTreeItem {
     public void injectDebugInfo(File directoryPath) {
         injectDebugInfo(directoryPath, "main");
     }
-    
+
+    /**
+     * Injects debugfile, debugline instructions into the code.
+     * @param directoryPath Directory path
+     * @param swfHash SWF identifier
+     */
     public void injectDebugInfo(File directoryPath, String swfHash) {
         Map<Integer, Map<Integer, Integer>> bodyToPosToLine = new HashMap<>();
         Map<Integer, Map<Integer, Integer>> bodyLineToPos = new HashMap<>();
@@ -694,6 +809,11 @@ public class ScriptPack extends AS3ClassTreeItem {
         ((Tag) abc.parentTag).setModified(true);
     }
 
+    /**
+     * Injects P-code debugfile, debugline instructions into the code.
+     * @param abcIndex Abc indexing
+     * @param swfHash SWF identifier
+     */
     public void injectPCodeDebugInfo(int abcIndex, String swfHash) {
 
         Map<Integer, String> bodyToIdentifier = new HashMap<>();
@@ -779,6 +899,10 @@ public class ScriptPack extends AS3ClassTreeItem {
         ((Tag) abc.parentTag).setModified(true);
     }
 
+    /**
+     * Gets method ids.
+     * @param methodInfos Result list of MethodIds
+     */
     public void getMethodInfos(List<MethodId> methodInfos) {
         int script_init = abc.script_info.get(scriptIndex).init_index;
         methodInfos.add(new MethodId(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, -1, script_init));
@@ -790,6 +914,11 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
     }
 
+    /**
+     * Deletes the script pack.
+     * @param abc ABC file
+     * @param d Whether to delete
+     */
     public void delete(ABC abc, boolean d) {
         ScriptInfo si = abc.script_info.get(scriptIndex);
         if (isSimple) {

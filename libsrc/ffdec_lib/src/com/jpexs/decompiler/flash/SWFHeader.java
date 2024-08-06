@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * SWF header information.
  * @author JPEXS
  */
 public class SWFHeader {

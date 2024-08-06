@@ -17,15 +17,7 @@
 package com.jpexs.decompiler.flash.action.as2;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
-import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
-import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
-import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -34,22 +26,19 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
- *
+ * Uninitialized class fields detector for ActionScript 2.
  * @author JPEXS
  */
 public class UninitializedClassFieldsDetector {
 
     /**
-     * Gets path of variable and its getMembers: a.b.c.d => [a,b,c,d]
+     * Gets path of variable and its getMembers: a.b.c.d => [a,b,c,d].
      *
-     * @param item
+     * @param item Item to get path from
      * @return List of path or null if not members path
      */
     private List<String> getMembersPath(GraphTargetItem item) {
@@ -92,6 +81,11 @@ public class UninitializedClassFieldsDetector {
         return ret;
     }
 
+    /**
+     * Gets full path of item: a.b.c.d => [a,b,c,d].
+     * @param item Item to get path from
+     * @return List of path or null if not members path
+     */
     private List<String> getFullPath(GraphTargetItem item) {
         if (item instanceof GetMemberActionItem) {
             return getMembersPath(item);
@@ -149,6 +143,14 @@ public class UninitializedClassFieldsDetector {
         return path;
     }
 
+    /**
+     * Checks whether the class contains a trait.
+     * @param classTraits Class traits
+     * @param classInheritance Class inheritance
+     * @param className Class name
+     * @param name Trait name
+     * @return Whether the class contains the trait
+     */
     private boolean containsTrait(Map<String, Map<String, Trait>> classTraits, Map<String, List<String>> classInheritance, String className, String name) {
         if (!classTraits.containsKey(className)) {
             return false;
@@ -164,6 +166,11 @@ public class UninitializedClassFieldsDetector {
         return false;
     }
 
+    /**
+     * Calculates uninitialized class traits.
+     * @param swf SWF
+     * @return Map of class name to map of trait name to trait
+     */
     public Map<String, Map<String, Trait>> calculateAs2UninitializedClassTraits(SWF swf) {
         if (swf.isAS3()) {
             return new HashMap<>();

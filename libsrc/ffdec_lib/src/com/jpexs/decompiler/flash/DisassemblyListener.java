@@ -17,14 +17,29 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Listener for disassembly events.
  * @author JPEXS
  */
 public interface DisassemblyListener {
 
+    /**
+     * Called on progress of reading.
+     * @param pos Position
+     * @param total Total length
+     */
     public void progressReading(long pos, long total);
 
+    /**
+     * Called on progress of deobfuscating.
+     * @param pos Position
+     * @param total Total length
+     */
     public void progressToString(long pos, long total);
 
+    /**
+     * Called on progress of deobfuscating.
+     * @param pos Position
+     * @param total Total length
+     */
     public void progressDeobfuscating(long pos, long total);
 }

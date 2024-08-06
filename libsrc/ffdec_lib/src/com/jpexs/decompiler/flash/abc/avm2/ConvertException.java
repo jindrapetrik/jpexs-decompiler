@@ -17,13 +17,22 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Convert exception.
  * @author JPEXS
  */
 public class ConvertException extends RuntimeException {
 
+    /**
+     * Line number
+     */
     public int line;
 
+
+    /**
+     * Constructs convert exception.
+     * @param s Message
+     * @param line Line number
+     */
     public ConvertException(String s, int line) {
         super(s + " on line " + line);
         this.line = line;

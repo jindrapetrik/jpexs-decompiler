@@ -17,15 +17,25 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.ContinueItem;
+
 import java.util.List;
 
 /**
- *
+ * Block interface.
+ * For example, a block can be a loop, if statement, or a function.
  * @author JPEXS
  */
 public interface Block {
 
+    /**
+     * Gets all sub continues.
+     * @return List of continues
+     */
     public List<ContinueItem> getContinues();
 
+    /**
+     * Gets all sub blocks.
+     * @return List of blocks
+     */
     public List<List<GraphTargetItem>> getSubs();
 }

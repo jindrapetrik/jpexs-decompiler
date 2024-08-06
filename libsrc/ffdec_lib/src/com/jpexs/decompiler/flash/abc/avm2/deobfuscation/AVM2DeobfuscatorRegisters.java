@@ -37,20 +37,10 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphSource;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TranslateException;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.helpers.Reference;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +54,11 @@ import java.util.logging.Logger;
  */
 public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
+    /**
+     * Gets registers used in the code.
+     * @param code AVM2 code
+     * @return Set of registers
+     */
     private Set<Integer> getRegisters(AVM2Code code) {
         Set<Integer> regs = new HashSet<>();
         for (AVM2Instruction ins : code.code) {
@@ -88,6 +83,18 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         return regs;
     }
 
+    /**
+     * Removes single assigned local registers.
+     * @param path Path
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         //System.err.println("regdeo:" + path);
@@ -155,6 +162,20 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         //System.err.println("/deo");
     }
 
+    /**
+     * Replaces single use registers.
+     * @param singleRegisters Single registers
+     * @param setInss Set instructions
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param cpool Constant pool
+     * @param trait Trait
+     * @param minfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     private void replaceSingleUseRegisters(Map<Integer, GraphTargetItem> singleRegisters, List<AVM2Instruction> setInss, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
 
@@ -182,6 +203,16 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         }
     }
 
+    /**
+     * Gets first register id which has setter.
+     * @param assignment Assignment
+     * @param body Method body
+     * @param abc ABC
+     * @param ignoredRegisters Ignored registers
+     * @param ignoredGets Ignored gets
+     * @return first register id
+     * @throws InterruptedException
+     */
     private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, MethodBody body, ABC abc, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
 
@@ -192,6 +223,21 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         return visitCode(assignment, new HashSet<>(), new Stack<>(), body, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
     }
 
+    /**
+     * Visits code.
+     * @param assignment Assignment
+     * @param visited Visited
+     * @param stack Stack
+     * @param body Method body
+     * @param abc ABC
+     * @param code AVM2 code
+     * @param idx Index
+     * @param endIdx End index
+     * @param ignored Ignored
+     * @param ignoredGets Ignored gets
+     * @return Register id
+     * @throws InterruptedException
+     */
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, Stack<Object> stack, MethodBody body, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
         LocalDataArea localData = new LocalDataArea();
         initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs, false);

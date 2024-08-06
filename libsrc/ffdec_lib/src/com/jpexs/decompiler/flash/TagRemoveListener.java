@@ -19,10 +19,14 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
- *
+ * Listener for tag removal.
  * @author JPEXS
  */
 public interface TagRemoveListener {
 
+    /**
+     * Called when a tag is removed.
+     * @param tag Removed tag
+     */
     public void tagRemoved(Tag tag);
 }

@@ -19,15 +19,26 @@ package com.jpexs.decompiler.graph;
 import java.io.Serializable;
 
 /**
- *
+ * Graph source item with a position.
  * @author JPEXS
  */
 public class GraphSourceItemPos implements Serializable {
 
+    /**
+     * Source item
+     */
     public GraphSourceItem item;
 
+    /**
+     * Position
+     */
     public int pos;
 
+    /**
+     * Constructs a GraphSourceItemPos
+     * @param item Source item
+     * @param pos Position
+     */
     public GraphSourceItemPos(GraphSourceItem item, int pos) {
         this.item = item;
         this.pos = pos;

@@ -17,11 +17,15 @@
 package com.jpexs.decompiler.flash.abc.avm2.exceptions;
 
 /**
- *
+ * Exception thrown when an error occurs during AVM2 execution.
  * @author JPEXS
  */
 public class AVM2ExecutionException extends Exception {
 
+    /**
+     * Constructs new AVM2ExecutionException with the specified detail message.
+     * @param message
+     */
     public AVM2ExecutionException(String message) {
         super(message);
     }

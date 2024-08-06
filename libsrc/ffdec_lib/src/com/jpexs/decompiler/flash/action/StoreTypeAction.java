@@ -20,10 +20,16 @@ import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.graph.TranslateStack;
 
 /**
- *
+ * Store type action interface.
  * @author JPEXS
  */
 public interface StoreTypeAction {
 
+    /**
+     * Gets variable name.
+     * @param stack Stack
+     * @param cpool Constant pool
+     * @return Variable name
+     */
     public String getVariableName(TranslateStack stack, ConstantPool cpool);
 }

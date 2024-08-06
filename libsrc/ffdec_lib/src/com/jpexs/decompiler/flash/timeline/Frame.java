@@ -29,11 +29,8 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
+
+import java.util.*;
 
 /**
  * Single frame of a timeline.
@@ -88,7 +85,7 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Inner nested tags in this frame.
-     * @see ShowFrameTag.isNestedTagType
+     * See ShowFrameTag.isNestedTagType
      */
     public List<Tag> innerTags = new ArrayList<>();
 

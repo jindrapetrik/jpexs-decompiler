@@ -23,12 +23,22 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Fixes collisions of multinames in ABC files.
+ */
 public class AbcMultiNameCollisionFixer {
 
+    /**
+     * Fixes collisions of multinames in SWF file.
+     *
+     * @param swf SWF file
+     * @return Number of fixed collisions
+     */
     public int fixCollisions(SWF swf) {
         int ret = 0;
         for (ABCContainerTag tag : swf.getAbcList()) {
@@ -37,6 +47,12 @@ public class AbcMultiNameCollisionFixer {
         return ret;
     }
 
+    /**
+     * Fixes collisions of multinames in ABC file.
+     *
+     * @param abc ABC file
+     * @return Number of fixed collisions
+     */
     public int fixCollisions(ABC abc) {
         Set<MultinameUsage> collidingUsages = abc.getCollidingMultinameUsages();
         Set<Integer> collidingMultinameIndices = new HashSet<>();

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 /**
- *
+ * Set of AVM2 instructions.
  * @author JPEXS
  */
 public class AVM2Instructions {

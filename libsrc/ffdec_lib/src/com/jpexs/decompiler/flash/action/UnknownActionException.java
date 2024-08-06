@@ -17,13 +17,20 @@
 package com.jpexs.decompiler.flash.action;
 
 /**
- *
+ * Unknown action exception.
  * @author JPEXS
  */
 public class UnknownActionException extends RuntimeException {
 
+    /**
+     * OpCode.
+     */
     public int opCode;
 
+    /**
+     * Constructs a new unknown action exception.
+     * @param opCode OpCode
+     */
     public UnknownActionException(int opCode) {
         super("Unknown opCode: 0x" + Integer.toHexString(opCode));
         this.opCode = opCode;

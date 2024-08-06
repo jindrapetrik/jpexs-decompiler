@@ -19,12 +19,20 @@ package com.jpexs.decompiler.graph;
 import java.util.Collection;
 
 /**
- *
+ * Graph source visitor interface.
  * @author JPEXS
  */
 public interface GraphTargetVisitorInterface {
 
+    /**
+     * Visits a graph target item.
+     * @param item Graph target item
+     */
     public void visit(GraphTargetItem item);
 
+    /**
+     * Visits all graph target items.
+     * @param items Collection of graph target items
+     */
     public void visitAll(Collection<GraphTargetItem> items);
 }

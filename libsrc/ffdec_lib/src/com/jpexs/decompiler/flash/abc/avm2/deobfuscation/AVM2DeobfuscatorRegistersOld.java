@@ -35,21 +35,10 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphSource;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.TranslateException;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.helpers.Reference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  *
@@ -61,6 +50,11 @@ import java.util.Set;
  */
 public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
+    /**
+     * Gets all register ids.
+     * @param code AVM2 code
+     * @return Set of register ids
+     */
     private Set<Integer> getRegisters(AVM2Code code) {
         Set<Integer> regs = new HashSet<>();
         for (AVM2Instruction ins : code.code) {
@@ -85,6 +79,18 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
         return regs;
     }
 
+    /**
+     * Removes single assigned local registers.
+     * @param path Path
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         //System.err.println("regdeo:" + path);
@@ -152,6 +158,19 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
         originalBody.setCode(body.getCode());
     }
 
+    /**
+     * Gets first register with setter.
+     * @param assignment Assignment
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param body Method body
+     * @param ignoredRegisters Ignored registers
+     * @param ignoredGets Ignored gets
+     * @return Register id
+     * @throws InterruptedException
+     */
     private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
 
@@ -163,26 +182,66 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
         return visitCode(assignment, visited, new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
     }
 
+    /**
+     * Exception target ip pair.
+     */
     private class ExceptionTargetIpPair {
 
+        /**
+         * Exception.
+         */
         private final ABCException exception;
+        /**
+         * Target ip.
+         */
         private final int targetIp;
 
+        /**
+         * Constructs a new instance of ExceptionTargetIpPair.
+         * @param exception Exception
+         * @param targetIp Target ip
+         */
         public ExceptionTargetIpPair(ABCException exception, int targetIp) {
             this.exception = exception;
             this.targetIp = targetIp;
         }
 
+        /**
+         * Gets exception.
+         * @return Exception
+         */
         public ABCException getException() {
             return exception;
         }
 
+        /**
+         * Gets target ip.
+         * @return Target ip
+         */
         public int getTargetIp() {
             return targetIp;
         }
 
     }
 
+    /**
+     * Visits code.
+     * @param assignment Assignment
+     * @param visited Visited
+     * @param stack Stack
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param body Method body
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param code AVM2 code
+     * @param idx Index
+     * @param endIdx End index
+     * @param ignored Ignored
+     * @param ignoredGets Ignored gets
+     * @return Register id
+     * @throws InterruptedException
+     */
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
 
         Map<Integer, List<ExceptionTargetIpPair>> exceptionStartToTargets = new HashMap<>();

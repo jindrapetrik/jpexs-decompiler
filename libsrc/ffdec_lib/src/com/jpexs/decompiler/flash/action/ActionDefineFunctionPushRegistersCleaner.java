@@ -26,12 +26,8 @@ import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+
+import java.util.*;
 
 /**
  * Cleaner for ActionDefineFunction push registers. From Flash 7 onwards,
@@ -49,11 +45,22 @@ import java.util.TreeSet;
  */
 public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapter {
 
+    /**
+     * Called when an action list is parsed
+     * @param actions Action list
+     * @param swf SWF object
+     * @throws InterruptedException
+     */
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         cleanActionDefineFunctions(actions);
     }
 
+    /**
+     * Cleans ActionDefineFunctions
+     *
+     * @param actions Action list
+     */
     private void cleanActionDefineFunctions(ActionList actions) {
         for (int i = actions.size() - 1; i >= 0; i--) {
             Action action = actions.get(i);
@@ -71,11 +78,11 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
     }
 
     /**
-     *
-     * @param code
+     * Cleans push registers from ActionDefineFunction
+     * @param code Action list
      * @param startIndex Index of first Action in DefineFunction body
      * @param count Count of actions in DefineFunction
-     * @return
+     * @return True if registers were cleaned, false otherwise
      */
     private boolean cleanPushRegisters(ActionList code, int startIndex, int count) {
         if (count == 0) {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Kind of stop part.
  * @author JPEXS
  */
 public enum StopPartKind {

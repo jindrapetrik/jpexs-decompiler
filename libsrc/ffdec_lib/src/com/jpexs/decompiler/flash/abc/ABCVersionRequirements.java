@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Target ABC version
+ * Target ABC version.
  *
  * @author JPEXS
  */
@@ -30,13 +30,34 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface ABCVersionRequirements {
 
+    /**
+     * Minimum minor version.
+     * @return
+     */
     int minMinor() default 0;
+
+    /**
+     * Maximum minor version.
+     * @return
+     */
 
     int maxMinor() default 0;
 
+    /**
+     * Maximum major version.
+     * @return
+     */
     int maxMajor() default 0;
 
+    /**
+     * Minimum major version.
+     * @return
+     */
     int minMajor() default 0;
 
+    /**
+     * Exact minor version.
+     * @return
+     */
     int exactMinor() default 0;
 }

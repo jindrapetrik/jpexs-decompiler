@@ -17,36 +17,64 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.graph.DottedChain;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Class path
  * @author JPEXS
  */
 public class ClassPath implements Serializable {
 
+    /**
+     * Package name
+     */
     public final DottedChain packageStr;
 
+    /**
+     * Class name
+     */
     public final String className;
 
+    /**
+     * Namespace suffix
+     */
     public final String namespaceSuffix;
 
+    /**
+     * Constructs a new class path
+     * @param packageStr Package name
+     * @param className Class name
+     * @param namespaceSuffix Namespace suffix
+     */
     public ClassPath(DottedChain packageStr, String className, String namespaceSuffix) {
         this.packageStr = packageStr == null ? DottedChain.TOPLEVEL : packageStr;
         this.className = className;
         this.namespaceSuffix = namespaceSuffix;
     }
 
+    /**
+     * To string
+     * @return String
+     */
     @Override
     public String toString() {
         return packageStr.add(className, namespaceSuffix).toPrintableString(true);
     }
 
+    /**
+     * To raw string
+     * @return Raw string
+     */
     public String toRawString() {
         return packageStr.add(className, namespaceSuffix).toRawString();
     }
 
+    /**
+     * Hash code
+     * @return Hash code
+     */
     @Override
     public int hashCode() {
         int hash = 3;
@@ -56,6 +84,11 @@ public class ClassPath implements Serializable {
         return hash;
     }
 
+    /**
+     * Equals
+     * @param obj
+     * @return True if equals
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

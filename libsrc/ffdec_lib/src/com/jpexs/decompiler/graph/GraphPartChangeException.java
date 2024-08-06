@@ -19,23 +19,43 @@ package com.jpexs.decompiler.graph;
 import java.util.List;
 
 /**
- *
+ * Exception when part of the graph is changed.
  * @author JPEXS
  */
 public class GraphPartChangeException extends Exception {
 
+    /**
+     * IP
+     */
     private final int ip;
+
+    /**
+     * Output
+     */
     private final List<GraphTargetItem> output;
 
+    /**
+     * Constructs a new GraphPartChangeException
+     * @param output Output
+     * @param ip IP
+     */
     public GraphPartChangeException(List<GraphTargetItem> output, int ip) {
         this.output = output;
         this.ip = ip;
     }
 
+    /**
+     * Gets the IP
+     * @return IP
+     */
     public int getIp() {
         return ip;
     }
 
+    /**
+     * Gets the output
+     * @return Output
+     */
     public List<GraphTargetItem> getOutput() {
         return output;
     }

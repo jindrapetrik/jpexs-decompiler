@@ -19,14 +19,22 @@ package com.jpexs.decompiler.graph;
 import java.util.Collection;
 
 /**
- *
+ * Abstract graph target visitor.
  * @author JPEXS
  */
 public abstract class AbstractGraphTargetVisitor implements GraphTargetVisitorInterface {
 
+    /**
+     * Visits a graph target item.
+     * @param item Graph target item
+     */
     @Override
     public abstract void visit(GraphTargetItem item);
 
+    /**
+     * Visits all graph target items.
+     * @param items Collection of graph target items
+     */
     @Override
     public final void visitAll(Collection<GraphTargetItem> items) {
         for (GraphTargetItem item : items) {

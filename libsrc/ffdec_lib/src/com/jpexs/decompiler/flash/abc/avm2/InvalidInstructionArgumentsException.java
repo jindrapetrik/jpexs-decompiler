@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.graph;
+package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Invalid instruction arguments exception.
  * @author JPEXS
  */
-public class GraphExceptionParts {
+public class InvalidInstructionArgumentsException extends RuntimeException {
 
-    public GraphPart start;
-    public GraphPart end;
-    public GraphPart target;
-
-    public GraphExceptionParts(GraphPart start, GraphPart end, GraphPart target) {
-        this.start = start;
-        this.end = end;
-        this.target = target;
+    /**
+     * Constructs new InvalidInstructionArgumentsException
+     */
+    public InvalidInstructionArgumentsException() {
+        super("Invalid method arguments");
     }
 }

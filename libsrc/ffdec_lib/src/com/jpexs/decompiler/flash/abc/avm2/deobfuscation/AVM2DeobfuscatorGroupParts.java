@@ -25,12 +25,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Stub for deobfuscator merging jump parts
+ * Stub for deobfuscator merging jump parts.
  *
  * @author JPEXS
  */
@@ -101,6 +102,19 @@ A:  jump B
 C:  blk_4
     
      */
+
+    /**
+     * Removes dead code and merges jump parts.
+     * @param path Path
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -165,6 +179,12 @@ C:  blk_4
         new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
     }
 
+    /**
+     * Gets real refs.
+     * @param refs Refs
+     * @param ip IP
+     * @return Real refs
+     */
     private int realRefs(Map<Integer, List<Integer>> refs, int ip) {
         int refCount = 0;
         for (int r : refs.get(ip)) {

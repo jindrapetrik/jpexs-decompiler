@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Openable source kind.
  * @author JPEXS
  */
 public enum OpenableSourceKind {

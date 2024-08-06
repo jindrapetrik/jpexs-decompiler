@@ -17,15 +17,31 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Exception thrown in the graph.
  * @author JPEXS
  */
 public class GraphException {
 
+    /**
+     * Start IP of thrown block
+     */
     public int start;
+    /**
+     * End IP of thrown block
+     */
     public int end;
+
+    /**
+     * Target IP to go when exception is thrown
+     */
     public int target;
 
+    /**
+     * Constructs a new exception
+     * @param start Start IP
+     * @param end End IP
+     * @param target Target IP
+     */
     public GraphException(int start, int end, int target) {
         this.start = start;
         this.end = end;

@@ -17,10 +17,13 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Listener for deobfuscation events.
  * @author JPEXS
  */
 public interface DeobfuscationListener {
 
+    /**
+     * Called when an item is deobfuscated.
+     */
     public void itemDeobfuscated();
 }

@@ -19,20 +19,36 @@ package com.jpexs.decompiler.flash;
 import java.io.IOException;
 
 /**
- *
+ * Task that can be retried on error.
  * @author JPEXS
  */
 public class RetryTask {
 
+    /**
+     * Runnable that can throw IOException.
+     */
     private final RunnableIOEx r;
 
+    /**
+     * Handler for retrying.
+     */
     private final AbortRetryIgnoreHandler handler;
 
+    /**
+     * Constructs a new RetryTask.
+     * @param r Runnable that can throw IOException
+     * @param handler Handler for retrying
+     */
     public RetryTask(RunnableIOEx r, AbortRetryIgnoreHandler handler) {
         this.r = r;
         this.handler = handler;
     }
 
+    /**
+     * Runs the task.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void run() throws IOException, InterruptedException {
         boolean retry;
         do {

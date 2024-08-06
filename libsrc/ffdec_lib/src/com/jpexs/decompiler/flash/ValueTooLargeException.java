@@ -17,24 +17,43 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Exception thrown when a value is too large for a specific type.
  * @author JPEXS
  */
 public class ValueTooLargeException extends IllegalArgumentException {
 
+    /**
+     * Type of the value
+     */
     private final String type;
+    /**
+     * Value that is too large
+     */
     private final Object value;
 
+    /**
+     * Constructs a new ValueTooLargeException with the specified type and value.
+     * @param type Type of the value
+     * @param value Value that is too large
+     */
     public ValueTooLargeException(String type, Object value) {
         super("Value is too large for " + type + ": " + value);
         this.type = type;
         this.value = value;
     }
 
+    /**
+     * Gets the type of the value.
+     * @return Type of the value
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Gets the value that is too large.
+     * @return Value that is too large
+     */
     public Object getValue() {
         return value;
     }

@@ -22,34 +22,39 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushDoubleIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.*;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.helpers.Reference;
+
 import java.util.Set;
 
 /**
- *
+ * Deobfuscator for removing zero jumps and null pushes.
  * @author JPEXS
  */
 public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
 
+    /**
+     * Removes zero jumps from the code.
+     * @param code AVM2 code
+     * @param body Method body
+     * @return True if any zero jumps were removed
+     * @throws InterruptedException
+     */
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
         return removeZeroJumps(code, body, new Reference<>(-1));
     }
 
+    /**
+     * Removes zero jumps from the code.
+     * @param code AVM2 code
+     * @param body Method body
+     * @param minChangedIpRef Reference to the minimum changed instruction pointer
+     * @return True if any zero jumps were removed
+     * @throws InterruptedException
+     */
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         boolean result = false;
         int minChangedIp = -1;
@@ -74,6 +79,11 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
         return result;
     }
 
+    /**
+     * Checks if the instruction is a simple push.
+     * @param def Instruction definition
+     * @return True if the instruction is a simple push
+     */
     private boolean isSimplePush(InstructionDefinition def) {
         return (def instanceof PushByteIns
                 || def instanceof PushDoubleIns
@@ -88,6 +98,13 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
                 || def instanceof PushUndefinedIns);
     }
 
+    /**
+     * Removes null pushes from the code.
+     * @param code AVM2 code
+     * @param body Method body
+     * @return True if any null pushes were removed
+     * @throws InterruptedException
+     */
     protected boolean removeNullPushes(AVM2Code code, MethodBody body) throws InterruptedException {
         boolean result = false;
         Set<Long> offsets = code.getImportantOffsets(body, true);
@@ -136,6 +153,18 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
         return result;
     }
 
+    /**
+     * Removes zero jumps and null pushes from the code.
+     * @param path Path
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();

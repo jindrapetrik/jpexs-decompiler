@@ -19,18 +19,28 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SecondPassData;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
+ * Base local data
  * @author JPEXS
  */
 public abstract class BaseLocalData {
 
+    /**
+     * Line start instruction
+     */
     public GraphSourceItem lineStartInstruction;
 
+    /**
+     * Set of all switch parts
+     */
     public Set<GraphPart> allSwitchParts = new HashSet<>();
 
+    /**
+     * Second pass data
+     */
     public SecondPassData secondPassData = null;
 }

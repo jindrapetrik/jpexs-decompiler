@@ -17,15 +17,26 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Compilation exception.
  * @author JPEXS
  */
 public class CompilationException extends Exception {
 
+    /**
+     * Line number.
+     */
     public int line;
 
+    /**
+     * Error message.
+     */
     public String text;
 
+    /**
+     * Constructs a new compilation exception.
+     * @param message Error message
+     * @param line Line number
+     */
     public CompilationException(String message, int line) {
         super("Compilation error on line " + line + ": " + message);
         this.line = line;

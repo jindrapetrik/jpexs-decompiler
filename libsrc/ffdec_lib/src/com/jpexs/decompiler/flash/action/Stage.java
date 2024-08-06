@@ -20,23 +20,40 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Stage object for ActionScript execution.
  * @author JPEXS
  */
 public class Stage extends DisplayObject {
 
+    /**
+     * Start time of the movie
+     */
     protected long startTime;
 
+    /**
+     * Timelined object
+     */
     protected Timelined timelined;
 
+    /**
+     * Timeline
+     */
     protected Timeline timeline;
 
+    /**
+     * Current frame
+     */
     protected Frame frame;
 
+    /**
+     * Constructs a new Stage object.
+     * @param timelined Timelined object
+     */
     public Stage(Timelined timelined) {
         startTime = System.currentTimeMillis();
         this.timelined = timelined;
@@ -44,6 +61,10 @@ public class Stage extends DisplayObject {
         this.frame = timelined != null && this.timeline.getFrameCount() > 0 ? this.timeline.getFrame(0) : null;
     }
 
+    /**
+     * Enumerates the instance names.
+     * @return List of instance names
+     */
     @Override
     public List<String> enumerate() {
         List<String> ret = new ArrayList<>();
@@ -57,6 +78,11 @@ public class Stage extends DisplayObject {
         return ret;
     }
 
+    /**
+     * Gets the member with the given name.
+     * @param name Name of the member
+     * @return Member object
+     */
     @Override
     protected Object getThisMember(String name) {
         if (frame != null) {
@@ -69,10 +95,18 @@ public class Stage extends DisplayObject {
         return null;
     }
 
+    /**
+     * Gets the current frame.
+     * @return Current frame
+     */
     public long getTime() {
         return System.currentTimeMillis() - startTime;
     }
 
+    /**
+     * Gets total frames.
+     * @return Total frames
+     */
     @Override
     public int getTotalFrames() {
         if (timeline == null) {
@@ -81,6 +115,10 @@ public class Stage extends DisplayObject {
         return timeline.getFrameCount();
     }
 
+    /**
+     * Goto frame.
+     * @param frameNum Frame.
+     */
     @Override
     public void gotoFrame(int frameNum) {
         super.gotoFrame(frameNum);
@@ -89,6 +127,10 @@ public class Stage extends DisplayObject {
         }
     }
 
+    /**
+     * Goto label.
+     * @param label Label
+     */
     @Override
     public void gotoLabel(String label) {
         if (timeline == null) {
@@ -100,18 +142,33 @@ public class Stage extends DisplayObject {
         }
     }
 
+    /**
+     * Stops sounds.
+     */
     public void stopSounds() {
 
     }
 
+    /**
+     * Toggle quality.
+     */
     public void toggleQuality() {
 
     }
 
+    /**
+     * Gets the URL.
+     * @param url URL
+     * @param target Target
+     */
     public void getURL(String url, String target) {
 
     }
 
+    /**
+     * Traces the given values.
+     * @param val Values
+     */
     public void trace(Object... val) {
 
     }

@@ -17,18 +17,33 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * FFDec version information.
  * @author JPEXS
  */
 public class Version {
 
+    /**
+     * Git tag name
+     */
     public String tagName;
 
+    /**
+     * Version name
+     */
     public String versionName;
 
+    /**
+     * Release date
+     */
     public String releaseDate;
 
+    /**
+     * Is this a prerelease version?
+     */
     public boolean prerelease;
 
+    /**
+     * Description
+     */
     public String description;
 }

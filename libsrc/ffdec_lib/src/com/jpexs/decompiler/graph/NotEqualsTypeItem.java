@@ -19,7 +19,7 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 
 /**
- *
+ * Not equals type item.
  * @author JPEXS
  */
 public interface NotEqualsTypeItem extends BinaryOp {

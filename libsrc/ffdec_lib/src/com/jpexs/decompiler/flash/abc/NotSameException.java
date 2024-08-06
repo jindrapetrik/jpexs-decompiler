@@ -19,11 +19,15 @@ package com.jpexs.decompiler.flash.abc;
 import com.jpexs.helpers.Helper;
 
 /**
- *
+ * Streams are not the same exception.
  * @author JPEXS
  */
 public class NotSameException extends RuntimeException {
 
+    /**
+     * Constructs a new NotSameException with specified position.
+     * @param pos Position
+     */
     public NotSameException(long pos) {
         super("Streams are not the same at pos " + Helper.formatHex((int) pos, 8));
     }

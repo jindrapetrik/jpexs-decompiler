@@ -19,15 +19,24 @@ package com.jpexs.decompiler.flash.abc;
 import java.io.IOException;
 
 /**
- *
+ * ABC open exception.
  * @author JPEXS
  */
 public class ABCOpenException extends IOException {
 
+    /**
+     * Constructs a new ABCOpenException with the specified detail message.
+     * @param message Detail message
+     */
     public ABCOpenException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new ABCOpenException with the specified detail message and cause.
+     * @param message Detail message
+     * @param cause Cause
+     */
     public ABCOpenException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -17,17 +17,32 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Info of AVM2 runtime.
  * @author JPEXS
  */
 public class AVM2RuntimeInfo {
 
+    /**
+     * AVM2 runtime.
+     */
     public AVM2Runtime runtime;
 
+    /**
+     * AVM2 version.
+     */
     public int version;
 
+    /**
+     * Debug flag.
+     */
     public boolean debug;
 
+    /**
+     * Constructs AVM2 runtime info.
+     * @param runtime AVM2 runtime
+     * @param version AVM2 version
+     * @param debug Debug flag
+     */
     public AVM2RuntimeInfo(AVM2Runtime runtime, int version, boolean debug) {
         this.runtime = runtime;
         this.version = version;

@@ -21,30 +21,61 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- *
+ * Output stream that copies data to another output stream.
  * @author JPEXS
  */
 public class CopyOutputStream extends OutputStream {
 
+    /**
+     * Output stream to copy data to.
+     */
     private final OutputStream os;
 
+    /**
+     * Input stream to compare data with.
+     */
     private final InputStream is;
 
+    /**
+     * Position in the output stream.
+     */
     private long pos = 0;
 
+    /**
+     * Size of the temporary buffer.
+     */
     private final int TEMPSIZE = 5;
 
+    /**
+     * Temporary buffer.
+     */
     private final int[] temp = new int[TEMPSIZE];
 
+    /**
+     * Position in the temporary buffer.
+     */
     private int tempPos = 0;
 
+    /**
+     * Number of bytes to ignore at the beginning.
+     */
     public int ignoreFirst = 0;
 
+    /**
+     * Constructs a new CopyOutputStream.
+     * @param os Output stream to copy data to
+     * @param is Input stream to compare data with
+     */
     public CopyOutputStream(OutputStream os, InputStream is) {
         this.os = os;
         this.is = is;
     }
 
+    /**
+     * Writes a byte to the output stream.
+     * @param b Byte to write
+     * @throws IOException If an I/O error occurs
+     */
     @Override
     public void write(int b) throws IOException {
         temp[tempPos] = b;

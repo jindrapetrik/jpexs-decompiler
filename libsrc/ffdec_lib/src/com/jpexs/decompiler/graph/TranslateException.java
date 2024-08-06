@@ -17,11 +17,15 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Exception thrown when there is a problem with translating the graph.
  * @author JPEXS
  */
 public class TranslateException extends RuntimeException {
 
+    /**
+     * Constructs new TranslateException with the specified detail message.
+     * @param s The detail message.
+     */
     public TranslateException(String s) {
         super(s);
     }

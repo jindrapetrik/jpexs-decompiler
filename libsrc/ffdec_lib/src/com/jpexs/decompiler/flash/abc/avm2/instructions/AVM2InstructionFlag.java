@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 /**
- *
+ * Flags for AVM2 instructions.
  * @author JPEXS
  */
 public enum AVM2InstructionFlag {

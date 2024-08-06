@@ -23,35 +23,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.*;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
@@ -61,43 +35,57 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.helpers.Reference;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 /**
- *
+ * AVM2 Instruction definition.
  * @author JPEXS
  */
 public abstract class InstructionDefinition implements Serializable {
 
+    /**
+     * Serial version UID
+     */
     public static final long serialVersionUID = 1L;
 
+    /**
+     * Operands
+     */
     public int[] operands;
 
+    /**
+     * Instruction name
+     */
     public String instructionName = "";
 
+    /**
+     * Instruction code
+     */
     public int instructionCode = 0;
 
+    /**
+     * Can throw exception
+     */
     public boolean canThrow;
 
+    /**
+     * Flags
+     */
     public AVM2InstructionFlag[] flags;
 
+    /**
+     * Constructs new instance
+     * @param instructionCode Instruction code
+     * @param instructionName Instruction name
+     * @param operands Operands
+     * @param canThrow Can throw exception
+     * @param flags Flags
+     */
     public InstructionDefinition(int instructionCode, String instructionName, int[] operands, boolean canThrow, AVM2InstructionFlag... flags) {
         this.instructionCode = instructionCode;
         this.instructionName = instructionName;
@@ -106,6 +94,11 @@ public abstract class InstructionDefinition implements Serializable {
         this.flags = flags;
     }
 
+    /**
+     * Checks if instruction has flag
+     * @param flag Flag
+     * @return True if instruction has flag
+     */
     public boolean hasFlag(AVM2InstructionFlag flag) {
         for (AVM2InstructionFlag f : flags) {
             if (f == flag) {
@@ -115,6 +108,10 @@ public abstract class InstructionDefinition implements Serializable {
         return false;
     }
 
+    /**
+     * To string
+     * @return String representation
+     */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -125,6 +122,13 @@ public abstract class InstructionDefinition implements Serializable {
         return s.toString();
     }
 
+    /**
+     * Verify instruction
+     * @param lda Local data area
+     * @param constants Constant pool
+     * @param ins Instruction
+     * @throws AVM2VerifyErrorException
+     */
     public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
         for (int i = 0; i < operands.length; i++) {
             int operand = operands[i];
@@ -177,22 +181,77 @@ public abstract class InstructionDefinition implements Serializable {
         }
     }
 
+    /**
+     * Checks if instruction cannot be statically computed.
+     * @return True = cannot be statically computed, false = can be statically computed
+     */
     public boolean isNotCompileTimeSupported() {
         return false;
     }
 
+    /**
+     * Executes instruction.
+     * @param lda Local data area
+     * @param constants Constant pool
+     * @param ins Instruction
+     * @return True if instruction was executed, false if not
+     * @throws AVM2ExecutionException
+     */
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         //throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
         return false;
     }
 
+    /**
+     * Throws illegal opcode exception.
+     * @param lda Local data area
+     * @param ins Instruction
+     * @throws AVM2VerifyErrorException
+     */
     protected void illegalOpCode(LocalDataArea lda, AVM2Instruction ins) throws AVM2VerifyErrorException {
         throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, lda.isDebug(), new Object[]{lda.methodName, instructionCode, ins.getAddress()});
     }
 
+    /**
+     * Translates instruction to high level code.
+     * @param localData Local data area
+     * @param stack Translate stack
+     * @param ins Instruction
+     * @param output Output
+     * @param path Path
+     * @throws InterruptedException
+     */
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
     }
 
+    /**
+     * Translates instruction to high level code.
+     * @param switchParts Switch parts
+     * @param callStack Call stack
+     * @param abcIndex ABC indexing
+     * @param setLocalPosToGetLocalPos Set local position to get local position
+     * @param lineStartItem Line start item
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param localRegs Local registers
+     * @param stack Translate stack
+     * @param scopeStack Scope stack
+     * @param localScopeStack Local scope stack
+     * @param ins Instruction
+     * @param output Output
+     * @param body Method body
+     * @param abc ABC
+     * @param localRegNames Local register names
+     * @param localRegTypes Local register types
+     * @param fullyQualifiedNames Fully qualified names
+     * @param path Path
+     * @param localRegsAssignmentIps Local registers assignment IPs
+     * @param ip IP
+     * @param code AVM2 code
+     * @param thisHasDefaultToPrimitive This has default to primitive
+     * @throws InterruptedException
+     */
     public void translate(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.allSwitchParts = switchParts;
@@ -219,14 +278,32 @@ public abstract class InstructionDefinition implements Serializable {
         lineStartItem.setVal(localData.lineStartInstruction);
     }
 
+    /**
+     * Gets number of pops from stack.
+     * @param ins Instruction
+     * @param abc ABC
+     * @return Number of pops from stack
+     */
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;
     }
 
+    /**
+     * Gets number of pushes to stack.
+     * @param ins Instruction
+     * @param abc ABC
+     * @return Number of pushes to stack
+     */
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 0;
     }
 
+    /**
+     * Resolves multiname.
+     * @param localData Local data area
+     * @param constants Constant pool
+     * @param multinameIndex Multiname index
+     */
     protected void resolveMultiname(LocalDataArea localData, AVM2ConstantPool constants, int multinameIndex) {
         if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
             Multiname multiname = constants.getMultiname(multinameIndex);
@@ -239,6 +316,16 @@ public abstract class InstructionDefinition implements Serializable {
         }
     }
 
+    /**
+     * Resolves multiname.
+     * @param localData Local data area
+     * @param property Property
+     * @param stack Translate stack
+     * @param constants Constant pool
+     * @param multinameIndex Multiname index
+     * @param ins Instruction
+     * @return Resolved multiname
+     */
     protected FullMultinameAVM2Item resolveMultiname(AVM2LocalData localData, boolean property, TranslateStack stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
@@ -255,6 +342,12 @@ public abstract class InstructionDefinition implements Serializable {
         return new FullMultinameAVM2Item(property, ins, localData.lineStartInstruction, multinameIndex, localData.abc.constants.getMultiname(multinameIndex).getName(localData.getConstants(), new ArrayList<>(), true, true), name, ns);
     }
 
+    /**
+     * Gets required stack size for multiname.
+     * @param constants Constant pool
+     * @param multinameIndex Multiname index
+     * @return Required stack size
+     */
     protected int getMultinameRequiredStackSize(AVM2ConstantPool constants, int multinameIndex) {
         int res = 0;
         if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
@@ -274,78 +367,40 @@ public abstract class InstructionDefinition implements Serializable {
         return res;
     }
 
-    protected int resolvedCount(AVM2ConstantPool constants, int multinameIndex) {
-        int pos = 0;
-        if (constants.getMultiname(multinameIndex).needsNs()) {
-            pos++;
-        }
-        if (constants.getMultiname(multinameIndex).needsName()) {
-            pos++;
-        }
-        return pos;
-
-    }
-
-    protected String resolveMultinameNoPop(int pos, Stack<AVM2Item> stack, AVM2ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<DottedChain> fullyQualifiedNames) {
-        String ns = "";
-        String name;
-        if (constants.getMultiname(multinameIndex).needsNs()) {
-            ns = "[" + stack.get(pos) + "]";
-            pos++;
-        }
-        if (constants.getMultiname(multinameIndex).needsName()) {
-            name = stack.get(pos).toString();
-        } else {
-            name = GraphTextWriter.hilighOffset(constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, false, true), ins.getAddress());
-        }
-        return name + ns;
-    }
-
+    /**
+     * Gets stack delta. Stack push count - stack pop count.
+     * @param ins Instruction
+     * @param abc ABC
+     * @return Stack delta
+     */
     public int getStackDelta(AVM2Instruction ins, ABC abc) {
         return getStackPushCount(ins, abc) - getStackPopCount(ins, abc);
     }
 
+    /**
+     * Gets scope stack delta. Scope stack push count - scope stack pop count.
+     * @param ins Instruction
+     * @param abc ABC
+     * @return Scope stack delta
+     */
     public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
         return 0;
     }
 
-    protected boolean isRegisterCompileTime(int regId, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-        Set<Integer> previous = new HashSet<>();
-        AVM2Code.getPreviousReachableIps(ip, refs, previous, new HashSet<>());
-        for (int p : previous) {
-            if (p < 0) {
-                continue;
-            }
-            if (p >= code.code.size()) {
-                continue;
-            }
-            AVM2Instruction sins = code.code.get(p);
-            if (code.code.get(p).definition instanceof SetLocalTypeIns) {
-                SetLocalTypeIns sl = (SetLocalTypeIns) sins.definition;
-                if (sl.getRegisterId(sins) == regId) {
-                    if (!AVM2Code.isDirectAncestor(ip, p, refs)) {
-                        return false;
-                    }
-                }
-            }
-            if ((code.code.get(p).definition instanceof IncLocalIns)
-                    || (code.code.get(p).definition instanceof IncLocalIIns)
-                    || (code.code.get(p).definition instanceof DecLocalIns)
-                    || (code.code.get(p).definition instanceof DecLocalIIns)) {
-                if (sins.operands[0] == regId) {
-                    if (!AVM2Code.isDirectAncestor(ip, p, refs)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Checks if instruction is exit instruction. (e.g. return, throw)
+     * @return True if instruction is exit instruction
+     */
     public boolean isExitInstruction() {
         return false;
     }
 
+    /**
+     * Gets item IP.
+     * @param localData Local data
+     * @param item Item
+     * @return Item IP or -1 if not found
+     */
     public static int getItemIp(AVM2LocalData localData, GraphTargetItem item) {
         GraphSourceItem src = item.getSrc();
         if (src == null) {
@@ -354,10 +409,27 @@ public abstract class InstructionDefinition implements Serializable {
         return localData.code.adr2pos(src.getAddress());
     }
 
+    /**
+     * Searches for slot name.
+     * @param slotIndex Slot index
+     * @param localData Local data
+     * @param obj Object
+     * @param realObj Real object
+     * @return Slot multiname or null if not found
+     */
     protected static Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, Reference<GraphTargetItem> realObj) {
         return searchSlotName(slotIndex, localData, obj, -1, realObj);
     }
 
+    /**
+     * Searches for slot name.
+     * @param slotIndex Slot index
+     * @param localData Local data
+     * @param obj Object
+     * @param multiNameIndex Multiname index
+     * @param realObj Real object
+     * @return Slot multiname or null if not found
+     */
     private static Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, int multiNameIndex, Reference<GraphTargetItem> realObj) {
         if ((obj instanceof ExceptionAVM2Item) && (multiNameIndex == -1 || ((ExceptionAVM2Item) obj).exception.name_index == multiNameIndex)) {
             return localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
@@ -402,6 +474,15 @@ public abstract class InstructionDefinition implements Serializable {
         return null;
     }
 
+    /**
+     * Handles set property.
+     * @param init Init
+     * @param localData Local data
+     * @param stack Translate stack
+     * @param ins Instruction
+     * @param output Output
+     * @param path Path
+     */
     public void handleSetProperty(boolean init, AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
@@ -649,6 +730,18 @@ public abstract class InstructionDefinition implements Serializable {
         SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem) result, -1, type.getVal());
     }
 
+    /**
+     * Checks if increment or decrement.
+     * @param standalone Standalone
+     * @param multinameIndex Multiname index
+     * @param ins Instruction
+     * @param localData Local data
+     * @param item Item
+     * @param valueLocalReg Value local register
+     * @param nameLocalReg Name local register
+     * @param objLocalReg Object local register
+     * @return Increment or decrement item or null if not found
+     */
     private GraphTargetItem checkIncDec(boolean standalone, int multinameIndex, AVM2Instruction ins, AVM2LocalData localData, GraphTargetItem item,
             LocalRegAVM2Item valueLocalReg, LocalRegAVM2Item nameLocalReg, LocalRegAVM2Item objLocalReg) {
         if (item instanceof SetLocalAVM2Item) {

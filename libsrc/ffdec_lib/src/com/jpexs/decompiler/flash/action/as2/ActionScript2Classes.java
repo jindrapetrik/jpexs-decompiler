@@ -16,17 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.as2;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,11 +28,23 @@ import java.util.logging.Logger;
  */
 public class ActionScript2Classes {
 
+    /**
+     * Map of class name to map of trait name to trait
+     */
     private static final Map<String, Map<String, Trait>> classToTraits = new HashMap<>();
+    /**
+     * Map of class name to list of parent class names
+     */
     private static final Map<String, List<String>> classInheritance = new HashMap<>();
 
+    /**
+     * Whether the classes are already initialized
+     */
     private static boolean inited = false;
 
+    /**
+     * Initialize the classes
+     */
     private static synchronized void initClasses() {
         if (inited) {
             return;
@@ -100,6 +103,13 @@ public class ActionScript2Classes {
         inited = true;
     }
 
+    /**
+     * Check if trait exists in class.
+     * @param className Class name
+     * @param name Trait name
+     * @param withInheritance Whether to check also parent classes
+     * @return True if trait exists
+     */
     public static boolean traitExists(String className, String name, boolean withInheritance) {
         if (!classToTraits.containsKey(className)) {
             return false;
@@ -124,11 +134,11 @@ public class ActionScript2Classes {
     }
 
     /**
-     * Get class traits, null when class not exists (or is not built-in)
+     * Get class traits, null when class not exists (or is not built-in).
      *
-     * @param className
-     * @param withInheritance
-     * @return
+     * @param className Class name
+     * @param withInheritance Whether to include parent classes
+     * @return Map of trait name to trait
      */
     public static Map<String, Trait> getClassTraits(String className, boolean withInheritance) {
         initClasses();
@@ -157,16 +167,29 @@ public class ActionScript2Classes {
         return result;
     }
 
+    /**
+     * Get map of class name to map of trait name to trait.
+     * @return Map of class name to map of trait name to trait
+     */
     public static Map<String, Map<String, Trait>> getClassToTraits() {
         initClasses();
         return classToTraits;
     }
 
+    /**
+     * Get map of class name to list of parent class names.
+     * @return Map of class name to list of parent class names
+     */
     public static Map<String, List<String>> getClassInheritance() {
         initClasses();
         return classInheritance;
     }
 
+
+    /**
+     * Sample test
+     * @param args
+     */
     public static void main(String[] args) {
         Map<String, Trait> traits = getClassTraits("flash.filters.BevelFilter", true);
         if (traits != null) {
