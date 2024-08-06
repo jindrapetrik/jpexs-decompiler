@@ -19,30 +19,48 @@ package com.jpexs.decompiler.flash.treeitems;
 import com.jpexs.decompiler.flash.SWF;
 
 /**
- *
+ * SWF header TreeItem
  * @author JPEXS
  */
 public class HeaderItem implements TreeItem {
 
+    /**
+     * SWF
+     */
     private final SWF swf;
 
+    /**
+     * Name for toString
+     */
     private final String name;
-
+    
     public HeaderItem(SWF swf, String name) {
         this.swf = swf;
         this.name = name;
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return name;
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         return swf.isHeaderModified();

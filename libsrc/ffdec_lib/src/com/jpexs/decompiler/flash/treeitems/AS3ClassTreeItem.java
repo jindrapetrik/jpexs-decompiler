@@ -20,23 +20,42 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 
 /**
- *
+ * ActionScript 3 class TreeItem.
  * @author JPEXS
  */
 public abstract class AS3ClassTreeItem implements TreeItem {
 
+    /**
+     * Name
+     */
     private final String name;
 
+    /**
+     * Class path
+     */
     private final ClassPath path;
 
+    /**
+     * Namespace suffix
+     */
     private final String namespaceSuffix;
 
+    /**
+     * Constructs AS3ClassTreeItem.
+     * @param name Name
+     * @param namespaceSuffix Namespace suffix
+     * @param path Class path
+     */
     public AS3ClassTreeItem(String name, String namespaceSuffix, ClassPath path) {
         this.name = name;
         this.path = path;
         this.namespaceSuffix = namespaceSuffix;
     }
 
+    /**
+     * Gets name with namespace suffix.
+     * @return 
+     */
     public String getNameWithNamespaceSuffix() {
         String ret = name;
         if (namespaceSuffix != null) {
@@ -45,6 +64,10 @@ public abstract class AS3ClassTreeItem implements TreeItem {
         return ret;
     }
 
+    /**
+     * Gets name with namespace suffix but printable.
+     * @return 
+     */
     public String getPrintableNameWithNamespaceSuffix() {
         String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
         if (namespaceSuffix != null) {
@@ -53,10 +76,18 @@ public abstract class AS3ClassTreeItem implements TreeItem {
         return ret;
     }
 
+    /**
+     * Gets class path as string.
+     * @return 
+     */
     public String getPath() {
         return path.toString();
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return getPrintableNameWithNamespaceSuffix();
