@@ -22,16 +22,38 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.Objects;
 
 /**
- *
+ * Scene object.
  * @author JPEXS
  */
 public class Scene implements TreeItem {
 
+    /**
+     * SWF.
+     */
     private SWF swf;
+    
+    /**
+     * Start frame (zero-ased).
+     */
     public int startFrame;
+    
+    /**
+     * End frame (zero-based).
+     */
     public int endFrame;
+    
+    /**
+     * Name.
+     */
     public String name;
 
+    /**
+     * Constructs Scene.
+     * @param swf SWF
+     * @param startFrame Start frame (zero-based)
+     * @param endFrame End frame (zero-based)
+     * @param name Name
+     */
     public Scene(SWF swf, int startFrame, int endFrame, String name) {
         this.swf = swf;
         this.startFrame = startFrame;
@@ -39,10 +61,19 @@ public class Scene implements TreeItem {
         this.name = name;
     }
 
+    /**
+     * Gets number of frames in this scene.
+     * @return 
+     */
     public int getSceneFrameCount() {
         return endFrame - startFrame + 1;
     }
 
+    /**
+     * Gets SceneFrame at index
+     * @param sceneFrameIndex Index at range 0 to sceneFrameCount - 1
+     * @return
+     */
     public SceneFrame getSceneFrame(int sceneFrameIndex) {
         if (sceneFrameIndex >= getSceneFrameCount()) {
             throw new IndexOutOfBoundsException("Invalid sceneframe index");
@@ -50,16 +81,28 @@ public class Scene implements TreeItem {
         return new SceneFrame(swf, this, startFrame + sceneFrameIndex);
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         return false; //??
     }
 
+    /**
+     * HashCode.
+     * @return 
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -68,6 +111,11 @@ public class Scene implements TreeItem {
         return hash;
     }
 
+    /**
+     * Equals.
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -86,6 +134,10 @@ public class Scene implements TreeItem {
         return Objects.equals(this.swf, other.swf);
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return name;

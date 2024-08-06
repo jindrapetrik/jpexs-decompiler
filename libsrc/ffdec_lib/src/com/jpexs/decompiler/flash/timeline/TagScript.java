@@ -25,46 +25,86 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * A tag containing script.
  * @author JPEXS
  */
 public class TagScript implements TreeItem, Exportable {
 
+    /**
+     * SWF.
+     */
     private final SWF swf;
 
+    /**
+     * Tag.
+     */
     private final Tag tag;
 
+    /**
+     * Frames
+     */
     private final List<TreeItem> frames;
 
+    /**
+     * Constructs TagScript.
+     * @param swf SWF
+     * @param tag Tag
+     * @param frames Frames
+     */
     public TagScript(SWF swf, Tag tag, List<TreeItem> frames) {
         this.swf = swf;
         this.tag = tag;
         this.frames = frames;
     }
 
+    /**
+     * Gets tag.
+     * @return 
+     */
     public Tag getTag() {
         return tag;
     }
 
+    /**
+     * Gets frames.
+     * @return 
+     */
     public List<TreeItem> getFrames() {
         return frames;
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return tag.toString();
     }
 
+    /**
+     * Gets export filename.
+     * @return 
+     */
     @Override
     public String getExportFileName() {
         return tag.getExportFileName();
     }
 
+    /**
+     * Equals.
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TagScript) {
@@ -74,11 +114,19 @@ public class TagScript implements TreeItem, Exportable {
         return false;
     }
 
+    /**
+     * HashCode.
+     * @return 
+     */
     @Override
     public int hashCode() {
         return tag.hashCode();
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         for (TreeItem f : frames) {

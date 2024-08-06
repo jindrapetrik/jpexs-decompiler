@@ -26,25 +26,54 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- *
+ * ActionScript 2 package TreeItem.
  * @author JPEXS
  */
 public class AS2Package implements TreeItem {
 
+    /**
+     * SWF this package resides in.
+     */
     private final SWF swf;
 
+    /**
+     * Name.
+     */
     private final String name;
 
+    /**
+     * Parent package.
+     */
     private final AS2Package parent;
 
+    /**
+     * Subpackges.
+     */
     public Map<String, AS2Package> subPackages = new TreeMap<>();
 
+    /**
+     * Scripts in this package.
+     */
     public Map<String, ASMSource> scripts = new TreeMap<>();
 
-    private boolean flat;
+    /**
+     * Whether the package is flat = in the format "mypkg.sub1.sub2" instead of "sub1".
+     */
+    private final boolean flat;
 
-    private boolean defaultPackage;
+    /**
+     * Whether this is default package.
+     */
+    private final boolean defaultPackage;
 
+    /**
+     * Constructs AS2Package
+     * @param name Name
+     * @param parent Parent package
+     * @param swf SWF this package resides in
+     * @param flat Whether the package is flat = in the format "mypkg.sub1.sub2" instead of "sub1"
+     * @param defaultPackage 
+     */
     public AS2Package(String name, AS2Package parent, SWF swf, boolean flat, boolean defaultPackage) {
         this.name = name;
         this.parent = parent;
@@ -53,15 +82,27 @@ public class AS2Package implements TreeItem {
         this.defaultPackage = defaultPackage;
     }
 
+    /**
+     * Checks whether it is default package.
+     * @return 
+     */
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * Gets all subpackages and subscripts.
+     * @return 
+     */
     public List<TreeItem> getAllChildren() {
         List<TreeItem> result = new ArrayList<>(getChildCount());
         result.addAll(subPackages.values());
@@ -69,6 +110,11 @@ public class AS2Package implements TreeItem {
         return result;
     }
 
+    /**
+     * Gets child at index.
+     * @param index
+     * @return 
+     */
     public TreeItem getChild(int index) {
         if (index < subPackages.size()) {
             for (AS2Package subPackage : subPackages.values()) {
@@ -93,10 +139,19 @@ public class AS2Package implements TreeItem {
         return null;
     }
 
+    /**
+     * Gets child count.
+     * @return 
+     */
     public int getChildCount() {
         return subPackages.size() + scripts.size();
     }
 
+    /**
+     * Gets index of child.
+     * @param child
+     * @return 
+     */
     public int getIndexOfChild(TreeItem child) {
         int res = 0;
         if (child instanceof AS2Package) {
@@ -120,15 +175,27 @@ public class AS2Package implements TreeItem {
         return res;
     }
 
+   /**
+    * ToString.
+    * @return 
+    */
     @Override
     public String toString() {
         return name;
     }
 
+    /**
+     * Gets package name.
+     * @return 
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         for (ASMSource s : scripts.values()) {
@@ -143,7 +210,13 @@ public class AS2Package implements TreeItem {
         }
         return false;
     }
-
+    
+    
+    /**
+     * Checks whether the package is flat.
+     * Flat = in the format "mypkg.sub1.sub2" instead of "sub1".
+     * @return 
+     */
     public boolean isFlat() {
         return flat;
     }

@@ -37,67 +37,155 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *
+ * State at specific depth on a frame.
  * @author JPEXS
  */
 public class DepthState {
 
+    /**
+     * Depth.
+     */
     public int depth = -1;
 
+    /**
+     * CharacterId.
+     */
     public int characterId = -1;
 
+    /**
+     * Matrix.
+     */
     public MATRIX matrix;
 
+    /**
+     * Instance name.
+     */
     public String instanceName;
 
+    /**
+     * Class name.
+     */
     public String className;
 
+    /**
+     * Color transform.
+     */
     public ColorTransform colorTransForm;
 
+    /**
+     * Whether to cache as bitmap.
+     */
     public boolean cacheAsBitmap = false;
 
+    /**
+     * Blend mode.
+     */
     public int blendMode = 0;
 
+    /**
+     * Filters.
+     */
     public List<FILTER> filters = new ArrayList<>();
 
+    /**
+     * Whether is visible.
+     */
     public boolean isVisible = true;
 
+    /**
+     * Background color.
+     */
     public RGBA backGroundColor;
 
+    /**
+     * Clip actions.
+     */
     public CLIPACTIONS clipActions;
 
+    /**
+     * AMF data.
+     */
     public byte[] amfData;
 
+    /**
+     * Ratio.
+     */
     public int ratio = -1;
 
+    /**
+     * Whether this is a keyframe.
+     */
     public boolean key = false;
 
+    /**
+     * Clip depth.
+     */
     public int clipDepth = -1;
 
+    /**
+     * How many frames this depthstate is the same.
+     */
     public int time = 0;
 
+    /**
+     * SWF file.
+     */
     private final SWF swf;
 
+    /**
+     * Frame.
+     */
     public Frame frame;
 
+    /**
+     * Frame of placeobject.
+     */
     public Frame placeFrame;
 
+    /**
+     * Last placeObject.
+     */
     public PlaceObjectTypeTag placeObjectTag;
 
+    /**
+     * Minimum required PlaceObject version.
+     */
     public int minPlaceObjectNum;
 
+    /**
+     * Instance identifier.
+     */
     public long instanceId;
 
+    /**
+     * Whether this is a motion tween.
+     */
     public boolean motionTween = false;
 
+    /**
+     * Whether this state has an image placed.
+     */
     public boolean hasImage = false;
 
+    /**
+     * Instance ids counter.
+     */
     private static AtomicLong lastInstanceId = new AtomicLong(0);
 
+    /**
+     * Gets new instance id.
+     * @return 
+     */
     public static long getNewInstanceId() {
         return lastInstanceId.addAndGet(1);
     }
 
+    /**
+     * Constructs DepthState.
+     * @param swf SWF
+     * @param frame Frame
+     * @param placeFrame Frame of placeObject
+     */
     public DepthState(SWF swf, Frame frame, Frame placeFrame) {
         this.swf = swf;
         this.frame = frame;
@@ -105,6 +193,13 @@ public class DepthState {
         this.instanceId = getNewInstanceId();
     }
 
+    /**
+     * Constructs DepthState.
+     * @param obj Last DepthState
+     * @param frame Frame
+     * @param placeFrame Frame of placeObject
+     * @param sameInstance Whether it is same instance
+     */
     public DepthState(DepthState obj, Frame frame, Frame placeFrame, boolean sameInstance) {
         this.frame = frame;
         this.placeFrame = placeFrame;
@@ -134,16 +229,29 @@ public class DepthState {
         }
     }
 
+    /**
+     * Sets matrix.
+     * @param matrix 
+     */
     public void setMATRIX(MATRIX matrix) {
         this.matrix = matrix;
         this.placeObjectTag.setMatrix(matrix);
     }
 
+    /**
+     * Checks whether cache as bitmap is on.
+     * @return 
+     */
     public boolean cacheAsBitmap() {
         return (placeObjectTag != null && placeObjectTag.cacheAsBitmap())
-                || (filters != null && filters.size() > 0);
+                || (filters != null && !filters.isEmpty());
     }
 
+    /**
+     * Converts DepthState to PlaceObject tag of required version.
+     * @param depth Depth
+     * @return 
+     */
     public PlaceObjectTypeTag toPlaceObjectTag(int depth) {
         if (minPlaceObjectNum <= 1) {
             CXFORM cxForm0 = colorTransForm == null ? null : new CXFORM(colorTransForm);
@@ -160,6 +268,10 @@ public class DepthState {
         return new PlaceObject4Tag(swf, false, depth, className, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null, hasImage);
     }
 
+    /**
+     * Gets character tag.
+     * @return 
+     */
     public CharacterTag getCharacter() {
         if (characterId == -1) {
 
@@ -173,6 +285,10 @@ public class DepthState {
         return swf.getCharacter(characterId);
     }
 
+    /**
+     * Hashcode.
+     * @return 
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -196,6 +312,11 @@ public class DepthState {
         return hash;
     }
 
+    /**
+     * Equals.
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

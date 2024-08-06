@@ -22,44 +22,85 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.Objects;
 
 /**
- *
+ * A frame in a Scene object.
  * @author JPEXS
  */
 public class SceneFrame implements TreeItem {
 
+    /**
+     * SWF.
+     */
     private final SWF swf;
+    
+    /**
+     * Scene.
+     */
     private final Scene scene;
+    
+    /**
+     * Real frame index - from main SWF time line.
+     */
     private final int realFrameIndex;
 
+    /**
+     * Constructs SceneFrame.
+     * @param swf SWF
+     * @param scene Scene
+     * @param realFrameIndex Real frame index - from main SWF time line
+     */
     public SceneFrame(SWF swf, Scene scene, int realFrameIndex) {
         this.swf = swf;
         this.scene = scene;
         this.realFrameIndex = realFrameIndex;
     }
 
+    /**
+     * Gets scene frame index.
+     * @return 
+     */
     public int getSceneFrameIndex() {
         return realFrameIndex - scene.startFrame;
     }
 
+    /**
+     * Gets frame.
+     * @return 
+     */
     public Frame getFrame() {
         return swf.getTimeline().getFrame(realFrameIndex);
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return "scene frame " + (getSceneFrameIndex() + 1);
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         return getFrame().isModified();
     }
 
+    /**
+     * HashCode.
+     * @return 
+     */
     @Override
     public int hashCode() {
         int hash = 5;
@@ -68,6 +109,11 @@ public class SceneFrame implements TreeItem {
         return hash;
     }
 
+    /**
+     * Equals.
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
