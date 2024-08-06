@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Simple value interface.
  * @author JPEXS
  */
 public interface SimpleValue {

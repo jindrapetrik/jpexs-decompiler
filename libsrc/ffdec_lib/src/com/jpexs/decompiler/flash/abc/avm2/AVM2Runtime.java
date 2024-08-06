@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Type of AVM2 runtime enum.
  * @author JPEXS
  */
 public enum AVM2Runtime {

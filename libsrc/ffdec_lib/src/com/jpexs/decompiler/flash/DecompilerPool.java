@@ -30,29 +30,34 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.ImmediateFuture;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Decompiler thread pool.
  * @author JPEXS
  */
 public class DecompilerPool {
 
+    /**
+     * Executor
+     */
     private final ThreadPoolExecutor executor;
 
+    /**
+     * Openable to futures map
+     */
     private Map<Openable, List<Future<HighlightedText>>> openableToFutures = new WeakHashMap<>();
 
+    /**
+     * Constructs a new DecompilerPool.
+     */
     public DecompilerPool() {
         int threadCount = Configuration.getParallelThreadCount();
         executor = new ThreadPoolExecutor(threadCount, threadCount,
@@ -60,6 +65,13 @@ public class DecompilerPool {
                 new LinkedBlockingQueue<>());
     }
 
+    /**
+     * Submits a task.
+     * @param src Source
+     * @param actions Actions
+     * @param listener Listener
+     * @return Future
+     */
     public Future<HighlightedText> submitTask(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) {
         Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
@@ -92,6 +104,13 @@ public class DecompilerPool {
         return submit(callable);
     }
 
+    /**
+     * Submits a task.
+     * @param abcIndex ABC index
+     * @param pack Script pack
+     * @param listener Listener
+     * @return Future
+     */
     public Future<HighlightedText> submitTask(AbcIndexing abcIndex, ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) {
         Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
@@ -128,6 +147,11 @@ public class DecompilerPool {
         return submit(callable);
     }
 
+    /**
+     * Submits a task.
+     * @param callable Callable
+     * @return Future
+     */
     private Future<HighlightedText> submit(Callable<HighlightedText> callable) {
         boolean parallel = Configuration.parallelSpeedUp.get();
         if (parallel) {
@@ -149,6 +173,10 @@ public class DecompilerPool {
         }
     }
 
+    /**
+     * Gets statistics.
+     * @return Statistics
+     */
     public String getStat() {
         return "core: " + executor.getCorePoolSize()
                 + " size: " + executor.getPoolSize()
@@ -159,6 +187,13 @@ public class DecompilerPool {
                 + " completed: " + executor.getCompletedTaskCount();
     }
 
+    /**
+     * Decompiles ASM source.
+     * @param src ASM source
+     * @param actions Actions
+     * @return Highlighted text
+     * @throws InterruptedException
+     */
     public HighlightedText decompile(ASMSource src, ActionList actions) throws InterruptedException {
         Future<HighlightedText> future = submitTask(src, actions, null);
         SWF swf = src.getSwf();
@@ -183,6 +218,13 @@ public class DecompilerPool {
         return null;
     }
 
+    /**
+     * Decompiles a script pack.
+     * @param abcIndex ABC indexing
+     * @param pack Script pack
+     * @return Highlighted text
+     * @throws InterruptedException
+     */
     public HighlightedText decompile(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
         Future<HighlightedText> future = submitTask(abcIndex, pack, null);
 
@@ -208,11 +250,19 @@ public class DecompilerPool {
         return null;
     }
 
+    /**
+     * Shuts down the pool.
+     * @throws InterruptedException
+     */
     public void shutdown() throws InterruptedException {
         executor.shutdown();
         executor.awaitTermination(100, TimeUnit.SECONDS);
     }
 
+    /**
+     * Destroys a SWF.
+     * @param swf SWF
+     */
     public void destroySwf(SWF swf) {
         List<Future<HighlightedText>> futures = openableToFutures.get(swf);
         if (futures != null) {

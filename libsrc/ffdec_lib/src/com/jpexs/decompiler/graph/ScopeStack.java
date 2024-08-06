@@ -17,15 +17,22 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Stack for scope.
  * @author JPEXS
  */
 public class ScopeStack extends TranslateStack {
 
+    /**
+     * Constructs a new ScopeStack.
+     * @param allowEmpty Whether empty stack is allowed
+     */
     public ScopeStack(boolean allowEmpty) {
         super(allowEmpty ? "scope" : null);
     }
 
+    /**
+     * Constructs a new ScopeStack.
+     */
     public ScopeStack() {
         this(true);
     }

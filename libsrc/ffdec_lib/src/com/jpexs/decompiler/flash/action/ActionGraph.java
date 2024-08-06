@@ -21,79 +21,60 @@ import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
-import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
-import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
-import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
-import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
-import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
-import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
-import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.action.swf4.ActionJump;
-import com.jpexs.decompiler.flash.action.swf4.ActionNot;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
-import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphPartChangeException;
-import com.jpexs.decompiler.graph.GraphSource;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.Loop;
-import com.jpexs.decompiler.graph.SecondPassData;
-import com.jpexs.decompiler.graph.StopPartKind;
-import com.jpexs.decompiler.graph.ThrowState;
-import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
-import com.jpexs.decompiler.graph.model.BreakItem;
-import com.jpexs.decompiler.graph.model.GotoItem;
-import com.jpexs.decompiler.graph.model.IfItem;
-import com.jpexs.decompiler.graph.model.PopItem;
-import com.jpexs.decompiler.graph.model.PushItem;
-import com.jpexs.decompiler.graph.model.ScriptEndItem;
-import com.jpexs.decompiler.graph.model.SwitchItem;
-import com.jpexs.decompiler.graph.model.TrueItem;
-import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.decompiler.graph.*;
+import com.jpexs.decompiler.graph.model.*;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
- *
+ * ActionScript 1/2 graph
  * @author JPEXS
  */
 public class ActionGraph extends Graph {
 
+    /**
+     * Inside DoInitAction
+     */
     private boolean insideDoInitAction;
 
+    /**
+     * Inside function
+     */
     private boolean insideFunction;
+
+    /**
+     * Uninitialized class traits - maps class name to map of trait name to trait
+     */
     private Map<String, Map<String, Trait>> uninitializedClassTraits;
 
+    /**
+     * Constructs ActionGraph
+     * @param uninitializedClassTraits Uninitialized class traits
+     * @param path Path
+     * @param insideDoInitAction Inside DoInitAction
+     * @param insideFunction Inside function
+     * @param code Code
+     * @param registerNames Register names
+     * @param variables Variables
+     * @param functions Functions
+     * @param version Version
+     * @param charset Charset
+     */
     public ActionGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
         super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
         this.uninitializedClassTraits = uninitializedClassTraits;
@@ -101,15 +82,28 @@ public class ActionGraph extends Graph {
         this.insideFunction = insideFunction;
     }
 
+    /**
+     * Get uninitialized class traits
+     * @return Uninitialized class traits - maps class name to map of trait name to trait
+     */
     public Map<String, Map<String, Trait>> getUninitializedClassTraits() {
         return uninitializedClassTraits;
     }
 
+
+    /**
+     * Gets the graphSource
+     * @return GraphSource
+     */
     @Override
     public ActionGraphSource getGraphCode() {
         return (ActionGraphSource) code;
     }
 
+    /**
+     * Gets sub-graphs
+     * @return
+     */
     @Override
     public LinkedHashMap<String, Graph> getSubGraphs() {
         LinkedHashMap<String, Graph> subgraphs = new LinkedHashMap<>();
@@ -141,15 +135,40 @@ public class ActionGraph extends Graph {
         return subgraphs;
     }
 
+    /**
+     * Checks whether is inside DoInitAction.
+     * @return True if is inside DoInitAction, false otherwise
+     */
     public boolean isInsideDoInitAction() {
         return insideDoInitAction;
     }
 
+    /**
+     * Method called after populating all parts.
+     * @param allParts All parts
+     */
     @Override
     protected void afterPopupateAllParts(Set<GraphPart> allParts) {
 
     }
 
+    /**
+     * Translates via Graph - decompiles.
+     * @param uninitializedClassTraits Uninitialized class traits
+     * @param secondPassData Second pass data
+     * @param insideDoInitAction Inside DoInitAction
+     * @param insideFunction Inside function
+     * @param registerNames Register names
+     * @param variables Variables
+     * @param functions Functions
+     * @param code Code
+     * @param version Version
+     * @param staticOperation Unused
+     * @param path Path
+     * @param charset Charset
+     * @return List of graph target items
+     * @throws InterruptedException
+     */
     public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
         ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
@@ -157,6 +176,13 @@ public class ActionGraph extends Graph {
         return g.translate(localData, staticOperation, path);
     }
 
+    /**
+     * Final process stack.
+     * Override this method to provide custom behavior.
+     * @param stack Translate stack
+     * @param output Output
+     * @param path Path
+     */
     @Override
     public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
         if (stack.size() > 0) {
@@ -172,6 +198,13 @@ public class ActionGraph extends Graph {
         }
     }
 
+    /**
+     * Checks whether a part can be a break candidate.
+     * @param localData Local data
+     * @param part Part
+     * @param throwStates List of throw states
+     * @return True if part can be a break candidate
+     */
     @Override
     protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         if (part.refs.size() <= 1) {
@@ -190,6 +223,14 @@ public class ActionGraph extends Graph {
         return !isSwitch;
     }
 
+    /**
+     * Final process.
+     * @param list List of GraphTargetItems
+     * @param level Level
+     * @param localData Local data
+     * @param path Path
+     * @throws InterruptedException
+     */
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
@@ -464,6 +505,12 @@ public class ActionGraph extends Graph {
 
     }
 
+    /**
+     * Moves all stack items to commands.
+     * (If it's not a branch stack resistant or other special case)
+     * @param commands Commands
+     * @param stack Stack
+     */
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         GraphTargetItem enumerate = null;
         if (!commands.isEmpty() && (commands.get(commands.size() - 1) instanceof EnumerateActionItem)) {
@@ -509,6 +556,14 @@ public class ActionGraph extends Graph {
         }
     }
 
+    /**
+     * Translates the graph - decompiles.
+     * @param localData Local data
+     * @param staticOperation Unused
+     * @param path Path
+     * @return List of GraphTargetItems
+     * @throws InterruptedException
+     */
     @Override
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = super.translate(localData, staticOperation, path);
@@ -536,6 +591,10 @@ public class ActionGraph extends Graph {
         }
      
      
+     */
+    /**
+     * Makes define registers up.
+     * @param list List of GraphTargetItems
      */
     private void makeDefineRegistersUp(List<GraphTargetItem> list) {
         for (int i = 0; i < list.size(); i++) {
@@ -581,6 +640,12 @@ public class ActionGraph extends Graph {
         }
     }
 
+    /**
+     * Finds part.
+     * @param ip IP
+     * @param allParts All parts
+     * @return GraphPart
+     */
     private GraphPart findPart(int ip, Set<GraphPart> allParts) {
         for (GraphPart p : allParts) {
             if (p.containsIP(ip)) {
@@ -590,6 +655,30 @@ public class ActionGraph extends Graph {
         return null;
     }
 
+    /**
+     * Check before decompiling next section.
+     * @param currentRet Current return
+     * @param foundGotos Found gotos
+     * @param partCodes Part codes
+     * @param partCodePos Part code position
+     * @param visited Visited
+     * @param code Code
+     * @param localData Local data
+     * @param allParts All parts
+     * @param stack Stack
+     * @param parent Parent part
+     * @param part Part
+     * @param stopPart Stop part
+     * @param stopPartKind Stop part kind
+     * @param loops Loops
+     * @param throwStates Throw states
+     * @param output Output
+     * @param currentLoop Current loop
+     * @param staticOperation Unused
+     * @param path Path
+     * @return List of GraphTargetItems to replace current output and stop further processing. Null to continue.
+     * @throws InterruptedException
+     */
     @Override
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
@@ -695,6 +784,11 @@ public class ActionGraph extends Graph {
         return ret;
     }
 
+    /**
+     * Checks IP and allows to modify it.
+     * @param ip Current IP
+     * @return New IP
+     */
     @Override
     protected int checkIp(int ip) {
         int oldIp = ip;
@@ -723,6 +817,12 @@ public class ActionGraph extends Graph {
         return ip;
     }
 
+    /**
+     * Prepares second pass data.
+     * Can return null when no second pass will happen.
+     * @param list List of GraphTargetItems
+     * @return Second pass data or null
+     */
     @Override
     public SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         ActionSecondPassData spd = new ActionSecondPassData();
@@ -735,6 +835,14 @@ public class ActionGraph extends Graph {
         return spd;
     }
 
+    /**
+     * Checks second pass switches.
+     * @param processedIfs Processed ifs
+     * @param list List of GraphTargetItems
+     * @param allSwitchParts All switch parts
+     * @param allSwitchOnFalseParts All switch on false parts
+     * @param allSwitchExpressions All switch expressions
+     */
     private void checkSecondPassSwitches(Set<GraphPart> processedIfs, List<GraphTargetItem> list, List<List<GraphPart>> allSwitchParts, List<List<GraphPart>> allSwitchOnFalseParts, List<List<GraphTargetItem>> allSwitchExpressions) {
         for (GraphTargetItem item : list) {
             if (item instanceof IfItem) {

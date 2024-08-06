@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
-import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
+import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCodeException;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -45,17 +45,10 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.stat.Statistics;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -153,7 +146,7 @@ public final class MethodBody implements Cloneable {
                 if (abc != null) {
                     avm2Code.removeWrongIndices(abc.constants);
                 }
-            } catch (UnknownInstructionCode | IOException ex) {
+            } catch (UnknownInstructionCodeException | IOException ex) {
                 avm2Code = new AVM2Code();
                 logger.log(Level.SEVERE, null, ex);
             }

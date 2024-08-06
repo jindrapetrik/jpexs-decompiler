@@ -20,30 +20,59 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 /**
- *
+ * Code statistics.
  * @author JPEXS
  */
 public class CodeStats {
 
+    /**
+     * Maximum stack size
+     */
     public int maxstack = 0;
 
+    /**
+     * Maximum scope size
+     */
     public int maxscope = 0;
 
+    /**
+     * Number of local registers
+     */
     public int maxlocal = 1;
 
+    /**
+     * Initial scope size
+     */
     public int initscope = 0;
 
+    /**
+     * Has set_dxns instruction
+     */
     public boolean has_set_dxns = false;
 
+    /**
+     * Has activation instruction
+     */
     public boolean has_activation = false;
 
+    /**
+     * Instruction statistics
+     */
     public InstructionStats[] instructionStats;
 
+    /**
+     * Converts statistics to string.
+     * @param writer Writer
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return Writer
+     */
     public GraphTextWriter toString(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
         writer.appendNoHilight("Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal).newLine();
         int i = 0;
@@ -59,9 +88,16 @@ public class CodeStats {
         return writer;
     }
 
+    /**
+     * Constructs code statistics.
+     */
     public CodeStats() {
     }
 
+    /**
+     * Constructs code statistics.
+     * @param code AVM2 code
+     */
     public CodeStats(AVM2Code code) {
         instructionStats = new InstructionStats[code.code.size()];
         for (int i = 0; i < code.code.size(); i++) {

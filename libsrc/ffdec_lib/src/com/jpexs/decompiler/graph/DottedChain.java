@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.helpers.Helper;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,10 +27,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Dotted chain class.
+ * Represents a chain of names separated by dots.
  * @author JPEXS
  */
 public class DottedChain implements Serializable, Comparable<DottedChain> {
+
+    //Basic dotted chains
 
     public static final DottedChain EMPTY = new DottedChain(true);
 
@@ -65,14 +69,29 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     public static final DottedChain ALL = new DottedChain(new String[]{"*"});
 
+    /**
+     * Parts of the chain.
+     */
     private List<PathPart> parts;
 
+    /**
+     * Is this chain null?
+     */
     private boolean isNull = false;
 
+    /**
+     * Get the namespace suffix of the part at the given index.
+     * @param index Index
+     * @return Namespace suffix
+     */
     public String getNamespaceSuffix(int index) {
         return parts.get(index).namespaceSuffix;
     }
 
+    /**
+     * Gets the last namespace suffix.
+     * @return Last namespace suffix
+     */
     public String getLastNamespaceSuffix() {
         if (parts.isEmpty()) {
             return "";
@@ -80,6 +99,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return parts.get(parts.size() - 1).namespaceSuffix;
     }
 
+    /**
+     * Parses a dotted chain from a string without suffix.
+     * @param name Name
+     * @return Dotted chain
+     */
     public static final DottedChain parseNoSuffix(String name) {
         if (name == null) {
             return DottedChain.EMPTY;
@@ -96,6 +120,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
     }
 
+    /**
+     * Parses a dotted chain from a string with suffix.
+     * @param name Name
+     * @return Dotted chain
+     */
     public static final DottedChain parseWithSuffix(String name) {
         if (name == null) {
             return DottedChain.EMPTY;
@@ -118,25 +147,46 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param isNull Whether the chain is null
+     */
     private DottedChain(boolean isNull) {
         this.isNull = isNull;
         this.parts = new ArrayList<>();
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param src Source chain
+     */
     public DottedChain(DottedChain src) {
         this.parts = new ArrayList<>(src.parts);
         this.isNull = src.isNull;
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param parts Parts
+     */
     public DottedChain(String[] parts) {
         this(Arrays.asList(parts));
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param parts Parts
+     * @param isNull Whether the chain is null
+     */
     private DottedChain(List<PathPart> parts, boolean isNull) {
         this.parts = parts;
         this.isNull = isNull;
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param parts Parts
+     */
     public DottedChain(List<String> parts) {
         List<PathPart> newParts = new ArrayList<>();
         for (String part : parts) {
@@ -145,10 +195,21 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         this.parts = newParts;
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param parts Parts
+     * @param namespaceSuffixes Namespace suffixes
+     */
     public DottedChain(String[] parts, String[] namespaceSuffixes) {
         this(new boolean[parts.length], parts, namespaceSuffixes);
     }
 
+    /**
+     * Constructs a new dotted chain.
+     * @param attributes Attributes
+     * @param parts Parts
+     * @param namespaceSuffixes Namespace suffixes
+     */
     public DottedChain(boolean[] attributes, String[] parts, String[] namespaceSuffixes) {
         List<PathPart> newParts = new ArrayList<>();
         for (int i = 0; i < attributes.length; i++) {
@@ -158,18 +219,35 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     }
 
+    /**
+     * Checks whether this chain is top-level.
+     * @return Whether this chain is top-level
+     */
     public boolean isTopLevel() {
         return !isNull && parts.isEmpty();
     }
 
+    /**
+     * Checks whether this chain is empty.
+     * @return Whether this chain is empty
+     */
     public boolean isEmpty() {
         return isNull;
     }
 
+    /**
+     * Gets the number of parts in this chain.
+     * @return Number of parts
+     */
     public int size() {
         return parts.size();
     }
 
+    /**
+     * Gets the part at the given index.
+     * @param index Index
+     * @return Part
+     */
     public String get(int index) {
         if (index >= parts.size()) {
             throw new ArrayIndexOutOfBoundsException();
@@ -178,6 +256,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return parts.get(index).name;
     }
 
+    /**
+     * Checks whether the part at the given index is an attribute.
+     * @param index Index
+     * @return Whether the part at the given index is an attribute
+     */
     public boolean isAttribute(int index) {
         if (index >= parts.size()) {
             throw new ArrayIndexOutOfBoundsException();
@@ -185,6 +268,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return parts.get(index).attribute;
     }
 
+    /**
+     * Gets the sub-chain of specific length.
+     * @param count Length
+     * @return
+     */
     public DottedChain subChain(int count) {
         if (count > parts.size()) {
             throw new ArrayIndexOutOfBoundsException();
@@ -193,6 +281,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return new DottedChain(new ArrayList<>(parts.subList(0, count)), isNull);
     }
 
+    /**
+     * Gets last part.
+     * @return Last part
+     */
     public String getLast() {
         if (isNull) {
             return null;
@@ -204,6 +296,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
     }
 
+    /**
+     * Checks whether the last part is an attribute.
+     * @return Whether the last part is an attribute
+     */
     public boolean isLastAttribute() {
         if (isNull) {
             return false;
@@ -215,6 +311,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         }
     }
 
+    /**
+     * Gets the chain without the last part.
+     * @return Chain without the last part
+     */
     public DottedChain getWithoutLast() {
         if (isNull) {
             return null;
@@ -226,6 +326,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return subChain(parts.size() - 1);
     }
 
+    /**
+     * Adds a part to the chain with a suffix.
+     * @param name Name
+     * @return New chain
+     */
     public DottedChain addWithSuffix(String name) {
         String addedNameNoSuffix = name;
         String addedNamespaceSuffix = "";
@@ -236,10 +341,23 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return add(addedNameNoSuffix, addedNamespaceSuffix);
     }
 
+    /**
+     * Adds a part to the chain.
+     * @param name Name
+     * @param namespaceSuffix Namespace suffix
+     * @return New chain
+     */
     public DottedChain add(String name, String namespaceSuffix) {
         return add(false, name, namespaceSuffix);
     }
 
+    /**
+     * Adds a part to the chain.
+     * @param attribute Whether the part is an attribute
+     * @param name Name
+     * @param namespaceSuffix Namespace suffix
+     * @return New chain
+     */
     public DottedChain add(boolean attribute, String name, String namespaceSuffix) {
         if (name == null) {
             return new DottedChain(this);
@@ -249,10 +367,23 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return new DottedChain(newParts, false);
     }
 
+    /**
+     * Adds prefix to the chain.
+     * @param name Name
+     * @param namespaceSuffix Namespace suffix
+     * @return New chain
+     */
     public DottedChain preAdd(String name, String namespaceSuffix) {
         return preAdd(false, name, namespaceSuffix);
     }
 
+    /**
+     * Adds prefix to the chain.
+     * @param attribute Whether the part is an attribute
+     * @param name Name
+     * @param namespaceSuffix Namespace suffix
+     * @return New chain
+     */
     public DottedChain preAdd(boolean attribute, String name, String namespaceSuffix) {
         if (name == null) {
             return new DottedChain(this);
@@ -262,11 +393,22 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return new DottedChain(newParts, false);
     }
 
+    /**
+     * To string.
+     * @return String
+     */
     @Override
     public String toString() {
         return toRawString();
     }
 
+    /**
+     * To string.
+     * @param as3 Whether to print as AS3
+     * @param raw Whether to print raw (without deobfuscation)
+     * @param withSuffix Whether to print with suffix
+     * @return String
+     */
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
         if (isNull) {
             return "";
@@ -294,6 +436,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return ret.toString();
     }
 
+    /**
+     * To file path.
+     * @return File path
+     */
     public String toFilePath() {
         if (isNull) {
             return "";
@@ -313,6 +459,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return ret.toString();
     }
 
+    /**
+     * To list.
+     * @return List
+     */
     public List<String> toList() {
         List<String> ret = new ArrayList<>();
         for (PathPart p : parts) {
@@ -321,14 +471,27 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return ret;
     }
 
+    /**
+     * To printable string.
+     * @param as3 Whether to print as AS3
+     * @return Printable string
+     */
     public String toPrintableString(boolean as3) {
         return toString(as3, false, true);
     }
 
+    /**
+     * To raw string. (without deobfuscation)
+     * @return Raw string
+     */
     public String toRawString() { //Is SUFFIX correctly handled?
         return toString(false/*ignored*/, true, true);
     }
 
+    /**
+     * Hash code.
+     * @return Hash code
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -337,6 +500,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return hash;
     }
 
+    /**
+     * Equals.
+     * @param obj Object
+     * @return Whether this object is equal to the given object
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -355,23 +523,52 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return Objects.equals(this.parts, other.parts);
     }
 
+    /**
+     * Compare to.
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     */
     @Override
     public int compareTo(DottedChain o) {
         return toRawString().compareTo(o.toRawString());
     }
 
+    /**
+     * Path part class.
+     */
     private static class PathPart implements Serializable {
 
+        /**
+         * Name.
+         */
         public String name;
+
+        /**
+         * Is this part an attribute?
+         */
         public boolean attribute;
+
+        /**
+         * Namespace suffix.
+         */
         public String namespaceSuffix;
 
+        /**
+         * Constructs a new path part.
+         * @param name Name
+         * @param attribute Whether this part is an attribute
+         * @param namespaceSuffix Namespace suffix
+         */
         public PathPart(String name, boolean attribute, String namespaceSuffix) {
             this.name = name;
             this.attribute = attribute;
             this.namespaceSuffix = namespaceSuffix;
         }
 
+        /**
+         * Hash code.
+         * @return
+         */
         @Override
         public int hashCode() {
             int hash = 5;
@@ -381,6 +578,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             return hash;
         }
 
+        /**
+         * Equals.
+         * @param obj Object
+         * @return Whether this object is equal to the given object
+         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {

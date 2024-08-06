@@ -26,13 +26,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.*;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -41,36 +35,13 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.action.ActionLocalData;
+import com.jpexs.decompiler.flash.action.*;
 import com.jpexs.decompiler.flash.action.as2.UninitializedClassFieldsDetector;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
-import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
-import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
-import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
-import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
-import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
-import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
+import com.jpexs.decompiler.flash.action.swf4.*;
+import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.cache.AS2Cache;
 import com.jpexs.decompiler.flash.cache.AS3Cache;
@@ -96,135 +67,48 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DebugIDTag;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
-import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DoABC2Tag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
-import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
-import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
-import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
-import com.jpexs.decompiler.flash.tags.EndTag;
-import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
-import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
-import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.ProtectTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SymbolClassTag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
-import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
-import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.Exportable;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.ImportTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
-import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.tags.base.SoundTag;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.*;
+import com.jpexs.decompiler.flash.tags.base.*;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
-import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
-import com.jpexs.decompiler.flash.timeline.FrameScript;
-import com.jpexs.decompiler.flash.timeline.TagScript;
-import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.timeline.*;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.flash.types.sound.SoundInfoSoundCacheEntry;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
-import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Cache;
-import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ImmediateFuture;
-import com.jpexs.helpers.NulStream;
-import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.Reference;
-import com.jpexs.helpers.SerializableImage;
+import com.jpexs.helpers.*;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 /**
  * Class representing SWF file.
@@ -677,8 +561,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Check whether the ExporterInfo (GFX) tag has flag for stripping shapes from DefineFont.
-     * @return 
+     * Checks whether the ExporterInfo (GFX) tag has flag for stripping shapes from DefineFont.
+     * @return True if the flag is set, false otherwise.
      */
     public boolean hasStrippedShapesFromFonts() {
         if (exporterInfo == null) {
@@ -692,7 +576,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets main ABCIndexing object for playerflobal.swc
-     * @return 
+     * @return ABCIndexing
      */
     public static AbcIndexing getPlayerGlobalAbcIndex() {
         return playerGlobalAbcIndex;
@@ -700,7 +584,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets main ABCIndexing object for airglobal.swc
-     * @return 
+     * @return ABCIndexing
      */
     public static AbcIndexing getAirGlobalAbcIndex() {
         return airGlobalAbcIndex;
@@ -715,7 +599,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets ABCIndexing object
-     * @return 
+     * @return ABCIndexing
      */
     public AbcIndexing getAbcIndex() {
         if (abcIndex != null) {
@@ -745,7 +629,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets number of ABCIndex dependent SWFs
-     * @return 
+     * @return Number of dependent SWFs
      */
     public int getNumAbcIndexDependencies() {
         return numAbcIndexDependencies;
@@ -753,7 +637,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Set dependencies for ABCIndex for resolving names during editation.
-     * @param swfs 
+     * @param swfs List of SWFs to set as dependencies
      */
     public void setAbcIndexDependencies(List<SWF> swfs) {
         abcIndex = null;
@@ -799,7 +683,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets SWF charset. SWF version 5 or lower were non-unicode. SWF object has assigned charset.
-     * @return 
+     * @return Charset
      */
     public String getCharset() {
         return charset;
@@ -807,7 +691,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Sets SWF charset. SWF version 5 or lower were non-unicode. SWF object has assigned charset.
-     * @param charset 
+     * @param charset Charset
      */
     public void setCharset(String charset) {
         this.charset = charset;
@@ -815,7 +699,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Sets modification flag for header.
-     * @param headerModified 
+     * @param headerModified Header modified flag
      */
     public void setHeaderModified(boolean headerModified) {
         this.headerModified = headerModified;
@@ -823,7 +707,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets modification flag for header.s
-     * @return 
+     * @return True if header was modified, false otherwise
      */
     public boolean isHeaderModified() {
         return headerModified;
@@ -911,7 +795,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Clears specified dump info.
-     * @param di 
+     * @param di Dump info to clear
      */
     private void clearDumpInfo(DumpInfo di) {
         for (DumpInfo childInfo : di.getChildInfos()) {
@@ -998,8 +882,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets all CharacterIdTags for specified character (with the same characterId).
-     * @param characterId
-     * @return
+     * @param characterId Character id
+     * @return List of CharacterIdTags
      */
     public List<CharacterIdTag> getCharacterIdTags(int characterId) {
         if (characterIdTags == null) {
@@ -1011,7 +895,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets CharacterIdTag with specific tag type.
-     * @param characterId
+     * @param characterId Id of the character
      * @param tagId Id of type of the tag. For example DefineFontNameTag.ID
      * @return CharacterIdTag or null when not found
      */
@@ -1032,7 +916,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Computes dependent characters of specified Timelined object.
-     * @param timelined
+     * @param timelined Timelined object
      * @param dep Adds results to this map.
      */
     private void computeDependentCharacters(Timelined timelined, Map<Integer, Set<Integer>> dep) {
@@ -1087,7 +971,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets dependent characters of a character.
-     * @param characterId
+     * @param characterId Character id
      * @return Set of dependent characterIds
      */
     public Set<Integer> getDependentCharacters(int characterId) {
@@ -1151,7 +1035,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets dependent frames for specified character.
-     * @param characterId
+     * @param characterId Character id
      * @return Set of dependent characterids
      */
     public Set<Integer> getDependentFrames(int characterId) {
@@ -1168,7 +1052,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets character tag by character id
-     * @param characterId
+     * @param characterId Character id
      * @return CharacterTag or null when not found
      */
     public CharacterTag getCharacter(int characterId) {
@@ -1177,7 +1061,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets character tag by the assigned AS3 class name (SymbolClass tag)
-     * @param className
+     * @param className Class name
      * @return CharacterTag or null when not found
      */
     public CharacterTag getCharacterByClass(String className) {
@@ -1193,7 +1077,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets character tag by the assigned export name (ExportAssets tag)
-     * @param exportName
+     * @param exportName Export name
      * @return CharacterTag or null when not found
      */
     public CharacterTag getCharacterByExportName(String exportName) {
@@ -1211,7 +1095,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets export name for specified character. 
      * Export names come from ExportAssets tag.
-     * @param characterId
+     * @param characterId Character id
      * @return Export name or null when no assigned exportname.
      */
     public String getExportName(int characterId) {
@@ -1222,7 +1106,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     
     /**
      * Gets URL from where the specified class was imported (ImportAssets/2 tag).
-     * @param className
+     * @param className Class name
      * @return URL or null when it's not imported
      */
     public String getClassSourceUrl(String className) {
@@ -1231,7 +1115,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets FontTag by class name.
-     * @param fontClass
+     * @param fontClass Class name
      * @return FontTag or null when not found
      */
     public FontTag getFontByClass(String fontClass) {
@@ -1250,7 +1134,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets FontTag by font name (that one from DefineFontNameTag).
-     * @param fontName
+     * @param fontName Font name
      * @return FontTag or null when not found
      */
     public FontTag getFontByName(String fontName) {
@@ -1270,9 +1154,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets FontTag by font name in tag and font style.
      * The font name is taken directly from that tag (from FontInfoTag for DefineFont1).
-     * @param fontName
-     * @param bold
-     * @param italic
+     * @param fontName Font name
+     * @param bold Bold
+     * @param italic Italic
      * @return FontTag or null when not found
      */
     public FontTag getFontByNameInTag(String fontName, boolean bold, boolean italic) {
@@ -1295,7 +1179,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Normal .getCharacterId method od the CharacterTag does not work for
      * imported characters.
      *
-     * @param tag
+     * @param tag CharacterId tag
      * @return Character id or -1 if not found
      */
     public int getCharacterId(CharacterIdTag tag) {
@@ -1311,7 +1195,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets FontTag by fontId (= characterId).
      * Logs a SEVERE message when the charter found, but is not a FontTag.
-     * @param fontId
+     * @param fontId Font id
      * @return FontTag or null when not found or the character is not a FontTag
      */
     public FontTag getFont(int fontId) {
@@ -1330,7 +1214,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets ImageTag by imageId (= characterId).
      * Logs a SEVERE message when the charter found, but is not a ImageTag.
-     * @param imageId
+     * @param imageId Image id
      * @return ImageTag or null when not found or the character is not an ImageTag
      */
     public ImageTag getImage(int imageId) {
@@ -1349,7 +1233,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets DefineSoundTag by soundId (= characterId).
      * Logs a SEVERE message when the charter found, but is not a DefineSoundTag.
-     * @param soundId
+     * @param soundId Sound id
      * @return DefineSoundTag or null when not found or the character is not an DefineSoundTag
      */
     public DefineSoundTag getSound(int soundId) {
@@ -1368,7 +1252,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets TextTag by textId (= characterId).
      * Logs a SEVERE message when the charter found, but is not a TextTag.
-     * @param textId
+     * @param textId Text id
      * @return TextTag or null when not found or the character is not an TextTag
      */
     public TextTag getText(int textId) {
@@ -1386,7 +1270,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets list of all ABC container tags in this SWF.
-     * @return 
+     * @return List of ABCContainerTag
      */
     public List<ABCContainerTag> getAbcList() {
         if (abcList == null) {
@@ -1405,7 +1289,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Checks whether this SWF is AS3.
      * The information is coming from FileAttributesTag and its actionscript3 flag.
-     * @return 
+     * @return True if AS3, false otherwise
      */
     public boolean isAS3() {
         FileAttributesTag fileAttributes = getFileAttributes();
@@ -1531,7 +1415,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Resets all timelines of the specified timelined object.
-     * @param timelined 
+     * @param timelined Timelined object
      */
     public void resetTimelines(Timelined timelined) {
         timelined.resetTimeline();
@@ -1546,10 +1430,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Walks all tags lin the list and searches for characterTags, characterIdTags and DefineExternalImage2
-     * @param list
-     * @param externalImages2
-     * @param characters
-     * @param characterIdTags 
+     * @param list List of tags
+     * @param externalImages2 Map of imageId to DefineExternalImage2
+     * @param characters Map of characterId to CharacterTag
+     * @param characterIdTags Map of characterId to list of CharacterIdTags
      */
     private void parseCharacters(Iterable<Tag> list, Map<Integer, DefineExternalImage2> externalImages2, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
         Iterator<Tag> iterator = list.iterator();
@@ -1599,9 +1483,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Checks whether a sprite is not recursive and thus valid.
-     * @param sprite
+     * @param sprite Sprite to check
      * @param path Already processed character ids
-     * @return
+     * @return True if valid, false otherwise
      */
     private boolean isSpriteValid(DefineSpriteTag sprite, List<Integer> path) {
         if (path.contains(sprite.spriteId)) {
@@ -1621,7 +1505,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets timeline.
-     * @return 
+     * @return Timeline
      */
     @Override
     public Timeline getTimeline() {
@@ -1645,7 +1529,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Gets all tags with specified type id.
      *
      * @param tagId Identificator of tag type
-     * @return
+     * @return List of tags
      */
     public List<Tag> getTagData(int tagId) {
         List<Tag> ret = new ArrayList<>();
@@ -1660,7 +1544,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Saves this SWF into OutputStream.
      *
-     * @param os
+     * @param os OutputStream
      */
     @Override
     public void saveTo(OutputStream os) throws IOException {
@@ -1669,9 +1553,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Saves this SWF into OutputStream with gfx and includeImported option.
-     * @param os
-     * @param gfx
-     * @param includeImported
+     * @param os OutputStream
+     * @param gfx GFX
+     * @param includeImported Include imported characters
      * @throws IOException 
      */
     public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
@@ -1718,7 +1602,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets bytes of header.
-     * @return 
+     * @return Header bytes
      */
     public byte[] getHeaderBytes() {
         return getHeaderBytes(compression, gfx, encrypted);
@@ -1726,9 +1610,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets specifif header bytes.
-     * @param compression
-     * @param gfx
-     * @return 
+     * @param compression Compression
+     * @param gfx GFX
+     * @return Header bytes
      */
     private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx) {
         return getHeaderBytes(compression, gfx, false);
@@ -1736,10 +1620,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets specific header bytes with encrypted option.
-     * @param compression
-     * @param gfx
+     * @param compression Compression
+     * @param gfx GFX
      * @param encrypted Enable Harman encryption?
-     * @return 
+     * @return Header bytes
      */
     private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx, boolean encrypted) {
         if (compression == SWFCompression.LZMA_ABC) {
@@ -1785,7 +1669,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Save file to byte array.
      * @param includeImported Include imported characterss
-     * @return
+     * @return Byte array
      * @throws IOException 
      */
     private byte[] saveToByteArray(boolean includeImported) throws IOException {
@@ -1794,9 +1678,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Save file to byte array with GFX option.
-     * @param gfx
+     * @param gfx GFX
      * @param includeImported Include imported characterss
-     * @return
+     * @return Byte array
      * @throws IOException 
      */
     private byte[] saveToByteArray(boolean gfx, boolean includeImported) throws IOException {
@@ -1831,7 +1715,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Checks whether SWF is modified.
      * First checks its internal modified flag, if its not, then walks all tags
      * and checks their modified flag.
-     * @return 
+     * @return True if modified, false otherwise
      */
     @Override
     public boolean isModified() {
@@ -1852,8 +1736,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Sets modified flag.s
-     * @param value 
+     * Sets modified flag.
+     * @param value Value to set
      */
     @Override
     public void setModified(boolean value) {
@@ -1904,7 +1788,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
      * @throws java.io.IOException
      * @throws java.lang.InterruptedException
@@ -1916,7 +1800,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use unicode)
      * @throws java.io.IOException
@@ -1929,7 +1813,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
      * @param lazy Do not parse all data, load it as necessary.
      * @throws java.io.IOException
@@ -1942,7 +1826,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
      * @param lazy Do not parse all data, load it as necessary.
      * @param charset Charset for SWFs with version 5 or lower (they do not use unicode)
@@ -1956,7 +1840,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param parallelRead Use parallel threads?
@@ -1970,7 +1854,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param parallelRead Use parallel threads?
@@ -1985,7 +1869,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param listener Progress listener
      * @param parallelRead Use parallel threads?
      */
@@ -1995,7 +1879,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Constructs SWF from stream.
-     * @param is
+     * @param is Stream to read SWF from
      * @param listener Progress listener
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use unicode)
@@ -2024,7 +1908,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2039,7 +1923,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Constructs SWF from stream - Faster constructor to check SWF only.
-     * @param is
+     * @param is Stream to read SWF from
      * @throws java.io.IOException
      */
     public SWF(InputStream is) throws IOException {
@@ -2049,7 +1933,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2067,7 +1951,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2084,7 +1968,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      * 
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2101,7 +1985,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Constructs SWF from stream.
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2120,7 +2004,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Constructs SWF from stream.
      *
-     * @param is
+     * @param is Stream to read SWF from
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
@@ -2224,7 +2108,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Resolve importAssets/2 tags.
      * Loads the external files using URL resolver. Calculates all characters.
-     * @param resolver 
+     * @param resolver URL resolver
      */
     private synchronized void resolveImported(UrlResolver resolver) {
         for (int p = 0; p < tags.size(); p++) {
@@ -2272,7 +2156,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets openable. (Self for SWF)
-     * @return 
+     * @return SWF
      */
     @Override
     public SWF getOpenable() {
@@ -2281,7 +2165,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets SWF that is root of the DefineBinaryData tag chain.
-     * @return 
+     * @return Root SWF
      */
     public SWF getRootSwf() {
         SWF result = this;
@@ -2331,7 +2215,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets short file name based on file title and file.
-     * @return 
+     * @return Short file name
      */
     @Override
     public String getShortFileName() {
@@ -2341,7 +2225,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets title of this SWF incuding parent nodes like SwfList and
      * DefineBinaryData.     
-     * @return 
+     * @return Title of the SWF
      */
     @Override
     public String getShortPathTitle() {
@@ -2357,9 +2241,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets full path title of this SWF incuding parent nodes like SwfList and
+     * Gets full path title of this SWF including parent nodes like SwfList and
      * DefineBinaryData.    
-     * @return 
+     * @return Full path title of the SWF
      */
     @Override
     public String getFullPathTitle() {
@@ -2376,7 +2260,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Sets file.
-     * @param file 
+     * @param file File
      */
     @Override
     public void setFile(String file) {
@@ -2386,7 +2270,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets file modification date.
-     * @return 
+     * @return Modification date
      */
     public Date getFileModificationDate() {
         try {
@@ -2408,8 +2292,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets all ABC container tags.
-     * @param list
-     * @param actionScripts 
+     * @param list List of tags
+     * @param actionScripts List of ABC container tags
      */
     private static void getAbcTags(Iterable<Tag> list, List<ABCContainerTag> actionScripts) {
         for (Tag t : list) {
@@ -2511,10 +2395,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Compresses SWF file
      *
-     * @param is
-     * @param os
-     * @param compression
-     * @param lzmaProperties
+     * @param is InputStream
+     * @param os OutputStream
+     * @param compression Compression
+     * @param lzmaProperties LZMA properties
      */
     private static void compress(InputStream is, OutputStream os, SWFCompression compression, byte[] lzmaProperties) throws IOException {
         byte[] hdr = new byte[8];
@@ -2612,9 +2496,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Compresses SWF file.
      *
-     * @param fis
-     * @param fos
-     * @param compression 
+     * @param fis InputStream
+     * @param fos OutputStream
+     * @param compression Compression
      * @return True on success
      */
     public static boolean compress(InputStream fis, OutputStream fos, SWFCompression compression) {
@@ -2628,8 +2512,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Encrypts Harman AIR encryption
-     * @param is
-     * @param os
+     * @param is InputStream
+     * @param os OutputStream
      * @return True on success
      * @throws java.io.IOException
      */
@@ -2655,8 +2539,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Decrypts Harman AIR encryption
-     * @param is
-     * @param os
+     * @param is InputStream
+     * @param os OutputStream
      * @return True on success
      * @throws java.io.IOException 
      */
@@ -2688,10 +2572,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Decodes LZMA stream.
-     * @param is
-     * @param os
-     * @param lzmaProperties
-     * @param fileSize
+     * @param is InputStream
+     * @param os OutputStream
+     * @param lzmaProperties LZMA properties
+     * @param fileSize File size
      * @throws IOException 
      */
     private static void decodeLZMAStream(InputStream is, OutputStream os, byte[] lzmaProperties, long fileSize) throws IOException {
@@ -2707,7 +2591,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Decodes SWF header.
      * @param headerData First 8 bytes of the file
-     * @return
+     * @return SWF header
      * @throws IOException 
      */
     public static SWFHeader decodeHeader(byte[] headerData) throws IOException {
@@ -2731,9 +2615,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Decompresses SWF file.
-     * @param fis
-     * @param fos
-     * @return 
+     * @param fis InputStream
+     * @param fos OutputStream
+     * @return True on success
      */
     public static boolean decompress(InputStream fis, OutputStream fos) {
         try {
@@ -2746,10 +2630,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Decompresses SWF file
-     * @param is
-     * @param os
+     * @param is InputStream
+     * @param os OutputStream
      * @param allowUncompressed When true, it will fail when file is not compressed.
-     * @return
+     * @return SWF header
      * @throws IOException 
      */
     private static SWFHeader decompress(InputStream is, OutputStream os, boolean allowUncompressed) throws IOException {
@@ -2873,10 +2757,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Rename invalid identifiers.
-     * @param renameType
-     * @param fis
-     * @param fos
-     * @return 
+     * @param renameType Rename type
+     * @param fis InputStream
+     * @param fos OutputStream
+     * @return True on success
      */
     public static boolean renameInvalidIdentifiers(RenameType renameType, InputStream fis, OutputStream fos) {
         try {
@@ -2893,8 +2777,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets ScriptPacks for specified class names.
-     * @param classNames
-     * @return
+     * @param classNames List of class names
+     * @return List of ScriptPacks
      * @throws Exception 
      */
     public List<ScriptPack> getScriptPacksByClassNames(List<String> classNames) throws Exception {
@@ -2923,8 +2807,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Makes scriptpacks unique.
      * Unique = no two packs with same classpath exist.
-     * @param packs
-     * @return 
+     * @param packs List of ScriptPacks
+     * @return List of unique ScriptPacks
      */
     private List<ScriptPack> uniqueAS3Packs(List<ScriptPack> packs) {
         List<ScriptPack> ret = new ArrayList<>();
@@ -2945,7 +2829,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Gets AS3 ScriptPacks.
      * ScriptPack = script or a part of script (for compound scripts).
      * @see ScriptPack
-     * @return 
+     * @return List of ScriptPacks
      */
     public List<ScriptPack> getAS3Packs() {
         List<ScriptPack> packs = new ArrayList<>();
@@ -2964,7 +2848,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets SWF display rect.
-     * @return 
+     * @return Display RECT
      */
     @Override
     public RECT getRect() {
@@ -2973,8 +2857,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets display RECT with added tags.
-     * @param added
-     * @return 
+     * @param added Set of added tags
+     * @return Display RECT
      */
     @Override
     public RECT getRect(Set<BoundedTag> added) {
@@ -2983,7 +2867,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets listener for Export events
-     * @return 
+     * @return Event listener
      */
     public EventListener getExportEventListener() {
         EventListener evl = new EventListener() {
@@ -3017,7 +2901,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param exportSettings Export settings
      * @param parallel Use parallel threads?
      * @param evl Event listener
-     * @return
+     * @return List of exported files
      * @throws IOException 
      */
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
@@ -3034,7 +2918,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param evl Event listener
      * @param as2 Export AS1/2
      * @param as3 Export AS3
-     * @return
+     * @return List of exported files
      * @throws IOException 
      */
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, List<ScriptPack> as3scripts, ScriptExportSettings exportSettings, boolean parallel, EventListener evl, boolean as2, boolean as3) throws IOException {
@@ -3053,7 +2937,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Get ASMSources (AS1/2).
      * @param exportFileNames Use export filenames
-     * @return 
+     * @return Map from path to ASMSource
      */
     public Map<String, ASMSource> getASMs(boolean exportFileNames) {
         return getASMs(exportFileNames, new ArrayList<>(), true);
@@ -3064,7 +2948,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param exportFileNames Use export filenames
      * @param nodesToExport Which tree nodes to export
      * @param exportAll Export everything
-     * @return 
+     * @return Map from path to ASMSource
      */
     public Map<String, ASMSource> getASMs(boolean exportFileNames, List<TreeItem> nodesToExport, boolean exportAll) {
         if (exportAll) {
@@ -3095,13 +2979,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Get ASMSources (AS1/2).
      * @param exportFileNames Use export filenames
-     * @param exportFileNames
      * @param treeItem Current item
      * @param nodesToExport Which tree nodes to export
      * @param exportAll Export everything
      * @param asmsToExport Result
-     * @param pathExportFilenames
-     * @param pathNoExportFilenames 
+     * @param pathExportFilenames Path for exported filenames
+     * @param pathNoExportFilenames Path for not exported filenames
      */
     private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String pathExportFilenames, String pathNoExportFilenames) {
         TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
@@ -3171,8 +3054,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets path of ASMSource.
      * @param exportFileName Use export filenames
-     * @param treeItem
-     * @return 
+     * @param treeItem TreeItem
+     * @return Path
      */
     private String getASMPath(boolean exportFileName, TreeItem treeItem) {
 
@@ -3203,8 +3086,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Wrap ASMSource to tagscript.
-     * @param treeItem
-     * @return 
+     * @param treeItem TreeItem
+     * @return TagScript if script, otherwise treeItem
      */
     private TreeItem getASMWrapToTagScript(TreeItem treeItem) {
         if (treeItem instanceof Tag) {
@@ -3226,7 +3109,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets ASMSources of the first level.
      * @param tagScriptCache Tag to tagscript cache
-     * @return 
+     * @return List of ASMSource
      */
     public List<TreeItem> getFirstLevelASMNodes(Map<Tag, TagScript> tagScriptCache) {
         Timeline timeline = getTimeline();
@@ -3292,7 +3175,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Adds event listener.
-     * @param listener 
+     * @param listener Listener
      */
     public final void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -3305,7 +3188,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes event listener.
-     * @param listener 
+     * @param listener Listener
      */
     public final void removeEventListener(EventListener listener) {
         listeners.remove(listener);
@@ -3318,8 +3201,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Informs all listeners registered on this SWF.
-     * @param event
-     * @param data 
+     * @param event Event
+     * @param data Data
      */
     public void informListeners(String event, Object data) {
         for (EventListener listener : listeners) {
@@ -3329,7 +3212,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets all VideoFrameTags for specified streamId.
-     * @param streamId
+     * @param streamId Stream ID
      * @param tags Input tags
      * @param output Output - map of frame number to VideoFrameTag.
      */
@@ -3349,9 +3232,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Write Little endian to stream
-     * @param os
-     * @param val
-     * @param size
+     * @param os OutputStream
+     * @param val Value
+     * @param size Size
      * @throws IOException 
      */
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
@@ -3363,11 +3246,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Creates Wav file from PCM data.
-     * @param fos
-     * @param soundRateHz
+     * @param fos OutputStream
+     * @param soundRateHz Sound rate in Hz
      * @param soundSize True = 16 bit, false = 8b bit.
      * @param soundType True = stereo, false = mono
-     * @param data
+     * @param data PCM data
      * @throws IOException 
      */
     public static void createWavFromPcmData(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
@@ -3405,8 +3288,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets prefix of type of specified character.
-     * @param characterTag
-     * @return 
+     * @param characterTag Character tag
+     * @return Type prefix
      */
     public static String getTypePrefix(CharacterTag characterTag) {
         if (characterTag instanceof ShapeTag) {
@@ -3435,9 +3318,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Converts set of characters to HTML canvas.
-     * @param fswf
+     * @param fswf SWF
      * @param library Set of characterIds
-     * @param fos
+     * @param fos OutputStream
      * @throws IOException 
      */
     public static void libraryToHtmlCanvas(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
@@ -3487,19 +3370,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets variables from AS1/2 code
-     * @param constantPool
-     * @param localData
-     * @param stack
-     * @param output
-     * @param code
-     * @param ip
-     * @param variables
-     * @param functions
-     * @param strings
-     * @param visited
-     * @param usageTypes
-     * @param path
+     * Gets variables from AS1/2 code.
+     * @param constantPool Constant pool
+     * @param localData Local data
+     * @param stack Stack
+     * @param output Output
+     * @param code Code
+     * @param ip Instruction pointer
+     * @param variables Variables
+     * @param functions Functions
+     * @param strings Strings
+     * @param visited Visited
+     * @param usageTypes Usage types
+     * @param path Path
      * @throws InterruptedException 
      */
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
@@ -3663,14 +3546,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets variables from AS1/2 code.
-     * @param insideDoInitAction
-     * @param variables
-     * @param functions
-     * @param strings
-     * @param usageTypes
-     * @param code
-     * @param addr
-     * @param path
+     * @param insideDoInitAction Is inside DoInitAction
+     * @param variables Variables
+     * @param functions Functions
+     * @param strings Strings
+     * @param usageTypes Usage types
+     * @param code Code
+     * @param addr Address
+     * @param path Path
      * @throws InterruptedException 
      */
     private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
@@ -3680,15 +3563,15 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets variables from AS1/2 code.
-     * @param insideDefineFunction1
-     * @param variables
-     * @param actionsMap
-     * @param functions
-     * @param strings
-     * @param usageTypes
-     * @param src
-     * @param path
-     * @return
+     * @param insideDefineFunction1 Is inside DefineFunction1
+     * @param variables Variables
+     * @param actionsMap Actions map
+     * @param functions Functions
+     * @param strings Strings
+     * @param usageTypes Usage types
+     * @param src Source
+     * @param path Path
+     * @return List of variables
      * @throws InterruptedException 
      */
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(boolean insideDefineFunction1, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ASMSource src, String path) throws InterruptedException {
@@ -3702,14 +3585,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets variables from AS1/2 code.
-     * @param insideDefineFunction1
-     * @param tags
-     * @param path
-     * @param variables
-     * @param actionsMap
-     * @param functions
-     * @param strings
-     * @param usageTypes
+     * @param insideDefineFunction1 Is inside DefineFunction1
+     * @param tags Tags
+     * @param path Path
+     * @param variables Variables
+     * @param actionsMap Actions map
+     * @param functions Functions
+     * @param strings Strings
+     * @param usageTypes Usage types
      * @throws InterruptedException 
      */
     private void getVariables(boolean insideDefineFunction1, Iterable<Tag> tags, String path, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
@@ -3733,16 +3616,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Adds variable for AS1/2 getVariables.
-     * @param insideDefineFunction1
-     * @param asm
-     * @param path
-     * @param processed
-     * @param variables
-     * @param actionsMap
-     * @param functions
-     * @param strings
-     * @param usageTypes
-     * @throws InterruptedException 
+     * @param insideDefineFunction1 Is inside DefineFunction1
+     * @param asm ASMSource
+     * @param path Path
+     * @param processed Processed
+     * @param variables Variables
+     * @param actionsMap Actions map
+     * @param functions Functions
+     * @param strings Strings
+     * @param usageTypes Usage types
+     * @throws InterruptedException
      */
     private void addVariable(boolean insideDefineFunction1, ASMSource asm, String path, List<String> processed, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
         int pos = 1;
@@ -3759,8 +3642,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Checks whether AS3 string constant exists.
      * Walks all ABC containers and ABCs inside.
-     * @param str
-     * @return 
+     * @param str String
+     * @return True if exists
      */
     public boolean as3StringConstantExists(String str) {
         for (ABCContainerTag abcTag : getAbcList()) {
@@ -3793,8 +3676,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Deobfuscates AS3 identifiers.
-     * @param renameType
-     * @return 
+     * @param renameType Rename type
+     * @return Number of changes
      */
     public int deobfuscateAS3Identifiers(RenameType renameType) {
         AbcIndexing ai = getAbcIndex();
@@ -3851,8 +3734,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Deobfuscates identifiers.
-     * @param renameType
-     * @return
+     * @param renameType Rename type
+     * @return Number of changes
      * @throws InterruptedException 
      */
     public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
@@ -3871,8 +3754,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Renames AS2 identifier.
-     * @param identifier
-     * @param newname
+     * @param identifier Identifier
+     * @param newname New name
      * @throws InterruptedException 
      */
     public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
@@ -3883,8 +3766,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Deobfuscates AS2 identifiers.
-     * @param renameType
-     * @return
+     * @param renameType Rename type
+     * @return Number of changes
      * @throws InterruptedException 
      */
     private int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
@@ -3893,7 +3776,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Renames AS2 identifiers.
-     * @param renameType
+     * @param renameType Rename type
      * @param selected Preselected identifiers map. Can be null when no preselected.
      * @return Number of changes
      * @throws InterruptedException 
@@ -4148,7 +4031,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets IdentifiersDeobfuscation.
-     * @return 
+     * @return IdentifiersDeobfuscation
      */
     public IdentifiersDeobfuscation getDeobfuscation() {
         return deobfuscation;
@@ -4216,8 +4099,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Converts MATRIX to AffineTransform.
-     * @param mat
-     * @return 
+     * @param mat Matrix
+     * @return AffineTransform
      */
     public static AffineTransform matrixToTransform(MATRIX mat) {
         return new AffineTransform(mat.getScaleXFloat(), mat.getRotateSkew0Float(),
@@ -4227,8 +4110,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Puts image to frame cache
-     * @param key
-     * @param img 
+     * @param key Key
+     * @param img Image
      */
     public void putToCache(String key, SerializableImage img) {
         if (Configuration.useFrameCache.get()) {
@@ -4238,10 +4121,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Puts sound to sound cache
-     * @param soundInfo
-     * @param soundTag
+     * @param soundInfo Sound info
+     * @param soundTag Sound tag
      * @param resample Resample to 44kHz?
-     * @param data 
+     * @param data Byte data
      */
     public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample, byte[] data) {
         SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
@@ -4359,7 +4242,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes ScriptPack from cache.
-     * @param pack 
+     * @param pack ScriptPack
      */
     public static void uncache(ScriptPack pack) {
         if (pack != null) {
@@ -4376,8 +4259,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Checks whether list of Actions of ASMSource is cached.
-     * @param src
-     * @return 
+     * @param src ASMSource
+     * @return True if cached
      */
     public static boolean isActionListCached(ASMSource src) {
         if (src != null) {
@@ -4392,8 +4275,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Checks whether ASMSource is cached.
-     * @param src
-     * @return 
+     * @param src ASMSource
+     * @return True if cached
      */
     public static boolean isCached(ASMSource src) {
         if (src != null) {
@@ -4408,8 +4291,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Checks whether ScriptPack is cached.
-     * @param pack
-     * @return 
+     * @param pack ScriptPack
+     * @return True if cached
      */
     public static boolean isCached(ScriptPack pack) {
         if (pack != null) {
@@ -4425,8 +4308,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets HighlightedText of ASMSource from cache.
-     * @param src
-     * @return 
+     * @param src ASMSource
+     * @return True if cached
      */
     public static HighlightedText getFromCache(ASMSource src) {
         if (src != null) {
@@ -4441,8 +4324,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets image from frame cache.
-     * @param key
-     * @return 
+     * @param key Key
+     * @return Image
      */
     public SerializableImage getFromCache(String key) {
         if (frameCache.contains(key)) {
@@ -4453,10 +4336,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets sound from sound cache.
-     * @param soundInfo
-     * @param soundTag
+     * @param soundInfo Sound info
+     * @param soundTag Sound tag
      * @param resample Resample to 44kHz
-     * @return 
+     * @return Byte data
      */
     public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag, boolean resample) {
         SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag, resample);
@@ -4468,8 +4351,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets HighlightedText for ScriptPack from cache.
-     * @param pack
-     * @return 
+     * @param pack ScriptPack
+     * @return Hi
      */
     public static HighlightedText getFromCache(ScriptPack pack) {
         if (pack != null) {
@@ -4485,8 +4368,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets ActionList of ASMSource from cache.
-     * @param src
-     * @return 
+     * @param src ASMSource
+     * @return ActionList
      */
     public static ActionList getActionListFromCache(ASMSource src) {
         if (src != null) {
@@ -4501,9 +4384,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets ActionList of ASMSource from cache, if not in cache, parses it.
-     * @param src
+     * @param src ASMSource
      * @param listeners Disassembly listeners
-     * @return
+     * @return ActionList
      * @throws InterruptedException 
      */
     public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
@@ -4547,9 +4430,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets HighlightedText of ASMSource and ActionList from cache, decompiles when not cached.
-     * @param src
-     * @param actions
-     * @return
+     * @param src ASMSource
+     * @param actions ActionList
+     * @return HighlightedText
      * @throws InterruptedException 
      */
     public static HighlightedText getCached(ASMSource src, ActionList actions) throws InterruptedException {
@@ -4567,8 +4450,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets HighlightedText of ScriptPack from cache, decompiles when not cached.
-     * @param pack
-     * @return
+     * @param pack ScriptPack
+     * @return HighlightedText
      * @throws InterruptedException 
      */
     public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
@@ -4587,10 +4470,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets Future of HighlightedText of ASMSource, ActionList
-     * @param src
-     * @param actions
+     * @param src ASMSource
+     * @param actions ActionList
      * @param listener Decompiled listeners
-     * @return
+     * @return Future of HighlightedText
      * @throws InterruptedException 
      */
     public static Future<HighlightedText> getCachedFuture(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
@@ -4612,9 +4495,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets Future of HighlightedText of ScriptPack
-     * @param pack
+     * @param pack ScriptPack
      * @param listener Decompiled listeners
-     * @return
+     * @return Future of HighlightedText
      * @throws InterruptedException 
      */
     public static Future<HighlightedText> getCachedFuture(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
@@ -4637,7 +4520,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets decompiler pool.
-     * @return 
+     * @return DecompilerPool
      */
     public DecompilerPool getDecompilerPool() {
         return decompilerPool;
@@ -4645,7 +4528,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets cache of Rectangles.
-     * @return
+     * @return Cache of Rectangles
      */
     public Cache<CharacterTag, RECT> getRectCache() {
         return rectCache;
@@ -4653,7 +4536,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets shape export data cache.
-     * @return 
+     * @return Shape export data cache
      */
     public Cache<SHAPE, ShapeExportData> getShapeExportDataCache() {
         return shapeExportDataCache;
@@ -4661,16 +4544,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets image of specified frame of timeline.
-     * @param timeline
-     * @param frame
-     * @param time
-     * @param cursorPosition
-     * @param mouseButton
-     * @param displayRect
-     * @param transformation
-     * @param colorTransform
-     * @param backGroundColor
-     * @param zoom
+     * @param timeline Timeline
+     * @param frame Frame
+     * @param time Time
+     * @param cursorPosition Cursor position
+     * @param mouseButton Mouse button
+     * @param displayRect Display rectangle
+     * @param transformation Transformation
+     * @param colorTransform Color transform
+     * @param backGroundColor Background color
+     * @param zoom Zoom
      * @param canUseSmoothing
      * @return 
      */
@@ -4706,10 +4589,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes character from timeline.
-     * @param characterId
-     * @param timeline
+     * @param characterId Character ID
+     * @param timeline Timeline
      * @param listener Listener to call after removing each of character.
-     * @return 
+     * @return True if modified
      */
     public boolean removeCharacterFromTimeline(int characterId, Timeline timeline, TagRemoveListener listener) {
         Set<Integer> chars = new HashSet<>();
@@ -4719,8 +4602,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes character with dependencies.
-     * @param toRemove
-     * @param timeline
+     * @param toRemove Tag to remove
+     * @param timeline Timeline
      * @param listener Listener to call after removing each of character.
      */    
     private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, TagRemoveListener listener) {
@@ -4737,9 +4620,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes character with dependencies.
-     * @param toRemove
-     * @param timeline
-     * @param dependingChars
+     * @param toRemove Tag to remove
+     * @param timeline Timeline
+     * @param dependingChars Depending characters
      * @param listener Listener to call after removing each of character.
      * @return 
      */
@@ -4823,10 +4706,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes character with dependencies.
-     * @param toRemove
-     * @param timeline
+     * @param toRemove Tag to remove
+     * @param timeline Timeline
      * @param listener Listener to call after removing each of character.
-     * @return 
+     * @return True if modified
      */
     private boolean removeTagFromTimeline(Tag toRemove, Timeline timeline, TagRemoveListener listener) {
         boolean modified = false;
@@ -4872,8 +4755,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes tags.
-     * @param tags
-     * @param removeDependencies
+     * @param tags Tags
+     * @param removeDependencies Remove dependencies?
      * @param listener Listener to call after removing each of character.
      */
     public void removeTags(Collection<Tag> tags, boolean removeDependencies, TagRemoveListener listener) {
@@ -4895,7 +4778,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes tag from SWF timeline.
-     * @param index 
+     * @param index Index of tag
      */
     @Override
     public void removeTag(int index) {
@@ -4906,7 +4789,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes tag from SWF timeline.
-     * @param tag 
+     * @param tag Tag
      */
     @Override
     public void removeTag(Tag tag) {
@@ -4917,8 +4800,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes tag from SWF timeline.s
-     * @param tag
-     * @param removeDependencies
+     * @param tag Tag
+     * @param removeDependencies Remove dependencies?
      * @param listener Listener to call after removing each of character.
      */
     public void removeTag(Tag tag, boolean removeDependencies, TagRemoveListener listener) {
@@ -4932,9 +4815,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Removes tag from SWF timeline.
-     * @param timelined
-     * @param tag
-     * @param removeDependencies
+     * @param timelined Timelined
+     * @param tag Tag
+     * @param removeDependencies Remove dependencies?
      * @param listener Listener to call after removing each of character.
      */
     private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies, TagRemoveListener listener) {
@@ -4961,7 +4844,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets (readonly) list of all tags in the SWF file.
-     * @return 
+     * @return Tags
      */
     @Override
     public ReadOnlyTagList getTags() {
@@ -4976,7 +4859,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Gets (readonly) list of all local tags in the SWF file.
      * local = not imported.
      * @deprecated The tags from getTags method call are all local by default now.
-     * @return 
+     * @return Tags
      */
     public ReadOnlyTagList getLocalTags() {
         /*List<Tag> localTags = new ArrayList<>();
@@ -4990,7 +4873,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Adds a tag to the SWF.
-     * @param tag
+     * @param tag Tag
      */
     @Override
     public void addTag(Tag tag) {
@@ -5001,8 +4884,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Adds a tag to the SWF at the specified index.
-     * @param index
-     * @param tag
+     * @param index Index
+     * @param tag Tag
      */
     @Override
     public void addTag(int index, Tag tag) {
@@ -5013,7 +4896,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets index of specified tag.
-     * @param tag
+     * @param tag Tag
      * @return Index or -1 when not found
      */
     @Override
@@ -5023,8 +4906,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Adds tag just before targetTag in targetTags timeline.
-     * @param newTag
-     * @param targetTag 
+     * @param newTag New tag
+     * @param targetTag Target tag
      */
     public static void addTagBefore(Tag newTag, Tag targetTag) {
         Timelined tim = targetTag.getTimelined();
@@ -5096,9 +4979,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Replaces character id with another.
-     * @param oldCharacterId
-     * @param newCharacterId
-     * @return 
+     * @param oldCharacterId Old character id
+     * @param newCharacterId New character id
+     * @return True if modified
      */
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
@@ -5122,8 +5005,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Switches ids of two characters.
-     * @param characterTag
-     * @param newCharacterId 
+     * @param characterTag Character tag
+     * @param newCharacterId New character id
      */
     public void replaceCharacterTags(CharacterTag characterTag, int newCharacterId) {
         int characterId = characterTag.getCharacterId();
@@ -5147,7 +5030,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Converts SWF to string.
-     * @return 
+     * @return String
      */
     @Override
     public String toString() {
@@ -5156,7 +5039,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     
     /**
      * Deobfuscates SWF file.
-     * @param level
+     * @param level Deobfuscation level
      * @throws InterruptedException 
      */
     public void deobfuscate(DeobfuscationLevel level) throws InterruptedException {
@@ -5399,7 +5282,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Generates SWD file for P-code debugging.
      * 
-     * @param file
+     * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @return True on success
      * @throws IOException
@@ -5412,7 +5295,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Generates SWD file for P-code debugging.
      * 
-     * @param file
+     * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @param swfHash SWF identifier
      * @return True on success
@@ -5503,7 +5386,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Generates SWF file for debugging.
      * 
-     * @param file
+     * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @return True on success
      * @throws IOException 
@@ -5515,7 +5398,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Generates SWF file for debugging.
      * 
-     * @param file
+     * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @param swfHash SWF identifier
      * @return True on success
@@ -5656,7 +5539,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Enables telemetry.
-     * @param password
+     * @param password Password
      * @return True on success
      */
     public boolean enableTelemetry(String password) {
@@ -5684,9 +5567,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets Flex Main class.
-     * @param ignoredClasses
-     * @param ignoredNs
-     * @return 
+     * @param ignoredClasses List of ignored classes
+     * @param ignoredNs List of ignored namespace names
+     * @return Main class name
      */
     public String getFlexMainClass(List<String> ignoredClasses, List<String> ignoredNs) {
         String documentClass = getDocumentClass();
@@ -5830,8 +5713,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Replaces a tag in the SWF.
-     * @param oldTag
-     * @param newTag
+     * @param oldTag Old tag
+     * @param newTag New tag
      */
     @Override
     public void replaceTag(Tag oldTag, Tag newTag) {
@@ -5845,8 +5728,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Replaces tag at given index.
-     * @param index
-     * @param newTag 
+     * @param index Index
+     * @param newTag New tag
      */
     @Override
     public void replaceTag(int index, Tag newTag) {
@@ -5856,7 +5739,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets rect including strokes.
-     * @return 
+     * @return Rect including strokes
      */
     @Override
     public RECT getRectWithStrokes() {
@@ -5899,11 +5782,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Searches needed characters
-     * @param characterToNeeded
-     * @param searched
-     * @param current
-     * @param visited
-     * @return 
+     * @param characterToNeeded Character to needed map
+     * @param searched Searched character id
+     * @param current Current character id
+     * @param visited Visited characters
+     * @return True if found
      */
     private boolean searchNeeded(Map<Integer, Set<Integer>> characterToNeeded, int searched, int current, Set<Integer> visited) {
         if (visited.contains(current)) {
@@ -5929,7 +5812,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Sets file title.
-     * @param fileTitle 
+     * @param fileTitle File title
      */
     public void setFileTitle(String fileTitle) {
         this.fileTitle = fileTitle;
@@ -5938,7 +5821,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets frame count.
      * It is a number stored in header.
-     * @return 
+     * @return Frame count
      */
     @Override
     public int getFrameCount() {
@@ -5948,7 +5831,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Sets frame count.
      * It is a number stored in header.
-     * @param frameCount 
+     * @param frameCount Frame count
      */
     @Override
     public void setFrameCount(int frameCount) {
@@ -5957,7 +5840,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Sets openableList which this SWF is part of.
-     * @param openableList 
+     * @param openableList OpenableList
      */
     @Override
     public void setOpenableList(OpenableList openableList) {
@@ -5966,7 +5849,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets openableList which this SWF is part of.
-     * @return 
+     * @return OpenableList
      */
     @Override
     public OpenableList getOpenableList() {
@@ -5984,7 +5867,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets uninitialized class traits in AS2.
-     * @return 
+     * @return Map of class name to map of trait name to trait
      */
     public synchronized Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() {
         if (uninitializedAs2ClassTraits == null) {
@@ -5995,7 +5878,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Gets SWF (self)
-     * @return 
+     * @return SWF
      */
     @Override
     public SWF getSwf() {

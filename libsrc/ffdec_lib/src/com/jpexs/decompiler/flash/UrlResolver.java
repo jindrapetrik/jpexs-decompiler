@@ -17,10 +17,15 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * URL resolver interface.
  * @author JPEXS
  */
 public interface UrlResolver {
 
+    /**
+     * Resolves URL to SWF object.
+     * @param url URL
+     * @return SWF object or null if not valid
+     */
     public SWF resolveUrl(String url);
 }

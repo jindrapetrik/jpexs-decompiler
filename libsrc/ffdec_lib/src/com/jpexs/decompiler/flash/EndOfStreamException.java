@@ -19,11 +19,14 @@ package com.jpexs.decompiler.flash;
 import java.io.IOException;
 
 /**
- *
+ * Exception thrown when end of stream is reached.
  * @author JPEXS
  */
 public class EndOfStreamException extends IOException {
 
+    /**
+     * Constructs a new EndOfStreamException.
+     */
     public EndOfStreamException() {
         super("Premature end of the stream reached");
     }

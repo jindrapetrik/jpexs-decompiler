@@ -20,17 +20,28 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 
 /**
- *
+ * Translate stack that counts the number of items pushed and not popped.
  * @author JPEXS
  */
 public class FixItemCounterTranslateStack extends TranslateStack {
 
+    /**
+     *
+     */
     private int fixItemCount = Integer.MAX_VALUE;
 
+    /**
+     * Constructs a new FixItemCounterTranslateStack
+     * @param path Path
+     */
     public FixItemCounterTranslateStack(String path) {
         super(null); //null path => do not add PushItems
     }
 
+    /**
+     * Pops an item from the stack
+     * @return The popped item
+     */
     @Override
     public GraphTargetItem pop() {
         GraphTargetItem result = super.pop();
@@ -41,6 +52,11 @@ public class FixItemCounterTranslateStack extends TranslateStack {
         return result;
     }
 
+    /**
+     * Removes the element at the specified index
+     * @param index the index of the element to be removed
+     * @return The removed element
+     */
     @Override
     public synchronized GraphTargetItem remove(int index) {
         if (index < fixItemCount) {
@@ -49,10 +65,18 @@ public class FixItemCounterTranslateStack extends TranslateStack {
         return super.remove(index);
     }
 
+    /**
+     * All items were never popped.
+     * @return True if all items were never popped
+     */
     public boolean allItemsFixed() {
         return size() <= fixItemCount;
     }
 
+    /**
+     * Gets the number of items that were never popped
+     * @return The number of items that were never popped
+     */
     public int getFixItemCount() {
         return fixItemCount;
     }

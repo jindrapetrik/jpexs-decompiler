@@ -17,12 +17,25 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Offset updater interface.
+ * Used to update offsets in instructions and operands.
  * @author JPEXS
  */
 public interface OffsetUpdater {
 
+    /**
+     * Updates instruction offset.
+     * @param addr Address of the instruction
+     * @return New address of the instruction
+     */
     public long updateInstructionOffset(long addr);
 
+    /**
+     * Updates operand offset.
+     * @param jumpAddr Address of the jump instruction
+     * @param targetAddress Address of the target instruction
+     * @param offset Operand (offset) of the jump instruction
+     * @return New operand offset
+     */
     public int updateOperandOffset(long jumpAddr, long targetAddress, int offset);
 }

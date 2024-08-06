@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Interface for runnable with result.
  * @param <T> Type of result
  * @author JPEXS
  */

@@ -19,105 +19,11 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
-import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
-import com.jpexs.decompiler.flash.action.swf3.ActionGoToLabel;
-import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionNextFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
-import com.jpexs.decompiler.flash.action.swf3.ActionPrevFrame;
-import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
-import com.jpexs.decompiler.flash.action.swf3.ActionStop;
-import com.jpexs.decompiler.flash.action.swf3.ActionStopSounds;
-import com.jpexs.decompiler.flash.action.swf3.ActionToggleQuality;
-import com.jpexs.decompiler.flash.action.swf3.ActionWaitForFrame;
-import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
-import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
-import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
-import com.jpexs.decompiler.flash.action.swf4.ActionCall;
-import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
-import com.jpexs.decompiler.flash.action.swf4.ActionCloneSprite;
-import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
-import com.jpexs.decompiler.flash.action.swf4.ActionEndDrag;
-import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetProperty;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetTime;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ActionGotoFrame2;
-import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.action.swf4.ActionJump;
-import com.jpexs.decompiler.flash.action.swf4.ActionLess;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBCharToAscii;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBStringExtract;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
-import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
-import com.jpexs.decompiler.flash.action.swf4.ActionNot;
-import com.jpexs.decompiler.flash.action.swf4.ActionOr;
-import com.jpexs.decompiler.flash.action.swf4.ActionPop;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf4.ActionRandomNumber;
-import com.jpexs.decompiler.flash.action.swf4.ActionRemoveSprite;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringExtract;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
-import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
-import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
-import com.jpexs.decompiler.flash.action.swf4.ActionTrace;
-import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
-import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitOr;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
-import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
-import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
-import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
-import com.jpexs.decompiler.flash.action.swf5.ActionDelete2;
-import com.jpexs.decompiler.flash.action.swf5.ActionEnumerate;
-import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
-import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
-import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
-import com.jpexs.decompiler.flash.action.swf5.ActionInitArray;
-import com.jpexs.decompiler.flash.action.swf5.ActionInitObject;
-import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
-import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
-import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
-import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
-import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
-import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
-import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
-import com.jpexs.decompiler.flash.action.swf5.ActionStackSwap;
-import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
-import com.jpexs.decompiler.flash.action.swf5.ActionTargetPath;
-import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
-import com.jpexs.decompiler.flash.action.swf5.ActionToString;
-import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
-import com.jpexs.decompiler.flash.action.swf5.ActionWith;
-import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
-import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
-import com.jpexs.decompiler.flash.action.swf6.ActionInstanceOf;
-import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
-import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
-import com.jpexs.decompiler.flash.action.swf7.ActionCastOp;
-import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
-import com.jpexs.decompiler.flash.action.swf7.ActionExtends;
-import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
-import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
-import com.jpexs.decompiler.flash.action.swf7.ActionTry;
+import com.jpexs.decompiler.flash.action.swf3.*;
+import com.jpexs.decompiler.flash.action.swf4.*;
+import com.jpexs.decompiler.flash.action.swf5.*;
+import com.jpexs.decompiler.flash.action.swf6.*;
+import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
@@ -125,205 +31,101 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecial;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
-import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
-import com.jpexs.decompiler.flash.tags.DebugIDTag;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
-import com.jpexs.decompiler.flash.tags.DefineBitsTag;
-import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
-import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
-import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
-import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
-import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
-import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
-import com.jpexs.decompiler.flash.tags.DefineFontAlignZonesTag;
-import com.jpexs.decompiler.flash.tags.DefineFontInfo2Tag;
-import com.jpexs.decompiler.flash.tags.DefineFontInfoTag;
-import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
-import com.jpexs.decompiler.flash.tags.DefineFontTag;
-import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
-import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
-import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
-import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
-import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
-import com.jpexs.decompiler.flash.tags.DefineShapeTag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
-import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineText2Tag;
-import com.jpexs.decompiler.flash.tags.DefineTextTag;
-import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABC2Tag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
-import com.jpexs.decompiler.flash.tags.DoActionTag;
-import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
-import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
-import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
-import com.jpexs.decompiler.flash.tags.EndTag;
-import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
-import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.FrameLabelTag;
-import com.jpexs.decompiler.flash.tags.FreeAllTag;
-import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
-import com.jpexs.decompiler.flash.tags.ImportAssets2Tag;
-import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
-import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
-import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.NameCharacterTag;
-import com.jpexs.decompiler.flash.tags.PathsArePostScriptTag;
-import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
-import com.jpexs.decompiler.flash.tags.ProductInfoTag;
-import com.jpexs.decompiler.flash.tags.ProtectTag;
-import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
-import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
-import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
-import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
-import com.jpexs.decompiler.flash.tags.StartSound2Tag;
-import com.jpexs.decompiler.flash.tags.StartSoundTag;
-import com.jpexs.decompiler.flash.tags.SymbolClassTag;
-import com.jpexs.decompiler.flash.tags.SyncFrameTag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
-import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
-import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
-import com.jpexs.decompiler.flash.tags.gfx.DefineGradientMap;
-import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
-import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
-import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
+import com.jpexs.decompiler.flash.tags.gfx.*;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
-import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
-import com.jpexs.decompiler.flash.types.ARGB;
-import com.jpexs.decompiler.flash.types.BITMAPDATA;
-import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
-import com.jpexs.decompiler.flash.types.BUTTONRECORD;
-import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
-import com.jpexs.decompiler.flash.types.CLIPACTIONS;
-import com.jpexs.decompiler.flash.types.CLIPEVENTFLAGS;
-import com.jpexs.decompiler.flash.types.COLORMAPDATA;
-import com.jpexs.decompiler.flash.types.CXFORM;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
-import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
-import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
-import com.jpexs.decompiler.flash.types.GLYPHENTRY;
-import com.jpexs.decompiler.flash.types.GRADIENT;
-import com.jpexs.decompiler.flash.types.GRADRECORD;
-import com.jpexs.decompiler.flash.types.KERNINGRECORD;
-import com.jpexs.decompiler.flash.types.LANGCODE;
-import com.jpexs.decompiler.flash.types.LINESTYLE;
-import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MORPHFOCALGRADIENT;
-import com.jpexs.decompiler.flash.types.MORPHGRADIENT;
-import com.jpexs.decompiler.flash.types.MORPHGRADRECORD;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.PIX15;
-import com.jpexs.decompiler.flash.types.PIX24;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.RGB;
-import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
-import com.jpexs.decompiler.flash.types.SOUNDINFO;
-import com.jpexs.decompiler.flash.types.TEXTRECORD;
-import com.jpexs.decompiler.flash.types.ZONEDATA;
-import com.jpexs.decompiler.flash.types.ZONERECORD;
-import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
-import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
-import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
-import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
-import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
-import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
-import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
-import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.FakeMemoryInputStream;
-import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.ImmediateFuture;
-import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.ProgressListener;
+import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.filters.*;
+import com.jpexs.decompiler.flash.types.shaperecords.*;
+import com.jpexs.helpers.*;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 
 /**
- * Class for reading data from SWF file
+ * Class for reading data from SWF file.
  *
  * @author JPEXS
  */
 public class SWFInputStream implements AutoCloseable {
 
+    /**
+     * Input stream
+     */
     private MemoryInputStream is;
 
+    /**
+     * Starting position in bytes in the stream
+     */
     private long startingPos;
 
+    /**
+     * Logger
+     */
     private static final Logger logger = Logger.getLogger(SWFInputStream.class.getName());
 
+    /**
+     * Empty byte array
+     */
     public static final byte[] BYTE_ARRAY_EMPTY = new byte[0];
 
+    /**
+     * Listeners for progress
+     */
     private final List<ProgressListener> listeners = new ArrayList<>();
 
+    /**
+     * How much percent is 100%
+     */
     private long percentMax;
 
+    /**
+     * SWF
+     */
     private SWF swf;
 
+    /**
+     * Dump info
+     */
     public DumpInfo dumpInfo;
 
+    /**
+     * Data
+     */
     private byte[] data;
 
+    /**
+     * Maximum limit of reading
+     */
     private int limit;
 
+    /**
+     * Last percent sent to listeners
+     */
+    private int lastPercent = -1;
+
+    /**
+     * Bit position
+     */
+    private int bitPos = 0;
+
+    /**
+     * Temporary byte
+     */
+    private int tempByte = 0;
+
+    /**
+     * Gets charset.
+     * @return Charset
+     */
     public String getCharset() {
         if (swf == null) {
             return Utf8Helper.charsetName;
@@ -331,10 +133,18 @@ public class SWFInputStream implements AutoCloseable {
         return swf.getCharset();
     }
 
+    /**
+     * Adds progress listener.
+     * @param listener Progress listener
+     */
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Removes progress listener.
+     * @param listener Progress listener
+     */
     public void removePercentListener(ProgressListener listener) {
         int index = listeners.indexOf(listener);
         if (index > -1) {
@@ -342,6 +152,9 @@ public class SWFInputStream implements AutoCloseable {
         }
     }
 
+    /**
+     * Informs listeners about progress.
+     */
     private void informListeners() {
         if (listeners.size() > 0 && percentMax > 0) {
             int percent = (int) (getPos() * 100 / percentMax);
@@ -354,17 +167,21 @@ public class SWFInputStream implements AutoCloseable {
         }
     }
 
+    /**
+     * Set maximum percent.
+     * @param percentMax Maximum percent
+     */
     public void setPercentMax(long percentMax) {
         this.percentMax = percentMax;
     }
 
     /**
-     * Constructor
+     * Constructs a new SWFInputStream.
      *
      * @param swf SWF to read
      * @param data SWF data
-     * @param startingPos
-     * @param limit
+     * @param startingPos Starting position in bytes in the stream
+     * @param limit Maximum limit of reading
      * @throws java.io.IOException
      */
     public SWFInputStream(SWF swf, byte[] data, long startingPos, int limit) throws IOException {
@@ -390,7 +207,7 @@ public class SWFInputStream implements AutoCloseable {
      * HACK: Special constructor to handle old GFX format - DO NOT USE for
      * normal purposes - it won't read tags, etc...
      *
-     * @param is
+     * @param is Input stream
      */
     public SWFInputStream(InputStream is) throws IOException {
         this.swf = null;
@@ -400,6 +217,10 @@ public class SWFInputStream implements AutoCloseable {
         this.is = new FakeMemoryInputStream(is);
     }
 
+    /**
+     * Gets SWF
+     * @return SWF
+     */
     public SWF getSwf() {
         return swf;
     }
@@ -423,10 +244,24 @@ public class SWFInputStream implements AutoCloseable {
         is.seek(pos - startingPos);
     }
 
+    /**
+     * Creates new dump level.
+     * @param name Name
+     * @param type Type
+     * @return
+     */
     private DumpInfo newDumpLevel(String name, String type) {
         return newDumpLevel(name, type, DumpInfoSpecialType.NONE, null);
     }
 
+    /**
+     * Creates new dump level.
+     * @param name Name
+     * @param type Type
+     * @param specialType Special type
+     * @param specialValue Special value
+     * @return
+     */
     private DumpInfo newDumpLevel(String name, String type, DumpInfoSpecialType specialType, Object specialValue) {
         if (dumpInfo != null) {
             long startByte = is.getPos();
@@ -444,10 +279,17 @@ public class SWFInputStream implements AutoCloseable {
         return dumpInfo;
     }
 
+    /**
+     * Ends dump level.
+     */
     private void endDumpLevel() {
         endDumpLevel(null);
     }
 
+    /**
+     * Ends dump level.
+     * @param value Value
+     */
     private void endDumpLevel(Object value) {
         if (dumpInfo != null) {
             if (dumpInfo.startBit == 0 && bitPos == 0) {
@@ -460,6 +302,10 @@ public class SWFInputStream implements AutoCloseable {
         }
     }
 
+    /**
+     * Ends dump level until.
+     * @param di Dump info
+     */
     private void endDumpLevelUntil(DumpInfo di) {
         if (di != null) {
             while (dumpInfo != null && dumpInfo != di) {
@@ -469,7 +315,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one byte from the stream
+     * Reads one byte from the stream.
      *
      * @return byte
      * @throws IOException
@@ -479,12 +325,20 @@ public class SWFInputStream implements AutoCloseable {
         return readNoBitReset();
     }
 
+    /**
+     * Aligns reading on byte.
+     */
     private void alignByte() {
         bitPos = 0;
     }
 
-    private int lastPercent = -1;
 
+    /**
+     * Reads one byte from the stream.
+     * @return Byte
+     * @throws IOException
+     * @throws EndOfStreamException
+     */
     private int readNoBitReset() throws IOException, EndOfStreamException {
         int r = is.read();
         if (r == -1) {
@@ -496,9 +350,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one UI8 (Unsigned 8bit integer) value from the stream
+     * Reads one UI8 (Unsigned 8bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return UI8 value or -1 on error
      * @throws IOException
      */
@@ -510,9 +364,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one null terminated string value from the stream
+     * Reads one null terminated string value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return String value
      * @throws IOException
      */
@@ -534,9 +388,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one netstring (length + string) value from the stream
+     * Reads one netstring (length + string) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return String value
      * @throws IOException
      */
@@ -549,9 +403,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one UI32 (Unsigned 32bit integer) value from the stream
+     * Reads one UI32 (Unsigned 32bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return UI32 value
      * @throws IOException
      */
@@ -563,7 +417,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one UI32 (Unsigned 32bit integer) value from the stream
+     * Reads one UI32 (Unsigned 32bit integer) value from the stream.
      *
      * @return UI32 value
      * @throws IOException
@@ -573,9 +427,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one UI16 (Unsigned 16bit integer) value from the stream
+     * Reads one UI16 (Unsigned 16bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return UI16 value
      * @throws IOException
      */
@@ -587,7 +441,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one UI16 (Unsigned 16bit integer) value from the stream
+     * Reads one UI16 (Unsigned 16bit integer) value from the stream.
      *
      * @return UI16 value
      * @throws IOException
@@ -596,6 +450,12 @@ public class SWFInputStream implements AutoCloseable {
         return readEx() + (readEx() << 8);
     }
 
+    /**
+     * Reads one UI24 (Unsigned 24bit integer) value from the stream.
+     * @param name Name
+     * @return
+     * @throws IOException
+     */
     public int readUI24(String name) throws IOException {
         newDumpLevel(name, "UI24");
         int ret = readEx() + (readEx() << 8) + (readEx() << 16);
@@ -604,9 +464,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SI32 (Signed 32bit integer) value from the stream
+     * Reads one SI32 (Signed 32bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return SI32 value
      * @throws IOException
      */
@@ -617,6 +477,12 @@ public class SWFInputStream implements AutoCloseable {
         return uval;
     }
 
+    /**
+     * Reads one SI32 (Signed 32bit integer) value from the stream.
+     *
+     * @return SI32 value
+     * @throws IOException
+     */
     private long readSI32Internal() throws IOException {
         long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
         if (uval >= 0x80000000) {
@@ -626,9 +492,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SI16 (Signed 16bit integer) value from the stream
+     * Reads one SI16 (Signed 16bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return SI16 value
      * @throws IOException
      */
@@ -639,6 +505,12 @@ public class SWFInputStream implements AutoCloseable {
         return uval;
     }
 
+    /**
+     * Reads one SI16 (Signed 16bit integer) value from the stream.
+     *
+     * @return SI16 value
+     * @throws IOException
+     */
     private int readSI16Internal() throws IOException {
         int uval = readEx() + (readEx() << 8);
         if (uval >= 0x8000) {
@@ -648,9 +520,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SI8 (Signed 8bit integer) value from the stream
+     * Reads one SI8 (Signed 8bit integer) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return SI8 value
      * @throws IOException
      */
@@ -662,7 +534,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SI8 (Signed 8bit integer) value from the stream
+     * Reads one SI8 (Signed 8bit integer) value from the stream.
      *
      * @return SI8 value
      * @throws IOException
@@ -676,9 +548,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FIXED (Fixed point 16.16) value from the stream
+     * Reads one FIXED (Fixed point 16.16) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return FIXED value
      * @throws IOException
      */
@@ -691,9 +563,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FIXED8 (Fixed point 8.8) signed value from the stream
+     * Reads one FIXED8 (Fixed point 8.8) signed value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return FIXED8 value
      * @throws IOException
      */
@@ -705,6 +577,11 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Reads long value from the stream.
+     * @return Long value
+     * @throws IOException
+     */
     private long readLong() throws IOException {
         byte[] readBuffer = readBytesInternalEx(8);
         return (((long) readBuffer[3] << 56)
@@ -719,9 +596,9 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads one DOUBLE (double precision floating point value) value from the
-     * stream
+     * stream.
      *
-     * @param name
+     * @param name Name
      * @return DOUBLE value
      * @throws IOException
      */
@@ -735,9 +612,9 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads one FLOAT (single precision floating point value) value from the
-     * stream
+     * stream.
      *
-     * @param name
+     * @param name Name
      * @return FLOAT value
      * @throws IOException
      */
@@ -754,9 +631,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FLOAT16 (16bit floating point value) value from the stream
+     * Reads one FLOAT16 (16bit floating point value) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return FLOAT16 value
      * @throws IOException
      */
@@ -772,10 +649,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads bytes from the stream
+     * Reads bytes from the stream.
      *
      * @param count Number of bytes to read
-     * @param name
+     * @param name Name
      * @return Array of read bytes
      * @throws IOException
      */
@@ -791,10 +668,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads AMF3 encoded value from the stream
+     * Reads AMF3 encoded value from the stream.
      *
-     * @param name
-     * @return
+     * @param name Name
+     * @return AMF3 value
      * @throws IOException
      */
     public Amf3Value readAmf3Object(String name) throws IOException, NoSerializerExistsException {
@@ -805,10 +682,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads byte range from the stream
+     * Reads byte range from the stream.
      *
      * @param count Number of bytes to read
-     * @param name
+     * @param name Name
      * @return ByteArrayRange object
      * @throws IOException
      */
@@ -817,12 +694,12 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads byte range from the stream
+     * Reads byte range from the stream.
      *
      * @param count Number of bytes to read
-     * @param name
-     * @param specialType
-     * @param specialValue
+     * @param name Name
+     * @param specialType Special type
+     * @param specialValue Special value
      * @return ByteArrayRange object
      * @throws IOException
      */
@@ -843,7 +720,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads bytes from the stream
+     * Reads bytes from the stream.
      *
      * @param count Number of bytes to read
      * @return Array of read bytes
@@ -865,7 +742,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Skip bytes from the stream
+     * Skip bytes from the stream.
      *
      * @param count Number of bytes to skip
      * @throws IOException
@@ -885,10 +762,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Skip bytes from the stream
+     * Skip bytes from the stream.
      *
      * @param count Number of bytes to skip
-     * @param name
+     * @param name Name
      * @throws IOException
      */
     public void skipBytesEx(long count, String name) throws IOException {
@@ -902,7 +779,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Skip bytes from the stream
+     * Skip bytes from the stream.
      *
      * @param count Number of bytes to skip
      * @throws IOException
@@ -916,10 +793,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads bytes from the stream
+     * Reads bytes from the stream.
      *
      * @param count Number of bytes to read
-     * @param name
+     * @param name Name
      * @return Array of read bytes
      * @throws IOException
      */
@@ -942,6 +819,13 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Reads ZLIB compressed bytes from the stream.
+     * @param count Number of bytes to read
+     * @param name Name
+     * @return
+     * @throws IOException
+     */
     public byte[] readBytesZlib(long count, String name) throws IOException {
         if (count == 0) {
             return BYTE_ARRAY_EMPTY;
@@ -953,10 +837,24 @@ public class SWFInputStream implements AutoCloseable {
         return uncompressByteArray(data);
     }
 
+    /**
+     * Uncompresses byte array.
+     * @param data Data
+     * @return Uncompressed data
+     * @throws IOException
+     */
     public static byte[] uncompressByteArray(byte[] data) throws IOException {
         return uncompressByteArray(data, 0, data.length);
     }
 
+    /**
+     * Uncompresses byte array.
+     * @param data Data
+     * @param offset Offset
+     * @param length Length
+     * @return Uncompressed data
+     * @throws IOException
+     */
     public static byte[] uncompressByteArray(byte[] data, int offset, int length) throws IOException {
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data, offset, length));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -969,9 +867,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one EncodedU32 (Encoded unsigned 32bit value) value from the stream
+     * Reads one EncodedU32 (Encoded unsigned 32bit value) value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return U32 value
      * @throws IOException
      */
@@ -1002,15 +900,13 @@ public class SWFInputStream implements AutoCloseable {
         return result;
     }
 
-    private int bitPos = 0;
 
-    private int tempByte = 0;
 
     /**
-     * Reads UB[nBits] (Unsigned-bit value) value from the stream
+     * Reads UB[nBits] (Unsigned-bit value) value from the stream.
      *
      * @param nBits Number of bits which represent value
-     * @param name
+     * @param name Name
      * @return Unsigned value
      * @throws IOException
      */
@@ -1025,7 +921,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads UB[nBits] (Unsigned-bit value) value from the stream
+     * Reads UB[nBits] (Unsigned-bit value) value from the stream.
      *
      * @param nBits Number of bits which represent value
      * @return Unsigned value
@@ -1054,10 +950,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads SB[nBits] (Signed-bit value) value from the stream
+     * Reads SB[nBits] (Signed-bit value) value from the stream.
      *
      * @param nBits Number of bits which represent value
-     * @param name
+     * @param name Name
      * @return Signed value
      * @throws IOException
      */
@@ -1072,7 +968,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads SB[nBits] (Signed-bit value) value from the stream
+     * Reads SB[nBits] (Signed-bit value) value from the stream.
      *
      * @param nBits Number of bits which represent value
      * @return Signed value
@@ -1088,10 +984,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads FB[nBits] (Signed fixed-point bit value) value from the stream
+     * Reads FB[nBits] (Signed fixed-point bit value) value from the stream.
      *
      * @param nBits Number of bits which represent value
-     * @param name
+     * @param name Name
      * @return Fixed-point value
      * @throws IOException
      */
@@ -1107,9 +1003,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one RECT value from the stream
+     * Reads one RECT value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return RECT value
      * @throws IOException
      */
@@ -1127,6 +1023,13 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Dumps tag.
+     * @param out Output stream
+     * @param tag Tag
+     * @param index Index
+     * @param level Level
+     */
     private static void dumpTag(PrintStream out, Tag tag, int index, int level) {
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.formatHex((int) tag.getPos(), 8));
@@ -1151,24 +1054,57 @@ public class SWFInputStream implements AutoCloseable {
         }
     }
 
+    /**
+     * Close the stream.
+     */
     @Override
     public void close() {
     }
 
+    /**
+     * Tag resolution task.
+     */
     private class TagResolutionTask implements Callable<Tag> {
 
+        /**
+         * Tag stub
+         */
         private final TagStub tag;
 
+        /**
+         * Dump info
+         */
         private final DumpInfo dumpInfo;
 
+        /**
+         * Level
+         */
         private final int level;
 
+        /**
+         * Parallel
+         */
         private final boolean parallel;
 
+        /**
+         * Skip unusual tags
+         */
         private final boolean skipUnusualTags;
 
+        /**
+         * Lazy loading
+         */
         private final boolean lazy;
 
+        /**
+         * Constructs a new TagResolutionTask.
+         * @param tag Tag stub
+         * @param dumpInfo Dump info
+         * @param level Level
+         * @param parallel Parallel
+         * @param skipUnusualTags Skip unusual tags
+         * @param lazy Lazy loading
+         */
         public TagResolutionTask(TagStub tag, DumpInfo dumpInfo, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) {
             this.tag = tag;
             this.dumpInfo = dumpInfo;
@@ -1178,6 +1114,11 @@ public class SWFInputStream implements AutoCloseable {
             this.lazy = lazy;
         }
 
+        /**
+         * Call.
+         * @return Tag
+         * @throws Exception
+         */
         @Override
         public Tag call() throws Exception {
             DumpInfo di = dumpInfo;
@@ -1197,14 +1138,14 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
-     * of the stream. Optionally can skip AS1/2 tags when file is AS3
+     * of the stream. Optionally can skip AS1/2 tags when file is AS3.
      *
-     * @param timelined
-     * @param level
-     * @param parallel
-     * @param skipUnusualTags
-     * @param parseTags
-     * @param lazy
+     * @param timelined Timelined object
+     * @param level Level
+     * @param parallel Parallel
+     * @param skipUnusualTags Skip unusual tags
+     * @param parseTags Parse tags
+     * @param lazy Lazy loading
      * @return List of tags
      * @throws IOException
      * @throws java.lang.InterruptedException
@@ -1296,6 +1237,17 @@ public class SWFInputStream implements AutoCloseable {
         return tags;
     }
 
+    /**
+     * Resolves tag.
+     * @param tag Tag stub
+     * @param level Level
+     * @param parallel Parallel
+     * @param skipUnusualTags Skip unusual tags
+     * @param lazy Lazy loading
+     * @param logErrors Log errors
+     * @return Tag
+     * @throws InterruptedException
+     */
     public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean lazy, boolean logErrors) throws InterruptedException {
         Tag ret;
 
@@ -1604,15 +1556,15 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads one Tag from the stream with optional resolving (= reading tag
-     * content)
+     * content).
      *
-     * @param timelined
-     * @param level
-     * @param pos
-     * @param resolve
-     * @param parallel
-     * @param skipUnusualTags
-     * @param lazy
+     * @param timelined Timelined object
+     * @param level Level
+     * @param pos Position
+     * @param resolve Resolve tag
+     * @param parallel Parallel
+     * @param skipUnusualTags Skip unusual tags
+     * @param lazy Lazy loading
      * @return Tag or null when End tag
      * @throws IOException
      * @throws java.lang.InterruptedException
@@ -1698,7 +1650,7 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one Action from the stream
+     * Reads one Action from the stream.
      *
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
@@ -1939,9 +1891,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MATRIX value from the stream
+     * Reads one MATRIX value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MATRIX value
      * @throws IOException
      */
@@ -1972,9 +1924,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CXFORMWITHALPHA value from the stream
+     * Reads one CXFORMWITHALPHA value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return CXFORMWITHALPHA value
      * @throws IOException
      */
@@ -2003,9 +1955,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CXFORM value from the stream
+     * Reads one CXFORM value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return CXFORM value
      * @throws IOException
      */
@@ -2032,9 +1984,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CLIPEVENTFLAGS value from the stream
+     * Reads one CLIPEVENTFLAGS value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return CLIPEVENTFLAGS value
      * @throws IOException
      */
@@ -2069,11 +2021,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CLIPACTIONRECORD value from the stream
+     * Reads one CLIPACTIONRECORD value from the stream.
      *
-     * @param swf
-     * @param tag
-     * @param name
+     * @param swf SWF
+     * @param tag Tag
+     * @param name Name
      * @param parentClipActions
      * @return CLIPACTIONRECORD value
      * @throws IOException
@@ -2089,11 +2041,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CLIPACTIONS value from the stream
+     * Reads one CLIPACTIONS value from the stream.
      *
-     * @param swf
-     * @param tag
-     * @param name
+     * @param swf SWF
+     * @param tag Tag
+     * @param name Name
      * @return CLIPACTIONS value
      * @throws IOException
      */
@@ -2112,9 +2064,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one COLORMATRIXFILTER value from the stream
+     * Reads one COLORMATRIXFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return COLORMATRIXFILTER value
      * @throws IOException
      */
@@ -2130,9 +2082,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one RGBA value from the stream
+     * Reads one RGBA value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return RGBA value
      * @throws IOException
      */
@@ -2148,9 +2100,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one RGBA value from the stream
+     * Reads one RGBA value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return RGBA value
      * @throws IOException
      */
@@ -2165,9 +2117,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one ARGB value from the stream
+     * Reads one ARGB value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return ARGB value
      * @throws IOException
      */
@@ -2183,9 +2135,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one ARGB value from the stream
+     * Reads one ARGB value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return ARGB value
      * @throws IOException
      */
@@ -2200,9 +2152,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one RGB value from the stream
+     * Reads one RGB value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return RGB value
      * @throws IOException
      */
@@ -2217,9 +2169,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one RGB value from the stream
+     * Reads one RGB value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return RGB value
      * @throws IOException
      */
@@ -2234,9 +2186,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one CONVOLUTIONFILTER value from the stream
+     * Reads one CONVOLUTIONFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return CONVOLUTIONFILTER value
      * @throws IOException
      */
@@ -2260,9 +2212,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one BLURFILTER value from the stream
+     * Reads one BLURFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return BLURFILTER value
      * @throws IOException
      */
@@ -2278,9 +2230,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one DROPSHADOWFILTER value from the stream
+     * Reads one DROPSHADOWFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return DROPSHADOWFILTER value
      * @throws IOException
      */
@@ -2302,9 +2254,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GLOWFILTER value from the stream
+     * Reads one GLOWFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return GLOWFILTER value
      * @throws IOException
      */
@@ -2324,9 +2276,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one BEVELFILTER value from the stream
+     * Reads one BEVELFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return BEVELFILTER value
      * @throws IOException
      */
@@ -2350,9 +2302,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GRADIENTGLOWFILTER value from the stream
+     * Reads one GRADIENTGLOWFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return GRADIENTGLOWFILTER value
      * @throws IOException
      */
@@ -2383,9 +2335,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GRADIENTBEVELFILTER value from the stream
+     * Reads one GRADIENTBEVELFILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return GRADIENTBEVELFILTER value
      * @throws IOException
      */
@@ -2416,9 +2368,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads list of FILTER values from the stream
+     * Reads list of FILTER values from the stream.
      *
-     * @param name
+     * @param name Name
      * @return List of FILTER values
      * @throws IOException
      */
@@ -2434,9 +2386,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FILTER value from the stream
+     * Reads one FILTER value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return FILTER value
      * @throws IOException
      */
@@ -2475,11 +2427,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads list of BUTTONRECORD values from the stream
+     * Reads list of BUTTONRECORD values from the stream.
      *
-     * @param swf
-     * @param buttonTag
-     * @param name
+     * @param swf SWF
+     * @param buttonTag ButtonTag
+     * @param name Name
      * @return List of BUTTONRECORD values
      * @throws IOException
      */
@@ -2495,11 +2447,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one BUTTONRECORD value from the stream
+     * Reads one BUTTONRECORD value from the stream.
      *
-     * @param swf
-     * @param tag
-     * @param name
+     * @param swf SWF
+     * @param tag ButtonTag
+     * @param name Name
      * @return BUTTONRECORD value
      * @throws IOException
      */
@@ -2538,11 +2490,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads list of BUTTONCONDACTION values from the stream
+     * Reads list of BUTTONCONDACTION values from the stream.
      *
-     * @param swf
-     * @param tag
-     * @param name
+     * @param swf SWF
+     * @param tag Tag
+     * @param name Name
      * @return List of BUTTONCONDACTION values
      * @throws IOException
      */
@@ -2559,11 +2511,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one BUTTONCONDACTION value from the stream
+     * Reads one BUTTONCONDACTION value from the stream.
      *
-     * @param swf
-     * @param tag
-     * @param name
+     * @param swf SWF
+     * @param tag Tag
+     * @param name Name
      * @return BUTTONCONDACTION value
      * @throws IOException
      */
@@ -2576,10 +2528,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GRADRECORD value from the stream
+     * Reads one GRADRECORD value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return GRADRECORD value
      * @throws IOException
      */
@@ -2598,10 +2550,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GRADIENT value from the stream
+     * Reads one GRADIENT value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return GRADIENT value
      * @throws IOException
      */
@@ -2621,10 +2573,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FOCALGRADIENT value from the stream
+     * Reads one FOCALGRADIENT value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return FOCALGRADIENT value
      * @throws IOException
      */
@@ -2644,10 +2596,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FILLSTYLE value from the stream
+     * Reads one FILLSTYLE value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return FILLSTYLE value
      * @throws IOException
      */
@@ -2688,10 +2640,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one FILLSTYLEARRAY value from the stream
+     * Reads one FILLSTYLEARRAY value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return FILLSTYLEARRAY value
      * @throws IOException
      */
@@ -2712,10 +2664,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one LINESTYLE value from the stream
+     * Reads one LINESTYLE value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return LINESTYLE value
      * @throws IOException
      */
@@ -2733,10 +2685,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one LINESTYLE2 value from the stream
+     * Reads one LINESTYLE2 value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return LINESTYLE2 value
      * @throws IOException
      */
@@ -2766,10 +2718,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one LINESTYLEARRAY value from the stream
+     * Reads one LINESTYLEARRAY value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param name
+     * @param name Name
      * @return LINESTYLEARRAY value
      * @throws IOException
      */
@@ -2796,10 +2748,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SHAPERECORD value from the stream
+     * Reads one SHAPERECORD value from the stream.
      *
-     * @param fillBits
-     * @param lineBits
+     * @param fillBits Fill bits
+     * @param lineBits Line bits
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return SHAPERECORD value
      * @throws IOException
@@ -2881,11 +2833,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SHAPE value from the stream
+     * Reads one SHAPE value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param morphShape
-     * @param name
+     * @param morphShape Is this a morph shape
+     * @param name Name
      * @return SHAPE value
      * @throws IOException
      */
@@ -2900,11 +2852,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SHAPEWITHSTYLE value from the stream
+     * Reads one SHAPEWITHSTYLE value from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param morphShape
-     * @param name
+     * @param morphShape Is this a morph shape
+     * @param name Name
      * @return SHAPEWITHSTYLE value
      * @throws IOException
      */
@@ -2921,11 +2873,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads list of SHAPERECORDs from the stream
+     * Reads list of SHAPERECORDs from the stream.
      *
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
-     * @param fillBits
-     * @param lineBits
+     * @param fillBits Fill bits
+     * @param lineBits Line bits
      * @return SHAPERECORDs array
      * @throws IOException
      */
@@ -2950,9 +2902,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SOUNDINFO value from the stream
+     * Reads one SOUNDINFO value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return SOUNDINFO value
      * @throws IOException
      */
@@ -2987,9 +2939,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one SOUNDENVELOPE value from the stream
+     * Reads one SOUNDENVELOPE value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return SOUNDENVELOPE value
      * @throws IOException
      */
@@ -3004,11 +2956,11 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one GLYPHENTRY value from the stream
+     * Reads one GLYPHENTRY value from the stream.
      *
-     * @param glyphBits
-     * @param advanceBits
-     * @param name
+     * @param glyphBits Glyph bits
+     * @param advanceBits Advance bits
+     * @param name Name
      * @return GLYPHENTRY value
      * @throws IOException
      */
@@ -3022,12 +2974,12 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one TEXTRECORD value from the stream
+     * Reads one TEXTRECORD value from the stream.
      *
-     * @param defineTextNum
-     * @param glyphBits
-     * @param advanceBits
-     * @param name
+     * @param defineTextNum 1 in DefineText, 2 in DefineText2...
+     * @param glyphBits Glyph bits
+     * @param advanceBits Advance bits
+     * @param name Name
      * @return TEXTRECORD value
      * @throws IOException
      */
@@ -3074,9 +3026,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHGRADRECORD value from the stream
+     * Reads one MORPHGRADRECORD value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHGRADRECORD value
      * @throws IOException
      */
@@ -3092,9 +3044,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHGRADIENT value from the stream
+     * Reads one MORPHGRADIENT value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHGRADIENT value
      * @throws IOException
      */
@@ -3120,7 +3072,7 @@ public class SWFInputStream implements AutoCloseable {
      * <p>
      * This is undocumented feature
      *
-     * @param name
+     * @param name Name
      * @return MORPHGRADIENT value
      * @throws IOException
      */
@@ -3141,9 +3093,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHFILLSTYLE value from the stream
+     * Reads one MORPHFILLSTYLE value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHFILLSTYLE value
      * @throws IOException
      */
@@ -3182,9 +3134,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHFILLSTYLEARRAY value from the stream
+     * Reads one MORPHFILLSTYLEARRAY value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHFILLSTYLEARRAY value
      * @throws IOException
      */
@@ -3205,9 +3157,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHLINESTYLE value from the stream
+     * Reads one MORPHLINESTYLE value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHLINESTYLE value
      * @throws IOException
      */
@@ -3223,9 +3175,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHLINESTYLE2 value from the stream
+     * Reads one MORPHLINESTYLE2 value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return MORPHLINESTYLE2 value
      * @throws IOException
      */
@@ -3257,10 +3209,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one MORPHLINESTYLEARRAY value from the stream
+     * Reads one MORPHLINESTYLEARRAY value from the stream.
      *
      * @param morphShapeNum 1 on DefineMorphShape, 2 on DefineMorphShape2
-     * @param name
+     * @param name Name
      * @return MORPHLINESTYLEARRAY value
      * @throws IOException
      */
@@ -3287,10 +3239,10 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one KERNINGRECORD value from the stream
+     * Reads one KERNINGRECORD value from the stream.
      *
-     * @param fontFlagsWideCodes
-     * @param name
+     * @param fontFlagsWideCodes Font flags wide codes
+     * @param name Name
      * @return KERNINGRECORD value
      * @throws IOException
      */
@@ -3310,9 +3262,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one LANGCODE value from the stream
+     * Reads one LANGCODE value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return LANGCODE value
      * @throws IOException
      */
@@ -3325,9 +3277,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one ZONERECORD value from the stream
+     * Reads one ZONERECORD value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return ZONERECORD value
      * @throws IOException
      */
@@ -3347,9 +3299,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one ZONEDATA value from the stream
+     * Reads one ZONEDATA value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return ZONEDATA value
      * @throws IOException
      */
@@ -3363,9 +3315,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one PIX15 value from the stream
+     * Reads one PIX15 value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return PIX15 value
      * @throws IOException
      */
@@ -3381,9 +3333,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one PIX15 value from the stream
+     * Reads one PIX15 value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return PIX15 value
      * @throws IOException
      */
@@ -3398,9 +3350,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one PIX24 value from the stream
+     * Reads one PIX24 value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return PIX24 value
      * @throws IOException
      */
@@ -3416,9 +3368,9 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one PIX24 value from the stream
+     * Reads one PIX24 value from the stream.
      *
-     * @param name
+     * @param name Name
      * @return PIX24 value
      * @throws IOException
      */
@@ -3435,10 +3387,10 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one COLORMAPDATA value from the stream
      *
-     * @param colorTableSize
-     * @param bitmapWidth
-     * @param bitmapHeight
-     * @param name
+     * @param colorTableSize Color table size
+     * @param bitmapWidth Bitmap width
+     * @param bitmapHeight Bitmap height
+     * @param name Name
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -3470,10 +3422,10 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one BITMAPDATA value from the stream
      *
-     * @param bitmapFormat
-     * @param bitmapWidth
-     * @param bitmapHeight
-     * @param name
+     * @param bitmapFormat Bitmap format
+     * @param bitmapWidth Bitmap width
+     * @param bitmapHeight Bitmap height
+     * @param name Name
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -3514,10 +3466,10 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one BITMAPDATA value from the stream
      *
-     * @param bitmapFormat
-     * @param bitmapWidth
-     * @param bitmapHeight
-     * @param name
+     * @param bitmapFormat Bitmap format
+     * @param bitmapWidth Bitmap width
+     * @param bitmapHeight Bitmap height
+     * @param name Name
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -3537,10 +3489,10 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one ALPHACOLORMAPDATA value from the stream
      *
-     * @param colorTableSize
-     * @param bitmapWidth
-     * @param bitmapHeight
-     * @param name
+     * @param colorTableSize Color table size
+     * @param bitmapWidth Bitmap width
+     * @param bitmapHeight Bitmap height
+     * @param name Name
      * @return ALPHACOLORMAPDATA value
      * @throws IOException
      */
@@ -3569,10 +3521,20 @@ public class SWFInputStream implements AutoCloseable {
         return ret;
     }
 
+    /**
+     * Gets number of available bytes in the stream.
+     * @return Number of available bytes
+     * @throws IOException
+     */
     public int available() throws IOException {
         return is.available();
     }
 
+    /**
+     * Gets number of available bits in the stream.
+     * @return Number of available bits
+     * @throws IOException
+     */
     public long availableBits() throws IOException {
         if (bitPos > 0) {
             return available() * 8 + (8 - bitPos);
@@ -3580,6 +3542,11 @@ public class SWFInputStream implements AutoCloseable {
         return available() * 8;
     }
 
+    /**
+     * Gets base stream.
+     * @return Base stream
+     * @throws IOException
+     */
     public MemoryInputStream getBaseStream() throws IOException {
         int pos = (int) is.getPos();
         MemoryInputStream mis = new MemoryInputStream(is.getAllRead(), 0, pos + is.available());
@@ -3587,6 +3554,12 @@ public class SWFInputStream implements AutoCloseable {
         return mis;
     }
 
+    /**
+     * Gets limited stream.
+     * @param limit Limit
+     * @return Limited stream
+     * @throws IOException
+     */
     public SWFInputStream getLimitedStream(int limit) throws IOException {
         SWFInputStream sis = new SWFInputStream(swf, is.getAllRead(), startingPos, (int) (is.getPos() + limit));
 

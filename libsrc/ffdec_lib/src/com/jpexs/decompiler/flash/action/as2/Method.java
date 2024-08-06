@@ -17,16 +17,38 @@
 package com.jpexs.decompiler.flash.action.as2;
 
 /**
- *
+ * Represents a method trait in ActionScript 2.
  * @author JPEXS
  */
 public class Method implements Trait {
 
+    /**
+     * Whether the method is static
+     */
     private final boolean isStatic;
+
+    /**
+     * Name of the method
+     */
     private final String name;
+
+    /**
+     * Return type of the method
+     */
     private final String returnType;
+
+    /**
+     * Name of the class the method is in
+     */
     private final String className;
 
+    /**
+     * Constructs a new method trait.
+     * @param isStatic Whether the method is static
+     * @param name Name of the method
+     * @param returnType Return type of the method
+     * @param className Name of the class the method is in
+     */
     public Method(boolean isStatic, String name, String returnType, String className) {
         this.isStatic = isStatic;
         this.name = name;
@@ -34,35 +56,63 @@ public class Method implements Trait {
         this.className = className;
     }
 
+    /**
+     * Gets the name of the class the method is in.
+     * @return Class name
+     */
     @Override
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Gets whether the method is static.
+     * @return Whether the method is static
+     */
     @Override
     public boolean isStatic() {
         return isStatic;
     }
 
+    /**
+     * Gets the name of the method.
+     * @return Name
+     */
     @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the return type of the method.
+     * @return Return type
+     */
     public String getReturnType() {
         return returnType;
     }
 
+    /**
+     * Converts the method to a string.
+     * @return String representation
+     */
     @Override
     public String toString() {
         return (isStatic ? "static " : "") + "function " + name + ": " + returnType;
     }
 
+    /**
+     * Gets the call type of the method.
+     * @return Call type
+     */
     @Override
     public String getCallType() {
         return returnType;
     }
 
+    /**
+     * Gets the type of the trait.
+     * @return Trait type
+     */
     @Override
     public String getType() {
         return "Function";

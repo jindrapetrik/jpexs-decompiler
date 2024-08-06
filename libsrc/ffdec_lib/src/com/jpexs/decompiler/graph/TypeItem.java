@@ -22,15 +22,18 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Type item.
  * @author JPEXS
  */
 public class TypeItem extends GraphTargetItem {
+
+    //Basic type items
 
     public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
@@ -50,34 +53,66 @@ public class TypeItem extends GraphTargetItem {
 
     public static TypeItem UNKNOWN = new TypeItem("--UNKNOWN--");
 
+    /**
+     * Full type name
+     */
     public final DottedChain fullTypeName;
 
-    public boolean printRaw = false;
-
+    /**
+     * Namespace
+     */
     public String ns;
 
+    /**
+     * Constructs a new instance of TypeItem
+     * @param s Full type name
+     */
     public TypeItem(String s) {
         this(s, null);
     }
 
+    /**
+     * Constructs a new instance of TypeItem
+     * @param s Full type name
+     * @param ns Namespace
+     */
     public TypeItem(String s, String ns) {
         this(s == null ? new DottedChain(new String[]{}, new String[]{""}) : DottedChain.parseWithSuffix(s), ns);
     }
 
+    /**
+     * Constructs a new instance of TypeItem
+     * @param fullTypeName Full type name
+     */
     public TypeItem(DottedChain fullTypeName) {
         this(fullTypeName, (String) null);
     }
 
+    /**
+     * Constructs a new instance of TypeItem
+     * @param fullTypeName Full type name
+     * @param ns Namespace
+     */
     public TypeItem(DottedChain fullTypeName, String ns) {
         this(fullTypeName, new ArrayList<>(), ns);
     }
 
+    /**
+     * Constructs a new instance of TypeItem
+     * @param fullTypeName Full type name
+     * @param subtypes Subtypes
+     * @param ns Namespace
+     */
     public TypeItem(DottedChain fullTypeName, List<GraphTargetItem> subtypes, String ns) {
         super(null, null, NOPRECEDENCE);
         this.fullTypeName = fullTypeName;
         this.ns = ns;
     }
 
+    /**
+     * Hash code
+     * @return Hash code
+     */
     @Override
     public int hashCode() {
         int hash = 5;
@@ -86,6 +121,11 @@ public class TypeItem extends GraphTargetItem {
         return hash;
     }
 
+    /**
+     * Equals
+     * @param obj Object to compare
+     * @return True if equal
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -104,6 +144,13 @@ public class TypeItem extends GraphTargetItem {
         return Objects.equals(this.fullTypeName, other.fullTypeName);
     }
 
+    /**
+     * Appends to writer
+     * @param writer Writer
+     * @param localData Local data
+     * @return Writer
+     * @throws InterruptedException
+     */
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean as3 = localData.constantsAvm2 != null;
@@ -117,21 +164,40 @@ public class TypeItem extends GraphTargetItem {
         return writer;
     }
 
+    /**
+     * Gets the return type
+     * @return Return type
+     */
     @Override
     public GraphTargetItem returnType() {
         return this;
     }
 
+    /**
+     * Checks whether this function has a return value
+     * @return True if has a return value
+     */
     @Override
     public boolean hasReturnValue() {
         return true;
     }
 
+    /**
+     * Returns a string representation of this function
+     * @return String representation
+     */
     @Override
     public String toString() {
         return fullTypeName.toRawString();
     }
 
+    /**
+     * Converts this item to low-level source code.
+     * @param localData Local data
+     * @param generator Source generator
+     * @return List of graph source items
+     * @throws CompilationException
+     */
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);

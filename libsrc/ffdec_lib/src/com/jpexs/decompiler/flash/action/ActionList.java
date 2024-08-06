@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,43 +42,82 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * List of actions.
  * @author JPEXS
  */
 public class ActionList extends ArrayList<Action> {
 
+    /**
+     * Deobfuscation mode
+     */
     public int deobfuscationMode;
 
+    /**
+     * File data
+     */
     public byte[] fileData;
 
+    /**
+     * Charset - SWF version 5 or lower does not have UTF-8 charset
+     */
     private String charset;
 
+    /**
+     * Constructs a new action list with the specified charset.
+     * @param charset Charset
+     */
     public ActionList(String charset) {
         this.charset = charset;
     }
 
+    /**
+     * Gets the charset.
+     * @return Charset
+     */
     public String getCharset() {
         return charset;
     }
 
+    /**
+     * Constructs a new action list with the specified actions and charset.
+     * @param actions Actions
+     * @param charset Charset
+     */
     public ActionList(Collection<Action> actions, String charset) {
         super(actions);
         this.charset = charset;
     }
 
+    /**
+     * Sets actions.
+     * @param list Actions
+     */
     public void setActions(List<Action> list) {
         clear();
         addAll(list);
     }
 
+    /**
+     * Removes actions.
+     * @param actionsToRemove Actions to remove
+     */
     public void removeActions(List<Action> actionsToRemove) {
         ActionListReader.removeActions(this, actionsToRemove, true);
     }
 
+    /**
+     * Removes action.
+     * @param index Index
+     */
     public void removeAction(int index) {
         ActionListReader.removeAction(this, index, true);
     }
 
+    /**
+     * Removes action.
+     * @param index Index
+     * @param count Count
+     */
     public void removeAction(int index, int count) {
         if (size() <= index + count - 1) {
             // Can't remove count elements, only size - index is available
@@ -89,22 +129,45 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Adds action.
+     * @param index Index
+     * @param action Action
+     */
     public void addAction(int index, Action action) {
         ActionListReader.addAction(this, index, action, false, false);
     }
 
+    /**
+     * Adds actions.
+     * @param index Index
+     * @param actions Actions
+     */
     public void addActions(int index, List<Action> actions) {
         ActionListReader.addActions(this, index, actions);
     }
 
+    /**
+     * Fixes action list.
+     */
     public void fixActionList() {
         ActionListReader.fixActionList(this, null);
     }
 
+    /**
+     * Gets container last actions.
+     * @param action Action
+     * @return Container last actions
+     */
     public List<Action> getContainerLastActions(Action action) {
         return ActionListReader.getContainerLastActions(this, action);
     }
 
+    /**
+     * Gets references for action.
+     * @param target Target
+     * @return References
+     */
     public Iterator<Action> getReferencesFor(final Action target) {
         return new Iterator<Action>() {
             private final Iterator<Action> iterator = ActionList.this.iterator();
@@ -167,6 +230,10 @@ public class ActionList extends ArrayList<Action> {
         };
     }
 
+    /**
+     * Gets constant pools.
+     * @return Constant pools
+     */
     public Iterable<ActionConstantPool> getConstantPools() {
         return () -> new Iterator<ActionConstantPool>() {
             private final Iterator<Action> iterator = ActionList.this.iterator();
@@ -203,6 +270,10 @@ public class ActionList extends ArrayList<Action> {
         };
     }
 
+    /**
+     * Gets pushes.
+     * @return Pushes
+     */
     public Iterable<ActionPush> getPushes() {
         return () -> new Iterator<ActionPush>() {
             private final Iterator<Action> iterator = ActionList.this.iterator();
@@ -239,6 +310,11 @@ public class ActionList extends ArrayList<Action> {
         };
     }
 
+    /**
+     * Gets constant pool index reference count.
+     * @param index Index
+     * @return Constant pool index reference count
+     */
     public int getConstantPoolIndexReferenceCount(int index) {
         int count = 0;
         for (Action action : this) {
@@ -258,6 +334,11 @@ public class ActionList extends ArrayList<Action> {
         return count;
     }
 
+    /**
+     * Gets inline constant pool string.
+     * @param index Index
+     * @param str String
+     */
     public void inlineConstantPoolString(int index, String str) {
         for (ActionPush push : getPushes()) {
             for (int i = 0; i < push.values.size(); i++) {
@@ -272,6 +353,9 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Removes non-referenced constant pool items.
+     */
     public void removeNonReferencedConstantPoolItems() {
         int maxSize = 0;
         for (ActionConstantPool constantPool : getConstantPools()) {
@@ -321,6 +405,9 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Removes nops.
+     */
     public void removeNops() {
         for (int i = 0; i < size(); i++) {
             if (get(i) instanceof ActionNop) {
@@ -329,15 +416,30 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Gets action by address.
+     * @param address Address
+     * @return Action
+     */
     public Action getByAddress(long address) {
         int idx = getIndexByAddress(address);
         return idx == -1 ? null : get(idx);
     }
 
+    /**
+     * Gets index by action.
+     * @param action Action
+     * @return Index
+     */
     public int getIndexByAction(Action action) {
         return getIndexByAddress(action.getAddress());
     }
 
+    /**
+     * Gets index by address.
+     * @param address Address
+     * @return Index
+     */
     public int getIndexByAddress(long address) {
         int min = 0;
         int max = size() - 1;
@@ -357,6 +459,11 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
+    /**
+     * Gets container.
+     * @param idx Index
+     * @return Container
+     */
     public GraphSourceItemContainer getContainer(int idx) {
         Action action = get(idx);
         int i = idx - 1;
@@ -376,6 +483,11 @@ public class ActionList extends ArrayList<Action> {
         return null;
     }
 
+    /**
+     * Gets container end index.
+     * @param idx Index
+     * @return Container end index
+     */
     public int getContainerEndIndex(int idx) {
         Action action = get(idx);
         int i = idx - 1;
@@ -395,6 +507,10 @@ public class ActionList extends ArrayList<Action> {
         return -1;
     }
 
+    /**
+     * Gets unreachable actions.
+     * @return Unreachable actions
+     */
     public List<Action> getUnreachableActions() {
         int[] isReachable = getUnreachableActionsMap(-1, 0);
         List<Action> unreachableActions = new ArrayList<>();
@@ -411,6 +527,12 @@ public class ActionList extends ArrayList<Action> {
         return unreachableActions;
     }
 
+    /**
+     * Gets unreachable actions.
+     * @param jumpIndex Jump index
+     * @param jumpTargetIndex Jump target index
+     * @return Unreachable actions
+     */
     public List<Action> getUnreachableActions(int jumpIndex, int jumpTargetIndex) {
         int[] isReachable = getUnreachableActionsMap(jumpIndex, jumpTargetIndex);
         isReachable[jumpIndex] = 0;
@@ -428,6 +550,12 @@ public class ActionList extends ArrayList<Action> {
         return unreachableActions;
     }
 
+    /**
+     * Gets unreachable actions map.
+     * @param jumpIndex Jump index
+     * @param jumpTargetIndex Jump target index
+     * @return Unreachable actions array - ip to reachable
+     */
     private int[] getUnreachableActionsMap(int jumpIndex, int jumpTargetIndex) {
         int size = size();
 
@@ -498,6 +626,9 @@ public class ActionList extends ArrayList<Action> {
         return isReachable;
     }
 
+    /**
+     * Combines pushes.
+     */
     public void combinePushes() {
         for (int i = 0; i < size() - 1; i++) {
             Action action = get(i);
@@ -522,6 +653,9 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Expands pushes.
+     */
     public void expandPushes() {
         for (int i = 0; i < size(); i++) {
             Action action = get(i);
@@ -543,6 +677,10 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Saves to file.
+     * @param fileName File name
+     */
     public void saveToFile(String fileName) {
         File file = new File(fileName);
         try (FileTextWriter writer = new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
@@ -552,6 +690,10 @@ public class ActionList extends ArrayList<Action> {
         }
     }
 
+    /**
+     * Converts to string.
+     * @return String
+     */
     @Override
     public String toString() {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
@@ -559,15 +701,4 @@ public class ActionList extends ArrayList<Action> {
         writer.finishHilights();
         return writer.toString();
     }
-
-    /*public String toSource() {
-        try {
-            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            actionsToSource(null, this, "", writer, charset);
-            return writer.toString();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }*/
 }

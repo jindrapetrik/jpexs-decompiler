@@ -17,14 +17,21 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 /**
- *
+ * Exception thrown when unknown instruction code is found.
  * @author JPEXS
  */
-public class UnknownInstructionCode extends RuntimeException {
+public class UnknownInstructionCodeException extends RuntimeException {
 
+    /**
+     * Instruction code
+     */
     public int code;
 
-    public UnknownInstructionCode(int code) {
+    /**
+     * Constructs a new UnknownInstructionCodeException.
+     * @param code Instruction code
+     */
+    public UnknownInstructionCodeException(int code) {
         super("Unknown instruction code: 0x" + Integer.toHexString(code));
         this.code = code;
     }

@@ -17,18 +17,38 @@
 package com.jpexs.decompiler.flash.action.as2;
 
 /**
- *
+ * Represents a trait in ActionScript 2.
  * @author JPEXS
  */
 public interface Trait {
 
+    /**
+     * Whether the trait is static
+     * @return Whether the trait is static
+     */
     public boolean isStatic();
 
+    /**
+     * Gets the name of the trait
+     * @return Name of the trait
+     */
     public String getName();
 
+    /**
+     * Gets the type of the trait
+     * @return Type of the trait
+     */
     public String getType();
 
+    /**
+     * Gets the call type of the trait
+     * @return Call type of the trait
+     */
     public String getCallType();
 
+    /**
+     * Gets the class name of the trait
+     * @return Class name of the trait
+     */
     public String getClassName();
 }

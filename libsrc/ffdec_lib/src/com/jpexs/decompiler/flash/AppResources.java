@@ -19,17 +19,31 @@ package com.jpexs.decompiler.flash;
 import java.util.ResourceBundle;
 
 /**
- *
+ * Application resources
  * @author JPEXS
  */
 public class AppResources {
 
+    /**
+     * Resource bundle
+     */
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.jpexs.decompiler.flash.locales.AppResources");
 
+    /**
+     * Translates a key
+     * @param key The key
+     * @return The translated key
+     */
     public static String translate(String key) {
         return resourceBundle.getString(key);
     }
 
+    /**
+     * Translates a key from a bundle
+     * @param bundle The bundle
+     * @param key The key
+     * @return The translated key
+     */
     public static String translate(String bundle, String key) {
         ResourceBundle b = ResourceBundle.getBundle(bundle);
         return b.getString(key);

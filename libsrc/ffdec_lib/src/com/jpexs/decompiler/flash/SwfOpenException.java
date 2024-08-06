@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash;
 import java.io.IOException;
 
 /**
- *
+ * Exception thrown when SWF file cannot be opened.
  * @author JPEXS
  */
 public class SwfOpenException extends IOException {

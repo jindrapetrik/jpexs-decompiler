@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,23 +26,67 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Graph source abstract class
  * @author JPEXS
  */
 public abstract class GraphSource implements Serializable {
 
+    /**
+     * Gets the size of the graph source
+     * @return The size of the graph source
+     */
     public abstract int size();
 
+    /**
+     * Gets the graph source item at the specified position
+     * @param pos Position of the graph source item
+     * @return The graph source item at the specified position
+     */
     public abstract GraphSourceItem get(int pos);
 
+    /**
+     * Checks if the graph source is empty
+     * @return True if the graph source is empty, false otherwise
+     */
     public abstract boolean isEmpty();
 
+    /**
+     * Translates the part of the graph source
+     * @param graph Graph
+     * @param part Graph part
+     * @param localData Local data
+     * @param stack Translate stack
+     * @param start Start position
+     * @param end End position
+     * @param staticOperation Unused
+     * @param path Path
+     * @return List of graph target items
+     * @throws InterruptedException
+     * @throws GraphPartChangeException
+     */
     public abstract List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
 
+    /**
+     * Gets the important addresses
+     * @return Set of important addresses
+     */
     public abstract Set<Long> getImportantAddresses();
 
+    /**
+     * Converts instruction at the specified position to string
+     * @param pos Position of the instruction
+     * @return Instruction as string
+     */
     public abstract String insToString(int pos);
 
+    /**
+     * Visits the code
+     * @param ip Start position
+     * @param lastIp Last position
+     * @param refs References
+     * @param endIp End position
+     * @throws InterruptedException
+     */
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -96,6 +141,12 @@ public abstract class GraphSource implements Serializable {
         }
     }
 
+    /**
+     * Visits the code
+     * @param alternateEntries Alternate entries
+     * @return References
+     * @throws InterruptedException
+     */
     public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         int siz = size();
@@ -111,10 +162,25 @@ public abstract class GraphSource implements Serializable {
         return refs;
     }
 
+    /**
+     * Converts address to position
+     * @param adr Address
+     * @return Position
+     */
     public abstract int adr2pos(long adr);
 
+    /**
+     * Converts address to position
+     * @param adr Address
+     * @param nearest Nearest
+     * @return Position
+     */
     public abstract int adr2pos(long adr, boolean nearest);
 
+    /**
+     * Gets the address after the code
+     * @return Address after the code
+     */
     public long getAddressAfterCode() {
         if (isEmpty()) {
             return 0;
@@ -123,8 +189,19 @@ public abstract class GraphSource implements Serializable {
         return lastAddr + get(size() - 1).getBytesLength();
     }
 
+    /**
+     * Converts position to address
+     * @param pos Position
+     * @return Address
+     */
     public abstract long pos2adr(int pos);
 
+    /**
+     * Converts position to address
+     * @param pos Position
+     * @param allowPosAfterCode Allow position after code
+     * @return Address
+     */
     public final long pos2adr(int pos, boolean allowPosAfterCode) {
         if (pos == size() && allowPosAfterCode) {
             return getAddressAfterCode();

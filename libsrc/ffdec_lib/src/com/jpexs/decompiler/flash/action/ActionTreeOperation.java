@@ -17,13 +17,18 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
+
 import java.util.List;
 
 /**
- *
+ * Operation on action tree.
  * @author JPEXS
  */
 public interface ActionTreeOperation {
 
+    /**
+     * Run operation on action tree.
+     * @param tree Action tree
+     */
     public void run(List<GraphTargetItem> tree);
 }

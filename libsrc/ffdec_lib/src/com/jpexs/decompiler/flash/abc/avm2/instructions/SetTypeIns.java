@@ -17,23 +17,26 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.*;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+
 import java.util.List;
 
 /**
- *
+ * SetType instruction interface.
  * @author JPEXS
  */
 public interface SetTypeIns {
 
+    /**
+     * Handles number to int conversion.
+     * @param value Value to convert
+     * @param type Type to convert to
+     * @return Value
+     */
     public static GraphTargetItem handleNumberToInt(GraphTargetItem value, GraphTargetItem type) {
         if ((value instanceof ConvertAVM2Item) || (value instanceof CoerceAVM2Item)) {
             if (type != null && (type.equals(TypeItem.INT) || type.equals(TypeItem.UINT))) {
@@ -45,6 +48,16 @@ public interface SetTypeIns {
         return value;
     }
 
+    /**
+     * Handles result.
+     * @param value Value
+     * @param stack Stack
+     * @param output Output
+     * @param localData Local data
+     * @param result Result
+     * @param regId Register ID
+     * @param type Type
+     */
     public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId, GraphTargetItem type) {
         GraphTargetItem notCoercedValue = value;
         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {

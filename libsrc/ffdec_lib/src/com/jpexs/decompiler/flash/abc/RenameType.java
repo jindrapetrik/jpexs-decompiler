@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc;
 
 /**
- *
+ * Rename type enum.
  * @author JPEXS
  */
 public enum RenameType {

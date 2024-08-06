@@ -19,11 +19,16 @@ package com.jpexs.decompiler.flash;
 import java.io.IOException;
 
 /**
- *
+ * Runnable with IOException and InterruptedException.
  * @author JPEXS
  */
 @FunctionalInterface
 public interface RunnableIOEx {
 
+    /**
+     * Run method.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void run() throws IOException, InterruptedException;
 }

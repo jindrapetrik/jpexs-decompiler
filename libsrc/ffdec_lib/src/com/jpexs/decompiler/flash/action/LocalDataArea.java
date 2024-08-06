@@ -18,50 +18,94 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+
+import java.util.*;
 
 /**
- *
+ * Local data area for ActionScript execution.
  * @author JPEXS
  */
 public class LocalDataArea {
 
+    /**
+     * Constant pool
+     */
     public List<String> constantPool;
 
+    /**
+     * Stack
+     */
     public Stack<Object> stack = new Stack<>();
 
+    /**
+     * Functions
+     */
     public List<ActionScriptFunction> functions = new ArrayList<>();
 
+    /**
+     * Local variables
+     */
     public Map<String, Object> localVariables = new HashMap<>();
 
+    /**
+     * Withs
+     */
     public List<ActionScriptWith> withs = new ArrayList<>();
 
+    /**
+     * Local registers - map of register index to value
+     */
     public Map<Integer, Object> localRegisters = new HashMap<>();
 
+    /**
+     * Target object
+     */
     public Object target;
 
+    /**
+     * Stage
+     */
     public Stage stage;
 
+    /**
+     * Jump
+     */
     public Long jump;
 
+    /**
+     * Return value
+     */
     public Object returnValue;
 
+    /**
+     * Execution exception
+     */
     public String executionException;
 
+    /**
+     * Check stack size
+     */
     public boolean checkStackSize = true;
 
+    /**
+     * Undefined count
+     */
     public int undefinedCount = 0;
 
+    /**
+     * Constructs a new local data area.
+     * @param stage Stage
+     */
     public LocalDataArea(Stage stage) {
         this.stage = stage;
         this.target = this.stage;
     }
 
+    /**
+     * Constructs a new local data area.
+     * @param stage Stage
+     * @param preserveVariableOrder Preserve variable order
+     */
     public LocalDataArea(Stage stage, boolean preserveVariableOrder) {
         this.stage = stage;
         target = this.stage;
@@ -70,6 +114,10 @@ public class LocalDataArea {
         }
     }
 
+    /**
+     * Checks if the stack is empty.
+     * @return True if the stack is empty, otherwise false
+     */
     public boolean stackIsEmpty() {
         if (!checkStackSize) {
             return false;
@@ -77,6 +125,11 @@ public class LocalDataArea {
         return stack.isEmpty();
     }
 
+    /**
+     * Checks if the stack has a minimum size.
+     * @param count Count
+     * @return True if the stack has a minimum size, otherwise false
+     */
     public boolean stackHasMinSize(int count) {
         if (!checkStackSize) {
             return true;
@@ -84,6 +137,9 @@ public class LocalDataArea {
         return stack.size() >= count;
     }
 
+    /**
+     * Clears the local data area.
+     */
     public void clear() {
         constantPool = null;
         stack.clear();
@@ -99,10 +155,19 @@ public class LocalDataArea {
         undefinedCount = 0;
     }
 
+    /**
+     * Pushes a value onto the stack.
+     * @param val Value
+     * @return Value
+     */
     public synchronized Object push(Object val) {
         return stack.push(val);
     }
 
+    /**
+     * Peeks at the top of the stack.
+     * @return Value
+     */
     public synchronized Object peek() {
         if (!checkStackSize && stack.isEmpty()) {
             undefinedCount++;
@@ -112,6 +177,10 @@ public class LocalDataArea {
         return stack.peek();
     }
 
+    /**
+     * Pops a value from the stack.
+     * @return Value
+     */
     public synchronized Object pop() {
         boolean isEmpty = stack.isEmpty();
         if (!checkStackSize && stack.isEmpty()) {
@@ -121,10 +190,18 @@ public class LocalDataArea {
         return stack.pop();
     }
 
+    /**
+     * Pops a value from the stack as a number.
+     * @return Value
+     */
     public synchronized Double popAsNumber() {
         return EcmaScript.toNumberAs2(pop());
     }
 
+    /**
+     * Pops a value from the stack as a string.
+     * @return Value
+     */
     public synchronized String popAsString() {
         return EcmaScript.toString(pop());
     }

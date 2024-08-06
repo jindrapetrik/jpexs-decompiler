@@ -17,17 +17,32 @@
 package com.jpexs.decompiler.flash.action;
 
 /**
- *
+ * Represents a with block in ActionScript.
  * @author JPEXS
  */
 public class ActionScriptWith {
 
+    /**
+     * Object that is used in the with block.
+     */
     protected ActionScriptObject obj;
 
+    /**
+     * Start address of the with block.
+     */
     protected long startAddr;
 
+    /**
+     * Length of the with block.
+     */
     protected long length;
 
+    /**
+     * Constructs a new ActionScriptWith object.
+     * @param obj Object that is used in the with block.
+     * @param startAddr Start address of the with block.
+     * @param length Length of the with block.
+     */
     public ActionScriptWith(ActionScriptObject obj, long startAddr, long length) {
         this.obj = obj;
         this.startAddr = startAddr;

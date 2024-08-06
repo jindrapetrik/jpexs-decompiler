@@ -16,11 +16,8 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.MemoryInputStream;
-import com.jpexs.helpers.PosMarkedInputStream;
-import com.jpexs.helpers.ProgressListener;
-import com.jpexs.helpers.Searchable;
+import com.jpexs.helpers.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -29,43 +26,82 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * SWF search class.
  * @author JPEXS
  */
 public class SWFSearch {
 
+    /**
+     * Searchable object
+     */
     protected Searchable s;
 
+    /**
+     * No check for validity
+     */
     private final boolean noCheck;
 
+    /**
+     * Search mode
+     */
     private final SearchMode searchMode;
 
+    /**
+     * Already processed
+     */
     private boolean processed = false;
 
+    /**
+     * Progress listeners
+     */
     private final Set<ProgressListener> listeners = new HashSet<>();
 
+    /**
+     * SWF streams
+     */
     private final Map<Long, MemoryInputStream> swfStreams = new LinkedHashMap<>();
 
+    /**
+     * Constructs SWF search object.
+     * @param s Searchable object
+     * @param noCheck No check for validity
+     * @param searchMode Search mode
+     */
     public SWFSearch(Searchable s, boolean noCheck, SearchMode searchMode) {
         this.s = s;
         this.noCheck = noCheck;
         this.searchMode = searchMode;
     }
 
+    /**
+     * Adds progress listener.
+     * @param l
+     */
     public void addProgressListener(ProgressListener l) {
         listeners.add(l);
     }
 
+    /**
+     * Removes progress listener.
+     * @param l
+     */
     public void removeProgressListener(ProgressListener l) {
         listeners.remove(l);
     }
 
+    /**
+     * Sets progress.
+     * @param p Progress
+     */
     private void setProgress(int p) {
         for (ProgressListener l : listeners) {
             l.progress(p);
         }
     }
 
+    /**
+     * Processes SWF search.
+     */
     public void process() {
         Map<Long, InputStream> ret;
         ret = s.search(new ProgressListener() {
@@ -144,6 +180,13 @@ public class SWFSearch {
         processed = true;
     }
 
+    /**
+     * Gets SWF stream.
+     * @param listener Progress listener
+     * @param address Address
+     * @return SWF stream
+     * @throws IOException
+     */
     public MemoryInputStream get(ProgressListener listener, long address) throws IOException {
         if (!processed) {
             return null;
@@ -154,10 +197,18 @@ public class SWFSearch {
         return swfStreams.get(address);
     }
 
+    /**
+     * Gets list of addresses.
+     * @return List of addresses
+     */
     public Set<Long> getAddresses() {
         return swfStreams.keySet();
     }
 
+    /**
+     * Gets number of SWF streams.
+     * @return Number of SWF streams
+     */
     public int length() {
         if (!processed) {
             return 0;

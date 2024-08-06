@@ -17,15 +17,26 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Parse exception.
  * @author JPEXS
  */
 public abstract class ParseException extends Exception {
 
+    /**
+     * Line number where the exception occurred.
+     */
     public long line;
 
+    /**
+     * Text of the exception.
+     */
     public String text;
 
+    /**
+     * Constructs a new parse exception.
+     * @param text
+     * @param line
+     */
     public ParseException(String text, long line) {
         super("ParseException:" + text + " on line " + line);
         this.line = line;

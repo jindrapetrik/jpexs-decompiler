@@ -16,31 +16,48 @@
  */
 package com.jpexs.decompiler.flash;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
+ * SWC file.
  * @author JPEXS
  */
 public class SWC extends ZippedBundle {
 
+    /**
+     * Constructs SWC from input stream.
+     * @param is Input stream
+     * @throws IOException
+     */
     public SWC(InputStream is) throws IOException {
         super(is);
     }
 
+    /**
+     * Constructs SWC from file.
+     * @param filename File
+     * @throws IOException
+     */
     public SWC(File filename) throws IOException {
         super(filename);
     }
 
+    /**
+     * Initializes SWC bundle.
+     * @param is Input stream
+     * @param filename File
+     * @throws IOException
+     */
     @Override
     protected void initBundle(InputStream is, File filename) throws IOException {
         super.initBundle(is, filename);
@@ -76,6 +93,10 @@ public class SWC extends ZippedBundle {
         }
     }
 
+    /**
+     * Returns extension of SWC file.
+     * @return Extension
+     */
     @Override
     public String getExtension() {
         return "swc";

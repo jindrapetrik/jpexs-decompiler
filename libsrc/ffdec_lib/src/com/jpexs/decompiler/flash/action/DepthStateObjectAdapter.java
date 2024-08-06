@@ -19,13 +19,20 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 
 /**
- *
+ * Adapter for DepthState object.
  * @author JPEXS
  */
 public class DepthStateObjectAdapter extends ActionScriptObject {
 
+    /**
+     * DepthState object
+     */
     protected DepthState ds;
 
+    /**
+     * Constructs a new DepthStateObjectAdapter with the given DepthState object.
+     * @param ds DepthState object
+     */
     public DepthStateObjectAdapter(DepthState ds) {
         this.ds = ds;
     }

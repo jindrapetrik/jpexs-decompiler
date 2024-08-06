@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * SWF compression types.
  * @author JPEXS
  */
 public enum SWFCompression {

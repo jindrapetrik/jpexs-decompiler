@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 /**
- *
+ * Deobfuscation scope enum.
  * @author JPEXS
  */
 public enum DeobfuscationScope {

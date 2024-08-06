@@ -18,27 +18,42 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.graph.Loop;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
- *
+ * AVM2 final process local data.
  * @author JPEXS
  */
 public class AVM2FinalProcessLocalData extends FinalProcessLocalData {
 
+    /**
+     * Local register names - register number to name mapping.
+     */
     public HashMap<Integer, String> localRegNames;
+
+    /**
+     * Set local position to get local position mapping.
+     */
     public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new HashMap<>();
 
+    /**
+     * Constructs AVM2 final process local data.
+     * @param loops List of loops
+     * @param localRegNames Local register names - register number to name mapping
+     * @param setLocalPosToGetLocalPos Set local position to get local position mapping
+     */
     public AVM2FinalProcessLocalData(List<Loop> loops, HashMap<Integer, String> localRegNames, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos) {
         super(loops);
         this.localRegNames = localRegNames;
         this.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
     }
 
+    /**
+     * Gets getlocal positions for setlocal position.
+     * @param setLocalPos Setlocal position
+     * @return Set of getlocal positions
+     */
     public Set<Integer> getSetLocalUsages(int setLocalPos) {
         if (setLocalPosToGetLocalPos == null) {
             return new HashSet<>();

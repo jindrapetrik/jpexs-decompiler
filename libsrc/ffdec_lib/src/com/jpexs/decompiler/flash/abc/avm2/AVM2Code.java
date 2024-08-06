@@ -20,264 +20,40 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGetSet;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorRegistersOld;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimpleOld;
-import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorZeroJumpsNullPushes;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.*;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf64Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li16Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li8Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf64Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si16Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si32Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si8Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi16Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi8Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DivideIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitAndIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitNotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitOrIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitXorIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.LShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.RShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.URShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructPropIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewActivationIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewArrayIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallMethodIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallStaticIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfEqIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfGeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfGtIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfLtIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNGeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNGtIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNLtIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfNeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal0Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal1Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocal3Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.BkptLineIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.DeletePropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindDefIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetDescendantsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetGlobalSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetScopeObjectIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNextIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextNameIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NextValueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetGlobalSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSlotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSuperIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.TimestampIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.AddPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ConvertMIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ConvertMPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecLocalPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecrementPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DividePIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncLocalPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncrementPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.ModuloPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.MultiplyPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.NegatePIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.PushDNanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.PushDecimalIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.SubtractPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceBIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceDIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.deprecated.CoerceUIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertF4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.ConvertFIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Lf32x4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.PushFloat4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.PushFloatIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.Sf32x4Ins;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.UnPlusIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AbsJumpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AddDIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.AllocIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallInterfaceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CallSuperIdIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.CodeGenOpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.ConcatIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DecodeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DelDescendantsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DeletePropertyLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.DoubleToAtomIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.InvalidIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.MarkIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PrologueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.PushConstantIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SendEnterIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SetPropertyLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.SweepIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.VerifyOpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.VerifyPassIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.WbIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushDoubleIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNamespaceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushWithIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ApplyTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertBIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertDIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertOIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertUIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.InstanceOfIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.IsTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.IsTypeLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.CheckFilterIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSLateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.StoreNewActivationAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.*;
+import com.jpexs.decompiler.flash.abc.avm2.model.*;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.types.ABCException;
-import com.jpexs.decompiler.flash.abc.types.AssignedValue;
-import com.jpexs.decompiler.flash.abc.types.ConvertData;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -289,160 +65,221 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
-import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
-import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphPart;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.ScopeStack;
-import com.jpexs.decompiler.graph.SecondPassException;
-import com.jpexs.decompiler.graph.SimpleValue;
-import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.stat.Statistics;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class representing AVM2 code inside a method body.
  * @author JPEXS
  */
 public class AVM2Code implements Cloneable {
 
+    /**
+     * Logger for this class
+     */
     private static final Logger logger = Logger.getLogger(AVM2Code.class.getName());
 
+    /**
+     * Debug mode - prints debug information.
+     */
     private static final boolean DEBUG_MODE = false;
 
-    public static int toSourceLimit = -1;
-
-    public List<AVM2Instruction> code;
-
+    /**
+     * Debug testing whether same code is write to output stream.
+     */
     public static boolean DEBUG_REWRITE = false;
 
+    /**
+     * Limit of toSource calls
+     */
+    public static int toSourceLimit = -1;
+
+    /**
+     * List of instructions in this code.
+     */
+    public List<AVM2Instruction> code;
+
+    /**
+     * U30 value (unsigned up to 30-bit integer)
+     */
     public static final int OPT_U30 = 0x100;
 
+    /**
+     * U8 value (unsigned 8 bit integer)
+     */
     public static final int OPT_U8 = 0x200;
 
+    /**
+     * S24 value (signed 24 bit integer)
+     */
     public static final int OPT_S24 = 0x300;
 
+    /**
+     * Case offsets
+     */
     public static final int OPT_CASE_OFFSETS = 0x400;
 
+    /**
+     * S8 value (signed 8 bit integer)
+     */
     public static final int OPT_S8 = 0x500;
 
+    /**
+     * S16 value (signed 16 bit integer)
+     */
     public static final int OPT_S16 = 0x600;
 
+    /**
+     * Multiname index data
+     */
     public static final int DAT_MULTINAME_INDEX = OPT_U30 + 0x01;
 
+    /**
+     * Argument count data
+     */
     public static final int DAT_ARG_COUNT = OPT_U30 + 0x02;
 
+    /**
+     * Method index data
+     */
     public static final int DAT_METHOD_INDEX = OPT_U30 + 0x03;
 
+    /**
+     * String index data
+     */
     public static final int DAT_STRING_INDEX = OPT_U30 + 0x04;
 
+    /**
+     * Debug type data
+     */
     public static final int DAT_DEBUG_TYPE = OPT_U8 + 0x05;
 
+    /**
+     * Register index data
+     */
     public static final int DAT_REGISTER_INDEX = OPT_U8 + 0x06;
 
+    /**
+     * Line number data
+     */
     public static final int DAT_LINENUM = OPT_U30 + 0x07;
 
+    /**
+     * Local register index data
+     */
     public static final int DAT_LOCAL_REG_INDEX = OPT_U30 + 0x08;
 
+    /**
+     * Slot index data
+     */
     public static final int DAT_SLOT_INDEX = OPT_U30 + 0x09;
 
+    /**
+     * Scope index data
+     */
     public static final int DAT_SCOPE_INDEX = OPT_U30 + 0x0A;
 
+    /**
+     * Offset data
+     */
     public static final int DAT_OFFSET = OPT_S24 + 0x0B;
 
+    /**
+     * Exception index data
+     */
     public static final int DAT_EXCEPTION_INDEX = OPT_U30 + 0x0C;
 
+    /**
+     * Class index data
+     */
     public static final int DAT_CLASS_INDEX = OPT_U30 + 0x0D;
 
+    /**
+     * Integer index data
+     */
     public static final int DAT_INT_INDEX = OPT_U30 + 0x0E;
 
+    /**
+     * Unsigned integer index data
+     */
     public static final int DAT_UINT_INDEX = OPT_U30 + 0x0F;
 
+    /**
+     * Double index data
+     */
     public static final int DAT_DOUBLE_INDEX = OPT_U30 + 0x10;
 
+    /**
+     * Decimal index data
+     */
     public static final int DAT_DECIMAL_INDEX = OPT_U30 + 0x11;
 
+    /**
+     * Case base offset data
+     */
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x12;
 
+    /**
+     * Number context data
+     */
     public static final int DAT_NUMBER_CONTEXT = OPT_U30 + 0x13;
 
+    /**
+     * Dispatch ID data
+     */
     public static final int DAT_DISPATCH_ID = OPT_U30 + 0x14;
 
+    /**
+     * Float index data
+     */
     public static final int DAT_FLOAT_INDEX = OPT_U30 + 0x15;
 
+    /**
+     * Float4 index data
+     */
     public static final int DAT_FLOAT4_INDEX = OPT_U30 + 0x16;
 
+    /**
+     * Namespace index data
+     */
     public static final int DAT_NAMESPACE_INDEX = OPT_U30 + 0x17;
 
-    public static String operandTypeSizeToString(int ot) {
-        int sizeType = ot & 0xff00;
-        switch (sizeType) {
-            case OPT_U30:
-                return "U30";
-            case OPT_S16:
-                return "S16";
-            case OPT_U8:
-                return "U8";
-            case OPT_S8:
-                return "S8";
-            case OPT_S24:
-                return "S24";
-            case OPT_CASE_OFFSETS:
-                return "S24(=n), S24[n]";
-        }
-        return "";
-    }
 
+    /**
+     * Map of operand type identifiers
+     */
     private static Map<Integer, String> operandDataTypeIdentifiers = ReflectionTools.getConstNamesMap(AVM2Code.class, Integer.class, "^DAT_(.*)$");
 
-    public static String operandTypeToString(int ot, boolean withTypeSize) {
-        String typeSize = operandTypeSizeToString(ot);
-        if (ot == OPT_CASE_OFFSETS) {
-            return "number" + (withTypeSize ? "(U30)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", ...";
-        }
-        if (operandDataTypeIdentifiers.containsKey(ot)) {
-            String dataType = operandDataTypeIdentifiers.get(ot);
-            return dataType + (withTypeSize ? "(" + typeSize + ")" : "");
-        } else {
-            return typeSize;
-        }
-
-    }
-
+    /**
+     * Instruction aliases array
+     */
     private static final String[][] instructionAliasesArray = {
-        //first is original name, then aliases
-        {"getlocal0", "getlocal_0"},
-        {"getlocal1", "getlocal_1"},
-        {"getlocal2", "getlocal_2"},
-        {"getlocal3", "getlocal_3"},
-        {"setlocal0", "setlocal_0"},
-        {"setlocal1", "setlocal_1"},
-        {"setlocal2", "setlocal_2"},
-        {"setlocal3", "setlocal_3"}
+            //first is original name, then aliases
+            {"getlocal0", "getlocal_0"},
+            {"getlocal1", "getlocal_1"},
+            {"getlocal2", "getlocal_2"},
+            {"getlocal3", "getlocal_3"},
+            {"setlocal0", "setlocal_0"},
+            {"setlocal1", "setlocal_1"},
+            {"setlocal2", "setlocal_2"},
+            {"setlocal3", "setlocal_3"}
     };
+
+    /**
+     * Instruction aliases map
+     */
     public static final Map<String, String> instructionAliases = new HashMap<>();
 
     static {
@@ -453,268 +290,274 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Instruction set
+     */
     public static final InstructionDefinition[] instructionSet = new InstructionDefinition[256];
 
+    /**
+     * All instruction set
+     */
     public static final InstructionDefinition[] allInstructionSet = new InstructionDefinition[]{
-        /*0x00*/null,
-        /*0x01*/ new BkptIns(),
-        /*0x02*/ new NopIns(),
-        /*0x03*/ new ThrowIns(),
-        /*0x04*/ new GetSuperIns(),
-        /*0x05*/ new SetSuperIns(),
-        /*0x06*/ new DXNSIns(),
-        /*0x07*/ new DXNSLateIns(),
-        /*0x08*/ new KillIns(),
-        /*0x09*/ new LabelIns(),
-        /*0x0A*/ new Lf32x4Ins(),
-        /*0x0B*/ new Sf32x4Ins(),
-        /*0x0C*/ new IfNLtIns(),
-        /*0x0D*/ new IfNLeIns(),
-        /*0x0E*/ new IfNGtIns(),
-        /*0x0F*/ new IfNGeIns(),
-        /*0x10*/ new JumpIns(),
-        /*0x11*/ new IfTrueIns(),
-        /*0x12*/ new IfFalseIns(),
-        /*0x13*/ new IfEqIns(),
-        /*0x14*/ new IfNeIns(),
-        /*0x15*/ new IfLtIns(),
-        /*0x16*/ new IfLeIns(),
-        /*0x17*/ new IfGtIns(),
-        /*0x18*/ new IfGeIns(),
-        /*0x19*/ new IfStrictEqIns(),
-        /*0x1A*/ new IfStrictNeIns(),
-        /*0x1B*/ new LookupSwitchIns(),
-        /*0x1C*/ new PushWithIns(),
-        /*0x1D*/ new PopScopeIns(),
-        /*0x1E*/ new NextNameIns(),
-        /*0x1F*/ new HasNextIns(),
-        /*0x20*/ new PushNullIns(),
-        /*0x21*/ new PushUndefinedIns(),
-        /*0x22*/ new PushFloatIns(), //major 47+
-        /*0x22*/ new PushConstantIns(), //before major 47
-        /*0x23*/ new NextValueIns(),
-        /*0x24*/ new PushByteIns(),
-        /*0x25*/ new PushShortIns(),
-        /*0x26*/ new PushTrueIns(),
-        /*0x27*/ new PushFalseIns(),
-        /*0x28*/ new PushNanIns(),
-        /*0x29*/ new PopIns(),
-        /*0x2A*/ new DupIns(),
-        /*0x2B*/ new SwapIns(),
-        /*0x2C*/ new PushStringIns(),
-        /*0x2D*/ new PushIntIns(),
-        /*0x2E*/ new PushUIntIns(),
-        /*0x2F*/ new PushDoubleIns(),
-        /*0x30*/ new PushScopeIns(),
-        /*0x31*/ new PushNamespaceIns(),
-        /*0x32*/ new HasNext2Ins(),
-        /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin
-        /*0x34*/ new PushDNanIns(), //pushdnan according to Flex SDK, lix16 (internal-only) according to Tamarin
-        /*0x35*/ new Li8Ins(),
-        /*0x36*/ new Li16Ins(),
-        /*0x37*/ new Li32Ins(),
-        /*0x38*/ new Lf32Ins(),
-        /*0x39*/ new Lf64Ins(),
-        /*0x3A*/ new Si8Ins(),
-        /*0x3B*/ new Si16Ins(),
-        /*0x3C*/ new Si32Ins(),
-        /*0x3D*/ new Sf32Ins(),
-        /*0x3E*/ new Sf64Ins(),
-        /*0x3F*/ null,
-        /*0x40*/ new NewFunctionIns(),
-        /*0x41*/ new CallIns(),
-        /*0x42*/ new ConstructIns(),
-        /*0x43*/ new CallMethodIns(),
-        /*0x44*/ new CallStaticIns(),
-        /*0x45*/ new CallSuperIns(),
-        /*0x46*/ new CallPropertyIns(),
-        /*0x47*/ new ReturnVoidIns(),
-        /*0x48*/ new ReturnValueIns(),
-        /*0x49*/ new ConstructSuperIns(),
-        /*0x4A*/ new ConstructPropIns(),
-        /*0x4B*/ new CallSuperIdIns(),
-        /*0x4C*/ new CallPropLexIns(),
-        /*0x4D*/ new CallInterfaceIns(),
-        /*0x4E*/ new CallSuperVoidIns(),
-        /*0x4F*/ new CallPropVoidIns(),
-        /*0x50*/ new Sxi1Ins(),
-        /*0x51*/ new Sxi8Ins(),
-        /*0x52*/ new Sxi16Ins(),
-        /*0x53*/ new ApplyTypeIns(),
-        /*0x54*/ new PushFloat4Ins(), //major 47+
-        /*0x55*/ new NewObjectIns(),
-        /*0x56*/ new NewArrayIns(),
-        /*0x57*/ new NewActivationIns(),
-        /*0x58*/ new NewClassIns(),
-        /*0x59*/ new GetDescendantsIns(),
-        /*0x5A*/ new NewCatchIns(),
-        /*0x5B*/ new DelDescendantsIns(), //deldescendants according to Flex, findpropglobalstrict(internal-only) according to Tamarin
-        /*0x5C*/ //new FindPropGlobalIns(), //Tamarin (internal-only)
-        /*0x5D*/ new FindPropertyStrictIns(),
-        /*0x5E*/ new FindPropertyIns(),
-        /*0x5F*/ new FindDefIns(),
-        /*0x60*/ new GetLexIns(),
-        /*0x61*/ new SetPropertyIns(),
-        /*0x62*/ new GetLocalIns(),
-        /*0x63*/ new SetLocalIns(),
-        /*0x64*/ new GetGlobalScopeIns(),
-        /*0x65*/ new GetScopeObjectIns(),
-        /*0x66*/ new GetPropertyIns(),
-        /*0x67*/ new GetOuterScopeIns(), // new GetPropertyLateIns()
-        /*0x68*/ new InitPropertyIns(),
-        /*0x69*/ new SetPropertyLateIns(),
-        /*0x6A*/ new DeletePropertyIns(),
-        /*0x6B*/ new DeletePropertyLateIns(),
-        /*0x6C*/ new GetSlotIns(),
-        /*0x6D*/ new SetSlotIns(),
-        /*0x6E*/ new GetGlobalSlotIns(),
-        /*0x6F*/ new SetGlobalSlotIns(),
-        /*0x70*/ new ConvertSIns(),
-        /*0x71*/ new EscXElemIns(),
-        /*0x72*/ new EscXAttrIns(),
-        /*0x73*/ new ConvertIIns(),
-        /*0x74*/ new ConvertUIns(),
-        /*0x75*/ new ConvertDIns(),
-        /*0x76*/ new ConvertBIns(),
-        /*0x77*/ new ConvertOIns(),
-        /*0x78*/ new CheckFilterIns(),
-        /*0x79*/ new ConvertMIns(), //minor 17 (Flex)
-        /*0x79*/ new ConvertFIns(), //major 47+, SWF 15+
-        /*0x7A*/ new ConvertMPIns(), //minor 17 (Flex)
-        /*0x7A*/ new UnPlusIns(), //major 47+, SWF 15+
-        /*0x7B*/ new ConvertF4Ins(), //major 47+, SWF 15+
-        /*0x7C*/ null,
-        /*0x7D*/ null,
-        /*0x7E*/ null,
-        /*0x7F*/ null,
-        /*0x80*/ new CoerceIns(),
-        /*0x81*/ new CoerceBIns(),
-        /*0x82*/ new CoerceAIns(),
-        /*0x83*/ new CoerceIIns(),
-        /*0x84*/ new CoerceDIns(),
-        /*0x85*/ new CoerceSIns(),
-        /*0x86*/ new AsTypeIns(),
-        /*0x87*/ new AsTypeLateIns(),
-        /*0x88*/ new CoerceUIns(),
-        /*0x89*/ new CoerceOIns(),
-        /*0x8A*/ null,
-        /*0x8B*/ null,
-        /*0x8C*/ null,
-        /*0x8D*/ null,
-        /*0x8E*/ null,
-        /*0x8F*/ new NegatePIns(),
-        /*0x90*/ new NegateIns(),
-        /*0x91*/ new IncrementIns(),
-        /*0x92*/ new IncLocalIns(),
-        /*0x93*/ new DecrementIns(),
-        /*0x94*/ new DecLocalIns(),
-        /*0x95*/ new TypeOfIns(),
-        /*0x96*/ new NotIns(),
-        /*0x97*/ new BitNotIns(),
-        /*0x98*/ null,
-        /*0x99*/ null,
-        /*0x9A*/ new ConcatIns(),
-        /*0x9B*/ new AddDIns(),
-        /*0x9C*/ new IncrementPIns(),
-        /*0x9D*/ new IncLocalPIns(),
-        /*0x9E*/ new DecrementPIns(),
-        /*0x9F*/ new DecLocalPIns(),
-        /*0xA0*/ new AddIns(),
-        /*0xA1*/ new SubtractIns(),
-        /*0xA2*/ new MultiplyIns(),
-        /*0xA3*/ new DivideIns(),
-        /*0xA4*/ new ModuloIns(),
-        /*0xA5*/ new LShiftIns(),
-        /*0xA6*/ new RShiftIns(),
-        /*0xA7*/ new URShiftIns(),
-        /*0xA8*/ new BitAndIns(),
-        /*0xA9*/ new BitOrIns(),
-        /*0xAA*/ new BitXorIns(),
-        /*0xAB*/ new EqualsIns(),
-        /*0xAC*/ new StrictEqualsIns(),
-        /*0xAD*/ new LessThanIns(),
-        /*0xAE*/ new LessEqualsIns(),
-        /*0xAF*/ new GreaterThanIns(),
-        /*0xB0*/ new GreaterEqualsIns(),
-        /*0xB1*/ new InstanceOfIns(),
-        /*0xB2*/ new IsTypeIns(),
-        /*0xB3*/ new IsTypeLateIns(),
-        /*0xB4*/ new InIns(),
-        /*0xB5*/ new AddPIns(),
-        /*0xB6*/ new SubtractPIns(),
-        /*0xB7*/ new MultiplyPIns(),
-        /*0xB8*/ new DividePIns(),
-        /*0xB9*/ new ModuloPIns(),
-        /*0xBA*/ null,
-        /*0xBB*/ null,
-        /*0xBC*/ null,
-        /*0xBD*/ null,
-        /*0xBE*/ null,
-        /*0xBF*/ null,
-        /*0xC0*/ new IncrementIIns(),
-        /*0xC1*/ new DecrementIIns(),
-        /*0xC2*/ new IncLocalIIns(),
-        /*0xC3*/ new DecLocalIIns(),
-        /*0xC4*/ new NegateIIns(),
-        /*0xC5*/ new AddIIns(),
-        /*0xC6*/ new SubtractIIns(),
-        /*0xC7*/ new MultiplyIIns(),
-        /*0xC8*/ null,
-        /*0xC9*/ null,
-        /*0xCA*/ null,
-        /*0xCB*/ null,
-        /*0xCC*/ null,
-        /*0xCD*/ null,
-        /*0xCE*/ null,
-        /*0xCF*/ null,
-        /*0xD0*/ new GetLocal0Ins(),
-        /*0xD1*/ new GetLocal1Ins(),
-        /*0xD2*/ new GetLocal2Ins(),
-        /*0xD3*/ new GetLocal3Ins(),
-        /*0xD4*/ new SetLocal0Ins(),
-        /*0xD5*/ new SetLocal1Ins(),
-        /*0xD6*/ new SetLocal2Ins(),
-        /*0xD7*/ new SetLocal3Ins(),
-        /*0xD8*/ null,
-        /*0xD9*/ null,
-        /*0xDA*/ null,
-        /*0xDB*/ null,
-        /*0xDC*/ null,
-        /*0xDD*/ null,
-        /*0xDE*/ null,
-        /*0xDF*/ null,
-        /*0xE0*/ null,
-        /*0xE1*/ null,
-        /*0xE2*/ null,
-        /*0xE3*/ null,
-        /*0xE4*/ null,
-        /*0xE5*/ null,
-        /*0xE6*/ null,
-        /*0xE7*/ null,
-        /*0xE8*/ null,
-        /*0xE9*/ null,
-        /*0xEA*/ null,
-        /*0xEB*/ null,
-        /*0xEC*/ null,
-        /*0xED*/ new InvalidIns(),
-        /*0xEE*/ new AbsJumpIns(),
-        /*0xEF*/ new DebugIns(),
-        /*0xF0*/ new DebugLineIns(),
-        /*0xF1*/ new DebugFileIns(),
-        /*0xF2*/ new BkptLineIns(),
-        /*0xF3*/ new TimestampIns(),
-        /*0xF4*/ null,
-        /*0xF5*/ new VerifyPassIns(),
-        /*0xF6*/ new AllocIns(),
-        /*0xF7*/ new MarkIns(),
-        /*0xF8*/ new WbIns(),
-        /*0xF9*/ new PrologueIns(),
-        /*0xFA*/ new SendEnterIns(),
-        /*0xFB*/ new DoubleToAtomIns(),
-        /*0xFC*/ new SweepIns(),
-        /*0xFD*/ new CodeGenOpIns(),
-        /*0xFE*/ new VerifyOpIns(),
-        /*0xFF*/ new DecodeIns()
+            /*0x00*/ null,
+            /*0x01*/ new BkptIns(),
+            /*0x02*/ new NopIns(),
+            /*0x03*/ new ThrowIns(),
+            /*0x04*/ new GetSuperIns(),
+            /*0x05*/ new SetSuperIns(),
+            /*0x06*/ new DXNSIns(),
+            /*0x07*/ new DXNSLateIns(),
+            /*0x08*/ new KillIns(),
+            /*0x09*/ new LabelIns(),
+            /*0x0A*/ new Lf32x4Ins(),
+            /*0x0B*/ new Sf32x4Ins(),
+            /*0x0C*/ new IfNLtIns(),
+            /*0x0D*/ new IfNLeIns(),
+            /*0x0E*/ new IfNGtIns(),
+            /*0x0F*/ new IfNGeIns(),
+            /*0x10*/ new JumpIns(),
+            /*0x11*/ new IfTrueIns(),
+            /*0x12*/ new IfFalseIns(),
+            /*0x13*/ new IfEqIns(),
+            /*0x14*/ new IfNeIns(),
+            /*0x15*/ new IfLtIns(),
+            /*0x16*/ new IfLeIns(),
+            /*0x17*/ new IfGtIns(),
+            /*0x18*/ new IfGeIns(),
+            /*0x19*/ new IfStrictEqIns(),
+            /*0x1A*/ new IfStrictNeIns(),
+            /*0x1B*/ new LookupSwitchIns(),
+            /*0x1C*/ new PushWithIns(),
+            /*0x1D*/ new PopScopeIns(),
+            /*0x1E*/ new NextNameIns(),
+            /*0x1F*/ new HasNextIns(),
+            /*0x20*/ new PushNullIns(),
+            /*0x21*/ new PushUndefinedIns(),
+            /*0x22*/ new PushFloatIns(), //major 47+
+            /*0x22*/ new PushConstantIns(), //before major 47
+            /*0x23*/ new NextValueIns(),
+            /*0x24*/ new PushByteIns(),
+            /*0x25*/ new PushShortIns(),
+            /*0x26*/ new PushTrueIns(),
+            /*0x27*/ new PushFalseIns(),
+            /*0x28*/ new PushNanIns(),
+            /*0x29*/ new PopIns(),
+            /*0x2A*/ new DupIns(),
+            /*0x2B*/ new SwapIns(),
+            /*0x2C*/ new PushStringIns(),
+            /*0x2D*/ new PushIntIns(),
+            /*0x2E*/ new PushUIntIns(),
+            /*0x2F*/ new PushDoubleIns(),
+            /*0x30*/ new PushScopeIns(),
+            /*0x31*/ new PushNamespaceIns(),
+            /*0x32*/ new HasNext2Ins(),
+            /*0x33*/ new PushDecimalIns(), //pushdecimal(minor 17), lix8 (internal-only) according to Tamarin
+            /*0x34*/ new PushDNanIns(), //pushdnan according to Flex SDK, lix16 (internal-only) according to Tamarin
+            /*0x35*/ new Li8Ins(),
+            /*0x36*/ new Li16Ins(),
+            /*0x37*/ new Li32Ins(),
+            /*0x38*/ new Lf32Ins(),
+            /*0x39*/ new Lf64Ins(),
+            /*0x3A*/ new Si8Ins(),
+            /*0x3B*/ new Si16Ins(),
+            /*0x3C*/ new Si32Ins(),
+            /*0x3D*/ new Sf32Ins(),
+            /*0x3E*/ new Sf64Ins(),
+            /*0x3F*/ null,
+            /*0x40*/ new NewFunctionIns(),
+            /*0x41*/ new CallIns(),
+            /*0x42*/ new ConstructIns(),
+            /*0x43*/ new CallMethodIns(),
+            /*0x44*/ new CallStaticIns(),
+            /*0x45*/ new CallSuperIns(),
+            /*0x46*/ new CallPropertyIns(),
+            /*0x47*/ new ReturnVoidIns(),
+            /*0x48*/ new ReturnValueIns(),
+            /*0x49*/ new ConstructSuperIns(),
+            /*0x4A*/ new ConstructPropIns(),
+            /*0x4B*/ new CallSuperIdIns(),
+            /*0x4C*/ new CallPropLexIns(),
+            /*0x4D*/ new CallInterfaceIns(),
+            /*0x4E*/ new CallSuperVoidIns(),
+            /*0x4F*/ new CallPropVoidIns(),
+            /*0x50*/ new Sxi1Ins(),
+            /*0x51*/ new Sxi8Ins(),
+            /*0x52*/ new Sxi16Ins(),
+            /*0x53*/ new ApplyTypeIns(),
+            /*0x54*/ new PushFloat4Ins(), //major 47+
+            /*0x55*/ new NewObjectIns(),
+            /*0x56*/ new NewArrayIns(),
+            /*0x57*/ new NewActivationIns(),
+            /*0x58*/ new NewClassIns(),
+            /*0x59*/ new GetDescendantsIns(),
+            /*0x5A*/ new NewCatchIns(),
+            /*0x5B*/ new DelDescendantsIns(), //deldescendants according to Flex, findpropglobalstrict(internal-only) according to Tamarin
+            /*0x5C*/ //new FindPropGlobalIns(), //Tamarin (internal-only)
+            /*0x5D*/ new FindPropertyStrictIns(),
+            /*0x5E*/ new FindPropertyIns(),
+            /*0x5F*/ new FindDefIns(),
+            /*0x60*/ new GetLexIns(),
+            /*0x61*/ new SetPropertyIns(),
+            /*0x62*/ new GetLocalIns(),
+            /*0x63*/ new SetLocalIns(),
+            /*0x64*/ new GetGlobalScopeIns(),
+            /*0x65*/ new GetScopeObjectIns(),
+            /*0x66*/ new GetPropertyIns(),
+            /*0x67*/ new GetOuterScopeIns(), // new GetPropertyLateIns()
+            /*0x68*/ new InitPropertyIns(),
+            /*0x69*/ new SetPropertyLateIns(),
+            /*0x6A*/ new DeletePropertyIns(),
+            /*0x6B*/ new DeletePropertyLateIns(),
+            /*0x6C*/ new GetSlotIns(),
+            /*0x6D*/ new SetSlotIns(),
+            /*0x6E*/ new GetGlobalSlotIns(),
+            /*0x6F*/ new SetGlobalSlotIns(),
+            /*0x70*/ new ConvertSIns(),
+            /*0x71*/ new EscXElemIns(),
+            /*0x72*/ new EscXAttrIns(),
+            /*0x73*/ new ConvertIIns(),
+            /*0x74*/ new ConvertUIns(),
+            /*0x75*/ new ConvertDIns(),
+            /*0x76*/ new ConvertBIns(),
+            /*0x77*/ new ConvertOIns(),
+            /*0x78*/ new CheckFilterIns(),
+            /*0x79*/ new ConvertMIns(), //minor 17 (Flex)
+            /*0x79*/ new ConvertFIns(), //major 47+, SWF 15+
+            /*0x7A*/ new ConvertMPIns(), //minor 17 (Flex)
+            /*0x7A*/ new UnPlusIns(), //major 47+, SWF 15+
+            /*0x7B*/ new ConvertF4Ins(), //major 47+, SWF 15+
+            /*0x7C*/ null,
+            /*0x7D*/ null,
+            /*0x7E*/ null,
+            /*0x7F*/ null,
+            /*0x80*/ new CoerceIns(),
+            /*0x81*/ new CoerceBIns(),
+            /*0x82*/ new CoerceAIns(),
+            /*0x83*/ new CoerceIIns(),
+            /*0x84*/ new CoerceDIns(),
+            /*0x85*/ new CoerceSIns(),
+            /*0x86*/ new AsTypeIns(),
+            /*0x87*/ new AsTypeLateIns(),
+            /*0x88*/ new CoerceUIns(),
+            /*0x89*/ new CoerceOIns(),
+            /*0x8A*/ null,
+            /*0x8B*/ null,
+            /*0x8C*/ null,
+            /*0x8D*/ null,
+            /*0x8E*/ null,
+            /*0x8F*/ new NegatePIns(),
+            /*0x90*/ new NegateIns(),
+            /*0x91*/ new IncrementIns(),
+            /*0x92*/ new IncLocalIns(),
+            /*0x93*/ new DecrementIns(),
+            /*0x94*/ new DecLocalIns(),
+            /*0x95*/ new TypeOfIns(),
+            /*0x96*/ new NotIns(),
+            /*0x97*/ new BitNotIns(),
+            /*0x98*/ null,
+            /*0x99*/ null,
+            /*0x9A*/ new ConcatIns(),
+            /*0x9B*/ new AddDIns(),
+            /*0x9C*/ new IncrementPIns(),
+            /*0x9D*/ new IncLocalPIns(),
+            /*0x9E*/ new DecrementPIns(),
+            /*0x9F*/ new DecLocalPIns(),
+            /*0xA0*/ new AddIns(),
+            /*0xA1*/ new SubtractIns(),
+            /*0xA2*/ new MultiplyIns(),
+            /*0xA3*/ new DivideIns(),
+            /*0xA4*/ new ModuloIns(),
+            /*0xA5*/ new LShiftIns(),
+            /*0xA6*/ new RShiftIns(),
+            /*0xA7*/ new URShiftIns(),
+            /*0xA8*/ new BitAndIns(),
+            /*0xA9*/ new BitOrIns(),
+            /*0xAA*/ new BitXorIns(),
+            /*0xAB*/ new EqualsIns(),
+            /*0xAC*/ new StrictEqualsIns(),
+            /*0xAD*/ new LessThanIns(),
+            /*0xAE*/ new LessEqualsIns(),
+            /*0xAF*/ new GreaterThanIns(),
+            /*0xB0*/ new GreaterEqualsIns(),
+            /*0xB1*/ new InstanceOfIns(),
+            /*0xB2*/ new IsTypeIns(),
+            /*0xB3*/ new IsTypeLateIns(),
+            /*0xB4*/ new InIns(),
+            /*0xB5*/ new AddPIns(),
+            /*0xB6*/ new SubtractPIns(),
+            /*0xB7*/ new MultiplyPIns(),
+            /*0xB8*/ new DividePIns(),
+            /*0xB9*/ new ModuloPIns(),
+            /*0xBA*/ null,
+            /*0xBB*/ null,
+            /*0xBC*/ null,
+            /*0xBD*/ null,
+            /*0xBE*/ null,
+            /*0xBF*/ null,
+            /*0xC0*/ new IncrementIIns(),
+            /*0xC1*/ new DecrementIIns(),
+            /*0xC2*/ new IncLocalIIns(),
+            /*0xC3*/ new DecLocalIIns(),
+            /*0xC4*/ new NegateIIns(),
+            /*0xC5*/ new AddIIns(),
+            /*0xC6*/ new SubtractIIns(),
+            /*0xC7*/ new MultiplyIIns(),
+            /*0xC8*/ null,
+            /*0xC9*/ null,
+            /*0xCA*/ null,
+            /*0xCB*/ null,
+            /*0xCC*/ null,
+            /*0xCD*/ null,
+            /*0xCE*/ null,
+            /*0xCF*/ null,
+            /*0xD0*/ new GetLocal0Ins(),
+            /*0xD1*/ new GetLocal1Ins(),
+            /*0xD2*/ new GetLocal2Ins(),
+            /*0xD3*/ new GetLocal3Ins(),
+            /*0xD4*/ new SetLocal0Ins(),
+            /*0xD5*/ new SetLocal1Ins(),
+            /*0xD6*/ new SetLocal2Ins(),
+            /*0xD7*/ new SetLocal3Ins(),
+            /*0xD8*/ null,
+            /*0xD9*/ null,
+            /*0xDA*/ null,
+            /*0xDB*/ null,
+            /*0xDC*/ null,
+            /*0xDD*/ null,
+            /*0xDE*/ null,
+            /*0xDF*/ null,
+            /*0xE0*/ null,
+            /*0xE1*/ null,
+            /*0xE2*/ null,
+            /*0xE3*/ null,
+            /*0xE4*/ null,
+            /*0xE5*/ null,
+            /*0xE6*/ null,
+            /*0xE7*/ null,
+            /*0xE8*/ null,
+            /*0xE9*/ null,
+            /*0xEA*/ null,
+            /*0xEB*/ null,
+            /*0xEC*/ null,
+            /*0xED*/ new InvalidIns(),
+            /*0xEE*/ new AbsJumpIns(),
+            /*0xEF*/ new DebugIns(),
+            /*0xF0*/ new DebugLineIns(),
+            /*0xF1*/ new DebugFileIns(),
+            /*0xF2*/ new BkptLineIns(),
+            /*0xF3*/ new TimestampIns(),
+            /*0xF4*/ null,
+            /*0xF5*/ new VerifyPassIns(),
+            /*0xF6*/ new AllocIns(),
+            /*0xF7*/ new MarkIns(),
+            /*0xF8*/ new WbIns(),
+            /*0xF9*/ new PrologueIns(),
+            /*0xFA*/ new SendEnterIns(),
+            /*0xFB*/ new DoubleToAtomIns(),
+            /*0xFC*/ new SweepIns(),
+            /*0xFD*/ new CodeGenOpIns(),
+            /*0xFE*/ new VerifyOpIns(),
+            /*0xFF*/ new DecodeIns()
     };
     // endoflist
 
@@ -736,8 +579,8 @@ public class AVM2Code implements Cloneable {
         }
 
         for (int i = 0;
-                i < instructionSet.length;
-                i++) {
+             i < instructionSet.length;
+             i++) {
             if (instructionSet[i] == null) {
                 instructionSet[i] = new UnknownInstruction(i);
             }
@@ -745,26 +588,99 @@ public class AVM2Code implements Cloneable {
 
     }
 
-    public static final String IDENTOPEN = "/*IDENTOPEN*/";
+    /**
+     * To source call counter.
+     */
+    private int toSourceCount = 0;
 
-    public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
+    /**
+     * Converts operand type to string.
+     * @param ot Operand type
+     * @return Operand type as string
+     */
+    public static String operandTypeSizeToString(int ot) {
+        int sizeType = ot & 0xff00;
+        switch (sizeType) {
+            case OPT_U30:
+                return "U30";
+            case OPT_S16:
+                return "S16";
+            case OPT_U8:
+                return "U8";
+            case OPT_S8:
+                return "S8";
+            case OPT_S24:
+                return "S24";
+            case OPT_CASE_OFFSETS:
+                return "S24(=n), S24[n]";
+        }
+        return "";
+    }
 
+
+    /**
+     * Converts operand type to string.
+     * @param ot Operand type
+     * @param withTypeSize Whether to include type size
+     * @return Operand type as string
+     */
+    public static String operandTypeToString(int ot, boolean withTypeSize) {
+        String typeSize = operandTypeSizeToString(ot);
+        if (ot == OPT_CASE_OFFSETS) {
+            return "number" + (withTypeSize ? "(U30)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", offset" + (withTypeSize ? "(S24)" : "") + ", ...";
+        }
+        if (operandDataTypeIdentifiers.containsKey(ot)) {
+            String dataType = operandDataTypeIdentifiers.get(ot);
+            return dataType + (withTypeSize ? "(" + typeSize + ")" : "");
+        } else {
+            return typeSize;
+        }
+
+    }
+
+
+    /**
+     * Constructs AVM2Code object.
+     */
     public AVM2Code() {
         code = new ArrayList<>();
     }
 
+    /**
+     * Constructs AVM2Code object.
+     * @param capacity Capacity
+     */
     public AVM2Code(int capacity) {
         code = new ArrayList<>(capacity);
     }
 
+    /**
+     * Constructs AVM2Code object.
+     * @param instructions List of instructions
+     */
     public AVM2Code(ArrayList<AVM2Instruction> instructions) {
         code = instructions;
     }
 
+    /**
+     * Executes the code.
+     * @param arguments Local registers values
+     * @param constants Constant pool
+     * @return Result of the execution
+     * @throws AVM2ExecutionException
+     */
     public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants) throws AVM2ExecutionException {
         return execute(arguments, constants, null);
     }
 
+    /**
+     * Executes the code.
+     * @param arguments Local registers values
+     * @param constants Constant pool
+     * @param runtimeInfo Runtime information
+     * @return Result of the execution
+     * @throws AVM2ExecutionException
+     */
     public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants, AVM2RuntimeInfo runtimeInfo) throws AVM2ExecutionException {
         int pos = 0;
         LocalDataArea lda = new LocalDataArea();
@@ -803,10 +719,24 @@ public class AVM2Code implements Cloneable {
         return Undefined.INSTANCE;
     }
 
+    /**
+     * Calculates the line debug file/line info and sets it to the instructions.
+     * @param abc ABC
+     */
     public void calculateDebugFileLine(ABC abc) {
         calculateDebugFileLine(null, 0, 0, abc, new HashSet<>(), new HashSet<>());
     }
 
+    /**
+     * Calculates the line debug file/line info and sets it to the instructions.
+     * @param debugFile Debug file
+     * @param debugLine Debug line
+     * @param pos Position
+     * @param abc ABC
+     * @param seen Seen instructions
+     * @param seenMethods Seen methods
+     * @return True of seen.
+     */
     private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen, Set<Integer> seenMethods) {
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
@@ -886,7 +816,7 @@ public class AVM2Code implements Cloneable {
     /**
      * Removes nonexistent indices to constants from instruction operands.
      *
-     * @param constants
+     * @param constants Constant pool
      */
     public void removeWrongIndices(AVM2ConstantPool constants) {
         //This is DANGEROUS as it may alter instruction size which may lead to incorrect jump offsets!!!
@@ -911,6 +841,12 @@ public class AVM2Code implements Cloneable {
         }*/
     }
 
+    /**
+     * Constructs AVM2Code object from ABC input stream.
+     * @param ais ABC input stream
+     * @param body Method body
+     * @throws IOException
+     */
     public AVM2Code(ABCInputStream ais, MethodBody body) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new HashMap<>();
         DumpInfo diParent = ais.dumpInfo;
@@ -1127,21 +1063,40 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Trim code list to size.
+     */
     public void compact() {
         if (code instanceof ArrayList) {
             ((ArrayList) code).trimToSize();
         }
     }
 
+    /**
+     * Sets instruction operand.
+     * @param ip Instruction pointer
+     * @param operandIndex Operand index
+     * @param value Value
+     * @param body Method body
+     */
     public void setInstructionOperand(int ip, int operandIndex, int value, MethodBody body) {
         int oldVal = code.get(ip).operands[ip];
         code.get(ip).operands[ip] = value;
     }
 
+    /**
+     * Gets code bytes.
+     * @return Code bytes
+     */
     public byte[] getBytes() {
         return getBytes(null);
     }
 
+    /**
+     * Gets code bytes.
+     * @param origBytes Original bytes
+     * @return Code bytes
+     */
     public byte[] getBytes(byte[] origBytes) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -1162,6 +1117,9 @@ public class AVM2Code implements Cloneable {
         return bos.toByteArray();
     }
 
+    /**
+     * Sets instruction addesses by their position.
+     */
     public void markOffsets() {
         long address = 0;
         for (int i = 0; i < code.size(); i++) {
@@ -1170,6 +1128,10 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * To string.
+     * @return String
+     */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -1180,10 +1142,21 @@ public class AVM2Code implements Cloneable {
         return s.toString();
     }
 
+    /**
+     * Converts code to ASM source.
+     * @param abc ABC
+     * @return ASM source
+     */
     public String toASMSource(ABC abc) {
         return toASMSource(abc, abc.constants);
     }
 
+    /**
+     * Converts code to ASM source.
+     * @param abc ABC
+     * @param constants Constant pool
+     * @return ASM source
+     */
     public String toASMSource(ABC abc, AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         toASMSource(abc, constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
@@ -1191,10 +1164,31 @@ public class AVM2Code implements Cloneable {
         return writer.toString();
     }
 
+    /**
+     * Converts code to ASM source.
+     * @param abc ABC
+     * @param constants Constant pool
+     * @param info Method info
+     * @param body Method body
+     * @param exportMode Export mode
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
         return toASMSource(abc, constants, info, body, new ArrayList<>(), exportMode, writer);
     }
 
+    /**
+     * Converts code to ASM source.
+     * @param abc ABC
+     * @param constants Constant pool
+     * @param info Method info
+     * @param body Method body
+     * @param outputMap Output map - list of ips
+     * @param exportMode Export mode
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
 
         if (info != null) {
@@ -1349,6 +1343,12 @@ public class AVM2Code implements Cloneable {
         return writer;
     }
 
+    /**
+     * Gets important offsets.
+     * @param body Method body
+     * @param tryEnds Whether to include try ends
+     * @return Important offsets
+     */
     public Set<Long> getImportantOffsets(MethodBody body, boolean tryEnds) {
         Set<Long> ret = new HashSet<>();
         if (body != null) {
@@ -1368,6 +1368,12 @@ public class AVM2Code implements Cloneable {
         return ret;
     }
 
+    /**
+     * Gets instruction at specific address.
+     * @param address Address
+     * @return Instruction or null if not found
+     * @throws ConvertException
+     */
     public AVM2Instruction adr2ins(long address) throws ConvertException {
         int pos = adr2pos(address, false);
         if (pos == code.size()) {
@@ -1378,10 +1384,23 @@ public class AVM2Code implements Cloneable {
         return code.get(pos);
     }
 
+    /**
+     * Converts address to position.
+     * @param address Address
+     * @return Position
+     * @throws ConvertException
+     */
     public int adr2pos(long address) throws ConvertException {
         return adr2pos(address, false);
     }
 
+    /**
+     * Converts address to position.
+     * @param address Address
+     * @param nearest Whether to find nearest position
+     * @return Position
+     * @throws ConvertException
+     */
     public int adr2pos(long address, boolean nearest) throws ConvertException {
         int ret = adr2posNoEx(address);
         if (ret < 0) {
@@ -1393,6 +1412,11 @@ public class AVM2Code implements Cloneable {
         return ret;
     }
 
+    /**
+     * Converts address to position without throwing an exception.
+     * @param address Address
+     * @return Position
+     */
     private int adr2posNoEx(long address) {
         int min = 0;
         int max = code.size() - 1;
@@ -1416,6 +1440,11 @@ public class AVM2Code implements Cloneable {
         return -min - 1;
     }
 
+    /**
+     * Converts position to address.
+     * @param pos Position
+     * @return Address
+     */
     public long pos2adr(int pos) {
         if (pos == code.size()) {
             return getEndOffset();
@@ -1423,6 +1452,10 @@ public class AVM2Code implements Cloneable {
         return (int) code.get(pos).getAddress();
     }
 
+    /**
+     * Gets end address after the last instruction.
+     * @return End address
+     */
     public long getEndOffset() {
         if (code.isEmpty()) {
             return 0;
@@ -1432,8 +1465,12 @@ public class AVM2Code implements Cloneable {
         return (int) (ins.getAddress() + ins.getBytesLength());
     }
 
-    private int toSourceCount = 0;
-
+    /**
+     * Gets local register names from debug info.
+     * @param abc ABC
+     * @param maxRegs Maximal register id
+     * @return Map from register index to name
+     */
     public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc, int maxRegs) {
         Map<Integer, String> regIndexToName = new HashMap<>();
         Map<String, Integer> regNameToIndex = new HashMap<>();
@@ -1473,6 +1510,11 @@ public class AVM2Code implements Cloneable {
         return regIndexToName;
     }
 
+    /**
+     * Gets position after debugline instruction and after jump instruction.
+     * @param ip Current position
+     * @return New position
+     */
     public int getIpThroughJumpAndDebugLine(int ip) {
         if (code.isEmpty()) {
             return ip;
@@ -1495,6 +1537,12 @@ public class AVM2Code implements Cloneable {
         return ip;
     }
 
+    /**
+     * Gets address after debugline instruction and after jump instruction.
+     * @param addr Current address
+     * @return New address
+     * @throws ConvertException
+     */
     public long getAddrThroughJumpAndDebugLine(long addr) throws ConvertException {
         return pos2adr(getIpThroughJumpAndDebugLine(adr2pos(addr, true)));
     }
@@ -1674,6 +1722,10 @@ public class AVM2Code implements Cloneable {
          }*/
     }
 
+    /**
+     * Gets number of registers used in the code.
+     * @return Number of registers
+     */
     public int getRegisterCount() {
         int maxRegister = -1;
         for (AVM2Instruction ins : code) {
@@ -1691,6 +1743,12 @@ public class AVM2Code implements Cloneable {
         return maxRegister + 1;
     }
 
+    /**
+     * Gets types of local registers.
+     * @param constants Constant pool
+     * @param fullyQualifiedNames Fully qualified names
+     * @return Map from register id to type
+     */
     public HashMap<Integer, GraphTargetItem> getLocalRegTypes(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         HashMap<Integer, GraphTargetItem> ret = new HashMap<>();
         AVM2Instruction prev = null;
@@ -1708,17 +1766,36 @@ public class AVM2Code implements Cloneable {
 
     }
 
+    /**
+     * Slot class
+     */
     private class Slot {
 
+        /**
+         * Scope
+         */
         public final GraphTargetItem scope;
 
+        /**
+         * Multiname
+         */
         public final Multiname multiname;
 
+        /**
+         * Constructs a new Slot.
+         * @param scope Scope
+         * @param multiname Multiname
+         */
         public Slot(GraphTargetItem scope, Multiname multiname) {
             this.scope = scope;
             this.multiname = multiname;
         }
 
+        /**
+         * Equals.
+         * @param obj Object
+         * @return True if equal
+         */
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Slot) {
@@ -1729,6 +1806,10 @@ public class AVM2Code implements Cloneable {
             return false;
         }
 
+        /**
+         * Hash code.
+         * @return Hash code
+         */
         @Override
         public int hashCode() {
             int hash = 7;
@@ -1738,10 +1819,22 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Initializes counter of toSource calls.
+     */
     public void initToSource() {
         toSourceCount = 0;
     }
 
+    /**
+     * Handles declaration of registers.
+     * @param minreg Minimal register id
+     * @param assignment Assignment
+     * @param declaredRegisters Declared registers
+     * @param declaredSlots Declared slots
+     * @param reg Register id
+     * @return Assignment
+     */
     private GraphTargetItem handleDeclareReg(int minreg, GraphTargetItem assignment, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, int reg) {
 
         //do not add declarations for reserved local registers like function arguments
@@ -1794,6 +1887,13 @@ public class AVM2Code implements Cloneable {
         return assignment;
     }
 
+    /**
+     * Calculates index of property name in the slot list.
+     * @param list List of slots
+     * @param propertyName Property name
+     * @param abc ABC
+     * @return Index of property name in the slot list or -1 if not found
+     */
     private int slotListIndexOf(List<Slot> list, String propertyName, ABC abc) {
         int index = 0;
         for (Slot s : list) {
@@ -1805,6 +1905,20 @@ public class AVM2Code implements Cloneable {
         return -1;
     }
 
+    /**
+     * Injects declarations of registers/slots/properties etc.
+     * @param level Level
+     * @param paramNames Parameter names
+     * @param items Items
+     * @param minreg Minimal register id
+     * @param declaredRegisters Declared registers
+     * @param declaredSlots Declared slots
+     * @param declaredSlotsDec Declared slots declarations
+     * @param declaredProperties Declared properties
+     * @param declaredPropsDec Declared properties declarations
+     * @param abc ABC
+     * @param body Method body
+     */
     private void injectDeclarations(int level, List<String> paramNames, List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, List<String> declaredProperties, List<DeclarationAVM2Item> declaredPropsDec, ABC abc, MethodBody body) {
         //boolean hasActivation = abc.method_info.get(body.method_info).flagNeed_activation();
         Map<String, TraitSlotConst> traits = new LinkedHashMap<>();
@@ -2062,6 +2176,29 @@ public class AVM2Code implements Cloneable {
         }*/
     }
 
+    /**
+     * Converts code to source - list of GraphTargetItems.
+     * @param callStack Call stack
+     * @param abcIndex ABC indexing
+     * @param thisHasDefaultToPrimitive True if this has default to primitive
+     * @param convertData Convert data
+     * @param path Path
+     * @param methodIndex Method index
+     * @param isStatic True if static
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param abc ABC
+     * @param body Method body
+     * @param localRegNames Local register names
+     * @param scopeStack Scope stack
+     * @param initializerType Initializer type
+     * @param fullyQualifiedNames Fully qualified names
+     * @param initTraits Initialized traits
+     * @param staticOperation Static operation
+     * @param localRegAssigmentIps Local register assignment IPs
+     * @return List of GraphTargetItems
+     * @throws InterruptedException
+     */
     public List<GraphTargetItem> toGraphTargetItems(List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
@@ -2254,6 +2391,12 @@ public class AVM2Code implements Cloneable {
         return list;
     }
 
+    /**
+     * Updates instruction byte count at given address.
+     * @param instructionAddress Instruction address
+     * @param byteDelta Byte delta
+     * @param body Method body
+     */
     public void updateInstructionByteCountByAddr(long instructionAddress, int byteDelta, MethodBody body) {
         if (byteDelta != 0) {
             updateOffsets(new OffsetUpdater() {
@@ -2280,11 +2423,22 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Updates instruction byte count at given position.
+     * @param pos Position
+     * @param byteDelta Byte delta
+     * @param body Method body
+     */
     public void updateInstructionByteCount(int pos, int byteDelta, MethodBody body) {
         AVM2Instruction instruction = code.get(pos);
         updateInstructionByteCountByAddr(instruction.getAddress(), byteDelta, body);
     }
 
+    /**
+     * Updates offsets (jumps) in the code with given updater.
+     * @param updater Offset updater
+     * @param body Method body
+     */
     public void updateOffsets(OffsetUpdater updater, MethodBody body) {
         for (int i = 0; i < code.size(); i++) {
             AVM2Instruction ins = code.get(i);
@@ -2316,6 +2470,12 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Fixes jumps to invalid addresses.
+     * @param path Path
+     * @param body Method body
+     * @throws InterruptedException
+     */
     public void fixJumps(final String path, MethodBody body) throws InterruptedException {
         if (code.isEmpty()) {
             return;
@@ -2351,6 +2511,10 @@ public class AVM2Code implements Cloneable {
         removeIgnored(body);
     }
 
+    /**
+     * Checks for invalid offsets (jumps) in the code.
+     * @param body Method body
+     */
     public void checkValidOffsets(MethodBody body) {
         updateOffsets(new OffsetUpdater() {
             @Override
@@ -2370,6 +2534,11 @@ public class AVM2Code implements Cloneable {
         }, body);
     }
 
+    /**
+     * Removes instruction at given position.
+     * @param pos Position
+     * @param body Method body
+     */
     public void removeInstruction(int pos, MethodBody body) {
         if ((pos < 0) || (pos >= code.size())) {
             throw new IndexOutOfBoundsException();
@@ -2422,9 +2591,9 @@ public class AVM2Code implements Cloneable {
      * newinstruction is jump, the offset operand must be handled properly by
      * caller.
      *
-     * @param pos
-     * @param instruction
-     * @param body
+     * @param pos Position
+     * @param instruction Instruction
+     * @param body Method body
      */
     public void replaceInstruction(int pos, AVM2Instruction instruction, MethodBody body) {
         AVM2Instruction oldInstruction = code.get(pos);
@@ -2463,7 +2632,7 @@ public class AVM2Code implements Cloneable {
      * If newinstruction is jump, the offset operand must be handled properly by
      * caller. All old jump offsets to pos are targeted before new instruction.
      *
-     * @param pos Position in the list
+     * @param pos Position
      * @param instruction Instruction False means before new instruction
      * @param body Method body (used for try handling)
      */
@@ -2476,7 +2645,7 @@ public class AVM2Code implements Cloneable {
      * If newinstruction is jump, the offset operand must be handled properly by
      * caller.
      *
-     * @param pos Position in the list
+     * @param pos Position
      * @param instruction Instruction
      * @param mapOffsetsAfterIns Map all jumps to the pos after new instruction?
      * False means before new instruction
@@ -2550,6 +2719,19 @@ public class AVM2Code implements Cloneable {
         //checkValidOffsets(body);
     }
 
+    /**
+     * Removes traps (deobfuscation)
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @param abc ABC
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic True if static
+     * @param path Path
+     * @return 1
+     * @throws InterruptedException
+     */
     public int removeTraps(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
@@ -2570,12 +2752,27 @@ public class AVM2Code implements Cloneable {
         return 1;
     }
 
+    /**
+     * Handles register while walking code for stats.
+     * @param stats Code stats
+     * @param reg Register
+     */
     private void handleRegister(CodeStats stats, int reg) {
         if (reg + 1 > stats.maxlocal) {
             stats.maxlocal = reg + 1;
         }
     }
 
+    /**
+     * Walks code for stats.
+     * @param stats Code stats
+     * @param pos Position
+     * @param stack Stack
+     * @param scope Scope
+     * @param abc ABC
+     * @param autoFill Auto fill
+     * @return
+     */
     private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc, boolean autoFill) {
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
@@ -2678,6 +2875,14 @@ public class AVM2Code implements Cloneable {
         return true;
     }
 
+    /**
+     * Gets stats.
+     * @param abc ABC
+     * @param body Method body
+     * @param initScope Initial scope
+     * @param autoFill Auto fill
+     * @return Code stats
+     */
     public CodeStats getStats(ABC abc, MethodBody body, int initScope, boolean autoFill) {
         CodeStats stats = new CodeStats(this);
         stats.initscope = initScope;
@@ -2719,8 +2924,11 @@ public class AVM2Code implements Cloneable {
         //stats.maxscope+=initScope;
         return stats;
     }
-
-    // simplified version of getStats. This method calculates only the maxlocal value
+    /**
+     * Calculates maxlocal value.
+     * Simplified version of getStats.
+     * @return Code stats
+     */
     public CodeStats getMaxLocal() {
         CodeStats stats = new CodeStats();
         for (AVM2Instruction ins : code) {
@@ -2741,6 +2949,13 @@ public class AVM2Code implements Cloneable {
         return stats;
     }
 
+    /**
+     * Visit code.
+     * @param ip Position
+     * @param lastIp Last position
+     * @param refs Map from position to list of references
+     * @throws InterruptedException
+     */
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         Queue<Integer> toVisit = new LinkedList<>();
         Queue<Integer> toVisitLast = new LinkedList<>();
@@ -2803,6 +3018,12 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Visits code.
+     * @param body Method body
+     * @return Map from position to list of references
+     * @throws InterruptedException
+     */
     public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < code.size(); i++) {
@@ -2819,6 +3040,11 @@ public class AVM2Code implements Cloneable {
         return refs;
     }
 
+    /**
+     * Remove instructions that are marked as ignored.
+     * @param body Method body
+     * @throws InterruptedException
+     */
     public void removeIgnored(MethodBody body) throws InterruptedException {
         //System.err.println("removing ignored...");
         for (int i = 0; i < code.size(); i++) {
@@ -2830,10 +3056,23 @@ public class AVM2Code implements Cloneable {
         //System.err.println("/ignored removed");
     }
 
+    /**
+     * Removes dead code.
+     * @param body Method body
+     * @return Number of removed instructions
+     * @throws InterruptedException
+     */
     public int removeDeadCode(MethodBody body) throws InterruptedException {
         return removeDeadCode(body, new Reference<>(-1));
     }
 
+    /**
+     * Removes dead code.
+     * @param body Method body
+     * @param minChangedIpRef Minimum changed instruction position (as reference)
+     * @return Number of removed instructions
+     * @throws InterruptedException
+     */
     public int removeDeadCode(MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         int cnt = 0;
@@ -2868,6 +3107,10 @@ public class AVM2Code implements Cloneable {
         return cnt;
     }
 
+    /**
+     * Replaces jumps to exit instructions (return, throw) with exit instruction.
+     * @return True if modified
+     */
     public boolean inlineJumpExit() {
         boolean modified = false;
         int csize = code.size();
@@ -2895,63 +3138,12 @@ public class AVM2Code implements Cloneable {
         return modified;
     }
 
-    private static int getMostCommonIp(AVM2GraphSource code, List<Integer> branches) {
-        List<List<Integer>> reachable = new ArrayList<>();
-        for (int i = 0; i < branches.size(); i++) {
-            List<Integer> r = new ArrayList<>();
-            getReachableIps(code, branches.get(i), r);
-        }
-
-        int commonLevel;
-        Map<Integer, Integer> levelMap = new HashMap<>();
-        for (List<Integer> first : reachable) {
-            int maxclevel = 0;
-            Set<Integer> visited = new HashSet<>();
-            for (Integer p : first) {
-                if (visited.contains(p)) {
-                    continue;
-                }
-                visited.add(p);
-                boolean common = true;
-                commonLevel = 1;
-                for (List<Integer> r : reachable) {
-                    if (r == first) {
-                        continue;
-                    }
-                    if (r.contains(p)) {
-                        commonLevel++;
-                    }
-                }
-                if (commonLevel <= maxclevel) {
-                    continue;
-                }
-                maxclevel = commonLevel;
-                if (levelMap.containsKey(p)) {
-                    if (levelMap.get(p) > commonLevel) {
-                        commonLevel = levelMap.get(p);
-                    }
-                }
-                levelMap.put(p, commonLevel);
-                if (common) {
-                    //return p;
-                }
-            }
-        }
-        for (int i = reachable.size() - 1; i >= 2; i--) {
-            for (Integer p : levelMap.keySet()) {
-                if (levelMap.get(p) == i) {
-                    return p;
-                }
-            }
-        }
-        for (Integer p : levelMap.keySet()) {
-            if (levelMap.get(p) == branches.size()) {
-                return p;
-            }
-        }
-        return -1;
-    }
-
+    /**
+     * Gets reachable positions.
+     * @param code AVM2 code
+     * @param ip Current position
+     * @param reachable Result - list of reachable positions
+     */
     public static void getReachableIps(AVM2GraphSource code, int ip, List<Integer> reachable) {
         do {
             if (reachable.contains(ip)) {
@@ -2971,10 +3163,25 @@ public class AVM2Code implements Cloneable {
         } while (ip < code.size());
     }
 
+    /**
+     * Checks if currentIp is direct ancestor.
+     * @param currentIp Current position
+     * @param ancestor Ancestor position
+     * @param refs Map from position to list of references
+     * @return True if currentIp is direct ancestor
+     */
     public static boolean isDirectAncestor(int currentIp, int ancestor, HashMap<Integer, List<Integer>> refs) {
         return isDirectAncestor(currentIp, ancestor, refs, new ArrayList<>());
     }
 
+    /**
+     * Checks if currentIp is direct ancestor.
+     * @param currentIp Current position
+     * @param ancestor Ancestor position
+     * @param refs Map from position to list of references
+     * @param visited List of visited positions
+     * @return True if currentIp is direct ancestor
+     */
     private static boolean isDirectAncestor(int currentIp, int ancestor, HashMap<Integer, List<Integer>> refs, List<Integer> visited) {
         if (currentIp == -1) {
             return true;
@@ -3007,6 +3214,14 @@ public class AVM2Code implements Cloneable {
         return false;
     }
 
+    /**
+     * Gets reachable positions prior the current position.
+     * @param currentIp Current position
+     * @param refs Map from position to list of references
+     * @param reachable Result - set of reachable positions
+     * @param visited List of visited positions
+     * @return True if visited does not contain currentIp
+     */
     public static boolean getPreviousReachableIps(int currentIp, HashMap<Integer, List<Integer>> refs, Set<Integer> reachable, Set<Integer> visited) {
         do {
             if (visited.contains(currentIp)) {
@@ -3038,6 +3253,10 @@ public class AVM2Code implements Cloneable {
         return true;
     }
 
+    /**
+     * Clones AVM2 code.
+     * @return Cloned AVM2 code
+     */
     @Override
     public AVM2Code clone() {
         try {
@@ -3056,6 +3275,11 @@ public class AVM2Code implements Cloneable {
         }
     }
 
+    /**
+     * Marks virtual addresses.
+     * Virtual address is the address of the instruction before any modifications to the code
+     * like deobfuscation etc.
+     */
     public void markVirtualAddresses() {
         for (AVM2Instruction ins : code) {
             ins.setVirtualAddress(ins.getAddress());

@@ -20,38 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.AddIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DivideIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.IncrementIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.ModuloIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.MultiplyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NegateIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.SubtractIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitAndIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitOrIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.BitXorIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.LShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.RShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.URShiftIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.GreaterThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessEqualsIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.LessThanIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.StrictEqualsIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewArrayIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
@@ -59,18 +31,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.DupIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushDoubleIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -78,19 +39,34 @@ import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
 import com.jpexs.decompiler.graph.TranslateException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 /**
- *
+ * Simple AVM2 deobfuscator.
  * @author JPEXS
  */
 public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes {
 
+    /**
+     * Maximum number of instructions to execute in one pass
+     */
     private final int executionLimit = 30000;
 
+    /**
+     * Removes obfuscation ifs.
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param body Method body
+     * @param inlineIns Inline instruction
+     * @return True if code was modified
+     * @throws InterruptedException
+     */
     protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, AVM2Instruction inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
         if (code.code.isEmpty()) {
@@ -128,6 +104,13 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
         return false;
     }
 
+    /**
+     * Initializes local registers.
+     * @param localData Local data
+     * @param localReservedCount Count of reserved local registers
+     * @param maxRegs Maximum registers
+     * @param executeFromFirst Execute from first
+     */
     protected void initLocalRegs(LocalDataArea localData, int localReservedCount, int maxRegs, boolean executeFromFirst) {
         for (int i = 0; i < localReservedCount; i++) {
             localData.localRegisters.put(i, NotCompileTime.INSTANCE);
@@ -137,6 +120,20 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
         }
     }
 
+    /**
+     * Executes instructions.
+     * @param staticRegs Static registers
+     * @param body Method body
+     * @param abc ABC
+     * @param code AVM2 code
+     * @param localData Local data
+     * @param idx Start index
+     * @param endIdx End index
+     * @param result Execution result
+     * @param inlineIns Inline instruction
+     * @return True if code was modified
+     * @throws InterruptedException
+     */
     private boolean executeInstructions(Map<Integer, Object> staticRegs, MethodBody body, ABC abc, AVM2Code code, LocalDataArea localData, int idx, int endIdx, ExecutionResult result, AVM2Instruction inlineIns) throws InterruptedException {
         int instructionsProcessed = 0;
 
@@ -348,6 +345,18 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
         return modified;
     }
 
+    /**
+     * Simple deobfuscation.
+     * @param path Path
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param abc ABC
+     * @param trait Trait
+     * @param methodInfo Method info
+     * @param body Method body
+     * @throws InterruptedException
+     */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -357,12 +366,24 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
         removeNullPushes(code, body);
     }
 
+    /**
+     * Execution result.
+     */
     class ExecutionResult {
 
+        /**
+         * Ip
+         */
         public int idx = -1;
 
+        /**
+         * Number of instructions processed
+         */
         public int instructionsProcessed = -1;
 
+        /**
+         * Stack
+         */
         public Stack<Object> stack = new Stack<>();
     }
 }

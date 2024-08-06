@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 /**
- *
+ * Search mode for searching in SWF file.
  * @author JPEXS
  */
 public enum SearchMode {

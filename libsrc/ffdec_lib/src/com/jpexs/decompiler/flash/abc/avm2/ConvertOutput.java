@@ -18,18 +18,30 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * Conversion output.
  * @author JPEXS
  */
 public class ConvertOutput {
 
+    /**
+     * Translate stack
+     */
     public TranslateStack stack;
 
+    /**
+     * Output
+     */
     public List<GraphTargetItem> output;
 
+    /**
+     * Constructs conversion output.
+     * @param stack Translate stack
+     * @param output Output
+     */
     public ConvertOutput(TranslateStack stack, List<GraphTargetItem> output) {
         this.stack = stack;
         this.output = output;

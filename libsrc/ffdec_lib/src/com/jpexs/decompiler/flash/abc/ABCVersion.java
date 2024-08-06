@@ -16,20 +16,43 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+/**
+ * Represents ABC version
+ */
 public class ABCVersion implements Comparable<ABCVersion> {
 
+    /**
+     * Major version
+     */
     public int major = 46;
+
+    /**
+     * Minor version
+     */
     public int minor = 16;
 
+    /**
+     * Constructs new ABCVersion
+     */
     public ABCVersion() {
 
     }
 
+    /**
+     * Constructs new ABCVersion
+     * @param major Major version
+     * @param minor Minor version
+     */
     public ABCVersion(int major, int minor) {
         this.major = major;
         this.minor = minor;
     }
 
+    /**
+     * Compares ABCVersion with another ABCVersion
+     * @param o the object to be compared.
+     * @return Negative number if this version is lower, 0 if versions are equal, positive number if this version is higher
+     */
     @Override
     public int compareTo(ABCVersion o) {
         if (major != o.major) {
@@ -38,11 +61,19 @@ public class ABCVersion implements Comparable<ABCVersion> {
         return minor - o.minor;
     }
 
+    /**
+     * Returns string representation of ABCVersion
+     * @return
+     */
     @Override
     public String toString() {
         return "" + major + "." + minor;
     }
 
+    /**
+     * Returns hash code of ABCVersion
+     * @return
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -51,6 +82,11 @@ public class ABCVersion implements Comparable<ABCVersion> {
         return hash;
     }
 
+    /**
+     * Equals method
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

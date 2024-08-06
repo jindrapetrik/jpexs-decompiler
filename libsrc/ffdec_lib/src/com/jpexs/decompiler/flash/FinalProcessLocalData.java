@@ -17,32 +17,49 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.graph.Loop;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
- *
+ * Final decompilation processing local d ata.
  * @author JPEXS
  */
 public class FinalProcessLocalData {
 
+    /**
+     * Temporary registers used in the code.
+     */
     public final HashSet<Integer> temporaryRegisters;
+
+    /**
+     * Loops in the code.
+     */
     public final List<Loop> loops;
+
+    /**
+     * Register usage. Map of setLocal ip to set of getLocal ips.
+     */
     public Map<Integer, Set<Integer>> registerUsage;
 
-    public Set<Integer> getRegisterUsage(int regIndex) {
+    /**
+     * Returns register usage for given setLocal ip.
+     * @param setLocalIp SetLocal ip
+     * @return Set of getLocal ips
+     */
+    public Set<Integer> getRegisterUsage(int setLocalIp) {
         if (registerUsage == null) {
             return new HashSet<>();
         }
-        if (!registerUsage.containsKey(regIndex)) {
+        if (!registerUsage.containsKey(setLocalIp)) {
             return new HashSet<>();
         }
-        return registerUsage.get(regIndex);
+        return registerUsage.get(setLocalIp);
     }
 
+    /**
+     * Constructs new FinalProcessLocalData.
+     * @param loops Loops in the code
+     */
     public FinalProcessLocalData(List<Loop> loops) {
         temporaryRegisters = new HashSet<>();
         registerUsage = new HashMap<>();

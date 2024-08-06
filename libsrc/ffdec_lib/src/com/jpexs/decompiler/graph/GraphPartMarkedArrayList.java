@@ -21,14 +21,25 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- *
+ * List which can store parts of the graph for each element.
  * @author JPEXS
  */
 public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
+    /**
+     * List of parts for each element.
+     */
     private List<List<GraphPart>> listParts = new ArrayList<>();
+
+    /**
+     * Current parts.
+     */
     private List<GraphPart> currentParts = new ArrayList<>();
 
+    /**
+     * Constructs GraphPartMarkedArrayList from another collection.
+     * @param collection
+     */
     @SuppressWarnings("unchecked")
     public GraphPartMarkedArrayList(Collection<? extends E> collection) {
         super(collection);
@@ -44,33 +55,63 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         }
     }
 
+    /**
+     * Constructs GraphPartMarkedArrayList.
+     */
     public GraphPartMarkedArrayList() {
     }
 
+    /**
+     * Starts new part.
+     * @param part Part
+     */
     public void startPart(GraphPart part) {
         currentParts.add(part);
     }
 
+    /**
+     * Clears current parts.
+     */
     public void clearCurrentParts() {
         currentParts = new ArrayList<>();
     }
 
+    /**
+     * Adds element to the collection.
+     * @param e element whose presence in this collection is to be ensured
+     * @return true if this collection changed as a result of the call
+     */
     @Override
     public boolean add(E e) {
         listParts.add(currentParts);
         return super.add(e);
     }
 
+    /**
+     * Inserts the specified element at the specified position in this list.
+     * @param index index at which the specified element is to be inserted
+     * @param element element to be inserted
+     */
     @Override
     public void add(int index, E element) {
         listParts.add(index, currentParts);
         super.add(index, element);
     }
 
+    /**
+     * Returns the parts at the specified index.
+     * @param index index of the element
+     * @return parts at the specified index
+     */
     public List<GraphPart> getPartsAt(int index) {
         return listParts.get(index);
     }
 
+    /**
+     * Gets the index of the part in the list.
+     * @param part
+     * @return
+     */
     public int indexOfPart(GraphPart part) {
         for (int i = 0; i < listParts.size(); i++) {
             List<GraphPart> list = listParts.get(i);
@@ -81,6 +122,11 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return -1;
     }
 
+    /**
+     * Adds all elements from the collection to this collection.
+     * @param c collection containing elements to be added to this collection
+     * @return true if this collection changed as a result of the call
+     */
     @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(Collection<? extends E> c) {
@@ -96,6 +142,13 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return super.addAll(c);
     }
 
+    /**
+     * Inserts all elements in the specified collection into this list at the
+     * @param index index at which to insert the first element from the
+     *              specified collection
+     * @param c collection containing elements to be added to this list
+     * @return true if this list changed as a result of the call
+     */
     @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
@@ -111,6 +164,11 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return super.addAll(index, c);
     }
 
+    /**
+     * Removes the first occurrence of the specified element from this list, if
+     * @param o element to be removed from this list, if present
+     * @return true if an element was removed as a result of this call
+     */
     @Override
     public boolean remove(Object o) {
         if (contains(o)) {
@@ -119,18 +177,32 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return super.remove(o);
     }
 
+    /**
+     * Removes the element at the specified position in this list. Shifts any
+     * @param index the index of the element to be removed
+     * @return the element that was removed from the list
+     */
     @Override
     public E remove(int index) {
         listParts.remove(index);
         return super.remove(index);
     }
 
+    /**
+     * Clears the list.
+     */
     @Override
     public void clear() {
         listParts.clear();
         super.clear();
     }
 
+    /**
+     * Returns a view of the portion of this list between the specified
+     * @param fromIndex low endpoint (inclusive) of the subList
+     * @param toIndex high endpoint (exclusive) of the subList
+     * @return a view of the specified range within this list
+     */
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         GraphPartMarkedArrayList<E> ret = new GraphPartMarkedArrayList<E>(this);
@@ -143,11 +215,20 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return ret;
     }
 
+    /**
+     * Returns a shallow copy of this ArrayList instance.
+     * @return a clone of this ArrayList instance
+     */
     @Override
     public Object clone() {
         return new GraphPartMarkedArrayList<>(this);
     }
 
+    /**
+     * Removes from this list all of its elements that are contained in the
+     * @param c collection containing elements to be removed from this list
+     * @return true if this list changed as a result of the call
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
         for (Object o : c) {

@@ -17,34 +17,56 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.PopItem;
+
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Stack for translation.
  * @author JPEXS
  */
 public class TranslateStack extends Stack<GraphTargetItem> {
 
+    /**
+     * Pop item
+     */
     private PopItem pop;
 
+    /**
+     * Path
+     */
     private final String path;
 
+    /**
+     * Simplifies all items in the stack.
+     */
     public void simplify() {
         for (int i = 0; i < size(); i++) {
             set(i, get(i).simplify(""));
         }
     }
 
+    /**
+     * Constructs new TranslateStack with the specified path.
+     * @param path The path.
+     */
     public TranslateStack(String path) {
         this.path = path;
     }
 
+    /**
+     * Gets the path.
+     * @return The path.
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Gets the pop item.
+     * @return The pop item.
+     */
     private PopItem getPop() {
         if (pop == null) {
             pop = new PopItem(null, null); //TODO: linestart?
@@ -53,6 +75,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return pop;
     }
 
+    /**
+     * Gets the item at the specified index.
+     * @param index index of the element to return
+     * @return The element at the specified position in this list
+     */
     @Override
     public synchronized GraphTargetItem get(int index) {
         if (path != null) {
@@ -64,6 +91,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.get(index);
     }
 
+    /**
+     * Gets the item at the top of the stack.
+     * @return The item at the top of the stack.
+     */
     @Override
     public synchronized GraphTargetItem peek() {
         if (path != null) {
@@ -75,6 +106,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.peek();
     }
 
+    /**
+     * Gets the item at the specified index from the top of the stack.
+     * @param index The index.
+     * @return The item at the specified index from the top of the stack.
+     */
     public synchronized GraphTargetItem peek(int index) {
         if (path != null) {
             if (index > this.size()) {
@@ -85,6 +121,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         return super.get(size() - index);
     }
 
+    /**
+     * Pop the item at the top of the stack.
+     * @return The item at the top of the stack.
+     */
     @Override
     public synchronized GraphTargetItem pop() {
         if (path != null) {

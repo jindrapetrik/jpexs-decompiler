@@ -17,17 +17,28 @@
 package com.jpexs.decompiler.graph;
 
 /**
- *
+ * Second pass exception.
  * @author JPEXS
  */
 public class SecondPassException extends RuntimeException {
 
+    /**
+     * Second pass data.
+     */
     private final SecondPassData data;
 
+    /**
+     * Constructs a new SecondPassException.
+     * @param data Second pass data
+     */
     public SecondPassException(SecondPassData data) {
         this.data = data;
     }
 
+    /**
+     * Gets the second pass data.
+     * @return Second pass data
+     */
     public SecondPassData getData() {
         return data;
     }
