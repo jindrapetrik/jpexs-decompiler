@@ -17,15 +17,26 @@
 package com.jpexs.decompiler.flash.timeline;
 
 /**
- *
+ * SVG clipping region
  * @author JPEXS
  */
 public class SvgClip {
 
+    /**
+     * Shape.
+     */
     public String shape;
 
+    /**
+     * Depth.
+     */
     public int depth;
 
+    /**
+     * Constructs SvgClip.
+     * @param shape Shape
+     * @param depth Depth
+     */
     public SvgClip(String shape, int depth) {
         this.shape = shape;
         this.depth = depth;

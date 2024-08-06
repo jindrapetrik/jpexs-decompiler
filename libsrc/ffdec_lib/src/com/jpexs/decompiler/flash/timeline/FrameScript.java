@@ -22,39 +22,70 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
- *
+ * A frame that contains script
  * @author JPEXS
  */
 public class FrameScript implements TreeItem, Exportable {
 
+    /**
+     * SWF.
+     */
     private final SWF swf;
 
+    /**
+     * Frame.
+     */
     private final Frame frame;
 
+    /**
+     * Constructs FrameScript.
+     * @param swf SWF
+     * @param frame Frame
+     */
     public FrameScript(SWF swf, Frame frame) {
         this.swf = swf;
         this.frame = frame;
     }
 
+    /**
+     * Gets Frame.
+     * @return 
+     */
     public Frame getFrame() {
         return frame;
     }
 
+    /**
+     * Gets openable.
+     * @return 
+     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
+    /**
+     * ToString.
+     * @return 
+     */
     @Override
     public String toString() {
         return frame.toString();
     }
 
+    /**
+     * Gets export filename.
+     * @return 
+     */
     @Override
     public String getExportFileName() {
         return frame.getExportFileName();
     }
 
+    /**
+     * Gets modified flag.
+     * @return 
+     */
     @Override
     public boolean isModified() {
         return frame.isModified();

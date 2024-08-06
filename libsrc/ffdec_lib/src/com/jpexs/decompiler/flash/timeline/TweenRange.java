@@ -17,13 +17,19 @@
 package com.jpexs.decompiler.flash.timeline;
 
 /**
- *
+ * Range of tween.
  * @author JPEXS
  */
 public class TweenRange {
 
+    /**
+     * Start frame (zero-based).
+     */
     public int startPosition;
 
+    /**
+     * End frame (zero-based).
+     */
     public int endPosition;
 
     public TweenRange(int startPosition, int endPosition) {

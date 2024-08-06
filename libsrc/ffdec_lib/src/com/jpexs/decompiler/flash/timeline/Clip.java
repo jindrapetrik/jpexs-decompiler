@@ -19,13 +19,19 @@ package com.jpexs.decompiler.flash.timeline;
 import java.awt.Shape;
 
 /**
- *
+ * Clipping region.
  * @author JPEXS
  */
 public class Clip {
 
+    /**
+     * Shape.
+     */
     public Shape shape;
 
+    /**
+     * Clipping depth.
+     */
     public int depth;
 
     public Clip(Shape shape, int depth) {
