@@ -17,12 +17,21 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- *
+ * An item with characterId
  * @author JPEXS
  */
 public interface HasCharacterId {
 
+    /**
+     * Gets characterId.
+     * Can be -1 in some special cases.
+     * @return 
+     */
     public int getCharacterId();
 
+    /**
+     * Sets characterId.
+     * @param characterId 
+     */
     public void setCharacterId(int characterId);
 }

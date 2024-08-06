@@ -20,14 +20,26 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
- *
+ * An item with SWF and tag.
  * @author JPEXS
  */
 public interface HasSwfAndTag {
 
+    /**
+     * Sets tag.
+     * @param tag 
+     */
     public void setSourceTag(Tag tag);
 
+    /**
+     * Gets SWF.
+     * @return 
+     */
     public SWF getSwf();
 
+    /**
+     * Gets tag.
+     * @return 
+     */
     public Tag getTag();
 }
