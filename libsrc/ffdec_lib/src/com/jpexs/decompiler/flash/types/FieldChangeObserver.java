@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import java.lang.reflect.Field;
 
 /**
- *
+ * Observer for field change.
  * @author JPEXS
  */
 public interface FieldChangeObserver {

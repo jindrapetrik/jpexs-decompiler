@@ -17,14 +17,23 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- *
+ * Glyph entry of dynamic text.
  * @author JPEXS
  */
 public class DynamicTextGlyphEntry extends GLYPHENTRY {
 
+    /**
+     * Font face.
+     */
     public String fontFace;
 
+    /**
+     * Font style.
+     */
     public int fontStyle;
 
+    /**
+     * Character.
+     */
     public char character;
 }

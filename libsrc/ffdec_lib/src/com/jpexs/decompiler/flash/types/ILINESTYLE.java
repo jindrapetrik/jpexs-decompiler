@@ -21,19 +21,39 @@ import com.jpexs.helpers.ConcreteClasses;
 import java.io.Serializable;
 
 /**
- *
+ * Interface for LINESTYLE and LINESTYLE2.
  * @author JPEXS
  */
 @ConcreteClasses({LINESTYLE.class, LINESTYLE2.class})
 public interface ILINESTYLE extends NeedsCharacters, Serializable {
 
+    /**
+     * Gets version of LINESTYLE.
+     * @return 
+     */
     public int getNum();
 
+    /**
+     * Gets color.
+     * @return 
+     */
     public RGB getColor();
 
+    /**
+     * Gets width.
+     * @return 
+     */
     public int getWidth();
 
+    /**
+     * Sets color.
+     * @param color 
+     */
     public void setColor(RGB color);
 
+    /**
+     * Sets width.
+     * @param width 
+     */
     public void setWidth(int width);
 }

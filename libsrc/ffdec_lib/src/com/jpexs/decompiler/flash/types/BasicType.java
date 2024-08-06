@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- *
+ * Basic types enum.
  * @author JPEXS
  */
 public enum BasicType {

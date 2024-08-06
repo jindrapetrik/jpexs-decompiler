@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- *
+ * Blend modes.
  * @author JPEXS
  */
 public class BlendMode {

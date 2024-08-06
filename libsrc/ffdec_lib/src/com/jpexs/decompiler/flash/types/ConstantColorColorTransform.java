@@ -19,17 +19,29 @@ package com.jpexs.decompiler.flash.types;
 import java.io.Serializable;
 
 /**
- *
+ * Single color color transform.
  * @author JPEXS
  */
 public class ConstantColorColorTransform extends ColorTransform implements Serializable {
 
+    /**
+     * Color
+     */
     private final int color;
 
+    /**
+     * Constructs ConstantColorColorTransform
+     * @param color Color
+     */
     public ConstantColorColorTransform(int color) {
         this.color = color;
     }
 
+    /**
+     * Apply colortransform.
+     * @param color Color
+     * @return 
+     */
     @Override
     public int apply(int color) {
         return this.color;
