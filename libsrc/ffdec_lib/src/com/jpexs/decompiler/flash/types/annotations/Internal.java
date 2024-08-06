@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Field is internal
+ * Field is internal.
  *
  * @author JPEXS
  */

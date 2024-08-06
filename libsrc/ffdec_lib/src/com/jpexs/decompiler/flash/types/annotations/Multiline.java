@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The String field can have large multiline text
+ * The String field can have large multiline text.
  *
  * @author JPEXS
  */

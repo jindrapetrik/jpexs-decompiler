@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The field is optional anc can be unset
+ * The field is optional anc can be unset.
  *
  * @author JPEXS
  */
