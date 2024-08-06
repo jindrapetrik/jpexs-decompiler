@@ -27,7 +27,7 @@ import java.awt.image.RasterFormatException;
 import java.awt.image.WritableRaster;
 
 /**
- *
+ * Blendmodes composite.
  * @author JPEXS
  */
 public final class BlendComposite implements Composite {
