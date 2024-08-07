@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Initialize property.
  * @author JPEXS
  */
 public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {

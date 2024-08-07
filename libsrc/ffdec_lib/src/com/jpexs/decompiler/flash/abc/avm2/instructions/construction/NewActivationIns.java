@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * newactivation instruction - Create a new activation object.
  * @author JPEXS
  */
 public class NewActivationIns extends InstructionDefinition {

@@ -40,7 +40,7 @@ import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.List;
 
 /**
- *
+ * setlocal type instruction - set local register value.
  * @author JPEXS
  */
 public abstract class SetLocalTypeIns extends InstructionDefinition implements SetTypeIns {

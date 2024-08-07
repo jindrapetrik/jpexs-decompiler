@@ -24,15 +24,11 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.Callable;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 
 /**
- *
+ * Call function.
  * @author JPEXS
  */
 public class CallAVM2Item extends AVM2Item {

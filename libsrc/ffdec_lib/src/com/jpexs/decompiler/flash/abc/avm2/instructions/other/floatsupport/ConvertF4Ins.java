@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * convert_f4 - Convert a value to a float4.
  * @author JPEXS
  */
 public class ConvertF4Ins extends InstructionDefinition {

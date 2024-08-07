@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * popscope instruction - Pop the top scope from the scope stack.
  * @author JPEXS
  */
 public class PopScopeIns extends InstructionDefinition {

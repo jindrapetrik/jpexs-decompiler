@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * convert_f - Convert a value to a float.
  * @author JPEXS
  */
 public class ConvertFIns extends InstructionDefinition {

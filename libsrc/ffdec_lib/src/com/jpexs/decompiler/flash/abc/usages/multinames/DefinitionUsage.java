@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.usages.multinames;
 
 /**
- *
+ * Definition usage.
  * @author JPEXS
  */
 public interface DefinitionUsage {

@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * getouterscope instruction - get outer scope object.
  * @author JPEXS
  */
 public class GetOuterScopeIns extends InstructionDefinition {

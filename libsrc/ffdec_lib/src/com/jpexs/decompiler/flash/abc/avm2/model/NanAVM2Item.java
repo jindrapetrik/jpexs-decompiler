@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * NaN value.
  * @author JPEXS
  */
 public class NanAVM2Item extends AVM2Item implements SimpleValue {

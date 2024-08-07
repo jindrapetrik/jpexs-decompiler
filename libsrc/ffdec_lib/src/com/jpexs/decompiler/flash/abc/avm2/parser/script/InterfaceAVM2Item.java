@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Interface.
  * @author JPEXS
  */
 public class InterfaceAVM2Item extends AVM2Item {

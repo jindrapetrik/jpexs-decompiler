@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * In operator.
  * @author JPEXS
  */
 public class InAVM2Item extends BinaryOpItem {

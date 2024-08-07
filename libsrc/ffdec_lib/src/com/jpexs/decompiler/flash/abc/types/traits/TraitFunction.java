@@ -35,15 +35,26 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- *
+ * Function trait in ABC file.
  * @author JPEXS
  */
 public class TraitFunction extends Trait implements TraitWithSlot {
 
+    /**
+     * Slot id
+     */
     public int slot_id;
 
+    /**
+     * Method info index
+     */
     public int method_info;
 
+    /**
+     * Deletes this trait.
+     * @param abc ABC
+     * @param d Deleted flag
+     */
     @Override
     public void delete(ABC abc, boolean d) {
         super.delete(abc, d);
@@ -52,11 +63,32 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         abc.method_info.get(method_info).delete(abc, d);
     }
 
+    /**
+     * Gets slot index.
+     * @return
+     */
     @Override
     public int getSlotIndex() {
         return slot_id;
     }
 
+    /**
+     * ToString of header.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         MethodBody body = abc.findBody(method_info);
@@ -73,15 +105,54 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    /**
+     * Converts header.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @throws InterruptedException
+     */
     @Override
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
+    /**
+     * To string.
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return String
+     */
     @Override
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return "Function " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
+    /**
+     * To string.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
@@ -104,6 +175,23 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    /**
+     * Converts trait.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param scopeStack Scope stack
+     * @throws InterruptedException
+     */
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
@@ -119,6 +207,16 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.endMethod();
     }
 
+    /**
+     * Removes traps - deobfuscation.
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param abc ABC
+     * @param path Path
+     * @return Number of removed traps
+     * @throws InterruptedException
+     */
     @Override
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int bodyIndex = abc.findBodyIndex(method_info);
@@ -128,21 +226,45 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         return 0;
     }
 
+    /**
+     * Clones trait.
+     * @return Cloned trait
+     */
     @Override
     public TraitFunction clone() {
         TraitFunction ret = (TraitFunction) super.clone();
         return ret;
     }
 
+    /**
+     * Gets dependencies.
+     * @param abcIndex ABC indexing
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param customNamespace Custom namespace
+     * @param abc ABC
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @throws InterruptedException
+     */
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
     }
 
+    /**
+     * Converts trait header.
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     @Override
     public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
         convertCommonHeaderFlags("function", abc, writer);
@@ -156,6 +278,13 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    /**
+     * Gets method infos.
+     * @param abc ABC
+     * @param traitId Trait ID
+     * @param classIndex Class index
+     * @param methodInfos Method infos
+     */
     @Override
     public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
         methodInfos.add(new MethodId(traitId, classIndex, method_info));

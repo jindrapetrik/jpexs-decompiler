@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * declocal_p instruction - decrement local register with number context.
  * @author JPEXS
  */
 public class DecLocalPIns extends InstructionDefinition {

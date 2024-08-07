@@ -27,10 +27,11 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * add instruction - Add two values.
  * @author JPEXS
  */
 public class AddIns extends InstructionDefinition {

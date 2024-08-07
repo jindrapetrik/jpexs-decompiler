@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifne instruction - if two values are not equal, jump.
  * @author JPEXS
  */
 public class IfNeIns extends InstructionDefinition implements IfTypeIns {

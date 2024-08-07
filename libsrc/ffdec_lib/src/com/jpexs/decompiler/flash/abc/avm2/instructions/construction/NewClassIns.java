@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- *
+ * newclass instruction - Create a new class.
  * @author JPEXS
  */
 public class NewClassIns extends InstructionDefinition {

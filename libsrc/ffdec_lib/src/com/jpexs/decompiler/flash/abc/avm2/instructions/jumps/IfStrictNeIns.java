@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifstrictne instruction - if two values are strictly not equal, jump.
  * @author JPEXS
  */
 public class IfStrictNeIns extends InstructionDefinition implements IfTypeIns {

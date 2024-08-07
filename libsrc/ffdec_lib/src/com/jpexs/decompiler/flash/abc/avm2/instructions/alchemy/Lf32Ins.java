@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lf32 instruction - Load 32-bit float from domain memory.
  * @author JPEXS
  */
 public class Lf32Ins extends InstructionDefinition implements AlchemyTypeIns {

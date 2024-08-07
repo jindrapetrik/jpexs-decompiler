@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Greater than.
  * @author JPEXS
  */
 public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {

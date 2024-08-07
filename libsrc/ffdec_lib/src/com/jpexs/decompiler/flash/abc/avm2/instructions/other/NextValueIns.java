@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * nextvalue instruction - get the next value of an object.
  * @author JPEXS
  */
 public class NextValueIns extends InstructionDefinition {

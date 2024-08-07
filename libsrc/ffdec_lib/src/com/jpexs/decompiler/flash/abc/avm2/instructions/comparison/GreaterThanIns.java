@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * greaterthan instruction - Greater than.
  * @author JPEXS
  */
 public class GreaterThanIns extends InstructionDefinition {

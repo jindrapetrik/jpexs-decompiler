@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 
 /**
- *
+ * Class name multiname usage.
  * @author JPEXS
  */
 public class ClassNameMultinameUsage extends MultinameUsage implements DefinitionUsage, InsideClassMultinameUsageInterface {

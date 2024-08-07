@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushnan instruction - Push a NaN value onto the stack.
  * @author JPEXS
  */
 public class PushNanIns extends InstructionDefinition {

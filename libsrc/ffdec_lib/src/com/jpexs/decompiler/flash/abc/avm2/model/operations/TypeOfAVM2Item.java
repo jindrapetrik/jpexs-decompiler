@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Get type of value.
  * @author JPEXS
  */
 public class TypeOfAVM2Item extends UnaryOpItem {

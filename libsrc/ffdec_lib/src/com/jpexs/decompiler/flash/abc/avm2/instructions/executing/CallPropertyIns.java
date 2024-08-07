@@ -30,11 +30,12 @@ import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callproperty instruction - Call a property.
  * @author JPEXS
  */
 public class CallPropertyIns extends InstructionDefinition {

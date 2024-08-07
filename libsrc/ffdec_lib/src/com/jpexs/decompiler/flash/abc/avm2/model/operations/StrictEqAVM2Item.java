@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Strict equal.
  * @author JPEXS
  */
 public class StrictEqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition, EqualsTypeItem {

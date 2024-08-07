@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * esc_xelems instruction - Escape XML element.
  * @author JPEXS
  */
 public class EscXElemIns extends InstructionDefinition {

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * decrement_p instruction - decrement a number with number context.
  * @author JPEXS
  */
 public class DecrementPIns extends InstructionDefinition {

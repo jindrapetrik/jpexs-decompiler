@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * jump instruction - jump.
  * @author JPEXS
  */
 public class JumpIns extends InstructionDefinition implements IfTypeIns {

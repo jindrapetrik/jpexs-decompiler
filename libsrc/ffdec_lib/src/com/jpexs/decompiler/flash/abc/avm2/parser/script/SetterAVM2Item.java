@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Setter.
  * @author JPEXS
  */
 public class SetterAVM2Item extends MethodAVM2Item {

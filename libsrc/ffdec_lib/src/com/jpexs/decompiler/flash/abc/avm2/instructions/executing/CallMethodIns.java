@@ -27,11 +27,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callmethod instruction - Call a method.
  * @author JPEXS
  */
 public class CallMethodIns extends InstructionDefinition {

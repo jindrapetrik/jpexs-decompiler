@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Set local register value.
  * @author JPEXS
  */
 public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {

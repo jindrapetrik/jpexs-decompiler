@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * getlex instruction - get property of object, lexically.
  * @author JPEXS
  */
 public class GetLexIns extends InstructionDefinition {

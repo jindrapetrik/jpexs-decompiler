@@ -22,10 +22,11 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.Objects;
 
 /**
- *
+ * Find definition.
  * @author JPEXS
  */
 public class FindDefAVM2Item extends AVM2Item {

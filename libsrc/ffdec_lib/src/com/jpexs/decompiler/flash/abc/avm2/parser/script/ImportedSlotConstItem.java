@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * Imported slot.
  * @author JPEXS
  */
 public class ImportedSlotConstItem extends AssignableAVM2Item {

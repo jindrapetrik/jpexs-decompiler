@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * returnvoid instruction - return from function with no return value.
  * @author JPEXS
  */
 public class ReturnVoidIns extends InstructionDefinition {

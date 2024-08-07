@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Unsigned right shift.
  * @author JPEXS
  */
 public class URShiftAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {

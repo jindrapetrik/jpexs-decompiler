@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Getter.
  * @author JPEXS
  */
 public class GetterAVM2Item extends MethodAVM2Item {

@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifeq instruction - if two values are equal, jump.
  * @author JPEXS
  */
 public class IfEqIns extends InstructionDefinition implements IfTypeIns {

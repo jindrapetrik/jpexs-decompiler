@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get the name of the next property when iterating over an object.
  * @author JPEXS
  */
 public class NextNameAVM2Item extends AVM2Item {

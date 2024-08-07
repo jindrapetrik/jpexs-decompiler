@@ -46,32 +46,62 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Represents a list of traits in ABC file.
  * @author JPEXS
  */
 public class Traits implements Cloneable, Serializable {
 
+    /**
+     * List of traits
+     */
     public List<Trait> traits;
 
+    /**
+     * Constructs a new Traits object.
+     */
     public Traits() {
         traits = new ArrayList<>();
     }
 
+    /**
+     * Constructs a new Traits object with the specified initial capacity.
+     * @param initialCapacity Initial capacity
+     */
     public Traits(int initialCapacity) {
         traits = new ArrayList<>(initialCapacity);
     }
 
+    /**
+     * Deletes traits.
+     * @param abc ABC file
+     * @param d Delete flag
+     */
     public void delete(ABC abc, boolean d) {
         for (Trait t : traits) {
             t.delete(abc, d);
         }
     }
 
+    /**
+     * Adds a trait to the list.
+     * @param t Trait to add
+     * @return Index of the added trait
+     */
     public int addTrait(Trait t) {
         traits.add(t);
         return traits.size() - 1;
     }
 
+    /**
+     * Removes traps - deobfuscation.
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param abc ABC file
+     * @param path Path
+     * @return Number of removed traps
+     * @throws InterruptedException
+     */
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int ret = 0;
         for (Trait t : traits) {
@@ -80,6 +110,10 @@ public class Traits implements Cloneable, Serializable {
         return ret;
     }
 
+    /**
+     * To string.
+     * @return String representation
+     */
     @Override
     public String toString() {
         String s = "";
@@ -92,6 +126,12 @@ public class Traits implements Cloneable, Serializable {
         return s;
     }
 
+    /**
+     * To string.
+     * @param abc ABC file
+     * @param fullyQualifiedNames Fully qualified names
+     * @return String representation
+     */
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String s = "";
         for (int t = 0; t < traits.size(); t++) {
@@ -103,40 +143,110 @@ public class Traits implements Cloneable, Serializable {
         return s;
     }
 
+    /**
+     * Conversion task.
+     */
     private class TraitConvertTask implements Callable<Void> {
 
+        /**
+         * Trait
+         */
         Trait trait;
 
+        /**
+         * Make packages flag
+         */
         boolean makePackages;
 
+        /**
+         * Path
+         */
         String path;
 
+        /**
+         * ABC file
+         */
         ABC abc;
 
+        /**
+         * Is static flag
+         */
         boolean isStatic;
 
+        /**
+         * Export mode
+         */
         ScriptExportMode exportMode;
 
+        /**
+         * Script index
+         */
         int scriptIndex;
 
+        /**
+         * Class index
+         */
         int classIndex;
 
+        /**
+         * Writer
+         */
         NulWriter writer;
 
+        /**
+         * Fully qualified names
+         */
         List<DottedChain> fullyQualifiedNames;
 
+        /**
+         * Trait index
+         */
         int traitIndex;
 
+        /**
+         * Parallel flag
+         */
         boolean parallel;
 
+        /**
+         * Parent trait
+         */
         Trait parent;
 
+        /**
+         * Convert data
+         */
         ConvertData convertData;
 
+        /**
+         * ABC indexing
+         */
         AbcIndexing abcIndex;
 
+        /**
+         * Scope stack
+         */
         ScopeStack scopeStack;
 
+        /**
+         * Constructs a new TraitConvertTask object.
+         * @param abcIndex ABC indexing
+         * @param trait Trait
+         * @param parent Parent trait
+         * @param convertData Convert data
+         * @param makePackages Make packages flag
+         * @param path Path
+         * @param abc ABC file
+         * @param isStatic Is static flag
+         * @param exportMode Export mode
+         * @param scriptIndex Script index
+         * @param classIndex Class index
+         * @param writer Writer
+         * @param fullyQualifiedNames Fully qualified names
+         * @param traitIndex Trait index
+         * @param parallel Parallel flag
+         * @param scopeStack Scope stack
+         */
         public TraitConvertTask(AbcIndexing abcIndex, Trait trait, Trait parent, ConvertData convertData, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, int traitIndex, boolean parallel, ScopeStack scopeStack) {
             this.trait = trait;
             this.parent = parent;
@@ -156,6 +266,11 @@ public class Traits implements Cloneable, Serializable {
             this.scopeStack = scopeStack;
         }
 
+        /**
+         * Calls the task.
+         * @return Null
+         * @throws InterruptedException
+         */
         @Override
         public Void call() throws InterruptedException {
             if (makePackages) {
@@ -167,6 +282,27 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * To string.
+     * @param abcIndex ABC indexing
+     * @param traitTypes Trait types
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC file
+     * @param isStatic Is static flag
+     * @param exportMode Export mode
+     * @param makePackages Make packages flag
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel flag
+     * @param ignoredTraitNames Ignored trait names
+     * @param insideInterface Inside interface flag
+     * @return Writer
+     * @throws InterruptedException
+     */
     public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
 
         List<Trait> ordered = new ArrayList<>(traits);
@@ -243,6 +379,24 @@ public class Traits implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * Converts traits.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC file
+     * @param isStatic Is static flag
+     * @param exportMode Export mode
+     * @param makePackages Make packages flag
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel flag
+     * @param scopeStack Scope stack
+     * @throws InterruptedException
+     */
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         if (!parallel || traits.size() < 2) {
             for (int t = 0; t < traits.size(); t++) {
@@ -275,6 +429,10 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Clones the traits.
+     * @return Cloned traits
+     */
     @Override
     public Traits clone() {
         try {
@@ -293,12 +451,33 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Gets dependencies.
+     * @param abcIndex ABC indexing
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static flag
+     * @param customNs Custom namespace
+     * @param abc ABC file
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @throws InterruptedException
+     */
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         for (Trait t : traits) {
             t.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
         }
     }
 
+    /**
+     * Gets method infos.
+     * @param abc ABC file
+     * @param isStatic Is static flag
+     * @param classIndex Class index
+     * @param methodInfos Method infos
+     */
     public void getMethodInfos(ABC abc, boolean isStatic, int classIndex, List<MethodId> methodInfos) {
         for (int t = 0; t < traits.size(); t++) {
             Trait trait = traits.get(t);

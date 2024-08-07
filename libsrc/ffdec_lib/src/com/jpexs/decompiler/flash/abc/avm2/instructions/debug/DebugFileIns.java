@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * debugfile instruction - Set the current file for debugging.
  * @author JPEXS
  */
 public class DebugFileIns extends InstructionDefinition {

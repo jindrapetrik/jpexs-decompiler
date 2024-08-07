@@ -35,7 +35,7 @@ import com.jpexs.helpers.Reference;
 import java.util.List;
 
 /**
- *
+ * getglobalslot instruction - get global slot value.
  * @author JPEXS
  */
 public class GetGlobalSlotIns extends InstructionDefinition {

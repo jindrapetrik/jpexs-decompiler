@@ -28,10 +28,11 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+
 import java.util.List;
 
 /**
- *
+ * convert_b instruction - Convert to boolean.
  * @author JPEXS
  */
 public class ConvertBIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

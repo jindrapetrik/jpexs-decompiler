@@ -20,15 +20,24 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import java.util.List;
 
 /**
- *
+ * Usage detector interface.
  * @author JPEXS
  */
 public interface UsageDetector {
 
-    public void filterUsages(ABC abc, UsagesFilter filter);
-
+    /**
+     * Find usages of a given index.
+     * @param abc ABC file
+     * @param index Index
+     * @return List of usages
+     */
     public List<Usage> findUsages(ABC abc, int index);
 
+    /**
+     * Find all usages of this kind in the ABC file.
+     * @param abc ABC file
+     * @return List of lists of usages
+     */
     public List<List<Usage>> findAllUsage(ABC abc);
 
     public String getKind();

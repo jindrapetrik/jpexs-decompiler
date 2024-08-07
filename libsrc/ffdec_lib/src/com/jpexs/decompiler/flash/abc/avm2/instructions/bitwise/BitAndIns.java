@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitAndAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * bitand instruction - Bitwise AND.
  * @author JPEXS
  */
 public class BitAndIns extends InstructionDefinition {

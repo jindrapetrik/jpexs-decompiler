@@ -24,7 +24,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Get super object.
  * @author JPEXS
  */
 public class GetSuperAVM2Item extends AVM2Item {

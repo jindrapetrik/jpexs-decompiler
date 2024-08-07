@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushundefined instruction - Push an undefined value onto the stack.
  * @author JPEXS
  */
 public class PushUndefinedIns extends InstructionDefinition {

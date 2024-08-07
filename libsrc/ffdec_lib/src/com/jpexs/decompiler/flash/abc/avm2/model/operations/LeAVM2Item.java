@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Less or equal.
  * @author JPEXS
  */
 public class LeAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {

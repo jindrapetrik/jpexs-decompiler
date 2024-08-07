@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+
 import java.util.List;
 
 /**
- *
+ * coerce_a instruction - Coerce any type.
  * @author JPEXS
  */
 public class CoerceAIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 /**
- *
+ * Assignment.
  * @author JPEXS
  */
 public interface AssignmentAVM2Item {

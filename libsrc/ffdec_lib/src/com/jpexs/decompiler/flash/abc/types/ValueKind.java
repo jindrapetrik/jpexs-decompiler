@@ -21,61 +21,137 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 
 /**
- *
+ * Value kind in ABC file.
  * @author JPEXS
  */
 public class ValueKind {
 
-    public static final int CONSTANT_DecimalOrFloat = 0x02; //decimal or float depending on ABC version
+    /**
+     * Constant kind: Decimal or float depending on ABC version
+     */
+    public static final int CONSTANT_DecimalOrFloat = 0x02;
 
-    public static final int CONSTANT_Int = 0x03; //integer
+    /**
+     * Constant kind: Integer
+     */
+    public static final int CONSTANT_Int = 0x03;
 
-    public static final int CONSTANT_UInt = 0x04; //uinteger
+    /**
+     * Constant kind: Unsigned integer
+     */
+    public static final int CONSTANT_UInt = 0x04;
 
-    public static final int CONSTANT_Double = 0x06; //double
+    /**
+     * Constant kind: Double
+     */
+    public static final int CONSTANT_Double = 0x06;
 
-    public static final int CONSTANT_Utf8 = 0x01; //string
+    /**
+     * Constant kind: String
+     */
+    public static final int CONSTANT_Utf8 = 0x01;
 
-    public static final int CONSTANT_True = 0x0B; //-
+    /**
+     * Constant kind: True
+     */
+    public static final int CONSTANT_True = 0x0B;
 
-    public static final int CONSTANT_False = 0x0A; //-
+    /**
+     * Constant kind: False
+     */
+    public static final int CONSTANT_False = 0x0A;
 
-    public static final int CONSTANT_Null = 0x0C; //-
+    /**
+     * Constant kind: Null
+     */
+    public static final int CONSTANT_Null = 0x0C;
 
-    public static final int CONSTANT_Undefined = 0x00; //-
+    /**
+     * Constant kind: Undefined
+     */
+    public static final int CONSTANT_Undefined = 0x00;
 
-    public static final int CONSTANT_Namespace = 0x08; //namespace
+    /**
+     * Constant kind: Namespace
+     */
+    public static final int CONSTANT_Namespace = 0x08;
 
-    public static final int CONSTANT_PackageNamespace = 0x16; //namespace
+    /**
+     * Constant kind: Package namespace
+     */
+    public static final int CONSTANT_PackageNamespace = 0x16;
 
-    public static final int CONSTANT_PackageInternalNs = 0x17; //namespace
+    /**
+     * Constant kind: Package internal namespace
+     */
+    public static final int CONSTANT_PackageInternalNs = 0x17;
 
-    public static final int CONSTANT_ProtectedNamespace = 0x18; //namespace
+    /**
+     * Constant kind: Protected namespace
+     */
+    public static final int CONSTANT_ProtectedNamespace = 0x18;
 
-    public static final int CONSTANT_ExplicitNamespace = 0x19; //namespace
+    /**
+     * Constant kind: Explicit namespace
+     */
+    public static final int CONSTANT_ExplicitNamespace = 0x19;
 
-    public static final int CONSTANT_StaticProtectedNs = 0x1A; //namespace
+    /**
+     * Constant kind: Static protected namespace
+     */
+    public static final int CONSTANT_StaticProtectedNs = 0x1A;
 
-    public static final int CONSTANT_PrivateNs = 0x05; //namespace
+    /**
+     * Constant kind: Private namespace
+     */
+    public static final int CONSTANT_PrivateNs = 0x05;
 
-    public static final int CONSTANT_Float4 = 0x1E; //float4
+    /**
+     * Constant kind: Float4
+     */
+    public static final int CONSTANT_Float4 = 0x1E;
 
-    private static final int[] optionalKinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05, 0x1E};
+    /**
+     * Kinds
+     */
+    private static final int[] kinds = new int[]{0x03, 0x04, 0x06, 0x02, 0x01, 0x0B, 0x0A, 0x0C, 0x00, 0x08, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x05, 0x1E};
 
-    private static final String[] optionalKindNames = new String[]{"Int", "UInt", "Double", "Decimal/Float", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNamespace", "Float4"};
+    /**
+     * Kind names
+     */
+    private static final String[] kindNames = new String[]{"Int", "UInt", "Double", "Decimal/Float", "Utf8", "True", "False", "Null", "Undefined", "Namespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs", "PrivateNamespace", "Float4"};
 
+    /**
+     * Value index
+     */
     public int value_index;
 
+    /**
+     * Value kind
+     */
     public int value_kind;
 
+    /**
+     * Constructs new value kind
+     */
     public ValueKind() {
     }
 
+    /**
+     * Constructs new value kind
+     * @param value_index Value index
+     * @param value_kind Value kind
+     */
     public ValueKind(int value_index, int value_kind) {
         this.value_index = value_index;
         this.value_kind = value_kind;
     }
 
+    /**
+     * Convert namespace kind to value kind
+     * @param nsKind Namespace kind
+     * @return Value kind
+     */
     public static int nsKindToValueKind(int nsKind) {
         switch (nsKind) {
             case Namespace.KIND_EXPLICIT:
@@ -96,6 +172,10 @@ public class ValueKind {
         return 0;
     }
 
+    /**
+     * Check if value is namespace
+     * @return True if value is namespace
+     */
     public boolean isNamespace() {
         switch (value_kind) {
             case CONSTANT_Namespace:
@@ -110,14 +190,19 @@ public class ValueKind {
         }
     }
 
+
+    /**
+     * Convert value kind to string
+     * @return String representation of value kind
+     */
     @Override
     public String toString() {
         String s = "";
         s += value_index + ":";
         boolean found = false;
-        for (int i = 0; i < optionalKinds.length; i++) {
-            if (optionalKinds[i] == value_kind) {
-                s += optionalKindNames[i];
+        for (int i = 0; i < kinds.length; i++) {
+            if (kinds[i] == value_kind) {
+                s += kindNames[i];
                 found = true;
                 break;
             }
@@ -128,6 +213,11 @@ public class ValueKind {
         return s;
     }
 
+    /**
+     * Convert value kind to string
+     * @param abc ABC file
+     * @return String representation of value kind
+     */
     public String toString(ABC abc) {
         String ret = "?";
         switch (value_kind) {
@@ -181,6 +271,11 @@ public class ValueKind {
         return ret;
     }
 
+    /**
+     * Convert value kind to P-code string
+     * @param abc ABC file
+     * @return P-code string representation of value kind
+     */
     public String toASMString(ABC abc) {
         String ret = "?";
         switch (value_kind) {

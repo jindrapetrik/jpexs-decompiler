@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Check if an object is an instance of a class.
  * @author JPEXS
  */
 public class InstanceOfAVM2Item extends BinaryOpItem {

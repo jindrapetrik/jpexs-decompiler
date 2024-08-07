@@ -28,11 +28,12 @@ import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callproplex instruction - Call a property, lexically.
  * @author JPEXS
  */
 public class CallPropLexIns extends CallPropertyIns {

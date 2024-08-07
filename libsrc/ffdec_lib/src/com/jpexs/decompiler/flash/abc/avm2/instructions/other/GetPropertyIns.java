@@ -53,7 +53,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * getproperty instruction - get property of object.
  * @author JPEXS
  */
 public class GetPropertyIns extends InstructionDefinition {

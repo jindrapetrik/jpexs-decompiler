@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Try block.
  * @author JPEXS
  */
 public class TryAVM2Item extends AVM2Item implements Block {

@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * li8 instruction - Load 8-bit integer from domain memory.
  * @author JPEXS
  */
 public class Li8Ins extends InstructionDefinition implements AlchemyTypeIns {

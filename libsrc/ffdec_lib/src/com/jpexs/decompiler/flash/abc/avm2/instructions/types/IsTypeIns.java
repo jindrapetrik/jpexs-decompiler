@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * istype instruction - Check if object is instance of type.
  * @author JPEXS
  */
 public class IsTypeIns extends InstructionDefinition {

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushnamespace instruction - Push a namespace onto the stack.
  * @author JPEXS
  */
 public class PushNamespaceIns extends InstructionDefinition {

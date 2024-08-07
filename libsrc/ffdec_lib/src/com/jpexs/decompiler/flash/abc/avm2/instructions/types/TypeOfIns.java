@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * typeof instruction - Get type of object.
  * @author JPEXS
  */
 public class TypeOfIns extends InstructionDefinition {

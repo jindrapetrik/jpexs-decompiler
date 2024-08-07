@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy;
 import com.jpexs.decompiler.graph.DottedChain;
 
 /**
- *
+ * Alchemy instruction - for domain memory access.
  * @author JPEXS
  */
 public interface AlchemyTypeIns {

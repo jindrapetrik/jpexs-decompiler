@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushstring instruction - Push a string onto the stack.
  * @author JPEXS
  */
 public class PushStringIns extends InstructionDefinition {

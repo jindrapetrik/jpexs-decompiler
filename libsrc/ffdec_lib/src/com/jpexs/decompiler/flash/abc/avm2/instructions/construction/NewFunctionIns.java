@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * newfunction instruction - Create a new function object.
  * @author JPEXS
  */
 public class NewFunctionIns extends InstructionDefinition {

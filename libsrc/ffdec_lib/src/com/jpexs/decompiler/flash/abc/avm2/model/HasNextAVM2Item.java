@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Determine if the given object has any more properties.
  * @author JPEXS
  */
 public class HasNextAVM2Item extends AVM2Item {

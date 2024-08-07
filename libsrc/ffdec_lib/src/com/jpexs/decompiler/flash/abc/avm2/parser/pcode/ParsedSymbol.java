@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
 /**
- *
+ * AVM2 P-code parser symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lf64 instruction - Load 64-bit float from domain memory.
  * @author JPEXS
  */
 public class Lf64Ins extends InstructionDefinition implements AlchemyTypeIns {

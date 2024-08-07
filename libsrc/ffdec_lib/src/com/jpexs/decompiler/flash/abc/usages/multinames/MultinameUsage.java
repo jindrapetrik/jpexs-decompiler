@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- *
+ * Multiname usage.
  * @author JPEXS
  */
 public abstract class MultinameUsage implements Usage {

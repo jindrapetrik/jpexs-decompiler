@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Right shift.
  * @author JPEXS
  */
 public class RShiftAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {

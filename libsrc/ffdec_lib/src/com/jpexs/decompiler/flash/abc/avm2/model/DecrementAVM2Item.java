@@ -21,11 +21,12 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Decrement value by 1.
  * @author JPEXS
  */
 public class DecrementAVM2Item extends AVM2Item {

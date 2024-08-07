@@ -19,12 +19,20 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.graph.model.BinaryOp;
 
 /**
- *
+ * If condition interface.
  * @author JPEXS
  */
 public interface IfCondition extends BinaryOp {
 
+    /**
+     * Gets if definition opcode.
+     * @return opcode
+     */
     public int getIfDefinition();
 
+    /**
+     * Gets if not definition opcode.
+     * @return opcode
+     */
     public int getIfNotDefinition();
 }

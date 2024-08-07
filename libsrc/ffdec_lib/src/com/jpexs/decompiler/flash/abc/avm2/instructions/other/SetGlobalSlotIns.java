@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * setglobalslot instruction - set global slot value.
  * @author JPEXS
  */
 public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIns {

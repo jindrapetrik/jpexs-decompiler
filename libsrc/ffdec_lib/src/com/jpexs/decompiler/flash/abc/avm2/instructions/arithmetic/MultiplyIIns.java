@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * multiply_i instruction - Multiply two integers.
  * @author JPEXS
  */
 public class MultiplyIIns extends InstructionDefinition {

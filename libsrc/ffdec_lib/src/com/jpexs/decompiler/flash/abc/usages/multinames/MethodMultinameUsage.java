@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import java.util.ArrayList;
 
 /**
- *
+ * Method multiname usage.
  * @author JPEXS
  */
 public abstract class MethodMultinameUsage extends TraitMultinameUsage {

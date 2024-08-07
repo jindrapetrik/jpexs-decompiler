@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifle instruction - if value is less or equal, jump.
  * @author JPEXS
  */
 public class IfLeIns extends InstructionDefinition implements IfTypeIns {

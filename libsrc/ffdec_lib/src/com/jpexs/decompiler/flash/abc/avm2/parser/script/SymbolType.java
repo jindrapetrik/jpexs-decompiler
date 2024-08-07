@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * ActionScript 3 parsed symbol type.
  * @author JPEXS
  */
 public enum SymbolType {

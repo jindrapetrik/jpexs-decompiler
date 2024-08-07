@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * bkptline instruction - break point with line number.
  * @author JPEXS
  */
 public class BkptLineIns extends InstructionDefinition {

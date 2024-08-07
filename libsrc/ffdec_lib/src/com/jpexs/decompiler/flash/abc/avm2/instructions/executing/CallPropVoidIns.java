@@ -29,11 +29,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callpropvoid instruction - Call a property, ignore return value.
  * @author JPEXS
  */
 public class CallPropVoidIns extends InstructionDefinition {

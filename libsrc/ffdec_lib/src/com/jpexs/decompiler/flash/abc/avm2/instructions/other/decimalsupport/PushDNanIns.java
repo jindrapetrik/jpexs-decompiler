@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * pushdnan instruction - push a decimal NaN.
  * @author JPEXS
  */
 public class PushDNanIns extends InstructionDefinition {

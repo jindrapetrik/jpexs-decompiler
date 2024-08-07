@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Modulo.
  * @author JPEXS
  */
 public class ModuloAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {

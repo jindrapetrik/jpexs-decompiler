@@ -34,7 +34,7 @@ import com.jpexs.helpers.Reference;
 import java.util.List;
 
 /**
- *
+ * getslot instruction - get slot value.
  * @author JPEXS
  */
 public class GetSlotIns extends InstructionDefinition {

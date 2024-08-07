@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * kill instruction - kill local register.
  * @author JPEXS
  */
 public class KillIns extends InstructionDefinition {

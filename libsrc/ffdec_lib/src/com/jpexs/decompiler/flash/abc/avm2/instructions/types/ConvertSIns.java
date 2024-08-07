@@ -28,10 +28,11 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+
 import java.util.List;
 
 /**
- *
+ * convert_s instruction - Convert to string.
  * @author JPEXS
  */
 public class ConvertSIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

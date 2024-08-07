@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Return value from a function.
  * @author JPEXS
  */
 public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {

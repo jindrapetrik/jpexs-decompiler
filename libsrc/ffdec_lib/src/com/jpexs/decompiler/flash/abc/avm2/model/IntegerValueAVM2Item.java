@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Integer value.
  * @author JPEXS
  */
 public class IntegerValueAVM2Item extends NumberValueAVM2Item implements IntegerValueTypeItem {

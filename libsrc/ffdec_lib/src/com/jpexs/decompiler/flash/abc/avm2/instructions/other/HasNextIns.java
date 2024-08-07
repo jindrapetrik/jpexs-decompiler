@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * hasnext instruction - determine if the given object has any more properties.
  * @author JPEXS
  */
 public class HasNextIns extends InstructionDefinition {

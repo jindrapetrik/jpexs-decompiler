@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * XML filter.
  * @author JPEXS
  */
 public class XMLFilterAVM2Item extends AVM2Item {

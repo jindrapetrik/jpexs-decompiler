@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * nop instruction - no operation.
  * @author JPEXS
  */
 public class NopIns extends InstructionDefinition {

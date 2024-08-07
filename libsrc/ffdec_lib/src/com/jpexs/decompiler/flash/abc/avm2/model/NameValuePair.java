@@ -25,7 +25,8 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import java.util.Objects;
 
 /**
- *
+ * Name-value pair.
+ * (For usage in objects)
  * @author JPEXS
  */
 public class NameValuePair extends AVM2Item {

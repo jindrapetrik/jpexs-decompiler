@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushshort instruction - Push a short value onto the stack.
  * @author JPEXS
  */
 public class PushShortIns extends InstructionDefinition implements PushIntegerTypeIns {

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Coerce or convert type instruction interface.
  * @author JPEXS
  */
 public interface CoerceOrConvertTypeIns {

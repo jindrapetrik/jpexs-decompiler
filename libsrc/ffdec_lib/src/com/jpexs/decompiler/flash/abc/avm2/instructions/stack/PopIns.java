@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.model.AnyItem;
 import java.util.List;
 
 /**
- *
+ * pop instruction - Pop the top value from the stack.
  * @author JPEXS
  */
 public class PopIns extends InstructionDefinition {

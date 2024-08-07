@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 
 /**
- *
+ * Method name multiname usage.
  * @author JPEXS
  */
 public class MethodNameMultinameUsage extends MethodMultinameUsage implements DefinitionUsage {

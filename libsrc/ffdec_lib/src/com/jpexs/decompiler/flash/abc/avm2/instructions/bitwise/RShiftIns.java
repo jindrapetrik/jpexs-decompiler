@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * rshift instruction - Bitwise right shift.
  * @author JPEXS
  */
 public class RShiftIns extends InstructionDefinition {

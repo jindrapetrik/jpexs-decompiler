@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+/**
+ * Float4 value.
+ * @author JPEXS
+ */
 public class Float4 {
 
     public float[] values = new float[4];

@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushnull instruction - Push a null value onto the stack.
  * @author JPEXS
  */
 public class PushNullIns extends InstructionDefinition {

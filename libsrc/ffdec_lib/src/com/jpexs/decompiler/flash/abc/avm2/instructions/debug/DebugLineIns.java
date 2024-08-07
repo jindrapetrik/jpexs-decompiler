@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * debugline instruction - Debug line number information.
  * @author JPEXS
  */
 public class DebugLineIns extends InstructionDefinition {

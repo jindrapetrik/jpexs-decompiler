@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * ABC Method info P-code parser.
  * @author JPEXS
  */
 public class MethodInfoParser {

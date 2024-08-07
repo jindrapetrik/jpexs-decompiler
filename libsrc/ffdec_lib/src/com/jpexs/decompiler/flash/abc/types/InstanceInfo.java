@@ -38,51 +38,111 @@ import com.jpexs.helpers.Helper;
 import java.util.List;
 
 /**
- *
+ * Instance info.
  * @author JPEXS
  */
 public class InstanceInfo {
 
+    /**
+     * Name index - multiname.
+     */
     public int name_index;
 
+    /**
+     * Super index - multiname.
+     */
     public int super_index;
 
-    public int flags; // 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs, 16 = non nullable
+    /**
+     * Flags.
+     * 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs, 16 = non nullable
+     */
+    public int flags;
 
-    public int protectedNS; //if flags & 8
+    /**
+     * Protected namespace.
+     * if flags & 8
+     */
+    public int protectedNS;
 
+    /**
+     * Interfaces.
+     */
     public int[] interfaces;
 
-    public int iinit_index; // MethodInfo - constructor
+    /**
+     * Instance initializer (constructor) - method index.
+     */
+    public int iinit_index;
 
+    /**
+     * Instance traits.
+     */
     public Traits instance_traits;
 
-    public static final int CLASS_SEALED = 1; //not dynamic
+    /**
+     * Not dynamic
+     */
+    public static final int CLASS_SEALED = 1; //
 
+    /**
+     * Final class
+     */
     public static final int CLASS_FINAL = 2;
 
+    /**
+     * Interface
+     */
     public static final int CLASS_INTERFACE = 4;
 
+    /**
+     * Has protected namespace
+     */
     public static final int CLASS_PROTECTEDNS = 8;
 
-    public static final int CLASS_NON_NULLABLE = 16; //This is somehow used in Flex, propably through annotations or something with Vector datatype (?)
+    /**
+     * Unknown.
+     * This is somehow used in Flex, probably through annotations or something with Vector datatype (?)
+     * TODO: Investigate this
+     */
+    public static final int CLASS_NON_NULLABLE = 16;
 
+    /**
+     * True if class is deleted.
+     */
     @Internal
     public boolean deleted;
 
+    /**
+     * Constructs a new InstanceInfo.
+     */
     public InstanceInfo() {
         instance_traits = new Traits();
     }
 
+    /**
+     * Constructs a new InstanceInfo.
+     * @param traits Instance traits
+     */
     public InstanceInfo(Traits traits) {
         instance_traits = traits;
     }
 
+    /**
+     * To string.
+     * @return String
+     */
     @Override
     public String toString() {
         return "name_index=" + name_index + " super_index=" + super_index + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString();
     }
 
+    /**
+     * To string.
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return String
+     */
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String supIndexStr = "[nothing]";
         if (super_index > 0) {
@@ -91,6 +151,16 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
+    /**
+     * Gets class header string.
+     * @param assetsDir Assets directory
+     * @param writer Writer
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @param allowPrivate Allow private
+     * @param allowEmbed Allow embed
+     * @return Writer
+     */
     public GraphTextWriter getClassHeaderStr(String assetsDir, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
 
         final String ASSETS_DIR = assetsDir; // "/_assets/";
@@ -246,22 +316,43 @@ public class InstanceInfo {
         return writer;
     }
 
+    /**
+     * Gets name.
+     * @param constants Constants
+     * @return Multiname
+     */
     public Multiname getName(AVM2ConstantPool constants) {
         return constants.getMultiname(name_index);
     }
 
+    /**
+     * Checks if class is interface.
+     * @return True if class is interface
+     */
     public boolean isInterface() {
         return ((flags & CLASS_INTERFACE) == CLASS_INTERFACE);
     }
 
+    /**
+     * Checks if class is dynamic.
+     * @return True if class is dynamic
+     */
     public boolean isDynamic() {
         return (flags & CLASS_SEALED) == 0;
     }
 
+    /**
+     * Checks if class is final.
+     * @return True if class is final
+     */
     public boolean isFinal() {
         return (flags & CLASS_FINAL) == CLASS_FINAL;
     }
 
+    /**
+     * Checks if class is nullable.
+     * @return True if class is nullable
+     */
     public boolean isNullable() {
         return (flags & CLASS_NON_NULLABLE) != CLASS_NON_NULLABLE;
     }

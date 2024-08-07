@@ -27,11 +27,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callstatic instruction - Call a method by method index.
  * @author JPEXS
  */
 public class CallStaticIns extends InstructionDefinition {

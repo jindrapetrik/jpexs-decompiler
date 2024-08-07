@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.methodinfoparser;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Method info parse exception.
  * @author JPEXS
  */
 public class MethodInfoParseException extends ParseException {

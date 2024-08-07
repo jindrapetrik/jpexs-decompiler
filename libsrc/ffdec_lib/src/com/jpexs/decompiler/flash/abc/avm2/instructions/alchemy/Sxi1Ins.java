@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * sxi1 instruction - Sign extend 1-bit integer to 32-bit integer.
  * @author JPEXS
  */
 public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 
 /**
- *
+ * Namespace.
  * @author JPEXS
  */
 public class NameSpaceAVM2Item extends AVM2Item {

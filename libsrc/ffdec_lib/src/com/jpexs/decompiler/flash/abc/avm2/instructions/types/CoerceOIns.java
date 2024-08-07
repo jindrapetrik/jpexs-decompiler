@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * coerce_o instruction - Coerce to object type.
  * @author JPEXS
  */
 public class CoerceOIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

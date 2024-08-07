@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * initproperty instruction - initialize property.
  * @author JPEXS
  */
 public class InitPropertyIns extends InstructionDefinition {

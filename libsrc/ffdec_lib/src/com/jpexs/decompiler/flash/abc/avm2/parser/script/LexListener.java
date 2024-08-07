@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 /**
- *
+ * Listener for lexical analysis.
  * @author JPEXS
  */
 public interface LexListener {

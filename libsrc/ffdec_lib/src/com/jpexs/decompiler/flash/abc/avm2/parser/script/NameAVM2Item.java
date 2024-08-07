@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Name.
  * @author JPEXS
  */
 public class NameAVM2Item extends AssignableAVM2Item {

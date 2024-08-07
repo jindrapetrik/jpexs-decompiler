@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * New activation.
  * @author JPEXS
  */
 public class NewActivationAVM2Item extends AVM2Item {

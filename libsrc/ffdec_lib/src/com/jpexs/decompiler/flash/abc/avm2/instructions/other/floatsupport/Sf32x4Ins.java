@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * sf32x4 - Store a float4 value into memory.
  * @author JPEXS
  */
 public class Sf32x4Ins extends InstructionDefinition {

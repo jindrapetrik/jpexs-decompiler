@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushuint instruction - Push an unsigned integer onto the stack.
  * @author JPEXS
  */
 public class PushUIntIns extends InstructionDefinition implements PushIntegerTypeIns {

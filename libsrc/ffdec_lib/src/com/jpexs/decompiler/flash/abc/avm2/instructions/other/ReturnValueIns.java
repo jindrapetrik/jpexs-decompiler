@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * returnvalue instruction - return value from function.
  * @author JPEXS
  */
 public class ReturnValueIns extends InstructionDefinition {

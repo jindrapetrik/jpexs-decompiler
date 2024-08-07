@@ -31,14 +31,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Method info in ABC file.
  * @author JPEXS
  */
 public class MethodInfo {
 
+    /**
+     * If this method is deleted
+     */
     @Internal
     public boolean deleted;
 
+    /**
+     * Deletes this method
+     * @param abc ABC file
+     * @param d True if method should be deleted, false if it should be undeleted
+     */
     public void delete(ABC abc, boolean d) {
         this.deleted = d;
 

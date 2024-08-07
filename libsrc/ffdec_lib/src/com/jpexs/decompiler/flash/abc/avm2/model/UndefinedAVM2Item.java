@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Undefined value.
  * @author JPEXS
  */
 public class UndefinedAVM2Item extends AVM2Item implements SimpleValue {

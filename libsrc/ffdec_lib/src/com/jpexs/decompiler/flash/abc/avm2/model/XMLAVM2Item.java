@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * XML.
  * @author JPEXS
  */
 public class XMLAVM2Item extends AVM2Item {

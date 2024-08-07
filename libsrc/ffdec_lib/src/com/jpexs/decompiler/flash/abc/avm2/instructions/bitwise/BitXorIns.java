@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitXorAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * bitxor instruction - Bitwise XOR.
  * @author JPEXS
  */
 public class BitXorIns extends InstructionDefinition {

@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * li32 instruction - Load 32-bit integer from domain memory.
  * @author JPEXS
  */
 public class Li32Ins extends InstructionDefinition implements AlchemyTypeIns {

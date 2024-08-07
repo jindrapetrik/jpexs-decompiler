@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 /**
- *
+ * Decimal value.
  * @author JPEXS
  */
 public class Decimal {

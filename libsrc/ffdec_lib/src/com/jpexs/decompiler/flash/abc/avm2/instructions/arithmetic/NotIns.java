@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * not instruction - Negate a boolean.
  * @author JPEXS
  */
 public class NotIns extends InstructionDefinition {

@@ -33,12 +33,13 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * AVM2 item base class.
  * @author JPEXS
  */
 public abstract class AVM2Item extends GraphTargetItem {

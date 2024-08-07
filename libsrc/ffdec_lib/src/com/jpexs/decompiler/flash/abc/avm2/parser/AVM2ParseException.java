@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Parse exception for AVM2 parser.
  * @author JPEXS
  */
 public class AVM2ParseException extends ParseException {

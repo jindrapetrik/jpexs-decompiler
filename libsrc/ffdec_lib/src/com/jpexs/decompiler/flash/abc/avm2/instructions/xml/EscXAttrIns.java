@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * esc_xattr instruction - Escape XML attribute.
  * @author JPEXS
  */
 public class EscXAttrIns extends InstructionDefinition {

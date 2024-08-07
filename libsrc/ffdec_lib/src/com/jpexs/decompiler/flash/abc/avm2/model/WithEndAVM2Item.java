@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * With end marker.
  * @author JPEXS
  */
 public class WithEndAVM2Item extends AVM2Item {

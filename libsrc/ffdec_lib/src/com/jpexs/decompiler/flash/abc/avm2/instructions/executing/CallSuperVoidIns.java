@@ -27,11 +27,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * callsuper instruction - Call a super method, ignoring the return value.
  * @author JPEXS
  */
 public class CallSuperVoidIns extends InstructionDefinition {

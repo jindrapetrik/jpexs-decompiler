@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * nextname instruction - get the next name of an object.
  * @author JPEXS
  */
 public class NextNameIns extends InstructionDefinition {

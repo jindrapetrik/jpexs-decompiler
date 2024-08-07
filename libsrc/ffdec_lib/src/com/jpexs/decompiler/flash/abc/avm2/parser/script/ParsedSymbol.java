@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 /**
- *
+ * ActionScript 3 parsed symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

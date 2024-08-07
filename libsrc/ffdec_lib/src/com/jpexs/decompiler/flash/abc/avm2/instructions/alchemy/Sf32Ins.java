@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * sf32 instruction - Store 32-bit float to domain memory.
  * @author JPEXS
  */
 public class Sf32Ins extends InstructionDefinition implements AlchemyTypeIns {

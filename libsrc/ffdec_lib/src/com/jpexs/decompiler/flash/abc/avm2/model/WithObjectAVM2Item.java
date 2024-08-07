@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * With object.
  * @author JPEXS
  */
 public class WithObjectAVM2Item extends AVM2Item {

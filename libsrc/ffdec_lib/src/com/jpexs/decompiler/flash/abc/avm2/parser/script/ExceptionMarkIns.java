@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * Exception mark instruction.
  * @author JPEXS
  */
 public class ExceptionMarkIns extends InstructionDefinition {

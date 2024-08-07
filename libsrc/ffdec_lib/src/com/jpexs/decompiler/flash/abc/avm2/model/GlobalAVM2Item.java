@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 
 /**
- *
+ * Global object.
  * @author JPEXS
  */
 public class GlobalAVM2Item extends AVM2Item {

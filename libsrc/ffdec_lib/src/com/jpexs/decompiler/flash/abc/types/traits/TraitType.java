@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 /**
- *
+ * Trait type.
  * @author JPEXS
  */
 public enum TraitType {
@@ -27,6 +27,11 @@ public enum TraitType {
     INITIALIZER,
     SCRIPT_INITIALIZER;
 
+    /**
+     * Gets trait type for trait.
+     * @param t Trait
+     * @return Trait type
+     */
     public static TraitType getTypeForTrait(Trait t) {
         if (t instanceof TraitMethodGetterSetter) {
             return METHOD;

@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * New function.
  * @author JPEXS
  */
 public class NewFunctionAVM2Item extends AVM2Item {

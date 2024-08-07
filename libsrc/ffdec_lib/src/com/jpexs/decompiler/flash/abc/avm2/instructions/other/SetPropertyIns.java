@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * setproperty instruction - set property value.
  * @author JPEXS
  */
 public class SetPropertyIns extends InstructionDefinition implements SetTypeIns {

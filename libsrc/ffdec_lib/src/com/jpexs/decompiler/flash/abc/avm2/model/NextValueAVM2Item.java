@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get the value of the next property when iterating over an object.
  * @author JPEXS
  */
 public class NextValueAVM2Item extends AVM2Item {

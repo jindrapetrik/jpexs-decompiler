@@ -23,7 +23,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 
 /**
- *
+ * Trait multiname usage.
  * @author JPEXS
  */
 public abstract class TraitMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {

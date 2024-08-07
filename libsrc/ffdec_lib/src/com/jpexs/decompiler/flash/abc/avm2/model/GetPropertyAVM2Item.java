@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Get property.
  * @author JPEXS
  */
 public class GetPropertyAVM2Item extends AVM2Item {

@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * negate instruction - Negate a number.
  * @author JPEXS
  */
 public class NegateIns extends InstructionDefinition {

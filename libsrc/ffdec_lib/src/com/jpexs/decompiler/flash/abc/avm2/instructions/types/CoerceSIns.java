@@ -30,10 +30,11 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+
 import java.util.List;
 
 /**
- *
+ * coerce_s instruction - Coerce value to string.
  * @author JPEXS
  */
 public class CoerceSIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

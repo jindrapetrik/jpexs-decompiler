@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * si32 instruction - Store 32-bit integer to domain memory.
  * @author JPEXS
  */
 public class Si32Ins extends InstructionDefinition implements AlchemyTypeIns {

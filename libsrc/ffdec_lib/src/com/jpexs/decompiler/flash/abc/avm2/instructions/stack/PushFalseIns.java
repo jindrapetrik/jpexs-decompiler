@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.model.FalseItem;
 import java.util.List;
 
 /**
- *
+ * pushfalse instruction - Push a false value onto the stack.
  * @author JPEXS
  */
 public class PushFalseIns extends InstructionDefinition {

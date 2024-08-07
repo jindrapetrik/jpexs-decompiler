@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Lexical analyzer bufferer. It stores all parsed symbols and can push them back.
  * @author JPEXS
  */
 public class LexBufferer implements LexListener {

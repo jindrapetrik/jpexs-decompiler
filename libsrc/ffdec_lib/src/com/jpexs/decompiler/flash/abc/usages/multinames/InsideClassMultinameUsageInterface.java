@@ -19,14 +19,26 @@ package com.jpexs.decompiler.flash.abc.usages.multinames;
 import com.jpexs.decompiler.flash.abc.ABC;
 
 /**
- *
+ * Inside class multiname usage interface.
  * @author JPEXS
  */
 public interface InsideClassMultinameUsageInterface {
 
+    /**
+     * Gets the script index.
+     * @return Script index
+     */
     public int getScriptIndex();
 
+    /**
+     * Gets the class index.
+     * @return Class index
+     */
     public int getClassIndex();
 
+    /**
+     * Gets the ABC.
+     * @return ABC
+     */
     public ABC getAbc();
 }

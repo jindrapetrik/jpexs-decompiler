@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * pushdecimal instruction - push a decimal.
  * @author JPEXS
  */
 public class PushDecimalIns extends InstructionDefinition {

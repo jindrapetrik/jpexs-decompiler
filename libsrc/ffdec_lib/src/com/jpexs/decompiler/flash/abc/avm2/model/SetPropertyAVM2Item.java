@@ -34,7 +34,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Set property value.
  * @author JPEXS
  */
 public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {

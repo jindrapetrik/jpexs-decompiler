@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.List;
 
 /**
- *
+ * pushtrue instruction - Push a true value onto the stack.
  * @author JPEXS
  */
 public class PushTrueIns extends InstructionDefinition {

@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * istypelate instruction - Check if object is instance of type, with a type determined at runtime.
  * @author JPEXS
  */
 public class IsTypeLateIns extends InstructionDefinition {

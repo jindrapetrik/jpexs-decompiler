@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * in instruction - determine if the given object has the given property.
  * @author JPEXS
  */
 public class InIns extends InstructionDefinition {

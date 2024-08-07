@@ -20,11 +20,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Const.
  * @author JPEXS
  */
 public class ConstAVM2Item extends AVM2Item {

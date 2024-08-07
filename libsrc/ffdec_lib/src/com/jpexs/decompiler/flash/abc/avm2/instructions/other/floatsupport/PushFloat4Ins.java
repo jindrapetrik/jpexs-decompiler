@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * pushfloat4 - Push a float4 constant onto the stack.
  * @author JPEXS
  */
 public class PushFloat4Ins extends InstructionDefinition {
