@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- *
+ * Base class for image tags.
  * @author JPEXS
  */
 public abstract class ImageTag extends DrawableTag {

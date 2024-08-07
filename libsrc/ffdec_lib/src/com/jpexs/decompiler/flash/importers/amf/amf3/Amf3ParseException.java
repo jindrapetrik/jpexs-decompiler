@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.importers.amf.amf3;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Exception thrown when AMF3 parsing fails.
  * @author JPEXS
  */
 public class Amf3ParseException extends ParseException {

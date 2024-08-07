@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Dynamic text model.
  * @author JPEXS
  */
 public class DynamicTextModel {

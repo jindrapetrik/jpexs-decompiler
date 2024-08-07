@@ -57,7 +57,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Dual PDF and image graphics 2D implementation.
+ * Applies all drawing operations to both image and PDF graphics.
  * @author JPEXS
  */
 public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, GraphicsGroupable, GraphicsTextDrawable {

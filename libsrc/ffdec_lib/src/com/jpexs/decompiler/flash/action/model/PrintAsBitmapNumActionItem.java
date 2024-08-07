@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Print as bitmap num.
  * @author JPEXS
  */
 public class PrintAsBitmapNumActionItem extends ActionItem {

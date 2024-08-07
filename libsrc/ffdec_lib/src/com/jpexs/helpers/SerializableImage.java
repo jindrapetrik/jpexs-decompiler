@@ -36,7 +36,7 @@ import java.io.Serializable;
 import java.util.Hashtable;
 
 /**
- *
+ * Serializable image.
  * @author JPEXS
  */
 public class SerializableImage implements Serializable {

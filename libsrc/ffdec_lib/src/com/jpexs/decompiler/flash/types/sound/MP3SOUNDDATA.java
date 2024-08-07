@@ -28,7 +28,7 @@ import javazoom.jl.decoder.MarkingBufferedInputStream;
 import javazoom.jl.decoder.MarkingPushbackInputStream;
 
 /**
- *
+ * MP3 sound data with frames.
  * @author JPEXS
  */
 public class MP3SOUNDDATA {

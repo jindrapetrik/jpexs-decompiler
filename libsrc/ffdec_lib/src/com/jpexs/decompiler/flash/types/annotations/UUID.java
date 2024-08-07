@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * It's an UUID.
+ * It's a UUID.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)

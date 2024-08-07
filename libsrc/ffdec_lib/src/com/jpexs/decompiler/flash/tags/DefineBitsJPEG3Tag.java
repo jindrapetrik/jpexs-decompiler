@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
-import java.awt.Graphics;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
@@ -43,7 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineBitsJPEG3 tag - Contains a JPEG image with alpha channel. (optionally a PNG or GIF without the separate alpha channel)
  * @author JPEXS
  */
 @SWFVersion(from = 3) //Note: GIF and PNG since version

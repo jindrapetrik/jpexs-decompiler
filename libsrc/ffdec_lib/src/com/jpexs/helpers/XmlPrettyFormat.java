@@ -32,7 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 /**
- *
+ * Pretty formats XML.
  * @author JPEXS
  */
 public class XmlPrettyFormat {

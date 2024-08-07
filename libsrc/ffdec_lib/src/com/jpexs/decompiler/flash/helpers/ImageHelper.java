@@ -41,7 +41,7 @@ import org.monte.media.jpeg.CMYKJPEGImageReader;
 import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
 
 /**
- *
+ * Image helper.
  * @author JPEXS
  */
 public class ImageHelper {

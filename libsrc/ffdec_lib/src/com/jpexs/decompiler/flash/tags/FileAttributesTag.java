@@ -27,7 +27,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * FileAttributes tag - attributes of the SWF file.
  * @author JPEXS
  */
 @SWFVersion(from = 8)

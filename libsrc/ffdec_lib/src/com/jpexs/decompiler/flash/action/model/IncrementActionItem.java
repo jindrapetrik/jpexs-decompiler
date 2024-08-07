@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Increment.
  * @author JPEXS
  */
 public class IncrementActionItem extends ActionItem {

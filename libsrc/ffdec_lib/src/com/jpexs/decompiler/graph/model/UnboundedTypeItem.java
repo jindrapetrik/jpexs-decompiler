@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Unbounded type.
  * @author JPEXS
  */
 public class UnboundedTypeItem extends AVM2Item {

@@ -87,7 +87,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * SVG importer.
  * @author JPEXS
  */
 public class SvgImporter {

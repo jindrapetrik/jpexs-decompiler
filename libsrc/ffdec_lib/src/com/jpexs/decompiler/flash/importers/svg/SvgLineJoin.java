@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG line join.
  * @author JPEXS
  */
 enum SvgLineJoin {

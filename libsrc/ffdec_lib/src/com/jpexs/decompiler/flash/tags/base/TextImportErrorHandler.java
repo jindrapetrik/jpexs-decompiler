@@ -17,12 +17,24 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * Error handler for text import.
  * @author JPEXS
  */
 public abstract class TextImportErrorHandler {
 
+    /**
+     * Handle error.
+     * @param textTag Text tag
+     * @return True if error was handled, false otherwise
+     */
     public abstract boolean handle(TextTag textTag);
 
+    /**
+     * Handle error.
+     * @param textTag Text tag
+     * @param message Error message
+     * @param line Line number
+     * @return True if error was handled, false otherwise
+     */
     public abstract boolean handle(TextTag textTag, String message, long line);
 }

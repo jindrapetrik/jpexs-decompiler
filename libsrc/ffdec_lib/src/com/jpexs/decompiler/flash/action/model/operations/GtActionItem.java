@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Greater.
  * @author JPEXS
  */
 public class GtActionItem extends BinaryOpItem implements LogicalOpItem {

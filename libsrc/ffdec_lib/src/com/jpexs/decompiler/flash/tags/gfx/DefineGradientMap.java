@@ -22,12 +22,13 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * DefineFradientMap tag - gradient map.
  * @author JPEXS
  */
 public class DefineGradientMap extends Tag {

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Paragraph.
  * @author JPEXS
  */
 public class Paragraph {

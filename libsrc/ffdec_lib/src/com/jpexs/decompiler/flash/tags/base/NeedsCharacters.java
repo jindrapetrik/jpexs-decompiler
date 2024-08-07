@@ -20,14 +20,30 @@ import com.jpexs.decompiler.flash.SWF;
 import java.util.Set;
 
 /**
- *
+ * Interface for classes that need another characters.
  * @author JPEXS
  */
 public interface NeedsCharacters {
 
+    /**
+     * Get needed characters.
+     * @param needed Result
+     * @param swf SWF file
+     */
     public void getNeededCharacters(Set<Integer> needed, SWF swf);
 
+    /**
+     * Replace character.
+     * @param oldCharacterId Old character ID
+     * @param newCharacterId New character ID
+     * @return True if character was replaced
+     */
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId);
 
+    /**
+     * Remove character.
+     * @param characterId Character ID
+     * @return True if character was removed
+     */
     public boolean removeCharacter(int characterId);
 }

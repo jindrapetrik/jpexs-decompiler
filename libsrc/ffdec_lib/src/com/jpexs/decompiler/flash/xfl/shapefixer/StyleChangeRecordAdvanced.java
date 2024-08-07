@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 
 /**
- *
+ * Advanced style change record with double precision.
  * @author JPEXS
  */
 public class StyleChangeRecordAdvanced extends ShapeRecordAdvanced {

@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Get variable.
  * @author JPEXS
  */
 public class GetVariableActionItem extends ActionItem {

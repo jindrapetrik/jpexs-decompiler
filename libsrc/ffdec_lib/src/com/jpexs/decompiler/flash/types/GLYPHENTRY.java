@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- *
+ * Glyph entry.
  * @author JPEXS
  */
 public class GLYPHENTRY implements Serializable {

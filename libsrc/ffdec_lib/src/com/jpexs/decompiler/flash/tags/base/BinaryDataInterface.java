@@ -18,11 +18,11 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.packers.Packer;
-import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
 
 /**
- *
+ * Interface for binary data objects.
+ * It is a DefineBinaryData tag and its subdata.
  * @author JPEXS
  */
 public interface BinaryDataInterface extends Exportable {

@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Bitmap filter
+ * Base class for filters.
  *
  * @author JPEXS
  */

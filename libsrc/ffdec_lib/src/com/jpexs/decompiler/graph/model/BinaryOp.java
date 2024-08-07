@@ -18,10 +18,12 @@ package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+
 import java.util.List;
 
 /**
- *
+ * Binary operation interface.
+ * Operation on two operands.
  * @author JPEXS
  */
 public interface BinaryOp {

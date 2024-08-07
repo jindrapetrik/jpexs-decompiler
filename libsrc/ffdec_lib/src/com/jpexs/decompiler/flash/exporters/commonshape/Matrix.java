@@ -21,7 +21,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
- *
+ * Matrix class, used in shape export.
  * @author JPEXS
  */
 public final class Matrix implements Cloneable {

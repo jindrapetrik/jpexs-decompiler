@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 /**
- *
+ * Point class, used in shape export.
  * @author JPEXS
  */
 public class Point {

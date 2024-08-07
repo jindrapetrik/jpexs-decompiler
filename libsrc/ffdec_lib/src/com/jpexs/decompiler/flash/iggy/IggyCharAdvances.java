@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Char advances.
  * @author JPEXS
  */
 public class IggyCharAdvances implements StructureInterface {

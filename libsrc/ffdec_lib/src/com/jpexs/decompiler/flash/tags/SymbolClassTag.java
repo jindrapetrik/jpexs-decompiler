@@ -34,7 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * SymbolClass tag - associates class names with character IDs.
+ * CharacterId 0 is the main class.
  * @author JPEXS
  */
 @SWFVersion(from = 9)

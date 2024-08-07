@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
 
 /**
- *
+ * Parenthesis.
  * @author JPEXS
  */
 public class ParenthesisItem extends GraphTargetItem {

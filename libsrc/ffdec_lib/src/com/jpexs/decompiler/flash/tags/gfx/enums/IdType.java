@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx.enums;
 import java.lang.reflect.Field;
 
 /**
- *
+ * Type of Id.
  * @author JPEXS
  */
 public class IdType {

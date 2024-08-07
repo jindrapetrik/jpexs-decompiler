@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Enumerated value. Helper item for loop detection.
  * @author JPEXS
  */
 public class EnumeratedValueActionItem extends ActionItem implements BranchStackResistant {

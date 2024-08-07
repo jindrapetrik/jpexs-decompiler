@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * For loop.
  * @author JPEXS
  */
 public class ForItem extends LoopItem implements Block {

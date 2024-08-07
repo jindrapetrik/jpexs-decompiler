@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Toggle high quality.
  * @author JPEXS
  */
 public class ToggleHighQualityActionItem extends ActionItem {

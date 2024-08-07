@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Check if object is instance of class.
  * @author JPEXS
  */
 public class InstanceOfActionItem extends BinaryOpItem {

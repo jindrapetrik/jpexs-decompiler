@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- *
+ * Index builder.
  * @author JPEXS
  */
 public class IggyIndexBuilder {

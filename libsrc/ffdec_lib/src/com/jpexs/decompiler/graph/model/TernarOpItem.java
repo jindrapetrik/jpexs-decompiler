@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Ternar operator.
  * @author JPEXS
  */
 public class TernarOpItem extends GraphTargetItem {

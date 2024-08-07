@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Instructs Flash Player to perform a list of actions when the current frame is
+ * DoAction tag - Instructs Flash Player to perform a list of actions when the current frame is
  * complete.
  *
  * @author JPEXS

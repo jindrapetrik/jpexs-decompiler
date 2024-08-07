@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- * Represents 15-bit red, green and blue value
+ * 15-bit red, green and blue value
  *
  * @author JPEXS
  */

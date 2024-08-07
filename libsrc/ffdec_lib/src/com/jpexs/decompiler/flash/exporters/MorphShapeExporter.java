@@ -63,7 +63,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * MorphShape exporter.
  * @author JPEXS
  */
 public class MorphShapeExporter {

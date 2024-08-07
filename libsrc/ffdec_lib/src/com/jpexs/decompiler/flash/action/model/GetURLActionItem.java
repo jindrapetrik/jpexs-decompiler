@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get URL.
  * @author JPEXS
  */
 public class GetURLActionItem extends ActionItem {

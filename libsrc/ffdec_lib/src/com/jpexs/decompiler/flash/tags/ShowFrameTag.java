@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Instructs Flash Player to display the contents of the display list
+ * ShowFrame tag - Instructs Flash Player to display the contents of the display list.
  *
  * @author JPEXS
  */

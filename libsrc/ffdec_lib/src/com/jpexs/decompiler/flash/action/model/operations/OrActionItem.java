@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Logical OR.
  * @author JPEXS
  */
 public class OrActionItem extends BinaryOpItem {

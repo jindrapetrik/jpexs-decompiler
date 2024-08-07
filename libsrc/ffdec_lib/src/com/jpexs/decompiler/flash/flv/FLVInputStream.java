@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * FLV input stream.
  * @author JPEXS
  */
 public class FLVInputStream {

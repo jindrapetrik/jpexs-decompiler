@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 
 /**
- *
+ * Line style, used in shape export.
  * @author JPEXS
  */
 public class LineStyle {

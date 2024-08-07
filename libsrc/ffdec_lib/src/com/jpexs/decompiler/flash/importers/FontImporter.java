@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
 
 /**
- *
+ * Font importer.
  * @author JPEXS
  */
 public class FontImporter {

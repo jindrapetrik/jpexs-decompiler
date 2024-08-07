@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters;
 import java.awt.Graphics;
 
 /**
- *
+ * Interface for grouping graphics.
  * @author JPEXS
  */
 public interface GraphicsGroupable {

@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Unary operator.
  * @author JPEXS
  */
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {

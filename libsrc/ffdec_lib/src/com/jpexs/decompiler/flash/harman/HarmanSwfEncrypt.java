@@ -34,7 +34,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- *
+ * Harman SWF encryption/decryption.
  * @author JPEXS
  *
  * Based on swfdecrypt.py by NathaanTFM

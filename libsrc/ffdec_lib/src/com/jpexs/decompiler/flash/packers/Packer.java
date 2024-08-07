@@ -31,7 +31,7 @@ public interface Packer {
     /**
      * Is this DefineBinaryData packed with this packer?
      *
-     * @param dataTag
+     * @param dataTag Data tag to check
      * @return true = it definitely is encrypted with this, false = it
      * definitely is not encrypted with this, null = it is unknown that it will
      * work
@@ -41,7 +41,7 @@ public interface Packer {
     /**
      * Is this data packed with this packer?
      *
-     * @param data
+     * @param data Data to check
      * @return true = it definitely is encrypted with this, false = it
      * definitely is not encrypted with this, null = it is unknown that it will
      * work
@@ -51,8 +51,8 @@ public interface Packer {
     /**
      * Unpack the data
      *
-     * @param is
-     * @param os
+     * @param is Data to unpack
+     * @param os Stream to write unpacked data to
      * @return True if it was unpacked correctly, False if it is not suitable
      * for unpacking or an error happened.
      * @throws java.io.IOException
@@ -62,8 +62,8 @@ public interface Packer {
     /**
      * Pack the data
      *
-     * @param is
-     * @param os
+     * @param is Data to pack
+     * @param os Stream to write packed data to
      * @return True if packed successfully, False if error happened.
      * @throws java.io.IOException
      */
@@ -72,9 +72,13 @@ public interface Packer {
     /**
      * Human readable name of this packer
      *
-     * @return
+     * @return Name of this packer
      */
     public String getName();
 
+    /**
+     * Unique identifier of this packer
+     * @return Identifier of this packer
+     */
     public String getIdentifier();
 }

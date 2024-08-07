@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Remove sprite.
  * @author JPEXS
  */
 public class RemoveSpriteActionItem extends ActionItem {

@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Adds character to the display list
+ * PlaceObject tag - adds character to the display list
  *
  * @author JPEXS
  */

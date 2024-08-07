@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- *
+ * Shape.
  * @author JPEXS
  */
 public class IggyShape implements StructureInterface {

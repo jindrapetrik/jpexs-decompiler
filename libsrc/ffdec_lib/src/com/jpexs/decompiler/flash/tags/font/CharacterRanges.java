@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Unicode character ranges.
  * @author JPEXS
  */
 public class CharacterRanges {

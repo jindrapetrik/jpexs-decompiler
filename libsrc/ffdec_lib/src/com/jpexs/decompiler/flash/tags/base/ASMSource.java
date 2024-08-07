@@ -27,10 +27,11 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.util.List;
 
 /**
- * Object containing ASM source
+ * Object containing ActionScript 1/2 bytecode.
  *
  * @author JPEXS
  */

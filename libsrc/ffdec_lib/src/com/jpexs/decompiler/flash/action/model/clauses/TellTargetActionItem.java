@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Tell target.
  * @author JPEXS
  */
 public class TellTargetActionItem extends ActionItem implements Block {

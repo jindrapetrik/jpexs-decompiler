@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get member.
  * @author JPEXS
  */
 public class GetMemberActionItem extends ActionItem {

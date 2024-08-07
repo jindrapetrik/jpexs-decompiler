@@ -21,7 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.Loop;
 
 /**
- *
+ * Loop.
  * @author JPEXS
  */
 public abstract class LoopActionItem extends ActionItem {

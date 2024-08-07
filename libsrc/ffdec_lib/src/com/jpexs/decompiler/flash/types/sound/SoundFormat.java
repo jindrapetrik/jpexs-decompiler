@@ -32,7 +32,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 /**
- *
+ * Sound format.
  * @author JPEXS
  */
 public class SoundFormat {

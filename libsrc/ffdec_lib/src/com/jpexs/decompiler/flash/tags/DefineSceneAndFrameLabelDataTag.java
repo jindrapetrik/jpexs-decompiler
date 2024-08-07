@@ -25,10 +25,11 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.Table;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 
 /**
- *
+ * DefineSceneAndFrameLabelData tag - defines scene and frame label data.
  * @author JPEXS
  */
 @SWFVersion(from = 9)

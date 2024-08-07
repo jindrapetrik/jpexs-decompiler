@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- *
+ * Language code.
  * @author JPEXS
  */
 public class LANGCODE implements Serializable {

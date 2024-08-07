@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Trace.
  * @author JPEXS
  */
 public class TraceActionItem extends ActionItem {

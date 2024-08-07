@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 
 /**
- *
+ * Script export settings.
  * @author JPEXS
  */
 public class ScriptExportSettings {

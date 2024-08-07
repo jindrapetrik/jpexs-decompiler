@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Unresolved constant.
  * @author JPEXS
  */
 public class UnresolvedConstantActionItem extends ActionItem implements SimpleValue {

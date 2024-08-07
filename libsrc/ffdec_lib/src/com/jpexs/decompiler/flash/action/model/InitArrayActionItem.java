@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Initialize array.
  * @author JPEXS
  */
 public class InitArrayActionItem extends ActionItem {

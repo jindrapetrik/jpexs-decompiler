@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 
 /**
- *
+ * Default SVG shape exporter.
  * @author JPEXS, Claus Wahlers
  */
 public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {

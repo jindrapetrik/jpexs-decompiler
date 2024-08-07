@@ -92,7 +92,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Preview exporter.
  * @author JPEXS
  */
 public class PreviewExporter {

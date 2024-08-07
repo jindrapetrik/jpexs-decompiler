@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * String not equal.
  * @author JPEXS
  */
 public class StringNeActionItem extends BinaryOpItem implements Inverted {

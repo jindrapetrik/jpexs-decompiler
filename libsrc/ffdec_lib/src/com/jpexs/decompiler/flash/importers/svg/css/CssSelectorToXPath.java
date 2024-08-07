@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Css selector to XPath converter.
  * @author JPEXS
  *
  * Based on implementation https://github.com/css2xpath/css2xpath

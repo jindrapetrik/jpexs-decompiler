@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Return value from function.
  * @author JPEXS
  */
 public class ReturnActionItem extends ActionItem implements ExitItem {

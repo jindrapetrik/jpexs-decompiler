@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Base class for morph shape exporters.
  * @author JPEXS, Claus Wahlers
  */
 public abstract class MorphShapeExporterBase implements IMorphShapeExporter {

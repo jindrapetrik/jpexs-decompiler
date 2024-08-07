@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *
+ * Line style array.
  * @author JPEXS
  */
 public class LINESTYLEARRAY implements NeedsCharacters, Serializable {

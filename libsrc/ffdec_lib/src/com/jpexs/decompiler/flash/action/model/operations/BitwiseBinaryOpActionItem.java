@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Bitwise binary operation.
  * @author JPEXS
  */
 public abstract class BitwiseBinaryOpActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

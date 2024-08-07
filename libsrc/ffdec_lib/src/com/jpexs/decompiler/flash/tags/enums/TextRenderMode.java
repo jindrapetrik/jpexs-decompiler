@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.enums;
 
 /**
- *
+ * Text render mode.
  * @author JPEXS
  */
 public enum TextRenderMode {

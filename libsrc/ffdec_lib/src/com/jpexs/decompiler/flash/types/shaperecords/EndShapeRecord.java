@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
- *
+ * End shape record.
  * @author JPEXS
  */
 public class EndShapeRecord extends SHAPERECORD {

@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Get type of value.
  * @author JPEXS
  */
 public class TypeOfActionItem extends ActionItem {

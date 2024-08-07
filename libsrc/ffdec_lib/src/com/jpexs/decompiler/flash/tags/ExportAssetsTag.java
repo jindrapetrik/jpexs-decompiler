@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Makes portions of a SWF file available for import by other SWF files
+ * ExportAssets tag - Makes portions of a SWF file available for import by other SWF files.
  *
  * @author JPEXS
  */

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.text;
 
 /**
- *
+ * Text parsed symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

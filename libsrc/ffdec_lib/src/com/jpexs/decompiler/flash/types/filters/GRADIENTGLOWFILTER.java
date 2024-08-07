@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Glow filter with gradient instead of single color
+ * Glow filter with gradient instead of single color.
  *
  * @author JPEXS
  */

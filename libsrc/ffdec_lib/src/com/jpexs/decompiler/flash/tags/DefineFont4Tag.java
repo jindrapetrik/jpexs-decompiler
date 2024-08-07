@@ -25,10 +25,12 @@ import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 
 /**
- *
+ * DefineFont4 - defines a font.
+ * Uses CFF (Compact Font Format) for font data.
  * @author JPEXS
  */
 @SWFVersion(from = 10)

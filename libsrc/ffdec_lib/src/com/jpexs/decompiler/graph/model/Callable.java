@@ -19,7 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import java.util.List;
 
 /**
- *
+ * Callable interface.
  * @author JPEXS
  */
 public interface Callable {

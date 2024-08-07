@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Reflection tools.
  * @author JPEXS
  */
 public class ReflectionTools {

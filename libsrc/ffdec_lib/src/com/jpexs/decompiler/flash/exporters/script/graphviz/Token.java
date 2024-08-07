@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.script.graphviz;
 import java.io.Serializable;
 
 /**
- *
+ * Token.
  * @author JPEXS
  */
 public class Token implements Serializable, Comparable {

@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- *
+ * Video frame tag - contains video data for a movie frame.
  * @author JPEXS
  */
 @SWFVersion(from = 6)

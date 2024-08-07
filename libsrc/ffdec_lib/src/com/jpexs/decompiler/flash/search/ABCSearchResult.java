@@ -23,19 +23,15 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.treeitems.Openable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * ABC search result.
  * @author JPEXS
  */
 public class ABCSearchResult implements Serializable, ScriptSearchResult {

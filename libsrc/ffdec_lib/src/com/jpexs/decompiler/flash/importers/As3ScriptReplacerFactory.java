@@ -19,6 +19,10 @@ package com.jpexs.decompiler.flash.importers;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 
+/**
+ * Factory for creating As3ScriptReplacerInterface instances.
+ * @author JPEXS
+ */
 public class As3ScriptReplacerFactory {
 
     public static As3ScriptReplacerInterface createByConfig(boolean air) {

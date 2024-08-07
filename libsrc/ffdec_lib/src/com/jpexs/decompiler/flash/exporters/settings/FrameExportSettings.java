@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.settings;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 
 /**
- *
+ * Frame export settings.
  * @author JPEXS
  */
 public class FrameExportSettings {

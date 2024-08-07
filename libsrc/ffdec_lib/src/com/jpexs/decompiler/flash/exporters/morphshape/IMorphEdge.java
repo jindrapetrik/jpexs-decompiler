@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 /**
- *
+ * Interface for morph edges.
  * @author JPEXS
  */
 public interface IMorphEdge {

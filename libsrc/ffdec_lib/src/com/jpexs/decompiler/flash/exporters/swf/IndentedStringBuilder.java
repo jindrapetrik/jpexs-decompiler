@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.swf;
 import com.jpexs.helpers.Helper;
 
 /**
- *
+ * Indented string builder.
  * @author JPEXS
  */
 public class IndentedStringBuilder {

@@ -26,7 +26,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * ProductInfo tag - product information of the SWF file generator.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

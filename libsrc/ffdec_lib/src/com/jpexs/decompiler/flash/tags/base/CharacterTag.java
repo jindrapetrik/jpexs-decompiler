@@ -22,10 +22,7 @@ import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
-import com.jpexs.decompiler.flash.action.swf7.ActionTry;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -34,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,7 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * A character tag.
  * @author JPEXS
  */
 public abstract class CharacterTag extends Tag implements CharacterIdTag {

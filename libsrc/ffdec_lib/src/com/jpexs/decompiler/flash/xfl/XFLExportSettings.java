@@ -17,12 +17,18 @@
 package com.jpexs.decompiler.flash.xfl;
 
 /**
- *
+ * XFL export settings.
  * @author JPEXS
  */
 public class XFLExportSettings {
 
+    /**
+     * Compressed
+     */
     public boolean compressed;
 
+    /**
+     * Export script
+     */
     public boolean exportScript = true;
 }

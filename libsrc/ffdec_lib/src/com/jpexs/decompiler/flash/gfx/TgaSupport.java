@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gfx;
 import javax.imageio.spi.IIORegistry;
 
 /**
- *
+ * TGA file format support initialization.
  * @author JPEXS
  */
 public class TgaSupport {

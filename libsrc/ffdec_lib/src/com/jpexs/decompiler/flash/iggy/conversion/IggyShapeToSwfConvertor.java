@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Converts Iggy shape to SWF shape.
  * @author JPEXS
  */
 public class IggyShapeToSwfConvertor {

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Shape.
  * @author JPEXS
  */
 public class SHAPE implements NeedsCharacters, Serializable {

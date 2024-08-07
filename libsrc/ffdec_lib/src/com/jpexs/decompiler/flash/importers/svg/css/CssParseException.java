@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg.css;
 
 /**
- *
+ * Css parse exception.
  * @author JPEXS
  */
 public class CssParseException extends Exception {

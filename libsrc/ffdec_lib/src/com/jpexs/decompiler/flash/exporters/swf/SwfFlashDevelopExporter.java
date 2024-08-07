@@ -30,7 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- *
+ * Exports SWF to FlashDevelop project.
  * @author JPEXS
  */
 public class SwfFlashDevelopExporter {

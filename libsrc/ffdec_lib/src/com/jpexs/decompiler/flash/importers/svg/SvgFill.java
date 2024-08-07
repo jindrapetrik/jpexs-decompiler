@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.importers.svg;
 import java.awt.Color;
 
 /**
- *
+ * SVG fill.
  * @author JPEXS
  */
 abstract class SvgFill implements Cloneable {

@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Font bin info.
  * @author JPEXS
  */
 public class IggyFontBinInfo implements StructureInterface {

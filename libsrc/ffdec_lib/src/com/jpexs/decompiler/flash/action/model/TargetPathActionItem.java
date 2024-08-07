@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get target path.
  * @author JPEXS
  */
 public class TargetPathActionItem extends ActionItem {

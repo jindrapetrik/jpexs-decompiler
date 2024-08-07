@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Divide.
  * @author JPEXS
  */
 public class DivideActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

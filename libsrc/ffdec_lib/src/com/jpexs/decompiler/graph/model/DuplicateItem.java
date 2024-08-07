@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Duplicate item.
  * @author JPEXS
  */
 public class DuplicateItem extends GraphTargetItem implements SimpleValue {

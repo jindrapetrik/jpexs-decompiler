@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- *
+ * FreeCharacter tag - undocumented.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

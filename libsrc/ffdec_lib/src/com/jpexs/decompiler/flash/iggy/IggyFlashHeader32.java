@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Flash header for 32-bit iggy files.
  * @author JPEXS
  *
  * Based of works of somebody called eternity.

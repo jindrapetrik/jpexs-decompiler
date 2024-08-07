@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- *
+ * Input stream for reading GFx data.
  * @author JPEXS
  */
 public class GFxInputStream {

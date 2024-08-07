@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Load variables num.
  * @author JPEXS
  */
 public class LoadVariablesNumActionItem extends ActionItem {

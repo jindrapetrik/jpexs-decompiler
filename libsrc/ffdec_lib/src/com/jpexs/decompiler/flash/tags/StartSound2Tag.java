@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *
+ * StartSound2 tag - starts a sound playing.
+ * Extends functionality of StartSound tag.
  * @author JPEXS
  */
 @SWFVersion(from = 9)

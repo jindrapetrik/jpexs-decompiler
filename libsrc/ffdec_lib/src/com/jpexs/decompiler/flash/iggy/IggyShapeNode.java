@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- *
+ * Shape node.
  * @author JPEXS
  */
 public class IggyShapeNode implements StructureInterface {

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * String add.
  * @author JPEXS
  */
 public class StringAddActionItem extends BinaryOpItem {

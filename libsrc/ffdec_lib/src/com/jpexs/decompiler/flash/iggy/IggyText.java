@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Text.
  * @author JPEXS
  */
 public class IggyText implements StructureInterface {

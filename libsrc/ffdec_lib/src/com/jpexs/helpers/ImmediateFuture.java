@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- *
+ * Future that happens now.
  * @author JPEXS
  * @param <V>
  */

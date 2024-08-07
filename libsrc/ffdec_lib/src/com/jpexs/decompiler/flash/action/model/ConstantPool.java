@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Constant pool for ActionScript 1/2.
  * @author JPEXS
  */
 public class ConstantPool {

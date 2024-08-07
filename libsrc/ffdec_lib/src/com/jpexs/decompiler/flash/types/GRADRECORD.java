@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Gradient record.
  * @author JPEXS
  */
 public class GRADRECORD implements Serializable {

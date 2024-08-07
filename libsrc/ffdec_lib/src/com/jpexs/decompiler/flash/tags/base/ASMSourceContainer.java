@@ -17,10 +17,11 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+
 import java.util.List;
 
 /**
- * Object which contains other objects
+ * Object which contains other ASMSources.
  *
  * @author JPEXS
  */

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.search;
 
 /**
- *
+ * Method ID.
  * @author JPEXS
  */
 public class MethodId {

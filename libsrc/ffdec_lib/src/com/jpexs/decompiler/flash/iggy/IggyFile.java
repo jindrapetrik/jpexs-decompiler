@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Iggy file.
  * @author JPEXS
  *
  * Based of works of somebody called eternity.

@@ -33,7 +33,7 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- *
+ * Exports SWF to IntelliJ IDEA project.
  * @author JPEXS
  */
 public class SwfIntelliJIdeaExporter {

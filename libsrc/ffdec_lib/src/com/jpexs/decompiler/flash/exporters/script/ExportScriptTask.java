@@ -37,7 +37,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 /**
- *
+ * Export script task.
  * @author JPEXS
  */
 public class ExportScriptTask implements Callable<File> {

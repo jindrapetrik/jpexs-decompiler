@@ -18,6 +18,9 @@ package com.jpexs.helpers.utf8.charset;
 
 import java.nio.charset.Charset;
 
+/**
+ * Shift JIS encoding.
+ */
 public class ShiftJis extends AbstractCharsetConverter {
 
     private static final Charset SHIFT_JIS_ENCODING = Charset.forName("Shift_JIS");

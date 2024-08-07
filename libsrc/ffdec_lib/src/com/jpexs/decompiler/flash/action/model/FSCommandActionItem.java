@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * FSCommand.
  * @author JPEXS
  */
 public class FSCommandActionItem extends ActionItem {

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Strict equality.
  * @author JPEXS
  */
 public class StrictEqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, EqualsTypeItem {

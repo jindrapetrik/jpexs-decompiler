@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Store value to a register.
  * @author JPEXS
  */
 public class StoreRegisterActionItem extends ActionItem implements SetTypeActionItem {

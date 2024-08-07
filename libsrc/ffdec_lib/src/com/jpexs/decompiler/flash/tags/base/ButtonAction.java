@@ -31,12 +31,13 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * Object containing ASM source
+ * Button action.
  *
  * @author JPEXS
  */

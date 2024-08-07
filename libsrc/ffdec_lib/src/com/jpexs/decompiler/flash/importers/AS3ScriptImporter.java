@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.Helper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * ActionScript 3 scripts importer.
  * @author JPEXS
  */
 public class AS3ScriptImporter {

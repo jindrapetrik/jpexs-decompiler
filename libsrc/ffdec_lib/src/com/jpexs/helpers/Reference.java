@@ -17,9 +17,10 @@
 package com.jpexs.helpers;
 
 /**
- *
+ * Reference to an object.
+ * Used for passing objects by reference.
  * @author JPEXS
- * @param <T>
+ * @param <T> Type of the object
  */
 public class Reference<T> {
 

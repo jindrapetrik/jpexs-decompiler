@@ -40,7 +40,7 @@ import javax.imageio.ImageIO;
 import net.npe.dds.DDSReader;
 
 /**
- *
+ * DefineSubImage tag - sub image.
  * @author JPEXS
  */
 public class DefineSubImage extends AbstractGfxImageTag {

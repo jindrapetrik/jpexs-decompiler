@@ -26,7 +26,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- * Sets the index of an object within the tab order.
+ * SetTabIndex tag - sets the index of an object within the tab order.
  *
  * @author JPEXS
  */

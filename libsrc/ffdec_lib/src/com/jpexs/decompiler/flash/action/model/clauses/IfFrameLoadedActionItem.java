@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * IfFrameLoaded clause.
  * @author JPEXS
  */
 public class IfFrameLoadedActionItem extends ActionItem implements Block {

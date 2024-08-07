@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import java.io.Serializable;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
+ * Represents bitmap pixel data with alpha channel.
  *
  * @author JPEXS
  */

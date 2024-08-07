@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- *
+ * FLV output stream
  * @author JPEXS
  */
 public class FLVOutputStream extends OutputStream {

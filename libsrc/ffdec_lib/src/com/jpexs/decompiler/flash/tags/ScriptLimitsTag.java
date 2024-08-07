@@ -26,7 +26,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * ScriptLimits tag - sets the maximum recursion depth and script timeout.
  * @author JPEXS
  */
 @SWFVersion(from = 7)

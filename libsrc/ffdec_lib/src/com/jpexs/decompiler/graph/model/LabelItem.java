@@ -22,7 +22,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * Label.
  * @author JPEXS
  */
 public class LabelItem extends GraphTargetItem {

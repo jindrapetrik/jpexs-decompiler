@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Base class for shape records.
  * @author JPEXS
  */
 @ConcreteClasses({CurvedEdgeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class, EndShapeRecord.class})

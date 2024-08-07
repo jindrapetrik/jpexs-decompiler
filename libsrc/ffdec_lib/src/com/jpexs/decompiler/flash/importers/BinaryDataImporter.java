@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.helpers.ByteArrayRange;
 
 /**
- *
+ * Binary data importer.
  * @author JPEXS
  */
 public class BinaryDataImporter extends TagImporter {

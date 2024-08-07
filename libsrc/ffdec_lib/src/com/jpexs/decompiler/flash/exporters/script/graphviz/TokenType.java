@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.exporters.script.graphviz;
 
 /**
- *
- * @author jindr
+ * TokenType
+ * @author JPEXS
  */
 public enum TokenType {
 

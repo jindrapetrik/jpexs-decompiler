@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Joined nodes.
  * @author JPEXS
  */
 public class JoinedNode extends Node {

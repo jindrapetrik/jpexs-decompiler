@@ -21,18 +21,15 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Base class for ActionScript 1/2 high-level model items.
  * @author JPEXS
  */
 public abstract class ActionItem extends GraphTargetItem implements Serializable {

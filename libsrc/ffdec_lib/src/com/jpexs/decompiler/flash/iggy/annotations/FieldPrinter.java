@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.iggy.annotations;
 import java.lang.reflect.Field;
 
 /**
- *
+ * Field printer.
  * @author JPEXS
  */
 public class FieldPrinter {

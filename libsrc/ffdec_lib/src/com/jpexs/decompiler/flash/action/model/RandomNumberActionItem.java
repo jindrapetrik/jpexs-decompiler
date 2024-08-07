@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- *
+ * Random number.
  * @author JPEXS
  */
 public class RandomNumberActionItem extends ActionItem {

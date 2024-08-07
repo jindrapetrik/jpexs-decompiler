@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Stream that can be read multiple times. It stores all read bytes in memory.
  * @author JPEXS
  */
 public class ReReadableInputStream extends SeekableInputStream {

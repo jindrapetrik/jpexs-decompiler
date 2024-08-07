@@ -24,7 +24,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * PathsArePostScript tag - undocumented.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

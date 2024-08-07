@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Symbol class export mode.
  * @author JPEXS
  */
 public enum SymbolClassExportMode {

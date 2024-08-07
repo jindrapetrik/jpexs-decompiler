@@ -48,6 +48,7 @@ import java.util.Map;
 
 /**
  *
+ * Iggy to SWF convertor.
  * WIP
  *
  * @author JPEXS

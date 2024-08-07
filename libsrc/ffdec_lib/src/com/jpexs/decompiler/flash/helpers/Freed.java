@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 /**
- *
+ * Interface for objects that can be freed.
  * @author JPEXS
  */
 public interface Freed {

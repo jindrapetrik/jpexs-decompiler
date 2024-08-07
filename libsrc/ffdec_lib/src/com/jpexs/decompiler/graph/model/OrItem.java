@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Logical OR.
  * @author JPEXS
  */
 public class OrItem extends BinaryOpItem implements CompoundableBinaryOp {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
 /**
- *
+ * AMF3 parsed symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

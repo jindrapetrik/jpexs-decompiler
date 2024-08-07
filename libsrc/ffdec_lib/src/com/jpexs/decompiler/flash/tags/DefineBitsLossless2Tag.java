@@ -28,14 +28,11 @@ import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
-import com.jpexs.decompiler.flash.types.annotations.EnumValue;
-import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
-import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.annotations.*;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
+
+import java.awt.*;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,7 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineBitsLossless2 tag - Contains a lossless compressed image with opacity.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

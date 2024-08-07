@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters;
 
 /**
- *
+ * Interface for setting blend mode.
  * @author JPEXS
  */
 public interface BlendModeSetable {

@@ -17,7 +17,7 @@
 package com.jpexs.helpers.stat;
 
 /**
- *
+ * Statistic data.
  * @author JPEXS
  */
 public class StatisticData {

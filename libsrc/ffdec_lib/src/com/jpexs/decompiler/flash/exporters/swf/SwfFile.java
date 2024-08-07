@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.SWF;
 import java.io.IOException;
 
 /**
- *
+ * Swf file.
+ * ???
  * @author JPEXS
  */
 public class SwfFile {

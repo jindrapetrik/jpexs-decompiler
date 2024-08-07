@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
- *
+ * Flash header for 64-bit version of Iggy format.
  * @author JPEXS
  *
  * Based of works of somebody called eternity.

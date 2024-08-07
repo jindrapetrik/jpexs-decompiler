@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Bitwise right shift.
  * @author JPEXS
  */
 public class RShiftActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

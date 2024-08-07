@@ -17,7 +17,7 @@
 package com.jpexs.helpers.properties;
 
 /**
- *
+ * Properties parser exception.
  * @author JPEXS
  */
 public class PropertiesParseException extends Exception {

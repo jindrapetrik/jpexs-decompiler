@@ -28,8 +28,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
-import java.awt.Graphics;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,7 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineBits tag - Contains a JPEG image.
+ * JPEG header is not included in the data - needs JPEGTables tag.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

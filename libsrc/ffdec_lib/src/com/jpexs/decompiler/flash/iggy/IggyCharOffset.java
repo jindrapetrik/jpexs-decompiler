@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- *
+ * Char offset.
  * @author JPEXS
  */
 public class IggyCharOffset implements StructureInterface {

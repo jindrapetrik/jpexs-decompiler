@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers;
 
 /**
- *
+ * Text import resize text bounds mode.
  * @author JPEXS
  */
 public enum TextImportResizeTextBoundsMode {

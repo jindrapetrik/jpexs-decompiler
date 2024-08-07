@@ -53,6 +53,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Replaces AS3 script in SWF using MXMLC compiler.
+ */
 public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptReplacerInterface {
 
     private ScriptPack initedPack;

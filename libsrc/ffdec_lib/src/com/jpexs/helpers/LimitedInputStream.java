@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Input stream that reads only limited number of bytes.
  * @author JPEXS
  */
 public class LimitedInputStream extends InputStream {

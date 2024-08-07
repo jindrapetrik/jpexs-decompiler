@@ -30,12 +30,13 @@ import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * DefineSound tag - defines sound.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

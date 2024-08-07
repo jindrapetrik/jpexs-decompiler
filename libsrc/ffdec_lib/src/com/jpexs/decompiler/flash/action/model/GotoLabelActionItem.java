@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Goto label.
  * @author JPEXS
  */
 public class GotoLabelActionItem extends ActionItem {

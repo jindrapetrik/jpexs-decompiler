@@ -42,6 +42,9 @@ import uk.co.caprica.vlcj.player.list.MediaListPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.list.PlaybackMode;
 import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
+/**
+ * Simple media player that uses VLCJ library to play video files.
+ */
 public class SimpleMediaPlayer {
 
     private List<FrameListener> listeners = new ArrayList<>();
@@ -309,7 +312,7 @@ public class SimpleMediaPlayer {
 
         public void sendImage() {
             for (FrameListener fl : videoSurfaces) {
-                fl.newFrameRecieved(this.image);
+                fl.newFrameReceived(this.image);
             }
         }
 

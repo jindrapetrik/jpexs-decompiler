@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Defines a sprite character
+ * DefineSprite tag - Defines a sprite character.
  *
  * @author JPEXS
  */

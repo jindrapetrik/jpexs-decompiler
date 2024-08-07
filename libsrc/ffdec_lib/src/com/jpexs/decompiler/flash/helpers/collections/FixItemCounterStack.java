@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.helpers.collections;
 import java.util.Stack;
 
 /**
- *
+ * Fix item counter stack.
  * @author JPEXS
  */
 public class FixItemCounterStack extends Stack<Object> {

@@ -27,7 +27,7 @@ import java.util.Set;
  * Identity hash set which maintains insertion order.
  *
  * @author JPEXS
- * @param <E>
+ * @param <E> Type of elements
  */
 public class LinkedIdentityHashSet<E> implements Set<E> {
 

@@ -21,7 +21,7 @@ import java.io.InputStream;
 
 /**
  * Special MemoryInputStream that is not a MemoryInputStream in fact. Input
- * stream to handle some edge cases
+ * stream to handle some edge cases.
  *
  * @author JPEXS
  */

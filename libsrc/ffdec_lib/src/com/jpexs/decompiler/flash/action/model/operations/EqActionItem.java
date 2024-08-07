@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Equality.
  * @author JPEXS
  */
 public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsTypeItem {

@@ -29,8 +29,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
-import java.awt.Graphics;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineBitsJPEG2 tag - Contains a JPEG image (optionally a PNG or GIF)
  * @author JPEXS
  */
 @SWFVersion(from = 2) //Note: GIF and PNG since version 8

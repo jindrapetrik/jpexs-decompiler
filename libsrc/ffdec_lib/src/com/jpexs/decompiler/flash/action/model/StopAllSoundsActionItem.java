@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Stop all sounds.
  * @author JPEXS
  */
 public class StopAllSoundsActionItem extends ActionItem {

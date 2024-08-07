@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * DefineText2 tag - defines text.
+ * Extends functionality of DefineText.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

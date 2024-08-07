@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import java.io.Serializable;
 
 /**
- * Represents Zone record
+ * Zone record.
  *
  * @author JPEXS
  */

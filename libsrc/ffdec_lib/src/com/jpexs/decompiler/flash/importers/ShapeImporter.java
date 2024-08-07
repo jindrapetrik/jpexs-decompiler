@@ -52,7 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Shape importer.
  * @author JPEXS
  */
 public class ShapeImporter {

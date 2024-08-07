@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Map implementation.
  * @param <K>
  * @param <V>
  * @author JPEXS

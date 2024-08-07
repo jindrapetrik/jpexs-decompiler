@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.dynamictext;
 
 /**
- *
+ * Character with style.
  * @author JPEXS
  */
 public class CharacterWithStyle {

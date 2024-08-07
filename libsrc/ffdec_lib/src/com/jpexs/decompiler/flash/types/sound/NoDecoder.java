@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Sound decoder that does nothing, just copies the data.
  * @author JPEXS
  */
 public class NoDecoder extends SoundDecoder {

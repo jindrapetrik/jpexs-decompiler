@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * New object.
  * @author JPEXS
  */
 public class NewObjectActionItem extends ActionItem {

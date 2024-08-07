@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.morphshape;
 
 /**
- *
+ * Exception thrown when there is a style mismatch in morph shape.
  * @author JPEXS
  */
 public class StyleMismatchException extends Exception {

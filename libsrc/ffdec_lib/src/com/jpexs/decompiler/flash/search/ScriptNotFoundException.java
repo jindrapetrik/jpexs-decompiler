@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.search;
 
 /**
- *
+ * Script not found exception.
  * @author JPEXS
  */
 public class ScriptNotFoundException extends Exception {

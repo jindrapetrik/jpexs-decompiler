@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- *
+ * Harman AIR SDK packer.
  * @author JPEXS
  */
 public class HarmanAirPacker implements Packer {

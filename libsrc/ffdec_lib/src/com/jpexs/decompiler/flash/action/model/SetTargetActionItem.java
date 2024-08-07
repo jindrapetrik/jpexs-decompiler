@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Set target.
  * @author JPEXS
  */
 public class SetTargetActionItem extends ActionItem {

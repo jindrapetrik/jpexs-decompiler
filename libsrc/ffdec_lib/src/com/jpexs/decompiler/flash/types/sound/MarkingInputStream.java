@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * InputStream that counts the number of bytes read.
  * @author JPEXS
  */
 public class MarkingInputStream extends InputStream {

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Unsupported.
  * @author JPEXS
  */
 public class UnsupportedActionItem extends ActionItem {

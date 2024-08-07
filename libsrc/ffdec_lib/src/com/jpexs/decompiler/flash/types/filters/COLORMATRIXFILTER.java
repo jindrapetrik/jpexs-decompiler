@@ -21,13 +21,14 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
-import java.util.ArrayList;
-import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Applies a color transformation on the pixels of a display list object
+ * Applies a color transformation on the pixels of a display list object.
  *
  * @author JPEXS
  */

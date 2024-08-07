@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 
 /**
- *
+ * Shape exporter interface.
  * @author JPEXS
  */
 public interface IShapeExporter {

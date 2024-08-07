@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.text;
 
 /**
- *
+ * Text symbol type.
  * @author JPEXS
  */
 public enum SymbolType {

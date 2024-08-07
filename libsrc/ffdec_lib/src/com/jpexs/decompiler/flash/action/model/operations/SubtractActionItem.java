@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Subtract.
  * @author JPEXS
  */
 public class SubtractActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

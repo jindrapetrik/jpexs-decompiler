@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.geom.Rectangle2D;
 
 /**
- *
+ * Export rectangle.
  * @author JPEXS
  */
 public class ExportRectangle {

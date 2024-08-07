@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Multiply.
  * @author JPEXS
  */
 public class MultiplyActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

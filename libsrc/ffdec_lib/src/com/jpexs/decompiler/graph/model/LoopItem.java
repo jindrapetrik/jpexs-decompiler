@@ -22,7 +22,7 @@ import com.jpexs.decompiler.graph.Loop;
 import java.util.List;
 
 /**
- *
+ * Base class for loops.
  * @author JPEXS
  */
 public abstract class LoopItem extends GraphTargetItem {

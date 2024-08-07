@@ -30,7 +30,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- * Defines a series of ActionScript 3 bytecodes to be executed
+ * DoABC tag - Defines a series of ActionScript 3 bytecodes to be executed.
  *
  * @author JPEXS
  */

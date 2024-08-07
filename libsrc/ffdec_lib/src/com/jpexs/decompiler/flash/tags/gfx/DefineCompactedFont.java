@@ -24,19 +24,15 @@ import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.gfx.FontType;
-import com.jpexs.decompiler.flash.types.gfx.GFxInputStream;
-import com.jpexs.decompiler.flash.types.gfx.GFxOutputStream;
-import com.jpexs.decompiler.flash.types.gfx.GlyphInfoType;
-import com.jpexs.decompiler.flash.types.gfx.GlyphType;
-import com.jpexs.decompiler.flash.types.gfx.KerningPairType;
+import com.jpexs.decompiler.flash.types.gfx.*;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.MemoryInputStream;
-import java.awt.Font;
+
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineCompactedFont tag - defines a font with compacted shapes.
  * @author JPEXS
  */
 public final class DefineCompactedFont extends FontTag {

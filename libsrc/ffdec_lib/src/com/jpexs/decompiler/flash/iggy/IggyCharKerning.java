@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Char kerning.
  * @author JPEXS
  */
 public class IggyCharKerning implements StructureInterface {

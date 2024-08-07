@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph.precontinues;
 
 /**
- *
+ * If statement.
  * @author JPEXS
  */
 public class IfNode extends Node {

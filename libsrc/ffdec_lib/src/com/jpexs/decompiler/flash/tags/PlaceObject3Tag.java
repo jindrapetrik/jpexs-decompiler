@@ -47,8 +47,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
- *
+ * PlaceObject3 tag - adds character to the display list.
+ * Extends the functionality of the PlaceObject2Tag.
  * @author JPEXS
  */
 @SWFVersion(from = 8)

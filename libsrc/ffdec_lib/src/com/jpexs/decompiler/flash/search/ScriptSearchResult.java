@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.search;
 
 /**
- *
+ * Script search result.
  * @author JPEXS
  */
 public interface ScriptSearchResult extends SearchResult {

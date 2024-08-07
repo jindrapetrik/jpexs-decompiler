@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *
+ * Unknown tag.
  * @author JPEXS
  */
 @SWFVersion(from = 1) //surprise!

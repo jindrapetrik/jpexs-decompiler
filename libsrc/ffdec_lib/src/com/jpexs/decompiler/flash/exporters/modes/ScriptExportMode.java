@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Script export mode.
  * @author JPEXS
  */
 public enum ScriptExportMode {

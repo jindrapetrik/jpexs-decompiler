@@ -20,7 +20,7 @@ import java.awt.Font;
 import java.util.Map;
 
 /**
- *
+ * Handler for missing characters in fonts.
  * @author JPEXS
  */
 public class MissingCharacterHandler {

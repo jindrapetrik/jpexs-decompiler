@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Imports characters from another file, v2
+ * ImportAssets2 tag - Imports characters from another file, v2
  *
  * @author JPEXS
  */

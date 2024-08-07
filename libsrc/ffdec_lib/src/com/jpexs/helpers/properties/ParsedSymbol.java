@@ -17,7 +17,7 @@
 package com.jpexs.helpers.properties;
 
 /**
- *
+ * Properties parser symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

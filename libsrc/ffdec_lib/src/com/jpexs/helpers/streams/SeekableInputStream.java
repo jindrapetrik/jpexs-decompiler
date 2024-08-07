@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Input stream with seek support.
  * @author JPEXS
  */
 public abstract class SeekableInputStream extends InputStream {

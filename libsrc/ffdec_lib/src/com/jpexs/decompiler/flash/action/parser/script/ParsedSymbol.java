@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.script;
 
 /**
- *
+ * ActionScript 1/2 parsed symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

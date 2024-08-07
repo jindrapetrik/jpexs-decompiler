@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
- *
+ * Curved edge record.
  * @author JPEXS
  */
 public class CurvedEdgeRecord extends SHAPERECORD {

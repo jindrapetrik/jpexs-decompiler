@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.action.parser;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Exception for action parsing errors
  * @author JPEXS
  */
 public class ActionParseException extends ParseException {

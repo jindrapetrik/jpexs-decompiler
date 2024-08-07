@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Glyph.
  * @author JPEXS
  */
 public class GlyphType implements Serializable {

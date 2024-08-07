@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Symbol class exporter.
  * @author JPEXS
  */
 public class SymbolClassExporter {

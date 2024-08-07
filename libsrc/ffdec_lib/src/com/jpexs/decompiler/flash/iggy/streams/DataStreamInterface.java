@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.iggy.streams;
 
 /**
- *
+ * Data stream interface.
  * @author JPEXS
  */
 public interface DataStreamInterface extends ReadDataStreamInterface, WriteDataStreamInterface {

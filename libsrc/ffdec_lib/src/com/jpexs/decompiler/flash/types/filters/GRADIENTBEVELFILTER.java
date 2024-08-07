@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Bevel filter with gradient instead of single color
+ * Bevel filter with gradient instead of single color.
  *
  * @author JPEXS
  */

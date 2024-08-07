@@ -17,7 +17,7 @@
 package com.jpexs.helpers.properties;
 
 /**
- *
+ * Properties parser symbol type.
  * @author JPEXS
  */
 public enum SymbolType {

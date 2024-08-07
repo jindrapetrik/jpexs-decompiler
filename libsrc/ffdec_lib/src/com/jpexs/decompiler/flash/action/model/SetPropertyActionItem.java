@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Set property.
  * @author JPEXS
  */
 public class SetPropertyActionItem extends ActionItem implements SetTypeActionItem {

@@ -26,6 +26,10 @@ import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,12 +37,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
- *
+ * DefineExternalSound tag - external sound.
  * @author JPEXS
  */
 public class DefineExternalSound extends CharacterTag implements SoundTag {

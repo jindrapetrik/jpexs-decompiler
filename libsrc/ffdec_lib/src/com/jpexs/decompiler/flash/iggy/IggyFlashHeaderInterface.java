@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 
 /**
- *
+ * Flash header interface.
  * @author JPEXS
  */
 public interface IggyFlashHeaderInterface extends StructureInterface {

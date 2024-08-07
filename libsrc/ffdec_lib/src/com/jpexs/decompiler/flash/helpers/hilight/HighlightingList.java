@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
- *
+ * List of Highlighting objects.
  * @author JPEXS
  */
 public class HighlightingList extends ArrayList<Highlighting> {

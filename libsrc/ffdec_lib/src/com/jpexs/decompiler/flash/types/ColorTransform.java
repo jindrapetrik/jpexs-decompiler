@@ -18,11 +18,12 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
+
+import java.awt.*;
 import java.awt.image.RescaleOp;
 
 /**
- *
+ * Base class for color transform.
  * @author JPEXS
  */
 public class ColorTransform implements Cloneable {

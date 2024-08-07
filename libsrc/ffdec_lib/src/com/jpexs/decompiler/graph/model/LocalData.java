@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Local data for decompilation.
  * @author JPEXS
  */
 public class LocalData {

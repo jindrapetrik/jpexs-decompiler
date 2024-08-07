@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Shape export mode.
  * @author JPEXS
  */
 public enum ShapeExportMode {

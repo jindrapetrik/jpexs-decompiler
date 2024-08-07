@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import java.io.Serializable;
 
 /**
+ * Color map data.
  * @author JPEXS
  */
 public class COLORMAPDATA implements Serializable {

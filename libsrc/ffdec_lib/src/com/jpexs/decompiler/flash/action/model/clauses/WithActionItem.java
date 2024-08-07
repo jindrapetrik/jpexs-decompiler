@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * With statement.
  * @author JPEXS
  */
 public class WithActionItem extends ActionItem {

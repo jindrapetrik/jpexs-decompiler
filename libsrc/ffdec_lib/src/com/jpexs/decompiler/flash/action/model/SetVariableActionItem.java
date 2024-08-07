@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Set variable.
  * @author JPEXS
  */
 public class SetVariableActionItem extends ActionItem implements SetTypeActionItem {

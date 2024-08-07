@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
- *
+ * UTF-8 print writer.
  * @author JPEXS
  */
 public class Utf8PrintWriter extends PrintWriter {

@@ -60,7 +60,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
- *
+ * Sound importer.
  * @author JPEXS
  */
 public class SoundImporter {

@@ -17,12 +17,20 @@
 package com.jpexs.helpers;
 
 /**
- *
+ * Progress listener interface for progress reporting and status messages.
  * @author JPEXS
  */
 public interface ProgressListener {
 
+    /**
+     * Reports progress.
+     * @param p Progress in percents (0-100)
+     */
     public void progress(int p);
 
+    /**
+     * Reports status message.
+     * @param status Status message
+     */
     public void status(String status);
 }

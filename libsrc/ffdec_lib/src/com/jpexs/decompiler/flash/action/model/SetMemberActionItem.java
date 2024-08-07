@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Set member.
  * @author JPEXS
  */
 public class SetMemberActionItem extends ActionItem implements SetTypeActionItem {

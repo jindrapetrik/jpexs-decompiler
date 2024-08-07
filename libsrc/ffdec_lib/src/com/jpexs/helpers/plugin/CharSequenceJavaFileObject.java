@@ -16,12 +16,11 @@
  */
 package com.jpexs.helpers.plugin;
 
-import java.net.URI;
-import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
+import java.net.URI;
 
 /**
- *
+ * A file object used to represent source coming from a string.
  * @author JPEXS
  */
 public class CharSequenceJavaFileObject extends SimpleJavaFileObject {

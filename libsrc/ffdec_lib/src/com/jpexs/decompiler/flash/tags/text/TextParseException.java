@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags.text;
 import com.jpexs.decompiler.flash.ParseException;
 
 /**
- *
+ * Text parse exception.
  * @author JPEXS
  */
 public class TextParseException extends ParseException {

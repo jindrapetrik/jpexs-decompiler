@@ -50,8 +50,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Same as PlaceObject3Tag except additional AMF data
- *
+ * PlaceObject4 tag - adds character to the display list.
+ * Extends the functionality of the PlaceObject3Tag - adds AMF3 data.
  * @author JPEXS
  */
 @SWFVersion(from = 19)

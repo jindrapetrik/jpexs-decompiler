@@ -51,7 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Base class for shape tags.
  * @author JPEXS
  */
 public abstract class ShapeTag extends DrawableTag implements LazyObject {

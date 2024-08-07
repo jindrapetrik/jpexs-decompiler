@@ -17,11 +17,12 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import java.awt.Color;
+
+import java.awt.*;
 import java.io.Serializable;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
+ * Represents 32-bit alpha, red, green and blue value.
  *
  * @author JPEXS
  */

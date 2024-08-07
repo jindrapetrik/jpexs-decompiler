@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Binary data export mode.
  * @author JPEXS
  */
 public enum BinaryDataExportMode {

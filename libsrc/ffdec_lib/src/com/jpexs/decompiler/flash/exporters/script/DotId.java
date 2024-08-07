@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Dot (GraphViz) identifier.
  * @author JPEXS
  */
 public final class DotId {

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Multibyte ascii code to character.
  * @author JPEXS
  */
 public class MBAsciiToCharActionItem extends ActionItem {

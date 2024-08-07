@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.flv;
 
 /**
- *
+ * Script data value.
  * @author JPEXS
  */
 public class SCRIPTDATAVALUE {

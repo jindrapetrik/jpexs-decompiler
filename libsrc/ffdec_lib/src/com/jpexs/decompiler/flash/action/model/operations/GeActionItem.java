@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Greater or equal.
  * @author JPEXS
  */
 public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {

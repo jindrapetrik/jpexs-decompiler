@@ -17,19 +17,16 @@
 package com.jpexs.decompiler.flash.math;
 
 import com.jpexs.helpers.Reference;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 /**
- *
+ * Bezier edge.
  * @author JPEXS
  */
 public class BezierEdge implements Serializable {

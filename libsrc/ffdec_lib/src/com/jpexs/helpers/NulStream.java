@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Output stream that writes to nowhere.
  * @author JPEXS
  */
 public class NulStream extends OutputStream {

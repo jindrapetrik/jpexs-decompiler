@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Shape with style.
  * @author JPEXS
  */
 public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializable {

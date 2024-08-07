@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- *
+ * UTF-8 input stream reader.
  * @author JPEXS
  */
 public class Utf8InputStreamReader extends InputStreamReader {

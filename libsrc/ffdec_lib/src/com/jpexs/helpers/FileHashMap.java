@@ -35,7 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * File hash map.
  * @author JPEXS
  * @param <K>
  * @param <V>

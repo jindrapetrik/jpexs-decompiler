@@ -17,12 +17,20 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * A tag that has depth.
  * @author JPEXS
  */
 public interface DepthTag {
 
+    /**
+     * Gets the depth.
+     * @return Depth
+     */
     public int getDepth();
 
+    /**
+     * Sets the depth.
+     * @param depth New depth
+     */
     public void setDepth(int depth);
 }

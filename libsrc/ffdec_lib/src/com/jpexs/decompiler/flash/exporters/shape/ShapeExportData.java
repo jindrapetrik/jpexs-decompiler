@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import java.util.List;
 
 /**
- *
+ * Shape export data.
  * @author JPEXS
  */
 public class ShapeExportData {

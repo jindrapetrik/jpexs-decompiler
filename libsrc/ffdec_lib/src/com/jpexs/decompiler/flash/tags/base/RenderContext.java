@@ -23,23 +23,45 @@ import java.awt.Point;
 import java.util.List;
 
 /**
- *
+ * Rendering context.
  * @author JPEXS
  */
 public class RenderContext {
 
+    /**
+     * Cursor position.
+     */
     public Point cursorPosition;
 
+    /**
+     * State under cursor.
+     */
     public List<DepthState> stateUnderCursor;
 
+    /**
+     * Mouse button.
+     */
     public int mouseButton;
 
+    /**
+     * Mouse over button.
+     */
     public ButtonTag mouseOverButton;
 
+    /**
+     * Border image.
+     */
     public SerializableImage borderImage;
 
+    /**
+     * Display object cache.
+     */
     public Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache;
 
+    /**
+     * Clear display object cache.
+     * @param placeObject Place object
+     */
     public void clearPlaceObjectCache(PlaceObjectTypeTag placeObject) {
         for (DisplayObjectCacheKey k : displayObjectCache.keys()) {
             if (k.placeObject == placeObject) {

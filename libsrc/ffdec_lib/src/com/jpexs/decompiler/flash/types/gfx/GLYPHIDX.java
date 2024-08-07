@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * Glyph index.
  * @author JPEXS
  */
 public class GLYPHIDX implements Serializable {

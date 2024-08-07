@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg.css;
 
 /**
- *
+ * Css parsed symbol.
  * @author JPEXS
  */
 public class CssParsedSymbol {

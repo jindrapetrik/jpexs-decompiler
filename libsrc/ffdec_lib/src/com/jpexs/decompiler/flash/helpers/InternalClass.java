@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 /**
- *
+ * Interface for objects that are internal.
  * @author JPEXS
  */
 public interface InternalClass {

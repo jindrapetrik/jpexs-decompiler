@@ -27,9 +27,8 @@ import com.jpexs.decompiler.flash.tags.gfx.enums.IdType;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +36,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- *
+ * DefineExternalImage2 tag - external image.
+ * Extends functionality of DefineExternalImage.
  * @author JPEXS
  */
 public class DefineExternalImage2 extends AbstractGfxImageTag {

@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * Base class for sound stream head tags.
  * @author JPEXS
  */
 public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdTag, SoundTag {

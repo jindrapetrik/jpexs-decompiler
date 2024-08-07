@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.settings;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 
 /**
- *
+ * SymbolClass export settings.
  * @author Dofera
  */
 public class SymbolClassExportSettings {

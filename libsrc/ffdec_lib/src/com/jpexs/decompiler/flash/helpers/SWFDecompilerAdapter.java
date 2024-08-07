@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 
 /**
- * Adapter for SWFDecompilerListener
+ * Adapter for SWFDecompilerListener.
  * @author JPEXS
  */
 public class SWFDecompilerAdapter implements SWFDecompilerListener {

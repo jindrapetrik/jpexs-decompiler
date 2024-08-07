@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Movie exporter.
  * @author JPEXS
  */
 public class MovieExporter {

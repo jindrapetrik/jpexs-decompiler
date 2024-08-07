@@ -25,12 +25,13 @@ import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * DefineButtonCxform tag - defines a color transform for a button.
  * @author JPEXS
  */
 @SWFVersion(from = 2)

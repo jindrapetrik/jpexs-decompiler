@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Converts SWF shape to Iggy shape.
  * @author JPEXS
  */
 public class SwfShapeToIggyConvertor {

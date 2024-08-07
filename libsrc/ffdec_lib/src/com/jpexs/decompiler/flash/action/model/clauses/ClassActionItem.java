@@ -19,31 +19,23 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.ActionItem;
-import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
-import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
-import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
-import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * ActionScript2 class.
  * @author JPEXS
  */
 public class ClassActionItem extends ActionItem implements Block {

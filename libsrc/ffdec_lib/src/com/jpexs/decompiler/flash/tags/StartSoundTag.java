@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *
+ * StartSound tag - starts a sound playing.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

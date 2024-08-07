@@ -35,7 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Helper class for UTF-8 charset.
  * @author JPEXS
  */
 public class Utf8Helper {

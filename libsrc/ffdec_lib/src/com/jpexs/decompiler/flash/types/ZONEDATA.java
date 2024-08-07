@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- * Represents Zonedata
+ * Zone data.
  *
  * @author JPEXS
  */

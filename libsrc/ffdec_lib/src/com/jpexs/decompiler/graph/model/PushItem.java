@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Push item on the stack.
  * @author JPEXS
  */
 public class PushItem extends GraphTargetItem {

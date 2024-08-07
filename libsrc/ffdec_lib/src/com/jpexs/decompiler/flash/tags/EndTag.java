@@ -24,7 +24,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
+ * End tag - Marks the end of the file or sprite.
  *
  * @author JPEXS
  */

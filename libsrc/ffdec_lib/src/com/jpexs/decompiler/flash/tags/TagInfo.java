@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Information for basic tag info panel.
  * @author JPEXS
  */
 public class TagInfo {

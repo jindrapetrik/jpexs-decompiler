@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Line style.
  * @author JPEXS
  */
 public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {

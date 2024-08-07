@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Binary data packed with a packer.
  * @author JPEXS
  */
 public class PackedBinaryData implements TreeItem, BinaryDataInterface {

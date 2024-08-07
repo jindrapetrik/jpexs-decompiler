@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Switch statement.
  * @author JPEXS
  */
 public class SwitchItem extends LoopItem implements Block {

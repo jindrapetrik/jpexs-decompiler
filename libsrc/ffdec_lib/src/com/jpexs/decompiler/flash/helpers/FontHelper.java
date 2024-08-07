@@ -37,7 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- *
+ * Font helper.
  * @author JPEXS
  */
 public class FontHelper {

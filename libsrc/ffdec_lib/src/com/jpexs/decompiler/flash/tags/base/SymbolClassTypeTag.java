@@ -22,7 +22,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.util.Map;
 
 /**
- *
+ * Base class for SymbolClass and ExportAssets tags.
  * @author JPEXS
  */
 public abstract class SymbolClassTypeTag extends Tag {

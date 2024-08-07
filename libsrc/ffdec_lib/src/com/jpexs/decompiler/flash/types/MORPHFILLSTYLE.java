@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *
+ * Morph fill style.
  * @author JPEXS
  */
 public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {

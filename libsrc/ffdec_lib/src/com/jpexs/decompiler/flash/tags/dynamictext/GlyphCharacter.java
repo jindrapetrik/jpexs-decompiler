@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags.dynamictext;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 
 /**
- *
+ * Glyph character.
  * @author JPEXS
  */
 public class GlyphCharacter {

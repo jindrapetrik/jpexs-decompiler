@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.settings;
 import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 
 /**
- *
+ * DefineFont4 export settings.
  * @author JPEXS
  */
 public class Font4ExportSettings {

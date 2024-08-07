@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * If statement.
  * @author JPEXS
  */
 public class IfItem extends GraphTargetItem implements Block {

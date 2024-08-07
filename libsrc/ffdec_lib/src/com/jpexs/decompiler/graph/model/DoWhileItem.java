@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Do-while loop.
  * @author JPEXS
  */
 public class DoWhileItem extends LoopItem implements Block {

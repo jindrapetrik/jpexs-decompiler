@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import java.io.Serializable;
 
 /**
- *
+ * Morph line style array.
  * @author JPEXS
  */
 public class MORPHLINESTYLEARRAY implements Serializable {

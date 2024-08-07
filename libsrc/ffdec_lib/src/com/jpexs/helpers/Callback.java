@@ -17,7 +17,7 @@
 package com.jpexs.helpers;
 
 /**
- * Class with helper method
+ * Class with helper method.
  *
  * @author JPEXS
  * @param <T>

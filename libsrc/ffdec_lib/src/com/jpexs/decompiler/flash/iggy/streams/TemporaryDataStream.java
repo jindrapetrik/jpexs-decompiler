@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
+ * Temporary data stream.
  * @author JPEXS
  */
 public class TemporaryDataStream extends RandomAccessFileDataStream {

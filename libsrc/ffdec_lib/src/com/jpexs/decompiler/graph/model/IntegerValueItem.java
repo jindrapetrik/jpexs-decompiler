@@ -23,7 +23,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import java.util.Set;
 
 /**
- *
+ * Integer value.
  * @author JPEXS
  */
 public class IntegerValueItem extends GraphTargetItem implements IntegerValueTypeItem {

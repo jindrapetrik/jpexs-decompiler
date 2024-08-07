@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.exporters.script;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 
+/**
+ * Dependency of a script.
+ */
 public class Dependency {
 
     private DottedChain id;

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 /**
- *
+ * Interface for listening to changes in a tag.
  * @author JPEXS
  */
 public interface TagChangedListener {

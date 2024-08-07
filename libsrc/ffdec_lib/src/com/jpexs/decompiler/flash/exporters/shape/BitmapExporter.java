@@ -22,29 +22,11 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import com.jpexs.decompiler.flash.types.GRADIENT;
-import com.jpexs.decompiler.flash.types.GRADRECORD;
-import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.RGB;
-import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.graphics.ExtendedBasicStroke;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.LinearGradientPaint;
-import java.awt.MultipleGradientPaint;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.RadialGradientPaint;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.TexturePaint;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
@@ -52,11 +34,9 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * Bitmap exporter.
  * @author JPEXS
  */
 public class BitmapExporter extends ShapeExporterBase {

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Shape for morph exporter.
  * @author JPEXS
  */
 public class ShapeForMorphExporter extends ShapeExporterBase {

@@ -19,7 +19,7 @@ package com.jpexs.helpers;
 import java.util.Date;
 
 /**
- *
+ * Stopwatch class for measuring time.
  * @author JPEXS
  */
 public class Stopwatch {

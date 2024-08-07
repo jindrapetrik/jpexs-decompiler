@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Logical NOT.
  * @author JPEXS
  */
 public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {

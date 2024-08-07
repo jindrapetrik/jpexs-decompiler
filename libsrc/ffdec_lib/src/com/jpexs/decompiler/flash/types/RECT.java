@@ -23,7 +23,7 @@ import java.awt.Point;
 import java.io.Serializable;
 
 /**
- * A rectangle value represents a rectangular region.
+ * Rectangular region.
  *
  * @author JPEXS
  */
