@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -25,6 +25,7 @@ import java.util.Set;
 
 /**
  * A loop in a graph.
+ *
  * @author JPEXS
  */
 public class Loop implements Serializable {
@@ -40,9 +41,9 @@ public class Loop implements Serializable {
     public GraphPart loopBreak;
 
     /**
-     * Precontinue part of the loop.
-     * A precontinue is a part of the loop that is executed before the continue part.
-     * Example of this is a for loop with continue statement.
+     * Precontinue part of the loop. A precontinue is a part of the loop that is
+     * executed before the continue part. Example of this is a for loop with
+     * continue statement.
      */
     public GraphPart loopPreContinue;
 
@@ -77,8 +78,8 @@ public class Loop implements Serializable {
     public int reachableMark;
 
     /**
-     * Phase of the loop.
-     * The decompiler marks here whether the loop is already processed or not.
+     * Phase of the loop. The decompiler marks here whether the loop is already
+     * processed or not.
      */
     public int phase;
 
@@ -89,6 +90,7 @@ public class Loop implements Serializable {
 
     /**
      * Constructs a loop
+     *
      * @param id Unique id of the loop
      * @param loopContinue Continue part of the loop
      * @param loopBreak Break part of the loop
@@ -101,6 +103,7 @@ public class Loop implements Serializable {
 
     /**
      * To string method
+     *
      * @return String representation of the loop
      */
     @Override
@@ -119,6 +122,7 @@ public class Loop implements Serializable {
 
     /**
      * Hash code
+     *
      * @return Hash code of the loop
      */
     @Override
@@ -130,6 +134,7 @@ public class Loop implements Serializable {
 
     /**
      * Equals
+     *
      * @param obj Object to compare
      * @return True if the object is equal to this loop
      */

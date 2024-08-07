@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -129,6 +129,7 @@ import java.util.logging.Logger;
 
 /**
  * AVM2 graph.
+ *
  * @author JPEXS
  */
 public class AVM2Graph extends Graph {
@@ -166,6 +167,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Get AVM2 code
+     *
      * @return AVM2 code
      */
     public AVM2Code getCode() {
@@ -174,6 +176,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Get exceptions
+     *
      * @param body Method body
      * @return Exceptions
      */
@@ -188,6 +191,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Constructs AVM2 graph
+     *
      * @param abcIndex ABC indexing
      * @param code AVM2 code
      * @param abc ABC
@@ -212,6 +216,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks whether part can be break candidate
+     *
      * @param localData Local data
      * @param part Part
      * @param throwStates List of throw states
@@ -229,6 +234,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check before get loops
+     *
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
@@ -266,6 +272,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check after get loops
+     *
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
@@ -278,6 +285,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Gets ignored switches
+     *
      * @param localData Local data
      * @param allParts All parts
      * @throws InterruptedException
@@ -552,6 +560,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Walk local registers usage
+     *
      * @param throwStates List of throw states
      * @param localData Local data
      * @param getLocalPos Get local position
@@ -653,8 +662,9 @@ public class AVM2Graph extends Graph {
 
     /**
      * Calculates local registers usage.
-     *
+     * <p>
      * TODO: optimize this to make it faster!!!
+     *
      * @param throwStates List of throw states
      * @param localData Local data
      * @param ignoredSwitches Ignored switches
@@ -706,6 +716,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Translates via Graph - decompiles.
+     *
      * @param secondPassData Second pass data
      * @param callStack Call stack
      * @param abcIndex ABC indexing
@@ -759,6 +770,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check graph.
+     *
      * @param allBlocks All blocks
      */
     @Override
@@ -780,6 +792,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Finds lookup switch with get local.
+     *
      * @param registerId Register ID
      * @param part Part
      * @param visited Visited
@@ -813,6 +826,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Finds lookup switch with get local.
+     *
      * @param registerId Register ID
      * @param part Part
      * @return Graph part
@@ -823,6 +837,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Finds all pops.
+     *
      * @param localData Local data
      * @param stackLevel Stack level
      * @param part Part
@@ -850,8 +865,8 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Gets real references.
-     * Real = start >= 0
+     * Gets real references. Real = start >= 0
+     *
      * @param part
      * @return
      */
@@ -867,6 +882,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Search first part outside try-catch.
+     *
      * @param localData Local data
      * @param ex Exception
      * @param loops Loops
@@ -902,6 +918,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Gets nearest non-empty part.
+     *
      * @param part Part
      * @return Graph part
      */
@@ -914,6 +931,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Gets catched exception IDs.
+     *
      * @param part Part
      * @param previouslyCatchedExceptionIds Previously catched exception IDs
      * @param catchedExceptionIds Catched exception IDs
@@ -1032,6 +1050,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Finds nearest part outside catch.
+     *
      * @param tryTarget Try target
      * @param catchParts Catch parts
      * @return Graph part
@@ -1049,6 +1068,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks try.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -1537,6 +1557,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks whether the part can handle visited.
+     *
      * @param localData Local data
      * @param part Graph part
      * @return True if the part can handle visited
@@ -1558,6 +1579,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks whether the part can handle loop.
+     *
      * @param localData Local data
      * @param part Graph part
      * @param loops List of loops
@@ -1604,6 +1626,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check part output.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -1642,8 +1665,9 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Check before decompiling next section.
-     * Override this method to provide custom behavior.
+     * Check before decompiling next section. Override this method to provide
+     * custom behavior.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -1663,7 +1687,8 @@ public class AVM2Graph extends Graph {
      * @param currentLoop Current loop
      * @param staticOperation Unused
      * @param path Path
-     * @return List of GraphTargetItems to replace current output and stop further processing. Null to continue.
+     * @return List of GraphTargetItems to replace current output and stop
+     * further processing. Null to continue.
      * @throws InterruptedException
      */
     @Override
@@ -1793,8 +1818,8 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Get next parts of a part.
-     * Can be overriden to provide custom behavior.
+     * Get next parts of a part. Can be overriden to provide custom behavior.
+     *
      * @param localData Local data
      * @param part Part
      * @return List of GraphParts
@@ -1819,7 +1844,8 @@ public class AVM2Graph extends Graph {
      * @param prev Previous part
      * @param part Part
      * @param allParts All parts
-     * @return Return same part to continue processing or return another part to continue to other part. Or return null to stop.
+     * @return Return same part to continue processing or return another part to
+     * continue to other part. Or return null to stop.
      */
     @Override
     protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack,
@@ -1896,15 +1922,16 @@ public class AVM2Graph extends Graph {
         return part;
     }
 
-
     /**
      * Check of part.
+     *
      * @param stack Translate stack
      * @param localData Local data
      * @param prev Previous part
      * @param part Part
      * @param allParts All parts
-     * @return Return same part to continue processing or return another part to continue to other part. Or return null to stop.
+     * @return Return same part to continue processing or return another part to
+     * continue to other part. Or return null to stop.
      */
     @Override
     protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
@@ -1913,6 +1940,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks whether part is empty.
+     *
      * @param part Part
      * @return True if part is empty
      */
@@ -1935,6 +1963,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check loop.
+     *
      * @param output List of GraphTargetItems
      * @param loopItem Loop item
      * @param localData Local data
@@ -2277,6 +2306,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Process various items.
+     *
      * @param list List of GraphTargetItems
      * @param lastLoopId Last loop id
      */
@@ -2332,6 +2362,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Final process after.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -2369,6 +2400,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Check if item is integer or pop integer.
+     *
      * @param item GraphTargetItem
      * @return True if item is integer or pop integer
      */
@@ -2384,6 +2416,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Final process.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -2744,6 +2777,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Gets data for final process.
+     *
      * @param localData
      * @param loops
      * @param throwStates
@@ -2758,6 +2792,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Prepares local data for branch.
+     *
      * @param localData Local data
      * @return Local data for a branch
      */
@@ -2773,6 +2808,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks switch statement.
+     *
      * @param localData Local data
      * @param switchItem Switch item
      * @param otherSides Other sides
@@ -2788,7 +2824,8 @@ public class AVM2Graph extends Graph {
         }
         AVM2LocalData avm2LocalData = (AVM2LocalData) localData;
         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);
-        int setLocalIp = InstructionDefinition.getItemIp(avm2LocalData, setLocal);;
+        int setLocalIp = InstructionDefinition.getItemIp(avm2LocalData, setLocal);
+        ;
         Set<Integer> allUsages = new HashSet<>(avm2LocalData.getSetLocalUsages(setLocalIp));
         boolean isOtherSideReg = false;
         for (GraphTargetItem otherSide : otherSides) {
@@ -2813,6 +2850,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Checks if part is a switch.
+     *
      * @param part Part
      * @return True if part is a switch
      */
@@ -2826,6 +2864,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Gets throw states.
+     *
      * @param localData Local data
      * @param allParts All parts
      * @return List of ThrowStates
@@ -2913,6 +2952,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Walk catch parts register.
+     *
      * @param registerId Register id
      * @param part Part
      * @param startIp Start ip
@@ -2955,6 +2995,7 @@ public class AVM2Graph extends Graph {
 
     /**
      * Walk catch parts.
+     *
      * @param stats Code stats
      * @param part Part
      * @param startIp Start ip
@@ -3026,8 +3067,9 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Moves all stack items to commands.
-     * (If it's not a branch stack resistant or other special case)
+     * Moves all stack items to commands. (If it's not a branch stack resistant
+     * or other special case)
+     *
      * @param commands Commands
      * @param stack Stack
      */
@@ -3043,8 +3085,9 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Prepares second pass data.
-     * Can return null when no second pass will happen.
+     * Prepares second pass data. Can return null when no second pass will
+     * happen.
+     *
      * @param list List of GraphTargetItems
      * @return Second pass data or null
      */

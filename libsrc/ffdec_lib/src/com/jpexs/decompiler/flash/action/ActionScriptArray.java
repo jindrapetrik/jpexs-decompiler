@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * Represents ActionScript array.
+ *
  * @author JPEXS
  */
 public class ActionScriptArray extends ActionScriptObject {
@@ -32,9 +33,9 @@ public class ActionScriptArray extends ActionScriptObject {
     protected List<Object> values = new ArrayList<>();
 
     //TODO: implement some methods?
-
     /**
      * Enumerates all members of this object
+     *
      * @return
      */
     @Override
@@ -48,6 +49,7 @@ public class ActionScriptArray extends ActionScriptObject {
 
     /**
      * Gets member of this object
+     *
      * @param path Member path
      * @return Member value
      */
@@ -61,6 +63,7 @@ public class ActionScriptArray extends ActionScriptObject {
 
     /**
      * Sets member of this object
+     *
      * @param path Member path
      * @param value Value to set
      */
@@ -75,6 +78,7 @@ public class ActionScriptArray extends ActionScriptObject {
 
     /**
      * Sets value at index
+     *
      * @param index Index
      * @param value Value
      */
@@ -109,6 +113,7 @@ public class ActionScriptArray extends ActionScriptObject {
 
     /**
      * Gets value at index
+     *
      * @param index Index
      * @return Value
      */

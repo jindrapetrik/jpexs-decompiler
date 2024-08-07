@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -37,8 +37,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * DefineExternalImage2 tag - external image.
- * Extends functionality of DefineExternalImage.
+ * DefineExternalImage2 tag - external image. Extends functionality of
+ * DefineExternalImage.
+ *
  * @author JPEXS
  */
 public class DefineExternalImage2 extends AbstractGfxImageTag {
@@ -99,7 +100,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     public DefineExternalImage2(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
-        characterID = idType == IdType.IDTYPE_NONE ? imageID : - 1;
+        characterID = idType == IdType.IDTYPE_NONE ? imageID : -1;
     }
 
     public DefineExternalImage2(SWF swf) {

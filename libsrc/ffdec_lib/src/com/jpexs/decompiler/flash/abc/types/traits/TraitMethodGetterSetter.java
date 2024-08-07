@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -40,13 +40,13 @@ import java.util.List;
 
 /**
  * Method, getter or setter trait in ABC file.
+ *
  * @author JPEXS
  */
 public class TraitMethodGetterSetter extends Trait {
 
     /**
-     * Dispatch id.
-     * Compiler assigned value that helps overriding.
+     * Dispatch id. Compiler assigned value that helps overriding.
      */
     public int disp_id;
 
@@ -57,6 +57,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Deletes this trait.
+     *
      * @param abc ABC
      * @param d Deleted flag
      */
@@ -70,6 +71,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Converts header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -89,6 +91,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Gets dependencies.
+     *
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -120,6 +123,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * ToString of header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -163,6 +167,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Converts trait.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -201,6 +206,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * To string.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -212,6 +218,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * To string.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -283,6 +290,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Removes traps - deobfuscation.
+     *
      * @param scriptIndex Script index
      * @param classIndex Class index
      * @param isStatic Is static
@@ -302,6 +310,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Clones trait.
+     *
      * @return Cloned trait
      */
     @Override
@@ -312,6 +321,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Checks if trait is visible.
+     *
      * @param isStatic Is static
      * @param abc ABC
      * @return True if trait is visible
@@ -336,6 +346,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Converts trait header.
+     *
      * @param abc ABC
      * @param writer Writer
      * @return Writer
@@ -366,6 +377,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     /**
      * Gets method infos.
+     *
      * @param abc ABC
      * @param traitId Trait ID
      * @param classIndex Class index

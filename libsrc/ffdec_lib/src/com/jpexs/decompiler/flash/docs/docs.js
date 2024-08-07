@@ -24,8 +24,7 @@ function hideNoName(name) {
             if ((typeof name) != "undefined" && name.trim() != "") {
                 var ss = lis[i].getElementsByTagName("strong");
                 for (var s = 0; s < ss.length; s++) {
-                    if (ss[s].className == "instruction-name")
-                    {
+                    if (ss[s].className == "instruction-name") {
                         var insName = ss[s].innerHTML;
                         if (insName.toLowerCase().indexOf(name.toLowerCase()) != 0) { //does not start with desired name
                             showhide(lis[i], false);
@@ -70,11 +69,9 @@ function sortInstructions(order) {
             if (cls.indexOf(" instruction-item ") != -1) {
                 var ss = lis[i].getElementsByTagName(order == "code" ? "span" : "strong");
                 for (var s = 0; s < ss.length; s++) {
-                    if (ss[s].className == "instruction-" + order)
-                    {
+                    if (ss[s].className == "instruction-" + order) {
                         var checkedVal = ss[s].innerHTML;
-                        if (smallestVal == null || smallestVal > checkedVal)
-                        {
+                        if (smallestVal == null || smallestVal > checkedVal) {
                             smallestItem = lis[i];
                             smallestVal = checkedVal;
                         }

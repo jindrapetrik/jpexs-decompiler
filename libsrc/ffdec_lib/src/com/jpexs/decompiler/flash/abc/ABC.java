@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -81,6 +81,7 @@ import java.util.logging.Logger;
 
 /**
  * ABC structure.
+ *
  * @author JPEXS
  */
 public class ABC implements Openable {
@@ -193,6 +194,7 @@ public class ABC implements Openable {
 
     /**
      * Constructs ABC.
+     *
      * @param tag
      */
     public ABC(ABCContainerTag tag) {
@@ -202,6 +204,7 @@ public class ABC implements Openable {
 
     /**
      * Adds change listener.
+     *
      * @param listener
      */
     public void addChangeListener(Runnable listener) {
@@ -210,6 +213,7 @@ public class ABC implements Openable {
 
     /**
      * Removes change listener.
+     *
      * @param listener
      */
     public void removeChangeListener(Runnable listener) {
@@ -227,6 +231,7 @@ public class ABC implements Openable {
 
     /**
      * Gets openable.
+     *
      * @return
      */
     @Override
@@ -239,6 +244,7 @@ public class ABC implements Openable {
 
     /**
      * Gets SWF.
+     *
      * @return
      */
     public SWF getSwf() {
@@ -247,6 +253,7 @@ public class ABC implements Openable {
 
     /**
      * Gets list of ABC containers.
+     *
      * @return
      */
     public List<ABCContainerTag> getAbcTags() {
@@ -259,6 +266,7 @@ public class ABC implements Openable {
 
     /**
      * Adds method body.
+     *
      * @param body
      * @return
      */
@@ -270,6 +278,7 @@ public class ABC implements Openable {
 
     /**
      * Adds method info.
+     *
      * @param mi
      * @return
      */
@@ -280,6 +289,7 @@ public class ABC implements Openable {
 
     /**
      * Deletes class.
+     *
      * @param class_info Class index
      * @param d Deletion flag
      */
@@ -327,6 +337,7 @@ public class ABC implements Openable {
 
     /**
      * Adds method to class.
+     *
      * @param classId Class index
      * @param name Method name
      * @param isStatic Whether method is static
@@ -367,6 +378,7 @@ public class ABC implements Openable {
 
     /**
      * Adds event listener.
+     *
      * @param listener
      */
     public void addEventListener(EventListener listener) {
@@ -375,6 +387,7 @@ public class ABC implements Openable {
 
     /**
      * Removes event listener.
+     *
      * @param listener
      */
     public void removeEventListener(EventListener listener) {
@@ -383,6 +396,7 @@ public class ABC implements Openable {
 
     /**
      * Informs listeners.
+     *
      * @param event
      * @param data
      */
@@ -394,6 +408,7 @@ public class ABC implements Openable {
 
     /**
      * Removes traps (deobfuscation).
+     *
      * @return
      * @throws InterruptedException
      */
@@ -403,6 +418,7 @@ public class ABC implements Openable {
 
     /**
      * Removes traps (deobfuscation).
+     *
      * @param listener Listener
      * @return
      * @throws InterruptedException
@@ -420,6 +436,7 @@ public class ABC implements Openable {
 
     /**
      * Removes dead code.
+     *
      * @return
      * @throws InterruptedException
      */
@@ -429,6 +446,7 @@ public class ABC implements Openable {
 
     /**
      * Removes dead code.
+     *
      * @param listener Listener
      * @return
      * @throws InterruptedException
@@ -443,6 +461,7 @@ public class ABC implements Openable {
 
     /**
      * Gets namespace name string usages.
+     *
      * @return Set of string indexes
      */
     public Set<Integer> getNsStringUsages() {
@@ -455,6 +474,7 @@ public class ABC implements Openable {
 
     /**
      * Gets traits string usages.
+     *
      * @param ret Result
      * @param traits Traits
      */
@@ -476,6 +496,7 @@ public class ABC implements Openable {
 
     /**
      * Gets string usages.
+     *
      * @return
      */
     public Set<Integer> getStringUsages() {
@@ -509,6 +530,7 @@ public class ABC implements Openable {
 
     /**
      * Gets string usage type.
+     *
      * @param ret Result - map of string index to usage type
      * @param strIndex String index
      * @param usageType Usage type
@@ -531,6 +553,7 @@ public class ABC implements Openable {
 
     /**
      * Gets string usage types.
+     *
      * @param ret Result - map of string index to usage type
      * @param traits Traits
      */
@@ -586,6 +609,7 @@ public class ABC implements Openable {
 
     /**
      * Gets string usage types.
+     *
      * @param ret Result - map of string index to usage type
      */
     public void getStringUsageTypes(Map<Integer, String> ret) {
@@ -596,6 +620,7 @@ public class ABC implements Openable {
 
     /**
      * Renames multiname.
+     *
      * @param multinameIndex
      * @param newname
      */
@@ -616,6 +641,7 @@ public class ABC implements Openable {
 
     /**
      * Deobfuscates identifiers.
+     *
      * @param stringUsageTypes Map of string index to usage type
      * @param stringUsages Set of string indexes
      * @param namesMap Map of old name to new name
@@ -715,6 +741,7 @@ public class ABC implements Openable {
 
     /**
      * Checks whether the ABC has decimal support.
+     *
      * @return
      */
     public boolean hasDecimalSupport() {
@@ -723,6 +750,7 @@ public class ABC implements Openable {
 
     /**
      * Sets decimal support.
+     *
      * @param val
      */
     public void setDecimalSupport(boolean val) {
@@ -739,6 +767,7 @@ public class ABC implements Openable {
 
     /**
      * Checks minimum version.
+     *
      * @param minMajor
      * @param minMinor
      * @return
@@ -749,6 +778,7 @@ public class ABC implements Openable {
 
     /**
      * Checks whether the ABC has float support.
+     *
      * @return
      */
     public boolean hasFloatSupport() {
@@ -757,6 +787,7 @@ public class ABC implements Openable {
 
     /**
      * Sets float support.
+     *
      * @param val
      */
     public void setFloatSupport(boolean val) {
@@ -773,6 +804,7 @@ public class ABC implements Openable {
 
     /**
      * Checks whether the ABC has exception support.
+     *
      * @return
      */
     public boolean hasExceptionSupport() {
@@ -781,6 +813,7 @@ public class ABC implements Openable {
 
     /**
      * Constructs ABC.
+     *
      * @param ais ABC input stream
      * @param swf SWF
      * @param tag ABC container tag
@@ -792,6 +825,7 @@ public class ABC implements Openable {
 
     /**
      * Constructs ABC.
+     *
      * @param ais ABC input stream
      * @param swf SWF
      * @param tag ABC container tag
@@ -824,6 +858,7 @@ public class ABC implements Openable {
 
     /**
      * Reads ABC from input stream.
+     *
      * @param ais ABC input stream
      * @param swf SWF
      * @throws IOException
@@ -1056,6 +1091,7 @@ public class ABC implements Openable {
 
     /**
      * Saves ABC to stream.
+     *
      * @param os Output stream
      * @throws IOException
      */
@@ -1175,6 +1211,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method info.
+     *
      * @param methodInfo Method info
      * @return MethodBody or null
      */
@@ -1184,6 +1221,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method info.
+     *
      * @param methodInfo Method info index
      * @return MethodBody or null
      */
@@ -1193,6 +1231,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method body index.
+     *
      * @param methodInfo Method info
      * @return Method body index or -1
      */
@@ -1202,6 +1241,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method body index.
+     *
      * @param methodInfo Method info index
      * @return Method body index or -1
      */
@@ -1211,6 +1251,7 @@ public class ABC implements Openable {
 
     /**
      * Finds body of class initializer by class.
+     *
      * @param classNameWithSuffix Class name with suffix
      * @return MethodBody or null
      */
@@ -1229,6 +1270,7 @@ public class ABC implements Openable {
 
     /**
      * Finds body of instance initializer by class.
+     *
      * @param classNameWithSuffix Class name with suffix
      * @return MethodBody or null
      */
@@ -1247,6 +1289,7 @@ public class ABC implements Openable {
 
     /**
      * Finds body by class and name.
+     *
      * @param classNameWithSuffix Class name with suffix
      * @param methodNameWithSuffix Method name with suffix
      * @return MethodBody or null
@@ -1286,6 +1329,7 @@ public class ABC implements Openable {
 
     /**
      * Checks whether the trait id is static.
+     *
      * @param classIndex Class index
      * @param traitId Trait id
      * @return True if static
@@ -1304,6 +1348,7 @@ public class ABC implements Openable {
 
     /**
      * Finds trait by trait id.
+     *
      * @param classIndex Class index
      * @param traitId Trait id
      * @return Trait or null
@@ -1328,6 +1373,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method id by trait id.
+     *
      * @param classIndex Class index
      * @param traitId Trait id
      * @return Method id or -1
@@ -1367,6 +1413,7 @@ public class ABC implements Openable {
 
     /**
      * Gets namespace map.
+     *
      * @return Map from namespace name trait DottedChain.
      */
     private Map<String, DottedChain> getNamespaceMap() {
@@ -1392,6 +1439,7 @@ public class ABC implements Openable {
 
     /**
      * Gets deobfuscation object.
+     *
      * @return AVM2Deobfuscation
      */
     private AVM2Deobfuscation getDeobfuscation() {
@@ -1404,6 +1452,7 @@ public class ABC implements Openable {
 
     /**
      * Gets method indexing object.
+     *
      * @return ABCMethodIndexing
      */
     public final ABCMethodIndexing getMethodIndexing() {
@@ -1423,6 +1472,7 @@ public class ABC implements Openable {
 
     /**
      * Converts namespace value to name.
+     *
      * @param valueStr Namespace value
      * @return Namespace name as DottedChain
      */
@@ -1445,6 +1495,7 @@ public class ABC implements Openable {
 
     /**
      * Gets script packs.
+     *
      * @param packagePrefix Package prefix to search
      * @param allAbcs List of all ABCs
      * @return List of ScriptPack
@@ -1461,6 +1512,7 @@ public class ABC implements Openable {
 
     /**
      * Dump ABC to output stream.
+     *
      * @param os
      */
     public void dump(OutputStream os) {
@@ -1489,6 +1541,7 @@ public class ABC implements Openable {
 
     /**
      * Finds multiname definition.
+     *
      * @param multinameIndex Multiname index
      * @return List of MultinameUsage
      */
@@ -1505,6 +1558,7 @@ public class ABC implements Openable {
 
     /**
      * Finds multiname usage of namespace.
+     *
      * @param namespaceIndex Namespace index
      * @return List of MultinameUsage
      */
@@ -1520,6 +1574,7 @@ public class ABC implements Openable {
 
     /**
      * Finds multiname usage.
+     *
      * @param multinameIndex Multiname index
      * @param exactMatch Whether to match exactly
      * @return List of MultinameUsage
@@ -1537,6 +1592,7 @@ public class ABC implements Openable {
     /**
      * Gets colliding usages of multinames. For example same name
      * consts/vars/methods or same class names. Mostly in obfuscated files.
+     *
      * @return Set of MultinameUsage
      */
     public Set<MultinameUsage> getCollidingMultinameUsages() {
@@ -1612,6 +1668,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method info by name in class.
+     *
      * @param classId Class id
      * @param methodNameWithSuffix Method name with suffix
      * @return Method info index or -1
@@ -1631,6 +1688,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method body by name in class.
+     *
      * @param classId Class id
      * @param methodNameWithSuffix Method name with suffix
      * @return Method body index or -1
@@ -1650,6 +1708,7 @@ public class ABC implements Openable {
 
     /**
      * Finds method body by method name in class.
+     *
      * @param className Class name
      * @param methodName Method name
      * @return Method body index or -1
@@ -1661,6 +1720,7 @@ public class ABC implements Openable {
 
     /**
      * Finds class by name.
+     *
      * @param name Class name
      * @return Class index or -1
      */
@@ -1671,6 +1731,7 @@ public class ABC implements Openable {
 
     /**
      * Finds class by name.
+     *
      * @param nameWithSuffix Class name with suffix
      * @return Class index or -1
      */
@@ -1689,6 +1750,7 @@ public class ABC implements Openable {
 
     /**
      * Finds script packs by path.
+     *
      * @param name Name
      * @param allAbcs List of all ABCs
      * @return List of ScriptPack
@@ -1727,6 +1789,7 @@ public class ABC implements Openable {
 
     /**
      * Finds script pack by path.
+     *
      * @param name Name
      * @param allAbcs List of all ABCs
      * @return ScriptPack or null
@@ -1743,6 +1806,7 @@ public class ABC implements Openable {
 
     /**
      * Gets global trait id.
+     *
      * @param type Trait type
      * @param isStatic Whether static
      * @param classIndex Class index
@@ -1775,6 +1839,7 @@ public class ABC implements Openable {
 
     /**
      * Removes class from traits.
+     *
      * @param traits Traits
      * @param index Trait index
      */
@@ -1793,6 +1858,7 @@ public class ABC implements Openable {
 
     /**
      * Moves class in traits.
+     *
      * @param traits Traits
      * @param oldIndex Old index
      * @param newIndex New index
@@ -1810,6 +1876,7 @@ public class ABC implements Openable {
 
     /**
      * Moves class index.
+     *
      * @param oldIndex Old index
      * @param newIndex New index
      * @param currentIndex Current index
@@ -1833,6 +1900,7 @@ public class ABC implements Openable {
 
     /**
      * Moves class.
+     *
      * @param oldIndex Old index
      * @param newIndex New index
      */
@@ -1865,6 +1933,7 @@ public class ABC implements Openable {
 
     /**
      * Adds class.
+     *
      * @param ci Class info
      * @param ii Instance info
      * @param index Class index
@@ -1893,6 +1962,7 @@ public class ABC implements Openable {
 
     /**
      * Adds class in traits.
+     *
      * @param traits Traits
      * @param index Class index
      */
@@ -1911,6 +1981,7 @@ public class ABC implements Openable {
 
     /**
      * Reorganizes classes.
+     *
      * @param classIndexMap Map from old index to new index
      */
     public void reorganizeClasses(Map<Integer, Integer> classIndexMap) {
@@ -1946,6 +2017,7 @@ public class ABC implements Openable {
 
     /**
      * Reorganizes classes in traits.
+     *
      * @param traits Traits
      * @param classIndexMap Map from old index to new index
      */
@@ -1964,6 +2036,7 @@ public class ABC implements Openable {
 
     /**
      * Removes class.
+     *
      * @param index Class index
      */
     public void removeClass(int index) {
@@ -1990,6 +2063,7 @@ public class ABC implements Openable {
 
     /**
      * Removes method from traits.
+     *
      * @param traits Traits
      * @param index Method index
      */
@@ -2017,6 +2091,7 @@ public class ABC implements Openable {
 
     /**
      * Removes method.
+     *
      * @param index Method index
      */
     public void removeMethod(int index) {
@@ -2071,6 +2146,7 @@ public class ABC implements Openable {
 
     /**
      * Replaces script pack.
+     *
      * @param replacer Replacer
      * @param pack Script pack
      * @param as ActionScript
@@ -2150,6 +2226,7 @@ public class ABC implements Openable {
 
     /**
      * Packs traits.
+     *
      * @param traits Traits
      */
     private void packTraits(Traits traits) {
@@ -2471,6 +2548,7 @@ public class ABC implements Openable {
 
     /**
      * Merges traits.
+     *
      * @param secondTraits Second traits
      * @param mergeMultinameMap Multiname index mapping
      * @param mergeStringMap String index mapping
@@ -2521,6 +2599,7 @@ public class ABC implements Openable {
 
     /**
      * Merges trait.
+     *
      * @param secondTrait Second trait
      * @param mergeMultinameMap Multiname index mapping
      * @param mergeMethodInfoMap Method info index mapping
@@ -2539,6 +2618,7 @@ public class ABC implements Openable {
 
     /**
      * Merges trait.
+     *
      * @param secondTrait Second trait
      * @param mergeMultinameMap Multiname index mapping
      * @param mergeStringMap String index mapping
@@ -2617,6 +2697,7 @@ public class ABC implements Openable {
 
     /**
      * Merges trait.
+     *
      * @param secondTrait Second trait
      * @param mergeMultinameMap Multiname index mapping
      * @param mergeMethodInfoMap Method info index mapping
@@ -2635,6 +2716,7 @@ public class ABC implements Openable {
 
     /**
      * Merges trait.
+     *
      * @param secondTrait Second trait
      * @param mergeClassMap Class index mapping
      * @param mergeMultinameMap Multiname index mapping
@@ -2653,6 +2735,7 @@ public class ABC implements Openable {
 
     /**
      * Finds custom namespace name of namespace.
+     *
      * @param link_ns_index Namespace index
      * @return Custom namespace name
      */
@@ -2671,6 +2754,7 @@ public class ABC implements Openable {
 
     /**
      * Finds custom namespace name of multiname.
+     *
      * @param m Multiname
      * @return Custom namespace name
      */
@@ -2706,6 +2790,7 @@ public class ABC implements Openable {
 
     /**
      * Gets file.
+     *
      * @return File or null
      */
     @Override
@@ -2715,6 +2800,7 @@ public class ABC implements Openable {
 
     /**
      * Gets file title.
+     *
      * @return File title or file when null or null
      */
     @Override
@@ -2727,6 +2813,7 @@ public class ABC implements Openable {
 
     /**
      * Gets title or short file name.
+     *
      * @return Title or short file name
      */
     @Override
@@ -2738,8 +2825,8 @@ public class ABC implements Openable {
     }
 
     /**
-     * Gets short path title.
-     * (Include path from parents like DefineBinaryData)
+     * Gets short path title. (Include path from parents like DefineBinaryData)
+     *
      * @return Short path title
      */
     @Override
@@ -2754,6 +2841,7 @@ public class ABC implements Openable {
 
     /**
      * Gets short file name.
+     *
      * @return Short file name
      */
     @Override
@@ -2763,6 +2851,7 @@ public class ABC implements Openable {
 
     /**
      * Gets full path title.
+     *
      * @return Full path title
      */
     @Override
@@ -2777,6 +2866,7 @@ public class ABC implements Openable {
 
     /**
      * Gets modified flag.
+     *
      * @return
      */
     @Override
@@ -2786,6 +2876,7 @@ public class ABC implements Openable {
 
     /**
      * Sets openable list.
+     *
      * @param openableList Openable list
      */
     @Override
@@ -2796,6 +2887,7 @@ public class ABC implements Openable {
 
     /**
      * Gets openable list.
+     *
      * @return Openable list
      */
     @Override
@@ -2805,6 +2897,7 @@ public class ABC implements Openable {
 
     /**
      * To string.
+     *
      * @return
      */
     @Override
@@ -2814,6 +2907,7 @@ public class ABC implements Openable {
 
     /**
      * Saves ABC to stream.
+     *
      * @param os Output stream
      * @throws IOException
      */
@@ -2824,6 +2918,7 @@ public class ABC implements Openable {
 
     /**
      * Sets file.
+     *
      * @param file File
      */
     @Override
@@ -2850,6 +2945,7 @@ public class ABC implements Openable {
 
     /**
      * Checks whether the ABC has versioned API.
+     *
      * @return True if the ABC has versioned API
      */
     public boolean isApiVersioned() {
@@ -2864,6 +2960,7 @@ public class ABC implements Openable {
 
     /**
      * Gets data size.
+     *
      * @return Data size
      */
     public long getDataSize() {

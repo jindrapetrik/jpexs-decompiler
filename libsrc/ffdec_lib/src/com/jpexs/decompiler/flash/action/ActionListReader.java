@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -188,6 +188,7 @@ public class ActionListReader {
 
     /**
      * Fixes action list.
+     *
      * @param actions Action list
      * @param nextOffsets Next offsets
      * @return Fixed action list
@@ -240,6 +241,7 @@ public class ActionListReader {
 
     /**
      * Gets original actions.
+     *
      * @param sis SWF input stream
      * @param startIp Start IP
      * @param endIp End IP
@@ -261,6 +263,7 @@ public class ActionListReader {
 
     /**
      * Gets near address.
+     *
      * @param actions Action list
      * @param address Address
      * @param next Next
@@ -289,6 +292,7 @@ public class ActionListReader {
 
     /**
      * Converts list of actions to map of address to action.
+     *
      * @param actions List of actions
      * @return Map of address to action
      */
@@ -307,6 +311,7 @@ public class ActionListReader {
 
     /**
      * Gets jumps.
+     *
      * @param actions List of actions
      * @param jumps Jumps - map of jumpAction to targetAction
      */
@@ -341,6 +346,7 @@ public class ActionListReader {
 
     /**
      * Gets container last actions.
+     *
      * @param actions List of actions
      * @param action Action
      * @return List of last actions
@@ -364,6 +370,7 @@ public class ActionListReader {
 
     /**
      * Gets container last actions.
+     *
      * @param actions List of actions
      * @param lastActions Last actions
      */
@@ -377,6 +384,7 @@ public class ActionListReader {
 
     /**
      * Updates addresses.
+     *
      * @param actions List of actions
      * @param address Address
      * @param charset Charset
@@ -398,6 +406,7 @@ public class ActionListReader {
 
     /**
      * Updates action lengths.
+     *
      * @param actions List of actions
      */
     private static void updateActionLengths(List<Action> actions) {
@@ -408,6 +417,7 @@ public class ActionListReader {
 
     /**
      * Updates action stores.
+     *
      * @param actions List of actions
      * @param jumps Jumps - map of jumpAction to targetAction
      */
@@ -435,6 +445,7 @@ public class ActionListReader {
 
     /**
      * Updates container sizes.
+     *
      * @param actions List of actions
      * @param containerLastActions Container last actions
      */
@@ -457,6 +468,7 @@ public class ActionListReader {
 
     /**
      * Replaces jump targets.
+     *
      * @param jumps Jumps - map of jumpAction to targetAction
      * @param oldTarget Old target
      * @param newTarget New target
@@ -471,6 +483,7 @@ public class ActionListReader {
 
     /**
      * Replaces container last actions.
+     *
      * @param containerLastActions Container last actions
      * @param oldTarget Old target
      * @param newTarget New target
@@ -488,6 +501,7 @@ public class ActionListReader {
 
     /**
      * Updates jumps.
+     *
      * @param actions List of actions
      * @param jumps Jumps - map of jumpAction to targetAction
      * @param containerLastActions Container last actions
@@ -776,6 +790,7 @@ public class ActionListReader {
 
     /**
      * Reads action list at the specified position.
+     *
      * @param listeners List of listeners
      * @param cpool Constant pool
      * @param sis SWF input stream
@@ -898,6 +913,7 @@ public class ActionListReader {
 
     /**
      * Fixes constant pools.
+     *
      * @param listeners List of listeners
      * @param actions Actions
      * @return True if constant pools were fixed, false otherwise
@@ -925,6 +941,7 @@ public class ActionListReader {
 
     /**
      * Fixes constant pools.
+     *
      * @param listeners List of listeners
      * @param cpool Constant pool
      * @param actions Actions

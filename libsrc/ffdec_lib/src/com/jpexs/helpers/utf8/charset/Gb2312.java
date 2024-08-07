@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * GB2312 to unicode and back conversion. Based on
  * https://github.com/MoarVM/MoarVM/blob/master/src/strings/gb2312_codeindex.h
  */
@@ -36,14 +35,14 @@ public class Gb2312 extends AbstractCharsetConverter {
     static final int GB2312_NULL = -1;
 
     /* Conversion tables are generated according to mapping from
- * unicode.org-mappings/EASTASIA/GB/GB2312.TXT
- * at https://haible.de/bruno/charsets/conversion-tables/GB2312.html
- * The following tables use EUC form for GB2312 characters.
+     * unicode.org-mappings/EASTASIA/GB/GB2312.TXT
+     * at https://haible.de/bruno/charsets/conversion-tables/GB2312.html
+     * The following tables use EUC form for GB2312 characters.
 
- * Unicode indexes 1106 - 8212, 9795 - 12287, 12842 - 19967,
- * and 40865 - 65280 don't correspond to gb2312 codepoint.
- * To reduce code length and save memory, these intervals are omitted 
- * in the conversion table and indexes are shifted in the function. */
+     * Unicode indexes 1106 - 8212, 9795 - 12287, 12842 - 19967,
+     * and 40865 - 65280 don't correspond to gb2312 codepoint.
+     * To reduce code length and save memory, these intervals are omitted
+     * in the conversion table and indexes are shifted in the function. */
     private static int[][] gb2312_index_to_cp_record = new int[87][94];
 
     private static int[] gb2312_cp_to_index_record = new int[24380];

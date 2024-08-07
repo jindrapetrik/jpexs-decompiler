@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 /**
  * Register number.
+ *
  * @author JPEXS
  */
 public class RegisterNumber implements Serializable {
@@ -37,6 +38,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -48,6 +50,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * Equals.
+     *
      * @param obj Object
      * @return True if equals
      */
@@ -68,6 +71,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * Constructs a new register number.
+     *
      * @param number Register number
      * @param name Register name
      */
@@ -78,6 +82,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * Constructs a new register number.
+     *
      * @param number Register number
      */
     public RegisterNumber(int number) {
@@ -86,6 +91,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * To string.
+     *
      * @return String representation
      */
     @Override
@@ -98,6 +104,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * To string without name.
+     *
      * @return String representation
      */
     public String toStringNoName() {
@@ -106,6 +113,7 @@ public class RegisterNumber implements Serializable {
 
     /**
      * Translate register number to name.
+     *
      * @return Translated name
      */
     public String translate() {

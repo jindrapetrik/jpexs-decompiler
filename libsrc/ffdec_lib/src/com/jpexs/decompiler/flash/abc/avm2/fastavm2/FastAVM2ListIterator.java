@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 /**
  * Iterator for FastAVM2List
+ *
  * @author JPEXS
  */
 public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem> {
@@ -42,6 +43,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Constructs a new iterator.
+     *
      * @param list List
      */
     FastAVM2ListIterator(FastAVM2List list) {
@@ -51,6 +53,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Constructs a new iterator.
+     *
      * @param list List
      * @param index Index
      */
@@ -68,6 +71,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Checks if there is a next item.
+     *
      * @return True if there is a next item
      */
     @Override
@@ -77,6 +81,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Gets the next item.
+     *
      * @return Next item
      */
     @Override
@@ -93,6 +98,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Gets the previous item.
+     *
      * @return Previous item
      */
     public AVM2InstructionItem prev() {
@@ -108,7 +114,8 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
     }
 
     /**
-     * Sets the current item.      
+     * Sets the current item.
+     *
      * @param item Item
      */
     public void setCurrent(AVM2InstructionItem item) {
@@ -128,6 +135,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Adds an item.
+     *
      * @param ins Instruction
      */
     public void add(AVM2Instruction ins) {
@@ -136,6 +144,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Adds an item.
+     *
      * @param insItem Instruction item
      */
     public void add(AVM2InstructionItem insItem) {
@@ -144,6 +153,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Adds an item before the current item.
+     *
      * @param insItem Instruction item
      */
     public void addBefore(AVM2InstructionItem insItem) {
@@ -152,6 +162,7 @@ public final class FastAVM2ListIterator implements Iterator<AVM2InstructionItem>
 
     /**
      * Get the item at the specified index.
+     *
      * @param index Index
      * @return Item
      */

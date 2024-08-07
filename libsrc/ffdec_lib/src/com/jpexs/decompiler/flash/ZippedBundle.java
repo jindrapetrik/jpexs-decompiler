@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -36,6 +36,7 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Bundle implementation for ZIP files.
+ *
  * @author JPEXS
  */
 public class ZippedBundle implements Bundle {
@@ -62,6 +63,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Constructs a new ZippedBundle from an input stream.
+     *
      * @param is Input stream
      * @throws IOException
      */
@@ -71,6 +73,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Constructs a new ZippedBundle from a file.
+     *
      * @param filename File
      * @throws IOException
      */
@@ -80,6 +83,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Constructs a new ZippedBundle from an input stream and a file.
+     *
      * @param is Input stream
      * @param filename File
      * @throws IOException
@@ -90,6 +94,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Initializes the bundle.
+     *
      * @param is Input stream
      * @param filename File
      * @throws IOException
@@ -116,6 +121,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets the number of entries in the bundle.
+     *
      * @return
      */
     @Override
@@ -125,6 +131,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets the keys in the bundle.
+     *
      * @return
      */
     @Override
@@ -134,6 +141,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets the input stream for a key.
+     *
      * @param key Key
      * @return Input stream
      * @throws IOException
@@ -165,6 +173,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets all input streams in the bundle.
+     *
      * @return Map of key to input stream
      * @throws IOException
      */
@@ -179,6 +188,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets the extension of the bundle.
+     *
      * @return Extension
      */
     @Override
@@ -188,6 +198,7 @@ public class ZippedBundle implements Bundle {
 
     /**
      * Gets whether the bundle is read-only.
+     *
      * @return Whether the bundle is read-only
      */
     @Override
@@ -195,9 +206,9 @@ public class ZippedBundle implements Bundle {
         return this.filename == null || !this.filename.canWrite();
     }
 
-
     /**
      * Replaces the input stream for a key.
+     *
      * @param key Key
      * @param swfIs New input stream
      * @return Whether the operation was successful

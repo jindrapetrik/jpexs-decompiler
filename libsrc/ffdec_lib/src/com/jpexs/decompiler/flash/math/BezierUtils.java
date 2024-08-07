@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,11 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * Bezier utils. Based on
  * https://code.google.com/archive/p/degrafa/source/default/source which is
  * derived from an algorithm in the book "Graphics Gems"
- *
+ * <p>
  * This modification does not have cubic curves support.
  */
 public class BezierUtils {
@@ -191,9 +190,7 @@ public class BezierUtils {
      * @param _right Array reference to an array in which the control points,
      * <code>Array</code> of <code>Point</code> references, of the right control
      * cage after subdivision are stored
-     *
      * @since 1.0
-     *
      */
     public void subdivide(List<Point2D> _c, double _t, List<Point2D> _left, List<Point2D> _right) {
         int degree = _c.size() - 1;

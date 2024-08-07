@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * A character tag.
+ *
  * @author JPEXS
  */
 public abstract class CharacterTag extends Tag implements CharacterIdTag {
@@ -129,7 +130,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         }
         return "" + getCharacterId();
     }
-    
+
     private String getMembersToClassName(GraphTargetItem item) {
         List<String> ret = new ArrayList<>();
         while (item instanceof GetMemberActionItem) {
@@ -159,13 +160,13 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         ret.add(0, varName);
         return String.join(".", ret);
     }
-    
+
     public String getAs2ClassName() {
         String linkageIdentifier = getExportName();
         if (linkageIdentifier == null) {
             return null;
         }
-        Reference<String> classNameRef = new Reference<>(null);        
+        Reference<String> classNameRef = new Reference<>(null);
         for (Tag t : getSwf().getTags()) {
             if (t instanceof DoInitActionTag) {
                 DoInitActionTag as = (DoInitActionTag) t;
@@ -221,7 +222,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
                                     return;
                                 }
                                 classNameRef.setVal(newClassNames.get(0));
-                            }                            
+                            }
                         });
                         as.getActionScriptSource(writer, null, ops);
                     } catch (InterruptedException ex) {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 /**
  * Information about openable source.
+ *
  * @author JPEXS
  */
 public class OpenableSourceInfo {
@@ -62,6 +63,7 @@ public class OpenableSourceInfo {
 
     /**
      * Constructs OpenableSourceInfo with empty source
+     *
      * @param fileTitle Title of the file
      */
     public OpenableSourceInfo(String fileTitle) {
@@ -71,6 +73,7 @@ public class OpenableSourceInfo {
 
     /**
      * Check if the source is empty
+     *
      * @return true if the source is empty
      */
     public boolean isEmpty() {
@@ -79,6 +82,7 @@ public class OpenableSourceInfo {
 
     /**
      * Constructs OpenableSourceInfo with input stream
+     *
      * @param inputStream Input stream of the source
      * @param file File path of the source
      * @param fileTitle Title of the file
@@ -89,6 +93,7 @@ public class OpenableSourceInfo {
 
     /**
      * Constructs OpenableSourceInfo with input stream
+     *
      * @param inputStream Input stream of the source
      * @param file File path of the source
      * @param fileTitle Title of the file
@@ -104,6 +109,7 @@ public class OpenableSourceInfo {
 
     /**
      * Gets kind of the source.
+     *
      * @return Kind of the source
      */
     public OpenableSourceKind getKind() {
@@ -125,6 +131,7 @@ public class OpenableSourceInfo {
 
     /**
      * Gets input stream of the source.
+     *
      * @return Input stream of the source
      */
     public InputStream getInputStream() {
@@ -133,6 +140,7 @@ public class OpenableSourceInfo {
 
     /**
      * Gets file path of the source.
+     *
      * @return File path of the source
      */
     public String getFile() {
@@ -141,6 +149,7 @@ public class OpenableSourceInfo {
 
     /**
      * Sets file path of the source.
+     *
      * @param file File path of the source
      */
     public void setFile(String file) {
@@ -181,6 +190,7 @@ public class OpenableSourceInfo {
 
     /**
      * Checks if the source is a bundle.
+     *
      * @return True if the source is a bundle
      */
     public boolean isBundle() {
@@ -198,6 +208,7 @@ public class OpenableSourceInfo {
 
     /**
      * Gets bundle from the source.
+     *
      * @param noCheck Whether to check the bundle
      * @param searchMode Search mode
      * @return Bundle or null

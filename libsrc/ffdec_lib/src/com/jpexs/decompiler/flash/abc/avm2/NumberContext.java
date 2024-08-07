@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -76,6 +76,7 @@ public class NumberContext {
 
     /**
      * Sets the usage of the number.
+     *
      * @param usage
      */
     public void setUsage(int usage) {
@@ -87,6 +88,7 @@ public class NumberContext {
 
     /**
      * Gets the usage of the number.
+     *
      * @return Usage of the number.
      */
     public int getUsage() {
@@ -95,6 +97,7 @@ public class NumberContext {
 
     /**
      * Gets the precision of the number.
+     *
      * @return Precision of the number.
      */
     public int getPrecision() {
@@ -103,6 +106,7 @@ public class NumberContext {
 
     /**
      * Sets the precision of the number.
+     *
      * @param precision Precision of the number.
      */
     public void setPrecision(int precision) {
@@ -114,6 +118,7 @@ public class NumberContext {
 
     /**
      * Converts the number context to a parameter.
+     *
      * @return Parameter.
      */
     public int toParam() {

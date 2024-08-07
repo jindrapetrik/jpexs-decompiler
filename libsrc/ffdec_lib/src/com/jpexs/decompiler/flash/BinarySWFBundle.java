@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -27,6 +27,7 @@ import java.util.Set;
 
 /**
  * Binary search SWF bundle
+ *
  * @author JPEXS
  */
 public class BinarySWFBundle implements Bundle {
@@ -38,6 +39,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Constructs a new BinarySWFBundle.
+     *
      * @param is Input stream
      * @param noCheck Do not check
      * @param searchMode Search mode
@@ -50,6 +52,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Gets size of the search.
+     *
      * @return Size of the search
      */
     @Override
@@ -59,6 +62,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Gets keys.
+     *
      * @return Keys
      */
     @Override
@@ -72,6 +76,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Gets openable.
+     *
      * @param key Key
      * @return Openable
      */
@@ -94,6 +99,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Gets all.
+     *
      * @return Map of string to seekable input stream
      */
     @Override
@@ -107,6 +113,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Gets extension.
+     *
      * @return Extension
      */
     @Override
@@ -116,6 +123,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Checks if read only.
+     *
      * @return True if read only, false otherwise
      */
     @Override
@@ -125,6 +133,7 @@ public class BinarySWFBundle implements Bundle {
 
     /**
      * Replaces openable.
+     *
      * @param key Key
      * @param is Input stream
      * @return True if successful, false otherwise

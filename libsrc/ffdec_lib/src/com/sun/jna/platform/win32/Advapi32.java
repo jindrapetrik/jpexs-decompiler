@@ -1,36 +1,35 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
 package com.sun.jna.platform.win32;
 
 /**
- *
  * @author JPEXS
  */
 /* Copyright (c) 2010 Daniel Doubrovkine, All Rights Reserved
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.  
+ * Lesser General Public License for more details.
  */
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -395,7 +394,6 @@ public interface Advapi32 extends StdCallLibrary {
             byte[] lpData, int cbData);
 
     /**
-     *
      * @param hKey hKey
      * @param lpSubKey lpSubKey
      * @param Reserved Reserved
@@ -414,7 +412,6 @@ public interface Advapi32 extends StdCallLibrary {
             HKEYByReference phkResult, IntByReference lpdwDisposition);
 
     /**
-     *
      * @param hKey hKey
      * @param name name
      * @return If the function succeeds, the return value is ERROR_SUCCESS. If
@@ -703,7 +700,7 @@ public interface Advapi32 extends StdCallLibrary {
     /**
      * Creates a new process and its primary thread. The new process runs in the
      * security context of the user represented by the specified token.
-     *
+     * <p>
      * Typically, the process that calls the CreateProcessAsUser function must
      * have the SE_INCREASE_QUOTA_NAME privilege and may require the
      * SE_ASSIGNPRIMARYTOKEN_NAME privilege if the token is not assignable. If
@@ -734,7 +731,7 @@ public interface Advapi32 extends StdCallLibrary {
      * @param lpEnvironment A pointer to an environment block for the new
      * process. If this parameter is NULL, the new process uses the environment
      * of the calling process.
-     *
+     * <p>
      * An environment block consists of a null-terminated block of
      * null-terminated strings. Each string is in the following form:
      * name=value\0

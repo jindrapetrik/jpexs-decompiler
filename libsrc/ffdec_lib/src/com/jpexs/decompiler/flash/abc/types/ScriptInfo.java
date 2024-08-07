@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * Script info in ABC file.
+ *
  * @author JPEXS
  */
 public class ScriptInfo {
@@ -68,6 +69,7 @@ public class ScriptInfo {
 
     /**
      * Constructs new script info.
+     *
      * @param traits Traits
      */
     public ScriptInfo(Traits traits) {
@@ -83,6 +85,7 @@ public class ScriptInfo {
 
     /**
      * Set modified flag.
+     *
      * @param modified Modified flag
      */
     public void setModified(boolean modified) {
@@ -91,6 +94,7 @@ public class ScriptInfo {
 
     /**
      * Check if script is modified.
+     *
      * @return True if script is modified
      */
     public boolean isModified() {
@@ -98,9 +102,10 @@ public class ScriptInfo {
     }
 
     /**
-     * Gets simple pack name.
-     * Finds the first public trait package name.
-     * If there is no public trait or there are more than one public traits, returns null.
+     * Gets simple pack name. Finds the first public trait package name. If
+     * there is no public trait or there are more than one public traits,
+     * returns null.
+     *
      * @param abc ABC file
      * @return Simple pack name - Can be null!
      */
@@ -127,6 +132,7 @@ public class ScriptInfo {
 
     /**
      * Gets script packs.
+     *
      * @param abc ABC file
      * @param scriptIndex Script index
      * @param packagePrefix Package prefix
@@ -217,6 +223,7 @@ public class ScriptInfo {
 
     /**
      * Removes traps - deobfuscation.
+     *
      * @param scriptIndex Script index
      * @param abc ABC file
      * @param path Path
@@ -229,6 +236,7 @@ public class ScriptInfo {
 
     /**
      * To string.
+     *
      * @return String representation
      */
     @Override
@@ -238,6 +246,7 @@ public class ScriptInfo {
 
     /**
      * To string.
+     *
      * @param abc ABC file
      * @param fullyQualifiedNames Fully qualified names
      * @return String representation
@@ -248,6 +257,7 @@ public class ScriptInfo {
 
     /**
      * Delete script info.
+     *
      * @param abc ABC file
      * @param d Deleted flag
      */

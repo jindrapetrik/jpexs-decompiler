@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,7 +54,7 @@ public interface Kernel32 extends WinNT {
      * @param uExitCode The exit code to be used by the process and threads
      * terminated as a result of this call.
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -148,7 +148,7 @@ public interface Kernel32 extends WinNT {
 
     public static final int REALTIME_PRIORITY_CLASS = 0x00000100;
 
-//	__out
+    //	__out
 //	HANDLE
 //	WINAPI
 //	CreateNamedPipe(
@@ -173,7 +173,7 @@ public interface Kernel32 extends WinNT {
 //        );
     boolean ConnectNamedPipe(HANDLE hNamedPipe, WinBase.OVERLAPPED lpOverlapped);
 
-//    WINBASEAPI
+    //    WINBASEAPI
 //    BOOL
 //    WINAPI
 //    DisconnectNamedPipe(
@@ -271,26 +271,24 @@ public interface Kernel32 extends WinNT {
      * modules, and threads used by these processes.
      *
      * @param dwFlags The portions of the system to be included in the snapshot.
-     *
      * @param th32ProcessID The process identifier of the process to be included
      * in the snapshot. This parameter can be zero to indicate the current
      * process. This parameter is used when the TH32CS_SNAPHEAPLIST,
      * TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, or TH32CS_SNAPALL value is
      * specified. Otherwise, it is ignored and all processes are included in the
      * snapshot.
-     *
+     * <p>
      * If the specified process is the Idle process or one of the CSRSS
      * processes, this function fails and the last error code is
      * ERROR_ACCESS_DENIED because their access restrictions prevent user-level
      * code from opening them.
-     *
+     * <p>
      * If the specified process is a 64-bit process and the caller is a 32-bit
      * process, this function fails and the last error code is
      * ERROR_PARTIAL_COPY (299).
-     *
      * @return If the function succeeds, it returns an open handle to the
      * specified snapshot.
-     *
+     * <p>
      * If the function fails, it returns INVALID_HANDLE_VALUE. To get extended
      * error information, call GetLastError. Possible error codes include
      * ERROR_BAD_LENGTH.

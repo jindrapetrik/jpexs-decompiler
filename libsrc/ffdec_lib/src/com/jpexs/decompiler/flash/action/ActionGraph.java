@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -85,6 +85,7 @@ import java.util.Set;
 
 /**
  * ActionScript 1/2 graph
+ *
  * @author JPEXS
  */
 public class ActionGraph extends Graph {
@@ -100,12 +101,14 @@ public class ActionGraph extends Graph {
     private boolean insideFunction;
 
     /**
-     * Uninitialized class traits - maps class name to map of trait name to trait
+     * Uninitialized class traits - maps class name to map of trait name to
+     * trait
      */
     private Map<String, Map<String, Trait>> uninitializedClassTraits;
 
     /**
      * Constructs ActionGraph
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param path Path
      * @param insideDoInitAction Inside DoInitAction
@@ -126,15 +129,17 @@ public class ActionGraph extends Graph {
 
     /**
      * Get uninitialized class traits
-     * @return Uninitialized class traits - maps class name to map of trait name to trait
+     *
+     * @return Uninitialized class traits - maps class name to map of trait name
+     * to trait
      */
     public Map<String, Map<String, Trait>> getUninitializedClassTraits() {
         return uninitializedClassTraits;
     }
 
-
     /**
      * Gets the graphSource
+     *
      * @return GraphSource
      */
     @Override
@@ -144,6 +149,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Gets sub-graphs
+     *
      * @return
      */
     @Override
@@ -179,6 +185,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Checks whether is inside DoInitAction.
+     *
      * @return True if is inside DoInitAction, false otherwise
      */
     public boolean isInsideDoInitAction() {
@@ -187,6 +194,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Method called after populating all parts.
+     *
      * @param allParts All parts
      */
     @Override
@@ -196,6 +204,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Translates via Graph - decompiles.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param secondPassData Second pass data
      * @param insideDoInitAction Inside DoInitAction
@@ -219,8 +228,8 @@ public class ActionGraph extends Graph {
     }
 
     /**
-     * Final process stack.
-     * Override this method to provide custom behavior.
+     * Final process stack. Override this method to provide custom behavior.
+     *
      * @param stack Translate stack
      * @param output Output
      * @param path Path
@@ -242,6 +251,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Checks whether a part can be a break candidate.
+     *
      * @param localData Local data
      * @param part Part
      * @param throwStates List of throw states
@@ -267,6 +277,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Final process.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -548,8 +559,9 @@ public class ActionGraph extends Graph {
     }
 
     /**
-     * Moves all stack items to commands.
-     * (If it's not a branch stack resistant or other special case)
+     * Moves all stack items to commands. (If it's not a branch stack resistant
+     * or other special case)
+     *
      * @param commands Commands
      * @param stack Stack
      */
@@ -600,6 +612,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Translates the graph - decompiles.
+     *
      * @param localData Local data
      * @param staticOperation Unused
      * @param path Path
@@ -636,6 +649,7 @@ public class ActionGraph extends Graph {
      */
     /**
      * Makes define registers up.
+     *
      * @param list List of GraphTargetItems
      */
     private void makeDefineRegistersUp(List<GraphTargetItem> list) {
@@ -684,6 +698,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Finds part.
+     *
      * @param ip IP
      * @param allParts All parts
      * @return GraphPart
@@ -699,6 +714,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Check before decompiling next section.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -718,7 +734,8 @@ public class ActionGraph extends Graph {
      * @param currentLoop Current loop
      * @param staticOperation Unused
      * @param path Path
-     * @return List of GraphTargetItems to replace current output and stop further processing. Null to continue.
+     * @return List of GraphTargetItems to replace current output and stop
+     * further processing. Null to continue.
      * @throws InterruptedException
      */
     @Override
@@ -828,6 +845,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Checks IP and allows to modify it.
+     *
      * @param ip Current IP
      * @return New IP
      */
@@ -860,8 +878,9 @@ public class ActionGraph extends Graph {
     }
 
     /**
-     * Prepares second pass data.
-     * Can return null when no second pass will happen.
+     * Prepares second pass data. Can return null when no second pass will
+     * happen.
+     *
      * @param list List of GraphTargetItems
      * @return Second pass data or null
      */
@@ -879,6 +898,7 @@ public class ActionGraph extends Graph {
 
     /**
      * Checks second pass switches.
+     *
      * @param processedIfs Processed ifs
      * @param list List of GraphTargetItems
      * @param allSwitchParts All switch parts

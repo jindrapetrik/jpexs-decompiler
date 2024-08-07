@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 /**
  * AVM2 constant pool.
+ *
  * @author JPEXS
  */
 public class AVM2ConstantPool implements Cloneable {
@@ -134,6 +135,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets cached multiname with namespace dottedchain.
+     *
      * @param multiName Multiname
      * @return Dotted chain
      */
@@ -143,6 +145,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Caches multiname with namespace dotted chain.
+     *
      * @param multiName Multiname
      * @param multinameWithNamespace Dotted chain
      */
@@ -166,6 +169,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list has at least one - null - element.
+     *
      * @param list List
      */
     private void ensureDefault(List<?> list) {
@@ -176,6 +180,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of integers has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureIntCapacity(int capacity) {
@@ -187,6 +192,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of namespaces has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureNamespaceCapacity(int capacity) {
@@ -198,6 +204,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of namespace sets has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureNamespaceSetCapacity(int capacity) {
@@ -209,6 +216,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of multinames has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureMultinameCapacity(int capacity) {
@@ -220,6 +228,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of unsigned integers has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureUIntCapacity(int capacity) {
@@ -231,6 +240,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of doubles has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureDoubleCapacity(int capacity) {
@@ -242,6 +252,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of decimals has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureDecimalCapacity(int capacity) {
@@ -253,6 +264,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of floats has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureFloatCapacity(int capacity) {
@@ -264,6 +276,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of float4 has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureFloat4Capacity(int capacity) {
@@ -275,6 +288,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Ensures that list of strings has the initial capacity.
+     *
      * @param capacity Capacity
      */
     public void ensureStringCapacity(int capacity) {
@@ -286,6 +300,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds an integer to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -298,6 +313,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a namespace to the constant pool.
+     *
      * @param ns Namespace
      * @return Index
      */
@@ -309,6 +325,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a namespace to the constant pool.
+     *
      * @param kind Kind
      * @param nameIndex Name index
      * @return Index
@@ -319,6 +336,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a namespace set to the constant pool.
+     *
      * @param nss Namespace set
      * @return Index
      */
@@ -330,6 +348,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a multiname to the constant pool.
+     *
      * @param m Multiname
      * @return Index
      */
@@ -341,6 +360,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds an unsigned integer to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -353,6 +373,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a double to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -364,6 +385,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a decimal to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -375,6 +397,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a float to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -386,6 +409,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a float4 to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -397,6 +421,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Adds a string to the constant pool.
+     *
      * @param value Value
      * @return Index
      */
@@ -408,6 +433,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets an integer at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -419,6 +445,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a namespace at the specified index.
+     *
      * @param index Index
      * @param ns Namespace
      * @return Namespace
@@ -430,6 +457,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a namespace set at the specified index.
+     *
      * @param index Index
      * @param nss Namespace set
      * @return Namespace set
@@ -441,6 +469,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a multiname at the specified index.
+     *
      * @param index Index
      * @param m Multiname
      * @return Multiname
@@ -452,6 +481,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets an unsigned integer at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -463,6 +493,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a double at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -474,6 +505,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a decimal at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -485,6 +517,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a float at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -496,6 +529,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a float4 at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -507,6 +541,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Sets a string at the specified index.
+     *
      * @param index Index
      * @param value Value
      * @return Value
@@ -518,6 +553,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets an integer at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -530,6 +566,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a namespace at the specified index.
+     *
      * @param index Index
      * @return Namespace
      */
@@ -539,6 +576,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a namespace set at the specified index.
+     *
      * @param index Index
      * @return Namespace set
      */
@@ -572,6 +610,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a multiname at the specified index.
+     *
      * @param index Index
      * @return Multiname
      */
@@ -581,6 +620,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets an unsigned integer at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -593,6 +633,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a double at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -605,6 +646,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a decimal at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -614,6 +656,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a float at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -623,6 +666,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a float4 at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -632,6 +676,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets a string at the specified index.
+     *
      * @param index Index
      * @return Value
      */
@@ -641,6 +686,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of integers in the constant pool.
+     *
      * @return Count
      */
     public int getIntCount() {
@@ -649,6 +695,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of namespaces in the constant pool.
+     *
      * @return Count
      */
     public int getNamespaceCount() {
@@ -657,6 +704,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of namespace sets in the constant pool.
+     *
      * @return Count
      */
     public int getNamespaceSetCount() {
@@ -665,6 +713,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of multinames in the constant pool.
+     *
      * @return Count
      */
     public int getMultinameCount() {
@@ -673,6 +722,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of unsigned integers in the constant pool.
+     *
      * @return Count
      */
     public int getUIntCount() {
@@ -681,6 +731,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of doubles in the constant pool.
+     *
      * @return Count
      */
     public int getDoubleCount() {
@@ -689,6 +740,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of decimals in the constant pool.
+     *
      * @return Count
      */
     public int getDecimalCount() {
@@ -697,6 +749,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of floats in the constant pool.
+     *
      * @return Count
      */
     public int getFloatCount() {
@@ -705,6 +758,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of float4s in the constant pool.
+     *
      * @return Count
      */
     public int getFloat4Count() {
@@ -713,6 +767,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the number of strings in the constant pool.
+     *
      * @return Count
      */
     public int getStringCount() {
@@ -720,9 +775,10 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Gets sub index of namespace with the specified namespace id.
-     * The namespaces that have the same name and kind are considered to be the same,
-     * so they have assigned a sub index to distinguish them.
+     * Gets sub index of namespace with the specified namespace id. The
+     * namespaces that have the same name and kind are considered to be the
+     * same, so they have assigned a sub index to distinguish them.
+     *
      * @param namespaceId Namespace id
      * @return Sub index
      */
@@ -738,7 +794,9 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Gets the namespace id of the namespace with the specified kind, name index and sub index.
+     * Gets the namespace id of the namespace with the specified kind, name
+     * index and sub index.
+     *
      * @param kind Kind
      * @param nameIndex Name index
      * @param index Sub index
@@ -758,7 +816,9 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Gets the namespace id of the namespace with the specified kind, name and sub index.
+     * Gets the namespace id of the namespace with the specified kind, name and
+     * sub index.
+     *
      * @param kind Kind
      * @param nameIndex Name index
      * @param index Sub index
@@ -774,7 +834,9 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Gets the namespace id of the namespace with the specified kind, name and sub index.
+     * Gets the namespace id of the namespace with the specified kind, name and
+     * sub index.
+     *
      * @param kind Kind
      * @param name Name
      * @param index Sub index
@@ -791,7 +853,9 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Gets the namespace id of the namespace with the specified kind, name and sub index.
+     * Gets the namespace id of the namespace with the specified kind, name and
+     * sub index.
+     *
      * @param kind Kind
      * @param name Name
      * @param index Sub index
@@ -808,6 +872,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets decimal id.
+     *
      * @param val Decimal
      * @param add Whether to add the decimal if it does not exist
      * @return Decimal id
@@ -822,6 +887,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets decimal id.
+     *
      * @param value Value
      * @return Decimal id
      */
@@ -831,6 +897,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets Qname id.
+     *
      * @param name Name
      * @param namespaceKind Namespace kind
      * @param namespaceName Namespace name
@@ -843,6 +910,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets public Qname id.
+     *
      * @param name Name
      * @param add Whether to add the Qname if it does not exist
      * @return Qname id
@@ -853,6 +921,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets Multiname id.
+     *
      * @param value Multiname
      * @return Multiname id
      */
@@ -862,6 +931,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets Multiname id.
+     *
      * @param val Multiname
      * @param add Whether to add the Multiname if it does not exist
      * @return Multiname id
@@ -894,6 +964,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets string id.
+     *
      * @param value Value
      * @return String id
      */
@@ -903,6 +974,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets string id.
+     *
      * @param val Value
      * @param add Whether to add the string if it does not exist
      * @return String id
@@ -920,6 +992,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets string id.
+     *
      * @param val Value
      * @param add Whether to add the string if it does not exist
      * @return String id
@@ -934,6 +1007,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets integer id.
+     *
      * @param value Value
      * @return Integer id
      */
@@ -943,6 +1017,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets integer id.
+     *
      * @param val Value
      * @param add Whether to add the integer if it does not exist
      * @return Integer id
@@ -957,6 +1032,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets namespace set id.
+     *
      * @param namespaces Namespaces
      * @return Namespace set id
      */
@@ -986,6 +1062,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets namespace set id.
+     *
      * @param namespaces Namespaces
      * @param add Whether to add the namespace set if it does not exist
      * @return Namespace set id
@@ -1000,6 +1077,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets unsigned integer id.
+     *
      * @param value Value
      * @return Unsigned integer id
      */
@@ -1009,6 +1087,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets unsigned integer id.
+     *
      * @param val Value
      * @param add Whether to add the unsigned integer if it does not exist
      * @return Unsigned integer id
@@ -1023,6 +1102,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets double id.
+     *
      * @param value Value
      * @return Double id
      */
@@ -1032,6 +1112,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets double id.
+     *
      * @param val Value
      * @param add Whether to add the double if it does not exist
      * @return Double id
@@ -1046,6 +1127,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets float id.
+     *
      * @param value Value
      * @return Float id
      */
@@ -1055,6 +1137,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets float id.
+     *
      * @param val Value
      * @param add Whether to add the float if it does not exist
      * @return Float id
@@ -1069,6 +1152,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets float4 id.
+     *
      * @param value Value
      * @return Float4 id
      */
@@ -1078,6 +1162,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets float4 id.
+     *
      * @param val Value
      * @param add Whether to add the float4 if it does not exist
      * @return Float4 id
@@ -1092,6 +1177,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Gets the string at the specified index as dotted chain.
+     *
      * @param index Index
      * @return Dotted chain
      */
@@ -1108,6 +1194,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Dumps the constant pool.
+     *
      * @param writer Writer
      */
     public void dump(Utf8PrintWriter writer) {
@@ -1137,6 +1224,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Converts multiname to string.
+     *
      * @param index Multiname index
      * @return String
      */
@@ -1149,6 +1237,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Converts namespace to string.
+     *
      * @param index Namespace index
      * @return String
      */
@@ -1161,6 +1250,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Converts namespace set to string.
+     *
      * @param index Namespace set index
      * @return String
      */
@@ -1173,6 +1263,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Clones the constant pool.
+     *
      * @return Cloned constant pool
      */
     @Override
@@ -1199,6 +1290,7 @@ public class AVM2ConstantPool implements Cloneable {
 
     /**
      * Makes a push instruction for the specified value.
+     *
      * @param ovalue Value
      * @return Instruction
      */
@@ -1363,8 +1455,8 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Checks cyclic type names.
-     * A type name is cyclic if it references itself or any of its children.
+     * Checks cyclic type names. A type name is cyclic if it references itself
+     * or any of its children.
      */
     public void checkCyclicTypeNames() {
         for (int i = 0; i < constant_multiname.size(); i++) {

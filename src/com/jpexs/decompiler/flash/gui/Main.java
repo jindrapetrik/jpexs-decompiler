@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -208,15 +208,15 @@ public class Main {
     public static CancellableWorker swfPrepareWorker = null;
 
     public static String currentDebuggerPackage = null;
-    
+
     private static SWF runningSWF = null;
-    
+
     private static SwfPreparation runningPreparation = null;
 
     public static SWF getRunningSWF() {
         return runningSWF;
-    }   
-    
+    }
+
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
         if (conf != null) {
@@ -552,10 +552,10 @@ public class Main {
                         if (importedFile.exists()) {
                             File newTempFile = createTempFileInDir(tempFilesDir, "~ffdec_run_import_", ".swf");
                             it.setUrl("./" + newTempFile.getName());
-                            byte[] impData = Helper.readFile(importedFile.getAbsolutePath());                            
+                            byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
                             Helper.writeFile(newTempFile.getAbsolutePath(), impData);
                             tempFiles.add(newTempFile);
-                            prepareSwf("imported_" + md5(impData),prep, newTempFile, importedFile, tempFilesDir, tempFiles);
+                            prepareSwf("imported_" + md5(impData), prep, newTempFile, importedFile, tempFilesDir, tempFiles);
                         }
                     }
                 }
@@ -568,8 +568,8 @@ public class Main {
             }
         }
     }
-    
-    private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {       
+
+    private static File createTempFileInDir(File tempFilesDir, String prefix, String suffix) throws IOException {
         if (tempFilesDir == null || !tempFilesDir.isDirectory()) {
             return File.createTempFile(prefix, suffix);
         }
@@ -614,9 +614,9 @@ public class Main {
             return;
         }
         File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
-        
+
         File tempFile;
-        List<File> tempFiles = new ArrayList<>();        
+        List<File> tempFiles = new ArrayList<>();
         try {
             tempFile = createTempFileInDir(tempRunDir, "~ffdec_run_", ".swf");
 
@@ -628,7 +628,7 @@ public class Main {
                 swfToSave.saveTo(fos, false, swf.gfx);
             }
 
-            prepareSwf("main",new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
+            prepareSwf("main", new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempRunDir, tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -640,7 +640,7 @@ public class Main {
                 runTempFile = tempFile;
                 runTempFiles = tempFiles;
                 runProcessDebug = false;
-                runningSWF = swf;           
+                runningSWF = swf;
                 runningPreparation = new SwfRunPrepare();
             }
             runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
@@ -658,12 +658,12 @@ public class Main {
         if (swf == null) {
             return;
         }
-        debugHandler.setMainDebuggedSwf(swf);        
+        debugHandler.setMainDebuggedSwf(swf);
         File tempRunDir = swf.getFile() == null ? null : new File(swf.getFile()).getParentFile();
         File tempFile = null;
 
         try {
-            tempFile = createTempFileInDir(tempRunDir, "~ffdec_debug_", ".swf");  
+            tempFile = createTempFileInDir(tempRunDir, "~ffdec_debug_", ".swf");
         } catch (Exception ex) {
             //ignored
         }
@@ -1982,7 +1982,7 @@ public class Main {
     }
 
     public static boolean saveFileDialog(Openable openable, final SaveFileMode mode) {
-        
+
         String ext = ".swf";
         switch (mode) {
             case SAVE:
@@ -1995,7 +1995,6 @@ public class Main {
                 ext = ".exe";
                 break;
         }
-        
 
         String icon = "save";
         if (mode == SaveFileMode.SAVEAS) {
@@ -2055,7 +2054,7 @@ public class Main {
                 return AppStrings.translate("filter.exe.wrapper");
             }
         };
-        
+
         FileFilter projectorWinFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2067,7 +2066,7 @@ public class Main {
                 return AppStrings.translate("filter.exe.projectorWin");
             }
         };
-        
+
         FileFilter projectorMacFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2079,7 +2078,7 @@ public class Main {
                 return AppStrings.translate("filter.exe.projectorMac");
             }
         };
-        
+
         FileFilter projectorLinuxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -2095,12 +2094,12 @@ public class Main {
             exeExportMode = Configuration.exeExportMode.get();
             if (exeExportMode == null) {
                 exeExportMode = ExeExportMode.WRAPPER;
-            }            
+            }
             fc.addChoosableFileFilter(wrapperFilter);
             fc.addChoosableFileFilter(projectorWinFilter);
             fc.addChoosableFileFilter(projectorMacFilter);
             fc.addChoosableFileFilter(projectorLinuxFilter);
-            
+
             switch (exeExportMode) {
                 case WRAPPER:
                     fc.setFileFilter(wrapperFilter);
@@ -2116,7 +2115,7 @@ public class Main {
                     // todo: decompress
                     fc.setFileFilter(projectorLinuxFilter);
                     break;
-            }         
+            }
         } else if ((openable instanceof SWF) && ((SWF) openable).gfx) {
             fc.addChoosableFileFilter(swfFilter);
             fc.setFileFilter(gfxFilter);
@@ -2157,7 +2156,7 @@ public class Main {
                     }
                     exeExportMode = ExeExportMode.WRAPPER;
                 }
-                if (selFilter == projectorWinFilter) {                    
+                if (selFilter == projectorWinFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".exe")) {
                         fileName += ".exe";
                     }
@@ -2444,15 +2443,15 @@ public class Main {
                                         continue;
                                     }
 
-                                    for (OpenableSourceInfo info : sourceInfos) {                                                                                                                                
-                                        final String infoFile = info.getFile();                                        
-                                        if (infoFile != null && new File(infoFile).equals(fullPath)) {                                                                                                                                    
-                                            for (OpenableList list :Main.getMainFrame().getPanel().getSwfs()) {
+                                    for (OpenableSourceInfo info : sourceInfos) {
+                                        final String infoFile = info.getFile();
+                                        if (infoFile != null && new File(infoFile).equals(fullPath)) {
+                                            for (OpenableList list : Main.getMainFrame().getPanel().getSwfs()) {
                                                 if (info == list.sourceInfo) {
                                                     list.setModified();
                                                 }
                                             }
-                                            
+
                                             View.execInEventDispatchLater(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -2482,16 +2481,16 @@ public class Main {
                 watcherWorker.execute();
             }
 
-            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {                
-                
+            DebuggerTools.initDebugger().addMessageListener(new DebugAdapter() {
+
                 @Override
                 public boolean isModifyBytesSupported() {
                     return true;
                 }
-                
+
                 @Override
-                public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener) {                
-                    
+                public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener) {
+
                     final String hash = md5(inputData);
                     OpenableOpened afterLoad = new OpenableOpened() {
                         @Override
@@ -2500,12 +2499,12 @@ public class Main {
                                 SWF mainSWF = getRunningSWF();
                                 File tempRunDir = mainSWF.getFile() == null ? null : new File(mainSWF.getFile()).getParentFile();
                                 File tempFile = createTempFileInDir(tempRunDir, "~ffdec_loader_", ".swf");
-                                try(FileOutputStream fos = new FileOutputStream(tempFile)) {
+                                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                                     fos.write(inputData);
                                 }
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "preparing for load: {0}", hash);
                                 prepareSwf("loaded_" + hash, runningPreparation, tempFile, mainSWF.getFile() == null ? null : new File(mainSWF.getFile()), tempRunDir, runTempFiles);
-                                byte outputData[] = Helper.readFileEx(tempFile.getAbsolutePath());
+                                byte[] outputData = Helper.readFileEx(tempFile.getAbsolutePath());
                                 tempFile.delete();
                                 Logger.getLogger(Main.class.getName()).log(Level.FINE, "calling datamodified");
                                 modifiedListener.dataModified(outputData);
@@ -2514,10 +2513,10 @@ public class Main {
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            Logger.getLogger(Main.class.getName()).log(Level.FINE, "finished opened method");                                
-                        }                        
+                            Logger.getLogger(Main.class.getName()).log(Level.FINE, "finished opened method");
+                        }
                     };
-                    
+
                     for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
                         for (int s = 0; s < sl.size(); s++) {
                             Openable op = sl.get(s);
@@ -2763,7 +2762,8 @@ public class Main {
                 UIManager.put("FormattedTextField.background", null);
                 UIManager.put("CommandButtonUI", null);
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
@@ -2889,7 +2889,6 @@ public class Main {
     /**
      * To bypass wrong encoded unicode characters coming from EXE, it Launch5j
      * encodes characters using URLEncoder.
-     *
      */
     private static void decodeLaunch5jArgs(String[] args) {
         String encargs = System.getProperty("l5j.encargs");
@@ -3362,7 +3361,7 @@ public class Main {
         SWF swf = getMainFrame().getPanel().getCurrentSwf();
         getMainFrame().getPanel().showBreakpointlistDialog(swf);
     }
-    
+
     public static String getSwfHash(SWF swf) {
         if (swf == getRunningSWF()) {
             return "main";
@@ -3373,7 +3372,7 @@ public class Main {
         }
         return "";
     }
-    
+
     public static SWF getSwfByHash(String hash) {
         if ("main".equals(hash)) {
             SWF runningSwf = getRunningSWF();

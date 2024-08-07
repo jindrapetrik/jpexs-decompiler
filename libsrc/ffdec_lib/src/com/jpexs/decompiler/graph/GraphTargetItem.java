@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -52,12 +52,12 @@ import java.util.Set;
 /**
  * Graph target item - an item in high level representation of the code.
  * Decompilation target.
+ *
  * @author JPEXS
  */
 public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     //Precedence levels
-
     public static final int PRECEDENCE_PRIMARY = 0;
 
     public static final int PRECEDENCE_POSTFIX = 1;
@@ -129,6 +129,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets the line start item
+     *
      * @return Line start item
      */
     public GraphSourceItem getLineStartItem() {
@@ -137,6 +138,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts a value to an item
+     *
      * @param r Value
      * @return Graph target item
      */
@@ -191,6 +193,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Simplifies something
+     *
      * @param it Graph target item
      * @param implicitCoerce Implicit coerce
      * @return Simplified graph target item
@@ -230,6 +233,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Simplifies this.
+     *
      * @param implicitCoerce Implicit coerce
      * @return Simplified graph target item
      */
@@ -239,6 +243,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets line.
+     *
      * @return Line
      */
     public int getLine() {
@@ -250,6 +255,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets file.
+     *
      * @return File
      */
     public String getFile() {
@@ -261,6 +267,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets first graph part.
+     *
      * @return First graph part
      */
     public GraphPart getFirstPart() {
@@ -283,6 +290,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Constructs GraphTargetItem
+     *
      * @param src Source item
      * @param lineStartItem Line start item
      * @param precedence Precedence
@@ -293,6 +301,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Constructs GraphTargetItem
+     *
      * @param src Source item
      * @param lineStartItem Line start item
      * @param precedence Precedence
@@ -307,6 +316,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets source item
+     *
      * @return Source item
      */
     public GraphSourceItem getSrc() {
@@ -315,6 +325,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets more source items
+     *
      * @return More source items
      */
     public List<GraphSourceItemPos> getMoreSrc() {
@@ -327,6 +338,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets highlight src data
+     *
      * @return
      */
     protected HighlightData getSrcData() {
@@ -339,6 +351,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets position
+     *
      * @return Position
      */
     protected int getPos() {
@@ -347,6 +360,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets needed sources
+     *
      * @return Needed sources
      */
     public List<GraphSourceItemPos> getNeededSources() {
@@ -365,6 +379,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string semicoloned.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -386,6 +401,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks if semicolon is needed
+     *
      * @return True if semicolon is needed
      */
     public boolean needsSemicolon() {
@@ -394,6 +410,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string as Boolean.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -405,6 +422,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string as String.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -416,6 +434,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string as int.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -427,6 +446,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string as Number.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -438,6 +458,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string.
+     *
      * @return String
      */
     @Override
@@ -447,6 +468,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -465,6 +487,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string.
+     *
      * @param localData Local data
      * @return String
      * @throws InterruptedException
@@ -475,6 +498,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string.
+     *
      * @param localData Local data
      * @return String
      * @throws InterruptedException
@@ -488,6 +512,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Append this to a writer.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -497,6 +522,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Append this to a writer.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -508,6 +534,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Append this to a writer.
+     *
      * @param writer Writer
      * @param localData Local data
      * @param implicitCoerce Implicit coerce
@@ -544,6 +571,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets precedence.
+     *
      * @return Precedence
      */
     public int getPrecedence() {
@@ -552,6 +580,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks if this can be evaluated statically.
+     *
      * @return True if this can be evaluated statically
      */
     public boolean isCompileTime() {
@@ -564,6 +593,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks if this can be evaluated statically.
+     *
      * @param dependencies Dependencies
      * @return True if this can be evaluated statically
      */
@@ -573,6 +603,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks if this can be evaluated statically.
+     *
      * @param dependencies Dependencies
      * @return True if this can be evaluated statically
      */
@@ -581,8 +612,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     /**
-     * Checks whether this has side effects.
-     * For example function call has side effect, but variable access does not.
+     * Checks whether this has side effects. For example function call has side
+     * effect, but variable access does not.
+     *
      * @return True if this has side effects
      */
     public boolean hasSideEffect() {
@@ -600,6 +632,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether it is computed via variables.
+     *
      * @return True if it is computed via variables
      */
     public boolean isVariableComputed() {
@@ -608,6 +641,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Computes EcmaScript result.
+     *
      * @return EcmaScript result
      */
     public Object getResult() {
@@ -616,6 +650,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Computes EcmaScript result as number.
+     *
      * @return EcmaScript result as number
      */
     public Double getResultAsNumber() {
@@ -624,6 +659,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Computes EcmaScript result as string.
+     *
      * @return EcmaScript result as string
      */
     public String getResultAsString() {
@@ -632,6 +668,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Computes EcmaScript result as boolean.
+     *
      * @return EcmaScript result as boolean
      */
     public Boolean getResultAsBoolean() {
@@ -640,6 +677,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string without quotes.
+     *
      * @param localData Local data
      * @return String
      */
@@ -657,6 +695,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string without quotes.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -671,6 +710,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Appends this to a writer without quotes.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -682,6 +722,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets this without coercion.
+     *
      * @return This without coercion
      */
     public GraphTargetItem getNotCoerced() {
@@ -690,6 +731,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets this without coercion and without duplicates.
+     *
      * @return This without coercion and without duplicates
      */
     public GraphTargetItem getNotCoercedNoDup() {
@@ -698,6 +740,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets this through registers.
+     *
      * @return This through registers
      */
     public GraphTargetItem getThroughRegister() {
@@ -706,6 +749,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether this needs a new line.
+     *
      * @return True if this needs a new line
      */
     public boolean needsNewLine() {
@@ -714,6 +758,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether this handles new line.
+     *
      * @return True if this handles new line
      */
     public boolean handlesNewLine() {
@@ -722,6 +767,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to string with new line.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -739,6 +785,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether this is empty.
+     *
      * @return True if this is empty
      */
     public boolean isEmpty() {
@@ -747,6 +794,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets through items that cannot be statically computed.
+     *
      * @return Through item that cannot be statically computed
      */
     public GraphTargetItem getThroughNotCompilable() {
@@ -755,6 +803,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets item through duplicates.
+     *
      * @return Item through duplicates
      */
     public GraphTargetItem getThroughDuplicate() {
@@ -763,6 +812,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether the value equals.
+     *
      * @param target Target
      * @return True if the value equals
      */
@@ -772,6 +822,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to source (low level code).
+     *
      * @param localData Local data
      * @param generator Source generator
      * @return Source
@@ -783,6 +834,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to source (low level code) and ignore return value.
+     *
      * @param localData Local data
      * @param generator Source generator
      * @return Source
@@ -797,6 +849,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Converts this to source (low level code). with BinaryOp
+     *
      * @param op Binary operation
      * @param action Action
      * @return Source
@@ -809,6 +862,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Merges Object list to one list of GraphTargetItems
+     *
      * @param localData Local data
      * @param gen Source generator
      * @param tar Objects
@@ -844,12 +898,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether this has return value.
+     *
      * @return True if this has return value
      */
     public abstract boolean hasReturnValue();
 
     /**
      * Gets all sub items.
+     *
      * @return All sub items
      */
     public List<GraphTargetItem> getAllSubItems() {
@@ -867,6 +923,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets all sub items recursively.
+     *
      * @return All sub items recursively
      */
     public Set<GraphTargetItem> getAllSubItemsRecursively() {
@@ -882,6 +939,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Visits this recursively.
+     *
      * @param visitor Visitor
      */
     public final void visitRecursively(GraphTargetVisitorInterface visitor) {
@@ -900,6 +958,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Visits this recursively without using Blocks.
+     *
      * @param visitor Visitor
      */
     public final void visitRecursivelyNoBlock(GraphTargetVisitorInterface visitor) {
@@ -918,6 +977,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Visits this.
+     *
      * @param visitor Visitor
      */
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -928,6 +988,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Visits this without using Blocks.
+     *
      * @param visitor
      */
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
@@ -936,12 +997,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets return type.
+     *
      * @return
      */
     public abstract GraphTargetItem returnType();
 
     /**
      * Clone this.
+     *
      * @return Cloned item
      */
     @Override
@@ -955,6 +1018,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Inverts this item.
+     *
      * @param src Source item
      * @return Inverted item
      */
@@ -964,6 +1028,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Appends this to a writer.
+     *
      * @param prevLineItem Previous line item
      * @param writer Writer
      * @param localData Local data
@@ -1005,6 +1070,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Append this to a writer as a Block.
+     *
      * @param prevLineItem
      * @param writer
      * @param localData
@@ -1019,6 +1085,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Gets this as long.
+     *
      * @return
      */
     public long getAsLong() {
@@ -1032,6 +1099,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Checks whether this is identical to other.
+     *
      * @param other Other
      * @return True if this is identical to other
      */
@@ -1041,6 +1109,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     /**
      * Alternative of Objects.equals() for GraphTargetItem.
+     *
      * @param o1 Object 1
      * @param o2 Object 2
      * @return True if objects are value equal

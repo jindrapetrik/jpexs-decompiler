@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -29,6 +29,7 @@ import java.util.ListIterator;
 
 /**
  * List of openable items.
+ *
  * @author JPEXS
  */
 public class OpenableList implements List<Openable>, SWFContainerItem {
@@ -39,8 +40,7 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
     public String name;
 
     /**
-     * Bundle.
-     * Can be null.
+     * Bundle. Can be null.
      */
     public Bundle bundle;
 
@@ -56,15 +56,17 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Checks whether it is bundle.
-     * @return 
+     *
+     * @return
      */
     public boolean isBundle() {
         return bundle != null;
     }
-    
+
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -73,8 +75,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * ToString.
-     * @return 
-     */    
+     *
+     * @return
+     */
     @Override
     public String toString() {
         if (isBundle()) {
@@ -86,7 +89,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Iterator.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Iterator<Openable> iterator() {
@@ -95,7 +99,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Gets item count.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int size() {
@@ -104,7 +109,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Checks whether items are empty.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isEmpty() {
@@ -113,8 +119,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Checks whether list contains specific openable.
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public boolean contains(Object o) {
@@ -123,7 +130,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Converts to array.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Object[] toArray() {
@@ -132,9 +140,10 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Converts to array.
+     *
      * @param <T>
      * @param ts
-     * @return 
+     * @return
      */
     @Override
     public <T> T[] toArray(T[] ts) {
@@ -143,8 +152,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Contains all.
+     *
      * @param clctn
-     * @return 
+     * @return
      */
     @Override
     public boolean containsAll(Collection<?> clctn) {
@@ -153,8 +163,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Removes all.
+     *
      * @param clctn
-     * @return 
+     * @return
      */
     @Override
     public boolean removeAll(Collection<?> clctn) {
@@ -163,8 +174,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Retains all.
+     *
      * @param clctn
-     * @return 
+     * @return
      */
     @Override
     public boolean retainAll(Collection<?> clctn) {
@@ -181,8 +193,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Adds all items.
+     *
      * @param clctn
-     * @return 
+     * @return
      */
     @Override
     public boolean addAll(Collection<? extends Openable> clctn) {
@@ -191,9 +204,10 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Adds all items at index.
+     *
      * @param i
      * @param clctn
-     * @return 
+     * @return
      */
     @Override
     public boolean addAll(int i, Collection<? extends Openable> clctn) {
@@ -202,8 +216,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Gets item at index.
+     *
      * @param i
-     * @return 
+     * @return
      */
     @Override
     public Openable get(int i) {
@@ -215,9 +230,10 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Sets item at index.
+     *
      * @param i
      * @param e
-     * @return 
+     * @return
      */
     @Override
     public Openable set(int i, Openable e) {
@@ -226,8 +242,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Adds item.
+     *
      * @param e
-     * @return 
+     * @return
      */
     @Override
     public boolean add(Openable e) {
@@ -236,8 +253,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Adds item at index.
+     *
      * @param i
-     * @param e 
+     * @param e
      */
     @Override
     public void add(int i, Openable e) {
@@ -246,8 +264,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Removes item.
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public boolean remove(Object o) {
@@ -256,8 +275,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Removes item at index.
+     *
      * @param i
-     * @return 
+     * @return
      */
     @Override
     public Openable remove(int i) {
@@ -266,8 +286,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Index of item.
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public int indexOf(Object o) {
@@ -276,8 +297,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Last index of item.
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public int lastIndexOf(Object o) {
@@ -286,7 +308,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * List iterator.
-     * @return 
+     *
+     * @return
      */
     @Override
     public ListIterator<Openable> listIterator() {
@@ -295,8 +318,9 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * List iterator.
+     *
      * @param i
-     * @return 
+     * @return
      */
     @Override
     public ListIterator<Openable> listIterator(int i) {
@@ -305,9 +329,10 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Sublist.
+     *
      * @param i
      * @param i1
-     * @return 
+     * @return
      */
     @Override
     public List<Openable> subList(int i, int i1) {
@@ -316,7 +341,8 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {
@@ -327,17 +353,16 @@ public class OpenableList implements List<Openable>, SWFContainerItem {
         }
         return false;
     }
-    
+
     /**
-     * Sets modified flag.
-     * It marks all items inside as modified.
+     * Sets modified flag. It marks all items inside as modified.
      */
     public void setModified() {
         for (Openable openable : this) {
             if (openable instanceof SWF) {
                 SWF swf = (SWF) openable;
                 swf.setModified(true);
-            } 
+            }
             if (openable instanceof ABC) {
                 ABC abc = (ABC) openable;
                 abc.getSwf().setModified(true);

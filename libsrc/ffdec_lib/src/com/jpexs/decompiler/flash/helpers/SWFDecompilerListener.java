@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,12 +26,14 @@ import java.util.List;
 
 /**
  * Listener for SWF decompiler events.
+ *
  * @author JPEXS
  */
 public interface SWFDecompilerListener {
 
     /**
      * Called when a file is proxied
+     *
      * @param data file data
      * @return proxied file data
      */
@@ -39,12 +41,14 @@ public interface SWFDecompilerListener {
 
     /**
      * Called when a SWF file is parsed
+     *
      * @param swf SWF object
      */
     void swfParsed(SWF swf);
 
     /**
      * Called when an action list is parsed
+     *
      * @param actions Action list
      * @param swf SWF object
      * @throws InterruptedException
@@ -53,6 +57,7 @@ public interface SWFDecompilerListener {
 
     /**
      * Called when an action tree is created
+     *
      * @param tree Action tree
      * @param swf SWF object
      * @throws InterruptedException
@@ -61,6 +66,7 @@ public interface SWFDecompilerListener {
 
     /**
      * Called when an ABC is parsed
+     *
      * @param abc ABC object
      * @param swf SWF object
      */
@@ -68,6 +74,7 @@ public interface SWFDecompilerListener {
 
     /**
      * Called when a method body is parsed
+     *
      * @param abc ABC object
      * @param body Method body
      * @param swf SWF object

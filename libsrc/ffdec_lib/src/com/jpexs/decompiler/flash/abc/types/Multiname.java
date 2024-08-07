@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 /**
  * Multiname in ABC file.
+ *
  * @author JPEXS
  */
 public class Multiname {
@@ -153,6 +154,7 @@ public class Multiname {
 
     /**
      * Gets namespace suffix.
+     *
      * @return Namespace suffix
      */
     public String getNamespaceSuffix() {
@@ -164,6 +166,7 @@ public class Multiname {
 
     /**
      * Sets display namespace flag.
+     *
      * @param displayNamespace Display namespace flag
      */
     public void setDisplayNamespace(boolean displayNamespace) {
@@ -172,6 +175,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname kind is valid.
+     *
      * @return True if the multiname kind is valid
      */
     private boolean validType() {
@@ -197,6 +201,7 @@ public class Multiname {
 
     /**
      * Constructs a new multiname.
+     *
      * @param kind Kind
      * @param name_index Name index
      * @param namespace_index Namespace index
@@ -218,6 +223,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname has its own name.
+     *
      * @return True if the multiname has its own name
      */
     public boolean hasOwnName() {
@@ -226,6 +232,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname has its own namespace.
+     *
      * @return True if the multiname has its own namespace
      */
     public boolean hasOwnNamespace() {
@@ -234,6 +241,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname has its own namespace set.
+     *
      * @return True if the multiname has its own namespace set
      */
     public boolean hasOwnNamespaceSet() {
@@ -242,6 +250,7 @@ public class Multiname {
 
     /**
      * Creates a new QName.
+     *
      * @param attribute Attribute flag
      * @param name_index Name index
      * @param namespace_index Namespace index
@@ -253,6 +262,7 @@ public class Multiname {
 
     /**
      * Creates a new RTQName.
+     *
      * @param attribute Attribute flag
      * @param name_index Name index
      * @return New RTQName
@@ -263,6 +273,7 @@ public class Multiname {
 
     /**
      * Creates a new RTQNameL.
+     *
      * @param attribute Attribute flag
      * @return New RTQNameL
      */
@@ -272,6 +283,7 @@ public class Multiname {
 
     /**
      * Creates a new Multiname.
+     *
      * @param attribute Attribute flag
      * @param name_index Name index
      * @param namespace_set_index Namespace set index
@@ -283,6 +295,7 @@ public class Multiname {
 
     /**
      * Creates a new MultinameL.
+     *
      * @param attribute Attribute flag
      * @param namespace_set_index Namespace set index
      * @return New MultinameL
@@ -293,6 +306,7 @@ public class Multiname {
 
     /**
      * Creates a new TypeName.
+     *
      * @param qname_index Qname index
      * @param params Parameters
      * @return New TypeName
@@ -303,6 +317,7 @@ public class Multiname {
 
     /**
      * Checks if the typename is cyclic.
+     *
      * @param constants Constant pool
      * @param name_index Type name index
      */
@@ -324,6 +339,7 @@ public class Multiname {
 
     /**
      * Checks if the typename is cyclic.
+     *
      * @param constants Constant pool
      * @param name_index Type name index
      * @param visited Visited set
@@ -353,6 +369,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname is attribute.
+     *
      * @return True if the multiname is attribute
      */
     public boolean isAttribute() {
@@ -376,6 +393,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname is runtime
+     *
      * @return True if the multiname is runtime
      */
     public boolean isRuntime() {
@@ -396,6 +414,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname requires name on stack.
+     *
      * @return True if the multiname requires name on stack
      */
     public boolean needsName() {
@@ -416,6 +435,7 @@ public class Multiname {
 
     /**
      * Checks if the multiname requires namespace on stack.
+     *
      * @return True if the multiname requires namespace on stack
      */
     public boolean needsNs() {
@@ -436,6 +456,7 @@ public class Multiname {
 
     /**
      * Gets the kind string
+     *
      * @return Kind string
      */
     public String getKindStr() {
@@ -451,6 +472,7 @@ public class Multiname {
 
     /**
      * Converts the multiname to string.
+     *
      * @param constants Constant pool
      * @param index Index
      * @return Multiname as string
@@ -491,6 +513,7 @@ public class Multiname {
 
     /**
      * Converts the namespace set to string.
+     *
      * @param constants Constant pool
      * @param index Index
      * @return Namespace set as string
@@ -517,6 +540,7 @@ public class Multiname {
 
     /**
      * Converts the multiname to string.
+     *
      * @param constants Constant pool
      * @param index Index
      * @param fullyQualifiedNames Fully qualified names
@@ -531,6 +555,7 @@ public class Multiname {
 
     /**
      * Converts the multiname to string.
+     *
      * @return Multiname as string
      */
     @Override
@@ -550,6 +575,7 @@ public class Multiname {
 
     /**
      * Converts the multiname to string.
+     *
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @return Multiname as string
@@ -596,6 +622,7 @@ public class Multiname {
 
     /**
      * Converts the typename to string.
+     *
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
@@ -628,6 +655,7 @@ public class Multiname {
 
     /**
      * Gets the name with custom namespace.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
@@ -671,6 +699,7 @@ public class Multiname {
 
     /**
      * Gets the name.
+     *
      * @param constants Constant pool
      * @param fullyQualifiedNames Fully qualified names
      * @param dontDeobfuscate Don't deobfuscate flag
@@ -698,6 +727,7 @@ public class Multiname {
 
     /**
      * Gets the name with namespace.
+     *
      * @param constants Constant pool
      * @param withSuffix With suffix flag
      * @return Name with namespace
@@ -736,6 +766,7 @@ public class Multiname {
 
     /**
      * Gets the namespace.
+     *
      * @param constants Constant pool
      * @return Namespace
      */
@@ -795,6 +826,7 @@ public class Multiname {
 
     /**
      * Gets the versions of this multiname for API versioned ABCs.
+     *
      * @param constants Constant pool
      * @return Versions of this multiname.
      */
@@ -810,6 +842,7 @@ public class Multiname {
 
     /**
      * Checks if this multiname is API versioned.
+     *
      * @param constants Constant pool
      * @return True if this multiname is API versioned
      */
@@ -825,6 +858,7 @@ public class Multiname {
 
     /**
      * Gets the namespace set.
+     *
      * @param constants Constant pool
      * @return Namespace set
      */
@@ -840,6 +874,7 @@ public class Multiname {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -856,6 +891,7 @@ public class Multiname {
 
     /**
      * Equals.
+     *
      * @param obj Object
      * @return True if the objects are equal
      */
@@ -931,8 +967,9 @@ public class Multiname {
     }
 
     /**
-     * Checks if this multiname is effectively a QName.
-     * Efectively means that it is a QName or QNameA or MULTINAME with only one namespace.
+     * Checks if this multiname is effectively a QName. Efectively means that it
+     * is a QName or QNameA or MULTINAME with only one namespace.
+     *
      * @param thisCpool
      * @return
      */
@@ -942,6 +979,7 @@ public class Multiname {
 
     /**
      * Checks if this qname effectively equals to other qname.
+     *
      * @param thisCpool This constant pool
      * @param other Other qname
      * @param otherCpool Other constant pool
@@ -978,6 +1016,7 @@ public class Multiname {
 
     /**
      * Gets the cyclic flag.
+     *
      * @return Cyclic flag
      */
     public boolean isCyclic() {

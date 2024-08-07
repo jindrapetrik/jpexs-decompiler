@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import com.jpexs.helpers.Helper;
 
 /**
  * Trait metadata.
+ *
  * @author JPEXS
  */
 public class MetadataInfo {
@@ -51,6 +52,7 @@ public class MetadataInfo {
 
     /**
      * Constructs a new MetadataInfo with given name index, keys and values
+     *
      * @param name_index Name index
      * @param keys Keys
      * @param values Values
@@ -63,6 +65,7 @@ public class MetadataInfo {
 
     /**
      * Returns a string representation of this MetadataInfo
+     *
      * @return String representation of this MetadataInfo
      */
     @Override
@@ -72,6 +75,7 @@ public class MetadataInfo {
 
     /**
      * Returns a string representation of this MetadataInfo
+     *
      * @param constants Constant pool
      * @return String representation of this MetadataInfo
      */

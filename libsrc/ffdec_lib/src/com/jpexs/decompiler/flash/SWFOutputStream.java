@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -129,6 +129,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Gets current position in the stream.
+     *
      * @return Current position in the stream
      */
     public long getPos() {
@@ -162,6 +163,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes byte array to the stream.
+     *
      * @param b The data.
      * @throws IOException
      */
@@ -174,6 +176,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes byte array to the stream.
+     *
      * @param b The data.
      * @param off The start offset in the data.
      * @param len The number of bytes to write.
@@ -188,6 +191,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes ByteArrayRange to the stream.
+     *
      * @param b The data.
      * @throws IOException
      */
@@ -199,6 +203,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Aligns to byte position.
+     *
      * @throws IOException
      */
     private void alignByte() throws IOException {
@@ -357,6 +362,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes long value to the stream.
+     *
      * @param value The value.
      * @throws IOException
      */
@@ -374,7 +380,8 @@ public class SWFOutputStream extends OutputStream {
     }
 
     /**
-     * Writes DOUBLE (double precision floating point value) value to the stream.
+     * Writes DOUBLE (double precision floating point value) value to the
+     * stream.
      *
      * @param value DOUBLE value
      * @throws IOException
@@ -472,6 +479,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Checks if value fits in SB[nBits] (Signed-bit value).
+     *
      * @param nBits Number of bits
      * @param value Value
      * @return True if value fits in SB[nBits]
@@ -484,6 +492,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Checks if value fits in UB[nBits] (Unsigned-bit value).
+     *
      * @param nBits Number of bits
      * @param value Value
      * @return True if value fits in UB[nBits]
@@ -496,6 +505,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes NB[nBits] (Bit value) value to the stream.
+     *
      * @param nBits Number of bits which represent value
      * @param value Value to write
      * @param type Type of value
@@ -579,6 +589,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Truncates value to 31 bits.
+     *
      * @param value Value
      * @return Truncated value
      */
@@ -663,6 +674,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Calculates number of bits needed for representing unsigned values.
+     *
      * @param first First Unsigned value
      * @param params Next Unsigned values
      * @return Number of bits
@@ -678,6 +690,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Calculates number of bits needed for representing unsigned value.
+     *
      * @param value Unsigned value
      * @return Number of bits
      */
@@ -710,6 +723,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Enlarges bit count for signed values.
+     *
      * @param currentBitCount Current bit count
      * @param value Value
      * @return New bit count
@@ -727,6 +741,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Enlarges bit count for unsigned values.
+     *
      * @param currentBitCount Current bit count
      * @param value Value
      * @return New bit count
@@ -1490,6 +1505,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Calculates SHAPE fill and line bits.
+     *
      * @param value SHAPE value
      */
     private void calculateSHAPEFillLineBits(SHAPE value) {
@@ -1981,6 +1997,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Writes ZLIB compressed data to the stream.
+     *
      * @param data Data to compress
      * @throws IOException
      */
@@ -1992,6 +2009,7 @@ public class SWFOutputStream extends OutputStream {
 
     /**
      * Compresses byte array using ZLIB.
+     *
      * @param data Data to compress
      * @return Compressed data
      * @throws IOException

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * State at specific depth on a frame.
+ *
  * @author JPEXS
  */
 public class DepthState {
@@ -174,7 +175,8 @@ public class DepthState {
 
     /**
      * Gets new instance id.
-     * @return 
+     *
+     * @return
      */
     public static long getNewInstanceId() {
         return lastInstanceId.addAndGet(1);
@@ -182,6 +184,7 @@ public class DepthState {
 
     /**
      * Constructs DepthState.
+     *
      * @param swf SWF
      * @param frame Frame
      * @param placeFrame Frame of placeObject
@@ -195,6 +198,7 @@ public class DepthState {
 
     /**
      * Constructs DepthState.
+     *
      * @param obj Last DepthState
      * @param frame Frame
      * @param placeFrame Frame of placeObject
@@ -231,7 +235,8 @@ public class DepthState {
 
     /**
      * Sets matrix.
-     * @param matrix 
+     *
+     * @param matrix
      */
     public void setMATRIX(MATRIX matrix) {
         this.matrix = matrix;
@@ -240,7 +245,8 @@ public class DepthState {
 
     /**
      * Checks whether cache as bitmap is on.
-     * @return 
+     *
+     * @return
      */
     public boolean cacheAsBitmap() {
         return (placeObjectTag != null && placeObjectTag.cacheAsBitmap())
@@ -249,8 +255,9 @@ public class DepthState {
 
     /**
      * Converts DepthState to PlaceObject tag of required version.
+     *
      * @param depth Depth
-     * @return 
+     * @return
      */
     public PlaceObjectTypeTag toPlaceObjectTag(int depth) {
         if (minPlaceObjectNum <= 1) {
@@ -270,7 +277,8 @@ public class DepthState {
 
     /**
      * Gets character tag.
-     * @return 
+     *
+     * @return
      */
     public CharacterTag getCharacter() {
         if (characterId == -1) {
@@ -287,7 +295,8 @@ public class DepthState {
 
     /**
      * Hashcode.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -314,8 +323,9 @@ public class DepthState {
 
     /**
      * Equals.
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {

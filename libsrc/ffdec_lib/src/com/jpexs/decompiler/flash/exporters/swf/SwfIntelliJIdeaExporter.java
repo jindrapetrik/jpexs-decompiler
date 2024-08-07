@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -33,14 +33,15 @@ import java.util.UUID;
 
 /**
  * Exports SWF to IntelliJ IDEA project.
+ *
  * @author JPEXS
  */
 public class SwfIntelliJIdeaExporter {
-    
+
     private static final String PROJECTID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final int PROJECTID_LENGTH = 27;
     private static final SecureRandom RANDOM = new SecureRandom();
-    
+
     private static String generateProjectId() {
         StringBuilder sb = new StringBuilder(PROJECTID_LENGTH);
         for (int i = 0; i < PROJECTID_LENGTH; i++) {
@@ -49,7 +50,6 @@ public class SwfIntelliJIdeaExporter {
         }
         return sb.toString();
     }
-    
 
     private static String doubleToString(double d) {
         String ds = "" + d;
@@ -61,13 +61,13 @@ public class SwfIntelliJIdeaExporter {
 
     public void exportIntelliJIdeaProject(SWF swf, File outDir, AbortRetryIgnoreHandler handler) throws IOException {
         exportIntelliJIdeaProject(swf, outDir, handler, null);
-    }   
+    }
 
     public void exportIntelliJIdeaProject(SWF swf, File outDir, AbortRetryIgnoreHandler handler, EventListener eventListener) throws IOException {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");
         }
-        
+
         if (!outDir.exists()) {
             if (!outDir.mkdirs()) {
                 throw new IOException("Cannot create directory");
@@ -77,7 +77,7 @@ public class SwfIntelliJIdeaExporter {
             throw new IOException("The selected file is not a directory");
         }
 
-        String simpleName = swf.getShortFileName();        
+        String simpleName = swf.getShortFileName();
         if (simpleName.contains(".")) {
             simpleName = simpleName.substring(0, simpleName.lastIndexOf("."));
         }
@@ -134,7 +134,7 @@ public class SwfIntelliJIdeaExporter {
         String workspaceXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<project version=\"4\">\n"
                 + "  <component name=\"ChangeListManager\">\n"
-                + "    <list default=\"true\" id=\"" + UUID.randomUUID() +"\" name=\"Changes\" comment=\"\" />\n"
+                + "    <list default=\"true\" id=\"" + UUID.randomUUID() + "\" name=\"Changes\" comment=\"\" />\n"
                 + "    <option name=\"SHOW_DIALOG\" value=\"false\" />\n"
                 + "    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n"
                 + "    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n"
@@ -150,7 +150,7 @@ public class SwfIntelliJIdeaExporter {
                 + "  </component>\n"
                 + "  <component name=\"PropertiesComponent\"><![CDATA[{\n"
                 + "  \"keyToString\": {\n"
-                + "    \"Flash App." + simpleName +".executor\": \"Run\",\n"
+                + "    \"Flash App." + simpleName + ".executor\": \"Run\",\n"
                 + "    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n"
                 + "    \"kotlin-language-version-configured\": \"true\",\n"
                 + "    \"nodejs_package_manager_path\": \"npm\",\n"
@@ -158,8 +158,8 @@ public class SwfIntelliJIdeaExporter {
                 + "  }\n"
                 + "}]]></component>\n"
                 + "  <component name=\"RunManager\">\n"
-                + "    <configuration name=\"" + simpleName+ "\" type=\"FlashRunConfigurationType\">\n"
-                + "      <option name=\"BCName\" value=\"" + simpleName+ "\" />\n"
+                + "    <configuration name=\"" + simpleName + "\" type=\"FlashRunConfigurationType\">\n"
+                + "      <option name=\"BCName\" value=\"" + simpleName + "\" />\n"
                 + "      <option name=\"IOSSimulatorDevice\" value=\"\" />\n"
                 + "      <option name=\"IOSSimulatorSdkPath\" value=\"\" />\n"
                 + "      <option name=\"adlOptions\" value=\"\" />\n"
@@ -209,7 +209,7 @@ public class SwfIntelliJIdeaExporter {
                 + "  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n"
                 + "  <component name=\"TaskManager\">\n"
                 + "    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n"
-                + "      <changelist id=\"" + UUID.randomUUID() +"\" name=\"Changes\" comment=\"\" />\n"
+                + "      <changelist id=\"" + UUID.randomUUID() + "\" name=\"Changes\" comment=\"\" />\n"
                 + "      <created>" + created + "</created>\n"
                 + "      <option name=\"number\" value=\"Default\" />\n"
                 + "      <option name=\"presentableId\" value=\"Default\" />\n"

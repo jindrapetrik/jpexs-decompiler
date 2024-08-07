@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -34,6 +34,7 @@ import java.util.Set;
 
 /**
  * Fast action list implementation.
+ *
  * @author JPEXS
  */
 public class FastActionList implements Collection<ActionItem> {
@@ -65,6 +66,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Constructs a new fast action list.
+     *
      * @param actions Action list
      */
     public FastActionList(ActionList actions) {
@@ -82,6 +84,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the charset of the actions.
+     *
      * @return Charset
      */
     public String getCharset() {
@@ -90,6 +93,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Inserts an action before the specified item.
+     *
      * @param item Item
      * @param action Action
      * @return New action item
@@ -101,6 +105,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Inserts an action before the specified item.
+     *
      * @param item Item
      * @param newItem New action item
      * @return New action item
@@ -116,6 +121,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Inserts an action after the specified item.
+     *
      * @param item Item
      * @param action Action
      * @return New action item
@@ -127,6 +133,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Inserts an action after the specified item.
+     *
      * @param item Item
      * @param newItem New action item
      * @return New action item
@@ -157,6 +164,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Removes the specified item.
+     *
      * @param item Item
      * @return Next item
      */
@@ -202,6 +210,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Removes the item(s) at the specified index.
+     *
      * @param index Index
      * @param count Count
      */
@@ -215,6 +224,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the item at the specified index.
+     *
      * @param index Index
      * @return Item
      */
@@ -225,6 +235,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Replaces the jump targets.
+     *
      * @param target Target
      * @param newTarget New target
      */
@@ -238,6 +249,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the last actions.
+     *
      * @param actions Action list
      * @param actionItemMap Action item map
      */
@@ -259,6 +271,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the last actions of a container.
+     *
      * @param actions Action list
      * @param action Action
      * @param actionItemMap Action item map
@@ -288,6 +301,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the nearest address.
+     *
      * @param actions Action list
      * @param address Address
      * @param next Next
@@ -316,6 +330,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the jumps.
+     *
      * @param actions Action list
      * @param actionItemMap Action item map
      */
@@ -474,6 +489,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the container.
+     *
      * @param item Item
      * @return Container
      */
@@ -608,6 +624,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the unreachable action count.
+     *
      * @param jump Jump
      * @param jumpTarget Jump target
      * @return Unreachable action count
@@ -650,6 +667,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Sets the excluded flags.
+     *
      * @param value Value
      */
     public void setExcludedFlags(boolean value) {
@@ -666,6 +684,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Updates the reachable flags.
+     *
      * @param jump Jump
      * @param jumpTarget Jump target
      */
@@ -734,6 +753,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Updates the actions.
+     *
      * @return Action list
      */
     public ActionList updateActions() {
@@ -758,6 +778,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the first action.
+     *
      * @return First action
      */
     public ActionItem first() {
@@ -766,6 +787,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the last action.
+     *
      * @return Last action
      */
     public ActionItem last() {
@@ -774,6 +796,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Converts list to action list.
+     *
      * @return Action list
      */
     public ActionList toActionList() {
@@ -782,6 +805,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the size of the list.
+     *
      * @return Size
      */
     @Override
@@ -791,6 +815,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Checks if the list is empty.
+     *
      * @return True if the list is empty, otherwise false
      */
     @Override
@@ -800,6 +825,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Checks if the list contains the specified element.
+     *
      * @param o element whose presence in this collection is to be tested
      * @return True if the list contains the specified element, otherwise false
      */
@@ -816,6 +842,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Gets the iterator.
+     *
      * @return Iterator
      */
     @Override
@@ -825,6 +852,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Converts the list to an array.
+     *
      * @return Array
      */
     @Override
@@ -847,11 +875,12 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Converts the list to an array.
+     *
      * @param a the array into which the elements of this collection are to be
-     *        stored, if it is big enough; otherwise, a new array of the same
-     *        runtime type is allocated for this purpose.
-     * @return Array
+     * stored, if it is big enough; otherwise, a new array of the same runtime
+     * type is allocated for this purpose.
      * @param <T> Type
+     * @return Array
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -876,6 +905,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Adds an element to the list.
+     *
      * @param e element whose presence in this collection is to be ensured
      * @return True
      */
@@ -887,6 +917,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Removes the specified element from the list.
+     *
      * @param o element to be removed from this collection, if present
      * @return True if the list contained the specified element, otherwise false
      */
@@ -909,8 +940,10 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Checks if the list contains all elements of the specified collection.
+     *
      * @param c collection to be checked for containment in this collection
-     * @return True if the list contains all elements of the specified collection, otherwise false
+     * @return True if the list contains all elements of the specified
+     * collection, otherwise false
      */
     @Override
     public boolean containsAll(Collection<?> c) {
@@ -925,6 +958,7 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Adds all elements of the specified collection to the list.
+     *
      * @param c collection containing elements to be added to this collection
      * @return True
      */
@@ -939,8 +973,11 @@ public class FastActionList implements Collection<ActionItem> {
 
     /**
      * Removes all elements of the specified collection from the list.
-     * @param c collection containing elements to be removed from this collection
-     * @return True if the list contained all elements of the specified collection, otherwise false
+     *
+     * @param c collection containing elements to be removed from this
+     * collection
+     * @return True if the list contained all elements of the specified
+     * collection, otherwise false
      */
     @Override
     public boolean removeAll(Collection<?> c) {
@@ -953,7 +990,9 @@ public class FastActionList implements Collection<ActionItem> {
     }
 
     /**
-     * Retains only the elements in the list that are contained in the specified collection.
+     * Retains only the elements in the list that are contained in the specified
+     * collection.
+     *
      * @param c collection containing elements to be retained in this collection
      * @return True if the list changed as a result of the call, otherwise false
      */

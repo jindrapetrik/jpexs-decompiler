@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,7 +62,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
 
 /**
- *
  * @author JPEXS
  */
 public class TagTreeModel extends AbstractTagTreeModel {
@@ -400,7 +399,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
     public Frame getFrame(SWF swf, Timelined t, int frame) {
         return searchForFrame(swf, swf, t, frame);
     }
-    
+
     @Override
     protected void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result) {
         for (TreeItem n : getAllChildren(parent)) {
@@ -414,11 +413,10 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
 
-            searchTreeItemMulti(objs, n, newPath, result);            
-        }     
+            searchTreeItemMulti(objs, n, newPath, result);
+        }
     }
 
-    
     @Override
     protected void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result) {
         for (TreeItem n : getAllChildren(parent)) {
@@ -429,10 +427,10 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
 
-            searchTreeItemParentMulti(objs, n, result);            
+            searchTreeItemParentMulti(objs, n, result);
         }
     }
-    
+
     private boolean searchMatches(TreeItem n, TreeItem obj) {
         if (n instanceof AS3Package) {
             AS3Package pkg = (AS3Package) n;
@@ -485,6 +483,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         return false;
     }
+
     @Override
     protected List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
@@ -563,7 +562,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         return ret;
     }
-    
+
     private List<? extends TreeItem> getAllChildrenInternal(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
         List<TreeItem> result = new ArrayList<>();
@@ -667,7 +666,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         return result;
     }
-    
+
     private TreeItem getChildInternal(Object parent, int index) {
         if (getChildCount(parent) == 0) {
             return null;

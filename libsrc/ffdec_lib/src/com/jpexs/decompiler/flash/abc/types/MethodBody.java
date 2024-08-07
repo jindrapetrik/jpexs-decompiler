@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -61,6 +61,7 @@ import java.util.logging.Logger;
 
 /**
  * Method body of a method in ABC file.
+ *
  * @author JPEXS
  */
 public final class MethodBody implements Cloneable {
@@ -169,6 +170,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Sets the ABC file.
+     *
      * @param abc ABC file
      */
     public void setAbc(ABC abc) {
@@ -176,7 +178,9 @@ public final class MethodBody implements Cloneable {
     }
 
     /**
-     * Constructs a new MethodBody with given ABC file, traits, code bytes and exceptions.
+     * Constructs a new MethodBody with given ABC file, traits, code bytes and
+     * exceptions.
+     *
      * @param abc ABC file
      * @param traits Traits
      * @param codeBytes Code bytes
@@ -191,6 +195,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Sets the code bytes.
+     *
      * @param codeBytes Code bytes
      */
     public synchronized void setCodeBytes(byte[] codeBytes) {
@@ -207,6 +212,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Gets the code bytes.
+     *
      * @return Code bytes
      */
     public synchronized byte[] getCodeBytes() {
@@ -219,6 +225,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Gets the AVM2 code.
+     *
      * @return AVM2 code
      */
     public synchronized AVM2Code getCode() {
@@ -242,6 +249,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Sets the AVM2 code.
+     *
      * @param code AVM2 code
      */
     public void setCode(AVM2Code code) {
@@ -258,6 +266,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Removes dead code.
+     *
      * @param constants Constant pool
      * @param trait Trait
      * @param info Method info
@@ -270,6 +279,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Removes traps - deobfuscation.
+     *
      * @param abc ABC file
      * @param trait Trait
      * @param scriptIndex Script index
@@ -286,6 +296,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Deobfuscates the method body.
+     *
      * @param level Deobfuscation level
      * @param trait Trait
      * @param scriptIndex Script index
@@ -306,6 +317,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Removes instruction.
+     *
      * @param pos Position
      */
     public void removeInstruction(int pos) {
@@ -326,6 +338,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Inserts all instructions at specified point. Handles offsets properly.
+     *
      * @param pos Position in the list
      * @param list List of instructions
      */
@@ -363,6 +376,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Get number of local registers reserved for this method.
+     *
      * @return Number of local registers reserved for this method
      */
     public int getLocalReservedCount() {
@@ -379,6 +393,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Get local register names.
+     *
      * @param abc ABC file
      * @return Local register names
      */
@@ -412,6 +427,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Converts the method body.
+     *
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param convertData Convert data
@@ -492,6 +508,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Returns a string representation of this MethodBody.
+     *
      * @return String representation of this MethodBody
      */
     @Override
@@ -504,6 +521,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Returns a string representation of this MethodBody.
+     *
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param path Path
@@ -563,6 +581,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Converts the method body. Can use previously converted method body.
+     *
      * @param deobfuscate Deobfuscate
      * @param path Path
      * @param isStatic Is static
@@ -589,6 +608,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Converts the method body.
+     *
      * @param deobfuscate Deobfuscate
      * @param path Path
      * @param isStatic Is static
@@ -626,6 +646,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Converts the method body to high-level source code.
+     *
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
@@ -652,6 +673,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Clones this MethodBody.
+     *
      * @return Cloned MethodBody
      */
     @Override
@@ -661,6 +683,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Clones this MethodBody.
+     *
      * @param deepTraits Deep traits
      * @return Cloned MethodBody
      */
@@ -692,6 +715,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Auto fills the statistics (max stack, max scope depth, ...).
+     *
      * @param abc ABC file
      * @param initScope Initial scope
      * @param hasThis Has this
@@ -722,6 +746,7 @@ public final class MethodBody implements Cloneable {
 
     /**
      * Auto fills the maximum number of registers.
+     *
      * @param abc ABC file
      * @return True if successful
      */

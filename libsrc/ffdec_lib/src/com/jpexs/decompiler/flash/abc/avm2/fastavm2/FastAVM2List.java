@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -34,6 +34,7 @@ import java.util.Set;
 
 /**
  * Fast AVM2 instruction list.
+ *
  * @author JPEXS
  */
 public class FastAVM2List implements Collection<AVM2InstructionItem> {
@@ -60,6 +61,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Constructs a new FastAVM2List from a method body
+     *
      * @param body Method body
      */
     public FastAVM2List(MethodBody body) {
@@ -78,6 +80,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Inserts item before another item
+     *
      * @param item Item to insert before
      * @param action Action to insert
      * @return
@@ -89,6 +92,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Inserts item before another item
+     *
      * @param item Item to insert before
      * @param newItem New item
      * @return New item
@@ -104,6 +108,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Inserts item after another item
+     *
      * @param item Item to insert after
      * @param action Action to insert
      * @return
@@ -115,6 +120,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Inserts item after another item
+     *
      * @param item Item to insert after
      * @param newItem New item
      * @return New item
@@ -145,6 +151,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Removes item
+     *
      * @param item Item to remove
      * @return Next item
      */
@@ -190,6 +197,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Removes item.
+     *
      * @param index Index of item to remove
      * @param count Number of items to remove
      */
@@ -203,6 +211,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets item at index
+     *
      * @param index Index
      * @return Item
      */
@@ -213,6 +222,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Replace jump targets.
+     *
      * @param target Target
      * @param newTarget New target
      */
@@ -226,6 +236,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets nerby address.
+     *
      * @param instructions Instructions
      * @param address Address
      * @param next Next
@@ -254,6 +265,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets jumps.
+     *
      * @param actions Actions
      * @param actionItemMap Action item map
      */
@@ -327,7 +339,6 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
         } while (item != firstItem);
     }
 
-
     /**
      * Updates container sizes.
      */
@@ -357,6 +368,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets container.
+     *
      * @param item Item
      * @return Container
      */
@@ -436,6 +448,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets unreachable action count.
+     *
      * @param jump Jump
      * @param jumpTarget Jump target
      * @return
@@ -478,6 +491,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Sets excluded flags.
+     *
      * @param value Value
      */
     public void setExcludedFlags(boolean value) {
@@ -494,6 +508,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Updates reachable flags.
+     *
      * @param jump Jump
      * @param jumpTarget Jump target
      */
@@ -562,6 +577,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Updates actions.
+     *
      * @param body Method body
      */
     public void updateActions(MethodBody body) {
@@ -586,6 +602,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets first item.
+     *
      * @return First item
      */
     public AVM2InstructionItem first() {
@@ -594,6 +611,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets last item.
+     *
      * @return Last item
      */
     public AVM2InstructionItem last() {
@@ -602,6 +620,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Converts to method body.
+     *
      * @param body Method body
      */
     public void toMethodBody(MethodBody body) {
@@ -610,6 +629,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets size.
+     *
      * @return Size
      */
     @Override
@@ -619,6 +639,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Checks if empty.
+     *
      * @return Whether empty
      */
     @Override
@@ -628,6 +649,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Checks if contains.
+     *
      * @param o element whose presence in this collection is to be tested
      * @return Whether contains
      */
@@ -644,6 +666,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Gets iterator.
+     *
      * @return Iterator
      */
     @Override
@@ -653,6 +676,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Converts to array.
+     *
      * @return Array
      */
     @Override
@@ -675,11 +699,12 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Converts to array.
+     *
      * @param a the array into which the elements of this collection are to be
-     *        stored, if it is big enough; otherwise, a new array of the same
-     *        runtime type is allocated for this purpose.
-     * @return Array
+     * stored, if it is big enough; otherwise, a new array of the same runtime
+     * type is allocated for this purpose.
      * @param <T>
+     * @return Array
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -704,6 +729,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Adds an element to this collection.
+     *
      * @param e element whose presence in this collection is to be ensured
      * @return Whether added
      */
@@ -715,6 +741,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Removes a single instance of the specified element from this collection,
+     *
      * @param o element to be removed from this collection, if present
      * @return Whether removed
      */
@@ -736,7 +763,9 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
     }
 
     /**
-     * Checks whether this collection contains all of the elements in the specified collection.
+     * Checks whether this collection contains all of the elements in the
+     * specified collection.
+     *
      * @param c collection to be checked for containment in this collection
      * @return Whether contains all
      */
@@ -753,6 +782,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
 
     /**
      * Adds all of the elements in the specified collection to this collection.
+     *
      * @param c collection containing elements to be added to this collection
      * @return Whether added all
      */
@@ -766,8 +796,11 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
     }
 
     /**
-     * Removes all of this collection's elements that are also contained in the specified collection.
-     * @param c collection containing elements to be removed from this collection
+     * Removes all of this collection's elements that are also contained in the
+     * specified collection.
+     *
+     * @param c collection containing elements to be removed from this
+     * collection
      * @return Whether removed all
      */
     @Override
@@ -781,7 +814,9 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
     }
 
     /**
-     * Retains only the elements in this collection that are contained in the specified collection.
+     * Retains only the elements in this collection that are contained in the
+     * specified collection.
+     *
      * @param c collection containing elements to be retained in this collection
      * @return Whether retained all
      */

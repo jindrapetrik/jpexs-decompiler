@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -32,6 +32,7 @@ import java.util.Map;
 
 /**
  * ABC method indexing.
+ *
  * @author JPEXS
  */
 public class ABCMethodIndexing {
@@ -48,6 +49,7 @@ public class ABCMethodIndexing {
 
     /**
      * Constructs ABC method indexing.
+     *
      * @param abc ABC
      */
     public ABCMethodIndexing(ABC abc) {
@@ -57,6 +59,7 @@ public class ABCMethodIndexing {
 
     /**
      * Creates body index from method index map.
+     *
      * @param abc ABC
      */
     public final void createBodyIdxFromMethodIdxMap(ABC abc) {
@@ -72,6 +75,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds method body index for method info.
+     *
      * @param methodInfo Method info
      * @return Method body index or -1 if not found
      */
@@ -86,6 +90,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds method body index for method info.
+     *
      * @param methodInfo Method info index
      * @return Method body index or -1 if not found
      */
@@ -100,6 +105,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds method body for method info.
+     *
      * @param methodInfo Method info
      * @return Method body or null if not found
      */
@@ -114,6 +120,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds method body for method info.
+     *
      * @param methodInfo Method info index
      * @return Method body or null if not found
      */
@@ -128,6 +135,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds method traits.
+     *
      * @param pack Script pack
      * @param bodyIndex Method body index
      * @return Method traits
@@ -146,6 +154,7 @@ public class ABCMethodIndexing {
 
     /**
      * Finds traits.
+     *
      * @param abc ABC
      * @param trait Trait
      * @param methodInfo Method info index

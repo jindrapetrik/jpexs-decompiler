@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.as2;
 
 /**
  * Represents a method trait in ActionScript 2.
+ *
  * @author JPEXS
  */
 public class Method implements Trait {
@@ -44,6 +45,7 @@ public class Method implements Trait {
 
     /**
      * Constructs a new method trait.
+     *
      * @param isStatic Whether the method is static
      * @param name Name of the method
      * @param returnType Return type of the method
@@ -58,6 +60,7 @@ public class Method implements Trait {
 
     /**
      * Gets the name of the class the method is in.
+     *
      * @return Class name
      */
     @Override
@@ -67,6 +70,7 @@ public class Method implements Trait {
 
     /**
      * Gets whether the method is static.
+     *
      * @return Whether the method is static
      */
     @Override
@@ -76,6 +80,7 @@ public class Method implements Trait {
 
     /**
      * Gets the name of the method.
+     *
      * @return Name
      */
     @Override
@@ -85,6 +90,7 @@ public class Method implements Trait {
 
     /**
      * Gets the return type of the method.
+     *
      * @return Return type
      */
     public String getReturnType() {
@@ -93,6 +99,7 @@ public class Method implements Trait {
 
     /**
      * Converts the method to a string.
+     *
      * @return String representation
      */
     @Override
@@ -102,6 +109,7 @@ public class Method implements Trait {
 
     /**
      * Gets the call type of the method.
+     *
      * @return Call type
      */
     @Override
@@ -111,6 +119,7 @@ public class Method implements Trait {
 
     /**
      * Gets the type of the trait.
+     *
      * @return Trait type
      */
     @Override

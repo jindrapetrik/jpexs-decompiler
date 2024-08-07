@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -49,6 +49,7 @@ import java.util.Map;
 
 /**
  * AVM2 instruction.
+ *
  * @author JPEXS
  */
 public class AVM2Instruction implements Cloneable, GraphSourceItem {
@@ -107,6 +108,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets file offset.
+     *
      * @return File offset
      */
     @Override
@@ -116,6 +118,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the line offset.
+     *
      * @return Line offset
      */
     @Override
@@ -128,6 +131,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Sets file and line.
+     *
      * @param file File
      * @param line Line
      */
@@ -138,6 +142,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Constructs a new AVM2 instruction.
+     *
      * @param offset Offset
      * @param instructionCode Instruction code
      * @param operands Operands
@@ -148,6 +153,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Constructs a new AVM2 instruction.
+     *
      * @param address Address
      * @param definition Definition
      * @param operands Operands
@@ -160,6 +166,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the bytes.
+     *
      * @return Bytes
      */
     public byte[] getBytes() {
@@ -200,6 +207,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the length of the bytes.
+     *
      * @return Length of the bytes
      */
     @Override
@@ -236,6 +244,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the offsets.
+     *
      * @return Offsets
      */
     public List<Long> getOffsets() {
@@ -262,6 +271,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the parameter.
+     *
      * @param constants Constants
      * @param idx Index of operand
      * @return Parameter
@@ -295,6 +305,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the parameter as a long.
+     *
      * @param constants Constants
      * @param idx Index of operand
      * @return Parameter as a long
@@ -305,6 +316,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets all parameters as string.
+     *
      * @param constants Constants
      * @param fullyQualifiedNames Fully qualified names
      * @return All parameters as string
@@ -482,6 +494,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the comment.
+     *
      * @return Comment
      */
     public String getComment() {
@@ -496,6 +509,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Checks whether this item is ignored.
+     *
      * @return True if this item is ignored, false otherwise
      */
     @Override
@@ -505,6 +519,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -522,6 +537,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * To string.
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -534,6 +550,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the customized instruction name.
+     *
      * @return Customized instruction name
      */
     private String getCustomizedInstructionName() {
@@ -545,6 +562,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * To string without address.
+     *
      * @param constants Constants
      * @param fullyQualifiedNames Fully qualified names
      * @return String without address
@@ -562,6 +580,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Translate the item to target items.
+     *
      * @param localData Local data
      * @param stack Stack
      * @param output Output list
@@ -581,6 +600,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the number of stack items that are popped by this item.
+     *
      * @param localData Local data
      * @param stack Stack
      * @return Number of stack items that are popped by this item
@@ -593,6 +613,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the number of stack items that are popped by this item.
+     *
      * @param aLocalData Local data
      * @return Number of stack items that are popped by this item
      */
@@ -602,6 +623,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the number of stack items that are pushed by this item.
+     *
      * @param localData Local data
      * @param stack Stack
      * @return Number of stack items that are pushed by this item
@@ -614,6 +636,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the number of stack items that are pushed by this item.
+     *
      * @param aLocalData Local data
      * @return Number of stack items that are pushed by this item
      */
@@ -623,6 +646,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Checks whether this item is a jump.
+     *
      * @return True if this item is a jump, false otherwise
      */
     @Override
@@ -632,6 +656,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Checks whether this item is a branch.
+     *
      * @return True if this item is a branch, false otherwise
      */
     @Override
@@ -641,6 +666,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Checks whether this item is an exit (throw, return, etc.).
+     *
      * @return True if this item is an exit, false otherwise
      */
     @Override
@@ -650,6 +676,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the address.
+     *
      * @return Address
      */
     @Override
@@ -659,6 +686,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Sets the address.
+     *
      * @param address Address
      */
     public void setAddress(long address) {
@@ -667,6 +695,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the target address of jump.
+     *
      * @return Target address.
      */
     public long getTargetAddress() {
@@ -675,15 +704,16 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Sets the target offset of jump.
+     *
      * @param offset Offset
      */
     public void setTargetOffset(int offset) {
         operands[0] = offset;
     }
 
-
     /**
      * Gets branches
+     *
      * @param code Code
      * @return List of IPs to branch to
      */
@@ -708,6 +738,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Checks whether the loops are ignored.
+     *
      * @return True if the loops are ignored, false otherwise
      */
     @Override
@@ -717,6 +748,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Sets whether this item is ignored.
+     *
      * @param ignored True if this item is ignored, false otherwise
      * @param pos Sub position
      */
@@ -726,9 +758,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     /**
-     * Checks whether this item is a DeobfuscatePop instruction.
-     * It is a special instruction for deobfuscation.
-     * @return True if this item is a DeobfuscatePop instruction, false otherwise
+     * Checks whether this item is a DeobfuscatePop instruction. It is a special
+     * instruction for deobfuscation.
+     *
+     * @return True if this item is a DeobfuscatePop instruction, false
+     * otherwise
      */
     @Override
     public boolean isDeobfuscatePop() {
@@ -737,6 +771,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Clone the instruction.
+     *
      * @return Cloned instruction
      */
     @Override
@@ -754,6 +789,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the line in the high level source code.
+     *
      * @return Line
      */
     @Override
@@ -763,6 +799,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     /**
      * Gets the high level source code file name.
+     *
      * @return File name
      */
     @Override

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 
 /**
  * List of actions.
+ *
  * @author JPEXS
  */
 public class ActionList extends ArrayList<Action> {
@@ -63,6 +64,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Constructs a new action list with the specified charset.
+     *
      * @param charset Charset
      */
     public ActionList(String charset) {
@@ -71,6 +73,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets the charset.
+     *
      * @return Charset
      */
     public String getCharset() {
@@ -79,6 +82,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Constructs a new action list with the specified actions and charset.
+     *
      * @param actions Actions
      * @param charset Charset
      */
@@ -89,6 +93,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Sets actions.
+     *
      * @param list Actions
      */
     public void setActions(List<Action> list) {
@@ -98,6 +103,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Removes actions.
+     *
      * @param actionsToRemove Actions to remove
      */
     public void removeActions(List<Action> actionsToRemove) {
@@ -106,6 +112,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Removes action.
+     *
      * @param index Index
      */
     public void removeAction(int index) {
@@ -114,6 +121,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Removes action.
+     *
      * @param index Index
      * @param count Count
      */
@@ -130,6 +138,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Adds action.
+     *
      * @param index Index
      * @param action Action
      */
@@ -139,6 +148,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Adds actions.
+     *
      * @param index Index
      * @param actions Actions
      */
@@ -155,6 +165,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets container last actions.
+     *
      * @param action Action
      * @return Container last actions
      */
@@ -164,6 +175,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets references for action.
+     *
      * @param target Target
      * @return References
      */
@@ -231,6 +243,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets constant pools.
+     *
      * @return Constant pools
      */
     public Iterable<ActionConstantPool> getConstantPools() {
@@ -271,6 +284,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets pushes.
+     *
      * @return Pushes
      */
     public Iterable<ActionPush> getPushes() {
@@ -311,6 +325,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets constant pool index reference count.
+     *
      * @param index Index
      * @return Constant pool index reference count
      */
@@ -335,6 +350,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets inline constant pool string.
+     *
      * @param index Index
      * @param str String
      */
@@ -417,6 +433,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets action by address.
+     *
      * @param address Address
      * @return Action
      */
@@ -427,6 +444,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets index by action.
+     *
      * @param action Action
      * @return Index
      */
@@ -436,6 +454,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets index by address.
+     *
      * @param address Address
      * @return Index
      */
@@ -460,6 +479,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets container.
+     *
      * @param idx Index
      * @return Container
      */
@@ -484,6 +504,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets container end index.
+     *
      * @param idx Index
      * @return Container end index
      */
@@ -508,6 +529,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets unreachable actions.
+     *
      * @return Unreachable actions
      */
     public List<Action> getUnreachableActions() {
@@ -528,6 +550,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets unreachable actions.
+     *
      * @param jumpIndex Jump index
      * @param jumpTargetIndex Jump target index
      * @return Unreachable actions
@@ -551,6 +574,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Gets unreachable actions map.
+     *
      * @param jumpIndex Jump index
      * @param jumpTargetIndex Jump target index
      * @return Unreachable actions array - ip to reachable
@@ -678,6 +702,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Saves to file.
+     *
      * @param fileName File name
      */
     public void saveToFile(String fileName) {
@@ -691,6 +716,7 @@ public class ActionList extends ArrayList<Action> {
 
     /**
      * Converts to string.
+     *
      * @return String
      */
     @Override

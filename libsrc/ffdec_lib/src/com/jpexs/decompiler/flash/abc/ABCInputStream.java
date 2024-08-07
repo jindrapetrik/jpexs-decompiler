@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -41,6 +41,7 @@ import java.io.IOException;
 
 /**
  * ABC input stream.
+ *
  * @author JPEXS
  */
 public class ABCInputStream implements AutoCloseable {
@@ -93,6 +94,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Stops buffering and returns buffered bytes.
+     *
      * @return Buffered bytes
      */
     public byte[] stopBuffer() {
@@ -106,6 +108,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Creates new ABC input stream
+     *
      * @param is Input stream
      */
     public ABCInputStream(MemoryInputStream is) {
@@ -124,6 +127,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Creates new dump level.
+     *
      * @param name Name
      * @param type Type
      * @return New DumpInfo
@@ -134,6 +138,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Creates new dump level.
+     *
      * @param name Name
      * @param type Type
      * @param specialType Special type
@@ -162,6 +167,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Ends dump level.
+     *
      * @param value Value
      */
     public void endDumpLevel(Object value) {
@@ -174,6 +180,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Ends dump level until specified dump info.
+     *
      * @param di Dump info
      */
     public void endDumpLevelUntil(DumpInfo di) {
@@ -186,6 +193,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads byte from the stream.
+     *
      * @return Byte
      * @throws IOException
      */
@@ -207,6 +215,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads byte from the stream.
+     *
      * @param name Name
      * @return Byte
      * @throws IOException
@@ -220,6 +229,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads bytes from the stream.
+     *
      * @param b Bytes
      * @return Number of bytes read
      * @throws IOException
@@ -249,6 +259,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U8 from the stream.
+     *
      * @param name Name
      * @return U8
      * @throws IOException
@@ -262,6 +273,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U32 from the stream.
+     *
      * @return U32
      * @throws IOException
      */
@@ -284,6 +296,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U32 from the stream.
+     *
      * @param name Name
      * @return U32
      * @throws IOException
@@ -297,6 +310,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U30 from the stream.
+     *
      * @return U30
      * @throws IOException
      */
@@ -308,6 +322,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U30 from the stream.
+     *
      * @param name Name
      * @return U30
      * @throws IOException
@@ -321,6 +336,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads S24 from the stream.
+     *
      * @param name Name
      * @return S24
      * @throws IOException
@@ -339,6 +355,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads U16 from the stream.
+     *
      * @param name Name
      * @return U16
      * @throws IOException
@@ -352,6 +369,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads S32 from the stream.
+     *
      * @param name Name
      * @return S32
      * @throws IOException
@@ -383,6 +401,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Gets available bytes in the stream.
+     *
      * @return Available bytes
      * @throws IOException
      */
@@ -392,6 +411,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads long from the stream.
+     *
      * @return Long
      * @throws IOException
      */
@@ -410,6 +430,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads double from the stream.
+     *
      * @param name Name
      * @return Double
      * @throws IOException
@@ -424,6 +445,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Safely reads bytes from the stream.
+     *
      * @param count Count
      * @param data Data
      * @throws IOException
@@ -436,6 +458,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads namespace from the stream.
+     *
      * @param name Name
      * @return Namespace
      * @throws IOException
@@ -456,6 +479,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads multiname from the stream.
+     *
      * @param name Name
      * @return Multiname
      * @throws IOException
@@ -499,6 +523,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads method info from the stream.
+     *
      * @param name Name
      * @return Method info
      * @throws IOException
@@ -537,6 +562,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads trait from the stream.
+     *
      * @param name Name
      * @return Trait
      * @throws IOException
@@ -604,6 +630,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads traits from the stream.
+     *
      * @param name Name
      * @return Traits
      * @throws IOException
@@ -621,6 +648,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads bytes from the stream.
+     *
      * @param count Count
      * @return Bytes
      * @throws IOException
@@ -635,6 +663,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads bytes from the stream.
+     *
      * @param count Count
      * @param name Name
      * @param specialType Special type
@@ -650,6 +679,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads decimal from the stream.
+     *
      * @param name Name
      * @return Decimal
      * @throws IOException
@@ -663,6 +693,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads float from the stream.
+     *
      * @param name Name
      * @return Float
      * @throws IOException
@@ -677,6 +708,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads float4 from the stream.
+     *
      * @param name Name
      * @return Float4
      * @throws IOException
@@ -694,6 +726,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads instance info from the stream.
+     *
      * @param name Name
      * @return Instance info
      * @throws IOException
@@ -720,6 +753,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Reads string from the stream.
+     *
      * @param name Name
      * @return String
      * @throws IOException
@@ -746,6 +780,7 @@ public class ABCInputStream implements AutoCloseable {
 
     /**
      * Gets current position in the stream.
+     *
      * @return Position
      */
     public long getPosition() {

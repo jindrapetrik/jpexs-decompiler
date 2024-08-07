@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 /**
  * Iterator for FastActionList.
+ *
  * @author JPEXS
  */
 public final class FastActionListIterator implements Iterator<ActionItem> {
@@ -42,6 +43,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Constructs a new FastActionListIterator.
+     *
      * @param list
      */
     FastActionListIterator(FastActionList list) {
@@ -51,6 +53,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Constructs a new FastActionListIterator.
+     *
      * @param list
      * @param index
      */
@@ -68,6 +71,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Returns if there is a next item.
+     *
      * @return If there is a next item
      */
     @Override
@@ -77,6 +81,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Returns the next item.
+     *
      * @return The next item
      */
     @Override
@@ -93,6 +98,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Returns the previous item.
+     *
      * @return The previous item
      */
     public ActionItem prev() {
@@ -109,6 +115,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Sets the current item.
+     *
      * @param item The item
      */
     public void setCurrent(ActionItem item) {
@@ -128,6 +135,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Adds an action after the current item.
+     *
      * @param action The action
      */
     public void add(Action action) {
@@ -136,6 +144,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Adds an action item after the current item.
+     *
      * @param actionItem The action item
      */
     public void add(ActionItem actionItem) {
@@ -144,6 +153,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Adds an action before the current item.
+     *
      * @param actionItem The action
      */
     public void addBefore(ActionItem actionItem) {
@@ -152,6 +162,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
 
     /**
      * Gets item at index.
+     *
      * @param index Index
      * @return Item at index
      */

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -36,6 +36,7 @@ import java.util.List;
 
 /**
  * Function trait in ABC file.
+ *
  * @author JPEXS
  */
 public class TraitFunction extends Trait implements TraitWithSlot {
@@ -52,6 +53,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Deletes this trait.
+     *
      * @param abc ABC
      * @param d Deleted flag
      */
@@ -65,6 +67,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Gets slot index.
+     *
      * @return
      */
     @Override
@@ -74,6 +77,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * ToString of header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -107,6 +111,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Converts header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -126,6 +131,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * To string.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -137,6 +143,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * To string.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -177,6 +184,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Converts trait.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -209,6 +217,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Removes traps - deobfuscation.
+     *
      * @param scriptIndex Script index
      * @param classIndex Class index
      * @param isStatic Is static
@@ -228,6 +237,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Clones trait.
+     *
      * @return Cloned trait
      */
     @Override
@@ -238,6 +248,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Gets dependencies.
+     *
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -261,6 +272,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Converts trait header.
+     *
      * @param abc ABC
      * @param writer Writer
      * @return Writer
@@ -280,6 +292,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     /**
      * Gets method infos.
+     *
      * @param abc ABC
      * @param traitId Trait ID
      * @param classIndex Class index

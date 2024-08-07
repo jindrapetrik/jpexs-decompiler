@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -110,6 +110,7 @@ import java.util.Stack;
 
 /**
  * Simple deobfuscator for AVM2 code. (Old version)
+ *
  * @author JPEXS
  */
 public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPushes {
@@ -131,6 +132,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Creates a push instruction from a graph target item.
+     *
      * @param cpool Constant pool
      * @param graphTargetItem Graph target item
      * @return Push instruction
@@ -160,6 +162,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Removes obfuscation ifs.
+     *
      * @param classIndex Class index
      * @param isStatic Is static
      * @param scriptIndex Script index
@@ -224,6 +227,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Creates a new local data.
+     *
      * @param scriptIndex Script index
      * @param abc ABC
      * @param cpool Constant pool
@@ -255,6 +259,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Initializes local registers.
+     *
      * @param localData Local data
      * @param localReservedCount Count of reserved local registers
      * @param maxRegs Maximal register id
@@ -270,6 +275,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Executes instructions.
+     *
      * @param importantOffsets Important offsets
      * @param staticRegs Static registers
      * @param body Method body
@@ -596,6 +602,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
     /**
      * Simple deobfuscates AVM2 code.
+     *
      * @param path Path
      * @param classIndex Class index
      * @param isStatic Is static

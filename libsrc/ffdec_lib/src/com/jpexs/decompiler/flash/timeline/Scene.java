@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Objects;
 
 /**
  * Scene object.
+ *
  * @author JPEXS
  */
 public class Scene implements TreeItem {
@@ -31,17 +32,17 @@ public class Scene implements TreeItem {
      * SWF.
      */
     private SWF swf;
-    
+
     /**
      * Start frame (zero-ased).
      */
     public int startFrame;
-    
+
     /**
      * End frame (zero-based).
      */
     public int endFrame;
-    
+
     /**
      * Name.
      */
@@ -49,6 +50,7 @@ public class Scene implements TreeItem {
 
     /**
      * Constructs Scene.
+     *
      * @param swf SWF
      * @param startFrame Start frame (zero-based)
      * @param endFrame End frame (zero-based)
@@ -63,7 +65,8 @@ public class Scene implements TreeItem {
 
     /**
      * Gets number of frames in this scene.
-     * @return 
+     *
+     * @return
      */
     public int getSceneFrameCount() {
         return endFrame - startFrame + 1;
@@ -71,6 +74,7 @@ public class Scene implements TreeItem {
 
     /**
      * Gets SceneFrame at index
+     *
      * @param sceneFrameIndex Index at range 0 to sceneFrameCount - 1
      * @return
      */
@@ -83,7 +87,8 @@ public class Scene implements TreeItem {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -92,7 +97,8 @@ public class Scene implements TreeItem {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {
@@ -101,7 +107,8 @@ public class Scene implements TreeItem {
 
     /**
      * HashCode.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -113,8 +120,9 @@ public class Scene implements TreeItem {
 
     /**
      * Equals.
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {
@@ -136,7 +144,8 @@ public class Scene implements TreeItem {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {

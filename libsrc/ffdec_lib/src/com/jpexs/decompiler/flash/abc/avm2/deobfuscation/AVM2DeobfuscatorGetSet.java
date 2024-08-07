@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -47,9 +47,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * AVM2 Deobfuscator removing single get / set registers.
- *
+ * <p>
  * Example: getlocal_1, getlocal_2, (kill 1), (kill 2), setlocal_2, setlocal_1
  *
  * @author JPEXS
@@ -73,6 +72,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * Remove obfuscation get sets
+     *
      * @param classIndex Class index
      * @param isStatic Is static
      * @param scriptIndex Script index
@@ -121,6 +121,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * Remove unreachable instructions.
+     *
      * @param code AVM2 code
      * @param body Method body
      * @throws InterruptedException
@@ -131,6 +132,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * Create new local data.
+     *
      * @param scriptIndex Script index
      * @param abc ABC
      * @param cpool Constant pool
@@ -162,6 +164,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * Initialize local registers.
+     *
      * @param localData AVM2 local data
      * @param localReservedCount Local reserved count
      * @param maxRegs Maximum registers
@@ -177,6 +180,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * Execute instructions.
+     *
      * @param body Method body
      * @param code AVM2 code
      * @param localData AVM2 local data
@@ -270,6 +274,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
 
     /**
      * AVM2 code remove traps.
+     *
      * @param path Path
      * @param classIndex Class index
      * @param isStatic Is static

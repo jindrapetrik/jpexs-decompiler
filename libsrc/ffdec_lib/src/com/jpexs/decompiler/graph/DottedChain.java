@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,14 +26,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Dotted chain class.
- * Represents a chain of names separated by dots.
+ * Dotted chain class. Represents a chain of names separated by dots.
+ *
  * @author JPEXS
  */
 public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     //Basic dotted chains
-
     public static final DottedChain EMPTY = new DottedChain(true);
 
     public static final DottedChain UNBOUNDED = new DottedChain(new String[]{"*"});
@@ -80,6 +79,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Get the namespace suffix of the part at the given index.
+     *
      * @param index Index
      * @return Namespace suffix
      */
@@ -89,6 +89,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets the last namespace suffix.
+     *
      * @return Last namespace suffix
      */
     public String getLastNamespaceSuffix() {
@@ -100,6 +101,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Parses a dotted chain from a string without suffix.
+     *
      * @param name Name
      * @return Dotted chain
      */
@@ -121,6 +123,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Parses a dotted chain from a string with suffix.
+     *
      * @param name Name
      * @return Dotted chain
      */
@@ -148,6 +151,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param isNull Whether the chain is null
      */
     private DottedChain(boolean isNull) {
@@ -157,6 +161,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param src Source chain
      */
     public DottedChain(DottedChain src) {
@@ -166,6 +171,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param parts Parts
      */
     public DottedChain(String[] parts) {
@@ -174,6 +180,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param parts Parts
      * @param isNull Whether the chain is null
      */
@@ -184,6 +191,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param parts Parts
      */
     public DottedChain(List<String> parts) {
@@ -196,6 +204,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param parts Parts
      * @param namespaceSuffixes Namespace suffixes
      */
@@ -205,6 +214,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Constructs a new dotted chain.
+     *
      * @param attributes Attributes
      * @param parts Parts
      * @param namespaceSuffixes Namespace suffixes
@@ -220,6 +230,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Checks whether this chain is top-level.
+     *
      * @return Whether this chain is top-level
      */
     public boolean isTopLevel() {
@@ -228,6 +239,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Checks whether this chain is empty.
+     *
      * @return Whether this chain is empty
      */
     public boolean isEmpty() {
@@ -236,6 +248,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets the number of parts in this chain.
+     *
      * @return Number of parts
      */
     public int size() {
@@ -244,6 +257,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets the part at the given index.
+     *
      * @param index Index
      * @return Part
      */
@@ -257,6 +271,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Checks whether the part at the given index is an attribute.
+     *
      * @param index Index
      * @return Whether the part at the given index is an attribute
      */
@@ -269,6 +284,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets the sub-chain of specific length.
+     *
      * @param count Length
      * @return
      */
@@ -282,6 +298,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets last part.
+     *
      * @return Last part
      */
     public String getLast() {
@@ -297,6 +314,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Checks whether the last part is an attribute.
+     *
      * @return Whether the last part is an attribute
      */
     public boolean isLastAttribute() {
@@ -312,6 +330,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Gets the chain without the last part.
+     *
      * @return Chain without the last part
      */
     public DottedChain getWithoutLast() {
@@ -327,6 +346,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Adds a part to the chain with a suffix.
+     *
      * @param name Name
      * @return New chain
      */
@@ -342,6 +362,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Adds a part to the chain.
+     *
      * @param name Name
      * @param namespaceSuffix Namespace suffix
      * @return New chain
@@ -352,6 +373,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Adds a part to the chain.
+     *
      * @param attribute Whether the part is an attribute
      * @param name Name
      * @param namespaceSuffix Namespace suffix
@@ -368,6 +390,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Adds prefix to the chain.
+     *
      * @param name Name
      * @param namespaceSuffix Namespace suffix
      * @return New chain
@@ -378,6 +401,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Adds prefix to the chain.
+     *
      * @param attribute Whether the part is an attribute
      * @param name Name
      * @param namespaceSuffix Namespace suffix
@@ -394,6 +418,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -403,6 +428,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To string.
+     *
      * @param as3 Whether to print as AS3
      * @param raw Whether to print raw (without deobfuscation)
      * @param withSuffix Whether to print with suffix
@@ -437,6 +463,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To file path.
+     *
      * @return File path
      */
     public String toFilePath() {
@@ -460,6 +487,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To list.
+     *
      * @return List
      */
     public List<String> toList() {
@@ -472,6 +500,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To printable string.
+     *
      * @param as3 Whether to print as AS3
      * @return Printable string
      */
@@ -481,6 +510,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * To raw string. (without deobfuscation)
+     *
      * @return Raw string
      */
     public String toRawString() { //Is SUFFIX correctly handled?
@@ -489,6 +519,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -501,6 +532,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Equals.
+     *
      * @param obj Object
      * @return Whether this object is equal to the given object
      */
@@ -524,8 +556,10 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     /**
      * Compare to.
+     *
      * @param o the object to be compared.
-     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     * @return a negative integer, zero, or a positive integer as this object is
+     * less than, equal to, or greater than the specified object.
      */
     @Override
     public int compareTo(DottedChain o) {
@@ -554,6 +588,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         /**
          * Constructs a new path part.
+         *
          * @param name Name
          * @param attribute Whether this part is an attribute
          * @param namespaceSuffix Namespace suffix
@@ -566,6 +601,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         /**
          * Hash code.
+         *
          * @return
          */
         @Override
@@ -579,6 +615,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         /**
          * Equals.
+         *
          * @param obj Object
          * @return Whether this object is equal to the given object
          */

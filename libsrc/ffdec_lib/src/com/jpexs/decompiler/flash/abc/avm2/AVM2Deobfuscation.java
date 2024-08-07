@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 /**
  * AVM2 deobfuscation.
+ *
  * @author JPEXS
  */
 public class AVM2Deobfuscation {
@@ -81,6 +82,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Constructs AVM2 deobfuscation.
+     *
      * @param swf SWF
      * @param constants AVM2 constant pool
      */
@@ -91,6 +93,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Checks if string is valid namespace part.
+     *
      * @param s String
      * @return True if string is valid namespace part
      */
@@ -119,6 +122,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Gets built-in namespace.
+     *
      * @param ns Namespace
      * @return Built-in namespace
      */
@@ -137,6 +141,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Generates random string.
+     *
      * @param deobfuscated Deobfuscated names
      * @param orig Original name
      * @param firstUppercase First uppercase
@@ -176,6 +181,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Deobfuscates package name.
+     *
      * @param stringUsageTypes String usage types
      * @param stringUsages String usages
      * @param namesMap Names map
@@ -223,6 +229,7 @@ public class AVM2Deobfuscation {
 
     /**
      * Deobfuscates name.
+     *
      * @param stringUsageTypes String usage types
      * @param stringUsages String usages
      * @param namespaceUsages Namespace usages

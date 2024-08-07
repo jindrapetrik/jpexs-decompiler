@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -371,6 +371,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets charset.
+     *
      * @return Charset
      */
     public String getCharset() {
@@ -382,6 +383,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Adds progress listener.
+     *
      * @param listener Progress listener
      */
     public void addPercentListener(ProgressListener listener) {
@@ -390,6 +392,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Removes progress listener.
+     *
      * @param listener Progress listener
      */
     public void removePercentListener(ProgressListener listener) {
@@ -416,6 +419,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Set maximum percent.
+     *
      * @param percentMax Maximum percent
      */
     public void setPercentMax(long percentMax) {
@@ -466,6 +470,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets SWF
+     *
      * @return SWF
      */
     public SWF getSwf() {
@@ -493,6 +498,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Creates new dump level.
+     *
      * @param name Name
      * @param type Type
      * @return
@@ -503,6 +509,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Creates new dump level.
+     *
      * @param name Name
      * @param type Type
      * @param specialType Special type
@@ -535,6 +542,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Ends dump level.
+     *
      * @param value Value
      */
     private void endDumpLevel(Object value) {
@@ -551,6 +559,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Ends dump level until.
+     *
      * @param di Dump info
      */
     private void endDumpLevelUntil(DumpInfo di) {
@@ -579,9 +588,9 @@ public class SWFInputStream implements AutoCloseable {
         bitPos = 0;
     }
 
-
     /**
      * Reads one byte from the stream.
+     *
      * @return Byte
      * @throws IOException
      * @throws EndOfStreamException
@@ -699,6 +708,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads one UI24 (Unsigned 24bit integer) value from the stream.
+     *
      * @param name Name
      * @return
      * @throws IOException
@@ -826,6 +836,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads long value from the stream.
+     *
      * @return Long value
      * @throws IOException
      */
@@ -1068,6 +1079,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Reads ZLIB compressed bytes from the stream.
+     *
      * @param count Number of bytes to read
      * @param name Name
      * @return
@@ -1086,6 +1098,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Uncompresses byte array.
+     *
      * @param data Data
      * @return Uncompressed data
      * @throws IOException
@@ -1096,6 +1109,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Uncompresses byte array.
+     *
      * @param data Data
      * @param offset Offset
      * @param length Length
@@ -1114,7 +1128,8 @@ public class SWFInputStream implements AutoCloseable {
     }
 
     /**
-     * Reads one EncodedU32 (Encoded unsigned 32bit value) value from the stream.
+     * Reads one EncodedU32 (Encoded unsigned 32bit value) value from the
+     * stream.
      *
      * @param name Name
      * @return U32 value
@@ -1146,8 +1161,6 @@ public class SWFInputStream implements AutoCloseable {
         endDumpLevel(result);
         return result;
     }
-
-
 
     /**
      * Reads UB[nBits] (Unsigned-bit value) value from the stream.
@@ -1272,6 +1285,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Dumps tag.
+     *
      * @param out Output stream
      * @param tag Tag
      * @param index Index
@@ -1345,6 +1359,7 @@ public class SWFInputStream implements AutoCloseable {
 
         /**
          * Constructs a new TagResolutionTask.
+         *
          * @param tag Tag stub
          * @param dumpInfo Dump info
          * @param level Level
@@ -1363,6 +1378,7 @@ public class SWFInputStream implements AutoCloseable {
 
         /**
          * Call.
+         *
          * @return Tag
          * @throws Exception
          */
@@ -1486,6 +1502,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Resolves tag.
+     *
      * @param tag Tag stub
      * @param level Level
      * @param parallel Parallel
@@ -3770,6 +3787,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets number of available bytes in the stream.
+     *
      * @return Number of available bytes
      * @throws IOException
      */
@@ -3779,6 +3797,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets number of available bits in the stream.
+     *
      * @return Number of available bits
      * @throws IOException
      */
@@ -3791,6 +3810,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets base stream.
+     *
      * @return Base stream
      * @throws IOException
      */
@@ -3803,6 +3823,7 @@ public class SWFInputStream implements AutoCloseable {
 
     /**
      * Gets limited stream.
+     *
      * @param limit Limit
      * @return Limited stream
      * @throws IOException

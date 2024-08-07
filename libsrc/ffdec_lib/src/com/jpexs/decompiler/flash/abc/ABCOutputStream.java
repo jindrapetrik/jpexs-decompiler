@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -34,6 +34,7 @@ import java.io.OutputStream;
 
 /**
  * ABC output stream.
+ *
  * @author JPEXS
  */
 public class ABCOutputStream extends OutputStream {
@@ -50,6 +51,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Constructs ABC output stream.
+     *
      * @param os Output stream
      */
     public ABCOutputStream(OutputStream os) {
@@ -58,6 +60,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Returns current position.
+     *
      * @return Current position
      */
     public long getPosition() {
@@ -66,6 +69,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes a byte to the output stream.
+     *
      * @param b The byte to write.
      * @throws IOException
      */
@@ -77,6 +81,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes a byte array to the output stream.
+     *
      * @param data The data to write.
      * @throws IOException
      */
@@ -88,6 +93,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes a byte array to the output stream.
+     *
      * @param b The data to write.
      * @param off The start offset in the data.
      * @param len The number of bytes to write.
@@ -101,6 +107,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes U30 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -130,6 +137,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes U32 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -151,6 +159,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes S24 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -167,6 +176,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes S32 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -204,6 +214,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes long to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -222,6 +233,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes double to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -231,6 +243,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes float to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -240,6 +253,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes float4 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -252,6 +266,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes U8 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -261,6 +276,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes U16 to the output stream.
+     *
      * @param value Value to write
      * @throws IOException
      */
@@ -271,6 +287,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes String to the output stream.
+     *
      * @param s String to write
      * @throws IOException
      */
@@ -282,6 +299,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes Namespace to the output stream.
+     *
      * @param ns Namespace to write
      * @throws IOException
      */
@@ -302,6 +320,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes Multiname to the output stream.
+     *
      * @param m Multiname to write
      * @throws IOException
      */
@@ -329,6 +348,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes MethodInfo to the output stream.
+     *
      * @param mi MethodInfo to write
      * @throws IOException
      */
@@ -357,6 +377,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes Trait to the output stream.
+     *
      * @param t Trait to write
      * @throws IOException
      */
@@ -397,6 +418,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes Traits to the output stream.
+     *
      * @param t Traits to write
      * @throws IOException
      */
@@ -409,6 +431,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes InstanceInfo to the output stream.
+     *
      * @param ii InstanceInfo to write
      * @throws IOException
      */
@@ -429,6 +452,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Writes Decimal to the output stream.
+     *
      * @param value Decimal to write
      * @throws IOException
      */
@@ -438,6 +462,7 @@ public class ABCOutputStream extends OutputStream {
 
     /**
      * Gets U30 byte length.
+     *
      * @param value Value
      * @return
      */

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -114,6 +114,7 @@ public class ActionScript2Classes {
 
     /**
      * Check if trait exists in class.
+     *
      * @param className Class name
      * @param name Trait name
      * @param withInheritance Whether to check also parent classes
@@ -178,6 +179,7 @@ public class ActionScript2Classes {
 
     /**
      * Get map of class name to map of trait name to trait.
+     *
      * @return Map of class name to map of trait name to trait
      */
     public static Map<String, Map<String, Trait>> getClassToTraits() {
@@ -187,6 +189,7 @@ public class ActionScript2Classes {
 
     /**
      * Get map of class name to list of parent class names.
+     *
      * @return Map of class name to list of parent class names
      */
     public static Map<String, List<String>> getClassInheritance() {
@@ -194,9 +197,9 @@ public class ActionScript2Classes {
         return classInheritance;
     }
 
-
     /**
      * Sample test
+     *
      * @param args
      */
     public static void main(String[] args) {

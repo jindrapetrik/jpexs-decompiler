@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,7 +40,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 
 /**
- *
  * @author JPEXS
  */
 public class TagInfoPanel extends JPanel {
@@ -82,7 +81,7 @@ public class TagInfoPanel extends JPanel {
                     if ("expand".equals(scheme)) {
                         if ("all".equals(strId)) {
                             updateHtmlContent(true, false);
-                        } 
+                        }
                         if ("details".equals(strId)) {
                             updateHtmlContent(true, true);
                         }
@@ -182,18 +181,18 @@ public class TagInfoPanel extends JPanel {
                     if (!frameList && expand) {
                         String charName;
                         CharacterTag character = swf == null ? null : swf.getCharacter(id);
-                        
+
                         if (showDetails) {
                             if (swf == null || character == null) {
                                 charName = "???";
                             } else {
                                 charName = Helper.escapeHTML(character.toString());
                             }
-                            strValue += String.format("<a href='%s://%d'>%s</a><br>", scheme, id, charName, id);                        
+                            strValue += String.format("<a href='%s://%d'>%s</a><br>", scheme, id, charName, id);
                         } else {
                             if (swf == null || character == null) {
                                 charName = "???";
-                            } else {                           
+                            } else {
                                 charName = character.getTagName();
                             }
 
@@ -207,10 +206,10 @@ public class TagInfoPanel extends JPanel {
                 value = strValue.substring(0, strValue.length() - 2);
 
                 if (!frameList && !expand) {
-                    value = value + " <a href='expand://all'>+</a>";                    
+                    value = value + " <a href='expand://all'>+</a>";
                 } else if (!frameList && expand && !showDetails) {
                     value = value + "<br><a href='expand://details'>+</a>";
-                }                
+                }
             }
 
             result += "<td>" + value + "</td>";

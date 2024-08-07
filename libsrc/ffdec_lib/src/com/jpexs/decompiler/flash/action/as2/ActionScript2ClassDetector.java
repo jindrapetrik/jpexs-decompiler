@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -61,6 +61,7 @@ import java.util.regex.Pattern;
 
 /**
  * Detects AS2 classes inside DoInitAction tags
+ *
  * @author JPEXS
  */
 public class ActionScript2ClassDetector {
@@ -82,6 +83,7 @@ public class ActionScript2ClassDetector {
 
         /**
          * Constructs a new AssertException
+         *
          * @param condition Condition
          */
         public AssertException(String condition) {
@@ -91,6 +93,7 @@ public class ActionScript2ClassDetector {
 
         /**
          * Gets condition
+         *
          * @return Condition
          */
         public String getCondition() {
@@ -164,6 +167,7 @@ public class ActionScript2ClassDetector {
     /**
      * Converts SetMemberActionItem to GetMemberActionItem,
      * SetVariableActionItem to GetVariableActionItem.
+     *
      * @param item Item
      * @return Converted item
      */
@@ -177,8 +181,9 @@ public class ActionScript2ClassDetector {
     }
 
     /**
-     * Converts NewMethodActionItem or NewObjectActionItem
-     * to GetMemberActionItem or GetVariableActionItem.
+     * Converts NewMethodActionItem or NewObjectActionItem to
+     * GetMemberActionItem or GetVariableActionItem.
+     *
      * @param nobj Item
      * @return Converted item
      * @throws AssertException
@@ -196,6 +201,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Gets path of setmembers: a.b.c.d => [a,b,c,d].
+     *
      * @param item Item
      * @return List of path or null if not members path
      */
@@ -256,6 +262,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Gets item without global prefix.
+     *
      * @param ti Item
      * @return Item without global prefix
      */
@@ -289,6 +296,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Converts item to string.
+     *
      * @param item Item
      * @param itemName Item name for exception
      * @return String
@@ -307,6 +315,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Detects classes in AS2 script.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param parts Parts
      * @param variables Variables
@@ -824,10 +833,10 @@ public class ActionScript2ClassDetector {
         return false;
     }
 
-
     /**
-     * In some weird cases, ifs are detected as ternars,
-     * this method expands ternars to ifs.
+     * In some weird cases, ifs are detected as ternars, this method expands
+     * ternars to ifs.
+     *
      * @param commands Commands
      */
     private void expandTernars(List<GraphTargetItem> commands) {
@@ -855,6 +864,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Checks if variants.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param commands Commands
      * @param variables Variables
@@ -1003,6 +1013,7 @@ public class ActionScript2ClassDetector {
 
     /**
      * Checks class.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param commands Commands
      * @param variables Variables

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * SoundStream blocks across frame range.
+ *
  * @author JPEXS
  */
 public class SoundStreamFrameRange implements TreeItem, SoundTag {
@@ -37,12 +38,12 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
      * Start frame (zero-based).
      */
     public int startFrame;
-    
+
     /**
      * End frame (zero-based).
      */
     public int endFrame;
-    
+
     /**
      * Sound blocks.
      */
@@ -55,6 +56,7 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Constructs SoundStreamFrameRange
+     *
      * @param head Sound stream head
      */
     public SoundStreamFrameRange(SoundStreamHeadTypeTag head) {
@@ -63,7 +65,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -72,7 +75,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets modified flag
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {
@@ -81,7 +85,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets sound export format.
-     * @return 
+     *
+     * @return
      */
     @Override
     public SoundExportFormat getExportFormat() {
@@ -90,7 +95,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Checks whether import is supported.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean importSupported() {
@@ -99,7 +105,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets sound rate.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int getSoundRate() {
@@ -107,9 +114,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     }
 
     /**
-     * Gets sound type.
-     * True = stereo, false = mono.
-     * @return 
+     * Gets sound type. True = stereo, false = mono.
+     *
+     * @return
      */
     @Override
     public boolean getSoundType() {
@@ -118,7 +125,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets raw sound data.
-     * @return 
+     *
+     * @return
      */
     @Override
     public List<ByteArrayRange> getRawSoundData() {
@@ -136,7 +144,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets sound format id.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int getSoundFormatId() {
@@ -145,7 +154,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets total sound sample count.
-     * @return 
+     *
+     * @return
      */
     @Override
     public long getTotalSoundSampleCount() {
@@ -153,9 +163,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     }
 
     /**
-     * Gets sound size.
-     * True = 16 bit, false = 8 bit.
-     * @return 
+     * Gets sound size. True = 16 bit, false = 8 bit.
+     *
+     * @return
      */
     @Override
     public boolean getSoundSize() {
@@ -164,7 +174,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets character export filename.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getCharacterExportFileName() {
@@ -173,7 +184,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets name.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getName() {
@@ -182,7 +194,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets sound format.
-     * @return 
+     *
+     * @return
      */
     @Override
     public SoundFormat getSoundFormat() {
@@ -190,9 +203,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     }
 
     /**
-     * Sets sound size.
-     * True = 16 bit, false = 8 bit
-     * @param soundSize 
+     * Sets sound size. True = 16 bit, false = 8 bit
+     *
+     * @param soundSize
      */
     @Override
     public void setSoundSize(boolean soundSize) {
@@ -200,9 +213,9 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     }
 
     /**
-     * Sets sound type.
-     * True = stereo, false = mono
-     * @param soundType 
+     * Sets sound type. True = stereo, false = mono
+     *
+     * @param soundType
      */
     @Override
     public void setSoundType(boolean soundType) {
@@ -211,7 +224,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Sets sound sample count.
-     * @param soundSampleCount 
+     *
+     * @param soundSampleCount
      */
     @Override
     public void setSoundSampleCount(long soundSampleCount) {
@@ -220,7 +234,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Sets sound compression.
-     * @param soundCompression 
+     *
+     * @param soundCompression
      */
     @Override
     public void setSoundCompression(int soundCompression) {
@@ -229,7 +244,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Sets sound rate.
-     * @param soundRate 
+     *
+     * @param soundRate
      */
     @Override
     public void setSoundRate(int soundRate) {
@@ -238,7 +254,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets character id.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int getCharacterId() {
@@ -247,7 +264,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets sound stream head.
-     * @return 
+     *
+     * @return
      */
     public SoundStreamHeadTypeTag getHead() {
         return head;
@@ -255,7 +273,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -264,7 +283,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Checks whether the sound is readonly.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isReadOnly() {
@@ -273,7 +293,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets FLA export name.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getFlaExportName() {
@@ -282,7 +303,8 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
 
     /**
      * Gets initial latency.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int getInitialLatency() {

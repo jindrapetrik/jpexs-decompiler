@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * List which can store parts of the graph for each element.
+ *
  * @author JPEXS
  */
 public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
@@ -38,6 +39,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Constructs GraphPartMarkedArrayList from another collection.
+     *
      * @param collection
      */
     @SuppressWarnings("unchecked")
@@ -63,6 +65,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Starts new part.
+     *
      * @param part Part
      */
     public void startPart(GraphPart part) {
@@ -78,6 +81,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Adds element to the collection.
+     *
      * @param e element whose presence in this collection is to be ensured
      * @return true if this collection changed as a result of the call
      */
@@ -89,6 +93,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Inserts the specified element at the specified position in this list.
+     *
      * @param index index at which the specified element is to be inserted
      * @param element element to be inserted
      */
@@ -100,6 +105,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Returns the parts at the specified index.
+     *
      * @param index index of the element
      * @return parts at the specified index
      */
@@ -109,6 +115,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Gets the index of the part in the list.
+     *
      * @param part
      * @return
      */
@@ -124,6 +131,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Adds all elements from the collection to this collection.
+     *
      * @param c collection containing elements to be added to this collection
      * @return true if this collection changed as a result of the call
      */
@@ -144,8 +152,9 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Inserts all elements in the specified collection into this list at the
+     *
      * @param index index at which to insert the first element from the
-     *              specified collection
+     * specified collection
      * @param c collection containing elements to be added to this list
      * @return true if this list changed as a result of the call
      */
@@ -166,6 +175,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Removes the first occurrence of the specified element from this list, if
+     *
      * @param o element to be removed from this list, if present
      * @return true if an element was removed as a result of this call
      */
@@ -179,6 +189,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Removes the element at the specified position in this list. Shifts any
+     *
      * @param index the index of the element to be removed
      * @return the element that was removed from the list
      */
@@ -199,6 +210,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Returns a view of the portion of this list between the specified
+     *
      * @param fromIndex low endpoint (inclusive) of the subList
      * @param toIndex high endpoint (exclusive) of the subList
      * @return a view of the specified range within this list
@@ -217,6 +229,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Returns a shallow copy of this ArrayList instance.
+     *
      * @return a clone of this ArrayList instance
      */
     @Override
@@ -226,6 +239,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
     /**
      * Removes from this list all of its elements that are contained in the
+     *
      * @param c collection containing elements to be removed from this list
      * @return true if this list changed as a result of the call
      */

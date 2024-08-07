@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  * A frame that contains script
+ *
  * @author JPEXS
  */
 public class FrameScript implements TreeItem, Exportable {
@@ -39,6 +40,7 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * Constructs FrameScript.
+     *
      * @param swf SWF
      * @param frame Frame
      */
@@ -49,7 +51,8 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * Gets Frame.
-     * @return 
+     *
+     * @return
      */
     public Frame getFrame() {
         return frame;
@@ -57,7 +60,8 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -66,7 +70,8 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -75,7 +80,8 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * Gets export filename.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getExportFileName() {
@@ -84,7 +90,8 @@ public class FrameScript implements TreeItem, Exportable {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {

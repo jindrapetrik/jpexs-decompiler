@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.as2;
 
 /**
  * Represents a variable trait in ActionScript 2.
+ *
  * @author JPEXS
  */
 public class Variable implements Trait {
@@ -44,6 +45,7 @@ public class Variable implements Trait {
 
     /**
      * Constructs a new variable trait.
+     *
      * @param isStatic Whether the variable is static
      * @param name Name of the variable
      * @param type Type of the variable
@@ -58,6 +60,7 @@ public class Variable implements Trait {
 
     /**
      * Checks whether the variable is static
+     *
      * @return Whether the variable is static
      */
     @Override
@@ -67,6 +70,7 @@ public class Variable implements Trait {
 
     /**
      * Gets the name of the variable
+     *
      * @return Name of the variable
      */
     @Override
@@ -76,6 +80,7 @@ public class Variable implements Trait {
 
     /**
      * Gets the type of the variable
+     *
      * @return Type of the variable
      */
     @Override
@@ -85,6 +90,7 @@ public class Variable implements Trait {
 
     /**
      * Converts the variable to a string
+     *
      * @return String representation of the variable
      */
     @Override
@@ -94,6 +100,7 @@ public class Variable implements Trait {
 
     /**
      * Gets the call type of the variable
+     *
      * @return Call type of the variable
      */
     @Override
@@ -103,6 +110,7 @@ public class Variable implements Trait {
 
     /**
      * Gets the class name of the variable
+     *
      * @return Class name of the variable
      */
     @Override
