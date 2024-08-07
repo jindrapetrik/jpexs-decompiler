@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * WaitForFrame action - Waits for a frame to be loaded before continuing.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

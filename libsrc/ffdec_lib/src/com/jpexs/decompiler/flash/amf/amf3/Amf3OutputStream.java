@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * AMF3 output stream.
+ */
 public class Amf3OutputStream extends OutputStream {
 
     public static final Logger LOGGER = Logger.getLogger(Amf3OutputStream.class.getName());

@@ -17,15 +17,24 @@
 package com.jpexs.decompiler.flash.action.special;
 
 import com.jpexs.decompiler.flash.action.Action;
+
 import java.util.List;
 
 /**
- *
+ * Action store interface.
  * @author JPEXS
  */
 public interface ActionStore {
 
+    /**
+     * Get store size.
+     * @return Store size
+     */
     public int getStoreSize();
 
+    /**
+     * Sets store items.
+     * @param store Store items
+     */
     public void setStore(List<Action> store);
 }

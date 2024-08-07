@@ -22,18 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
-import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;
-import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
-import com.jpexs.decompiler.flash.action.model.LoadVariablesActionItem;
-import com.jpexs.decompiler.flash.action.model.LoadVariablesNumActionItem;
-import com.jpexs.decompiler.flash.action.model.PrintActionItem;
-import com.jpexs.decompiler.flash.action.model.PrintAsBitmapActionItem;
-import com.jpexs.decompiler.flash.action.model.PrintAsBitmapNumActionItem;
-import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
-import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
-import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -44,6 +33,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * GetURL2 action - Gets a URL, stack-based.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

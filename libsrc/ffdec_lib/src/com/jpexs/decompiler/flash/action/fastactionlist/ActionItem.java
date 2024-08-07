@@ -17,51 +17,98 @@
 package com.jpexs.decompiler.flash.action.fastactionlist;
 
 import com.jpexs.decompiler.flash.action.Action;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Action in the fast action list.
  * @author JPEXS
  */
 public class ActionItem {
 
+    /**
+     *
+     */
     public Action action;
 
+    /**
+     * Previous action in the list.
+     */
     public ActionItem prev;
 
+    /**
+     * Next action in the list.
+     */
     public ActionItem next;
 
+    /**
+     * Jump target of this action.
+     */
     private ActionItem jumpTarget;
 
+    /**
+     * Actions that jump to this action.
+     */
     public Set<ActionItem> jumpsHere;
 
+    /**
+     * Last actions.
+     */
     public Set<ActionItem> lastActionOf;
 
+    /**
+     * Container last actions.
+     */
     private List<ActionItem> containerLastActions;
 
-    // 1 means reachable, 2 means reachable and processed
+    /**
+     * Reachable flag.
+     * 1 means reachable, 2 means reachable and processed
+     */
     int reachable;
 
+    /**
+     * Excluded flag.
+     */
     public boolean excluded;
 
+    /**
+     * Constructs a new ActionItem.
+     * @param action
+     */
     public ActionItem(Action action) {
         this.action = action;
     }
 
+    /**
+     * Checks if this action is a jump target.
+     * @return true if this action is a jump target
+     */
     public boolean isJumpTarget() {
         return jumpsHere != null && !jumpsHere.isEmpty();
     }
 
+    /**
+     * Gets the number of jumps to this action.
+     * @return Number of jumps to this action
+     */
     public int jumpsHereSize() {
         return jumpsHere == null ? 0 : jumpsHere.size();
     }
 
+    /**
+     * Checks if this action is the last action of a container.
+     * @return True if this action is the last action of a container
+     */
     public boolean isContainerLastAction() {
         return lastActionOf != null && !lastActionOf.isEmpty();
     }
 
+    /**
+     * Removes the jump target.
+     */
     public void removeJumpTarget() {
         if (jumpTarget == null) {
             return;
@@ -74,14 +121,26 @@ public class ActionItem {
         jumpTarget = null;
     }
 
+    /**
+     * Gets the jump target.
+     * @return Jump target
+     */
     public ActionItem getJumpTarget() {
         return jumpTarget;
     }
 
+    /**
+     * Gets the jump target action.
+     * @return Jump target action
+     */
     public Action getJumpTargetAction() {
         return jumpTarget == null ? null : jumpTarget.action;
     }
 
+    /**
+     * Sets the jump target.
+     * @param item Jump target
+     */
     public void setJumpTarget(ActionItem item) {
         removeJumpTarget();
 
@@ -97,10 +156,17 @@ public class ActionItem {
         jumpTarget = item;
     }
 
+    /**
+     * Gets container last actions.
+     * @return Container last actions
+     */
     public List<ActionItem> getContainerLastActions() {
         return containerLastActions;
     }
 
+    /**
+     * Removes container last actions.
+     */
     public void removeContainerLastActions() {
         if (containerLastActions == null) {
             return;
@@ -115,6 +181,11 @@ public class ActionItem {
         containerLastActions = null;
     }
 
+    /**
+     * Replaces container last action.
+     * @param oldItem Old action
+     * @param newItem New action
+     */
     public void replaceContainerLastAction(ActionItem oldItem, ActionItem newItem) {
         if (containerLastActions == null) {
             return;
@@ -132,6 +203,10 @@ public class ActionItem {
         }
     }
 
+    /**
+     * Sets container last actions.
+     * @param lastActions Container last actions
+     */
     public void setContainerLastActions(List<ActionItem> lastActions) {
         removeContainerLastActions();
 
@@ -142,6 +217,10 @@ public class ActionItem {
         containerLastActions = lastActions;
     }
 
+    /**
+     * Ensures last action of.
+     * @return Last action of
+     */
     private Set<ActionItem> ensureLastActionOf() {
         if (lastActionOf == null) {
             lastActionOf = new HashSet<>();
@@ -150,6 +229,10 @@ public class ActionItem {
         return lastActionOf;
     }
 
+    /**
+     * Checks if this action is excluded.
+     * @return True if this action is excluded
+     */
     public boolean isExcluded() {
         return excluded;
     }

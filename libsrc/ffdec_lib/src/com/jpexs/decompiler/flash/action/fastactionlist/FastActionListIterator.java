@@ -20,22 +20,40 @@ import com.jpexs.decompiler.flash.action.Action;
 import java.util.Iterator;
 
 /**
- *
+ * Iterator for FastActionList.
  * @author JPEXS
  */
 public final class FastActionListIterator implements Iterator<ActionItem> {
 
+    /**
+     * Current item
+     */
     private ActionItem item;
 
+    /**
+     * List
+     */
     private final FastActionList list;
 
+    /**
+     * If the iterator has started
+     */
     private boolean started = false;
 
+    /**
+     * Constructs a new FastActionListIterator.
+     * @param list
+     */
     FastActionListIterator(FastActionList list) {
         item = list.first();
         this.list = list;
     }
 
+    /**
+     * Constructs a new FastActionListIterator.
+     * @param list
+     * @param index
+     */
     FastActionListIterator(FastActionList list, int index) {
         item = list.first();
         this.list = list;
@@ -48,11 +66,19 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
         }
     }
 
+    /**
+     * Returns if there is a next item.
+     * @return If there is a next item
+     */
     @Override
     public boolean hasNext() {
         return item != null && (!started || item != list.first());
     }
 
+    /**
+     * Returns the next item.
+     * @return The next item
+     */
     @Override
     public ActionItem next() {
         ActionItem result = item;
@@ -65,6 +91,10 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
         return result;
     }
 
+    /**
+     * Returns the previous item.
+     * @return The previous item
+     */
     public ActionItem prev() {
         item = item.prev;
         if (item == list.first()) {
@@ -77,6 +107,10 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
         return item;
     }
 
+    /**
+     * Sets the current item.
+     * @param item The item
+     */
     public void setCurrent(ActionItem item) {
         this.item = item;
         if (item == list.first()) {
@@ -84,23 +118,43 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
         }
     }
 
+    /**
+     * Removes the current item.
+     */
     @Override
     public void remove() {
         item = list.removeItem(item.prev);
     }
 
+    /**
+     * Adds an action after the current item.
+     * @param action The action
+     */
     public void add(Action action) {
         item = list.insertItemAfter(item.prev, action).next;
     }
 
+    /**
+     * Adds an action item after the current item.
+     * @param actionItem The action item
+     */
     public void add(ActionItem actionItem) {
         item = list.insertItemAfter(item.prev, actionItem).next;
     }
 
+    /**
+     * Adds an action before the current item.
+     * @param actionItem The action
+     */
     public void addBefore(ActionItem actionItem) {
         list.insertItemBefore(item.prev, actionItem);
     }
 
+    /**
+     * Gets item at index.
+     * @param index Index
+     * @return Item at index
+     */
     public ActionItem peek(int index) {
         ActionItem item = this.item;
         for (int i = 0; i < index; i++) {

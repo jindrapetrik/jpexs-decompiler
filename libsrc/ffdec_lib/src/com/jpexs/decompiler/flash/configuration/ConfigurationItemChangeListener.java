@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.configuration;
 
 /**
- *
+ * Listener for configuration item changes. Used in ConfigurationItem.
  * @author JPEXS
  * @param <T>
  */

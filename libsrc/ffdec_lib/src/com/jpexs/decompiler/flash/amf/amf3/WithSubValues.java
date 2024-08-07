@@ -18,7 +18,14 @@ package com.jpexs.decompiler.flash.amf.amf3;
 
 import java.util.List;
 
+/**
+ * Interface for AMF3 objects that have sub values
+ */
 public interface WithSubValues {
 
+    /**
+     * Gets sub values.
+     * @return List of sub values
+     */
     public List<Object> getSubValues();
 }

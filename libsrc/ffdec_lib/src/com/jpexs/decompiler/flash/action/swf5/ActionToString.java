@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * ToString action - Converts a value to a string.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * ToNumber action - Converts a value to a number.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * SWF specific configuration.
  * @author JPEXS
  */
 public class SwfSpecificConfiguration implements Serializable {

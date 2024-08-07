@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * ToInteger action - Converts a value to an integer.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

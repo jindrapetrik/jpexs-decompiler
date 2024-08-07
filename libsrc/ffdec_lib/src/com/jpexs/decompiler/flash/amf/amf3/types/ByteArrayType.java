@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 
+/**
+ * AMF3 byte array type.
+ */
 public class ByteArrayType {
 
     private byte[] data;

@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Map which maintains order of keys
+ * Map which maintains order of keys.
  *
  * @param <K> Key type
  * @param <V> Value type

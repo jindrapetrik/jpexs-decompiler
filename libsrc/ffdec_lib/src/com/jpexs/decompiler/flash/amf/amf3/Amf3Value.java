@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.io.IOException;
 
+/**
+ * AMF3 value.
+ */
 public class Amf3Value {
 
     @SWFField

@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Configuration default calendar annotation.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)

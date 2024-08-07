@@ -27,12 +27,13 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Pop action - Removes the top item from the stack.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

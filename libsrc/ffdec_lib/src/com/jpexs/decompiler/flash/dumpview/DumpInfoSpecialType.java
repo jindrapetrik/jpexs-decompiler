@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.dumpview;
 
 /**
- *
+ * Type of special dump info.
  * @author JPEXS
  */
 public enum DumpInfoSpecialType {

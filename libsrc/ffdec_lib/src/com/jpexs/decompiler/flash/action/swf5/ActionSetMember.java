@@ -21,16 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
-import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -40,12 +31,13 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * SetMember action - Set member of object.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

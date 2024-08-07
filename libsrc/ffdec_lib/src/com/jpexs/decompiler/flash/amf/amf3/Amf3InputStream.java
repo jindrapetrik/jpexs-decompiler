@@ -45,6 +45,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * AMF3 input stream.
+ */
 public class Amf3InputStream extends InputStream {
 
     public static final Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());

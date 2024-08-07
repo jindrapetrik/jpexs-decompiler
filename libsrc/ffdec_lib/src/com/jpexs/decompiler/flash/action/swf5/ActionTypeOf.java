@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * TypeOf action - Returns the type of a value.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

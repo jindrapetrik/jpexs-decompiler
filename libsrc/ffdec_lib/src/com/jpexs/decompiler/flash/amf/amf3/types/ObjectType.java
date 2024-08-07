@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * AMF3 object type.
+ */
 public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Object> {
 
     private Map<String, Object> sealedMembers;

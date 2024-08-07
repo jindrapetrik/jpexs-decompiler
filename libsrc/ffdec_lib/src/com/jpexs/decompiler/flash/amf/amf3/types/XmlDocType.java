@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
+/**
+ * AMF3 XML document type.
+ */
 public class XmlDocType implements Amf3ValueType {
 
     private String data;

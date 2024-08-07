@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.ecma;
 import java.io.Serializable;
 
 /**
- *
+ * ECMA null value.
  * @author JPEXS
  */
 public class Null implements Serializable {

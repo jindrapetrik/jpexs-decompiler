@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.helpers.Cache;
 
 /**
- *
+ * Cache for AS3 decompiled code.
  * @author JPEXS
  */
 public class AS3Cache {

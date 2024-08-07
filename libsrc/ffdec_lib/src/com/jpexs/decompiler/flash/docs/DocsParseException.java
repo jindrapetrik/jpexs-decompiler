@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.docs;
 
 /**
- *
+ * Exception thrown when parsing documentation fails.
  * @author JPEXS
  */
 public class DocsParseException extends Exception {

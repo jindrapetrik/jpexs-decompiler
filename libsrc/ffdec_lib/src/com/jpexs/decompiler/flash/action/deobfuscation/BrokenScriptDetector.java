@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.deobfuscation;
 
 /**
- *
+ * Detects if the code is broken.
  * @author JPEXS
  */
 public class BrokenScriptDetector {

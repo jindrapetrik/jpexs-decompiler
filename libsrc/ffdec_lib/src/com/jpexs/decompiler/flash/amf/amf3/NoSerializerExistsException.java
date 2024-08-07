@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.amf.amf3;
 
+/**
+ * Exception thrown when no deserializer exists for a given class.
+ */
 public class NoSerializerExistsException extends Exception {
 
     private final String className;

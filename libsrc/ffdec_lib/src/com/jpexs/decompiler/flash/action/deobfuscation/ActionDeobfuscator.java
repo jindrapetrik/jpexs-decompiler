@@ -18,62 +18,13 @@ package com.jpexs.decompiler.flash.action.deobfuscation;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ActionListReader;
-import com.jpexs.decompiler.flash.action.LocalDataArea;
-import com.jpexs.decompiler.flash.action.Stage;
+import com.jpexs.decompiler.flash.action.*;
 import com.jpexs.decompiler.flash.action.fastactionlist.ActionItem;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionList;
 import com.jpexs.decompiler.flash.action.fastactionlist.FastActionListIterator;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
-import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
-import com.jpexs.decompiler.flash.action.swf4.ActionAnd;
-import com.jpexs.decompiler.flash.action.swf4.ActionAsciiToChar;
-import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
-import com.jpexs.decompiler.flash.action.swf4.ActionDivide;
-import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetTime;
-import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.action.swf4.ActionJump;
-import com.jpexs.decompiler.flash.action.swf4.ActionLess;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBAsciiToChar;
-import com.jpexs.decompiler.flash.action.swf4.ActionMBStringLength;
-import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
-import com.jpexs.decompiler.flash.action.swf4.ActionNot;
-import com.jpexs.decompiler.flash.action.swf4.ActionOr;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringAdd;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringEquals;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
-import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
-import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
-import com.jpexs.decompiler.flash.action.swf4.ActionToInteger;
-import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
-import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitOr;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitXor;
-import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
-import com.jpexs.decompiler.flash.action.swf5.ActionDecrement;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
-import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
-import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
-import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
-import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
-import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
-import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
-import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
-import com.jpexs.decompiler.flash.action.swf5.ActionToString;
-import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
+import com.jpexs.decompiler.flash.action.swf4.*;
+import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -83,17 +34,11 @@ import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.PushItem;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+
+import java.util.*;
 
 /**
- *
+ * ActionScript 1/2 deobfuscator.
  * @author JPEXS
  */
 public class ActionDeobfuscator extends SWFDecompilerAdapter {

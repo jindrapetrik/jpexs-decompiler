@@ -17,12 +17,19 @@
 package com.jpexs.decompiler.flash.cache;
 
 /**
- *
+ * Listener for decompiled scripts.
  * @author JPEXS
  */
 public interface ScriptDecompiledListener<T> {
 
+    /**
+     * Called when decompilation starts.
+     */
     public void onStart();
 
+    /**
+     * Called when decompilation is completed.
+     * @param result Result of decompilation
+     */
     public void onComplete(T result);
 }

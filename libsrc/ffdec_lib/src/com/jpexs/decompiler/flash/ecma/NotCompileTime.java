@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.ecma;
 import java.io.Serializable;
 
 /**
- *
+ * Not statically computable value.
  * @author JPEXS
  */
 public class NotCompileTime implements Serializable {

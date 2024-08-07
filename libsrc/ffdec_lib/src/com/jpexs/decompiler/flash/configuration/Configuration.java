@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Configuration of FFDec.
  * @author JPEXS
  */
 public final class Configuration {

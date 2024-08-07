@@ -31,13 +31,14 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * SetTarget action - Sets the target for the following actions.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * ECMA Array type.
  * @author JPEXS
  */
 public class ArrayType extends ObjectType {

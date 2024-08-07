@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
+/**
+ * Interface for AMF3 value types
+ */
 public interface Amf3ValueType {
 
 }

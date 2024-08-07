@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import java.util.List;
 
+/**
+ * AMF3 vector of int type.
+ */
 public class VectorIntType extends AbstractVectorType<Long> {
 
     public VectorIntType(boolean fixed, List<Long> values) {

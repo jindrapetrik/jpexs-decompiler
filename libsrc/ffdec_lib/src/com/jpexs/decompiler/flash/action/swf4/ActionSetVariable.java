@@ -21,18 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
-import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
-import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -44,12 +33,13 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * SetVariable action - Sets a variable value.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

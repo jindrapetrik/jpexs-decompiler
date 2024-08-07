@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * AMF3 array type
+ */
 public class ArrayType implements WithSubValues, Amf3ValueType {
 
     private List<Object> denseValues;
