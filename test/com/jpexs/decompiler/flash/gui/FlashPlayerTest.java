@@ -563,7 +563,7 @@ public class FlashPlayerTest {
                     ActionLocalData localData = new ActionLocalData(null, false, new HashMap<>());
                     TranslateStack stack = new TranslateStack("");
                     for (Action a : newActions) {
-                        a.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                        a.translate(localData, stack, output, 0, "");
                     }
 
                     String ffdecTranslateResult;

@@ -367,7 +367,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public List<GraphTargetItem> getActionsToTree() {
         try {
-            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, Graph.SOP_USE_STATIC, "", swf.getCharset());
+            return Action.actionsToTree(new HashMap<>(), false, false, getActions(), swf.version, 0, "", swf.getCharset());
         } catch (InterruptedException ex) {
             return new ArrayList<>();
         }

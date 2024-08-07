@@ -95,14 +95,7 @@ public class Graph {
      * Exceptions in the graph
      */
     private final List<GraphException> exceptions;
-
-    /**
-     * Constant not used anymore
-     *
-     * @deprecated not used.
-     */
-    public static final int SOP_USE_STATIC = 0;
-
+    
     /**
      * Debug flag to print all parts
      */

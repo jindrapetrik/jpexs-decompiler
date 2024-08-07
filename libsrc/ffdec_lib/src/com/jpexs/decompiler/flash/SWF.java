@@ -1869,7 +1869,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.writeFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
-            sos.writeTags(includeImported ? getTags() : getLocalTags());
+            sos.writeTags(getTags());
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -3729,7 +3729,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (ins instanceof ActionConstantPool) {
                 constantPool = new ConstantPool(((ActionConstantPool) ins).constantPool);
             }
-            int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+            int staticOperation = 0;
 
             int requiredStackSize = ins.getStackPopCount(localData, stack);
             if (stack.size() < requiredStackSize) {
@@ -4069,7 +4069,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         classNameParts = new String[]{className};
                     }
                 }
-                int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+                int staticOperation = 0;
                 List<GraphTargetItem> dec;
                 try {
                     dec = Action.actionsToTree(new HashMap<>() /*??*/, true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
@@ -5138,25 +5138,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         return readOnlyTags;
-    }
-
-    /**
-     * Gets (readonly) list of all local tags in the SWF file. local = not
-     * imported.
-     *
-     * @return Tags
-     * @deprecated The tags from getTags method call are all local by default
-     * now.
-     */
-    public ReadOnlyTagList getLocalTags() {
-        /*List<Tag> localTags = new ArrayList<>();
-        for (Tag t : tags) {
-            if (!t.isImported()) {
-                localTags.add(t);
-            }
-        }*/
-        return new ReadOnlyTagList(tags);
-    }
+    }  
 
     /**
      * Adds a tag to the SWF.
