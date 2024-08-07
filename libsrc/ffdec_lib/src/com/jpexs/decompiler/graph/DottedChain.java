@@ -18,7 +18,6 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.helpers.Helper;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;

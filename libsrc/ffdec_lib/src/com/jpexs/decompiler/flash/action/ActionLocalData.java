@@ -22,7 +22,6 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

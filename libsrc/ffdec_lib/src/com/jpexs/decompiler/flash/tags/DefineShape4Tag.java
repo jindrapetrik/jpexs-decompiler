@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
-
 import java.io.IOException;
 
 /**

@@ -17,14 +17,17 @@
 package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.gui.Main;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.List;
+import java.util.Set;
+import javax.swing.UIManager;
 import jsyntaxpane.components.BreakPointListener;
 import jsyntaxpane.components.LineMarkerPainter;
 import jsyntaxpane.components.LineNumbersBreakpointsRuler;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.Set;
 
 /**
  *

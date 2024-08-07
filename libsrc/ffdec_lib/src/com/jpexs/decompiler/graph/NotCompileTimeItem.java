@@ -18,7 +18,6 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
-
 import java.util.Set;
 
 /**

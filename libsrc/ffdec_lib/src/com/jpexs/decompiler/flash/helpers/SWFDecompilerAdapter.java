@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-
 import java.util.List;
 
 /**

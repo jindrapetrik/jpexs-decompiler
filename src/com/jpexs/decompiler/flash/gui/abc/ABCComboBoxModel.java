@@ -17,11 +17,10 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.ComboBoxModel;
+import javax.swing.event.ListDataListener;
 
 /**
  *

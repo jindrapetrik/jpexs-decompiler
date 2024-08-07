@@ -17,8 +17,11 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.graph.Loop;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Final decompilation processing local d ata.

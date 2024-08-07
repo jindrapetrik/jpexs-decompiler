@@ -16,9 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
-import jsyntaxpane.Token;
-
 import javax.swing.text.Highlighter;
+import jsyntaxpane.Token;
 
 /**
  *

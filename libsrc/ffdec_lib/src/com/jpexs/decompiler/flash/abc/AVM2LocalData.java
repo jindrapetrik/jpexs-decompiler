@@ -21,13 +21,21 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.types.*;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * AVM2 local data.

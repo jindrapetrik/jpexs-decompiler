@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import java.awt.*;
+import java.awt.Font;
 import java.util.Objects;
 
 /**

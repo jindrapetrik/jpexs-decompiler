@@ -26,9 +26,6 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -39,6 +36,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
+import javax.swing.tree.TreePath;
 
 /**
  *

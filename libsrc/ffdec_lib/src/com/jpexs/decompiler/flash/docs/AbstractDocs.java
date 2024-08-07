@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.docs;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;

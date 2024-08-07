@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.DeletePropertyAVM2It
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
-
 import java.util.List;
 
 /**

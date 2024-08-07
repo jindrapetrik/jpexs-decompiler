@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import java.awt.*;
+import java.awt.Point;
 
 /**
  *

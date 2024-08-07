@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;

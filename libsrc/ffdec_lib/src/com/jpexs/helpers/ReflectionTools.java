@@ -19,7 +19,6 @@ package com.jpexs.helpers;
 import com.jpexs.decompiler.flash.types.FieldChangeObserver;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

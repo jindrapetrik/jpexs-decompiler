@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Image;
 import java.awt.image.PixelGrabber;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * BMP file writer.

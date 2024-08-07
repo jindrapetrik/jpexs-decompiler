@@ -24,8 +24,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Fast AVM2 instruction list.

@@ -23,7 +23,6 @@ import com.sun.jna.platform.win32.WinDef.HINSTANCE;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinReg.HKEY;
-
 import java.util.Arrays;
 import java.util.List;
 

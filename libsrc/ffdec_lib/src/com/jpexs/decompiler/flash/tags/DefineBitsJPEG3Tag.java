@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;

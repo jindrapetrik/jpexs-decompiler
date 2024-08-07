@@ -23,7 +23,12 @@ package natorder;
  misrepresented as being the original software.
  3. This notice may not be removed or altered from any source distribution.
  */
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
 public class NaturalOrderComparator implements Comparator {
 

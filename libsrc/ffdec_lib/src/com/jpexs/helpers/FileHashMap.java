@@ -17,7 +17,6 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.helpers.Freed;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

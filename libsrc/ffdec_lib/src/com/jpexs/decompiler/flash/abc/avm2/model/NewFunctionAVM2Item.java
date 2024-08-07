@@ -29,7 +29,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

@@ -35,10 +35,21 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.graph.*;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *

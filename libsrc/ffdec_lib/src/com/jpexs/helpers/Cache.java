@@ -18,7 +18,6 @@ package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;

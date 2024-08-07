@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

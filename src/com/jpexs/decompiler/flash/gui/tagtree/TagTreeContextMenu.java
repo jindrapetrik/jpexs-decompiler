@@ -131,11 +131,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -159,6 +155,15 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.TreePath;
 
 /**
  *

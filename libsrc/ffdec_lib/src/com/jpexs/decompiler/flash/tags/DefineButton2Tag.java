@@ -26,13 +26,16 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
-import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;

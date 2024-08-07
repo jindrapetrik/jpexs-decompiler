@@ -37,7 +37,6 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-
 import java.io.IOException;
 import java.io.OutputStream;
 

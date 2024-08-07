@@ -40,7 +40,6 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;

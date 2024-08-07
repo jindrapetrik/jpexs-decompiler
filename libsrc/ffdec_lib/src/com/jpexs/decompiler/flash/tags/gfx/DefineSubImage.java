@@ -19,9 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.tags.TagInfo;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
@@ -32,12 +30,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
-import javax.imageio.ImageIO;
-import net.npe.dds.DDSReader;
 
 /**
  * DefineSubImage tag - sub image.

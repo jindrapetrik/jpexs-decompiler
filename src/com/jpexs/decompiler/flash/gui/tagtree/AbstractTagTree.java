@@ -102,12 +102,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
-
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -119,6 +114,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  *

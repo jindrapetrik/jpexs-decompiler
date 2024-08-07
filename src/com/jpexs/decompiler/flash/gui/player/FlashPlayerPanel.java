@@ -25,8 +25,13 @@ import com.jpexs.javactivex.ActiveXEvent;
 import com.jpexs.javactivex.ActiveXException;
 import com.jpexs.javactivex.example.controls.flash.ShockwaveFlash;
 import com.sun.jna.Platform;
-
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Panel;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;

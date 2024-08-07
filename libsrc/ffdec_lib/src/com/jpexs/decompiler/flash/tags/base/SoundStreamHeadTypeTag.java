@@ -18,12 +18,10 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
-import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.List;

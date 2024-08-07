@@ -19,13 +19,17 @@ package com.jpexs.decompiler.flash.gui.graph;
 import com.jpexs.decompiler.flash.exporters.script.PcodeGraphVizExporter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.graph.Graph;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 
 /**
  *

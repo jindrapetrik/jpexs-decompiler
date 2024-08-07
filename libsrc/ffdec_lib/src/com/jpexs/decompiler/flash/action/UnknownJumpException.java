@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.action.model.ActionItem;
-
 import java.util.List;
 import java.util.Stack;
 

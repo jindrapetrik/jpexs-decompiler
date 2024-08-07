@@ -28,14 +28,13 @@ import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  *

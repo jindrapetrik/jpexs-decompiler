@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-
 import java.util.List;
 
 /**

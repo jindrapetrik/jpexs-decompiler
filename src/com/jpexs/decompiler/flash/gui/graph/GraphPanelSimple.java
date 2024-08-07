@@ -18,8 +18,12 @@ package com.jpexs.decompiler.flash.gui.graph;
 
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.HashMap;

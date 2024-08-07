@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.controls;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 
 /**
  *

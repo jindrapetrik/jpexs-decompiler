@@ -18,8 +18,12 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Local data area for ActionScript execution.

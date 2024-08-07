@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
-
 import java.io.IOException;
 import java.util.Map;
 

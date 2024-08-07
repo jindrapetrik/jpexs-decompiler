@@ -17,14 +17,13 @@
 package com.jpexs.decompiler.flash.gui.graph;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import javax.imageio.ImageIO;
 
 /**
  *

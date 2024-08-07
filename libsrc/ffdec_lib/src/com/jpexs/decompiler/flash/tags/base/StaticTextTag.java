@@ -41,7 +41,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.io.IOException;
 import java.io.StringReader;

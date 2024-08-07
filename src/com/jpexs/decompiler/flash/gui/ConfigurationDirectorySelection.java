@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -29,7 +28,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
 
 /**
  *

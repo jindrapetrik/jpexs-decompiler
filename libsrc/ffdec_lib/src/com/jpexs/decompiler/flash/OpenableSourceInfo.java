@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.helpers.Path;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Information about openable source.

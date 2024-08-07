@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

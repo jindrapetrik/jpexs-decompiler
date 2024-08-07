@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.Helper;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

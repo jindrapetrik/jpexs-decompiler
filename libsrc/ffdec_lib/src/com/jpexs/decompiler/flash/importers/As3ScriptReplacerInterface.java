@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-
 import java.io.IOException;
 import java.util.List;
 

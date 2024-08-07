@@ -25,14 +25,34 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.UnknownInstruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
-import com.jpexs.decompiler.flash.abc.types.*;
-import com.jpexs.decompiler.flash.abc.types.traits.*;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.Float4;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
-
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Parses AVM2 P-code.

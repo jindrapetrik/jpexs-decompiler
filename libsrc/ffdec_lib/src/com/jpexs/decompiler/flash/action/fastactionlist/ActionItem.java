@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.fastactionlist;
 
 import com.jpexs.decompiler.flash.action.Action;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

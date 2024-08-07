@@ -28,7 +28,6 @@ import com.sun.jna.platform.win32.WinNT.EVENTLOGRECORD;
 import com.sun.jna.platform.win32.WinReg.HKEY;
 import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.sun.jna.ptr.IntByReference;
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;

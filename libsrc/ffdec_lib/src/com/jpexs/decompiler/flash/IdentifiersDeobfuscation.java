@@ -25,8 +25,12 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 /**

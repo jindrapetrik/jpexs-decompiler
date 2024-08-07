@@ -17,7 +17,11 @@
 package com.jpexs.decompiler.graph;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A loop in a graph.

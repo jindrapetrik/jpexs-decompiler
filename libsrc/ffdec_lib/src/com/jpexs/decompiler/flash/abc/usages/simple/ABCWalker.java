@@ -20,8 +20,12 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
-import com.jpexs.decompiler.flash.abc.types.traits.*;
-
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

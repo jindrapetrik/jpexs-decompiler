@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.Insets;
 import java.awt.Rectangle;

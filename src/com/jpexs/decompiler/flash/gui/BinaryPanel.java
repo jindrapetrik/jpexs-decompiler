@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import java.awt.BorderLayout;
 import java.awt.Color;

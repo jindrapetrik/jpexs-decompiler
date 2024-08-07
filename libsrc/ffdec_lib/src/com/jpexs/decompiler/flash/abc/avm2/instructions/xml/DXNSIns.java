@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.DefaultXMLNamespace;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-
 import java.util.List;
 
 /**

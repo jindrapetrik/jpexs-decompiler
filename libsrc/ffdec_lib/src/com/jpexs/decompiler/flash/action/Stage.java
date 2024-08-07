@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-
 import java.util.ArrayList;
 import java.util.List;
 

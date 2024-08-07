@@ -17,18 +17,37 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.model.*;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.ecma.*;
+import com.jpexs.decompiler.flash.ecma.ArrayType;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.ObjectType;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
-import com.jpexs.decompiler.graph.model.*;
+import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.Reference;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Graph target item - an item in high level representation of the code.

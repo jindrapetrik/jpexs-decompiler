@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.graph.DottedChain;
-
 import java.io.Serializable;
 import java.util.Objects;
 

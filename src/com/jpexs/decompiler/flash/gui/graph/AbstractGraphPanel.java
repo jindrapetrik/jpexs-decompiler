@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.gui.graph;
 
 import com.jpexs.decompiler.graph.Graph;
-
-import javax.swing.*;
+import javax.swing.JPanel;
 
 /**
  *

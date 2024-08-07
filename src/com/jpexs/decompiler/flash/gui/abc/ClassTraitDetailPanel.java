@@ -29,15 +29,15 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import com.jpexs.decompiler.flash.tags.Tag;
-
-import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 /**
  *

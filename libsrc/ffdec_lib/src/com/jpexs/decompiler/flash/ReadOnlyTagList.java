@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.tags.Tag;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

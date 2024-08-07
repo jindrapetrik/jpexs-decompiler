@@ -31,7 +31,6 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Reference;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

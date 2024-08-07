@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 /**
  *
