@@ -28,13 +28,14 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * InitObject action - Initialize object.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

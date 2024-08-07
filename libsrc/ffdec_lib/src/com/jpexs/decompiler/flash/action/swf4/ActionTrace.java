@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Trace action - Outputs a string to the debugger.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Unknown action.
  * @author JPEXS
  */
 public class ActionUnknown extends ActionNop {

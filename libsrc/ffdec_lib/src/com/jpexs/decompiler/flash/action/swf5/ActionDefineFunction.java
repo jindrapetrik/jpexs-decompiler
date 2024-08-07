@@ -18,11 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionList;
-import com.jpexs.decompiler.flash.action.ActionScriptFunction;
-import com.jpexs.decompiler.flash.action.ActionScriptObject;
-import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.*;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -30,22 +26,15 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SecondPassData;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- *
+ * DefineFunction action - Defines a function.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.ecma;
 import java.io.Serializable;
 
 /**
- *
+ * ECMA undefined value.
  * @author JPEXS
  */
 public class Undefined implements Serializable {

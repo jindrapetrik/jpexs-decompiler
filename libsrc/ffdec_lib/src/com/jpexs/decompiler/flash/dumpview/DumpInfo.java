@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Dump info.
  * @author JPEXS
  */
 public class DumpInfo implements TreeItem {

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- *
+ * SWF specific custom configuration.
  * @author JPEXS
  */
 public class SwfSpecificCustomConfiguration implements Serializable {

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * ECMA Object type.
  * @author JPEXS
  */
 public class ObjectType implements Callable {

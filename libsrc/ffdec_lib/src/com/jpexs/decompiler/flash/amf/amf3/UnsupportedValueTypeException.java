@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.amf.amf3;
 
+/**
+ * Exception thrown when an unsupported value type is encountered.
+ */
 public class UnsupportedValueTypeException extends RuntimeException {
 
     private Integer marker = null;

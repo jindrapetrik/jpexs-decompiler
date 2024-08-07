@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
- *
+ * Dump info for SWF node.
  * @author JPEXS
  */
 public class DumpInfoSwfNode extends DumpInfo {

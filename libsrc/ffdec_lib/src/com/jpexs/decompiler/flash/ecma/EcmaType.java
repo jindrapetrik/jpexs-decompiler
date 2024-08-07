@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.ecma;
 
 /**
- *
+ * ECMA type enumeration.
  * @author JPEXS
  */
 public enum EcmaType {

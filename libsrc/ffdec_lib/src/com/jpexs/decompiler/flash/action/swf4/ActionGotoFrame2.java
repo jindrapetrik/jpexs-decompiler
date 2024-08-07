@@ -33,13 +33,14 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * GotoFrame2 action - Goes to a frame, stack-based.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

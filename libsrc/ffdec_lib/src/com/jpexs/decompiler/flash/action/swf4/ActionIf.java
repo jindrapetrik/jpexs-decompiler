@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * If action - Jumps to a location if a condition is true.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

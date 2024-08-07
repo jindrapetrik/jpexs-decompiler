@@ -27,12 +27,13 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * MBAsciiToChar action - Converts a multibyte ASCII character to a Unicode character.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Generator for AVM2 instruction set documentation.
+ * Generator for AS 1/2 actions documentation.
  *
  * @author JPEXS
  */

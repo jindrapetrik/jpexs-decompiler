@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import java.util.List;
 
+/**
+ * AMF3 vector of object type.
+ */
 public class VectorObjectType extends AbstractVectorType<Object> {
 
     private String typeName;

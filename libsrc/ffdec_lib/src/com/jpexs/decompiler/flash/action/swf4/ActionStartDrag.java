@@ -31,12 +31,13 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * StartDrag action - Starts dragging a movie clip.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

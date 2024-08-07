@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * AMF3 dictionary type.
+ */
 public class DictionaryType extends ListMap<Object, Object> implements WithSubValues, Amf3ValueType {
 
     private final boolean weakKeys;

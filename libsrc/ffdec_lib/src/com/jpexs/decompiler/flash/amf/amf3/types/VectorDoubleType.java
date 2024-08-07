@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import java.util.List;
 
+/**
+ * AMF3 vector of double type.
+ */
 public class VectorDoubleType extends AbstractVectorType<Double> {
 
     public VectorDoubleType(boolean fixed, List<Double> values) {

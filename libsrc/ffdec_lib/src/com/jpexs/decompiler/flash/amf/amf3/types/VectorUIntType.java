@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import java.util.List;
 
+/**
+ * AMF3 vector of uint type.
+ */
 public class VectorUIntType extends AbstractVectorType<Long> {
 
     public VectorUIntType(boolean fixed, List<Long> values) {

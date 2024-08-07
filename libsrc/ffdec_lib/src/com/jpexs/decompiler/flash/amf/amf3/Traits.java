@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.amf.amf3;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * AMF3 traits.
+ */
 public class Traits {
 
     private String className;

@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.helpers.Cache;
 
 /**
- *
+ * Cache for AS2 decompiled code.
  * @author JPEXS
  */
 public class AS2Cache {

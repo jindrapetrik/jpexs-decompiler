@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.docs;
 
 /**
- *
+ * Parsed symbol in documentation.
  * @author JPEXS
  */
 public class ParsedSymbol {

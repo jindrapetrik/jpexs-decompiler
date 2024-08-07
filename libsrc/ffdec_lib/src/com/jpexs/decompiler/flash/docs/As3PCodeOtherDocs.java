@@ -22,6 +22,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+/**
+ * AS3 PCode other documentation.
+ */
 public class As3PCodeOtherDocs extends AbstractDocs {
 
     static ResourceBundle prop;

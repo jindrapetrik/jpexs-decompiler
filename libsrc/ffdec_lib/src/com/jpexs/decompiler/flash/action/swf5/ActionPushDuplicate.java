@@ -21,18 +21,15 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SecondPassData;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * PushDuplicate action - Push duplicate of top stack value.
  * @author JPEXS
  */
 @SWFVersion(from = 5)

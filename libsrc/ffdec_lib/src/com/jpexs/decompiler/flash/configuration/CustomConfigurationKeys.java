@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.configuration;
 
 /**
- *
+ * Custom configuration keys.
  * @author JPEXS
  */
 public class CustomConfigurationKeys {

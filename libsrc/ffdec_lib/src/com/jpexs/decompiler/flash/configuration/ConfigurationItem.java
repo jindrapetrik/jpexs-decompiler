@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Configuration item.
  * @author JPEXS
  * @param <T>
  */

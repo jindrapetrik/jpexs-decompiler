@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.dumpview;
 
 /**
- *
+ * Special dump info.
  * @author JPEXS
  */
 public class DumpInfoSpecial extends DumpInfo {

@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * GetProperty action - Gets a property of an object.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

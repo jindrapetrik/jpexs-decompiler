@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Try action - Try block with catch and finally blocks.
  * @author JPEXS
  */
 @SWFVersion(from = 7)

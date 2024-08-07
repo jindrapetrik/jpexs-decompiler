@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.amf.amf3;
 
+/**
+ * AMF3 marker constants.
+ */
 public class Marker {
 
     public static final int UNDEFINED = 0x00;

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * ECMA script functions.
  * @author JPEXS
  */
 public class EcmaScript {

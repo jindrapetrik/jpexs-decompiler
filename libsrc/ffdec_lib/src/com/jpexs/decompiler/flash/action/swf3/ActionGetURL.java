@@ -21,12 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
-import com.jpexs.decompiler.flash.action.model.GetURLActionItem;
-import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
-import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
-import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
@@ -36,6 +31,7 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * GetURL action - Gets a URL.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

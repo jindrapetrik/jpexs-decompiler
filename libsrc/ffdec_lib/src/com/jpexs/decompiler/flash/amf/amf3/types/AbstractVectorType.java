@@ -18,9 +18,14 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class for AMF3 vector types
+ * @param <T> Type of vector values
+ */
 public abstract class AbstractVectorType<T> implements WithSubValues, Amf3ValueType {
 
     private boolean fixed;

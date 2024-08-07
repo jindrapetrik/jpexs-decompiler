@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Set which maintains orders elements by time they were added
+ * Set which maintains orders elements by time they were added.
  *
  * @param <E>
  */

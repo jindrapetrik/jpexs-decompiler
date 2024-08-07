@@ -23,34 +23,22 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.as2.Trait;
-import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
-import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
-import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
-import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
-import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.*;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SecondPassData;
-import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * StoreRegister action - Store value in register.
  * @author JPEXS
  */
 @SWFVersion(from = 5)
