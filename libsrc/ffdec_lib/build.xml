@@ -257,7 +257,7 @@
     
     <target name="release_javadoc" depends="javadoc,-load-version,-timestamp,-suffix">
         <zip destfile="${releases.dir}/${prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip">
-            <zipfileset dir="${javadoc.dir}" prefix="${prefix.filename}_${javadoc.dir}"></zipfileset>
+            <zipfileset dir="${javadoc.dir}"></zipfileset>
         </zip>
     </target>
         
