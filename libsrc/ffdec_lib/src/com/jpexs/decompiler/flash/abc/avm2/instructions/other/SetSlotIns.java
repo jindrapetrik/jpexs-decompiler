@@ -51,6 +51,9 @@ import java.util.Objects;
  */
 public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
 
+    /**
+     * Constructor
+     */
     public SetSlotIns() {
         super(0x6d, "setslot", new int[]{AVM2Code.DAT_SLOT_INDEX}, true);
     }

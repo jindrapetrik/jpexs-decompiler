@@ -47,6 +47,12 @@ import java.util.Set;
  */
 public class ReturnActionItem extends ActionItem implements ExitItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value to return
+     */
     public ReturnActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }

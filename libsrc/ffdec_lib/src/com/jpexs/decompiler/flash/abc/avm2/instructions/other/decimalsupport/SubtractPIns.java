@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class SubtractPIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public SubtractPIns() {
         super(0xB6, "subtract_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

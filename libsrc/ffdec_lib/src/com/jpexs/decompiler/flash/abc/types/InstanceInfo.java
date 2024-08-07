@@ -61,7 +61,8 @@ public class InstanceInfo {
     public int flags;
 
     /**
-     * Protected namespace. if flags & 8
+     * Protected namespace.
+     * If flag CLASS_PROTECTEDNS set.
      */
     public int protectedNS;
 

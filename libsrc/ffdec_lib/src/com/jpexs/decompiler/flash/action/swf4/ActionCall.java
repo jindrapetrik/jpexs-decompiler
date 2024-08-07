@@ -40,10 +40,19 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionCall extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionCall() {
         super(0x9E, 0, Utf8Helper.charsetName);
     }
 
+    /**
+     * Constructor
+     *
+     * @param actionLength Action length
+     * @param charset Charset
+     */
     public ActionCall(int actionLength, String charset) {
         super(0x9E, actionLength, charset);
     }

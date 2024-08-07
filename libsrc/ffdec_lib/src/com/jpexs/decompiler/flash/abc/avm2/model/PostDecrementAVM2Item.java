@@ -37,8 +37,17 @@ import java.util.Objects;
  */
 public class PostDecrementAVM2Item extends AVM2Item implements AssignmentAVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public PostDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;

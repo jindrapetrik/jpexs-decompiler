@@ -40,6 +40,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionMBAsciiToChar extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionMBAsciiToChar() {
         super(0x37, 0, Utf8Helper.charsetName);
     }

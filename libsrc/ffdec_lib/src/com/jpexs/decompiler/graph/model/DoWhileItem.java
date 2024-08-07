@@ -38,10 +38,19 @@ import java.util.List;
  */
 public class DoWhileItem extends LoopItem implements Block {
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Expression
+     */
     public List<GraphTargetItem> expression;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -78,6 +87,15 @@ public class DoWhileItem extends LoopItem implements Block {
         }
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param commands Commands
+     * @param expression Expression
+     */
     public DoWhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
         super(src, lineStartIns, loop);
         this.expression = expression;

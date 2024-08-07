@@ -36,6 +36,12 @@ import java.util.Objects;
  */
 public class ThrowActionItem extends ActionItem implements ExitItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object to throw
+     */
     public ThrowActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, object);
     }

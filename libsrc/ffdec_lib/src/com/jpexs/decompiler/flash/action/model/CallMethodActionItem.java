@@ -39,16 +39,38 @@ import java.util.Objects;
  */
 public class CallMethodActionItem extends ActionItem {
 
+    /**
+     * Method name
+     */
     public GraphTargetItem methodName;
 
+    /**
+     * Script object
+     */
     public GraphTargetItem scriptObject;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Special - getter
+     */
     public static int SPECIAL_GETTER = 1;
+    /**
+     * Special - setter
+     */
     public static int SPECIAL_SETTER = 2;
 
+    /**
+     * Special
+     */
     private int special = 0;
+
+    /**
+     * Setter/getter variable name
+     */
     private String setterGetterVarName = null;
 
     @Override
@@ -57,6 +79,15 @@ public class CallMethodActionItem extends ActionItem {
         visitor.visit(scriptObject);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scriptObject Script object
+     * @param methodName Method name
+     * @param arguments Arguments
+     */
     public CallMethodActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.methodName = methodName;

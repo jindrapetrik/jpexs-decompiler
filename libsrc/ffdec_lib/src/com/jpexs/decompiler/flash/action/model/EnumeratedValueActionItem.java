@@ -40,6 +40,9 @@ public class EnumeratedValueActionItem extends ActionItem implements BranchStack
 
     }
 
+    /**
+     * Constructor.
+     */
     public EnumeratedValueActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
     }

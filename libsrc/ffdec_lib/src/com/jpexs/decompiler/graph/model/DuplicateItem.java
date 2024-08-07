@@ -34,6 +34,12 @@ import java.util.Set;
  */
 public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start item
+     * @param value Value
+     */
     public DuplicateItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(src, lineStartIns, value.getPrecedence(), value);
     }

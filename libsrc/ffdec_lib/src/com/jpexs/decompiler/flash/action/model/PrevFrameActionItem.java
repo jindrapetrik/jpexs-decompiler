@@ -42,6 +42,12 @@ public class PrevFrameActionItem extends ActionItem {
         return writer.append("()");
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public PrevFrameActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }

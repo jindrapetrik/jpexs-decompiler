@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Si16Ins() {
         super(0x3B, "si16", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

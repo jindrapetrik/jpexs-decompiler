@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class IfNGeIns extends InstructionDefinition implements IfTypeIns {
 
+    /**
+     * Constructor
+     */
     public IfNGeIns() {
         super(0x0f, "ifnge", new int[]{AVM2Code.DAT_OFFSET}, true);
     }

@@ -39,6 +39,9 @@ import java.util.List;
  */
 public class IfStrictNeIns extends InstructionDefinition implements IfTypeIns {
 
+    /**
+     * Constructor
+     */
     public IfStrictNeIns() {
         super(0x1A, "ifstrictne", new int[]{AVM2Code.DAT_OFFSET}, false);
     }

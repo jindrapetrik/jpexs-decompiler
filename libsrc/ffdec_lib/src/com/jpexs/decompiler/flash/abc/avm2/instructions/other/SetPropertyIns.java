@@ -42,6 +42,9 @@ import java.util.Objects;
  */
 public class SetPropertyIns extends InstructionDefinition implements SetTypeIns {
 
+    /**
+     * Constructor
+     */
     public SetPropertyIns() {
         super(0x61, "setproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

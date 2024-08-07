@@ -38,6 +38,10 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionStackSwap extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionStackSwap(String charset) {
         super(0x4D, 0, charset);
     }

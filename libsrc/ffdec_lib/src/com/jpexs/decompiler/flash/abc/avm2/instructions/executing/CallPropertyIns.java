@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class CallPropertyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallPropertyIns() {
         super(0x46, "callproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

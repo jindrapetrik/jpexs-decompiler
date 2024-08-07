@@ -40,10 +40,22 @@ import java.util.Set;
  */
 public class StringAVM2Item extends AVM2Item implements SimpleValue {
 
+    /**
+     * Value
+     */
     private String value;
 
+    /**
+     * Number value
+     */
     private Double numberValue;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public StringAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;

@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class NegateIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NegateIns() {
         super(0x90, "negate", new int[]{}, true);
     }

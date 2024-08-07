@@ -39,6 +39,9 @@ import java.util.List;
  */
 public class IfEqIns extends InstructionDefinition implements IfTypeIns {
 
+    /**
+     * Constructor
+     */
     public IfEqIns() {
         super(0x13, "ifeq", new int[]{AVM2Code.DAT_OFFSET}, true);
     }

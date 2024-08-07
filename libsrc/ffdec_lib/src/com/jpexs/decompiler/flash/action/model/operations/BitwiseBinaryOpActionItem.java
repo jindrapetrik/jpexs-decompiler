@@ -31,6 +31,17 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public abstract class BitwiseBinaryOpActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartItem Line start item
+     * @param precedence Precedence
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param operator Operator
+     * @param coerceLeft Coerce left
+     * @param coerceRight Coerce right
+     */
     public BitwiseBinaryOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
         super(instruction, lineStartItem, precedence, leftSide, rightSide, operator, coerceLeft, coerceRight);
     }

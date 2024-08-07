@@ -41,22 +41,59 @@ import java.util.Objects;
  */
 public class NewFunctionAVM2Item extends AVM2Item {
 
+    /**
+     * Function name
+     */
     public String functionName;
 
+    /**
+     * Path
+     */
     public String path;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
+    /**
+     * Script index
+     */
     public int scriptIndex;
 
+    /**
+     * Class index
+     */
     public int classIndex;
 
+    /**
+     * ABC
+     */
     public ABC abc;
 
+    /**
+     * Method index
+     */
     public int methodIndex;
 
+    /**
+     * Scope stack
+     */
     public ScopeStack scopeStack;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param functionName Function name
+     * @param path Path
+     * @param isStatic Is static
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param abc ABC
+     * @param methodIndex Method index
+     * @param scopeStack Scope stack
+     */
     public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, int methodIndex, ScopeStack scopeStack) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;

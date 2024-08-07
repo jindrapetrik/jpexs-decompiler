@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class CallInterfaceIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallInterfaceIns() {
         super(0x4D, "callinterface", new int[]{AVM2Code.DAT_CLASS_INDEX}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.UNDOCUMENTED);
     }

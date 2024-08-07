@@ -38,14 +38,29 @@ import java.util.List;
  */
 public class SwitchItem extends LoopItem implements Block {
 
+    /**
+     * Switched object
+     */
     public GraphTargetItem switchedObject;
 
+    /**
+     * Case values
+     */
     public List<GraphTargetItem> caseValues;
 
+    /**
+     * Case commands
+     */
     public List<List<GraphTargetItem>> caseCommands;
 
+    /**
+     * Values mapping
+     */
     public List<Integer> valuesMapping;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -70,6 +85,16 @@ public class SwitchItem extends LoopItem implements Block {
         visitor.visitAll(caseValues);
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param switchedObject Switched object
+     * @param caseValues Case values
+     * @param caseCommands Case commands
+     * @param valuesMapping Values mapping
+     */
     public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
         super(instruction, lineStartIns, loop);
         this.switchedObject = switchedObject;

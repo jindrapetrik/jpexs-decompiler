@@ -37,6 +37,10 @@ import java.util.Map;
  */
 public class ActionFSCommand2 extends Action {
 
+    /**
+     * Constructor
+     * @param charset Charset
+     */
     public ActionFSCommand2(String charset) {
         super(0x2D, 0, charset);
     }

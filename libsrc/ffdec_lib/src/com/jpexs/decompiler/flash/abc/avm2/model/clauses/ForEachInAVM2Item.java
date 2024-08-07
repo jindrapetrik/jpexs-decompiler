@@ -43,10 +43,19 @@ import java.util.List;
  */
 public class ForEachInAVM2Item extends LoopItem implements Block {
 
+    /**
+     * Expression
+     */
     public InAVM2Item expression;
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -69,6 +78,15 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
         visitor.visit(expression);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param expression Expression
+     * @param commands Commands
+     */
     public ForEachInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
 

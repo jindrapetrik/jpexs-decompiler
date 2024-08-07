@@ -43,6 +43,9 @@ import java.util.List;
  */
 public class ConstructPropIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ConstructPropIns() {
         super(0x4a, "constructprop", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

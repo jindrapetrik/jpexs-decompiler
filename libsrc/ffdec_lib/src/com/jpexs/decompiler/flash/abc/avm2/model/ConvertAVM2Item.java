@@ -33,8 +33,19 @@ import java.util.Set;
  */
 public class ConvertAVM2Item extends AVM2Item {
 
+    /**
+     * Type to convert to
+     */
     public GraphTargetItem type;
 
+    /**
+     * Constructor
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value to convert
+     * @param type Type to convert to
+     */
     public ConvertAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, value.getPrecedence(), value);
         this.type = type;

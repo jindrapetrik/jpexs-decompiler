@@ -36,6 +36,13 @@ import java.util.Set;
  */
 public class StringEqActionItem extends BinaryOpItem implements Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public StringEqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "eq", "String", "String");
     }
@@ -50,6 +57,12 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static Boolean getResult(Object rightResult, Object leftResult) {
         return EcmaScript.toString(leftResult).equals(EcmaScript.toString(rightResult));
     }

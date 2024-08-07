@@ -71,7 +71,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes a byte to the output stream.
      *
      * @param b The byte to write.
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void write(int b) throws IOException {
@@ -83,7 +83,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes a byte array to the output stream.
      *
      * @param data The data to write.
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void write(byte[] data) throws IOException {
@@ -97,7 +97,7 @@ public class ABCOutputStream extends OutputStream {
      * @param b The data to write.
      * @param off The start offset in the data.
      * @param len The number of bytes to write.
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
@@ -109,7 +109,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes U30 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeU30(long value) throws IOException {
         writeS32(value);
@@ -139,7 +139,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes U32 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeU32(long value) throws IOException {
         boolean loop = true;
@@ -161,7 +161,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes S24 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeS24(long value) throws IOException {
         int ret = (int) (value & 0xff);
@@ -178,7 +178,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes S32 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeS32(long value) throws IOException {
         boolean belowZero = value < 0;
@@ -216,7 +216,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes long to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeLong(long value) throws IOException {
         byte[] writeBuffer = new byte[8];
@@ -235,7 +235,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes double to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeDouble(double value) throws IOException {
         writeLong(Double.doubleToLongBits(value));
@@ -245,7 +245,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes float to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeFloat(float value) throws IOException {
         writeU16(Float.floatToIntBits(value));
@@ -255,7 +255,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes float4 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeFloat4(Float4 value) throws IOException {
         writeFloat(value.values[0]);
@@ -268,7 +268,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes U8 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeU8(int value) throws IOException {
         write(value);
@@ -278,7 +278,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes U16 to the output stream.
      *
      * @param value Value to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeU16(int value) throws IOException {
         write(value & 0xff);
@@ -289,7 +289,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes String to the output stream.
      *
      * @param s String to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeString(String s) throws IOException {
         byte[] sbytes = Utf8Helper.getBytes(s);
@@ -301,7 +301,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes Namespace to the output stream.
      *
      * @param ns Namespace to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeNamespace(Namespace ns) throws IOException {
         write(ns.kind);
@@ -322,7 +322,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes Multiname to the output stream.
      *
      * @param m Multiname to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeMultiname(Multiname m) throws IOException {
         writeU8(m.kind);
@@ -350,7 +350,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes MethodInfo to the output stream.
      *
      * @param mi MethodInfo to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeMethodInfo(MethodInfo mi) throws IOException {
         writeU30(mi.param_types.length);
@@ -379,7 +379,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes Trait to the output stream.
      *
      * @param t Trait to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeTrait(Trait t) throws IOException {
         writeU30(t.name_index);
@@ -420,7 +420,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes Traits to the output stream.
      *
      * @param t Traits to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeTraits(Traits t) throws IOException {
         writeU30(t.traits.size());
@@ -433,7 +433,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes InstanceInfo to the output stream.
      *
      * @param ii InstanceInfo to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeInstanceInfo(InstanceInfo ii) throws IOException {
         writeU30(ii.name_index);
@@ -454,7 +454,7 @@ public class ABCOutputStream extends OutputStream {
      * Writes Decimal to the output stream.
      *
      * @param value Decimal to write
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeDecimal(Decimal value) throws IOException {
         write(value.data);
@@ -464,7 +464,7 @@ public class ABCOutputStream extends OutputStream {
      * Gets U30 byte length.
      *
      * @param value Value
-     * @return
+     * @return Length
      */
     public static int getU30ByteLength(long value) {
         boolean belowZero = value < 0;

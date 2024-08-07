@@ -46,15 +46,31 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionGotoFrame2 extends Action {
 
+    /**
+     * Scene bias flag
+     */
     boolean sceneBiasFlag;
 
+    /**
+     * Play flag
+     */
     boolean playFlag;
 
+    /**
+     * Scene bias
+     */
     public int sceneBias;
 
     @Reserved
     int reserved;
 
+    /**
+     * Constructor.
+     * @param playFlag Play flag
+     * @param sceneBiasFlag Scene bias flag
+     * @param sceneBias Scene bias
+     * @param charset Charset
+     */
     public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias, String charset) {
         super(0x9F, 0, charset);
         this.sceneBiasFlag = sceneBiasFlag;
@@ -62,6 +78,12 @@ public class ActionGotoFrame2 extends Action {
         this.sceneBias = sceneBias;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9F, actionLength, sis.getCharset());
         reserved = (int) sis.readUB(6, "reserved");
@@ -102,6 +124,13 @@ public class ActionGotoFrame2 extends Action {
         return "GotoFrame2 " + sceneBiasFlag + ", " + playFlag + ", " + (sceneBiasFlag ? ", " + sceneBias : "");
     }
 
+    /**
+     * Constructor.
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionGotoFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9F, -1, charset);
         sceneBiasFlag = lexBoolean(lexer);

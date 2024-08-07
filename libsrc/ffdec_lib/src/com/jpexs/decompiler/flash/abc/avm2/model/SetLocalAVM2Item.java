@@ -38,18 +38,39 @@ import java.util.Objects;
  */
 public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {
 
+    /**
+     * Register index
+     */
     public int regIndex;
 
+    /**
+     * Declaration
+     */
     public DeclarationAVM2Item declaration;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Hide value
+     */
     public boolean hideValue = false;
 
+    /**
+     * Caused by duplicate
+     */
     public boolean causedByDup = false;
 
     @Override
@@ -62,6 +83,14 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         this.declaration = declaration;
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param regIndex Register index
+     * @param value Value
+     * @param type Type
+     */
     public SetLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.regIndex = regIndex;

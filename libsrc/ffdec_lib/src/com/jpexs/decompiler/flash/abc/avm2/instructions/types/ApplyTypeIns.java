@@ -38,6 +38,9 @@ import java.util.List;
  */
 public class ApplyTypeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ApplyTypeIns() {
         super(0x53, "applytype", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
     }

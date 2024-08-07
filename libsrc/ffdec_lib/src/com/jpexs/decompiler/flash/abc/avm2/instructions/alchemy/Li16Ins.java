@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Li16Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Li16Ins() {
         super(0x36, "li16", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

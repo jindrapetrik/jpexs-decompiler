@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class PushNanIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushNanIns() {
         super(0x28, "pushnan", new int[]{}, false);
     }

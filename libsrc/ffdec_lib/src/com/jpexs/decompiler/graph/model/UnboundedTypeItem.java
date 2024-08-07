@@ -27,6 +27,9 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public class UnboundedTypeItem extends AVM2Item {
 
+    /**
+     * Constructor.
+     */
     public UnboundedTypeItem() {
         super(null, null, NOPRECEDENCE);
     }

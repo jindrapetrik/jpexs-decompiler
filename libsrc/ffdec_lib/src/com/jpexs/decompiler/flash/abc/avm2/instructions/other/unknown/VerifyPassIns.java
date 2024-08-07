@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class VerifyPassIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public VerifyPassIns() {
         super(0xF5, "verifypass", new int[]{}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK);
     }

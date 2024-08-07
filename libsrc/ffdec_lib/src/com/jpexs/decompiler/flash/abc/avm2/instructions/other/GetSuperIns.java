@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class GetSuperIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetSuperIns() {
         super(0x04, "getsuper", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

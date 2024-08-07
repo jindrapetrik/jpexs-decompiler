@@ -25,7 +25,18 @@ import java.util.List;
  */
 public interface Callable {
 
+    /**
+     * Call a method with a name and arguments.
+     * @param methodName Method name
+     * @param args Arguments
+     * @return Result of the method call
+     */
     public Object call(String methodName, List<Object> args);
 
+    /**
+     * Call with arguments.
+     * @param args Arguments
+     * @return Result of the call
+     */
     public Object call(List<Object> args);
 }

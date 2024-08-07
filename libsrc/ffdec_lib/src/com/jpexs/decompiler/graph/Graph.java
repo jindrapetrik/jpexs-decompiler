@@ -134,7 +134,7 @@ public class Graph {
     /**
      * Gets sub-graphs
      *
-     * @return
+     * @return Sub-graphs
      */
     public LinkedHashMap<String, Graph> getSubGraphs() {
         return new LinkedHashMap<>();
@@ -155,7 +155,7 @@ public class Graph {
      * Initializes the graph.
      *
      * @param localData Local data
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void init(BaseLocalData localData) throws InterruptedException {
         if (heads != null) {
@@ -508,7 +508,7 @@ public class Graph {
      * @param loops Loops
      * @param throwStates Throw states
      * @return Common successor
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphPart getNextCommonPart(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
         return getCommonPart(localData, part, getNextParts(localData, part), loops, throwStates);
@@ -525,7 +525,7 @@ public class Graph {
      * @param loops Loops
      * @param throwStates Throw states
      * @return Common successor
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphPart getCommonPart(BaseLocalData localData, GraphPart prev, List<GraphPart> parts, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
         if (parts.isEmpty()) {
@@ -597,7 +597,7 @@ public class Graph {
      * @param throwStates Throw states
      * @param stopPart Stop part
      * @return Most common successor
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphPart getMostCommonPart(BaseLocalData localData, List<GraphPart> parts, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart) throws InterruptedException {
         if (parts.isEmpty()) {
@@ -903,7 +903,7 @@ public class Graph {
      * @param staticOperation Unused
      * @param path Path
      * @return List of GraphTargetItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
 
@@ -1029,7 +1029,7 @@ public class Graph {
     /**
      * Process switches.
      *
-     * @param list
+     * @param list List of GraphTargetItems
      */
     protected final void processSwitches(List<GraphTargetItem> list) {
         processSwitches(list, -1);
@@ -1200,10 +1200,10 @@ public class Graph {
      * Gets data for final process. Override this method to provide data for
      * final process.
      *
-     * @param localData
-     * @param loops
-     * @param throwStates
-     * @return
+     * @param localData Local data
+     * @param loops Loops
+     * @param throwStates Throw states
+     * @return Final process local data
      */
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
         return new FinalProcessLocalData(loops);
@@ -1217,7 +1217,7 @@ public class Graph {
      * @param path Path
      * @param allParts All parts
      * @param throwStates Throw states
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
 
@@ -1230,7 +1230,7 @@ public class Graph {
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected void afterGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts) throws InterruptedException {
 
@@ -1302,7 +1302,7 @@ public class Graph {
      * @param localData Local data
      * @param loops Loops
      * @param throwStates Throw states
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void getBackEdges(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
         clearLoops(loops);
@@ -1336,7 +1336,7 @@ public class Graph {
      * @param level Level
      * @param localData Local data
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
         if (debugDoNotProcess) {
@@ -1432,7 +1432,7 @@ public class Graph {
      * @param level Level
      * @param localData Local data
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
@@ -1925,7 +1925,7 @@ public class Graph {
      * @param path Path
      * @return List of GraphTargetItems to replace current output and stop
      * further processing. Null to continue.
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
@@ -1971,8 +1971,8 @@ public class Graph {
      * @param stack Translate stack
      * @param staticOperation Unused
      * @return Top of the stack
-     * @throws InterruptedException
-     * @throws GraphPartChangeException
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
      */
     //@SuppressWarnings("unchecked")
     protected final GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation) throws InterruptedException, GraphPartChangeException {
@@ -1990,8 +1990,8 @@ public class Graph {
      * @param staticOperation Unused
      * @param path Path
      * @return List of GraphTargetItems
-     * @throws InterruptedException
-     * @throws GraphPartChangeException
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
      */
     protected final List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         List<GraphPart> sub = part.getSubParts();
@@ -2094,7 +2094,7 @@ public class Graph {
      * @param loops List of loops
      * @param throwStates List of throw states
      * @param stopPart Stop part
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart) throws InterruptedException {
         clearLoops(loops);
@@ -2160,7 +2160,7 @@ public class Graph {
      * @param first First
      * @param visited Set of Graph parts
      * @param level Level
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void getLoopsWalk(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart, boolean first, List<GraphPart> visited, int level) throws InterruptedException {
 
@@ -2616,7 +2616,7 @@ public class Graph {
      * @param path Path
      * @param recursionLevel Recursion level
      * @return True to stop processing. False to continue.
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Loop currentLoop, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         return false;
@@ -2709,7 +2709,7 @@ public class Graph {
      * @param staticOperation Unused
      * @param path Path
      * @return List of GraphTargetItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, int staticOperation, String path) throws InterruptedException {
         return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
@@ -2736,7 +2736,7 @@ public class Graph {
      * @param path Path
      * @param recursionLevel Recursion level
      * @return List of GraphTargetItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         loopPrintGraph:
@@ -3660,7 +3660,7 @@ public class Graph {
      *
      * @param ip IP
      * @param allParts All parts
-     * @return
+     * @return Part
      */
     public GraphPart searchPart(int ip, Collection<? extends GraphPart> allParts) {
         if (ip < 0) {
@@ -3681,7 +3681,7 @@ public class Graph {
      * @param allBlocks All blocks to populate parts into.
      * @param exceptions Exceptions
      * @return List of entry points
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<GraphException> exceptions) throws InterruptedException {
         List<Integer> alternateEntries = new ArrayList<>();
@@ -3709,20 +3709,20 @@ public class Graph {
      * @param parent Parent part
      * @param path Path
      * @param code Graph source
-     * @param startip Start IP
+     * @param startIp Start IP
      * @param lastIp Last IP
      * @param allBlocks All blocks
      * @param refs References
      * @param visited Visited
      * @return Entry point
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
-    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited) throws InterruptedException {
+    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startIp, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
 
-        int ip = startip;
+        int ip = startIp;
         GraphPart existingPart = searchPart(ip, allBlocks);
         if (existingPart != null) {
             if (parent != null) {
@@ -3743,7 +3743,7 @@ public class Graph {
             if (ip >= code.size()) {
                 break;
             }
-            if (visited[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
+            if (visited[ip] || ((ip != startIp) && (refs.get(ip).size() > 1))) {
                 part.end = lastIp;
                 GraphPart found = searchPart(ip, allBlocks);
 
@@ -3842,7 +3842,7 @@ public class Graph {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem ti : tree) {
@@ -3990,7 +3990,7 @@ public class Graph {
      * @param nextRef Next reference
      * @param tiRef Target item reference
      * @return Switch item
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,

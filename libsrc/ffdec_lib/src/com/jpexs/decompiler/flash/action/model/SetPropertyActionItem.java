@@ -41,9 +41,20 @@ import java.util.Objects;
  */
 public class SetPropertyActionItem extends ActionItem implements SetTypeActionItem {
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Property index
+     */
     public int propertyIndex;
+
+    /**
+     * Temp register
+     */
+    private int tempRegister = -1;
 
     @Override
     public GraphPart getFirstPart() {
@@ -54,8 +65,6 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     public void setValue(GraphTargetItem value) {
         this.value = value;
     }
-
-    private int tempRegister = -1;
 
     @Override
     public int getTempRegister() {
@@ -72,6 +81,15 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
         return value;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     * @param propertyIndex Property index
+     * @param value Value
+     */
     public SetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.target = target;

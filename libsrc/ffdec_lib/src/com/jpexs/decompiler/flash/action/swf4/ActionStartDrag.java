@@ -43,6 +43,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionStartDrag extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionStartDrag() {
         super(0x27, 0, Utf8Helper.charsetName);
     }

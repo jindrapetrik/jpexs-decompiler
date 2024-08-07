@@ -40,10 +40,22 @@ import net.npe.dds.DDSReader;
  */
 public abstract class AbstractGfxImageTag extends ImageTag {
 
+    /**
+     * Constructs new AbstractGfxImageTag.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public AbstractGfxImageTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Loads DDS image.
+     * @param imageData Image data
+     * @return BufferedImage
+     */
     private BufferedImage loadDds(byte[] imageData) {
         int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
         BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
@@ -51,6 +63,12 @@ public abstract class AbstractGfxImageTag extends ImageTag {
         return bufImage;
     }
 
+    /**
+     * Gets external buffered image.
+     * @param fileName File name
+     * @param bitmapFormat Bitmap format
+     * @return BufferedImage
+     */
     protected BufferedImage getExternalBufferedImage(String fileName, int bitmapFormat) {
         Path imagePath = null;
 

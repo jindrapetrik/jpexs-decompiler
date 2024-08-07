@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionPop extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionPop() {
         super(0x17, 0, Utf8Helper.charsetName);
     }

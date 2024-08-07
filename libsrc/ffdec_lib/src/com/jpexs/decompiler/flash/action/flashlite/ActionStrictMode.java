@@ -40,13 +40,28 @@ import java.util.Map;
  */
 public class ActionStrictMode extends Action {
 
+    /**
+     * Mode
+     */
     public int mode;
 
+    /**
+     * Constructor
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionStrictMode(SWFInputStream sis) throws IOException {
         super(0x89, 1, sis.getCharset());
         mode = sis.readUI8("mode");
     }
 
+    /**
+     * Constructor
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionStrictMode(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x89, 1, charset);
         mode = (int) lexLong(lexer);

@@ -35,6 +35,12 @@ import java.util.Objects;
  */
 public class ToNumberActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public ToNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -60,6 +66,11 @@ public class ToNumberActionItem extends ActionItem {
         return getResult(value.getResultAsNumber());
     }
 
+    /**
+     * Gets result.
+     * @param num Number
+     * @return Result
+     */
     public static Double getResult(Double num) {
         return num;
     }

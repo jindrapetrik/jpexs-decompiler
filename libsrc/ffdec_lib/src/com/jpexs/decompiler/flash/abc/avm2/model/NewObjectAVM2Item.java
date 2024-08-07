@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * New object.
  * @author JPEXS
  */
 public class NewObjectAVM2Item extends AVM2Item {

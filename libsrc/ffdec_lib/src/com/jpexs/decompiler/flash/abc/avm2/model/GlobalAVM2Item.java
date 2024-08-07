@@ -31,6 +31,11 @@ import java.util.HashMap;
  */
 public class GlobalAVM2Item extends AVM2Item {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public GlobalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }

@@ -39,8 +39,14 @@ import java.util.Objects;
  */
 public class DefineLocalActionItem extends ActionItem implements SetTypeActionItem {
 
+    /**
+     * name
+     */
     public GraphTargetItem name;
 
+    /**
+     * Temp register
+     */
     private int tempRegister = -1;
 
     @Override
@@ -71,6 +77,14 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         return value;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param name Name
+     * @param value Value
+     */
     public DefineLocalActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.name = name;

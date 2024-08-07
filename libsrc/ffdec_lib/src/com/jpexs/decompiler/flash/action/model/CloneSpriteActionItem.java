@@ -39,10 +39,19 @@ import java.util.Objects;
  */
 public class CloneSpriteActionItem extends ActionItem {
 
+    /**
+     * Source
+     */
     public GraphTargetItem source;
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Depth
+     */
     public GraphTargetItem depth;
 
     @Override
@@ -52,6 +61,15 @@ public class CloneSpriteActionItem extends ActionItem {
         visitor.visit(depth);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param source Source
+     * @param target Target
+     * @param depth Depth
+     */
     public CloneSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.source = source;

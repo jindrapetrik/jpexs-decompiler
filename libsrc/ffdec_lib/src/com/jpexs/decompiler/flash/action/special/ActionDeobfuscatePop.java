@@ -29,6 +29,9 @@ import java.util.List;
  */
 public class ActionDeobfuscatePop extends ActionPop {
 
+    /**
+     * Constructor.
+     */
     public ActionDeobfuscatePop() {
     }
 

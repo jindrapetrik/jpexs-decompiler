@@ -38,10 +38,19 @@ import java.util.List;
  */
 public class WhileItem extends LoopItem implements Block {
 
+    /**
+     * Expression
+     */
     public List<GraphTargetItem> expression;
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -73,6 +82,15 @@ public class WhileItem extends LoopItem implements Block {
         }
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param expression Expression
+     * @param commands Commands
+     */
     public WhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop);
         this.expression = expression;

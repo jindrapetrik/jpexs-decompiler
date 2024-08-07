@@ -40,10 +40,24 @@ import java.util.List;
  */
 public class IfFrameLoadedActionItem extends ActionItem implements Block {
 
+    /**
+     * Actions
+     */
     private final List<GraphTargetItem> actions;
 
+    /**
+     * Frame
+     */
     private final GraphTargetItem frame;
 
+    /**
+     * Constructor.
+     *
+     * @param frame Frame
+     * @param actions Actions
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public IfFrameLoadedActionItem(GraphTargetItem frame, List<GraphTargetItem> actions, GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.actions = actions;

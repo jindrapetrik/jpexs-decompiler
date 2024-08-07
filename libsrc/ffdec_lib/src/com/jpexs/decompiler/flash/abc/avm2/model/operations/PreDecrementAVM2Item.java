@@ -34,6 +34,12 @@ import java.util.List;
  */
 public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2Item {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public PreDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unneccessary ++Number(xx) when xx not number*/);
     }

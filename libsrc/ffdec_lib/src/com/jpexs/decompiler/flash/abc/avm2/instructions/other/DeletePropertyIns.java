@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class DeletePropertyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DeletePropertyIns() {
         super(0x6a, "deleteproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

@@ -30,6 +30,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class BkptLineIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public BkptLineIns() {
         super(0xF2, "bkptline", new int[]{AVM2Code.DAT_LINENUM}, false /*?*/);
     }

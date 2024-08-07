@@ -44,8 +44,17 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionSetTarget extends Action {
 
+    /**
+     * Target name
+     */
     public String targetName;
 
+    /**
+     * Constructor
+     *
+     * @param targetName Target name
+     * @param charset Charset
+     */
     public ActionSetTarget(String targetName, String charset) {
         super(0x8B, 0, charset);
         this.targetName = targetName;
@@ -62,6 +71,14 @@ public class ActionSetTarget extends Action {
         return true;
     }
 
+    /**
+     * Constructor
+     *
+     * @param actionLength Length of action
+     * @param sis SWF input stream
+     * @param version SWF version
+     * @throws IOException On I/O error
+     */
     public ActionSetTarget(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8B, actionLength, sis.getCharset());
         //byte[] data = sis.readBytes(actionLength);
@@ -89,6 +106,14 @@ public class ActionSetTarget extends Action {
         return Utf8Helper.getBytesLength(targetName) + 1;
     }
 
+    /**
+     * Constructor
+     *
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionSetTarget(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8B, -1, charset);
         targetName = lexString(lexer);

@@ -34,8 +34,18 @@ import java.util.List;
  */
 public class BlockItem extends GraphTargetItem {
 
+    /**
+     * Commands
+     */
     List<GraphTargetItem> commands;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param commands Commands
+     */
     public BlockItem(GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.commands = commands;

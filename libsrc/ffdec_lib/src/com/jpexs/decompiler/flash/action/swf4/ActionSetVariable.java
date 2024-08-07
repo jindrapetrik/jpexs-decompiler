@@ -56,6 +56,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionSetVariable extends Action implements StoreTypeAction {
 
+    /**
+     * Constructor.
+     */
     public ActionSetVariable() {
         super(0x1D, 0, Utf8Helper.charsetName);
     }

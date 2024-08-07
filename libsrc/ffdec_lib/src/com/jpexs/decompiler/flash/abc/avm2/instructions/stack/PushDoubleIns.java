@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushDoubleIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushDoubleIns() {
         super(0x2f, "pushdouble", new int[]{AVM2Code.DAT_DOUBLE_INDEX}, false);
     }

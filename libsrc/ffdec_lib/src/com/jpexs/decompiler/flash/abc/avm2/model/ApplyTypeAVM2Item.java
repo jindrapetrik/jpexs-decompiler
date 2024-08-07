@@ -41,6 +41,14 @@ public class ApplyTypeAVM2Item extends AVM2Item {
 
     public List<GraphTargetItem> params;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param params Parameters
+     */
     public ApplyTypeAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, List<GraphTargetItem> params) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.params = params;

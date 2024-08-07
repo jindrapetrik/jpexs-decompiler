@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class CheckFilterIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CheckFilterIns() {
         super(0x78, "checkfilter", new int[]{}, true);
     }

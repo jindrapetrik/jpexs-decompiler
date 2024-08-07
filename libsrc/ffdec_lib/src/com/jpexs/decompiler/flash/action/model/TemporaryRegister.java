@@ -31,15 +31,32 @@ import java.util.Objects;
  */
 public class TemporaryRegister extends ActionItem {
 
+    /**
+     * Register ID.
+     */
     private final int regId;
 
+    /**
+     * If this register is used.
+     */
     public boolean used = false;
 
+    /**
+     * Constructor.
+     *
+     * @param regId Register ID
+     * @param value Value
+     */
     public TemporaryRegister(int regId, GraphTargetItem value) {
         super(value.getSrc(), value.getLineStartItem(), value.getPrecedence(), value);
         this.regId = regId;
     }
 
+    /**
+     * Gets register ID.
+     *
+     * @return Register ID
+     */
     public int getRegId() {
         return regId;
     }

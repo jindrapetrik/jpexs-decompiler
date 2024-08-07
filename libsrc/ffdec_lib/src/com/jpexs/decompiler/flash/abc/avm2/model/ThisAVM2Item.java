@@ -40,12 +40,30 @@ import java.util.Set;
  */
 public class ThisAVM2Item extends AVM2Item {
 
+    /**
+     * Class name
+     */
     public DottedChain className;
 
+    /**
+     * Is basic object
+     */
     public boolean basicObject;
 
+    /**
+     * Show class name
+     */
     public boolean showClassName;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param className Class name
+     * @param basicObject Is basic object
+     * @param showClassName Show class name
+     */
     public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, DottedChain className, boolean basicObject, boolean showClassName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.className = className;
@@ -54,6 +72,10 @@ public class ThisAVM2Item extends AVM2Item {
         getSrcData().localName = "this";
     }
 
+    /**
+     * Checks if this is a basic object.
+     * @return True if this is a basic object
+     */
     public boolean isBasicObject() {
         return basicObject;
     }

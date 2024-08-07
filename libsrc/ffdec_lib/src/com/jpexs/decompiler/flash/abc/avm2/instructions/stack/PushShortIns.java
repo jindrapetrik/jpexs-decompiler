@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushShortIns extends InstructionDefinition implements PushIntegerTypeIns {
 
+    /**
+     * Constructor
+     */
     public PushShortIns() {
         super(0x25, "pushshort", new int[]{AVM2Code.OPT_S16}, false);
     }

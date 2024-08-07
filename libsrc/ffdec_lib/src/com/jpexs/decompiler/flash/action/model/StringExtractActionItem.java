@@ -36,10 +36,25 @@ import java.util.Objects;
  */
 public class StringExtractActionItem extends ActionItem {
 
+    /**
+     * Index
+     */
     public GraphTargetItem index;
 
+    /**
+     * Count
+     */
     public GraphTargetItem count;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param index Index
+     * @param count Count
+     */
     public StringExtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.index = index;
@@ -72,6 +87,14 @@ public class StringExtractActionItem extends ActionItem {
         return getResult(count.getResult(), index.getResult(), value.getResult());
     }
 
+    /**
+     * Get result.
+     *
+     * @param count Count
+     * @param index Index
+     * @param value Value
+     * @return Result
+     */
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
         int idx = EcmaScript.toInt32(index);

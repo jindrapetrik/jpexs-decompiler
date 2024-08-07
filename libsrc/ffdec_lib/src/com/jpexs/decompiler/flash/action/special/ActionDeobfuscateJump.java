@@ -28,10 +28,22 @@ import java.io.IOException;
  */
 public class ActionDeobfuscateJump extends ActionJump {
 
+    /**
+     * Constructor.
+     * @param offset Jump offset
+     * @param charset Charset
+     */
     public ActionDeobfuscateJump(int offset, String charset) {
         super(2, charset);
     }
 
+    /**
+     * Constructor.
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionDeobfuscateJump(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(lexer, charset);
     }

@@ -39,16 +39,38 @@ import java.util.Set;
  */
 public class UnresolvedConstantActionItem extends ActionItem implements SimpleValue {
 
+    /**
+     * Computed register value
+     */
     public GraphTargetItem computedRegValue;
 
+    /**
+     * Position
+     */
     public final int pos;
 
+    /**
+     * Index
+     */
     private int index;
 
+    /**
+     * Constructor.
+     *
+     * @param index Index
+     */
     public UnresolvedConstantActionItem(int index) {
         this(null, null, 0, index);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param instructionPos Instruction position
+     * @param index Index
+     */
     public UnresolvedConstantActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int instructionPos, int index) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.index = index;
@@ -80,6 +102,10 @@ public class UnresolvedConstantActionItem extends ActionItem implements SimpleVa
         return "\u00A7\u00A7constant(" + index + ")";
     }
 
+    /**
+     * Gets the index.
+     * @return Index
+     */
     public int getIndex() {
         return index;
     }
@@ -151,10 +177,18 @@ public class UnresolvedConstantActionItem extends ActionItem implements SimpleVa
         return true;
     }
 
+    /**
+     * Checks if this is string.
+     * @return True if this is string
+     */
     public boolean isString() {
         return true;
     }
 
+    /**
+     * Gets as string.
+     * @return String
+     */
     public String getAsString() {
         if (!isString()) {
             return null;

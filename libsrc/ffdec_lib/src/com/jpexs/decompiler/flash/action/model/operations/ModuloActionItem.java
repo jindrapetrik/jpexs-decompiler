@@ -35,6 +35,13 @@ import java.util.List;
  */
 public class ModuloActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public ModuloActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%", "Number", "Number");
     }
@@ -44,6 +51,12 @@ public class ModuloActionItem extends BinaryOpItem implements CompoundableBinary
         return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static Number getResult(Double rightResult, Double leftResult) {
         if (Double.isNaN(leftResult) || Double.isNaN(rightResult) || Double.compare(rightResult, 0) == 0) {
             return Double.NaN;

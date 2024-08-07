@@ -36,8 +36,8 @@ import java.util.logging.Logger;
 /**
  * Cache.
  *
- * @param <K>
- * @param <V>
+ * @param <K> Key type
+ * @param <V> Value type
  * @author JPEXS
  */
 public class Cache<K, V> implements Freed {

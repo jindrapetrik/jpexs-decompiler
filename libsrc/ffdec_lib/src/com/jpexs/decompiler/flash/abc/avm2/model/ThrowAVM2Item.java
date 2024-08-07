@@ -36,6 +36,12 @@ import java.util.Objects;
  */
 public class ThrowAVM2Item extends AVM2Item implements ExitItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value to throw
+     */
     public ThrowAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, NOPRECEDENCE, value);
     }

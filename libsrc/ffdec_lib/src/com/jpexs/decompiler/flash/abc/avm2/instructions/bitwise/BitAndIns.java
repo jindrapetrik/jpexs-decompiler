@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class BitAndIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public BitAndIns() {
         super(0xa8, "bitand", new int[]{}, true);
     }

@@ -38,6 +38,9 @@ import java.util.Objects;
  */
 public class UnLoadMovieActionItem extends ActionItem {
 
+    /**
+     * Target string
+     */
     private final GraphTargetItem targetString;
 
     @Override
@@ -45,6 +48,12 @@ public class UnLoadMovieActionItem extends ActionItem {
         visitor.visit(targetString);
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param targetString Target string
+     */
     public UnLoadMovieActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem targetString) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.targetString = targetString;

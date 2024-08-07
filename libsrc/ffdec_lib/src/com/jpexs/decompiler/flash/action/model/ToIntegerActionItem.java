@@ -36,6 +36,12 @@ import java.util.Objects;
  */
 public class ToIntegerActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public ToIntegerActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -61,6 +67,11 @@ public class ToIntegerActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param num Number
+     * @return Result
+     */
     public static long getResult(Object num) {
         return EcmaScript.toInt32(num);
     }

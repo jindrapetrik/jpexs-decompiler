@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class InIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public InIns() {
         super(0xb4, "in", new int[]{}, true);
     }

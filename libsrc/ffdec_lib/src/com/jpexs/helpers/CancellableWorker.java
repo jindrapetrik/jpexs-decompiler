@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Cancellable worker.
  *
- * @param <T>
+ * @param <T> Result type
  * @author JPEXS
  */
 public abstract class CancellableWorker<T> implements RunnableFuture<T> {

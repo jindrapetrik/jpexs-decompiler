@@ -39,10 +39,19 @@ import java.util.Objects;
  */
 public class GetPropertyActionItem extends ActionItem {
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Property index
+     */
     public int propertyIndex;
 
+    /**
+     * Use getProperty function
+     */
     public boolean useGetPropertyFunction = true;
 
     @Override
@@ -50,6 +59,14 @@ public class GetPropertyActionItem extends ActionItem {
         visitor.visit(target);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     * @param propertyIndex Property index
+     */
     public GetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;

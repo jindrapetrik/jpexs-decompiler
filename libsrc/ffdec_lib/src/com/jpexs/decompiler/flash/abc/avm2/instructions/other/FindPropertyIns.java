@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class FindPropertyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public FindPropertyIns() {
         super(0x5e, "findproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

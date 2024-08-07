@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class IncLocalPIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IncLocalPIns() {
         super(0x9D, "inclocal_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT, AVM2Code.DAT_LOCAL_REG_INDEX}, true /*?*/, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

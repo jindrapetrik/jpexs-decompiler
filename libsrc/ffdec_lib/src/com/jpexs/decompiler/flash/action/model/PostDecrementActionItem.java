@@ -46,8 +46,14 @@ import java.util.Objects;
  */
 public class PostDecrementActionItem extends ActionItem implements SetTypeActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Temp register
+     */
     private int tempRegister = -1;
 
     @Override
@@ -55,6 +61,13 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
         visitor.visit(object);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public PostDecrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.object = object;

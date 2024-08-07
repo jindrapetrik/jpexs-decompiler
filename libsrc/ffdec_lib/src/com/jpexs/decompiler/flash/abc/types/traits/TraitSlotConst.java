@@ -335,7 +335,6 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param abc ABC
      * @param path Path
      * @return Number of removed traps
-     * @throws InterruptedException
      */
     @Override
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {

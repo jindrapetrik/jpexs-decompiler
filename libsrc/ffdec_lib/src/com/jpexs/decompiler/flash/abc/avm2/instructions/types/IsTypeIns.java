@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class IsTypeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IsTypeIns() {
         super(0xb2, "istype", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

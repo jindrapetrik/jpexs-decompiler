@@ -35,6 +35,9 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class CoerceIIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
+    /**
+     * Constructor
+     */
     public CoerceIIns() {
         super(0x83, "coerce_i", new int[]{}, true, AVM2InstructionFlag.DEPRECATED); // stack: -1+1
     }

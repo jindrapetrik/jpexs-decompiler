@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class CoerceAIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
+    /**
+     * Constructor
+     */
     public CoerceAIns() {
         super(0x82, "coerce_a", new int[]{}, true);
     }

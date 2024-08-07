@@ -38,6 +38,12 @@ import java.util.Objects;
  */
 public class RemoveSpriteActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     */
     public RemoveSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, target);
     }

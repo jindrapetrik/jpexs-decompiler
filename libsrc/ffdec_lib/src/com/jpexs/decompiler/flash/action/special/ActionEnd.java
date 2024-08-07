@@ -35,6 +35,10 @@ import java.util.Map;
  */
 public class ActionEnd extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionEnd(String charset) {
         super(0, 0, charset);
         setIgnored(true, 0);

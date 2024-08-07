@@ -28,8 +28,17 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class LabelItem extends GraphTargetItem {
 
+    /**
+     * Label name.
+     */
     public String labelName;
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param labelName Label name
+     */
     public LabelItem(GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.labelName = labelName;

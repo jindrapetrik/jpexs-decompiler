@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class SwapIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public SwapIns() {
         super(0x2b, "swap", new int[]{}, false);
     }

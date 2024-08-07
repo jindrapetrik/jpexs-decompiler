@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class DXNSIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DXNSIns() {
         super(0x06, "dxns", new int[]{AVM2Code.DAT_STRING_INDEX}, true);
     }

@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class PushFloatIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushFloatIns() {
         super(0x22, "pushfloat", new int[]{AVM2Code.DAT_FLOAT_INDEX}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.FLOAT_MAJOR);
     }

@@ -39,8 +39,20 @@ import java.util.List;
  */
 public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, NotEqualsTypeItem {
 
+    /**
+     * Version 2 flag
+     */
     boolean version2;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param version2 Version 2 flag
+     */
     public NeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=", "", "");
         this.version2 = version2;

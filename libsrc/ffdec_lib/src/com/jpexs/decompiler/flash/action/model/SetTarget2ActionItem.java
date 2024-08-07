@@ -34,8 +34,18 @@ import java.util.Objects;
  */
 public class SetTarget2ActionItem extends ActionItem {
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     */
     public SetTarget2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;

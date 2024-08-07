@@ -36,16 +36,40 @@ import java.util.Set;
  */
 public class LocalRegAVM2Item extends AVM2Item {
 
+    /**
+     * Register index
+     */
     public final int regIndex;
 
+    /***
+     * Computed value
+     */
     public GraphTargetItem computedValue;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Computed result
+     */
     private final Object computedResult;
 
+    /**
+     * Is compile time
+     */
     private boolean isCT = false;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param regIndex Register index
+     * @param computedValue Computed value
+     * @param type Type
+     */
     public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem computedValue, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;

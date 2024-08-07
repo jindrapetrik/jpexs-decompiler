@@ -31,6 +31,12 @@ import java.util.List;
  */
 public class ParenthesisItem extends GraphTargetItem {
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public ParenthesisItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY, value);
     }

@@ -36,7 +36,9 @@ import java.util.List;
  * @author JPEXS
  */
 public class Lf32Ins extends InstructionDefinition implements AlchemyTypeIns {
-
+    /**
+     * Constructor
+     */
     public Lf32Ins() {
         super(0x38, "lf32", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

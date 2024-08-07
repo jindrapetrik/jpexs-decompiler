@@ -38,14 +38,34 @@ import java.util.Set;
  */
 public class IfItem extends GraphTargetItem implements Block {
 
+    /**
+     * Expression
+     */
     public GraphTargetItem expression;
 
+    /**
+     * On true
+     */
     public List<GraphTargetItem> onTrue;
 
+    /**
+     * On false
+     */
     public List<GraphTargetItem> onFalse;
 
+    /**
+     * Decision part
+     */
     public GraphPart decisionPart;
+
+    /**
+     * On true part
+     */
     public GraphPart onTruePart;
+
+    /**
+     * On false part
+     */
     public GraphPart onFalsePart;
 
     @Override
@@ -87,6 +107,15 @@ public class IfItem extends GraphTargetItem implements Block {
         visitor.visit(expression);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param expression Expression
+     * @param onTrue On true
+     * @param onFalse On false
+     */
     public IfItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
         super(src, lineStartIns, NOPRECEDENCE);
         this.expression = expression;

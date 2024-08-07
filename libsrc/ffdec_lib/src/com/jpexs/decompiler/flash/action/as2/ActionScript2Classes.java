@@ -52,6 +52,13 @@ public class ActionScript2Classes {
     private static boolean inited = false;
 
     /**
+     * Constructor.
+     */
+    private ActionScript2Classes() {
+
+    }
+
+    /**
      * Initialize the classes
      */
     private static synchronized void initClasses() {
@@ -200,7 +207,7 @@ public class ActionScript2Classes {
     /**
      * Sample test
      *
-     * @param args
+     * @param args Command line arguments
      */
     public static void main(String[] args) {
         Map<String, Trait> traits = getClassTraits("flash.filters.BevelFilter", true);

@@ -38,8 +38,19 @@ import java.util.List;
  */
 public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsTypeItem {
 
+    /**
+     * Version 2 flag.
+     */
     boolean version2;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param version2 Version 2 flag
+     */
     public EqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "==", "", "");
         this.version2 = version2;
@@ -50,6 +61,13 @@ public class EqActionItem extends BinaryOpItem implements LogicalOpItem, EqualsT
         return getResult(rightSide.getResult(), leftSide.getResult(), version2);
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @param version2 Version 2 flag
+     * @return Result
+     */
     public static Boolean getResult(Object rightResult, Object leftResult, boolean version2) {
         if (version2) {
             return EcmaScript.equals(true, leftResult, rightResult);

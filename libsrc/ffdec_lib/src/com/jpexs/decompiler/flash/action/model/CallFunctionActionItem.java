@@ -44,10 +44,19 @@ import java.util.Set;
  */
 public class CallFunctionActionItem extends ActionItem {
 
+    /**
+     * Function name.
+     */
     public final GraphTargetItem functionName;
 
+    /**
+     * Arguments.
+     */
     public final List<GraphTargetItem> arguments;
 
+    /**
+     * Calculated function.
+     */
     public GraphTargetItem calculatedFunction;
 
     @Override
@@ -55,6 +64,14 @@ public class CallFunctionActionItem extends ActionItem {
         visitor.visitAll(arguments);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param functionName Function name
+     * @param arguments Arguments
+     */
     public CallFunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;

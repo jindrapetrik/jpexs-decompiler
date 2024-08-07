@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class BitNotIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public BitNotIns() {
         super(0x97, "bitnot", new int[]{}, true);
     }

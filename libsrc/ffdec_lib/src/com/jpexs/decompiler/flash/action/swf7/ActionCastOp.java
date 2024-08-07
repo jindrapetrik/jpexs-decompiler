@@ -42,6 +42,9 @@ import java.util.Map;
 @SWFVersion(from = 7)
 public class ActionCastOp extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionCastOp() {
         super(0x2B, 0, Utf8Helper.charsetName);
     }

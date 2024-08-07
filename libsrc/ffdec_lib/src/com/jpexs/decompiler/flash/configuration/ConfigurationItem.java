@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * Configuration item.
  *
- * @param <T>
+ * @param <T> Type of value
  * @author JPEXS
  */
 public class ConfigurationItem<T> {

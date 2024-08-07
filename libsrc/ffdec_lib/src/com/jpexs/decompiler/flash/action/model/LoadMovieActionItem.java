@@ -38,10 +38,19 @@ import java.util.Objects;
  */
 public class LoadMovieActionItem extends ActionItem {
 
+    /**
+     * URL string
+     */
     private final GraphTargetItem urlString;
 
+    /**
+     * Target string
+     */
     private final GraphTargetItem targetString;
 
+    /**
+     * Method
+     */
     private final int method;
 
     @Override
@@ -50,6 +59,15 @@ public class LoadMovieActionItem extends ActionItem {
         visitor.visit(targetString);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param urlString URL string
+     * @param targetString Target string
+     * @param method Method
+     */
     public LoadMovieActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;

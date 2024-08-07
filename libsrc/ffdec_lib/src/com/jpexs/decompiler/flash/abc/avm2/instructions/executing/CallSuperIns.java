@@ -38,6 +38,9 @@ import java.util.List;
  */
 public class CallSuperIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallSuperIns() {
         super(0x45, "callsuper", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

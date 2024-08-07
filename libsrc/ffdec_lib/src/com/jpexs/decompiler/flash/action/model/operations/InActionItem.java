@@ -32,6 +32,14 @@ import java.util.Set;
  */
 public class InActionItem extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param name Name
+     * @param object Object
+     */
     public InActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, ActionItem name, ActionItem object) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
     }

@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class GetSlotIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetSlotIns() {
         super(0x6c, "getslot", new int[]{AVM2Code.DAT_SLOT_INDEX}, true);
     }

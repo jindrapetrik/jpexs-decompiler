@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionStop extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionStop() {
         super(0x07, 0, Utf8Helper.charsetName);
     }

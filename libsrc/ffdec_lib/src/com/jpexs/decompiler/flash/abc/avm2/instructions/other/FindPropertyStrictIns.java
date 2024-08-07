@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class FindPropertyStrictIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public FindPropertyStrictIns() {
         super(0x5d, "findpropstrict", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

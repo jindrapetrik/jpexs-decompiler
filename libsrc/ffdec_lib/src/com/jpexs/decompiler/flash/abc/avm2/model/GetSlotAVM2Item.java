@@ -31,16 +31,42 @@ import java.util.Objects;
  */
 public class GetSlotAVM2Item extends AVM2Item {
 
+    /**
+     * Slot name
+     */
     public Multiname slotName;
 
+    /**
+     * Scope
+     */
     public GraphTargetItem scope;
 
+    /**
+     * Slot object
+     */
     public GraphTargetItem slotObject;
 
+    /**
+     * Slot index
+     */
     public int slotIndex;
 
+    /**
+     * Slot type
+     */
     public GraphTargetItem slotType;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     * @param slotObject Slot object
+     * @param slotIndex Slot index
+     * @param slotName Slot name
+     * @param slotType Slot type
+     */
     public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem slotType) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.slotName = slotName;

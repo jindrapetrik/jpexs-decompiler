@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionGetTime extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionGetTime() {
         super(0x34, 0, Utf8Helper.charsetName);
     }

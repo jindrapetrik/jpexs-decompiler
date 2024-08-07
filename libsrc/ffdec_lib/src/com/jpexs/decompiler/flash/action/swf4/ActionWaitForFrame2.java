@@ -52,10 +52,21 @@ import java.util.Set;
 @SWFVersion(from = 4)
 public class ActionWaitForFrame2 extends Action implements ActionStore {
 
+    /**
+     * Number of actions to skip
+     */
     public int skipCount;
 
-    List<Action> skipped;
+    /**
+     * Skipped actions
+     */
+    public List<Action> skipped;
 
+    /**
+     * Constructor.
+     * @param skipCount Number of actions to skip
+     * @param charset Charset
+     */
     public ActionWaitForFrame2(int skipCount, String charset) {
         super(0x8D, 1, charset);
         this.skipCount = skipCount;
@@ -73,6 +84,12 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
         skipCount = store.size();
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionWaitForFrame2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x8D, actionLength, sis.getCharset());
         skipCount = sis.readUI8("skipCount");
@@ -107,6 +124,13 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
          }*/
     }
 
+    /**
+     * Constructor.
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionWaitForFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8D, -1, charset);
         skipCount = (int) lexLong(lexer);

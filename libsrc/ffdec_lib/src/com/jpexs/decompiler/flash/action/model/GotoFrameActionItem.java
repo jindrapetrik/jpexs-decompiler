@@ -33,8 +33,18 @@ import java.util.List;
  */
 public class GotoFrameActionItem extends ActionItem {
 
+    /**
+     * Frame number
+     */
     public int frame;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param frame Frame number
+     */
     public GotoFrameActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int frame) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.frame = frame;

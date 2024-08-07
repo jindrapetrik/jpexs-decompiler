@@ -2615,6 +2615,18 @@ public class ActionScript3Parser {
         return items;
     }
 
+    /**
+     * Converts string to script traits.
+     * @param allOpenedNamespaces All opened namespaces
+     * @param str String to parse
+     * @param fileName File name
+     * @param scriptIndex Script index
+     * @return List of script traits
+     * @throws AVM2ParseException On parsing error
+     * @throws IOException On I/O error
+     * @throws CompilationException On compilation error
+     * @throws InterruptedException On interrupt
+     */
     public List<GraphTargetItem> scriptTraitsFromString(List<List<NamespaceItem>> allOpenedNamespaces, String str, String fileName, int scriptIndex) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         lexer = new ActionScriptLexer(str);
 
@@ -2625,6 +2637,15 @@ public class ActionScript3Parser {
         return ret;
     }
 
+    /**
+     * Adds script from tree.
+     * @param allOpenedNamespaces All opened namespaces
+     * @param items Items
+     * @param classPos Class position
+     * @param documentClass Document class
+     * @throws AVM2ParseException On parsing error
+     * @throws CompilationException On compilation error
+     */
     public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
@@ -2643,18 +2664,51 @@ public class ActionScript3Parser {
         abcIndex.getSelectedAbc().fireChanged();
     }
 
+    /**
+     * Adds script.
+     * @param s Source code
+     * @param fileName File name
+     * @param classPos Class position
+     * @param scriptIndex Script index
+     * @param documentClass Document class
+     * @throws AVM2ParseException On parsing error
+     * @throws IOException On I/O error
+     * @throws CompilationException On compilation error
+     * @throws InterruptedException On interrupt
+     */
     public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex);
         addScriptFromTree(allOpenedNamespaces, traits, classPos, documentClass);
     }
 
+    /**
+     * Constructor.
+     * @param abcIndex ABC index
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public ActionScript3Parser(AbcIndexing abcIndex) throws IOException, InterruptedException {
         SWF.initPlayer();
 
         this.abcIndex = abcIndex;
     }
 
+    /**
+     * Compiles AS3 source code.
+     * @param src Source code
+     * @param abc ABC
+     * @param abcIndex ABC index
+     * @param fileName File name
+     * @param classPos Class position
+     * @param scriptIndex Script index
+     * @param air AIR
+     * @param documentClass Document class
+     * @throws AVM2ParseException On parsing error
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     * @throws CompilationException On compilation error
+     */
     public static void compile(String src, ABC abc, AbcIndexing abcIndex, String fileName, int classPos, int scriptIndex, boolean air, String documentClass) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
         SWF.initPlayer();
@@ -2679,7 +2733,15 @@ public class ActionScript3Parser {
         }
     }
 
-    public static void compile(SWF swf, String src, String dst, int classPos, int scriptIndex) {
+    /**
+     * Compiles AS3 source code.
+     * @param swf SWF
+     * @param srcFile Source file
+     * @param destFile Target file
+     * @param classPos Class position
+     * @param scriptIndex Script index
+     */
+    public static void compile(SWF swf, String srcFile, String destFile, int classPos, int scriptIndex) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
             SWF.initPlayer();
@@ -2687,8 +2749,8 @@ public class ActionScript3Parser {
             AbcIndexing abcIndex = swf.getAbcIndex();
             abcIndex.selectAbc(abc);
             ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
-            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex, swf.getDocumentClass());
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
+            parser.addScript(new String(Helper.readFile(srcFile), Utf8Helper.charset), srcFile, classPos, scriptIndex, swf.getDocumentClass());
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(destFile)))) {
                 abc.saveToStream(fos);
             }
         } catch (Exception ex) {

@@ -31,10 +31,26 @@ import java.util.Set;
  */
 public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
+    /**
+     * Operator
+     */
     public String operator;
 
+    /**
+     * Coerce value to this type
+     */
     protected String coerce;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartItem Line start item
+     * @param precedence Precedence
+     * @param value Value
+     * @param operator Operator
+     * @param coerce Coerce
+     */
     public UnaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem value, String operator, String coerce) {
         super(instruction, lineStartItem, precedence, value);
         this.operator = operator;
@@ -148,6 +164,14 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
         return hash;
     }
 
+    /**
+     * Converts operand to string.
+     *
+     * @param operand Operand
+     * @param writer Writer
+     * @param localData Local data
+     * @throws InterruptedException On interrupt
+     */
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         operand.toString(writer, localData, "");
     }

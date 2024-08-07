@@ -43,8 +43,16 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionGotoFrame extends Action {
 
+    /**
+     * Frame number
+     */
     public int frame;
 
+    /**
+     * Constructor
+     * @param frame Frame number
+     * @param charset Charset
+     */
     public ActionGotoFrame(int frame, String charset) {
         super(0x81, 2, charset);
         this.frame = frame;
@@ -56,6 +64,13 @@ public class ActionGotoFrame extends Action {
         return true;
     }
 
+    /**
+     * Constructor
+     *
+     * @param actionLength Length of action
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionGotoFrame(int actionLength, SWFInputStream sis) throws IOException {
         super(0x81, actionLength, sis.getCharset());
         frame = sis.readUI16("frame");
@@ -81,6 +96,13 @@ public class ActionGotoFrame extends Action {
         return 2;
     }
 
+    /**
+     * Constructor
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionGotoFrame(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x81, 0, charset);
         frame = (int) lexLong(lexer);

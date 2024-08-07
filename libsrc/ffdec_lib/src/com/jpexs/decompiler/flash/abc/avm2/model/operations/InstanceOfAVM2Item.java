@@ -35,6 +35,13 @@ import java.util.List;
  */
 public class InstanceOfAVM2Item extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param type Type
+     */
     public InstanceOfAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof", "", "");
     }

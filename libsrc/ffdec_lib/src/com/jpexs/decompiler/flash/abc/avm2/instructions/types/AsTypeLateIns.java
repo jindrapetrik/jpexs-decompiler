@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class AsTypeLateIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public AsTypeLateIns() {
         super(0x87, "astypelate", new int[]{}, true);
     }

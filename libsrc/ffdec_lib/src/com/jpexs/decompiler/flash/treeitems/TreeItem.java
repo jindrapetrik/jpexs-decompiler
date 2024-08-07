@@ -26,14 +26,14 @@ public interface TreeItem {
     /**
      * Gets openable which this item resides.
      *
-     * @return
+     * @return Openable
      */
     public Openable getOpenable();
 
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return True if modified
      */
     public boolean isModified();
 }

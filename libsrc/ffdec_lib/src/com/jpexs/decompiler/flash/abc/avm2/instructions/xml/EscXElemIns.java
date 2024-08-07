@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class EscXElemIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public EscXElemIns() {
         super(0x71, "esc_xelem", new int[]{}, true);
     }

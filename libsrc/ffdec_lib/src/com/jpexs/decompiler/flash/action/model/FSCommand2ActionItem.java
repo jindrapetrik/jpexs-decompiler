@@ -39,8 +39,14 @@ import java.util.Objects;
  */
 public class FSCommand2ActionItem extends ActionItem {
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Command
+     */
     public GraphTargetItem command;
 
     @Override
@@ -49,6 +55,14 @@ public class FSCommand2ActionItem extends ActionItem {
         visitor.visit(command);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param command Command
+     * @param arguments Arguments
+     */
     public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.command = command;

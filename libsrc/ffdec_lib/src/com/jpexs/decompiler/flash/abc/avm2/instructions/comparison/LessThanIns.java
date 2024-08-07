@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class LessThanIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public LessThanIns() {
         super(0xad, "lessthan", new int[]{}, true);
     }

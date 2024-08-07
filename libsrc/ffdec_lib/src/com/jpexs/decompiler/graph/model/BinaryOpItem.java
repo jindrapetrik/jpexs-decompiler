@@ -34,13 +34,29 @@ import java.util.Set;
  */
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
+    /**
+     * Left side of the operation
+     */
     public GraphTargetItem leftSide;
 
+    /**
+     * Right side of the operation
+     */
     public GraphTargetItem rightSide;
 
+    /**
+     * Operator
+     */
     protected final String operator;
 
+    /**
+     * Coerce left side to this type
+     */
     protected String coerceLeft;
+
+    /**
+     * Coerce right side to this type
+     */
     protected String coerceRight;
 
     @Override
@@ -52,6 +68,18 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return fp;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartItem Line start item
+     * @param precedence Precedence
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param operator Operator
+     * @param coerceLeft Coerce left
+     * @param coerceRight Coerce right
+     */
     public BinaryOpItem(GraphSourceItem instruction, GraphSourceItem lineStartItem, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator, String coerceLeft, String coerceRight) {
         super(instruction, lineStartItem, precedence);
         this.leftSide = leftSide;
@@ -95,6 +123,14 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return writer;
     }
 
+    /**
+     * Converts operand to string
+     *
+     * @param operand Operand
+     * @param writer Writer
+     * @param localData Local data
+     * @throws InterruptedException On interrupt
+     */
     protected void operandToString(GraphTargetItem operand, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         operand.toString(writer, localData, "");
     }
@@ -143,6 +179,12 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return hash;
     }
 
+    /**
+     * Gets left most item
+     *
+     * @param item Item
+     * @return Left most item
+     */
     public GraphTargetItem getLeftMostItem(GraphTargetItem item) {
         GraphTargetItem ret = item;
         if (ret instanceof BinaryOpItem) {
@@ -151,6 +193,11 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return ret;
     }
 
+    /**
+     * Gets left most item
+     *
+     * @return Left most item
+     */
     public GraphTargetItem getLeftMostItem() {
         GraphTargetItem ret = leftSide;
         if (ret instanceof BinaryOpItem) {

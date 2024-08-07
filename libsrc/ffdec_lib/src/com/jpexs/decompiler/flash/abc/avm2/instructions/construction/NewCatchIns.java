@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class NewCatchIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewCatchIns() {
         super(0x5a, "newcatch", new int[]{AVM2Code.DAT_EXCEPTION_INDEX}, true);
     }

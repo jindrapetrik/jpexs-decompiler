@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class ReturnVoidIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ReturnVoidIns() {
         super(0x47, "returnvoid", new int[]{}, false);
     }

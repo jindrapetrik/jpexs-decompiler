@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class MultiplyIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public MultiplyIIns() {
         super(0xc7, "multiply_i", new int[]{}, true);
     }

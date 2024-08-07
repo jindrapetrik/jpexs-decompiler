@@ -26,5 +26,11 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public interface LogicalOpItem {
 
+    /**
+     * Inverts the logical operation.
+     *
+     * @param src Source item
+     * @return Inverted target item
+     */
     public GraphTargetItem invert(GraphSourceItem src);
 }

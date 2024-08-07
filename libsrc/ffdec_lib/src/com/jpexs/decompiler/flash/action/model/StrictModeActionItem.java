@@ -27,8 +27,18 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class StrictModeActionItem extends ActionItem {
 
+    /**
+     * Mode
+     */
     public int mode;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param mode Mode
+     */
     public StrictModeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int mode) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.mode = mode;

@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class Sxi1Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Sxi1Ins() {
         super(0x50, "sxi1", new int[]{}, false, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

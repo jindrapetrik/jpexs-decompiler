@@ -45,6 +45,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionGetVariable extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionGetVariable() {
         super(0x1C, 0, Utf8Helper.charsetName);
     }

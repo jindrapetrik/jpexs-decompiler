@@ -24,6 +24,7 @@ import java.util.List;
  * List which can store parts of the graph for each element.
  *
  * @author JPEXS
+ * @param <E> Element type
  */
 public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 

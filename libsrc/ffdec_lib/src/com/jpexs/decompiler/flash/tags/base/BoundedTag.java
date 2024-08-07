@@ -29,22 +29,22 @@ public interface BoundedTag {
     /**
      * Gets rectangle bounds.
      *
-     * @return
+     * @return Rectangle bounds
      */
     public RECT getRect();
 
     /**
      * Gets rectangle bounds with added boundedTags
      *
-     * @param added
-     * @return
+     * @param added Bounded tags to add
+     * @return Rectangle bounds
      */
     public RECT getRect(Set<BoundedTag> added);
 
     /**
      * Gets rectangle including strokes.
      *
-     * @return
+     * @return Rectangle including strokes
      */
     public RECT getRectWithStrokes();
 }

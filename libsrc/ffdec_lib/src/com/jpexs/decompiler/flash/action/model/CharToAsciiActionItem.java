@@ -36,6 +36,12 @@ import java.util.Set;
  */
 public class CharToAsciiActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public CharToAsciiActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -75,6 +81,11 @@ public class CharToAsciiActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Get result.
+     * @param ch Character
+     * @return Result
+     */
     public static int getResult(Object ch) {
         String s = ch.toString();
         if (s.length() > 0) {

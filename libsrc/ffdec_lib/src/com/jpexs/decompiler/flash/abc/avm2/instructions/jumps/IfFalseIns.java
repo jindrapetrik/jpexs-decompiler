@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class IfFalseIns extends InstructionDefinition implements IfTypeIns {
 
+    /**
+     * Constructor
+     */
     public IfFalseIns() {
         super(0x12, "iffalse", new int[]{AVM2Code.DAT_OFFSET}, false);
     }

@@ -38,12 +38,29 @@ import java.util.Objects;
  */
 public class WithAVM2Item extends AVM2Item {
 
+    /**
+     * Scope
+     */
     public GraphTargetItem scope;
 
+    /**
+     * Items
+     */
     public List<GraphTargetItem> items;
 
+    /**
+     * Subvariables
+     */
     public List<AssignableAVM2Item> subvariables = new ArrayList<>();
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     * @param items Items
+     */
     public WithAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, List<GraphTargetItem> items) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
@@ -56,6 +73,13 @@ public class WithAVM2Item extends AVM2Item {
         visitor.visitAll(items);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     */
     public WithAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;

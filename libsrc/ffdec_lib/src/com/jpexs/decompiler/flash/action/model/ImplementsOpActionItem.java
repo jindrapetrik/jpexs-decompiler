@@ -31,10 +31,24 @@ import java.util.Objects;
  */
 public class ImplementsOpActionItem extends ActionItem {
 
+    /**
+     * Subclass
+     */
     public GraphTargetItem subclass;
 
+    /**
+     * Superclasses
+     */
     public List<GraphTargetItem> superclasses;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param subclass Subclass
+     * @param superclasses Superclasses
+     */
     public ImplementsOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subclass = subclass;

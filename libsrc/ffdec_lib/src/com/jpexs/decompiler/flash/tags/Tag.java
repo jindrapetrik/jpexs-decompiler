@@ -445,7 +445,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * Writes Tag value to the stream
      *
      * @param sos SWF output stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeTag(SWFOutputStream sos) throws IOException {
         if (Configuration._debugCopy.get() || isModified() || isImported()) {
@@ -502,7 +502,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public abstract void getData(SWFOutputStream sos) throws IOException;
 

@@ -36,20 +36,44 @@ import java.util.Objects;
  */
 public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {
 
+    /**
+     * Slot name
+     */
     public Multiname slotName;
 
+    /**
+     * Scope
+     */
     public GraphTargetItem scope;
 
+    /**
+     * Declaration
+     */
     public DeclarationAVM2Item declaration;
 
+    /**
+     * Slot object
+     */
     public GraphTargetItem slotObject;
 
+    /**
+     * Slot index
+     */
     public int slotIndex;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
     @Override
@@ -71,6 +95,17 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         this.declaration = declaration;
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     * @param slotObject Slot object
+     * @param slotIndex Slot index
+     * @param slotName Slot name
+     * @param value Value
+     * @param type Type
+     */
     public SetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.slotName = slotName;
@@ -107,6 +142,12 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
     }
 
+    /**
+     * Gets name as string.
+     * @param localData Local data
+     * @return Name as string
+     * @throws InterruptedException On interrupt
+     */
     public String getNameAsStr(LocalData localData) throws InterruptedException {
         if (slotName == null) {
             return slotObject.toString(localData) + ".§§slot[" + slotIndex + "]";
@@ -114,6 +155,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
+    /**
+     * Gets name.
+     * @param writer Writer
+     * @param localData Local data
+     * @return Writer
+     * @throws InterruptedException
+     */
     public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer.append(getNameAsStr(localData));
     }

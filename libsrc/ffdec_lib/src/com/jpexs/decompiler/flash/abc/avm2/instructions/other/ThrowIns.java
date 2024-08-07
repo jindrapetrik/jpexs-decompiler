@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class ThrowIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ThrowIns() {
         super(0x03, "throw", new int[]{}, true);
     }

@@ -33,10 +33,17 @@ public class ActionScriptArray extends ActionScriptObject {
     protected List<Object> values = new ArrayList<>();
 
     //TODO: implement some methods?
+
+    /**
+     * Constructor.
+     */
+    public ActionScriptArray() {
+    }
+
     /**
      * Enumerates all members of this object
      *
-     * @return
+     * @return List of member names
      */
     @Override
     public List<String> enumerate() {

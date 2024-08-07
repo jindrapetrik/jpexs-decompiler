@@ -41,6 +41,9 @@ import java.util.List;
  */
 public class CallIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallIns() {
         super(0x41, "call", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
     }

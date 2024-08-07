@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class IncrementIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IncrementIIns() {
         super(0xc0, "increment_i", new int[]{}, true);
     }

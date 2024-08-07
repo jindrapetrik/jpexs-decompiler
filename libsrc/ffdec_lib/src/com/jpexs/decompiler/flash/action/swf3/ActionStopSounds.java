@@ -38,6 +38,9 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionStopSounds extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionStopSounds() {
         super(0x09, 0, Utf8Helper.charsetName);
     }

@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Sf64Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Sf64Ins() {
         super(0x3E, "sf64", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

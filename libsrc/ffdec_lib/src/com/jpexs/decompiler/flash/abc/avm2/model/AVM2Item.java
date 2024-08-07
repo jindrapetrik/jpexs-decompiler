@@ -48,10 +48,25 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     private AVM2Instruction lineStartIns;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param precedence Precedence
+     */
     public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence) {
         this(instruction, lineStartIns, precedence, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param precedence Precedence
+     * @param value Value
+     */
     public AVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
         super(instruction, lineStartIns, precedence, value);
         if (instruction instanceof AVM2Instruction) {
@@ -62,10 +77,20 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
     }
 
+    /**
+     * Gets instruction.
+     *
+     * @return Instruction
+     */
     public AVM2Instruction getInstruction() {
         return instruction;
     }
 
+    /**
+     * Gets line start instruction.
+     *
+     * @return Line start instruction
+     */
     public AVM2Instruction getLineStartIns() {
         return lineStartIns;
     }
@@ -75,6 +100,16 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
+    /**
+     * Formats property.
+     * @param writer Writer
+     * @param object Object
+     * @param propertyName Property name
+     * @param localData Local data
+     * @param isStatic Is static
+     * @return Writer
+     * @throws InterruptedException On interrupt
+     */
     protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData, boolean isStatic) throws InterruptedException {
         boolean empty = object.getThroughDuplicate() instanceof FindPropertyAVM2Item;
         if (object instanceof LocalRegAVM2Item) {
@@ -147,6 +182,12 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
     }
 
+    /**
+     * Gets local register name.
+     * @param localRegNames Local register names
+     * @param reg Register
+     * @return Local register name
+     */
     public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
         if (localRegNames.containsKey(reg)) {
             return IdentifiersDeobfuscation.printIdentifier(true, localRegNames.get(reg));
@@ -162,6 +203,7 @@ public abstract class AVM2Item extends GraphTargetItem {
      public boolean hasReturnValue() {
      return false;
      }*/
+
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (!hasReturnValue()) {
@@ -172,6 +214,12 @@ public abstract class AVM2Item extends GraphTargetItem {
         return ret;
     }
 
+    /**
+     * Creates instruction.
+     * @param instructionCode Instruction code
+     * @param operands Operands
+     * @return Instruction
+     */
     public static AVM2Instruction ins(int instructionCode, Integer... operands) {
         InstructionDefinition def = AVM2Code.instructionSet[instructionCode];
         List<Integer> ops = new ArrayList<>();
@@ -188,11 +236,23 @@ public abstract class AVM2Item extends GraphTargetItem {
         return new AVM2Instruction(0, def, opArr);
     }
 
+    /**
+     * Gets free register.
+     * @param localData Local data
+     * @param generator Generator
+     * @return Free register
+     */
     public static int getFreeRegister(SourceGeneratorLocalData localData, SourceGenerator generator) {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         return g.getFreeRegister(localData);
     }
 
+    /**
+     * Kills register.
+     * @param localData Local data
+     * @param generator Generator
+     * @param regNumber Register number
+     */
     public static void killRegister(SourceGeneratorLocalData localData, SourceGenerator generator, int regNumber) {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         g.killRegister(localData, regNumber);
@@ -226,6 +286,11 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
+    /**
+     * Whether target must stay intact. A special case.
+     * @param target Target
+     * @return Whether target must stay intact
+     */
     public static boolean mustStayIntact1(GraphTargetItem target) {
         target = target.getNotCoerced();
         if (target instanceof ExceptionAVM2Item) {
@@ -234,6 +299,11 @@ public abstract class AVM2Item extends GraphTargetItem {
         return false;
     }
 
+    /**
+     * Whether target must stay intact. Version 2. A special case.
+     * @param target Target
+     * @return Whether target must stay intact. Version 2.
+     */
     public static boolean mustStayIntact2(GraphTargetItem target) {
         target = target.getNotCoerced();
         if (target instanceof NextValueAVM2Item) {

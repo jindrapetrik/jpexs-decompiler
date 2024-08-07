@@ -23,7 +23,14 @@ package com.jpexs.decompiler.graph.precontinues;
  */
 public class IfNode extends Node {
 
+    /**
+     * On true
+     */
     public Node onTrue;
+
+    /**
+     * On false
+     */
     public Node onFalse;
 
     @Override

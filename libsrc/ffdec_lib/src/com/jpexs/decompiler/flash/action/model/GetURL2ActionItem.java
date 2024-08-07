@@ -39,10 +39,19 @@ import java.util.Objects;
  */
 public class GetURL2ActionItem extends ActionItem {
 
+    /**
+     * URL string
+     */
     public GraphTargetItem urlString;
 
+    /**
+     * Target string
+     */
     public GraphTargetItem targetString;
 
+    /**
+     * Send vars method
+     */
     public int sendVarsMethod;
 
     @Override
@@ -70,6 +79,15 @@ public class GetURL2ActionItem extends ActionItem {
         return writer.append(methodStr).append(")");
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param urlString URL string
+     * @param targetString Target string
+     * @param method Send vars method
+     */
     public GetURL2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;

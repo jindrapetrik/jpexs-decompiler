@@ -29,8 +29,17 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class IncLocalAVM2Item extends AVM2Item {
 
+    /**
+     * Local register index
+     */
     public int regIndex;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param regIndex Local register index
+     */
     public IncLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
         super(instruction, lineStartIns, PRECEDENCE_POSTFIX);
         this.regIndex = regIndex;

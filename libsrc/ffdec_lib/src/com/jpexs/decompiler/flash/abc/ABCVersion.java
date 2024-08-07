@@ -67,7 +67,7 @@ public class ABCVersion implements Comparable<ABCVersion> {
     /**
      * Returns string representation of ABCVersion
      *
-     * @return
+     * @return String representation of ABCVersion
      */
     @Override
     public String toString() {
@@ -77,7 +77,7 @@ public class ABCVersion implements Comparable<ABCVersion> {
     /**
      * Returns hash code of ABCVersion
      *
-     * @return
+     * @return Hash code of ABCVersion
      */
     @Override
     public int hashCode() {
@@ -90,8 +90,8 @@ public class ABCVersion implements Comparable<ABCVersion> {
     /**
      * Equals method
      *
-     * @param obj
-     * @return
+     * @param obj Object to compare
+     * @return True if objects are equal
      */
     @Override
     public boolean equals(Object obj) {

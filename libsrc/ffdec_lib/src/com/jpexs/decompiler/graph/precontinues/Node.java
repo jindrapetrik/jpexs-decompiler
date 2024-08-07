@@ -27,18 +27,43 @@ import java.util.List;
  */
 public class Node {
 
+    /**
+     * Next nodes
+     */
     public List<Node> next = new ArrayList<>();
+    /**
+     * Previous nodes
+     */
     public List<Node> prev = new ArrayList<Node>();
+    /**
+     * Graph part
+     */
     public GraphPart graphPart;
+    /**
+     * Current id
+     */
     private static int CURRENT_ID = 0;
+    /**
+     * Id
+     */
     private int id;
 
+    /**
+     * Parent node
+     */
     public Node parentNode;
 
+    /**
+     * Constructor.
+     */
     public Node() {
         this.id = ++CURRENT_ID;
     }
 
+    /**
+     * Gets id.
+     * @return Id
+     */
     public int getId() {
         return id;
     }
@@ -73,6 +98,10 @@ public class Node {
         return true;
     }
 
+    /**
+     * Replces previous node.
+     * @param newNode New node
+     */
     public void replacePrevs(Node newNode) {
         for (Node p : this.prev) {
             for (int i = 0; i < p.next.size(); i++) {
@@ -83,6 +112,10 @@ public class Node {
         }
     }
 
+    /**
+     * Replaces next node.
+     * @param newNode New node
+     */
     public void replaceNexts(Node newNode) {
         for (Node n : this.next) {
             for (int i = 0; i < n.prev.size(); i++) {
@@ -93,6 +126,9 @@ public class Node {
         }
     }
 
+    /**
+     * Removes node from graph.
+     */
     public void removeFromGraph() {
         for (Node p : this.prev) {
             for (int i = p.next.size() - 1; i >= 0; i--) {

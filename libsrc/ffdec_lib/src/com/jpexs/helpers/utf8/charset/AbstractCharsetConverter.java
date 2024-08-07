@@ -24,10 +24,24 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Abstract charset converter.
  * @author JPEXS
  */
 public abstract class AbstractCharsetConverter {
 
+    /**
+     * Constructor.
+     */
+    public AbstractCharsetConverter() {
+    }
+
+    /**
+     * Reads charset data from lexer.
+     * @param data Charset data
+     * @param lexer Lexer
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     protected static void readMap(Map<Integer, Integer> data, ActionScriptLexer lexer) throws IOException, ActionParseException {
         ParsedSymbol s;
         lexer.lex(); //identifier;
@@ -52,6 +66,13 @@ public abstract class AbstractCharsetConverter {
         lexer.lex(); //;
     }
 
+    /**
+     * Reads one dimensional int array from lexer.
+     * @param data Data
+     * @param lexer Lexer
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     protected static void readOneDimensionalInt(int[] data, ActionScriptLexer lexer) throws IOException, ActionParseException {
         ParsedSymbol s;
         lexer.lex(); //identifier
@@ -78,6 +99,13 @@ public abstract class AbstractCharsetConverter {
         lexer.lex(); //;
     }
 
+    /**
+     * Reads two dimensional int array from lexer.
+     * @param data Data
+     * @param lexer Lexer
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     protected static void readTwoDimensionalInt(int[][] data, ActionScriptLexer lexer) throws IOException, ActionParseException {
         ParsedSymbol s;
         lexer.lex(); //identifier;
@@ -111,7 +139,17 @@ public abstract class AbstractCharsetConverter {
         lexer.lex(); //;
     }
 
+    /**
+     * Converts from this charset to unicode.
+     * @param codePoint Code point
+     * @return Unicode code point
+     */
     public abstract int toUnicode(int codePoint);
 
+    /**
+     * Converts unicode to this charset.
+     * @param codePoint Code point
+     * @return This charset codepoint
+     */
     public abstract int fromUnicode(int codePoint);
 }

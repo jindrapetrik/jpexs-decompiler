@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIns {
 
+    /**
+     * Constructor
+     */
     public SetGlobalSlotIns() {
         super(0x6f, "setglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX}, false);
     }

@@ -41,4 +41,11 @@ public class ActionSecondPassData extends SecondPassData {
      * List of case expressions for each switch statement
      */
     List<List<GraphTargetItem>> switchCaseExpressions = new ArrayList<>();
+
+    /**
+     * Constructor.
+     */
+    public ActionSecondPassData() {
+
+    }
 }

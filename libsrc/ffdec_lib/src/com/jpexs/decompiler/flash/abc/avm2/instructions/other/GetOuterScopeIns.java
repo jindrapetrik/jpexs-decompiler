@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class GetOuterScopeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetOuterScopeIns() {
         super(0x67, "getouterscope", new int[]{AVM2Code.DAT_SCOPE_INDEX}, false);
     }

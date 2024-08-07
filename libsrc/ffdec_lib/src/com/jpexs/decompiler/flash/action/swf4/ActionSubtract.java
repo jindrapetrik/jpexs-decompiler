@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionSubtract extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionSubtract() {
         super(0x0B, 0, Utf8Helper.charsetName);
     }

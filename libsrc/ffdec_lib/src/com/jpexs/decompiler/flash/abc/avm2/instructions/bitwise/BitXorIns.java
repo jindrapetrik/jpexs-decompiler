@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class BitXorIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public BitXorIns() {
         super(0xaa, "bitxor", new int[]{}, true);
     }

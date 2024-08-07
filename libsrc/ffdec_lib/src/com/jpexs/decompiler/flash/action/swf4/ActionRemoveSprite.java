@@ -40,6 +40,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionRemoveSprite extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionRemoveSprite() {
         super(0x25, 0, Utf8Helper.charsetName);
     }

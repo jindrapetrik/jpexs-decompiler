@@ -38,6 +38,10 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionEquals extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionEquals(String charset) {
         super(0x0E, 0, charset);
     }

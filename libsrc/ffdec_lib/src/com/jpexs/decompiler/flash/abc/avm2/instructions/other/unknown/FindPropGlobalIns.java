@@ -37,6 +37,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class FindPropGlobalIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public FindPropGlobalIns() {
         super(0x5C, "findpropglobal", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_STACK);
     }

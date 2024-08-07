@@ -35,6 +35,11 @@ import java.util.List;
  */
 public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public ReturnVoidAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
     }

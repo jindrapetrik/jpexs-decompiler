@@ -59,6 +59,9 @@ import java.util.Set;
  */
 public class GetPropertyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetPropertyIns() {
         super(0x66, "getproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

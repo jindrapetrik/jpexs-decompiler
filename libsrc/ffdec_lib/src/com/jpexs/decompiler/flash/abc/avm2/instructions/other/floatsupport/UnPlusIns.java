@@ -28,6 +28,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class UnPlusIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public UnPlusIns() {
         super(0x7A, "unplus", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class EscXAttrIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public EscXAttrIns() {
         super(0x72, "esc_xattr", new int[]{}, true);
     }

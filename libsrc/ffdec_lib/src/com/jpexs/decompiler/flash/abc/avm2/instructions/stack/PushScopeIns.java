@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class PushScopeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushScopeIns() {
         super(0x30, "pushscope", new int[]{}, false);
     }

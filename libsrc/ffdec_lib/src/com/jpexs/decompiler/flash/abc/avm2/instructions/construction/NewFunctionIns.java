@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class NewFunctionIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewFunctionIns() {
         super(0x40, "newfunction", new int[]{AVM2Code.DAT_METHOD_INDEX}, true);
     }

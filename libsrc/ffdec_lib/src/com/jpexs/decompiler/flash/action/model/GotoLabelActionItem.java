@@ -35,8 +35,18 @@ import java.util.Objects;
  */
 public class GotoLabelActionItem extends ActionItem {
 
+    /**
+     * Label
+     */
     public String label;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param label Label
+     */
     public GotoLabelActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String label) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.label = label;

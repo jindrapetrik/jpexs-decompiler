@@ -31,37 +31,37 @@ import java.lang.annotation.Target;
 public @interface ABCVersionRequirements {
 
     /**
-     * Minimum minor version.
+     * Gets minimum minor version.
      *
-     * @return
+     * @return minimum minor version
      */
     int minMinor() default 0;
 
     /**
-     * Maximum minor version.
+     * Gets maximum minor version.
      *
-     * @return
+     * @return maximum minor version
      */
     int maxMinor() default 0;
 
     /**
-     * Maximum major version.
+     * Gets maximum major version.
      *
-     * @return
+     * @return maximum major version
      */
     int maxMajor() default 0;
 
     /**
-     * Minimum major version.
+     * Get minimum major version.
      *
-     * @return
+     * @return minimum major version
      */
     int minMajor() default 0;
 
     /**
-     * Exact minor version.
+     * Gets exact minor version.
      *
-     * @return
+     * @return Exact minor version
      */
     int exactMinor() default 0;
 }

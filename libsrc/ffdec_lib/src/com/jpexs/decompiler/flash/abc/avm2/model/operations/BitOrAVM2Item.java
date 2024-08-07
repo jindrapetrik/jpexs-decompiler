@@ -34,6 +34,13 @@ import java.util.List;
  */
 public class BitOrAVM2Item extends BitwiseBinaryOpAVM2Item {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public BitOrAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|", "Number", "Number");
     }

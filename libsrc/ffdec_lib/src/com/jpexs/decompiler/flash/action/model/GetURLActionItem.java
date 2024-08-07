@@ -36,8 +36,14 @@ import java.util.Objects;
  */
 public class GetURLActionItem extends ActionItem {
 
+    /**
+     * URL string
+     */
     public String urlString;
 
+    /**
+     * Target string
+     */
     public String targetString;
 
     @Override
@@ -51,6 +57,13 @@ public class GetURLActionItem extends ActionItem {
         return writer.append("\")");
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param urlString URL string
+     * @param targetString Target string
+     */
     public GetURLActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String urlString, String targetString) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.urlString = urlString;

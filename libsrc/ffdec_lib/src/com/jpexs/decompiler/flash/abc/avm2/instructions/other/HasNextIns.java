@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class HasNextIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public HasNextIns() {
         super(0x1f, "hasnext", new int[]{}, true);
     }

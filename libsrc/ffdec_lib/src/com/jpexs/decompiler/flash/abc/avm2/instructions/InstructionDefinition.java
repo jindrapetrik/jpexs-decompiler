@@ -161,7 +161,7 @@ public abstract class InstructionDefinition implements Serializable {
      * @param lda Local data area
      * @param constants Constant pool
      * @param ins Instruction
-     * @throws AVM2VerifyErrorException
+     * @throws AVM2VerifyErrorException On verification error
      */
     public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
         for (int i = 0; i < operands.length; i++) {
@@ -232,7 +232,7 @@ public abstract class InstructionDefinition implements Serializable {
      * @param constants Constant pool
      * @param ins Instruction
      * @return True if instruction was executed, false if not
-     * @throws AVM2ExecutionException
+     * @throws AVM2ExecutionException On execution error
      */
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {
         //throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
@@ -244,7 +244,7 @@ public abstract class InstructionDefinition implements Serializable {
      *
      * @param lda Local data area
      * @param ins Instruction
-     * @throws AVM2VerifyErrorException
+     * @throws AVM2VerifyErrorException On verification error
      */
     protected void illegalOpCode(LocalDataArea lda, AVM2Instruction ins) throws AVM2VerifyErrorException {
         throw new AVM2VerifyErrorException(AVM2VerifyErrorException.ILLEGAL_OPCODE, lda.isDebug(), new Object[]{lda.methodName, instructionCode, ins.getAddress()});
@@ -258,7 +258,7 @@ public abstract class InstructionDefinition implements Serializable {
      * @param ins Instruction
      * @param output Output
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
     }
@@ -290,7 +290,7 @@ public abstract class InstructionDefinition implements Serializable {
      * @param ip IP
      * @param code AVM2 code
      * @param thisHasDefaultToPrimitive This has default to primitive
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void translate(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();

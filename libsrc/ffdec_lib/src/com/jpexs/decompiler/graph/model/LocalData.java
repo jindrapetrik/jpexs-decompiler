@@ -34,30 +34,73 @@ import java.util.Set;
  */
 public class LocalData {
 
+    /**
+     * Empty local data
+     */
     public static LocalData empty = new LocalData();
 
+    /**
+     * Constant pool
+     */
     public ConstantPool constants;
 
+    /**
+     * AVM2 constant pool
+     */
     public AVM2ConstantPool constantsAvm2;
 
+    /**
+     * ABC indexing
+     */
     public AbcIndexing abcIndex;
 
+    /**
+     * Call stack
+     */
     public List<MethodBody> callStack;
 
+    /**
+     * Local register names
+     */
     public HashMap<Integer, String> localRegNames;
 
+    /**
+     * Fully qualified names
+     */
     public List<DottedChain> fullyQualifiedNames;
 
+    /**
+     * Seen methods
+     */
     public Set<Integer> seenMethods = new HashSet<>();
 
+    /**
+     * ABC
+     */
     public ABC abc;
 
+    /**
+     * Creates a new local data
+     *
+     * @param constants Constant pool
+     * @return Local data
+     */
     public static LocalData create(ConstantPool constants) {
         LocalData localData = new LocalData();
         localData.constants = constants;
         return localData;
     }
 
+    /**
+     * Creates a new local data
+     * @param callStack Call stack
+     * @param abcIndex ABC indexing
+     * @param abc ABC
+     * @param localRegNames Local register names
+     * @param fullyQualifiedNames Fully qualified names
+     * @param seenMethods Seen methods
+     * @return Local data
+     */
     public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) {
         LocalData localData = new LocalData();
         localData.abc = abc;

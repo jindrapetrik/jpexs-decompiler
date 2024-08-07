@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Li8Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Li8Ins() {
         super(0x35, "li8", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

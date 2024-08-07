@@ -40,6 +40,10 @@ import java.util.Map;
 @SWFVersion(from = 7)
 public class ActionImplementsOp extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionImplementsOp(String charset) {
         super(0x2C, 0, charset);
     }

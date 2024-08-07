@@ -42,6 +42,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionCloneSprite extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionCloneSprite() {
         super(0x24, 0, Utf8Helper.charsetName);
     }

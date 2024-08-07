@@ -42,8 +42,19 @@ import java.util.Set;
  */
 public class CoerceAVM2Item extends AVM2Item {
 
+    /**
+     * Type
+     */
     public GraphTargetItem typeObj;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param typeObj Type
+     */
     public CoerceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem typeObj) {
         super(instruction, lineStartIns, value.getPrecedence(), value);
         this.typeObj = typeObj;

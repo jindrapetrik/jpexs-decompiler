@@ -71,6 +71,13 @@ public class ActionScript2ClassDetector {
      */
     private static final Logger logger = Logger.getLogger(ActionScript2ClassDetector.class.getName());
 
+
+    /**
+     * Constructor.
+     */
+    public ActionScript2ClassDetector() {
+    }
+
     /**
      * Assert exception
      */

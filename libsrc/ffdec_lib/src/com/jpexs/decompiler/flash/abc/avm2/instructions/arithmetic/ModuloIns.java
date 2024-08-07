@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class ModuloIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ModuloIns() {
         super(0xa4, "modulo", new int[]{}, true);
     }

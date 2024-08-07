@@ -32,6 +32,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class ConvertMIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ConvertMIns() {
         super(0x79, "convert_m", new int[]{}, true, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.NO_FLASH_PLAYER); // -1 +1
     }

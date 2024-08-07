@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionBitRShift extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionBitRShift() {
         super(0x64, 0, Utf8Helper.charsetName);
     }

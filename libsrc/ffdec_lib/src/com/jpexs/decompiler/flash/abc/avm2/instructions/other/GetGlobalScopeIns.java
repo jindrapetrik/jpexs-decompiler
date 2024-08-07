@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class GetGlobalScopeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetGlobalScopeIns() {
         super(0x64, "getglobalscope", new int[]{}, false);
     }

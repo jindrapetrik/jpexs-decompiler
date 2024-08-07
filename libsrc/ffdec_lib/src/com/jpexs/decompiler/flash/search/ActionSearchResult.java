@@ -42,6 +42,14 @@ public class ActionSearchResult implements ScriptSearchResult {
     private static final int SERIAL_VERSION_MAJOR = 1;
     private static final int SERIAL_VERSION_MINOR = 0;
 
+    /**
+     * Constructor.
+     *
+     * @param swf SWF
+     * @param is Input stream
+     * @throws IOException On I/O error
+     * @throws ScriptNotFoundException If script not found
+     */
     public ActionSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
         Map<String, ASMSource> asms = swf.getASMs(false);
         ObjectInputStream ois = new ObjectInputStream(is);
@@ -59,6 +67,12 @@ public class ActionSearchResult implements ScriptSearchResult {
         pcode = ois.readBoolean();
     }
 
+    /**
+     * Save to output stream.
+     *
+     * @param os Output stream
+     * @throws IOException On I/O error
+     */
     public void save(OutputStream os) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.write(SERIAL_VERSION_MAJOR);
@@ -69,16 +83,31 @@ public class ActionSearchResult implements ScriptSearchResult {
         oos.close();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src ASM source
+     * @param pcode Whether pcode
+     * @param path Path
+     */
     public ActionSearchResult(ASMSource src, boolean pcode, String path) {
         this.src = src;
         this.pcode = pcode;
         this.path = path;
     }
 
+    /**
+     * Get source.
+     * @return Source
+     */
     public ASMSource getSrc() {
         return src;
     }
 
+    /**
+     * Is pcode.
+     * @return True if pcode
+     */
     public boolean isPcode() {
         return pcode;
     }

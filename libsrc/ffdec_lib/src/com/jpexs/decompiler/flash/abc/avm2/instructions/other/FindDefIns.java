@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class FindDefIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public FindDefIns() {
         super(0x5f, "finddef", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

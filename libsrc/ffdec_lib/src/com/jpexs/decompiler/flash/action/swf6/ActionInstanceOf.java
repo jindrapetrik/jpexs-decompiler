@@ -40,6 +40,9 @@ import java.util.Map;
 @SWFVersion(from = 6)
 public class ActionInstanceOf extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionInstanceOf() {
         super(0x54, 0, Utf8Helper.charsetName);
     }
@@ -49,6 +52,13 @@ public class ActionInstanceOf extends Action {
         return "InstanceOf";
     }
 
+    /**
+     * Checks if an object is an instance of a class.
+     *
+     * @param a Object
+     * @param b Class
+     * @return True if object is an instance of class
+     */
     public static boolean getInstanceOfResult(Object a, Object b) {
         ActionScriptObject type = (ActionScriptObject) b;
         ActionScriptObject obj = (ActionScriptObject) a;

@@ -37,8 +37,17 @@ import java.util.Set;
  */
 public class BooleanAVM2Item extends AVM2Item {
 
+    /**
+     * Value.
+     */
     public Boolean value;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public BooleanAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Boolean value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;

@@ -33,6 +33,13 @@ import java.util.List;
  */
 public class OrItem extends BinaryOpItem implements CompoundableBinaryOp {
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public OrItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(src, lineStartIns, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||", "Boolean", "Boolean");
         this.leftSide = leftSide;

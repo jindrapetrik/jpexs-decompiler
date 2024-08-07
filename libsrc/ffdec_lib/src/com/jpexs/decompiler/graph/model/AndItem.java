@@ -41,6 +41,13 @@ public class AndItem extends BinaryOpItem implements CompoundableBinaryOp {
         return ret;
     }
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public AndItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(src, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&", "Boolean", "Boolean");
         this.leftSide = leftSide;

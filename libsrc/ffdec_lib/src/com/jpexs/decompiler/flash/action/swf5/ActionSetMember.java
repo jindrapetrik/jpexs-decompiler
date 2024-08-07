@@ -52,6 +52,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionSetMember extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionSetMember() {
         super(0x4F, 0, Utf8Helper.charsetName);
     }

@@ -146,12 +146,7 @@ public class ActionGraph extends Graph {
     public ActionGraphSource getGraphCode() {
         return (ActionGraphSource) code;
     }
-
-    /**
-     * Gets sub-graphs
-     *
-     * @return
-     */
+    
     @Override
     public LinkedHashMap<String, Graph> getSubGraphs() {
         LinkedHashMap<String, Graph> subgraphs = new LinkedHashMap<>();
@@ -218,7 +213,7 @@ public class ActionGraph extends Graph {
      * @param path Path
      * @param charset Charset
      * @return List of graph target items
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
         ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
@@ -282,7 +277,7 @@ public class ActionGraph extends Graph {
      * @param level Level
      * @param localData Local data
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
@@ -617,7 +612,7 @@ public class ActionGraph extends Graph {
      * @param staticOperation Unused
      * @param path Path
      * @return List of GraphTargetItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
@@ -736,7 +731,7 @@ public class ActionGraph extends Graph {
      * @param path Path
      * @return List of GraphTargetItems to replace current output and stop
      * further processing. Null to continue.
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {

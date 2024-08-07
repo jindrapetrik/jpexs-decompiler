@@ -99,6 +99,13 @@ import java.util.Stack;
  */
 public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
+    /**
+     * Constructor.
+     */
+    public ActionDeobfuscator() {
+        super();
+    }
+
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         FastActionList fastActions = new FastActionList(actions);
@@ -449,10 +456,26 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         return false;
     }
 
+    /**
+     * Check if the name is fake.
+     * @param name Name
+     * @return True if the name is fake
+     */
     protected boolean isFakeName(String name) {
         return !IdentifiersDeobfuscation.isValidName(false, name);
     }
 
+    /**
+     * Execute actions.
+     * @param item Action item
+     * @param localData Local data
+     * @param constantPool Constant pool
+     * @param result Execution result
+     * @param fakeFunctions Fake functions
+     * @param useVariables Use variables
+     * @param allowGetUninitializedVariables Allow get uninitialized variables
+     * @throws InterruptedException On interrupt
+     */
     private void executeActions(ActionItem item, LocalDataArea localData, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean useVariables, boolean allowGetUninitializedVariables) throws InterruptedException {
         if (item.action.isExit()) {
             return;

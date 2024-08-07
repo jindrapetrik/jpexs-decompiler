@@ -43,6 +43,14 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
 
     private final GraphTargetItem ofs;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param ofs Offset
+     * @param type Type
+     * @param size Size
+     */
     public AlchemyLoadAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem ofs, String type, int size) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.ofs = ofs;

@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class DecLocalIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DecLocalIIns() {
         super(0xc3, "declocal_i", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX}, true);
     }

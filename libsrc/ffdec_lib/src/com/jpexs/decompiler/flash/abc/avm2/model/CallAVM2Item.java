@@ -38,10 +38,19 @@ import java.util.Set;
  */
 public class CallAVM2Item extends AVM2Item {
 
+    /**
+     * Receiver.
+     */
     public GraphTargetItem receiver;
 
+    /**
+     * Function.
+     */
     public GraphTargetItem function;
 
+    /**
+     * Arguments.
+     */
     public List<GraphTargetItem> arguments;
 
     private abstract static class Func implements Callable {
@@ -139,6 +148,15 @@ public class CallAVM2Item extends AVM2Item {
         });
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param receiver Receiver
+     * @param function Function
+     * @param arguments Arguments
+     */
     public CallAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem receiver, GraphTargetItem function, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.receiver = receiver;

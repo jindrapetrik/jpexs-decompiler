@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PopScopeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PopScopeIns() {
         super(0x1d, "popscope", new int[]{}, false);
     }

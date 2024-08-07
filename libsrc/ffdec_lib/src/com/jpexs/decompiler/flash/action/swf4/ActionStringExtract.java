@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionStringExtract extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionStringExtract() {
         super(0x15, 0, Utf8Helper.charsetName);
     }

@@ -40,6 +40,13 @@ import java.util.Set;
  */
 public class GraphPrecontinueDetector {
 
+    /**
+     * Detects precontinues in graph.
+     * @param heads Heads
+     * @param allParts All parts
+     * @param loops Loops
+     * @param throwStates Throw states
+     */
     public void detectPrecontinues(List<GraphPart> heads, Set<GraphPart> allParts, List<Loop> loops, List<ThrowState> throwStates) {
         boolean isSomethingTodo = false;
         for (Loop el : loops) {
@@ -169,7 +176,7 @@ public class GraphPrecontinueDetector {
     /**
      * Converts node graph to graphviz for easily display.
      *
-     * @param headNodes
+     * @param headNodes Head nodes
      */
     public void printGraph(List<Node> headNodes) {
         Set<Node> allNodes = new LinkedHashSet<>();

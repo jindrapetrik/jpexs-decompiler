@@ -31,10 +31,24 @@ import java.util.Objects;
  */
 public class ConstructAVM2Item extends AVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> args;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param args Arguments
+     */
     public ConstructAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, List<GraphTargetItem> args) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

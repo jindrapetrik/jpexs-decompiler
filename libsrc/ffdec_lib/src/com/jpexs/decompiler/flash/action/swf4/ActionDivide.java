@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionDivide extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionDivide() {
         super(0x0D, 0, Utf8Helper.charsetName);
     }

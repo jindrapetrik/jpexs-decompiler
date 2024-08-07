@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class CallSuperVoidIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallSuperVoidIns() {
         super(0x4e, "callsupervoid", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

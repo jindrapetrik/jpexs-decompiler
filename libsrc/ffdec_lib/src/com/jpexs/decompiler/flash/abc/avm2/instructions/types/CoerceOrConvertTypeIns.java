@@ -27,5 +27,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public interface CoerceOrConvertTypeIns {
 
+    /**
+     * Get target type of coercing or converting.
+     *
+     * @param constants Constants
+     * @param ins Instruction
+     * @return Target type
+     */
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins);
 }

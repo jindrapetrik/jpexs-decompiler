@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class GetScopeObjectIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetScopeObjectIns() {
         super(0x65, "getscopeobject", new int[]{AVM2Code.DAT_SCOPE_INDEX}, false);
     }

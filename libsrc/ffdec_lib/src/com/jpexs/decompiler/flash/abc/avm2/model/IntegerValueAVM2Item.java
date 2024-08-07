@@ -42,10 +42,22 @@ import java.util.Set;
  */
 public class IntegerValueAVM2Item extends NumberValueAVM2Item implements IntegerValueTypeItem {
 
+    /**
+     * Value
+     */
     public Integer value;
 
+    /**
+     * Formatted
+     */
     private String formatted;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public IntegerValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Integer value) {
         super(instruction, lineStartIns);
         this.value = value;

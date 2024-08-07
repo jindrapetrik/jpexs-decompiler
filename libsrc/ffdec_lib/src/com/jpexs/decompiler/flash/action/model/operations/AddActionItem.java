@@ -41,8 +41,20 @@ import java.util.List;
  */
 public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Version 2.
+     */
     boolean version2;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param version2 Version 2
+     */
     public AddActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+", "", "");
         this.version2 = version2;
@@ -74,6 +86,14 @@ public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOpA
         return getResult(rightSide.getResult(), leftSide.getResult(), version2);
     }
 
+    /**
+     * Gets result.
+     *
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @param version2 Version 2
+     * @return Result
+     */
     public static Object getResult(Object rightResult, Object leftResult, boolean version2) {
         if (version2) {
             if (EcmaScript.type(leftResult) == EcmaType.STRING || EcmaScript.type(rightResult) == EcmaType.STRING) {

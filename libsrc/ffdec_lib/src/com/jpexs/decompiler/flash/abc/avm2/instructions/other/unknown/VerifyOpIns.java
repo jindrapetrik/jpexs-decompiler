@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class VerifyOpIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public VerifyOpIns() {
         super(0xFE, "verifyop", new int[]{}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.UNDOCUMENTED);
     }

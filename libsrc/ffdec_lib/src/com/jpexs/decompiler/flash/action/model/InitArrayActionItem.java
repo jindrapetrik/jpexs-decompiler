@@ -36,6 +36,9 @@ import java.util.Objects;
  */
 public class InitArrayActionItem extends ActionItem {
 
+    /**
+     * Values
+     */
     public List<GraphTargetItem> values;
 
     @Override
@@ -43,6 +46,12 @@ public class InitArrayActionItem extends ActionItem {
         visitor.visitAll(values);
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param values Values
+     */
     public InitArrayActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> values) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.values = values;

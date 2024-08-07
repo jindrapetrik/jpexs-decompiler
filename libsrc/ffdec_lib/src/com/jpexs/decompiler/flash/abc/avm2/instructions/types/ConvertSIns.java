@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class ConvertSIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
+    /**
+     * Constructor
+     */
     public ConvertSIns() {
         super(0x70, "convert_s", new int[]{}, true);
     }

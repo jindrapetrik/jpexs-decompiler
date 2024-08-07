@@ -35,6 +35,13 @@ import java.util.Set;
  */
 public class InstanceOfActionItem extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param type Type
+     */
     public InstanceOfActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, value, type, "instanceof", "", "");
     }

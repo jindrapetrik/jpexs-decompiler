@@ -45,6 +45,24 @@ import java.util.regex.Pattern;
  */
 public class ActionScriptSearch {
 
+    /**
+     * Constructor.
+     */
+    public ActionScriptSearch() {
+
+    }
+
+    /**
+     * Search AS2 code.
+     * @param swf SWF
+     * @param txt Text to search
+     * @param ignoreCase Ignore case
+     * @param regexp Regular expression
+     * @param pcode P-code
+     * @param listener Listener
+     * @param scope Scope
+     * @return List of search results
+     */
     public List<ActionSearchResult> searchAs2(SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, ScriptSearchListener listener, Map<String, ASMSource> scope) {
         if (txt != null && !txt.isEmpty()) {
             Map<String, ASMSource> asms;
@@ -124,6 +142,17 @@ public class ActionScriptSearch {
         return null;
     }
 
+    /**
+     * Search AS3 code.
+     * @param openable Openable
+     * @param txt Text to search
+     * @param ignoreCase Ignore case
+     * @param regexp Regular expression
+     * @param pcode P-code
+     * @param listener Listener
+     * @param scope Scope
+     * @return List of search results
+     */
     public List<ABCSearchResult> searchAs3(final Openable openable, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, ScriptSearchListener listener, List<ScriptPack> scope) {
         // todo: pcode seach
         if (txt != null && !txt.isEmpty()) {

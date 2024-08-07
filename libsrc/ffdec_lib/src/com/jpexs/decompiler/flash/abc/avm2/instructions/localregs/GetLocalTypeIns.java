@@ -55,6 +55,13 @@ import java.util.List;
  */
 public abstract class GetLocalTypeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     * @param instructionCode Instruction code
+     * @param instructionName Instruction name
+     * @param operands Operands
+     * @param canThrow Can throw exception
+     */
     public GetLocalTypeIns(int instructionCode, String instructionName, int[] operands, boolean canThrow) {
         super(instructionCode, instructionName, operands, canThrow);
     }

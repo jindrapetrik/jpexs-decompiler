@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class LessEqualsIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public LessEqualsIns() {
         super(0xae, "lessequals", new int[]{}, true);
     }
