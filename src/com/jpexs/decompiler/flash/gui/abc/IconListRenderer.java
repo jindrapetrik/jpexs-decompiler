@@ -18,13 +18,10 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.gui.View;
-import java.awt.Component;
+
+import javax.swing.*;
+import java.awt.*;
 import java.net.URL;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JList;
 
 /**
  *

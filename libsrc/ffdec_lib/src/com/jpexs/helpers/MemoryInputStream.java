@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.helpers.streams.SeekableInputStream;
+
 import java.io.IOException;
 
 /**

@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.gui.controls;
 
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,7 +27,6 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import java.util.Date;
-import javax.swing.JSplitPane;
 
 /**
  *

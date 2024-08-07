@@ -25,22 +25,19 @@ import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.gui.hexview.HexViewListener;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 
 /**
  *

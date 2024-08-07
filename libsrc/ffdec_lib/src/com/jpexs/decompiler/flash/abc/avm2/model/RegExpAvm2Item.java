@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.Callable;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

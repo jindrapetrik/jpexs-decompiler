@@ -78,12 +78,11 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
-import java.awt.Component;
-import java.awt.GraphicsEnvironment;
-import java.awt.MenuItem;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
-import java.awt.Window;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -134,13 +133,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileFilter;
-import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
  * Main executable class

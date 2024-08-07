@@ -24,10 +24,8 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.Component;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Shape;
+
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

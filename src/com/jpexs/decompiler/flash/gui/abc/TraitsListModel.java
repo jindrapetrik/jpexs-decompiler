@@ -19,12 +19,13 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
+
+import javax.swing.*;
+import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
 
 /**
  *

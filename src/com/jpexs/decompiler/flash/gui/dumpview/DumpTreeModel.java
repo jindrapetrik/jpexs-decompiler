@@ -20,12 +20,13 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

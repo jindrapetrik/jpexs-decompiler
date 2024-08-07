@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc.tablemodels;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 

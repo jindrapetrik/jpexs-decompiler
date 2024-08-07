@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import java.awt.Window;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ResourceBundle;
-import javax.swing.JDialog;
-import javax.swing.JRootPane;
 
 /**
  *

@@ -17,6 +17,7 @@
 package com.jpexs.helpers;
 
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
