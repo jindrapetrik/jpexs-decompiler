@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui.helpers;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import javax.swing.Spring;
+import javax.swing.SpringLayout;
 
 /**
  * A 1.4 file that provides utility methods for creating form- or grid-style

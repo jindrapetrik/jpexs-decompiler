@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.Serializable;
 
 /**

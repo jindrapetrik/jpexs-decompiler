@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
-
 import java.io.Serializable;
 import java.util.List;
 

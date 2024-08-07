@@ -18,7 +18,6 @@ package com.jpexs.helpers.utf8;
 
 import com.jpexs.helpers.utf8.charset.Gb2312;
 import com.jpexs.helpers.utf8.charset.ShiftJis;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

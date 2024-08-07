@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

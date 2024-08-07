@@ -16,6 +16,11 @@
  */
 package com.jpexs.helpers;
 
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -25,11 +30,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Pretty formats XML.

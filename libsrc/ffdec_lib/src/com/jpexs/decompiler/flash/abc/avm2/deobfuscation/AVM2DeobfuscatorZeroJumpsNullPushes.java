@@ -22,12 +22,22 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.NotIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.*;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushDoubleIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushTrueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUIntIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.helpers.Reference;
-
 import java.util.Set;
 
 /**

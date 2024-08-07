@@ -17,7 +17,6 @@
 package com.jpexs.build;
 
 import com.jpexs.helpers.Helper;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

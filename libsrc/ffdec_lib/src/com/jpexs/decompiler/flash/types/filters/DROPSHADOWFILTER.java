@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.RGBA;

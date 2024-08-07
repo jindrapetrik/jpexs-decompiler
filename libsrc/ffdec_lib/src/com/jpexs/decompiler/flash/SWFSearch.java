@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.helpers.*;
-
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.MemoryInputStream;
+import com.jpexs.helpers.PosMarkedInputStream;
+import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.Searchable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;

@@ -21,7 +21,6 @@ import static com.jpexs.decompiler.flash.types.GRADIENT.INTERPOLATION_RGB_MODE;
 import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_PAD_MODE;
 import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_REFLECT_MODE;
 import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_REPEAT_MODE;
-
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;

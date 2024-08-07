@@ -24,15 +24,14 @@ import com.jpexs.decompiler.flash.gfx.TgaSupport;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.gfx.enums.FileFormatType;
 import com.jpexs.helpers.ByteArrayRange;
-import net.npe.dds.DDSReader;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.imageio.ImageIO;
+import net.npe.dds.DDSReader;
 
 /**
  * Base class for GFX image tags.

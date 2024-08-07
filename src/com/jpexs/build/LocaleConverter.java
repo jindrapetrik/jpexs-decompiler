@@ -17,7 +17,6 @@
 package com.jpexs.build;
 
 import com.jpexs.helpers.Helper;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 

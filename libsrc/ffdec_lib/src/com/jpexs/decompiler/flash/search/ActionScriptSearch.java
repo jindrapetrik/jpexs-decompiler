@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

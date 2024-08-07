@@ -21,10 +21,14 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 

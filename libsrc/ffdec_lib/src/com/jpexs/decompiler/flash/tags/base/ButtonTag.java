@@ -30,8 +30,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-
-import java.awt.*;
+import java.awt.Shape;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;

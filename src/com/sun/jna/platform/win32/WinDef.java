@@ -24,8 +24,7 @@ import com.sun.jna.platform.win32.BaseTSD.LONG_PTR;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.ByReference;
 import com.sun.jna.win32.StdCallLibrary;
-
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 

@@ -20,7 +20,6 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
-
 import java.io.IOException;
 import java.io.OutputStream;
 

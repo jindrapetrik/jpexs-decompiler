@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

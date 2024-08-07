@@ -17,8 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.usages.multinames.MultinameUsage;
-
-import javax.swing.*;
+import javax.swing.DefaultListModel;
 
 /**
  *

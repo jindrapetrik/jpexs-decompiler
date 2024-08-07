@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-
 import java.io.Serializable;
 import java.util.List;
 

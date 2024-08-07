@@ -27,7 +27,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.helpers.Reference;
-
 import java.util.ArrayList;
 import java.util.List;
 

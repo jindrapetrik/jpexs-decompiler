@@ -17,7 +17,6 @@
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
-
 import java.io.Serializable;
 
 /**

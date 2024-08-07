@@ -21,8 +21,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**

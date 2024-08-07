@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.helpers.SwfHeaderStreamSearch;
 import com.jpexs.helpers.streams.SeekableInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;

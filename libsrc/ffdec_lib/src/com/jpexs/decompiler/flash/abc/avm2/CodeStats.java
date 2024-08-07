@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.model.LocalData;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

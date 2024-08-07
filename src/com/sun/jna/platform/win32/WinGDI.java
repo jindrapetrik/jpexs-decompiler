@@ -24,7 +24,6 @@ package com.sun.jna.platform.win32;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinDef.RECT;
 import com.sun.jna.win32.StdCallLibrary;
-
 import java.util.Arrays;
 import java.util.List;
 

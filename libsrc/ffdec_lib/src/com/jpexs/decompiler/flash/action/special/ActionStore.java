@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.special;
 
 import com.jpexs.decompiler.flash.action.Action;
-
 import java.util.List;
 
 /**

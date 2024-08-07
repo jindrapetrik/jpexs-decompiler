@@ -18,7 +18,6 @@ package com.jpexs.process;
 
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Searchable;
-
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.Map;

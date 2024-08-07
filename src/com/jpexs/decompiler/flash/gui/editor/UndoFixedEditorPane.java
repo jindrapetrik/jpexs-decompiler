@@ -19,17 +19,7 @@ package com.jpexs.decompiler.flash.gui.editor;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Stopwatch;
-import jsyntaxpane.SyntaxDocument;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.EditorKit;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.PlainDocument;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Reader;
@@ -38,6 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JEditorPane;
+import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
+import jsyntaxpane.SyntaxDocument;
 
 /**
  *

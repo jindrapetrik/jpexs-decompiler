@@ -16,11 +16,8 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightingList;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.

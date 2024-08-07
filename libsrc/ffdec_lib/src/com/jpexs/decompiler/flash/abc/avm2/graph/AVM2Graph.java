@@ -111,7 +111,6 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

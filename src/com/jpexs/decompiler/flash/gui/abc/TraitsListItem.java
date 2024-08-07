@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

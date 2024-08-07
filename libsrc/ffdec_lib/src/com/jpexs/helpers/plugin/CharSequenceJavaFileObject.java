@@ -16,8 +16,8 @@
  */
 package com.jpexs.helpers.plugin;
 
-import javax.tools.SimpleJavaFileObject;
 import java.net.URI;
+import javax.tools.SimpleJavaFileObject;
 
 /**
  * A file object used to represent source coming from a string.

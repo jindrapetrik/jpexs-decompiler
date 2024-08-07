@@ -29,7 +29,6 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

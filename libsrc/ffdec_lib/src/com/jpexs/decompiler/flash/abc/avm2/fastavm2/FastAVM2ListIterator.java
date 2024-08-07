@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.fastavm2;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-
 import java.util.Iterator;
 
 /**

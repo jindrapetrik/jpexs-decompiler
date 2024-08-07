@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.PopItem;
-
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;

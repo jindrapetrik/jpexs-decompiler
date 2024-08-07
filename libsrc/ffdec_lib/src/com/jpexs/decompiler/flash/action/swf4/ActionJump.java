@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;

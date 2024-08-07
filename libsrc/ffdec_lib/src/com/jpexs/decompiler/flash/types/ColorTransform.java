@@ -18,8 +18,7 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.helpers.SerializableImage;
-
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.RescaleOp;
 
 /**
