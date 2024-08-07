@@ -19,17 +19,32 @@ package com.jpexs.decompiler.flash.abc.types;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Assigned value - for slots, const.
  * @author JPEXS
  */
 public class AssignedValue {
 
+    /**
+     * Value
+     */
     public GraphTargetItem value;
 
+    /**
+     * Initializer type
+     */
     public int initializer;
 
+    /**
+     * Method index
+     */
     public int method;
 
+    /**
+     * Constructs a new assigned value.
+     * @param value Value
+     * @param initializer Initializer type
+     * @param method Method index
+     */
     public AssignedValue(GraphTargetItem value, int initializer, int method) {
         this.value = value;
         this.initializer = initializer;

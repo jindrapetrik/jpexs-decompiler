@@ -25,10 +25,11 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+
 import java.util.ArrayList;
 
 /**
- *
+ * Const or var multiname usage.
  * @author JPEXS
  */
 public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {

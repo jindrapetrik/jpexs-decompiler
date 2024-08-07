@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 /**
- *
+ * setlocal instruction - set local register value.
  * @author JPEXS
  */
 public class SetLocalIns extends SetLocalTypeIns {

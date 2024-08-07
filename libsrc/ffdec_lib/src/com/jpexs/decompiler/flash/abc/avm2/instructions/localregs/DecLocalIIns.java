@@ -31,10 +31,11 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * declocal_i instruction - Decrement local integer variable by 1.
  * @author JPEXS
  */
 public class DecLocalIIns extends InstructionDefinition {

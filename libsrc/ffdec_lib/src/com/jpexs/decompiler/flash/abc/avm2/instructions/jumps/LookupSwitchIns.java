@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lookupswitch instruction - switch based on a key.
  * @author JPEXS
  */
 public class LookupSwitchIns extends InstructionDefinition {

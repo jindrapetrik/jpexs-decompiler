@@ -56,57 +56,132 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- *
+ * Trait in ABC file.
  * @author JPEXS
  */
 public abstract class Trait implements Cloneable, Serializable {
 
+    /**
+     * Goto constructor definition metadata identifier
+     */
     public static final String METADATA_CTOR_DEFINITION = "__go_to_ctor_definition_help";
 
+    /**
+     * Goto definition metadata identifier
+     */
     public static final String METADATA_DEFINITION = "__go_to_definition_help";
 
+    /**
+     * Empty metadata array
+     */
     private static final int[] EMPTY_METADATA_ARRAY = new int[0];
 
+    /**
+     * Name index - index to multiname constant pool
+     */
     public int name_index;
 
+    /**
+     * Kind type
+     */
     public int kindType;
 
+    /**
+     * Kind flags
+     */
     public int kindFlags;
 
+    /**
+     * Metadata
+     */
     public int[] metadata = EMPTY_METADATA_ARRAY;
 
+    /**
+     * File offset
+     */
     public long fileOffset;
 
+    /**
+     * Bytes
+     */
     public byte[] bytes;
 
+    /**
+     * Attribute: Trait is final
+     */
     public static final int ATTR_Final = 0x1;
 
+    /**
+     * Attribute: Trait has override flag
+     */
     public static final int ATTR_Override = 0x2;
 
+    /**
+     * Attribute: Trait has metadata
+     */
     public static final int ATTR_Metadata = 0x4;
 
+    /**
+     * Attribute: Unknown
+     */
     public static final int ATTR_0x8 = 0x8; //unknown
 
+    /**
+     * Trait kind: Slot
+     */
     public static final int TRAIT_SLOT = 0;
 
+    /**
+     * Trait kind: Method
+     */
     public static final int TRAIT_METHOD = 1;
 
+    /**
+     * Trait kind: Getter
+     */
     public static final int TRAIT_GETTER = 2;
 
+    /**
+     * Trait kind: Setter
+     */
     public static final int TRAIT_SETTER = 3;
 
+    /**
+     * Trait kind: Class
+     */
     public static final int TRAIT_CLASS = 4;
 
+    /**
+     * Trait kind: Function
+     */
     public static final int TRAIT_FUNCTION = 5;
 
+    /**
+     * Trait kind: Const
+     */
     public static final int TRAIT_CONST = 6;
 
+    /**
+     * Deleted flag
+     */
     public boolean deleted = false;
 
+    /**
+     * Deletes trait.
+     * @param abc ABC
+     * @param d Deleted flag
+     */
     public void delete(ABC abc, boolean d) {
         deleted = d;
     }
 
+    /**
+     * Gets metadata table.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param abc ABC
+     * @return Metadata table
+     */
     public final List<Entry<String, Map<String, String>>> getMetaDataTable(Trait parent, ConvertData convertData, ABC abc) {
         List<Entry<String, Map<String, String>>> ret = new ArrayList<>();
         for (int m : metadata) {
@@ -175,24 +250,51 @@ public abstract class Trait implements Cloneable, Serializable {
         return ret;
     }
 
+    /**
+     * Gets package.
+     * @param abc ABC
+     * @return Package
+     */
     protected DottedChain getPackage(ABC abc) {
         return getName(abc).getSimpleNamespaceName(abc.constants);
     }
 
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
-        if (ignoredCustom == null) {
+    /**
+     * Gets dependencies.
+     * @param abcIndex ABC indexing
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param customNamespace Custom namespace
+     * @param abc ABC
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @throws InterruptedException
+     */
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+        if (customNamespace == null) {
             Multiname m = getName(abc);
             int nskind = m.getSimpleNamespaceKind(abc.constants);
             if (nskind == Namespace.KIND_NAMESPACE) {
-                ignoredCustom = m.getSimpleNamespaceName(abc.constants).toRawString();
+                customNamespace = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
+        DependencyParser.parseDependenciesFromMultiname(abcIndex, customNamespace, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
+    /*
+     * List of built-in classes that are not imported by default
+     */
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
 
+    /**
+     * Checks if class is built-in.
+     * @param name Name
+     * @return True if class is built-in
+     */
     private static boolean isBuiltInClass(String name) {
         for (String g : builtInClasses) {
             if (g.equals(name)) {
@@ -202,6 +304,15 @@ public abstract class Trait implements Cloneable, Serializable {
         return false;
     }
 
+    /**
+     * Gets all class trait names.
+     * @param traitNamesInThisScript Trait names in this script
+     * @param abcIndex ABC indexing
+     * @param abc ABC
+     * @param classIndex Class index
+     * @param scriptIndex Script index
+     * @param isParent Is parent
+     */
     private void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
         boolean publicProtectedOnly = isParent;
         for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {
@@ -232,6 +343,18 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Writes imports.
+     * @param abcIndex ABC indexing
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param abc ABC
+     * @param writer Writer
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @throws InterruptedException
+     */
     public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
@@ -359,6 +482,14 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Gets metadata.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     public final GraphTextWriter getMetaData(Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {
         List<Entry<String, Map<String, String>>> md = getMetaDataTable(parent, convertData, abc);
         for (Entry<String, Map<String, String>> en : md) {
@@ -392,10 +523,21 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * Checks if trait is API versioned.
+     * @param abc ABC
+     * @return True if trait is API versioned
+     */
     public boolean isApiVersioned(ABC abc) {
         return abc.constants.getMultiname(name_index).isApiVersioned(abc.constants);
     }
 
+    /**
+     * Gets API versions.
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     public final GraphTextWriter getApiVersions(ABC abc, GraphTextWriter writer) {
         List<Integer> apiVersions = abc.constants.getMultiname(name_index).getApiVersions(abc.constants);
         for (int version : apiVersions) {
@@ -404,6 +546,15 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * Gets modifiers.
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param insideInterface Inside interface
+     * @param writer Writer
+     * @param classIndex Class index
+     * @return Writer
+     */
     public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
@@ -479,25 +630,83 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * To string.
+     * @return String
+     */
     @Override
     public String toString() {
         return "name_index=" + name_index + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
+    /**
+     * To string.
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return String
+     */
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         return abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
+    /**
+     * To string.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
 
+    /**
+     * Converts trait.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param scopeStack Scope stack
+     * @throws InterruptedException
+     */
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
     }
 
+    /**
+     * Converts trait header.
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     public abstract GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer);
 
+    /**
+     * Converts common header flags.
+     * @param traitType Trait type
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter convertCommonHeaderFlags(String traitType, ABC abc, GraphTextWriter writer) {
         writer.appendNoHilight("trait ");
         writer.hilightSpecial(traitType, HighlightSpecialType.TRAIT_TYPE);
@@ -572,6 +781,24 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * ToString conversion including package.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
@@ -589,6 +816,23 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
+    /**
+     * Converts trait including package.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param scopeStack Scope stack
+     * @throws InterruptedException
+     */
     public void convertPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
@@ -598,15 +842,52 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * ToString of header.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         toString(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         return writer;
     }
 
+    /**
+     * Converts header.
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @throws InterruptedException
+     */
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         convert(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
     }
 
+    /**
+     * Gets name.
+     * @param abc ABC
+     * @return Name
+     */
     public final Multiname getName(ABC abc) {
         if (name_index == 0) {
             return null;
@@ -615,8 +896,23 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Removes traps - deobfuscation.
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param abc ABC
+     * @param path Path
+     * @return Number of removed traps
+     * @throws InterruptedException
+     */
     public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException;
 
+    /**
+     * Gets class path.
+     * @param abc ABC
+     * @return Class path
+     */
     public final ClassPath getPath(ABC abc) {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
@@ -626,6 +922,10 @@ public abstract class Trait implements Cloneable, Serializable {
         return new ClassPath(packageName, objectName, namespaceSuffix); //assume not null name
     }
 
+    /**
+     * Clones trait.
+     * @return Cloned trait
+     */
     @Override
     public Trait clone() {
         try {
@@ -636,12 +936,29 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Checks if trait is visible.
+     * @param isStatic Is static
+     * @param abc ABC
+     * @return True if trait is visible
+     */
     public boolean isVisible(boolean isStatic, ABC abc) {
         return true;
     }
 
+    /**
+     * Gets method infos.
+     * @param abc ABC
+     * @param traitId Trait ID
+     * @param classIndex Class index
+     * @param methodInfos Method infos
+     */
     public abstract void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos);
 
+    /**
+     * Convets kind to string.
+     * @return String
+     */
     public String getKindToStr() {
         String traitKindStr = "";
         switch (kindType) {

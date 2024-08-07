@@ -18,11 +18,12 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Data for conversion.
  * @author JPEXS
  */
 public class ConvertData {

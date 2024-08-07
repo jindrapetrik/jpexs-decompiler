@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushscope instruction - Push a value onto the scope stack.
  * @author JPEXS
  */
 public class PushScopeIns extends InstructionDefinition {

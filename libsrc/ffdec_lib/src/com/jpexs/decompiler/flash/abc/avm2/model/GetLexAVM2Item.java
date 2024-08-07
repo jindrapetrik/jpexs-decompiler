@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Find and get property.
  * @author JPEXS
  */
 public class GetLexAVM2Item extends AVM2Item {

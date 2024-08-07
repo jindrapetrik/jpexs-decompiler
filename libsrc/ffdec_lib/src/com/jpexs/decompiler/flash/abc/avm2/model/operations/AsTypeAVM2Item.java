@@ -24,11 +24,12 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * As type conversion.
  * @author JPEXS
  */
 public class AsTypeAVM2Item extends BinaryOpItem {

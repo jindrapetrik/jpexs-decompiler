@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Get slot.
  * @author JPEXS
  */
 public class GetSlotAVM2Item extends AVM2Item {

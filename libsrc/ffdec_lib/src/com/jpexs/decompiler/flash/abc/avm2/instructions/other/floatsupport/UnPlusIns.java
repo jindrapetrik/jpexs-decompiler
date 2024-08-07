@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * unplus - unary plus operator.
  * @author JPEXS
  */
 public class UnPlusIns extends InstructionDefinition {

@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 /**
- *
+ * Exception mark instruction.
  * @author JPEXS
  */
 public class ExceptionMarkAVM2Instruction extends AVM2Instruction {

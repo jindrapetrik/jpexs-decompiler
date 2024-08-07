@@ -25,10 +25,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * checkfilter instruction - Check to make sure an object can have a filter operation performed on it.
  * @author JPEXS
  */
 public class CheckFilterIns extends InstructionDefinition {

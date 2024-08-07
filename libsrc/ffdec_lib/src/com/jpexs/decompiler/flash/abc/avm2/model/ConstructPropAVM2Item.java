@@ -21,11 +21,12 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Construct property.
  * @author JPEXS
  */
 public class ConstructPropAVM2Item extends AVM2Item {

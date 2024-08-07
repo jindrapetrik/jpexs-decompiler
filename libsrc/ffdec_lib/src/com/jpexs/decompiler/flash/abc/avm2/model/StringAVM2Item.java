@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * String value.
  * @author JPEXS
  */
 public class StringAVM2Item extends AVM2Item implements SimpleValue {

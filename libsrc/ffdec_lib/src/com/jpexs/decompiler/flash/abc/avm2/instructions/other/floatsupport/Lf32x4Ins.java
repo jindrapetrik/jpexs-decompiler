@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lf32x4 - Load a float4 from domain memory.
  * @author JPEXS
  */
 public class Lf32x4Ins extends InstructionDefinition {

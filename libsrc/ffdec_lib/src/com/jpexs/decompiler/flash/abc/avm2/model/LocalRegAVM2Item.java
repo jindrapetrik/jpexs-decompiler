@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Local register.
  * @author JPEXS
  */
 public class LocalRegAVM2Item extends AVM2Item {

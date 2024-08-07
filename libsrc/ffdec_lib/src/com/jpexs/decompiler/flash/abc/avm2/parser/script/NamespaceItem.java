@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Namespace.
  * @author JPEXS
  */
 public class NamespaceItem {

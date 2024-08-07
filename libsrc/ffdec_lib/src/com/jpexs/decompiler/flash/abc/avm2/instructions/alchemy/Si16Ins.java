@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * si16 instruction - Store 16-bit integer to domain memory.
  * @author JPEXS
  */
 public class Si16Ins extends InstructionDefinition implements AlchemyTypeIns {

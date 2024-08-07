@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 /**
- *
+ * hasnext2 instruction - determine if the given object has any more properties.
  * @author JPEXS
  */
 public class HasNext2Ins extends InstructionDefinition {

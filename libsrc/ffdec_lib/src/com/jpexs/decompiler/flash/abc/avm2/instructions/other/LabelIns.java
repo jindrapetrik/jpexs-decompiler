@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * label instruction - label for branch instructions.
  * @author JPEXS
  */
 public class LabelIns extends InstructionDefinition { //this can be target of branch

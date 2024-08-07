@@ -23,20 +23,16 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
-import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Coerce value to another type.
  * @author JPEXS
  */
 public class CoerceAVM2Item extends AVM2Item {

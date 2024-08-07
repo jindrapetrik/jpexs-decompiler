@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 
 /**
- *
+ * Const or var name multiname usage.
  * @author JPEXS
  */
 public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage implements DefinitionUsage {

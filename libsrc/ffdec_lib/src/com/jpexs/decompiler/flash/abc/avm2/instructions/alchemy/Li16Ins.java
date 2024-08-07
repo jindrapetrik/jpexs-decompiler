@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * li16 instruction - Load 16-bit integer from domain memory.
  * @author JPEXS
  */
 public class Li16Ins extends InstructionDefinition implements AlchemyTypeIns {

@@ -27,11 +27,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.helpers.Reference;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Assignable.
  * @author JPEXS
  */
 public abstract class AssignableAVM2Item extends AVM2Item {

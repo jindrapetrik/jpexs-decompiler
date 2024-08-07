@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifnge instruction - if value is greater or equal, jump.
  * @author JPEXS
  */
 public class IfNGeIns extends InstructionDefinition implements IfTypeIns {

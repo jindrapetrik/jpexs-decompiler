@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Filter operation.
  * @author JPEXS
  */
 public class FilterAVM2Item extends AVM2Item {

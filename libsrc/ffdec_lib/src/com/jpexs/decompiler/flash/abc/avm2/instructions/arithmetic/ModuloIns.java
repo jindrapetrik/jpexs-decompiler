@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * modulo instruction - Modulo operation.
  * @author JPEXS
  */
 public class ModuloIns extends InstructionDefinition {

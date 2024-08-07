@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Null value.
  * @author JPEXS
  */
 public class NullAVM2Item extends AVM2Item implements SimpleValue {

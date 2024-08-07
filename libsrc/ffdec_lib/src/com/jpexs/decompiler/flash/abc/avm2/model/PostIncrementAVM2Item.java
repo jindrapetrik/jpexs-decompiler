@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Post increment operation (x++).
  * @author JPEXS
  */
 public class PostIncrementAVM2Item extends AVM2Item implements AssignmentAVM2Item {

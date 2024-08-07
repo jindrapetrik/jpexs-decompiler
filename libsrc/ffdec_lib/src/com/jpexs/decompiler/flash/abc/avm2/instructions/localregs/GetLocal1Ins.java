@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 /**
- *
+ * getlocal1 instruction - get local register 1 value.
  * @author JPEXS
  */
 public class GetLocal1Ins extends GetLocalTypeIns {

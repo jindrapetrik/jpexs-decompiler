@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.EqAVM2Item;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * equals instruction - Compare two values for equality.
  * @author JPEXS
  */
 public class EqualsIns extends InstructionDefinition {

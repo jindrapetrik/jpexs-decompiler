@@ -20,24 +20,56 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Set type value.
  * @author JPEXS
  */
 public interface SetTypeAVM2Item {
 
+    /**
+     * Gets object.
+     * @return Object
+     */
     public GraphTargetItem getObject();
 
+    /**
+     * Gets value.
+     * @return Value
+     */
     public GraphTargetItem getValue();
 
+    /**
+     * Gets declaration.
+     * @return Declaration
+     */
     public DeclarationAVM2Item getDeclaration();
 
+    /**
+     * Sets declaration.
+     * @param dec Declaration
+     */
     public void setDeclaration(DeclarationAVM2Item dec);
 
+    /**
+     * Gets compound value.
+     * @return Compound value
+     */
     public GraphTargetItem getCompoundValue();
 
+    /**
+     * Sets compound value.
+     * @param value Compound value
+     */
     public void setCompoundValue(GraphTargetItem value);
 
+    /**
+     * Sets compound operator.
+     * @param operator Compound operator
+     */
     public void setCompoundOperator(String operator);
 
+    /**
+     * Gets compound operator.
+     * @return Compound operator
+     */
     public String getCompoundOperator();
 }

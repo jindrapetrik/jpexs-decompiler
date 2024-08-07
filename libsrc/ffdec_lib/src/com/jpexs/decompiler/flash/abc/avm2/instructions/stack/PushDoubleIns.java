@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushdouble instruction - Push a double value onto the stack.
  * @author JPEXS
  */
 public class PushDoubleIns extends InstructionDefinition {

@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * sf64 instruction - Store 64-bit float to domain memory.
  * @author JPEXS
  */
 public class Sf64Ins extends InstructionDefinition implements AlchemyTypeIns {

@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * ifnlt instruction - if value is not less, jump.
  * @author JPEXS
  */
 public class IfNLtIns extends InstructionDefinition implements IfTypeIns {

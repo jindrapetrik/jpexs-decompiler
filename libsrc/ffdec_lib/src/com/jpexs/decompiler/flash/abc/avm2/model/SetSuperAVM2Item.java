@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Set super property value.
  * @author JPEXS
  */
 public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {

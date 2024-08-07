@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Initialize vector.
  * @author JPEXS
  */
 public class InitVectorAVM2Item extends AVM2Item {

@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * urshift instruction - Unsigned right bitwise shift.
  * @author JPEXS
  */
 public class URShiftIns extends InstructionDefinition {

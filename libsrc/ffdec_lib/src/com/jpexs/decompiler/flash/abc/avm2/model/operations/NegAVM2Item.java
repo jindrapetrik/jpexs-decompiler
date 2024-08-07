@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.model.UnaryOpItem;
 import java.util.List;
 
 /**
- *
+ * Negate.
  * @author JPEXS
  */
 public class NegAVM2Item extends UnaryOpItem {

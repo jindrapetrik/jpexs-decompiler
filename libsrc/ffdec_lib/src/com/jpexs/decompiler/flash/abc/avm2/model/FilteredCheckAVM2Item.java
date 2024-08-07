@@ -22,10 +22,11 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.Objects;
 
 /**
- *
+ * Check whether object supports filtering.
  * @author JPEXS
  */
 public class FilteredCheckAVM2Item extends AVM2Item {

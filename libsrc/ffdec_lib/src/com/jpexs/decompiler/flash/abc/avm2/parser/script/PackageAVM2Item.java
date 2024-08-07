@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Package.
  * @author JPEXS
  */
 public class PackageAVM2Item extends AVM2Item {

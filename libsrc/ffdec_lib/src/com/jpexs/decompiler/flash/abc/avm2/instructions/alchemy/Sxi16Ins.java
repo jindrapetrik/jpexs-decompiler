@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * sxi16 instruction - Sign extend 16-bit integer to 32-bit integer.
  * @author JPEXS
  */
 public class Sxi16Ins extends InstructionDefinition implements AlchemyTypeIns {

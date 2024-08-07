@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * convert_m instruction - convert to decimal.
  * @author JPEXS
  */
 public class ConvertMIns extends InstructionDefinition {

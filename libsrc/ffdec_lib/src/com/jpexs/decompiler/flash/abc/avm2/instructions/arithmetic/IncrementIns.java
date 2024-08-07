@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * increment instruction - Increment a number.
  * @author JPEXS
  */
 public class IncrementIns extends InstructionDefinition {

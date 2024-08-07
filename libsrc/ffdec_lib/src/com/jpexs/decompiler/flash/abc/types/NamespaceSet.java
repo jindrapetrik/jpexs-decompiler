@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Namespace set in ABC file.
  * @author JPEXS
  */
 public class NamespaceSet {

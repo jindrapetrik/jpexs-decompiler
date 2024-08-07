@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * setslot instruction - set slot value.
  * @author JPEXS
  */
 public class SetSlotIns extends InstructionDefinition implements SetTypeIns {

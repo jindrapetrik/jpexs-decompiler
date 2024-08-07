@@ -50,7 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Property.
  * @author JPEXS
  */
 public class PropertyAVM2Item extends AssignableAVM2Item {

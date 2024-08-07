@@ -23,7 +23,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Increment local register by 1.
  * @author JPEXS
  */
 public class IncLocalAVM2Item extends AVM2Item {

@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * getdescendants instruction - get descendants of object.
  * @author JPEXS
  */
 public class GetDescendantsIns extends InstructionDefinition {

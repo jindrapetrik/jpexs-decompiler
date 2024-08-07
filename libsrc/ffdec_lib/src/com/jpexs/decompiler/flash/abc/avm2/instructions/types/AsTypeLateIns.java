@@ -26,10 +26,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.AsTypeAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * astypelate instruction - Type conversion, with a type determined at runtime.
  * @author JPEXS
  */
 public class AsTypeLateIns extends InstructionDefinition {

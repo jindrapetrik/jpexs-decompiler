@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 
 /**
- *
+ * Jump instruction for continue statement in loops.
  * @author JPEXS
  */
 public class ContinueJumpIns extends JumpIns {

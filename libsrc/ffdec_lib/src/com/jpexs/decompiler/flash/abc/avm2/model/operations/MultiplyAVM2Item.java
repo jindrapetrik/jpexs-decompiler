@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Multiply.
  * @author JPEXS
  */
 public class MultiplyAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {

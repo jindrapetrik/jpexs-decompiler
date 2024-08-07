@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Pre decrement.
  * @author JPEXS
  */
 public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2Item {

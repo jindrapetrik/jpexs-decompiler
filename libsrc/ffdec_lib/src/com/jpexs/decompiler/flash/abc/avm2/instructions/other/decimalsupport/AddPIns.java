@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * add_p instruction - add two numbers with number context.
  * @author JPEXS
  */
 public class AddPIns extends InstructionDefinition {

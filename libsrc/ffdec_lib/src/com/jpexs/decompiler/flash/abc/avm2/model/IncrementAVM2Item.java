@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Increment by 1.
  * @author JPEXS
  */
 public class IncrementAVM2Item extends AVM2Item {

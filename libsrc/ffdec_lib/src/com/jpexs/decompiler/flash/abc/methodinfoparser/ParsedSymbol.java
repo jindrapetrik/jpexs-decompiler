@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.methodinfoparser;
 
 /**
- *
+ * ABC method info P-code parser symbol.
  * @author JPEXS
  */
 public class ParsedSymbol {

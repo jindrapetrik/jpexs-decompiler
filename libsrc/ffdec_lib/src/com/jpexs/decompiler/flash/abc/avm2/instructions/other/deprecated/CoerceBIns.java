@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * coerce_b instruction - coerce to boolean.
  * @author JPEXS
  */
 public class CoerceBIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

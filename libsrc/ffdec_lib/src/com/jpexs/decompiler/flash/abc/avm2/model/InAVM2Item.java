@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Determine whether an object has a named property.
  * @author JPEXS
  */
 public class InAVM2Item extends AVM2Item {

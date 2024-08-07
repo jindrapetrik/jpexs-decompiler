@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Method.
  * @author JPEXS
  */
 public class MethodAVM2Item extends FunctionAVM2Item {

@@ -49,7 +49,7 @@ import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
 /**
- *
+ * getlocal type instruction - get local register value.
  * @author JPEXS
  */
 public abstract class GetLocalTypeIns extends InstructionDefinition {

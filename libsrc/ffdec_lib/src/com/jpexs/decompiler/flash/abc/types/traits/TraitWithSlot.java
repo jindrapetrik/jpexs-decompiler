@@ -17,10 +17,14 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 /**
- *
+ * Trait with slot index interface.
  * @author JPEXS
  */
 public interface TraitWithSlot {
 
+    /**
+     * Gets slot index.
+     * @return Slot index
+     */
     public int getSlotIndex();
 }

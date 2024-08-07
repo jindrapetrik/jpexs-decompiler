@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Left shift.
  * @author JPEXS
  */
 public class LShiftAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {

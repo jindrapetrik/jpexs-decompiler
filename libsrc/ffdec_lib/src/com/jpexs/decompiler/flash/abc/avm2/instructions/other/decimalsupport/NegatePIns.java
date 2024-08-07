@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * negate_p instruction - negate with number context.
  * @author JPEXS
  */
 public class NegatePIns extends InstructionDefinition {

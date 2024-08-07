@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * sxi8 instruction - Sign extend 8-bit integer to 32-bit integer.
  * @author JPEXS
  */
 public class Sxi8Ins extends InstructionDefinition implements AlchemyTypeIns {

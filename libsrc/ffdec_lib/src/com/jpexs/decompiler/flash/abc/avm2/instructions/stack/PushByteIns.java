@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * pushbyte instruction - Push a byte value onto the stack.
  * @author JPEXS
  */
 public class PushByteIns extends InstructionDefinition implements PushIntegerTypeIns {

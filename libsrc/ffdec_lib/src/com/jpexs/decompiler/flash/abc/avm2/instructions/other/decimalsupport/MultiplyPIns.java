@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * multiply_p instruction - multiply two numbers with number context.
  * @author JPEXS
  */
 public class MultiplyPIns extends InstructionDefinition {

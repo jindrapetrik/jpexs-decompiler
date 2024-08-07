@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * iffalse instruction - if value is false, jump.
  * @author JPEXS
  */
 public class IfFalseIns extends InstructionDefinition implements IfTypeIns {

@@ -29,7 +29,7 @@ import com.jpexs.helpers.Reference;
 import java.util.List;
 
 /**
- *
+ * getsuper instruction - get super object.
  * @author JPEXS
  */
 public class GetSuperIns extends InstructionDefinition {

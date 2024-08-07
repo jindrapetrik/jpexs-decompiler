@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Slot.
  * @author JPEXS
  */
 public class SlotAVM2Item extends AVM2Item {

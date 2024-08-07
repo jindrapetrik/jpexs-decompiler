@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lshift instruction - Bitwise left shift.
  * @author JPEXS
  */
 public class LShiftIns extends InstructionDefinition {

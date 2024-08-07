@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * coerce_u instruction - coerce to uint.
  * @author JPEXS
  */
 public class CoerceUIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

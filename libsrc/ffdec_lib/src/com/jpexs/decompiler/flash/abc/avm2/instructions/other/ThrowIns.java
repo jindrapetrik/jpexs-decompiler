@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * throw instruction - throw an exception.
  * @author JPEXS
  */
 public class ThrowIns extends InstructionDefinition {

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Namespaced.
  * @author JPEXS
  */
 public class NamespacedAVM2Item extends AssignableAVM2Item {

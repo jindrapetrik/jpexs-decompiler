@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 
 /**
- *
+ * Finally jump instruction.
  * @author JPEXS
  */
 public class FinallyJumpIns extends JumpIns {

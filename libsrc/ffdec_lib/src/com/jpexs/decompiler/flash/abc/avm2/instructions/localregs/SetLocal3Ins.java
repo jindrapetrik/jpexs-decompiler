@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 /**
- *
+ * setlocal3 instruction - set local register 3 value.
  * @author JPEXS
  */
 public class SetLocal3Ins extends SetLocalTypeIns {

@@ -33,7 +33,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * XML.
  * @author JPEXS
  */
 public class XMLAVM2Item extends AVM2Item {

@@ -46,19 +46,36 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- *
+ * Slot or const trait in ABC file.
  * @author JPEXS
  */
 public class TraitSlotConst extends Trait implements TraitWithSlot {
 
+    /**
+     * Slot index.
+     */
     public int slot_id;
 
+    /**
+     * Type index.
+     */
     public int type_index;
 
+    /**
+     * Value index.
+     */
     public int value_index;
 
+    /**
+     * Value kind.
+     */
     public int value_kind;
 
+    /**
+     * Deletes this trait.
+     * @param abc ABC
+     * @param d Deleted flag
+     */
     @Override
     public void delete(ABC abc, boolean d) {
         super.delete(abc, d);
@@ -66,11 +83,21 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         abc.constants.getMultiname(name_index).deleted = d;
     }
 
+    /**
+     * Gets slot index.
+     * @return Slot index
+     */
     @Override
     public int getSlotIndex() {
         return slot_id;
     }
 
+    /**
+     * Gets type as string.
+     * @param constants Constant pool
+     * @param fullyQualifiedNames Fully qualified names
+     * @return Type as string
+     */
     public String getType(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
         if (type_index > 0) {
@@ -79,6 +106,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return typeStr;
     }
 
+    /**
+     * Gets name as string.
+     * @param writer Writer
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return Writer
+     */
     public GraphTextWriter getNameStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         ValueKind val = null;
@@ -102,6 +136,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    /**
+     * Checks if value is present. (Can be assigned in initializer)
+     * @param abc ABC
+     * @param convertData Convert data
+     * @return True if value is present
+     */
     private boolean hasValueStr(ABC abc, ConvertData convertData) {
         if (convertData.assignedValues.containsKey(this)) {
             return true;
@@ -114,6 +154,17 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return value_kind != 0;
     }
 
+    /**
+     * Gets value as string.
+     * @param abcIndex ABC indexing
+     * @param exportMode Export mode
+     * @param parent Parent
+     * @param convertData Convert data
+     * @param writer Writer
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @throws InterruptedException
+     */
     public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
@@ -143,6 +194,10 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
     }
 
+    /**
+     * Checks if the value is namespace.
+     * @return True if the value is namespace
+     */
     public boolean isNamespace() {
         if (value_kind != 0) {
             ValueKind val = new ValueKind(value_index, value_kind);
@@ -151,6 +206,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return false;
     }
 
+    /**
+     * To string.
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @return String
+     */
     @Override
     public String toString(ABC abc, List<DottedChain> fullyQualifiedNames) {
         String typeStr = "*";
@@ -160,6 +221,24 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc) + " metadata=" + Helper.intArrToString(metadata);
     }
 
+    /**
+     * To string.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param insideInterface Inside interface
+     * @return Writer
+     * @throws InterruptedException
+     */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(parent, convertData, abc, writer);
@@ -193,6 +272,23 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer.appendNoHilight(";").newLine();
     }
 
+    /**
+     * Converts trait.
+     * @param abcIndex ABC indexing
+     * @param parent Parent trait
+     * @param convertData Convert data
+     * @param path Path
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param exportMode Export mode
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param writer Writer
+     * @param fullyQualifiedNames Fully qualified names
+     * @param parallel Parallel
+     * @param scopeStack Scope stack
+     * @throws InterruptedException
+     */
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
@@ -201,35 +297,77 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
     }
 
+    /**
+     * Checks if the trait is const.
+     * @return True if the trait is const
+     */
     public boolean isConst() {
         return kindType == TRAIT_CONST;
     }
 
+    /**
+     * Checks if the trait is var (= slot).
+     * @return True if the trait is var
+     */
     public boolean isVar() {
         return kindType == TRAIT_SLOT;
     }
 
+    /**
+     * Removes traps - deobfuscation.
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param abc ABC
+     * @param path Path
+     * @return Number of removed traps
+     * @throws InterruptedException
+     */
     @Override
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         //do nothing
         return 0;
     }
 
+    /**
+     * Clones the trait.
+     * @return Cloned trait
+     */
     @Override
     public TraitSlotConst clone() {
         TraitSlotConst ret = (TraitSlotConst) super.clone();
         return ret;
     }
 
+    /**
+     * Gets dependencies.
+     * @param abcIndex ABC indexing
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param customNamespace Custom namespace
+     * @param abc ABC
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param uses Uses
+     * @throws InterruptedException
+     */
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
-        DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
+        DependencyParser.parseDependenciesFromMultiname(abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
     }
 
+    /**
+     * Checks if trait is visible.
+     * @param isStatic Is static
+     * @param abc ABC
+     * @return True if trait is visible
+     */
     @Override
     public boolean isVisible(boolean isStatic, ABC abc) {
 
@@ -251,6 +389,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return true;
     }
 
+    /**
+     * Converts trait header.
+     * @param abc ABC
+     * @param writer Writer
+     * @return Writer
+     */
     @Override
     public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
         convertCommonHeaderFlags(isConst() ? "const" : "slot", abc, writer);
@@ -269,6 +413,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    /**
+     * Gets method infos.
+     * @param abc ABC
+     * @param traitId Trait ID
+     * @param classIndex Class index
+     * @param methodInfos Method infos
+     */
     @Override
     public void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos) {
     }

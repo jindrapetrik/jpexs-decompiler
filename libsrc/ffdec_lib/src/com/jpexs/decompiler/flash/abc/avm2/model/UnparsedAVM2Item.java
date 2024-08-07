@@ -24,7 +24,8 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- *
+ * Unparsed data.
+ * This just ouputs string as is, without any processing.
  * @author JPEXS
  */
 public class UnparsedAVM2Item extends AVM2Item {

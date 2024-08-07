@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * New array.
  * @author JPEXS
  */
 public class NewArrayAVM2Item extends AVM2Item {

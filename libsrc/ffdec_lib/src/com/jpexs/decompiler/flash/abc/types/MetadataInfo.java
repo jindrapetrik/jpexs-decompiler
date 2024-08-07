@@ -20,34 +20,61 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
 
 /**
- *
+ * Trait metadata.
  * @author JPEXS
  */
 public class MetadataInfo {
 
+    /**
+     * Name index - index to string in constant pool
+     */
     public int name_index;
 
+    /**
+     * Keys - indexes to string in constant pool
+     */
     public int[] keys;
 
+    /**
+     * Values - indexes to string in constant pool
+     */
     public int[] values;
 
+    /**
+     * Constructs a new MetadataInfo with empty keys and values
+     */
     public MetadataInfo() {
         this.name_index = 0;
         this.keys = new int[0];
         this.values = new int[0];
     }
 
+    /**
+     * Constructs a new MetadataInfo with given name index, keys and values
+     * @param name_index Name index
+     * @param keys Keys
+     * @param values Values
+     */
     public MetadataInfo(int name_index, int[] keys, int[] values) {
         this.name_index = name_index;
         this.keys = keys;
         this.values = values;
     }
 
+    /**
+     * Returns a string representation of this MetadataInfo
+     * @return String representation of this MetadataInfo
+     */
     @Override
     public String toString() {
         return "name_index=" + name_index + " keys=" + Helper.intArrToString(keys) + " values=" + Helper.intArrToString(values);
     }
 
+    /**
+     * Returns a string representation of this MetadataInfo
+     * @param constants Constant pool
+     * @return String representation of this MetadataInfo
+     */
     public String toString(AVM2ConstantPool constants) {
         StringBuilder sb = new StringBuilder();
         sb.append("name=").append(constants.getString(name_index));

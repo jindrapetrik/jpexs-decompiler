@@ -44,7 +44,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Unresolved - variable, property, type, etc.
+ * To be resolved later.
  * @author JPEXS
  */
 public class UnresolvedAVM2Item extends AssignableAVM2Item {

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Exception.
  * @author JPEXS
  */
 public class ExceptionAVM2Item extends AVM2Item {

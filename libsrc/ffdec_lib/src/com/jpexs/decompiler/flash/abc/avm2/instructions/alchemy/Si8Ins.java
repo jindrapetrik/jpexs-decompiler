@@ -31,7 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * si8 instruction - Store 8-bit integer to domain memory.
  * @author JPEXS
  */
 public class Si8Ins extends InstructionDefinition implements AlchemyTypeIns {

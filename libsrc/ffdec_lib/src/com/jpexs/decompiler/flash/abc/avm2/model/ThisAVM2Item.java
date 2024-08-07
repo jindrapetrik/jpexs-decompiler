@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * This object.
  * @author JPEXS
  */
 public class ThisAVM2Item extends AVM2Item {

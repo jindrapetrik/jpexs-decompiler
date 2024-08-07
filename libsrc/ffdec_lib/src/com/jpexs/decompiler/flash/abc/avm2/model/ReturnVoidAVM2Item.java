@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Return from a function without a value.
  * @author JPEXS
  */
 public class ReturnVoidAVM2Item extends AVM2Item implements ExitItem {

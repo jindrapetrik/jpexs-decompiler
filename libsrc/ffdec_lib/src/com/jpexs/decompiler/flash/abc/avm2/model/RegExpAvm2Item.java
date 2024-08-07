@@ -43,7 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Regular expression.
  * @author JPEXS
  */
 public class RegExpAvm2Item extends AVM2Item implements Callable {

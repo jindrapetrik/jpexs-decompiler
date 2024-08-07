@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * newarray instruction - Create a new array.
  * @author JPEXS
  */
 public class NewArrayIns extends InstructionDefinition {

@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * swap instruction - Swaps the top two values on the stack.
  * @author JPEXS
  */
 public class SwapIns extends InstructionDefinition {

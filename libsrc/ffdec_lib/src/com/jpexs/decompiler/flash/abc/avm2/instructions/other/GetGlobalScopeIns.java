@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * getglobalscope instruction - get global scope object.
  * @author JPEXS
  */
 public class GetGlobalScopeIns extends InstructionDefinition {

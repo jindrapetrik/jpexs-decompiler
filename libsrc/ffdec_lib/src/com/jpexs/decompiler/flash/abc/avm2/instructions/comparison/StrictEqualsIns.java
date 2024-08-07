@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * strictequals instruction - Compare two values for strict equality.
  * @author JPEXS
  */
 public class StrictEqualsIns extends InstructionDefinition {

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * newobject instruction - Create a new object.
  * @author JPEXS
  */
 public class NewObjectIns extends InstructionDefinition {

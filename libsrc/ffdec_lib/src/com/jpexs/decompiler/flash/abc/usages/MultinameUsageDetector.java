@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Multiname usage detector.
  * @author JPEXS
  */
 public class MultinameUsageDetector implements UsageDetector {
@@ -290,10 +290,5 @@ public class MultinameUsageDetector implements UsageDetector {
                 }
             }
         }
-    }
-
-    @Override
-    public void filterUsages(ABC abc, UsagesFilter filter) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

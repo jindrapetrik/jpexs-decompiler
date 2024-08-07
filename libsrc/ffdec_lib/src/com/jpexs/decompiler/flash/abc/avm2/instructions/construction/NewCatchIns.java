@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * newcatch instruction - Create a new catch object.
  * @author JPEXS
  */
 public class NewCatchIns extends InstructionDefinition {

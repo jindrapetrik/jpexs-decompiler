@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Index.
  * @author JPEXS
  */
 public class IndexAVM2Item extends AssignableAVM2Item {

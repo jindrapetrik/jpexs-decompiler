@@ -19,14 +19,26 @@ package com.jpexs.decompiler.flash.abc.usages;
 import com.jpexs.decompiler.flash.abc.ABC;
 
 /**
- *
+ * Usage interface.
  * @author JPEXS
  */
 public interface Usage {
 
+    /**
+     * Returns the ABC file.
+     * @return ABC file
+     */
     public ABC getAbc();
 
+    /**
+     * Returns the index of the usage in the constant pool.
+     * @return index of the usage in the constant pool
+     */
     public int getIndex();
 
+    /**
+     * Returns the kind of the usage.
+     * @return kind of the usage
+     */
     public String getKind();
 }

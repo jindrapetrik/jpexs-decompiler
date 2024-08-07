@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * greaterequals instruction - Greater or equals.
  * @author JPEXS
  */
 public class GreaterEqualsIns extends InstructionDefinition {

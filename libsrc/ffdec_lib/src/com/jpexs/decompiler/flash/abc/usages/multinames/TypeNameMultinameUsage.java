@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import java.util.ArrayList;
 
 /**
- *
+ * TypeName multiname usage.
  * @author JPEXS
  */
 public class TypeNameMultinameUsage extends MultinameUsage {

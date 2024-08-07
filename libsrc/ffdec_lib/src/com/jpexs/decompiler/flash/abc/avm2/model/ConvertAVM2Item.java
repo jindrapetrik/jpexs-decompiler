@@ -23,11 +23,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Convert value to another type.
  * @author JPEXS
  */
 public class ConvertAVM2Item extends AVM2Item {

@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lessthan instruction - Less than.
  * @author JPEXS
  */
 public class LessThanIns extends InstructionDefinition {

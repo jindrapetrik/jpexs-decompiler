@@ -26,12 +26,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- *
+ * applytype instruction - Push a type onto the stack with the specified parameters.
  * @author JPEXS
  */
 public class ApplyTypeIns extends InstructionDefinition {

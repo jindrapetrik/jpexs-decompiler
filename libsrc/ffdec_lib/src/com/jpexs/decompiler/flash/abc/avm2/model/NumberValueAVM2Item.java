@@ -20,7 +20,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 
 /**
- *
+ * Number value.
  * @author JPEXS
  */
 public abstract class NumberValueAVM2Item extends AVM2Item implements SimpleValue {

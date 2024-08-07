@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * timestamp instruction.
  * @author JPEXS
  */
 public class TimestampIns extends InstructionDefinition {

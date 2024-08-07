@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * instanceof instruction - Check if object is instance of type.
  * @author JPEXS
  */
 public class InstanceOfIns extends InstructionDefinition {

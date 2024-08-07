@@ -34,7 +34,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * inclocal instruction - Increment local register by 1.
  * @author JPEXS
  */
 public class IncLocalIns extends InstructionDefinition {

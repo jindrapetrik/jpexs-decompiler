@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 /**
- *
+ * divide_p instruction - divide two numbers with number context.
  * @author JPEXS
  */
 public class DividePIns extends InstructionDefinition {

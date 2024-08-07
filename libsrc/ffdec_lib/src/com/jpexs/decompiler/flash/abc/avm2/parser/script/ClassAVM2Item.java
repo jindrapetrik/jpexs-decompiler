@@ -18,19 +18,16 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Class.
  * @author JPEXS
  */
 public class ClassAVM2Item extends AVM2Item implements Block {

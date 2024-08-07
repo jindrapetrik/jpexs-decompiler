@@ -34,10 +34,11 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * coerce instruction - Coerce value to specified type.
  * @author JPEXS
  */
 public class CoerceIns extends InstructionDefinition implements CoerceOrConvertTypeIns {

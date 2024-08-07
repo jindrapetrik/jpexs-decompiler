@@ -25,10 +25,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.DefaultXMLNamespace;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+
 import java.util.List;
 
 /**
- *
+ * dxnslate instruction - Set default XML namespace, with a value determined at runtime.
  * @author JPEXS
  */
 public class DXNSLateIns extends InstructionDefinition {

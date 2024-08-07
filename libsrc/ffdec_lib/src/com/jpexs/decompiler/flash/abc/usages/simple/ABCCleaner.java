@@ -21,24 +21,11 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.types.ClassInfo;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
-import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.abc.types.Multiname;
-import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
-import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
-import com.jpexs.decompiler.flash.abc.types.ValueKind;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.types.*;
+import com.jpexs.decompiler.flash.abc.types.traits.*;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.NulStream;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,11 +33,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Cleans unused items from ABC file.
  * @author JPEXS
  */
 public class ABCCleaner {
 
+    /**
+     * Cleans unused items from ABC file.
+     * @param abc ABC file
+     */
     public void clean(ABC abc) {
         ABCSimpleUsageDetector usageDetector = new ABCSimpleUsageDetector(abc);
         usageDetector.detect();
@@ -376,5 +367,4 @@ public class ABCCleaner {
             }
         }
     }
-
 }

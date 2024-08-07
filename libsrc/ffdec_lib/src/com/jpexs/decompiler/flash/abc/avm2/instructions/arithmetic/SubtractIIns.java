@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * subtract_i instruction - Subtract two integers.
  * @author JPEXS
  */
 public class SubtractIIns extends InstructionDefinition {

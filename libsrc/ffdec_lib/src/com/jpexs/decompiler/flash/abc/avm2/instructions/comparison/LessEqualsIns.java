@@ -30,7 +30,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
 /**
- *
+ * lessequals instruction - Less or equals.
  * @author JPEXS
  */
 public class LessEqualsIns extends InstructionDefinition {

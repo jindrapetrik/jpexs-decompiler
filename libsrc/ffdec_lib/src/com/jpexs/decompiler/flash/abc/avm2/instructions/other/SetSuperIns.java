@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * setsuper instruction - set super property value.
  * @author JPEXS
  */
 public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
