@@ -33,10 +33,23 @@ import java.util.List;
  */
 public class BreakItem extends GraphTargetItem {
 
+    /**
+     * Loop id
+     */
     public long loopId;
 
+    /**
+     * Label required
+     */
     private boolean labelRequired;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source item
+     * @param lineStartIns Line start instruction
+     * @param loopId Loop id
+     */
     public BreakItem(GraphSourceItem src, GraphSourceItem lineStartIns, long loopId) {
         super(src, lineStartIns, NOPRECEDENCE);
         this.loopId = loopId;

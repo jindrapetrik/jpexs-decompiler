@@ -37,12 +37,27 @@ import java.util.Random;
  */
 public class RandomNumberActionItem extends ActionItem {
 
+    /**
+     * Random number generator
+     */
     private static final Random rnd = new Random();
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param maximum Maximum
+     */
     public RandomNumberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem maximum) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, maximum);
     }
 
+    /**
+     * Gets result.
+     *
+     * @param maximum Maximum
+     * @return Result
+     */
     public static Integer getResult(Object maximum) {
         int maximumInt = EcmaScript.toInt32(maximum);
         if (maximumInt <= 0) {

@@ -45,14 +45,29 @@ import java.util.Set;
  */
 public class SetVariableActionItem extends ActionItem implements SetTypeActionItem {
 
+    /**
+     * Name
+     */
     public GraphTargetItem name;
 
+    /**
+     * Temp register
+     */
     private int tempRegister = -1;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
+    /**
+     * Force use set
+     */
     public boolean forceUseSet = false;
 
     @Override
@@ -80,6 +95,14 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         return value;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param name Name
+     * @param value Value
+     */
     public SetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.name = name;

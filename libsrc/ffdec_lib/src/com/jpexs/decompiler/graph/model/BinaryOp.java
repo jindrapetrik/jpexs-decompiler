@@ -27,19 +27,51 @@ import java.util.List;
  */
 public interface BinaryOp {
 
+    /**
+     * Gets left side.
+     * @return Left side
+     */
     public GraphTargetItem getLeftSide();
 
+    /**
+     * Gets right side.
+     * @return Right side
+     */
     public GraphTargetItem getRightSide();
 
+    /**
+     * Sets left side.
+     * @param value Left side
+     */
     public void setLeftSide(GraphTargetItem value);
 
+    /**
+     * Sets right side.
+     * @param value Right side
+     */
     public void setRightSide(GraphTargetItem value);
 
+    /**
+     * Gets precedence.
+     * @return Precedence
+     */
     public int getPrecedence();
 
+    /**
+     * Gets all sub items.
+     * @return All sub items
+     */
     public List<GraphTargetItem> getAllSubItems();
 
+    /**
+     * Gets operator.
+     * @return Operator
+     */
     public String getOperator();
 
+    /**
+     * Gets operator instruction.
+     * @return Operator instruction
+     */
     public List<GraphSourceItem> getOperatorInstruction();
 }

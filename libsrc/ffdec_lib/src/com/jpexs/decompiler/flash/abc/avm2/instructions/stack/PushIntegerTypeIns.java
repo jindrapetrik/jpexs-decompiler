@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.stack;
 
 /**
+ * Push integer, short or byte to the stack.
  * @author JPEXS
  */
 public interface PushIntegerTypeIns {

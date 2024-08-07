@@ -26,14 +26,14 @@ public interface HasCharacterId {
     /**
      * Gets characterId. Can be -1 in some special cases.
      *
-     * @return
+     * @return Character id
      */
     public int getCharacterId();
 
     /**
      * Sets characterId.
      *
-     * @param characterId
+     * @param characterId Character id
      */
     public void setCharacterId(int characterId);
 }

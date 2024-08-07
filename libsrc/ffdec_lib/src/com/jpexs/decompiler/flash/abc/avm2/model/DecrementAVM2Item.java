@@ -31,6 +31,12 @@ import java.util.Set;
  */
 public class DecrementAVM2Item extends AVM2Item {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public DecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, object);
     }

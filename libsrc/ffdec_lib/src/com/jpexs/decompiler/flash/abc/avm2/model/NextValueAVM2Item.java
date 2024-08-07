@@ -36,12 +36,28 @@ import java.util.Objects;
  */
 public class NextValueAVM2Item extends AVM2Item {
 
+    /**
+     * Index
+     */
     public GraphTargetItem index;
 
+    /**
+     * Object
+     */
     public GraphTargetItem obj;
 
+    /**
+     * Local register
+     */
     public GraphTargetItem localReg;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param index Index
+     * @param obj Object
+     */
     public NextValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.index = index;

@@ -45,18 +45,39 @@ import java.util.List;
  */
 public class TryAVM2Item extends AVM2Item implements Block {
 
+    /**
+     * Try commands
+     */
     public List<GraphTargetItem> tryCommands;
 
+    /**
+     * Catch exceptions
+     */
     public List<ABCException> catchExceptions;
 
+    /**
+     * Catch exceptions 2
+     */
     public List<NameAVM2Item> catchExceptions2;
 
+    /**
+     * Catch commands
+     */
     public List<List<GraphTargetItem>> catchCommands;
 
+    /**
+     * Finally commands
+     */
     public List<GraphTargetItem> finallyCommands;
 
+    /**
+     * Catch variables
+     */
     public List<List<AssignableAVM2Item>> catchVariables = new ArrayList<>();
 
+    /**
+     * Finally catch name
+     */
     public String finCatchName = "";
 
     @Override
@@ -95,6 +116,15 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     }
 
+    /**
+     * Constructor.
+     *
+     * @param tryCommands Try commands
+     * @param catchExceptions Catch exceptions
+     * @param catchCommands Catch commands
+     * @param finallyCommands Finally commands
+     * @param finCatchName Finally catch name
+     */
     public TryAVM2Item(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands, String finCatchName) {
         super(null, null, NOPRECEDENCE);
         this.tryCommands = tryCommands;

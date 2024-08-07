@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class DivideIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DivideIns() {
         super(0xa3, "divide", new int[]{}, true);
     }

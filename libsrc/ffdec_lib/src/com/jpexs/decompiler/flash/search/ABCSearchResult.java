@@ -41,23 +41,57 @@ import java.util.logging.Logger;
  */
 public class ABCSearchResult implements Serializable, ScriptSearchResult {
 
+    /**
+     * Instance initializer string
+     */
     public static String STR_INSTANCE_INITIALIZER = AppResources.translate("trait.instanceinitializer");
 
+    /**
+     * Class initializer string
+     */
     public static String STR_CLASS_INITIALIZER = AppResources.translate("trait.classinitializer");
 
+    /**
+     * Script initializer string
+     */
     public static String STR_SCRIPT_INITIALIZER = AppResources.translate("trait.scriptinitializer");
 
+    /**
+     * Script pack
+     */
     private ScriptPack scriptPack;
 
+    /**
+     * Is pcode
+     */
     private final boolean pcode;
 
+    /**
+     * Class index
+     */
     private final int classIndex;
 
+    /**
+     * Trait id
+     */
     private final int traitId;
 
+    /**
+     * Serial version major
+     */
     private static final int SERIAL_VERSION_MAJOR = 1;
+    /**
+     * Serial version minor
+     */
     private static final int SERIAL_VERSION_MINOR = 0;
 
+    /**
+     * Constructs ABC search result.
+     * @param openable Openable
+     * @param is Input stream
+     * @throws IOException On I/O error
+     * @throws ScriptNotFoundException On script not found
+     */
     @SuppressWarnings("unchecked")
     public ABCSearchResult(Openable openable, InputStream is) throws IOException, ScriptNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(is);
@@ -105,6 +139,11 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         }
     }
 
+    /**
+     * Save to output stream.
+     * @param os Output stream
+     * @throws IOException On I/O error
+     */
     public void save(OutputStream os) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.write(SERIAL_VERSION_MAJOR);
@@ -118,6 +157,10 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         oos.close();
     }
 
+    /**
+     * Constructs ABC search result.
+     * @param scriptPack Script pack
+     */
     public ABCSearchResult(ScriptPack scriptPack) {
         this.scriptPack = scriptPack;
         pcode = false;
@@ -125,6 +168,12 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         traitId = GraphTextWriter.TRAIT_UNKNOWN;
     }
 
+    /**
+     * Constructs ABC search result.
+     * @param scriptPack Script pack
+     * @param classIndex Class index
+     * @param traitId Trait id
+     */
     public ABCSearchResult(ScriptPack scriptPack, int classIndex, int traitId) {
         this.scriptPack = scriptPack;
         pcode = true;
@@ -132,22 +181,42 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         this.traitId = traitId;
     }
 
+    /**
+     * Gets script pack.
+     * @return Script pack
+     */
     public ScriptPack getScriptPack() {
         return scriptPack;
     }
 
+    /**
+     * Is P-code
+     * @return True if P-code
+     */
     public boolean isPcode() {
         return pcode;
     }
 
+    /**
+     * Gets class index.
+     * @return Class index
+     */
     public int getClassIndex() {
         return classIndex;
     }
 
+    /**
+     * Gets trait id.
+     * @return Trait id
+     */
     public int getTraitId() {
         return traitId;
     }
 
+    /**
+     * Gets trait name.
+     * @return Trait name
+     */
     private String getTraitName() {
         if (traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             return STR_SCRIPT_INITIALIZER;
@@ -178,6 +247,10 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         }
     }
 
+    /**
+     * To string.
+     * @return String
+     */
     @Override
     public String toString() {
         String result = scriptPack.getClassPath().toString();
@@ -190,6 +263,10 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         return result;
     }
 
+    /**
+     * Gets openable.
+     * @return Openable
+     */
     @Override
     public Openable getOpenable() {
         return scriptPack.getOpenable();

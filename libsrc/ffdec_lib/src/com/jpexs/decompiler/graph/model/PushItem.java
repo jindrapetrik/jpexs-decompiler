@@ -33,6 +33,10 @@ import java.util.Objects;
  */
 public class PushItem extends GraphTargetItem {
 
+    /**
+     * Constructor.
+     * @param value Value to push
+     */
     public PushItem(GraphTargetItem value) {
         super(value.getSrc(), value.getLineStartItem(), value.getPrecedence(), value);
     }

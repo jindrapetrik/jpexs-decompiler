@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class ConvertBIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
+    /**
+     * Constructor
+     */
     public ConvertBIns() {
         super(0x76, "convert_b", new int[]{}, true);
     }

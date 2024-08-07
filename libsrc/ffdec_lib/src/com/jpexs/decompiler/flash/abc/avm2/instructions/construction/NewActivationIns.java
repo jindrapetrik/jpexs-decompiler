@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class NewActivationIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewActivationIns() {
         super(0x57, "newactivation", new int[]{}, true);
     }

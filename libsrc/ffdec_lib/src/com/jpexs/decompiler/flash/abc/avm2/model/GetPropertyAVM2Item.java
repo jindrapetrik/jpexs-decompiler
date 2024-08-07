@@ -44,14 +44,29 @@ import java.util.Set;
  */
 public class GetPropertyAVM2Item extends AVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Call type
+     */
     public GraphTargetItem callType;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
     @Override
@@ -134,6 +149,17 @@ public class GetPropertyAVM2Item extends AVM2Item {
         return null;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param propertyName Property name
+     * @param type Type
+     * @param callType Call type
+     * @param isStatic Is static
+     */
     public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

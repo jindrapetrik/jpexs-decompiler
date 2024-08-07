@@ -41,8 +41,14 @@ import java.util.Objects;
  */
 public class InitObjectActionItem extends ActionItem {
 
+    /**
+     * Names
+     */
     public List<GraphTargetItem> names;
 
+    /**
+     * Values
+     */
     public List<GraphTargetItem> values;
 
     @Override
@@ -51,6 +57,14 @@ public class InitObjectActionItem extends ActionItem {
         visitor.visitAll(values);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param names Names
+     * @param values Values
+     */
     public InitObjectActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> names, List<GraphTargetItem> values) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.values = values;

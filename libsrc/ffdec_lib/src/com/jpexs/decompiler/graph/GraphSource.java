@@ -65,8 +65,8 @@ public abstract class GraphSource implements Serializable {
      * @param staticOperation Unused
      * @param path Path
      * @return List of graph target items
-     * @throws InterruptedException
-     * @throws GraphPartChangeException
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
      */
     public abstract List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
 
@@ -92,7 +92,7 @@ public abstract class GraphSource implements Serializable {
      * @param lastIp Last position
      * @param refs References
      * @param endIp End position
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -153,7 +153,7 @@ public abstract class GraphSource implements Serializable {
      *
      * @param alternateEntries Alternate entries
      * @return References
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();

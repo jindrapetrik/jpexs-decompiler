@@ -29,37 +29,37 @@ import java.util.Set;
 public class ActionItem {
 
     /**
-     *
+     * Action
      */
     public Action action;
 
     /**
-     * Previous action in the list.
+     * Previous action in the list
      */
     public ActionItem prev;
 
     /**
-     * Next action in the list.
+     * Next action in the list
      */
     public ActionItem next;
 
     /**
-     * Jump target of this action.
+     * Jump target of this action
      */
     private ActionItem jumpTarget;
 
     /**
-     * Actions that jump to this action.
+     * Actions that jump to this action
      */
     public Set<ActionItem> jumpsHere;
 
     /**
-     * Last actions.
+     * Last actions
      */
     public Set<ActionItem> lastActionOf;
 
     /**
-     * Container last actions.
+     * Container last actions
      */
     private List<ActionItem> containerLastActions;
 
@@ -69,14 +69,14 @@ public class ActionItem {
     int reachable;
 
     /**
-     * Excluded flag.
+     * Excluded flag
      */
     public boolean excluded;
 
     /**
      * Constructs a new ActionItem.
      *
-     * @param action
+     * @param action Action
      */
     public ActionItem(Action action) {
         this.action = action;

@@ -38,13 +38,38 @@ import java.util.Stack;
  */
 public abstract class ABCWalker {
 
+    /**
+     * Walk type
+     */
     public static enum WalkType {
+        /**
+         * Orphan
+         */
         Orphan,
+        /**
+         * Script
+         */
         Script,
+        /**
+         * Class
+         */
         Class,
+        /**
+         * Instance
+         */
         Instance
     }
 
+    /**
+     * Constructor
+     */
+    public ABCWalker() {
+    }
+    /**
+     * Walks ABC
+     * @param abc ABC
+     * @param walkOrphanItems Walk orphan items
+     */
     public final void walkABC(ABC abc, boolean walkOrphanItems) {
         Set<Integer> handledClasses = new HashSet<>();
         Set<Integer> handledMethodInfos = new HashSet<>();
@@ -72,6 +97,19 @@ public abstract class ABCWalker {
         }
     }
 
+    /**
+     * Optional handle class
+     * @param handledClasses Handled classes
+     * @param handledMethodBodies Handled method bodies
+     * @param handledMethodInfos Handled method infos
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     * @return
+     */
     private boolean optionalHandleClass(Set<Integer> handledClasses, Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int traitIndex, WalkType walkType) {
         if (handledClasses.contains(index)) {
             return false;
@@ -86,6 +124,20 @@ public abstract class ABCWalker {
         return true;
     }
 
+    /**
+     * Optional handle method info.
+     * @param handledMethodBodies Handled method bodies
+     * @param handledMethodInfos Handled method infos
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     * @param initializer Initializer
+     * @param callStack Call stack
+     */
     private void optionalHandleMethodInfo(Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
         if (handledMethodInfos.contains(index)) {
             return;
@@ -107,6 +159,20 @@ public abstract class ABCWalker {
         }
     }
 
+    /**
+     * Optional handle method body.
+     * @param handledMethodBodies Handled method bodies
+     * @param handledMethodInfos Handled method infos
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     * @param initializer Initializer
+     * @param callStack Call stack
+     */
     private void optionalHandleMethodBody(Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
         if (handledMethodBodies.contains(index)) {
             return;
@@ -124,6 +190,21 @@ public abstract class ABCWalker {
         walkTraits(abc, abc.bodies.get(index).traits, scriptIndex, scriptTraitIndex, classIndex, traitIndex, index, handledMethodBodies, handledMethodInfos, handledMethodInfos, walkType, callStack);
     }
 
+    /**
+     * Walk traits.
+     * @param abc ABC
+     * @param traits Traits
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param bodyIndex Body index
+     * @param handledMethodBodies Handled method bodies
+     * @param handledMethodInfos Handled method infos
+     * @param handledClasses Handled classes
+     * @param walkType Walk type
+     * @param callStack Call stack
+     */
     private void walkTraits(ABC abc, Traits traits, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, Set<Integer> handledClasses, WalkType walkType, Stack<Integer> callStack) {
 
         int bodyTraitIndex = -1;
@@ -167,38 +248,125 @@ public abstract class ABCWalker {
         }
     }
 
+    /**
+     * Handle method info.
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     * @param initializer Initializer
+     * @param callStack Call stack
+     */
     protected void handleMethodInfo(ABC abc, int index, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer, Stack<Integer> callStack) {
 
     }
 
+    /**
+     * Handle method body.
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     * @param initializer Initializer
+     */
     protected void handleMethodBody(ABC abc, int index, int scriptIndex, int classIndex, int traitIndex, WalkType walkType, boolean initializer) {
 
     }
 
+    /**
+     * Handle class.
+     * @param abc ABC
+     * @param index Index
+     * @param scriptIndex Script index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     */
     protected void handleClass(ABC abc, int index, int scriptIndex, int traitIndex, WalkType walkType) {
 
     }
 
+    /**
+     * Handle script.
+     * @param abc ABC
+     * @param index Index
+     */
     protected void handleScript(ABC abc, int index) {
 
     }
 
+    /**
+     * Handle trait slot const.
+     * @param abc ABC
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param bodyIndex Body index
+     * @param bodyTraitIndex Body trait index
+     * @param walkType Walk type
+     * @param callStack Call stack
+     */
     protected void handleTraitSlotConst(ABC abc, TraitSlotConst trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, int bodyTraitIndex, WalkType walkType, Stack<Integer> callStack) {
 
     }
 
+    /**
+     * Handle trait method getter setter.
+     * @param abc ABC
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     */
     protected void handleTraitMethodGetterSetter(ABC abc, TraitMethodGetterSetter trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType) {
 
     }
 
+    /**
+     * Handle trait function.
+     * @param abc ABC
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param walkType Walk type
+     */
     protected void handleTraitFunction(ABC abc, TraitFunction trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, WalkType walkType) {
 
     }
 
+    /**
+     * Handle trait class.
+     * @param abc ABC
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     */
     protected void handleTraitClass(ABC abc, TraitClass trait, int scriptIndex, int scriptTraitIndex) {
 
     }
 
+    /**
+     * Handle metadata info.
+     * @param abc ABC
+     * @param index Index
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param scriptTraitIndex Script trait index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param traitMetadataIndex Trait metadata index
+     * @param walkType Walk type
+     */
     protected void handleMetadataInfo(ABC abc, int index, Trait trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int traitMetadataIndex, WalkType walkType) {
 
     }

@@ -31,8 +31,16 @@ import java.util.Objects;
  */
 public class NameValuePair extends AVM2Item {
 
+    /**
+     * Name
+     */
     public GraphTargetItem name;
 
+    /**
+     * Constructor.
+     * @param name Name
+     * @param value Value
+     */
     public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
         super(name.getSrc(), name.getLineStartItem(), NOPRECEDENCE, value);
         this.name = name;

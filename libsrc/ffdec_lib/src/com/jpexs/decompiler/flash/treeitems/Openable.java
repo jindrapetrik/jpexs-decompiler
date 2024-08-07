@@ -29,21 +29,21 @@ public interface Openable extends TreeItem {
     /**
      * Gets file title.
      *
-     * @return
+     * @return File title
      */
     public String getFileTitle();
 
     /**
      * Gets title with path from root (like in nested SWFs)
      *
-     * @return
+     * @return Short path title
      */
     public String getShortPathTitle();
 
     /**
      * Gets short file name based on file title and file.
      *
-     * @return
+     * @return Short filename
      */
     public String getShortFileName();
 
@@ -55,7 +55,8 @@ public interface Openable extends TreeItem {
     public String getFile();
 
     /**
-     * @return
+     * Gets title or short filename.
+     * @return File title or short filename
      */
     public String getTitleOrShortFileName();
 
@@ -70,29 +71,29 @@ public interface Openable extends TreeItem {
     /**
      * Sets OpenableList which this Openable resides.
      *
-     * @param openableList
+     * @param openableList OpenableList
      */
     public void setOpenableList(OpenableList openableList);
 
     /**
      * Gets OpenableList which this Openable resides.
      *
-     * @return
+     * @return OpenableList
      */
     public OpenableList getOpenableList();
 
     /**
      * Saves Openable to stream.
      *
-     * @param os
-     * @throws IOException
+     * @param os Output stream
+     * @throws IOException On I/O error
      */
     public void saveTo(OutputStream os) throws IOException;
 
     /**
      * Sets file.
      *
-     * @param file
+     * @param file File
      */
     public void setFile(String file);
 

@@ -25,7 +25,15 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
  */
 public interface UnaryOp {
 
+    /**
+     * Gets value
+     * @return Value
+     */
     public GraphTargetItem getValue();
 
+    /**
+     * Gets precedence
+     * @return Precedence
+     */
     public int getPrecedence();
 }

@@ -32,10 +32,23 @@ import java.util.List;
  */
 public class GotoItem extends GraphTargetItem implements Block {
 
+    /**
+     * Label name
+     */
     public String labelName;
 
+    /**
+     * Target commands
+     */
     public List<GraphTargetItem> targetCommands = null;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param labelName Label name
+     */
     public GotoItem(GraphSourceItem src, GraphSourceItem lineStartIns, String labelName) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.labelName = labelName;

@@ -32,6 +32,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class ConvertF4Ins extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ConvertF4Ins() {
         super(0x7B, "convert_f4", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

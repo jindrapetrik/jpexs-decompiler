@@ -49,10 +49,23 @@ import java.util.regex.Pattern;
  */
 public class RegExpAvm2Item extends AVM2Item implements Callable {
 
+    /**
+     * Pattern
+     */
     public String pattern;
 
+    /**
+     * Modifier
+     */
     public String modifier;
 
+    /**
+     * Constructor.
+     * @param pattern Pattern
+     * @param modifier Modifier
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public RegExpAvm2Item(String pattern, String modifier, GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.pattern = pattern;
@@ -64,6 +77,11 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
         return true;
     }
 
+    /**
+     * Escapes regular expression string.
+     * @param s String
+     * @return Escaped string
+     */
     public static String escapeRegExpString(String s) {
         StringBuilder ret = new StringBuilder(s.length());
         boolean escape = false;

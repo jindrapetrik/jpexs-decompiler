@@ -56,12 +56,24 @@ import java.util.List;
  */
 public class ForInActionItem extends LoopActionItem implements Block {
 
+    /**
+     * Variable name
+     */
     public GraphTargetItem variableName;
 
+    /**
+     * Enumerated variable
+     */
     public GraphTargetItem enumVariable;
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -86,6 +98,16 @@ public class ForInActionItem extends LoopActionItem implements Block {
         visitor.visit(enumVariable);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param variableName Variable name
+     * @param enumVariable Enumerated variable
+     * @param commands Commands
+     */
     public ForInActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem variableName, GraphTargetItem enumVariable, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
         this.variableName = variableName;

@@ -32,8 +32,18 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class StoreNewActivationAVM2Item extends AVM2Item {
 
+    /**
+     * Register index
+     */
     public int regIndex;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param regIndex Register index
+     */
     public StoreNewActivationAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;

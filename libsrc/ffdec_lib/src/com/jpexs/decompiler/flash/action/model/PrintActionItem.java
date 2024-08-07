@@ -39,8 +39,14 @@ import java.util.Objects;
  */
 public class PrintActionItem extends ActionItem {
 
+    /**
+     * Target
+     */
     private final GraphTargetItem target;
 
+    /**
+     * Bounding box
+     */
     private final GraphTargetItem boundingBox;
 
     @Override
@@ -49,6 +55,14 @@ public class PrintActionItem extends ActionItem {
         visitor.visit(boundingBox);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     * @param boundingBox Bounding box
+     */
     public PrintActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, GraphTargetItem boundingBox) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;

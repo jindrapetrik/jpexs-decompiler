@@ -32,6 +32,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class ConvertFIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ConvertFIns() {
         super(0x79, "convert_f", new int[]{}, true, AVM2InstructionFlag.FLOAT_MAJOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

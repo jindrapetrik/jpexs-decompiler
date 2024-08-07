@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class MultiplyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public MultiplyIns() {
         super(0xa2, "multiply", new int[]{}, true);
     }

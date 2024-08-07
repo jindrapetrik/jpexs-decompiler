@@ -42,6 +42,9 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionPlay extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionPlay() {
         super(0x06, 0, Utf8Helper.charsetName);
     }

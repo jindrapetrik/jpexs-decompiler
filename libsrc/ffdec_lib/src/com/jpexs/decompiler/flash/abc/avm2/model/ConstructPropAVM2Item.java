@@ -31,14 +31,36 @@ import java.util.Objects;
  */
 public class ConstructPropAVM2Item extends AVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> args;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param propertyName Property name
+     * @param args Arguments
+     * @param type Type
+     */
     public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

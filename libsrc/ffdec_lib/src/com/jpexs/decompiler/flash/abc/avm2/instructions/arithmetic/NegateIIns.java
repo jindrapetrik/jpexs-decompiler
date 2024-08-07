@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class NegateIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NegateIIns() {
         super(0xc4, "negate_i", new int[]{}, true);
     }

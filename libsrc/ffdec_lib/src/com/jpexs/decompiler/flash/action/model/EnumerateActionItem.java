@@ -37,6 +37,9 @@ import java.util.Objects;
  */
 public class EnumerateActionItem extends ActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
     @Override
@@ -44,6 +47,13 @@ public class EnumerateActionItem extends ActionItem {
         visitor.visit(object);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public EnumerateActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

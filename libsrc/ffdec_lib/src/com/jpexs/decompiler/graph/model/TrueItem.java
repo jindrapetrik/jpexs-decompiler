@@ -34,6 +34,11 @@ import java.util.Set;
  */
 public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleValue {
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     */
     public TrueItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
     }

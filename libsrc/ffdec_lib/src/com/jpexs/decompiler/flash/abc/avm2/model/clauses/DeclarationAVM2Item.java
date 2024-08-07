@@ -40,14 +40,32 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class DeclarationAVM2Item extends AVM2Item {
 
+    /**
+     * Assignment
+     */
     public GraphTargetItem assignment;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Type is null
+     */
     public boolean typeIsNull = false;
 
+    /**
+     * Show value
+     */
     public boolean showValue = true;
 
+    /**
+     * Constructor.
+     *
+     * @param assignment Assignment
+     * @param type Type
+     */
     public DeclarationAVM2Item(GraphTargetItem assignment, GraphTargetItem type) {
         super(assignment.getSrc(), assignment.getLineStartItem(), assignment.getPrecedence());
         this.type = type;
@@ -60,6 +78,11 @@ public class DeclarationAVM2Item extends AVM2Item {
         visitor.visit(assignment);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param assignment Assignment
+     */
     public DeclarationAVM2Item(GraphTargetItem assignment) {
         this(assignment, null);
     }

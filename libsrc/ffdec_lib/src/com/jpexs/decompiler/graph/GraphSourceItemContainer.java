@@ -62,7 +62,7 @@ public interface GraphSourceItemContainer {
      *
      * @param size Size up to this point
      * @param lexer Lexer
-     * @return
+     * @return True if the division was parsed successfully
      */
     public boolean parseDivision(long size, FlasmLexer lexer);
 

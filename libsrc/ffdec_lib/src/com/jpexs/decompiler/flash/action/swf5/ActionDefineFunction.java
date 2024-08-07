@@ -52,19 +52,39 @@ import java.util.Set;
 @SWFVersion(from = 5)
 public class ActionDefineFunction extends Action implements GraphSourceItemContainer {
 
+    /**
+     * Function name
+     */
     public String functionName;
 
+    /**
+     * Replaced function name
+     */
     public String replacedFunctionName;
 
+    /**
+     * Parameter names
+     */
     public List<String> paramNames = new ArrayList<>();
 
+    /**
+     * Replaced parameter names
+     */
     public List<String> replacedParamNames;
 
-    //public List<Action> code;
+    /**
+     * Code size
+     */
     public int codeSize;
 
+    /**
+     * Version
+     */
     private int version;
 
+    /**
+     * Constant pool
+     */
     public List<String> constantPool;
 
     @Override
@@ -76,6 +96,14 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         return true;
     }
 
+    /**
+     * Constructor.
+     * @param functionName Function name
+     * @param paramNames Parameter names
+     * @param codeSize Code size
+     * @param version Version
+     * @param charset Charset
+     */
     public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, int version, String charset) {
         super(0x9B, 0, charset);
         this.functionName = functionName;
@@ -84,6 +112,13 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         this.paramNames = paramNames;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param version Version
+     * @throws IOException On I/O error
+     */
     public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x9B, actionLength, sis.getCharset());
         this.version = version;
@@ -95,6 +130,13 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         codeSize = sis.readUI16("codeSize");
     }
 
+    /**
+     * Constructor.
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionDefineFunction(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9B, -1, charset);
         functionName = lexString(lexer);

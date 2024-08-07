@@ -48,6 +48,9 @@ import java.util.List;
  */
 public class ConstructIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ConstructIns() {
         super(0x42, "construct", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
     }

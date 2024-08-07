@@ -40,8 +40,18 @@ import java.util.Set;
  */
 public class NewArrayAVM2Item extends AVM2Item {
 
+    /**
+     * Values.
+     */
     public List<GraphTargetItem> values;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param values Values
+     */
     public NewArrayAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> values) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.values = values;

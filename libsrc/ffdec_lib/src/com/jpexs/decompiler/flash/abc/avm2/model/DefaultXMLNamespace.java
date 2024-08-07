@@ -36,8 +36,18 @@ import java.util.Objects;
  */
 public class DefaultXMLNamespace extends AVM2Item {
 
+    /**
+     * Namespace.
+     */
     private final GraphTargetItem ns;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param ns Namespace
+     */
     public DefaultXMLNamespace(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem ns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.ns = ns;

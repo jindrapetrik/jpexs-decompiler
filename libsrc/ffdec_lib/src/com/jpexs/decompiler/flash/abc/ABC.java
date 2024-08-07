@@ -131,7 +131,7 @@ public class ABC implements Openable {
      */
     private ABCMethodIndexing abcMethodIndexing;
 
-    /*
+    /**
      * ABC minor version with decimal support
      */
     public static final int MINORwithDECIMAL = 17;
@@ -151,7 +151,7 @@ public class ABC implements Openable {
      */
     private AVM2Deobfuscation deobfuscation;
 
-    /*
+    /**
      * Parent tag
      */
     @Internal
@@ -195,7 +195,7 @@ public class ABC implements Openable {
     /**
      * Constructs ABC.
      *
-     * @param tag
+     * @param tag ABC container tag
      */
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
@@ -205,7 +205,7 @@ public class ABC implements Openable {
     /**
      * Adds change listener.
      *
-     * @param listener
+     * @param listener Listener
      */
     public void addChangeListener(Runnable listener) {
         changeListeners.add(listener);
@@ -214,7 +214,7 @@ public class ABC implements Openable {
     /**
      * Removes change listener.
      *
-     * @param listener
+     * @param listener Listener
      */
     public void removeChangeListener(Runnable listener) {
         changeListeners.remove(listener);
@@ -232,7 +232,7 @@ public class ABC implements Openable {
     /**
      * Gets openable.
      *
-     * @return
+     * @return Openable
      */
     @Override
     public Openable getOpenable() {
@@ -245,7 +245,7 @@ public class ABC implements Openable {
     /**
      * Gets SWF.
      *
-     * @return
+     * @return SWF
      */
     public SWF getSwf() {
         return parentTag.getSwf();
@@ -254,7 +254,7 @@ public class ABC implements Openable {
     /**
      * Gets list of ABC containers.
      *
-     * @return
+     * @return List of ABC containers
      */
     public List<ABCContainerTag> getAbcTags() {
         Openable openable = getOpenable();
@@ -267,8 +267,8 @@ public class ABC implements Openable {
     /**
      * Adds method body.
      *
-     * @param body
-     * @return
+     * @param body Method body
+     * @return Method body index
      */
     public int addMethodBody(MethodBody body) {
         bodies.add(body);
@@ -279,8 +279,8 @@ public class ABC implements Openable {
     /**
      * Adds method info.
      *
-     * @param mi
-     * @return
+     * @param mi Method info
+     * @return Method info index
      */
     public int addMethodInfo(MethodInfo mi) {
         method_info.add(mi);
@@ -315,7 +315,7 @@ public class ABC implements Openable {
     /**
      * Gets id of metadata/add metadata.
      *
-     * @param newMetadata
+     * @param newMetadata Metadata
      * @param add Add if not found?
      * @return New index or -1 if not found (add=false)
      */
@@ -341,7 +341,7 @@ public class ABC implements Openable {
      * @param classId Class index
      * @param name Method name
      * @param isStatic Whether method is static
-     * @return
+     * @return Method/Getter/Setter trait
      */
     public TraitMethodGetterSetter addMethod(int classId, String name, boolean isStatic) {
         Multiname multiname = new Multiname();
@@ -379,7 +379,7 @@ public class ABC implements Openable {
     /**
      * Adds event listener.
      *
-     * @param listener
+     * @param listener Listener
      */
     public void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -388,7 +388,7 @@ public class ABC implements Openable {
     /**
      * Removes event listener.
      *
-     * @param listener
+     * @param listener Listener
      */
     public void removeEventListener(EventListener listener) {
         listeners.remove(listener);
@@ -397,8 +397,8 @@ public class ABC implements Openable {
     /**
      * Informs listeners.
      *
-     * @param event
-     * @param data
+     * @param event Event
+     * @param data Data
      */
     protected void informListeners(String event, Object data) {
         for (EventListener listener : listeners) {
@@ -409,8 +409,8 @@ public class ABC implements Openable {
     /**
      * Removes traps (deobfuscation).
      *
-     * @return
-     * @throws InterruptedException
+     * @return Number of removed traps
+     * @throws InterruptedException On interrupt
      */
     public int removeTraps() throws InterruptedException {
         return removeTraps(null);
@@ -420,8 +420,8 @@ public class ABC implements Openable {
      * Removes traps (deobfuscation).
      *
      * @param listener Listener
-     * @return
-     * @throws InterruptedException
+     * @return Number of removed traps
+     * @throws InterruptedException On interrupt
      */
     public int removeTraps(DeobfuscationListener listener) throws InterruptedException {
         int rem = 0;
@@ -437,8 +437,8 @@ public class ABC implements Openable {
     /**
      * Removes dead code.
      *
-     * @return
-     * @throws InterruptedException
+     * @return Number of modified lines
+     * @throws InterruptedException On interrupt
      */
     public int removeDeadCode() throws InterruptedException {
         return removeDeadCode(null);
@@ -448,8 +448,8 @@ public class ABC implements Openable {
      * Removes dead code.
      *
      * @param listener Listener
-     * @return
-     * @throws InterruptedException
+     * @return Number of modified lines
+     * @throws InterruptedException On interrupt
      */
     public int removeDeadCode(DeobfuscationListener listener) throws InterruptedException {
         int rem = 0;
@@ -497,7 +497,7 @@ public class ABC implements Openable {
     /**
      * Gets string usages.
      *
-     * @return
+     * @return Set of string indexes
      */
     public Set<Integer> getStringUsages() {
         Set<Integer> ret = new HashSet<>();
@@ -621,8 +621,8 @@ public class ABC implements Openable {
     /**
      * Renames multiname.
      *
-     * @param multinameIndex
-     * @param newname
+     * @param multinameIndex Multiname index
+     * @param newname New name
      */
     public void renameMultiname(int multinameIndex, String newname) {
         if (multinameIndex <= 0 || multinameIndex >= constants.getMultinameCount()) {
@@ -742,7 +742,7 @@ public class ABC implements Openable {
     /**
      * Checks whether the ABC has decimal support.
      *
-     * @return
+     * @return Whether the ABC has decimal support
      */
     public boolean hasDecimalSupport() {
         return version.minor >= MINORwithDECIMAL;
@@ -751,7 +751,7 @@ public class ABC implements Openable {
     /**
      * Sets decimal support.
      *
-     * @param val
+     * @param val Value
      */
     public void setDecimalSupport(boolean val) {
         if (val) {
@@ -768,8 +768,8 @@ public class ABC implements Openable {
     /**
      * Checks minimum version.
      *
-     * @param minMajor
-     * @param minMinor
+     * @param minMajor Minimum major version
+     * @param minMinor Minimum minor version
      * @return
      */
     private boolean minVersionCheck(int minMajor, int minMinor) {
@@ -779,7 +779,7 @@ public class ABC implements Openable {
     /**
      * Checks whether the ABC has float support.
      *
-     * @return
+     * @return Whether the ABC has float support
      */
     public boolean hasFloatSupport() {
         return minVersionCheck(47, 16);
@@ -788,7 +788,7 @@ public class ABC implements Openable {
     /**
      * Sets float support.
      *
-     * @param val
+     * @param val Value
      */
     public void setFloatSupport(boolean val) {
         if (val) {
@@ -805,7 +805,7 @@ public class ABC implements Openable {
     /**
      * Checks whether the ABC has exception support.
      *
-     * @return
+     * @return Whether the ABC has exception support
      */
     public boolean hasExceptionSupport() {
         return version.compareTo(new ABCVersion(46, 15)) > 0;
@@ -817,7 +817,7 @@ public class ABC implements Openable {
      * @param ais ABC input stream
      * @param swf SWF
      * @param tag ABC container tag
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag) throws IOException {
         this(ais, swf, tag, null, null);
@@ -831,7 +831,7 @@ public class ABC implements Openable {
      * @param tag ABC container tag
      * @param file File
      * @param fileTitle File title
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag, String file, String fileTitle) throws IOException {
         this.parentTag = tag;
@@ -861,7 +861,7 @@ public class ABC implements Openable {
      *
      * @param ais ABC input stream
      * @param swf SWF
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private void read(ABCInputStream ais, SWF swf) throws IOException {
         int minor_version = ais.readU16("minor_version");
@@ -1093,7 +1093,7 @@ public class ABC implements Openable {
      * Saves ABC to stream.
      *
      * @param os Output stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void saveToStream(OutputStream os) throws IOException {
         ABCOutputStream aos = new ABCOutputStream(os);
@@ -1513,7 +1513,7 @@ public class ABC implements Openable {
     /**
      * Dump ABC to output stream.
      *
-     * @param os
+     * @param os Output stream
      */
     public void dump(OutputStream os) {
         Utf8PrintWriter output;
@@ -2152,9 +2152,9 @@ public class ABC implements Openable {
      * @param as ActionScript
      * @param dependencies Dependencies
      * @return True if the pack is simple (= not compound)
-     * @throws As3ScriptReplaceException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws As3ScriptReplaceException On script replace error
+     * @throws IOException On IO error
+     * @throws InterruptedException On interrupt
      */
     public boolean replaceScriptPack(As3ScriptReplacerInterface replacer, ScriptPack pack, String as, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException {
         replacer.replaceScript(pack, as, dependencies);
@@ -2867,7 +2867,7 @@ public class ABC implements Openable {
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return Whether the ABC is modified
      */
     @Override
     public boolean isModified() {
@@ -2898,7 +2898,7 @@ public class ABC implements Openable {
     /**
      * To string.
      *
-     * @return
+     * @return String
      */
     @Override
     public String toString() {
@@ -2909,7 +2909,7 @@ public class ABC implements Openable {
      * Saves ABC to stream.
      *
      * @param os Output stream
-     * @throws IOException
+     * @throws IOException On IO error
      */
     @Override
     public void saveTo(OutputStream os) throws IOException {

@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class GreaterThanIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GreaterThanIns() {
         super(0xaf, "greaterthan", new int[]{}, true);
     }

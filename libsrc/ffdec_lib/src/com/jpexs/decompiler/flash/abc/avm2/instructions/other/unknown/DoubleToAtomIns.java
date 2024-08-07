@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class DoubleToAtomIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DoubleToAtomIns() {
         super(0xFB, "doubletoatom", new int[]{}, true /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

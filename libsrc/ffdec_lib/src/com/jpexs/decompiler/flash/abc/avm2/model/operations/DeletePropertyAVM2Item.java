@@ -43,15 +43,32 @@ import java.util.Objects;
  */
 public class DeletePropertyAVM2Item extends AVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Line
+     */
     private int line;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
-    //Constructor for compiler
+    /**
+     * Constructor.
+     * For compiler.
+     * @param property Property
+     * @param line Line
+     */
     public DeletePropertyAVM2Item(GraphTargetItem property, int line) {
         this(null, null, property, null, false);
         this.line = line;
@@ -63,6 +80,14 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         visitor.visit(propertyName);
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param propertyName Property name
+     * @param isStatic Is static
+     */
     public DeletePropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY);
         this.object = object;

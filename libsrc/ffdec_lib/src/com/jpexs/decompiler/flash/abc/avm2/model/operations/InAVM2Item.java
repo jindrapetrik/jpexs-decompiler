@@ -35,6 +35,13 @@ import java.util.List;
  */
 public class InAVM2Item extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param name Name
+     * @param object Object
+     */
     public InAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, name, object, "in", "", "");
     }

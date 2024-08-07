@@ -33,20 +33,44 @@ import java.util.Objects;
  */
 public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public FullMultinameAVM2Item propertyName;
 
+    /**
+     * Declaration
+     */
     public DeclarationAVM2Item declaration;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Call type
+     */
     public GraphTargetItem callType;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
     @Override
@@ -73,6 +97,18 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
         return value.getFirstPart();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param object Object
+     * @param propertyName Property name
+     * @param type Type
+     * @param callType Call type
+     * @param isStatic Is static
+     */
     public SetSuperAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;

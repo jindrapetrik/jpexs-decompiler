@@ -28,14 +28,32 @@ import java.util.List;
  */
 public abstract class LoopItem extends GraphTargetItem {
 
+    /**
+     * Loop
+     */
     public Loop loop;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source item
+     * @param lineStartItem Line start item
+     * @param loop Loop
+     */
     public LoopItem(GraphSourceItem src, GraphSourceItem lineStartItem, Loop loop) {
         super(src, lineStartItem, NOPRECEDENCE);
         this.loop = loop;
     }
 
+    /**
+     * Checks if loop has base body.
+     * @return True if loop has base body
+     */
     public abstract boolean hasBaseBody();
 
+    /**
+     * Gets base body commands.
+     * @return List of base body commands
+     */
     public abstract List<GraphTargetItem> getBaseBodyCommands();
 }

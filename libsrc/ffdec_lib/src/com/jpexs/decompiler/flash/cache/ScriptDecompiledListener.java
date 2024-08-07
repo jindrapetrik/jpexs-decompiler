@@ -20,6 +20,7 @@ package com.jpexs.decompiler.flash.cache;
  * Listener for decompiled scripts.
  *
  * @author JPEXS
+ * @param <T> Result type
  */
 public interface ScriptDecompiledListener<T> {
 

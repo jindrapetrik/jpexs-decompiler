@@ -49,16 +49,36 @@ import java.util.Set;
  */
 public class ClassActionItem extends ActionItem implements Block {
 
+    /**
+     * Extends
+     */
     public GraphTargetItem extendsOp;
 
+    /**
+     * Implements
+     */
     public List<GraphTargetItem> implementsOp;
 
+    /**
+     * Class name
+     */
     public GraphTargetItem className;
 
     //public GraphTargetItem constructor;
+
+    /**
+     * Traits
+     */
     public List<MyEntry<GraphTargetItem, GraphTargetItem>> traits;
+
+    /**
+     * Which traits are static
+     */
     public List<Boolean> traitsStatic;
 
+    /**
+     * Uninitialized variables
+     */
     public Set<String> uninitializedVars;
 
     @Override
@@ -73,6 +93,15 @@ public class ClassActionItem extends ActionItem implements Block {
 
     }
 
+    /**
+     * Constructor.
+     *
+     * @param className Class name
+     * @param extendsOp Extends
+     * @param implementsOp Implements
+     * @param traits Traits
+     * @param traitsStatic Which traits are static
+     */
     public ClassActionItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<MyEntry<GraphTargetItem, GraphTargetItem>> traits, List<Boolean> traitsStatic) {
         super(null, null, NOPRECEDENCE);
         this.className = className;

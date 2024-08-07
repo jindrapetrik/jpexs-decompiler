@@ -33,8 +33,17 @@ import com.jpexs.helpers.Helper;
  */
 public class NameSpaceAVM2Item extends AVM2Item {
 
+    /**
+     * Namespace index
+     */
     public int namespaceIndex;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param namespaceIndex Namespace index
+     */
     public NameSpaceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int namespaceIndex) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.namespaceIndex = namespaceIndex;

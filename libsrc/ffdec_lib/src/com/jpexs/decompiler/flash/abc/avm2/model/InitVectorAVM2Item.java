@@ -44,22 +44,49 @@ import java.util.Objects;
  */
 public class InitVectorAVM2Item extends AVM2Item {
 
+    /**
+     * Vector package name
+     */
     public static final DottedChain VECTOR_PACKAGE = new DottedChain(new String[]{"__AS3__", "vec"});
 
+    /**
+     * Vector fully qualified name
+     */
     public static final DottedChain VECTOR_FQN = new DottedChain(new String[]{"__AS3__", "vec", "Vector"});
 
+    /**
+     * Vector of int fully qualified name
+     */
     public static final DottedChain VECTOR_INT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$int"});
 
+    /**
+     * Vector of double fully qualified name
+     */
     public static final DottedChain VECTOR_DOUBLE = new DottedChain(new String[]{"__AS3__", "vec", "Vector$double"});
 
+    /**
+     * Vector of uint fully qualified name
+     */
     public static final DottedChain VECTOR_UINT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$uint"});
 
+    /**
+     * Vector of object fully qualified name
+     */
     public static final DottedChain VECTOR_OBJECT = new DottedChain(new String[]{"__AS3__", "vec", "Vector$object"});
 
+    /**
+     * Subtype
+     */
     public GraphTargetItem subtype;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Opened namespaces
+     */
     List<NamespaceItem> openedNamespaces;
 
     private int allNsSet(AbcIndexing abc) throws CompilationException {
@@ -72,12 +99,27 @@ public class InitVectorAVM2Item extends AVM2Item {
         visitor.visitAll(arguments);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param subtype Subtype
+     * @param arguments Arguments
+     */
     public InitVectorAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subtype, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subtype = subtype;
         this.arguments = arguments;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param subtype Subtype
+     * @param arguments Arguments
+     * @param openedNamespaces Opened namespaces
+     */
     public InitVectorAVM2Item(GraphTargetItem subtype, List<GraphTargetItem> arguments, List<NamespaceItem> openedNamespaces) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.subtype = subtype;

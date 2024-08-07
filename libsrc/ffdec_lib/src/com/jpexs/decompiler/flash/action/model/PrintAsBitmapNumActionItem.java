@@ -39,8 +39,14 @@ import java.util.Objects;
  */
 public class PrintAsBitmapNumActionItem extends ActionItem {
 
+    /**
+     * Number
+     */
     private final GraphTargetItem num;
 
+    /**
+     * Bounding box
+     */
     private final GraphTargetItem boundingBox;
 
     @Override
@@ -49,6 +55,14 @@ public class PrintAsBitmapNumActionItem extends ActionItem {
         visitor.visit(boundingBox);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param num Number
+     * @param boundingBox Bounding box
+     */
     public PrintAsBitmapNumActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem num, GraphTargetItem boundingBox) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.num = num;

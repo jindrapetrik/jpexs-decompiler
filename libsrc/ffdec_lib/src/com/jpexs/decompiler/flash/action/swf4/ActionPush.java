@@ -64,10 +64,19 @@ import java.util.Set;
 @SWFVersion(from = 4)
 public class ActionPush extends Action {
 
+    /**
+     * Values to push
+     */
     public List<Object> values;
 
+    /**
+     * Replacement values, if not null, values will be replaced by this list
+     */
     public List<Object> replacement;
 
+    /**
+     * Constant pool
+     */
     public List<String> constantPool;
 
     /**
@@ -76,6 +85,14 @@ public class ActionPush extends Action {
      */
     public static final int MAX_CONSTANT_INDEX_TYPE8 = 255;
 
+    /**
+     * Constructor
+     *
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param version SWF version
+     * @throws IOException On I/O error
+     */
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x96, actionLength, sis.getCharset());
         int type;
@@ -231,6 +248,12 @@ public class ActionPush extends Action {
         return res;
     }
 
+    /**
+     * Checks if the value is valid
+     *
+     * @param value Value
+     * @return True if valid
+     */
     public static boolean isValidValue(Object value) {
         if (value instanceof String) {
             for (char ch : ((String) value).toCharArray()) {
@@ -248,6 +271,12 @@ public class ActionPush extends Action {
         return true;
     }
 
+    /**
+     * Constructor
+     *
+     * @param value Value
+     * @param charset Charset
+     */
     public ActionPush(Object value, String charset) {
         super(0x96, 0, charset);
         this.values = new ArrayList<>();
@@ -255,6 +284,12 @@ public class ActionPush extends Action {
         updateLength();
     }
 
+    /**
+     * Constructor
+     *
+     * @param values Values
+     * @param charset Charset
+     */
     public ActionPush(Object[] values, String charset) {
         super(0x96, 0, charset);
         this.values = new ArrayList<>();
@@ -262,6 +297,15 @@ public class ActionPush extends Action {
         updateLength();
     }
 
+    /**
+     * Constructor
+     *
+     * @param lexer Lexer
+     * @param constantPool Constant pool
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionPush(FlasmLexer lexer, List<String> constantPool, String charset) throws IOException, ActionParseException {
         super(0x96, 0, charset);
         this.constantPool = constantPool;
@@ -323,6 +367,14 @@ public class ActionPush extends Action {
         return writer;
     }
 
+    /**
+     * Converts the parameters to string - use replacements when available.
+     * @param container Container
+     * @param knownAddreses Known addresses
+     * @param exportMode Export mode
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
@@ -334,6 +386,11 @@ public class ActionPush extends Action {
         return writer;
     }
 
+    /**
+     * To string without quotes.
+     * @param i Index
+     * @return String
+     */
     public String toStringNoQ(int i) {
         String ret;
         Object value = values.get(i);
@@ -349,6 +406,12 @@ public class ActionPush extends Action {
         return ret;
     }
 
+    /**
+     * Converts the parameters to string.
+     *
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter paramsToString(GraphTextWriter writer) {
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
@@ -359,6 +422,11 @@ public class ActionPush extends Action {
         return writer;
     }
 
+    /**
+     * Converts the parameter to string.
+     * @param i Index
+     * @return String
+     */
     public String toString(int i) {
         String ret;
         Object value = values.get(i);
@@ -384,6 +452,11 @@ public class ActionPush extends Action {
         return writer.toString();
     }
 
+    /**
+     * To string.
+     * @param writer Writer
+     * @return Writer
+     */
     public GraphTextWriter toString(GraphTextWriter writer) {
         writer.appendNoHilight("Push ");
         paramsToString(writer);

@@ -53,43 +53,100 @@ import java.util.Set;
 @SWFVersion(from = 7)
 public class ActionDefineFunction2 extends Action implements GraphSourceItemContainer {
 
+    /**
+     * Function name
+     */
     public String functionName;
 
+    /**
+     * Replaced function name
+     */
     public String replacedFunctionName;
 
+    /**
+     * Parameter names
+     */
     public List<String> paramNames = new ArrayList<>();
 
+    /**
+     * Replaced parameter names
+     */
     public List<String> replacedParamNames;
 
+    /**
+     * Parameter registers
+     */
     public List<Integer> paramRegisters = new ArrayList<>();
 
+    /**
+     * Preload parent flag
+     */
     public boolean preloadParentFlag;
 
+    /**
+     * Preload root flag
+     */
     public boolean preloadRootFlag;
 
+    /**
+     * Suppress super flag
+     */
     public boolean suppressSuperFlag;
 
+    /**
+     * Preload super flag
+     */
     public boolean preloadSuperFlag;
 
+    /**
+     * Suppress arguments flag
+     */
     public boolean suppressArgumentsFlag;
 
+    /**
+     * Preload arguments flag
+     */
     public boolean preloadArgumentsFlag;
 
+    /**
+     * Suppress this flag
+     */
     public boolean suppressThisFlag;
 
+    /**
+     * Preload this flag
+     */
     public boolean preloadThisFlag;
 
+    /**
+     * Reserved
+     */
     @Reserved
     public int reserved;
 
+    /**
+     * Preload global flag
+     */
     public boolean preloadGlobalFlag;
 
+    /**
+     * Register count
+     */
     public int registerCount;
 
+    /**
+     * Code size
+     */
     public int codeSize;
 
+    /**
+     * Version
+     */
     private int version;
 
+    /**
+     * Constant pool
+     */
     public List<String> constantPool;
 
     @Override
@@ -101,6 +158,25 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         return true;
     }
 
+    /**
+     * Constructor.
+     * @param functionName Function name
+     * @param preloadParentFlag Preload parent flag
+     * @param preloadRootFlag Preload root flag
+     * @param suppressSuperFlag Suppress super flag
+     * @param preloadSuperFlag Preload super flag
+     * @param suppressArgumentsFlag Suppress arguments flag
+     * @param preloadArgumentsFlag Preload arguments flag
+     * @param suppressThisFlag Suppress this flag
+     * @param preloadThisFlag Preload this flag
+     * @param preloadGlobalFlag Preload global flag
+     * @param registerCount Register count
+     * @param codeSize Code size
+     * @param version Version
+     * @param paramNames Parameter names
+     * @param paramRegisters Parameter registers
+     * @param charset Charset
+     */
     public ActionDefineFunction2(String functionName, boolean preloadParentFlag, boolean preloadRootFlag, boolean suppressSuperFlag, boolean preloadSuperFlag, boolean suppressArgumentsFlag, boolean preloadArgumentsFlag, boolean suppressThisFlag, boolean preloadThisFlag, boolean preloadGlobalFlag, int registerCount, int codeSize, int version, List<String> paramNames, List<Integer> paramRegisters, String charset) {
         super(0x8E, 0, charset);
         this.functionName = functionName;
@@ -120,6 +196,13 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         this.paramRegisters = paramRegisters;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param version Version
+     * @throws IOException On I/O error
+     */
     public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8E, actionLength, sis.getCharset());
         this.version = version;
@@ -143,6 +226,13 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         codeSize = sis.readUI16("codeSize");
     }
 
+    /**
+     * Constructor.
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionDefineFunction2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8E, -1, charset);
         functionName = lexString(lexer);
@@ -262,6 +352,10 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         return "DefineFunction2";
     }
 
+    /**
+     * Gets the first register
+     * @return First register
+     */
     public int getFirstRegister() {
         int pos = 1;
         if (preloadThisFlag) {

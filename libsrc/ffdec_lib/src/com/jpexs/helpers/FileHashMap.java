@@ -37,8 +37,8 @@ import java.util.logging.Logger;
 /**
  * File hash map.
  *
- * @param <K>
- * @param <V>
+ * @param <K> Key type
+ * @param <V> Value type
  * @author JPEXS
  */
 public class FileHashMap<K, V> extends AbstractMap<K, V> implements Freed {

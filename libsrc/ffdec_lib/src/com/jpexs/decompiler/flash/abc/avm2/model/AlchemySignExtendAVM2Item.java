@@ -38,6 +38,14 @@ public class AlchemySignExtendAVM2Item extends AVM2Item {
 
     private final int size;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param size Size
+     */
     public AlchemySignExtendAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, int size) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.size = size;

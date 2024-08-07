@@ -23,5 +23,9 @@ package com.jpexs.decompiler.graph.model;
  */
 public interface IntegerValueTypeItem {
 
+    /**
+     * Gets the integer value of this item.
+     * @return Integer value
+     */
     public int intValue();
 }

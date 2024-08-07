@@ -39,6 +39,12 @@ import java.util.Set;
  */
 public class TypeOfActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public TypeOfActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, value);
     }
@@ -70,6 +76,11 @@ public class TypeOfActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param obj Object
+     * @return Result
+     */
     public static String getResult(Object obj) {
         Object res = obj;
         EcmaType type = EcmaScript.type(res);

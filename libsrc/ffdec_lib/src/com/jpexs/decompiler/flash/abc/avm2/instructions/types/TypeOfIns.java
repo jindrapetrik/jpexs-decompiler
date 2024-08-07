@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class TypeOfIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public TypeOfIns() {
         super(0x95, "typeof", new int[]{}, false);
     }

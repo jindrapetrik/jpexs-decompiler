@@ -38,10 +38,19 @@ import java.util.Objects;
  */
 public class NewMethodActionItem extends ActionItem {
 
+    /**
+     * Method name
+     */
     public GraphTargetItem methodName;
 
+    /**
+     * Script object
+     */
     public GraphTargetItem scriptObject;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
     @Override
@@ -50,6 +59,15 @@ public class NewMethodActionItem extends ActionItem {
         visitor.visitAll(arguments);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scriptObject Script object
+     * @param methodName Method name
+     * @param arguments Arguments
+     */
     public NewMethodActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.methodName = methodName;

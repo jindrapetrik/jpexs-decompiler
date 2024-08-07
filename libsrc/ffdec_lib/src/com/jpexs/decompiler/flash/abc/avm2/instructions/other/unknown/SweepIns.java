@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class SweepIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public SweepIns() {
         super(0xFC, "sweep", new int[]{}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.UNDOCUMENTED);
     }

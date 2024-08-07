@@ -34,6 +34,12 @@ import java.util.Map;
  */
 public class ActionUnknown extends ActionNop {
 
+    /**
+     * Constructor.
+     * @param actionCode Action code
+     * @param actionLength Action length
+     * @param charset Charset
+     */
     public ActionUnknown(int actionCode, int actionLength, String charset) {
         super(actionCode, charset);
         this.actionLength = actionLength;

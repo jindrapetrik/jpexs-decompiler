@@ -37,6 +37,9 @@ import java.util.Set;
  */
 public class IncrementActionItem extends ActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
     @Override
@@ -44,6 +47,13 @@ public class IncrementActionItem extends ActionItem {
         visitor.visit(object);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public IncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE);
         this.object = object;
@@ -75,6 +85,11 @@ public class IncrementActionItem extends ActionItem {
         return getResult(object.getResultAsNumber());
     }
 
+    /**
+     * Gets result.
+     * @param num Number
+     * @return Result
+     */
     public static Double getResult(Double num) {
         return num + 1;
     }

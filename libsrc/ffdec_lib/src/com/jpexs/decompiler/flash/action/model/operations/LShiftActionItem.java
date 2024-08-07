@@ -36,6 +36,13 @@ import java.util.List;
  */
 public class LShiftActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public LShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, "<<", "int", "int");
     }
@@ -45,6 +52,12 @@ public class LShiftActionItem extends BinaryOpItem implements CompoundableBinary
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static int getResult(Object rightResult, Object leftResult) {
         return EcmaScript.toInt32(leftResult) << EcmaScript.toInt32(rightResult);
     }

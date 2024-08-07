@@ -119,7 +119,7 @@ public class ABCInputStream implements AutoCloseable {
      * Sets position in bytes in the stream.
      *
      * @param pos Number of bytes
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public void seek(long pos) throws IOException {
         is.seek(pos);
@@ -195,7 +195,7 @@ public class ABCInputStream implements AutoCloseable {
      * Reads byte from the stream.
      *
      * @return Byte
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readInternal() throws IOException {
         int i = is.read();
@@ -218,7 +218,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Byte
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int read(String name) throws IOException {
         newDumpLevel(name, "byte");
@@ -232,7 +232,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param b Bytes
      * @return Number of bytes read
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int read(byte[] b) throws IOException {
         int currBytesRead = is.read(b);
@@ -262,7 +262,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return U8
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readU8(String name) throws IOException {
         newDumpLevel(name, "U8");
@@ -275,7 +275,7 @@ public class ABCInputStream implements AutoCloseable {
      * Reads U32 from the stream.
      *
      * @return U32
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readU32Internal() throws IOException {
         int i;
@@ -299,7 +299,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return U32
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readU32(String name) throws IOException {
         newDumpLevel(name, "U32");
@@ -312,7 +312,7 @@ public class ABCInputStream implements AutoCloseable {
      * Reads U30 from the stream.
      *
      * @return U30
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readU30Internal() throws IOException {
         long u32 = readU32Internal();
@@ -325,7 +325,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return U30
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readU30(String name) throws IOException {
         newDumpLevel(name, "U30");
@@ -339,7 +339,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return S24
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readS24(String name) throws IOException {
         newDumpLevel(name, "S24");
@@ -358,7 +358,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return U16
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readU16(String name) throws IOException {
         newDumpLevel(name, "U16");
@@ -372,7 +372,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return S32
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readS32(String name) throws IOException {
         int i;
@@ -403,7 +403,7 @@ public class ABCInputStream implements AutoCloseable {
      * Gets available bytes in the stream.
      *
      * @return Available bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int available() throws IOException {
         return is.available();
@@ -413,7 +413,7 @@ public class ABCInputStream implements AutoCloseable {
      * Reads long from the stream.
      *
      * @return Long
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readLong() throws IOException {
         safeRead(8, stringDataBuffer);
@@ -433,7 +433,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Double
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public double readDouble(String name) throws IOException {
         newDumpLevel(name, "Double");
@@ -448,7 +448,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param count Count
      * @param data Data
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private void safeRead(int count, byte[] data) throws IOException {
         for (int i = 0; i < count; i++) {
@@ -461,7 +461,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Namespace
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Namespace readNamespace(String name) throws IOException {
         newDumpLevel(name, "Namespace");
@@ -482,7 +482,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Multiname
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Multiname readMultiname(String name) throws IOException {
         int kind = readU8("kind");
@@ -526,7 +526,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Method info
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MethodInfo readMethodInfo(String name) throws IOException {
         newDumpLevel(name, "method_info");
@@ -565,7 +565,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Trait
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Trait readTrait(String name) throws IOException {
         newDumpLevel(name, "Trait");
@@ -633,7 +633,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Traits
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Traits readTraits(String name) throws IOException {
         newDumpLevel(name, "Traits");
@@ -651,7 +651,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param count Count
      * @return Bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private byte[] readBytesInternal(int count) throws IOException {
         byte[] ret = new byte[count];
@@ -668,7 +668,7 @@ public class ABCInputStream implements AutoCloseable {
      * @param name Name
      * @param specialType Special type
      * @return Bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public byte[] readBytes(int count, String name, DumpInfoSpecialType specialType) throws IOException {
         newDumpLevel(name, "Bytes", specialType);
@@ -682,7 +682,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Decimal
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Decimal readDecimal(String name) throws IOException {
         newDumpLevel(name, "Decimal");
@@ -696,7 +696,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Float
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Float readFloat(String name) throws IOException {
         newDumpLevel(name, "Float");
@@ -711,7 +711,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Float4
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Float4 readFloat4(String name) throws IOException {
         newDumpLevel(name, "Float4");
@@ -729,7 +729,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return Instance info
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public InstanceInfo readInstanceInfo(String name) throws IOException {
         newDumpLevel(name, "instance_info");
@@ -756,7 +756,7 @@ public class ABCInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return String
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public String readString(String name) throws IOException {
         newDumpLevel(name, "String");

@@ -34,12 +34,30 @@ import java.util.Objects;
  */
 public class TernarOpItem extends GraphTargetItem {
 
+    /**
+     * Expression
+     */
     public GraphTargetItem expression;
 
+    /**
+     * On true
+     */
     public GraphTargetItem onTrue;
 
+    /**
+     * On false
+     */
     public GraphTargetItem onFalse;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param expression Expression
+     * @param onTrue On true
+     * @param onFalse On false
+     */
     public TernarOpItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
         super(src, lineStartIns, PRECEDENCE_CONDITIONAL);
         this.expression = expression;

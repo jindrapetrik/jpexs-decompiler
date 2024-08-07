@@ -37,10 +37,22 @@ import java.util.List;
  */
 public class InterfaceActionItem extends ActionItem {
 
+    /**
+     * Name
+     */
     public GraphTargetItem name;
 
+    /**
+     * Super interfaces
+     */
     public List<GraphTargetItem> superInterfaces;
 
+    /**
+     * Constructor.
+     *
+     * @param name Name
+     * @param superInterfaces Super interfaces
+     */
     public InterfaceActionItem(GraphTargetItem name, List<GraphTargetItem> superInterfaces) {
         super(null, null, NOPRECEDENCE);
         this.name = name;

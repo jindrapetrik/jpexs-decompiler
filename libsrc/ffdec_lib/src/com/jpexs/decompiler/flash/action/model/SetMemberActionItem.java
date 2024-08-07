@@ -42,14 +42,29 @@ import java.util.Objects;
  */
 public class SetMemberActionItem extends ActionItem implements SetTypeActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Object name
+     */
     public GraphTargetItem objectName;
 
+    /**
+     * Value
+     */
     private int tempRegister = -1;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
     @Override
@@ -84,6 +99,15 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
         return value;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param objectName Object name
+     * @param value Value
+     */
     public SetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;

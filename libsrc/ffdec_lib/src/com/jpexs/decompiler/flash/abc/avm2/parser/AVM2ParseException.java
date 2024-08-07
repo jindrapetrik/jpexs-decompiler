@@ -25,6 +25,12 @@ import com.jpexs.decompiler.flash.ParseException;
  */
 public class AVM2ParseException extends ParseException {
 
+    /**
+     * Constructor.
+     *
+     * @param text Text
+     * @param line Line
+     */
     public AVM2ParseException(String text, long line) {
         super(text, line);
     }

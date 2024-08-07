@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushUIntIns extends InstructionDefinition implements PushIntegerTypeIns {
 
+    /**
+     * Constructor
+     */
     public PushUIntIns() {
         super(0x2e, "pushuint", new int[]{AVM2Code.DAT_UINT_INDEX}, false);
     }

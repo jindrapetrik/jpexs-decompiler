@@ -29,8 +29,17 @@ import java.util.Set;
  */
 public class IntegerValueItem extends GraphTargetItem implements IntegerValueTypeItem {
 
+    /**
+     * Integer value
+     */
     private final int intValue;
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public IntegerValueItem(GraphSourceItem src, GraphSourceItem lineStartIns, int value) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
         this.intValue = value;

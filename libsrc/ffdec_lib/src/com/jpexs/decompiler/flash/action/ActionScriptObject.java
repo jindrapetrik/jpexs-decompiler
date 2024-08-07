@@ -50,6 +50,13 @@ public class ActionScriptObject implements Cloneable {
     protected List<Object> implementsObjs = new ArrayList<>();
 
     /**
+     * Constructor.
+     */
+    public ActionScriptObject() {
+
+    }
+
+    /**
      * Clears all members of the object
      */
     public void clearMembers() {

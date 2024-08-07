@@ -43,6 +43,9 @@ import java.util.Map;
 @SWFVersion(from = 6)
 public class ActionEnumerate2 extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionEnumerate2() {
         super(0x55, 0, Utf8Helper.charsetName);
     }

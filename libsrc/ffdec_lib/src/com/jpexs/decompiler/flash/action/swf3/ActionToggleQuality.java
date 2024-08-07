@@ -38,6 +38,9 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionToggleQuality extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionToggleQuality() {
         super(0x08, 0, Utf8Helper.charsetName);
     }

@@ -46,10 +46,21 @@ import java.util.Set;
 @SWFVersion(from = 5)
 public class ActionWith extends Action implements GraphSourceItemContainer {
 
+    /**
+     * Code size.
+     */
     public int codeSize;
 
+    /**
+     * Version.
+     */
     public int version;
 
+    /**
+     * Constructor.
+     * @param codeSize Code size
+     * @param charset Charset
+     */
     public ActionWith(int codeSize, String charset) {
         super(0x94, 2, charset);
         this.codeSize = codeSize;
@@ -73,12 +84,26 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         return false;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param version Version
+     * @throws IOException Error
+     */
     public ActionWith(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x94, actionLength, sis.getCharset());
         codeSize = sis.readUI16("codeSize");
         this.version = version;
     }
 
+    /**
+     * Constructor.
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionWith(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x94, 2, charset);
         lexBlockOpen(lexer);

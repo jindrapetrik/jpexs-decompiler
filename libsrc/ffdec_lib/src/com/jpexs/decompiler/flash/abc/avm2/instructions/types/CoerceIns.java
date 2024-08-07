@@ -43,6 +43,9 @@ import java.util.List;
  */
 public class CoerceIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
+    /**
+     * Constructor
+     */
     public CoerceIns() {
         super(0x80, "coerce", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

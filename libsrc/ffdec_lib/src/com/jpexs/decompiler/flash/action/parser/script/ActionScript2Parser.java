@@ -178,6 +178,9 @@ import java.util.Map;
  */
 public class ActionScript2Parser {
 
+    /**
+     * Builtin classes that can be casted to
+     */
     public static final List<String> BUILTIN_CASTS = Arrays.asList(new String[]{
         "flash.display.BitmapData",
         "flash.external.ExternalInterface",
@@ -227,11 +230,28 @@ public class ActionScript2Parser {
         "XMLUI"
     });
 
+    /**
+     * Swf version
+     */
     private final int swfVersion;
+    /**
+     * Swf classes
+     */
     private List<String> swfClasses = new ArrayList<>();
+    /**
+     * Target source
+     */
     private final ASMSource targetSource;
+    /**
+     * Charset
+     */
     private String charset;
 
+    /**
+     * Constructor
+     * @param swf Swf
+     * @param targetSource Target source
+     */
     public ActionScript2Parser(SWF swf, ASMSource targetSource) {
         this.swfVersion = swf.version;
         this.charset = swf.getCharset();
@@ -243,6 +263,10 @@ public class ActionScript2Parser {
 
     private final boolean debugMode = false;
 
+    /**
+     * Parse SWF classes
+     * @param swf SWF
+     */
     private void parseSwfClasses(SWF swf) {
         Map<String, ASMSource> asms = swf.getASMs(false);
         for (ASMSource s : asms.values()) {
@@ -2104,6 +2128,15 @@ public class ActionScript2Parser {
 
     private List<String> constantPool;
 
+    /**
+     * Convert a string to a high-level model.
+     * @param str The string to convert
+     * @param constantPool The constant pool to use
+     * @return The high-level model
+     * @throws ActionParseException On parse error
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException, InterruptedException {
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
@@ -2399,6 +2432,16 @@ public class ActionScript2Parser {
         return ret;
     }
 
+    /**
+     * Converts a string to a list of actions.
+     * @param s The string to convert
+     * @param charset Charset
+     * @return List of actions
+     * @throws ActionParseException On parsing error
+     * @throws IOException On I/O error
+     * @throws CompilationException On compilation error
+     * @throws InterruptedException On interrupt
+     */
     public List<Action> actionsFromString(String s, String charset) throws ActionParseException, IOException, CompilationException, InterruptedException {
         try {
             List<String> constantPool = new ArrayList<>();

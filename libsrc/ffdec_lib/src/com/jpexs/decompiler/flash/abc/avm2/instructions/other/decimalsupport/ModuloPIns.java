@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class ModuloPIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ModuloPIns() {
         super(0xB9, "modulo_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.ES4_NUMERICS_MINOR);
     }

@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class AddIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public AddIIns() {
         super(0xc5, "add_i", new int[]{}, true);
     }

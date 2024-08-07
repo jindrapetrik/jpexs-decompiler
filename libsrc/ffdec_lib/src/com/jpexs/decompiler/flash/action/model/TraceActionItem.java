@@ -38,6 +38,12 @@ import java.util.Objects;
  */
 public class TraceActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public TraceActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }

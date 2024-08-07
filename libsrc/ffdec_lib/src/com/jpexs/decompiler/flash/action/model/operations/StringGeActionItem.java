@@ -37,6 +37,13 @@ import java.util.Set;
  */
 public class StringGeActionItem extends BinaryOpItem implements Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public StringGeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "ge", "String", "String");
     }

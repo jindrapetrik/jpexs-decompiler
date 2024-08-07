@@ -56,14 +56,29 @@ import java.util.logging.Logger;
  */
 public class TryActionItem extends ActionItem implements Block {
 
+    /**
+     * Try commands
+     */
     public List<GraphTargetItem> tryCommands;
 
+    /**
+     * Catch exception names
+     */
     public List<GraphTargetItem> catchExceptionNames;
 
+    /**
+     * Catch exception types
+     */
     public List<GraphTargetItem> catchExceptionTypes;
 
+    /**
+     * Catch commands
+     */
     public List<List<GraphTargetItem>> catchCommands;
 
+    /**
+     * Finally commands
+     */
     public List<GraphTargetItem> finallyCommands;
 
     @Override
@@ -97,6 +112,15 @@ public class TryActionItem extends ActionItem implements Block {
 
     }
 
+    /**
+     * Constructor.
+     *
+     * @param tryCommands Try commands
+     * @param catchExceptionNames Catch exception names
+     * @param catchExceptionTypes Catch exception types
+     * @param catchCommands Catch commands
+     * @param finallyCommands Finally commands
+     */
     public TryActionItem(List<GraphTargetItem> tryCommands, List<GraphTargetItem> catchExceptionNames, List<GraphTargetItem> catchExceptionTypes, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
         super(null, null, NOPRECEDENCE);
         this.tryCommands = tryCommands;

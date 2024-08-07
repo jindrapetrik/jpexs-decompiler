@@ -36,8 +36,14 @@ import java.util.Objects;
  */
 public class CastOpActionItem extends ActionItem {
 
+    /**
+     * Constructor
+     */
     public GraphTargetItem constructor;
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
     @Override
@@ -46,6 +52,14 @@ public class CastOpActionItem extends ActionItem {
         visitor.visit(object);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param constructor Constructor
+     * @param object Object
+     */
     public CastOpActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem constructor, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.constructor = constructor;

@@ -42,12 +42,24 @@ import java.util.Objects;
  */
 public class GotoFrame2ActionItem extends ActionItem {
 
+    /**
+     * Frame
+     */
     public GraphTargetItem frame;
 
+    /**
+     * Scene bias flag
+     */
     public boolean sceneBiasFlag;
 
+    /**
+     * Play flag
+     */
     public boolean playFlag;
 
+    /**
+     * Scene bias
+     */
     public int sceneBias;
 
     @Override
@@ -55,6 +67,16 @@ public class GotoFrame2ActionItem extends ActionItem {
         visitor.visit(frame);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param frame Frame
+     * @param sceneBiasFlag Scene bias flag
+     * @param playFlag Play flag
+     * @param sceneBias Scene bias
+     */
     public GotoFrame2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.frame = frame;

@@ -35,6 +35,11 @@ import java.util.Set;
  */
 public class GetTimeActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public GetTimeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }

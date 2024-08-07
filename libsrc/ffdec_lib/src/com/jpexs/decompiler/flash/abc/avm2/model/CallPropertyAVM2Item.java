@@ -37,18 +37,47 @@ import java.util.Objects;
  */
 public class CallPropertyAVM2Item extends AVM2Item {
 
+    /**
+     * Receiver
+     */
     public GraphTargetItem receiver;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Is void
+     */
     public boolean isVoid;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param isVoid Is void
+     * @param receiver Receiver
+     * @param propertyName Property name
+     * @param arguments Arguments
+     * @param type Type
+     * @param isStatic Is static
+     */
     public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments, GraphTargetItem type, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.receiver = receiver;

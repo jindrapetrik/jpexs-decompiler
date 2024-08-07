@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class PushWithIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushWithIns() {
         super(0x1c, "pushwith", new int[]{}, false);
     }

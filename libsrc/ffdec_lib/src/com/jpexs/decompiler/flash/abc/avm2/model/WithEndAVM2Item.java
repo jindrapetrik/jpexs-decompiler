@@ -31,8 +31,17 @@ import java.util.Objects;
  */
 public class WithEndAVM2Item extends AVM2Item {
 
+    /**
+     * Scope.
+     */
     public GraphTargetItem scope;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     */
     public WithEndAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.scope = scope;

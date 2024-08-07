@@ -25,6 +25,11 @@ import com.jpexs.decompiler.flash.ParseException;
  */
 public class ActionParseException extends ParseException {
 
+    /**
+     * Constructs a new parse exception.
+     * @param text Text of the exception
+     * @param line Line number where the exception occurred
+     */
     public ActionParseException(String text, long line) {
         super(text, line);
     }

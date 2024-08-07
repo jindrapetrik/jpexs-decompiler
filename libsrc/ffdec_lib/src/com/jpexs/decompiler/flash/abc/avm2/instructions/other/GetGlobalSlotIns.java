@@ -41,6 +41,9 @@ import java.util.List;
  */
 public class GetGlobalSlotIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetGlobalSlotIns() {
         super(0x6e, "getglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX}, false);
     }

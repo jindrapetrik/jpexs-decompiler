@@ -34,6 +34,13 @@ import java.util.Objects;
  */
 public class EvalActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public EvalActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }

@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Sf32Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Sf32Ins() {
         super(0x3D, "sf32", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

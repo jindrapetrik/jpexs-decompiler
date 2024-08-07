@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class StrictEqualsIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public StrictEqualsIns() {
         super(0xac, "strictequals", new int[]{}, true);
     }

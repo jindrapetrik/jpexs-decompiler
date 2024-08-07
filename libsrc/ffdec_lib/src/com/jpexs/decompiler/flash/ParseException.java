@@ -36,8 +36,8 @@ public abstract class ParseException extends Exception {
     /**
      * Constructs a new parse exception.
      *
-     * @param text
-     * @param line
+     * @param text Text of the exception
+     * @param line Line number where the exception occurred
      */
     public ParseException(String text, long line) {
         super("ParseException:" + text + " on line " + line);

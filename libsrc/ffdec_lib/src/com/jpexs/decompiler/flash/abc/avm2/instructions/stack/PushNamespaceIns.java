@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class PushNamespaceIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushNamespaceIns() {
         super(0x31, "pushnamespace", new int[]{AVM2Code.DAT_NAMESPACE_INDEX}, false);
     }

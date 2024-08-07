@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * JPEG marker.
  * @author JPEXS
  */
 public class JpegMarker {

@@ -37,8 +37,14 @@ import java.util.Objects;
  */
 public class MBStringExtractActionItem extends ActionItem {
 
+    /**
+     * Index
+     */
     public GraphTargetItem index;
 
+    /**
+     * Count
+     */
     public GraphTargetItem count;
 
     @Override
@@ -48,6 +54,15 @@ public class MBStringExtractActionItem extends ActionItem {
         visitor.visit(count);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     * @param index Index
+     * @param count Count
+     */
     public MBStringExtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.index = index;
@@ -81,6 +96,14 @@ public class MBStringExtractActionItem extends ActionItem {
         return getResult(count.getResult(), index.getResult(), value.getResult());
     }
 
+    /**
+     * Gets result.
+     *
+     * @param count Count
+     * @param index Index
+     * @param value Value
+     * @return Result
+     */
     public static String getResult(Object count, Object index, Object value) {
         String str = EcmaScript.toString(value);
         int idx = EcmaScript.toInt32(index);

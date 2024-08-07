@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class IncLocalIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IncLocalIIns() {
         super(0xc2, "inclocal_i", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX}, true);
     }

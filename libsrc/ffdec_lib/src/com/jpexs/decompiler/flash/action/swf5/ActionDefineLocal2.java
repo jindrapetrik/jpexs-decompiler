@@ -41,6 +41,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionDefineLocal2 extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionDefineLocal2() {
         super(0x41, 0, Utf8Helper.charsetName);
     }

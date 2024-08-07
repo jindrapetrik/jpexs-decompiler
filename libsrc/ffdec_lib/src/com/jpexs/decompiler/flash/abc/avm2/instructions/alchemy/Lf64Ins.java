@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Lf64Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Lf64Ins() {
         super(0x39, "lf64", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

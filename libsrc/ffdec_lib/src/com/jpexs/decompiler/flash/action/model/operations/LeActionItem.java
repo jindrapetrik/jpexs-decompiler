@@ -41,6 +41,13 @@ import java.util.List;
  */
 public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public LeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=", "", "");
     }

@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Set implementation.
  *
- * @param <T>
+ * @param <T> Type of elements
  * @author JPEXS
  */
 public class MySet<T> implements Set<T> {

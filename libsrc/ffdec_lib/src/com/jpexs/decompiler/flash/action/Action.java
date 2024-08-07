@@ -219,6 +219,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param actionCode Action type identifier
      * @param actionLength Length of action data
+     * @param charset Charset
      */
     public Action(int actionCode, int actionLength, String charset) {
         this.actionCode = actionCode;
@@ -307,7 +308,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param lex FlasmLexer
      * @return String value
-     * @throws IOException
+     * @throws IOException On I/O error
      * @throws ActionParseException When read object is not String
      */
     protected String lexString(FlasmLexer lex) throws IOException, ActionParseException {
@@ -322,7 +323,7 @@ public abstract class Action implements GraphSourceItem {
      * Reads Block startServer from FlasmLexer.
      *
      * @param lex FlasmLexer
-     * @throws IOException
+     * @throws IOException On I/O error
      * @throws ActionParseException When read object is not Block startServer
      */
     protected void lexBlockOpen(FlasmLexer lex) throws IOException, ActionParseException {
@@ -337,7 +338,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param lex FlasmLexer
      * @return Identifier name
-     * @throws IOException
+     * @throws IOException On I/O error
      * @throws ActionParseException When read object is not Identifier
      */
     protected String lexIdentifier(FlasmLexer lex) throws IOException, ActionParseException {
@@ -353,7 +354,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param lex FlasmLexer
      * @return long value
-     * @throws IOException
+     * @throws IOException On I/O error
      * @throws ActionParseException When read object is not long value
      */
     protected long lexLong(FlasmLexer lex) throws IOException, ActionParseException {
@@ -369,7 +370,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param lex FlasmLexer
      * @return boolean value
-     * @throws IOException
+     * @throws IOException On I/O error
      * @throws ActionParseException When read object is not boolean value
      */
     protected boolean lexBoolean(FlasmLexer lex) throws IOException, ActionParseException {
@@ -384,8 +385,8 @@ public abstract class Action implements GraphSourceItem {
      * Reads optional comma from FlasmLexer.
      *
      * @param lex FlasmLexer
-     * @throws IOException
-     * @throws ActionParseException
+     * @throws IOException On I/O error
+     * @throws ActionParseException On parse error
      */
     protected void lexOptionalComma(FlasmLexer lex) throws IOException, ActionParseException {
         ASMParsedSymbol symb = lex.lex();
@@ -416,7 +417,7 @@ public abstract class Action implements GraphSourceItem {
      * Gets content bytes of action.
      *
      * @param sos SWFOutputStream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     protected void getContentBytes(SWFOutputStream sos) throws IOException {
     }
@@ -525,7 +526,7 @@ public abstract class Action implements GraphSourceItem {
      * @param src ASMSource
      * @param constantPools List of constant pools
      * @param tryInline Whether to try to inline constant pools
-     * @throws ConstantPoolTooBigException
+     * @throws ConstantPoolTooBigException When constant pool is too big
      */
     public static void setConstantPools(ASMSource src, List<List<String>> constantPools, boolean tryInline) throws ConstantPoolTooBigException {
         try {
@@ -593,13 +594,13 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Converts list of actions to ASM source.
      *
-     * @param listeners
-     * @param address
+     * @param listeners List of listeners
+     * @param address Address
      * @param list List of actions
      * @param version SWF version
      * @param exportMode PCode or hex?
-     * @param writer
-     * @return GraphTextWriter
+     * @param writer Writer
+     * @return Writer
      */
     public static GraphTextWriter actionsToString(List<DisassemblyListener> listeners, long address, ActionList list, int version, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (exportMode == ScriptExportMode.CONSTANTS) {
@@ -958,7 +959,7 @@ public abstract class Action implements GraphSourceItem {
      * @param writer Writer
      * @param charset Charset
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static GraphTextWriter actionsToSource(Map<String, Map<String, Trait>> uninitializedClassTraits, final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset) throws InterruptedException {
         return Action.actionsToSource(uninitializedClassTraits, asm, actions, path, writer, charset, new ArrayList<>());
@@ -967,6 +968,7 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Converts list of actions to ActionScript source code.
      *
+     * @param uninitializedClassTraits Uninitialized class traits
      * @param asm ASM source
      * @param actions List of actions
      * @param path Path
@@ -974,7 +976,7 @@ public abstract class Action implements GraphSourceItem {
      * @param charset Charset
      * @param treeOperations List of tree operations
      * @return Writer
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static GraphTextWriter actionsToSource(Map<String, Map<String, Trait>> uninitializedClassTraits, final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         writer.suspendMeasure();
@@ -1050,7 +1052,7 @@ public abstract class Action implements GraphSourceItem {
      * @param path Path
      * @param charset Charset
      * @return List of treeItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         return actionsToTree(uninitializedClassTraits, insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
@@ -1058,7 +1060,9 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts list of actions to List of treeItems.
-     *
+     * @param uninitializedClassTraits Uninitialized class traits
+     * @param insideDoInitAction Inside DoInitAction?
+     * @param insideFunction Inside function?
      * @param regNames Register names
      * @param variables Variables
      * @param functions Functions
@@ -1066,8 +1070,9 @@ public abstract class Action implements GraphSourceItem {
      * @param version SWF version
      * @param staticOperation Unused
      * @param path Path
+     * @param charset Charset
      * @return List of treeItems
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> actionsToTree(Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
@@ -1097,7 +1102,7 @@ public abstract class Action implements GraphSourceItem {
      * @param functions Functions
      * @param staticOperation the value of staticOperation
      * @param path the value of path
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
@@ -1110,7 +1115,7 @@ public abstract class Action implements GraphSourceItem {
      * @param output Output list
      * @param staticOperation Unused
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {
@@ -1219,8 +1224,8 @@ public abstract class Action implements GraphSourceItem {
      * @param path Path
      * @param charset Charset
      * @return List of tree items
-     * @throws InterruptedException
-     * @throws GraphPartChangeException
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
      */
     public static List<GraphTargetItem> actionsPartToTree(ActionGraph graph, Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> lineStartActionRef, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
         if (start < actions.size() && (end > 0) && (start > 0)) {

@@ -35,6 +35,12 @@ import java.util.Objects;
  */
 public class MBCharToAsciiActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public MBCharToAsciiActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -60,6 +66,11 @@ public class MBCharToAsciiActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Get result.
+     * @param ch Character
+     * @return Result
+     */
     public static int getResult(Object ch) {
         String s = ch.toString();
         if (s.length() > 0) {

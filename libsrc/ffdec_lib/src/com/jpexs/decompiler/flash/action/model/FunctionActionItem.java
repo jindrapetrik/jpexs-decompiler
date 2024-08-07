@@ -52,41 +52,99 @@ import java.util.Set;
  */
 public class FunctionActionItem extends ActionItem implements BranchStackResistant {
 
+    /**
+     * Decompile get/set functions
+     */
     public static final boolean DECOMPILE_GET_SET = true;
 
+    /**
+     * Is getter
+     */
     public boolean isGetter = false;
 
+    /**
+     * Is setter
+     */
     public boolean isSetter = false;
 
+    /**
+     * Actions
+     */
     public List<GraphTargetItem> actions;
 
+    /**
+     * Constants
+     */
     public List<String> constants;
 
+    /**
+     * Function name
+     */
     public String functionName;
 
+    /**
+     * Parameter names
+     */
     public List<String> paramNames;
 
+    /**
+     * Register names
+     */
     public Map<Integer, String> regNames;
 
+    /**
+     * Calculated function name
+     */
     public GraphTargetItem calculatedFunctionName;
 
+    /**
+     * Has eval
+     */
     public boolean hasEval = false;
 
+    /**
+     * Register start
+     */
     private int regStart;
 
+    /**
+     * Variables
+     */
     private List<VariableActionItem> variables;
+
+    /**
+     * Inner functions
+     */
     private List<FunctionActionItem> innerFunctions;
 
+    /**
+     * Register - this
+     */
     public static final int REGISTER_THIS = 1;
 
+    /**
+     * Register - arguments
+     */
     public static final int REGISTER_ARGUMENTS = 2;
 
+    /**
+     * Register - super
+     */
     public static final int REGISTER_SUPER = 3;
 
+    /**
+     * Register - root
+     */
     public static final int REGISTER_ROOT = 4;
 
+    /**
+     * Register - parent
+     */
     public static final int REGISTER_PARENT = 5;
 
+    /**
+     * Register - global
+     */
     public static final int REGISTER_GLOBAL = 6;
 
     @Override
@@ -99,14 +157,35 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
 
     }
 
+    /**
+     * Adds variable.
+     * @param variable Variable
+     */
     public void addVariable(VariableActionItem variable) {
         variables.add(variable);
     }
 
+    /**
+     * Constructor.
+     */
     public FunctionActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param functionName Function name
+     * @param paramNames Parameter names
+     * @param regNames Register names
+     * @param actions Actions
+     * @param constants Constants
+     * @param regStart Register start
+     * @param variables Variables
+     * @param innerFunctions Inner functions
+     * @param hasEval Has eval
+     */
     public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions, boolean hasEval) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;

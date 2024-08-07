@@ -26,8 +26,16 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class TemporaryRegisterMark extends ActionItem {
 
+    /**
+     * Temporary register.
+     */
     public TemporaryRegister tempReg;
 
+    /**
+     * Constructor.
+     *
+     * @param tempReg Temporary register
+     */
     public TemporaryRegisterMark(TemporaryRegister tempReg) {
         this.tempReg = tempReg;
     }

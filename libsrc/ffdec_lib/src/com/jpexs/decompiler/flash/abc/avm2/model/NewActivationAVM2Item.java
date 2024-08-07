@@ -35,8 +35,17 @@ import java.util.List;
  */
 public class NewActivationAVM2Item extends AVM2Item {
 
+    /**
+     * Slots.
+     */
     public HashMap<Integer, GraphTargetItem> slots = new HashMap<>();
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public NewActivationAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
     }

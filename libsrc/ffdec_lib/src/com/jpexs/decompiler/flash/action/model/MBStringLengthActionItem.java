@@ -36,6 +36,13 @@ import java.util.Objects;
  */
 public class MBStringLengthActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public MBStringLengthActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -67,6 +74,12 @@ public class MBStringLengthActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Gets result.
+     *
+     * @param obj Object
+     * @return Result
+     */
     public static Double getResult(Object obj) {
         return EcmaScript.toNumberAs2(EcmaScript.toString(obj).length());
     }

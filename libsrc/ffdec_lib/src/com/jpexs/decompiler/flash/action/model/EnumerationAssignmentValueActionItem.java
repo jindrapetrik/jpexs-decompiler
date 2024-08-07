@@ -39,6 +39,9 @@ public class EnumerationAssignmentValueActionItem extends ActionItem {
 
     }
 
+    /**
+     * Constructor.
+     */
     public EnumerationAssignmentValueActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
     }

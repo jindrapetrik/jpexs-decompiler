@@ -161,7 +161,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
      */
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
@@ -183,7 +182,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
      * @param writer Writer
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
-     * @throws InterruptedException
      */
     @Override
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {

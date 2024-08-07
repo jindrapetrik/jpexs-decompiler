@@ -31,10 +31,24 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class FilterAVM2Item extends AVM2Item {
 
+    /**
+     * Expression
+     */
     public GraphTargetItem expression;
 
+    /**
+     * Collection
+     */
     public GraphTargetItem collection;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param collection Collection
+     * @param expression Expression
+     */
     public FilterAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem collection, GraphTargetItem expression) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.expression = expression;

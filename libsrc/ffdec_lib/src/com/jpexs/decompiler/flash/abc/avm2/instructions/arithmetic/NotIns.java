@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class NotIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NotIns() {
         super(0x96, "not", new int[]{}, false);
     }

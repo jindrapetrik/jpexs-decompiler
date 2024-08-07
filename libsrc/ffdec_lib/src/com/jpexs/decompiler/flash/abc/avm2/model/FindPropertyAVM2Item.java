@@ -37,8 +37,18 @@ import java.util.Objects;
  */
 public class FindPropertyAVM2Item extends AVM2Item {
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param propertyName Property name
+     */
     public FindPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem propertyName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;

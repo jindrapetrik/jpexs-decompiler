@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class PrologueIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PrologueIns() {
         super(0xF9, "prologue", new int[]{}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNDOCUMENTED);
     }

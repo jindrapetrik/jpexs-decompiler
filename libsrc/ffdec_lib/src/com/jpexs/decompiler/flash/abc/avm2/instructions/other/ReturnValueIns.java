@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class ReturnValueIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public ReturnValueIns() {
         super(0x48, "returnvalue", new int[]{}, true);
     }

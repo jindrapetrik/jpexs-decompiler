@@ -37,6 +37,11 @@ import java.util.List;
  */
 public class NanAVM2Item extends AVM2Item implements SimpleValue {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public NanAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
     }

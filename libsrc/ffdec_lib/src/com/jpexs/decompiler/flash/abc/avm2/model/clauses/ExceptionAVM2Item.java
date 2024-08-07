@@ -30,8 +30,16 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class ExceptionAVM2Item extends AVM2Item {
 
+    /**
+     * Exception.
+     */
     public ABCException exception;
 
+    /**
+     * Constructor.
+     *
+     * @param exception Exception
+     */
     public ExceptionAVM2Item(ABCException exception) {
         super(null, null, NOPRECEDENCE);
         this.exception = exception;

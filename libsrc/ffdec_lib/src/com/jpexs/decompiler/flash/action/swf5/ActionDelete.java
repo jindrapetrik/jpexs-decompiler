@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionDelete extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionDelete() {
         super(0x3A, 0, Utf8Helper.charsetName);
     }

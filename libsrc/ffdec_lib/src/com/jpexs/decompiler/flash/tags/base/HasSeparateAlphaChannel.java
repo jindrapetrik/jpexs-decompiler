@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import java.io.IOException;
 
 /**
+ * Has separate alpha channel interface.
  * @author JPEXS
  */
 public interface HasSeparateAlphaChannel {

@@ -38,18 +38,41 @@ import java.util.List;
  */
 public abstract class ActionItem extends GraphTargetItem implements Serializable {
 
+    /**
+     * Constructor.
+     */
     public ActionItem() {
         super(null, null, NOPRECEDENCE);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param precedence Precedence
+     */
     public ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence) {
         this(instruction, lineStartIns, precedence, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param precedence Precedence
+     * @param value Value
+     */
     public ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int precedence, GraphTargetItem value) {
         super(instruction, lineStartIns, precedence, value);
     }
 
+    /**
+     * Chech if item is empty string.
+     * @param target Target
+     * @return True if item is empty string
+     */
     protected boolean isEmptyString(GraphTargetItem target) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
@@ -62,6 +85,14 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         return false;
     }
 
+    /**
+     * Strip quotes.
+     * @param target Target
+     * @param localData Local data
+     * @param writer Writer
+     * @return Writer
+     * @throws InterruptedException On interrupt
+     */
     protected GraphTextWriter stripQuotes(GraphTargetItem target, LocalData localData, GraphTextWriter writer) throws InterruptedException {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
@@ -75,6 +106,14 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         }
     }
 
+    /**
+     * Converts item to source including call.
+     * @param localData Local data
+     * @param gen Generator
+     * @param list List
+     * @return List of source items
+     * @throws CompilationException On compilation error
+     */
     protected List<GraphSourceItem> toSourceCall(SourceGeneratorLocalData localData, SourceGenerator gen, List<GraphTargetItem> list) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) gen;
         String charset = asGenerator.getCharset();

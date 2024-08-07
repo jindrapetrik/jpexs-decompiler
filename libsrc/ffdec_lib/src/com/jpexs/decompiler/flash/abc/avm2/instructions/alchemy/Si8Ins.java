@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Si8Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Si8Ins() {
         super(0x3A, "si8", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

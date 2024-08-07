@@ -33,6 +33,11 @@ import java.util.List;
  */
 public class PopItem extends GraphTargetItem {
 
+    /**
+     * Constructor.
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     */
     public PopItem(GraphSourceItem src, GraphSourceItem lineStartIns) {
         super(src, lineStartIns, PRECEDENCE_PRIMARY);
     }

@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionToInteger extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionToInteger() {
         super(0x18, 0, Utf8Helper.charsetName);
     }

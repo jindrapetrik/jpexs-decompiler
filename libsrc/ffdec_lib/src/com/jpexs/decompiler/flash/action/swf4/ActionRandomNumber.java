@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionRandomNumber extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionRandomNumber() {
         super(0x30, 0, Utf8Helper.charsetName);
     }

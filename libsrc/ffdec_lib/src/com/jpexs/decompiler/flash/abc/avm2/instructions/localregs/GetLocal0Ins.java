@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
  */
 public class GetLocal0Ins extends GetLocalTypeIns {
 
+    /**
+     * Constructor
+     */
     public GetLocal0Ins() {
         super(0xd0, "getlocal0", new int[]{}, false);
     }

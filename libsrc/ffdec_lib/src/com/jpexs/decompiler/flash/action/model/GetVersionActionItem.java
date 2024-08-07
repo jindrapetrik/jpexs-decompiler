@@ -34,6 +34,11 @@ import java.util.List;
  */
 public class GetVersionActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public GetVersionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }

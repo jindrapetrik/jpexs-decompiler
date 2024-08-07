@@ -44,12 +44,29 @@ import java.util.List;
  */
 public class TellTargetActionItem extends ActionItem implements Block {
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Nested
+     */
     public boolean nested = false;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     * @param commands Commands
+     */
     public TellTargetActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;

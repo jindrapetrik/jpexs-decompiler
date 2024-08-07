@@ -39,6 +39,10 @@ import java.util.Map;
 @SWFVersion(from = 7)
 public class ActionExtends extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionExtends(String charset) {
         super(0x69, 0, charset);
     }

@@ -36,6 +36,13 @@ import java.util.Set;
  */
 public class StringNeActionItem extends BinaryOpItem implements Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public StringNeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "ne", "String", "String");
     }

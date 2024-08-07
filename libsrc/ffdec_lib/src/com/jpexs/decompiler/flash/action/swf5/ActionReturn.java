@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionReturn extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionReturn() {
         super(0x3E, 0, Utf8Helper.charsetName);
     }

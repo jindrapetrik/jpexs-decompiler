@@ -38,6 +38,13 @@ import java.util.List;
  */
 public class NeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition, NotEqualsTypeItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public NeqAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=", "", "");
     }

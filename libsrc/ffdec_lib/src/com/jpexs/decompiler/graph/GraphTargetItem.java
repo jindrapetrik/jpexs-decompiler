@@ -339,7 +339,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Gets highlight src data
      *
-     * @return
+     * @return Highlight src data
      */
     protected HighlightData getSrcData() {
         if (srcData == null) {
@@ -383,7 +383,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringSemicoloned(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -414,7 +414,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "Boolean");
@@ -426,7 +426,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "String");
@@ -438,7 +438,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "int");
@@ -450,7 +450,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "Number");
@@ -471,8 +471,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      *
      * @param writer Writer
      * @param localData Local data
+     * @param implicitCoerce Implicit coerce
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -488,9 +489,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Converts this to string.
      *
+     * @param writer Writer
      * @param localData Local data
      * @return String
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData, "");
@@ -501,7 +503,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      *
      * @param localData Local data
      * @return String
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public String toString(LocalData localData) throws InterruptedException {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
@@ -516,7 +518,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
 
@@ -526,7 +528,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return appendTry(writer, localData, "");
@@ -539,7 +541,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param localData Local data
      * @param implicitCoerce Implicit coerce
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         GraphTargetItem t = this;
@@ -699,7 +701,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
@@ -714,7 +716,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendToNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return toString(writer, localData);
@@ -771,7 +773,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
@@ -826,7 +828,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param localData Local data
      * @param generator Source generator
      * @return Source
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return new ArrayList<>();
@@ -838,7 +840,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param localData Local data
      * @param generator Source generator
      * @return Source
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (!hasReturnValue()) {
@@ -867,7 +869,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param gen Source generator
      * @param tar Objects
      * @return List of GraphTargetItems
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public static List<GraphSourceItem> toSourceMerge(SourceGeneratorLocalData localData, SourceGenerator gen, Object... tar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -989,7 +991,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Visits this without using Blocks.
      *
-     * @param visitor
+     * @param visitor Visitor
      */
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
         visit(visitor);
@@ -998,7 +1000,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Gets return type.
      *
-     * @return
+     * @return Return type
      */
     public abstract GraphTargetItem returnType();
 
@@ -1035,7 +1037,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param commands Commands
      * @param asBlock As block
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendCommands(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands, boolean asBlock) throws InterruptedException {
 
@@ -1071,12 +1073,12 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Append this to a writer as a Block.
      *
-     * @param prevLineItem
-     * @param writer
-     * @param localData
-     * @param commands
-     * @return
-     * @throws InterruptedException
+     * @param prevLineItem Previous line item
+     * @param writer Writer
+     * @param localData Local data
+     * @param commands Commands
+     * @return Writer
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendBlock(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands) throws InterruptedException {
         appendCommands(prevLineItem, writer, localData, commands, true);
@@ -1086,7 +1088,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Gets this as long.
      *
-     * @return
+     * @return This as long
      */
     public long getAsLong() {
         if (this instanceof DirectValueActionItem) {

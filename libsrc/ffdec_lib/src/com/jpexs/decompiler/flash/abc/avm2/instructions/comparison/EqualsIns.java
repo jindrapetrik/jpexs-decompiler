@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class EqualsIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public EqualsIns() {
         super(0xab, "equals", new int[]{}, true);
     }

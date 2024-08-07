@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class AddDIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public AddDIns() {
         super(0x9B, "add_d", new int[]{}, true /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.UNDOCUMENTED);
     }

@@ -23,6 +23,9 @@ package com.jpexs.decompiler.graph.precontinues;
  */
 public class WhileNode extends Node {
 
+    /**
+     * Body
+     */
     public Node body;
 
     @Override

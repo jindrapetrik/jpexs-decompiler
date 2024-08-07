@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushUndefinedIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushUndefinedIns() {
         super(0x21, "pushundefined", new int[]{}, false);
     }

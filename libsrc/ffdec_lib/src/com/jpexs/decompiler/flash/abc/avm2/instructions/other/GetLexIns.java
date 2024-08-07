@@ -44,6 +44,9 @@ import java.util.Objects;
  */
 public class GetLexIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetLexIns() {
         super(0x60, "getlex", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

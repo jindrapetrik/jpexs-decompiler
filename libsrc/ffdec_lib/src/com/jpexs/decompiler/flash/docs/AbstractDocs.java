@@ -35,8 +35,21 @@ import java.util.logging.Logger;
  */
 public class AbstractDocs {
 
+    /**
+     * Constructs new AbstractDocs
+     */
+    public AbstractDocs() {
+    }
+
+    /**
+     * Cache for documentation.
+     */
     protected static Cache<String, String> docsCache = Cache.getInstance(false, true, "abstractDocsCache", false);
 
+    /**
+     * Gets HTML header.
+     * @return HTML header
+     */
     protected static String htmlFooter() {
         StringBuilder sb = new StringBuilder();
 
@@ -44,6 +57,10 @@ public class AbstractDocs {
         return sb.toString();
     }
 
+    /**
+     * Gets style.
+     * @return Style
+     */
     public static String getStyle() {
         String cached = docsCache.get("__style");
         if (cached != null) {
@@ -61,24 +78,53 @@ public class AbstractDocs {
         return style;
     }
 
+    /**
+     * Gets meta property.
+     * @param name Name
+     * @param content Content
+     * @return Meta property
+     */
     protected static String metaProp(String name, String content) {
         return "\t\t<meta property=\"" + name + "\" content=\"" + content + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
 
+    /**
+     * Gets meta property.
+     * @param name Name
+     * @param content Content
+     * @return Meta property
+     */
     protected static String meta(String name, String content) {
         return "\t\t<meta name=\"" + name + "\" content=\"" + content + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
 
+    /**
+     * Gets meta property.
+     * @param name Name
+     * @param content Content
+     * @return Meta property
+     */
     protected static String meta(String name, Date content) {
         return "\t\t<meta name=\"" + name + "\" content=\"" + getISO8601StringForDate(content) + "\">" + As3PCodeOtherDocs.NEWLINE;
     }
 
+    /**
+     * Gets ISO8601 string for date.
+     * @param date Date
+     * @return ISO8601 string for date
+     */
     protected static String getISO8601StringForDate(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.format(date);
     }
 
+    /**
+     * Hilights argument.
+     * @param docs Docs
+     * @param argumentIndex Argument index
+     * @return Hilighted argument
+     */
     protected static String hilightArgument(String docs, int argumentIndex) {
         if (argumentIndex < 0) {
             return docs;

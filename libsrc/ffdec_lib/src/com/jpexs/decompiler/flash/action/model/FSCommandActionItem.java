@@ -39,8 +39,18 @@ import java.util.Objects;
  */
 public class FSCommandActionItem extends ActionItem {
 
+    /**
+     * Command
+     */
     private final GraphTargetItem command;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param command Command
+     */
     public FSCommandActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.command = command;

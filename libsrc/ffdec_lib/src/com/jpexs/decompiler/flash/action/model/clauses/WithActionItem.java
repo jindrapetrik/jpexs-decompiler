@@ -38,16 +38,36 @@ import java.util.List;
  */
 public class WithActionItem extends ActionItem {
 
+    /**
+     * Scope
+     */
     public GraphTargetItem scope;
 
+    /**
+     * Items
+     */
     public List<GraphTargetItem> items;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     * @param items Items
+     */
     public WithActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, List<GraphTargetItem> items) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = items;
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param scope Scope
+     */
     public WithActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, ActionItem scope) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;

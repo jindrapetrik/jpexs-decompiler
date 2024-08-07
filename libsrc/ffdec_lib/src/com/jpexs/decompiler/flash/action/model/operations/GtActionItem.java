@@ -40,6 +40,13 @@ import java.util.List;
  */
 public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public GtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">", "", "");
     }
@@ -49,6 +56,12 @@ public class GtActionItem extends BinaryOpItem implements LogicalOpItem {
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static Object getResult(Object rightResult, Object leftResult) {
         Object ret = EcmaScript.compare(leftResult, rightResult, true);
         if (ret == Undefined.INSTANCE) {

@@ -34,11 +34,11 @@ import java.util.List;
  * @author JPEXS
  */
 public class JumpIns extends InstructionDefinition implements IfTypeIns {
-
-    public static final String NAME = "jump";
-
+    /**
+     * Constructor
+     */
     public JumpIns() {
-        super(0x10, NAME, new int[]{AVM2Code.DAT_OFFSET}, false);
+        super(0x10, "jump", new int[]{AVM2Code.DAT_OFFSET}, false);
     }
 
     @Override

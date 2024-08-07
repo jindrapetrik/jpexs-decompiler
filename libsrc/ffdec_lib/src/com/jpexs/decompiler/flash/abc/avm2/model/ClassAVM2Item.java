@@ -31,15 +31,31 @@ import com.jpexs.decompiler.graph.model.LocalData;
  */
 public class ClassAVM2Item extends AVM2Item {
 
+    /**
+     * Class name
+     */
     public Multiname className;
 
+    /**
+     * Class name as string
+     */
     public DottedChain classNameAsStr;
 
+    /**
+     * Constructor.
+     *
+     * @param className Class name
+     */
     public ClassAVM2Item(Multiname className) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.className = className;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param className Class name as string
+     */
     public ClassAVM2Item(DottedChain className) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.classNameAsStr = className;

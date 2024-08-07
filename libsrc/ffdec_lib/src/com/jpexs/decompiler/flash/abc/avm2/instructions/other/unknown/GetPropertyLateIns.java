@@ -32,6 +32,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class GetPropertyLateIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetPropertyLateIns() {
         super(0x67, "getpropertylate", new int[]{}, true /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

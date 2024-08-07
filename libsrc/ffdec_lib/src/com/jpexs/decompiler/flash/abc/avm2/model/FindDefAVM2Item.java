@@ -31,8 +31,18 @@ import java.util.Objects;
  */
 public class FindDefAVM2Item extends AVM2Item {
 
+    /**
+     * Property name
+     */
     public Multiname propertyName;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param propertyName Property name
+     */
     public FindDefAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;

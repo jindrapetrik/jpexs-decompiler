@@ -39,10 +39,19 @@ import java.util.Objects;
  */
 public class GetMemberActionItem extends ActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Member name
+     */
     public final GraphTargetItem memberName;
 
+    /**
+     * Print obfuscated member name
+     */
     public boolean printObfuscatedMemberName = false;
 
     @Override
@@ -51,6 +60,14 @@ public class GetMemberActionItem extends ActionItem {
         visitor.visit(memberName);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param memberName Member name
+     */
     public GetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem memberName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

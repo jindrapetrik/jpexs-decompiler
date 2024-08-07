@@ -45,13 +45,29 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionConstantPool extends Action {
 
+    /**
+     * Constant pool
+     */
     public List<String> constantPool = new ArrayList<>();
 
+
+    /**
+     * Constructor.
+     * @param constantPool Constant pool
+     * @param charset Charset
+     */
     public ActionConstantPool(List<String> constantPool, String charset) {
         super(0x88, 0, charset);
         this.constantPool = constantPool;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param version SWF version
+     * @throws IOException On I/O error
+     */
     public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x88, actionLength, sis.getCharset());
         //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
@@ -61,6 +77,13 @@ public class ActionConstantPool extends Action {
         }
     }
 
+    /**
+     * Constructor.
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionConstantPool(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x88, 0, charset);
         boolean first = true;
@@ -102,10 +125,20 @@ public class ActionConstantPool extends Action {
         return calculateSize(constantPool);
     }
 
+    /**
+     * Calculates size of string converted to bytes
+     * @param str String
+     * @return Size
+     */
     public static int calculateSize(String str) {
         return Utf8Helper.getBytesLength(str) + 1;
     }
 
+    /**
+     * Calculates the size of the action converted to bytes
+     * @param strings Strings
+     * @return Size
+     */
     public static int calculateSize(List<String> strings) {
         int res = 2;
         for (String s : strings) {

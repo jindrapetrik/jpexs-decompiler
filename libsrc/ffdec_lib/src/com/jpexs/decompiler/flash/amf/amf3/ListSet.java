@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Set which maintains orders elements by time they were added.
  *
- * @param <E>
+ * @param <E> Type of element
  */
 public class ListSet<E> implements Set<E> {
 

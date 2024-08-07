@@ -58,19 +58,44 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionGetURL2 extends Action {
 
+    /**
+     * Send variables method
+     */
     public int sendVarsMethod;
 
+    /**
+     * GET method
+     */
     public static final int GET = 1;
 
+    /**
+     * POST method
+     */
     public static final int POST = 2;
 
+    /**
+     * Load target flag
+     */
     public boolean loadTargetFlag;
 
+    /**
+     * Load variables flag
+     */
     public boolean loadVariablesFlag;
 
+    /**
+     * Reserved
+     */
     @Reserved
     public int reserved;
 
+    /**
+     * Constructor
+     * @param sendVarsMethod Send variables method
+     * @param loadVariablesFlag Load variables flag
+     * @param loadTargetFlag Load target flag
+     * @param charset Charset
+     */
     public ActionGetURL2(int sendVarsMethod, boolean loadVariablesFlag, boolean loadTargetFlag, String charset) {
         super(0x9A, 1, charset);
         this.loadTargetFlag = loadTargetFlag;
@@ -78,6 +103,13 @@ public class ActionGetURL2 extends Action {
         this.sendVarsMethod = sendVarsMethod;
     }
 
+    /**
+     * Constructor
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @param charset Charset
+     * @throws IOException Error reading data
+     */
     public ActionGetURL2(int actionLength, SWFInputStream sis, String charset) throws IOException {
         super(0x9A, actionLength, charset);
         loadVariablesFlag = sis.readUB(1, "loadVariablesFlag") == 1;
@@ -109,6 +141,13 @@ public class ActionGetURL2 extends Action {
         return 1;
     }
 
+    /**
+     * Constructor
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On error parsing action
+     */
     public ActionGetURL2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x9A, -1, charset);
 

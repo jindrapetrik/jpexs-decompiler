@@ -53,6 +53,12 @@ import java.util.Map;
 public class ABCCleaner {
 
     /**
+     * Constructs ABCCleaner.
+     */
+    public ABCCleaner() {
+    }  
+    
+    /**
      * Cleans unused items from ABC file.
      *
      * @param abc ABC file

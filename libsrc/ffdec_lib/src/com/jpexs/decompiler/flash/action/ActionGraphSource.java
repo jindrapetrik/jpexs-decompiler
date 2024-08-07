@@ -204,8 +204,8 @@ public class ActionGraphSource extends GraphSource {
      * @param staticOperation Unused
      * @param path Path
      * @return List of graph target items
-     * @throws InterruptedException
-     * @throws GraphPartChangeException
+     * @throws InterruptedException On interrupt
+     * @throws GraphPartChangeException On graph part change
      */
     @Override
     public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {

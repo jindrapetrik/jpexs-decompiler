@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionPrevFrame extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionPrevFrame() {
         super(0x05, 0, Utf8Helper.charsetName);
     }

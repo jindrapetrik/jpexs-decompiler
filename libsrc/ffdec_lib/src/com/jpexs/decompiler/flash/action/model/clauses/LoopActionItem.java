@@ -27,8 +27,18 @@ import com.jpexs.decompiler.graph.Loop;
  */
 public abstract class LoopActionItem extends ActionItem {
 
+    /***
+     * Loop
+     */
     public Loop loop;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     */
     public LoopActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.loop = loop;

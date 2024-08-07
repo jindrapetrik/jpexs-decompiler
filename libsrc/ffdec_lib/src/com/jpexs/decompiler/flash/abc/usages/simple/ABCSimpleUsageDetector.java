@@ -50,24 +50,68 @@ public class ABCSimpleUsageDetector {
      * Item kind
      */
     public static enum ItemKind {
+        /**
+         * Integer
+         */
         INT(true),
+        /**
+         * Unsigned integer
+         */
         UINT(true),
+        /**
+         * Double
+         */
         DOUBLE(true),
+        /**
+         * String
+         */
         STRING(true),
+        /**
+         * Namespace
+         */
         NAMESPACE(true),
+        /**
+         * Namespace set
+         */
         NAMESPACESET(true),
+        /**
+         * Multiname
+         */
         MULTINAME(true),
+        /**
+         * Metadata info
+         */
         METADATAINFO(false),
+        /**
+         * Method info
+         */
         METHODINFO(false),
+        /**
+         * Method body
+         */
         METHODBODY(false),
+        /**
+         * Class
+         */
         CLASS(false);
 
+        /**
+         * True if has reserved zero index.
+         */
         private boolean reserveZeroIndex;
 
+        /**
+         * Constructs a new item kind.
+         * @param reserveZeroIndex True if has reserved zero index
+         */
         private ItemKind(boolean reserveZeroIndex) {
             this.reserveZeroIndex = reserveZeroIndex;
         }
 
+        /**
+         * Checks if has reserved zero index.
+         * @return True if has reserved zero index
+         */
         public boolean hasReservedZeroIndex() {
             return reserveZeroIndex;
         }
@@ -78,10 +122,19 @@ public class ABCSimpleUsageDetector {
 
     private final ABC abc;
 
+    /**
+     * Constructs a new ABC simple usage detector.
+     * @param abc ABC
+     */
     public ABCSimpleUsageDetector(ABC abc) {
         this.abc = abc;
     }
 
+    /**
+     * Initializes usages.
+     * @param kind Item kind
+     * @param itemCount Item count
+     */
     private void initUsages(ItemKind kind, int itemCount) {
         List<List<String>> list = new ArrayList<>();
         if (kind.hasReservedZeroIndex() && itemCount == 0) {
@@ -93,6 +146,9 @@ public class ABCSimpleUsageDetector {
         usages.put(kind, list);
     }
 
+    /**
+     * Detects usages.
+     */
     public void detect() {
         usages.clear();
 
@@ -443,9 +499,10 @@ public class ABCSimpleUsageDetector {
     }
 
     /**
-     * @param kind
-     * @param index
-     * @param usageDescription
+     * Handles usage.
+     * @param kind Item kind
+     * @param index Index
+     * @param usageDescription Usage description
      * @return True if it is new
      */
     private boolean handleUsage(ItemKind kind, int index, String usageDescription) {
@@ -456,26 +513,54 @@ public class ABCSimpleUsageDetector {
         return kindList.size() == 1;
     }
 
+    /**
+     * Gets usages.
+     * @return Usages
+     */
     public Map<ItemKind, List<List<String>>> getUsages() {
         return Collections.unmodifiableMap(usages);
     }
 
+    /**
+     * Gets usages of kind and index.
+     * @param kind Item kind
+     * @param index Index
+     * @return Usages
+     */
     public List<String> getUsages(ItemKind kind, int index) {
         return Collections.unmodifiableList(usages.get(kind).get(index));
     }
 
+    /**
+     * Gets usages of kind.
+     * @param kind Item kind
+     * @return Usages
+     */
     public List<List<String>> getUsages(ItemKind kind) {
         return Collections.unmodifiableList(usages.get(kind));
     }
 
+    /**
+     * Gets zero usages.
+     * @return Zero usages
+     */
     public Map<ItemKind, List<Integer>> getZeroUsages() {
         return Collections.unmodifiableMap(zeroUsages);
     }
 
+    /**
+     * Gets zero usages of kind.
+     * @param kind Item kind
+     * @return Zero usages
+     */
     public List<Integer> getZeroUsages(ItemKind kind) {
         return zeroUsages.get(kind);
     }
 
+    /**
+     * Gets zero usages count.
+     * @return Zero usages count
+     */
     public int getZeroUsagesCount() {
         int cnt = 0;
         for (ItemKind kind : zeroUsages.keySet()) {
@@ -484,6 +569,11 @@ public class ABCSimpleUsageDetector {
         return cnt;
     }
 
+    /**
+     * Gets zero usages count of kind.
+     * @param kind Item kind
+     * @return Zero usages count
+     */
     public int getZeroUsagesCount(ItemKind kind) {
         return zeroUsages.get(kind).size();
     }

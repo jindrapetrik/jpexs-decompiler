@@ -32,16 +32,41 @@ import java.util.Objects;
  */
 public class GetLexAVM2Item extends AVM2Item {
 
+    /**
+     * Property name
+     */
     public Multiname propertyName;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Call type
+     */
     public GraphTargetItem callType;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
+    /**
+     * Full property name
+     */
     private final DottedChain fullPropertyName;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param propertyName Property name
+     * @param constants Constants
+     * @param type Type
+     * @param callType Call type
+     * @param isStatic Is static
+     */
     public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
@@ -51,6 +76,10 @@ public class GetLexAVM2Item extends AVM2Item {
         this.isStatic = isStatic;
     }
 
+    /**
+     * Gets the raw property name.
+     * @return Raw property name
+     */
     public String getRawPropertyName() {
         return fullPropertyName.toRawString();
     }

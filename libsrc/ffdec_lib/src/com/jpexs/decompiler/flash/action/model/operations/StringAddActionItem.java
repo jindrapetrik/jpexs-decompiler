@@ -36,6 +36,13 @@ import java.util.Set;
  */
 public class StringAddActionItem extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public StringAddActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "add", "String", "String");
     }
@@ -50,6 +57,12 @@ public class StringAddActionItem extends BinaryOpItem {
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static String getResult(Object rightResult, Object leftResult) {
         return EcmaScript.toString(leftResult) + EcmaScript.toString(rightResult);
     }

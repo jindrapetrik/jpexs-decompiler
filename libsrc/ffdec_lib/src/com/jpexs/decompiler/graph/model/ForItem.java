@@ -38,14 +38,29 @@ import java.util.List;
  */
 public class ForItem extends LoopItem implements Block {
 
+    /**
+     * First commands
+     */
     public List<GraphTargetItem> firstCommands;
 
+    /**
+     * Expression
+     */
     public GraphTargetItem expression;
 
+    /**
+     * Final commands
+     */
     public List<GraphTargetItem> finalCommands;
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Label used
+     */
     private boolean labelUsed;
 
     @Override
@@ -82,6 +97,17 @@ public class ForItem extends LoopItem implements Block {
         visitor.visit(expression);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param firstCommands First commands
+     * @param expression Expression
+     * @param finalCommands Final commands
+     * @param commands Commands
+     */
     public ForItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop);
         this.firstCommands = firstCommands;

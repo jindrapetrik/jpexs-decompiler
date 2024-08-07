@@ -36,6 +36,12 @@ import java.util.Objects;
  */
 public class AsciiToCharActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value ASCII code
+     */
     public AsciiToCharActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
     }
@@ -61,6 +67,11 @@ public class AsciiToCharActionItem extends ActionItem {
         return getResult(value.getResult());
     }
 
+    /**
+     * Get result.
+     * @param ascii ASCII code
+     * @return Result
+     */
     public static String getResult(Object ascii) {
         int res = (char) EcmaScript.toInt32(ascii);
         if (res == 0) {

@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionAsciiToChar extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionAsciiToChar() {
         super(0x33, 0, Utf8Helper.charsetName);
     }

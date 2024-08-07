@@ -41,16 +41,34 @@ import java.util.Set;
  */
 public class GetVariableActionItem extends ActionItem {
 
+    /**
+     * Name
+     */
     public final GraphTargetItem name;
 
+    /**
+     * Computed value
+     */
     private GraphTargetItem computedValue;
 
+    /**
+     * Computed result
+     */
     private Object computedResult;
 
+    /**
+     * Computed compile time
+     */
     private boolean computedCompiletime = false;
 
+    /**
+     * Computed variable computed
+     */
     private boolean computedVariableComputed = false;
 
+    /**
+     * Print obfuscated name
+     */
     public boolean printObfuscatedName = false;
 
     @Override
@@ -63,6 +81,13 @@ public class GetVariableActionItem extends ActionItem {
         visitor.visit(name);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public GetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.name = value;
@@ -114,6 +139,10 @@ public class GetVariableActionItem extends ActionItem {
         return null;
     }
 
+    /**
+     * Sets computed value.
+     * @param computedValue Computed value
+     */
     public void setComputedValue(GraphTargetItem computedValue) {
         this.computedValue = computedValue;
         if (computedValue != null) {

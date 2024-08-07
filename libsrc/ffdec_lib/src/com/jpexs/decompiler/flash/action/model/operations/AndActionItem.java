@@ -35,6 +35,13 @@ import java.util.List;
  */
 public class AndActionItem extends BinaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public AndActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_LOGICALAND, leftSide, rightSide, "and", "Boolean", "Boolean");
     }
@@ -44,6 +51,12 @@ public class AndActionItem extends BinaryOpItem {
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static Boolean getResult(Object rightResult, Object leftResult) {
         return EcmaScript.toBoolean(leftResult) && EcmaScript.toBoolean(rightResult);
     }

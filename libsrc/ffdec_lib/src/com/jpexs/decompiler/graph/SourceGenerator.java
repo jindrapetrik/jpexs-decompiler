@@ -49,7 +49,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item PushItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException;
 
@@ -59,7 +59,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item PopItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PopItem item) throws CompilationException;
 
@@ -69,7 +69,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item TrueItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TrueItem item) throws CompilationException;
 
@@ -79,7 +79,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item FalseItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FalseItem item) throws CompilationException;
 
@@ -89,7 +89,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item AndItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, AndItem item) throws CompilationException;
 
@@ -99,7 +99,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item OrItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, OrItem item) throws CompilationException;
 
@@ -109,7 +109,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item IfItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) throws CompilationException;
 
@@ -119,7 +119,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item TernarOpItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TernarOpItem item) throws CompilationException;
 
@@ -129,7 +129,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item WhileItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) throws CompilationException;
 
@@ -139,7 +139,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item DoWhileItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) throws CompilationException;
 
@@ -149,7 +149,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item ForItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) throws CompilationException;
 
@@ -159,7 +159,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item SwitchItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException;
 
@@ -169,7 +169,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item NotItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException;
 
@@ -179,7 +179,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item DuplicateItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DuplicateItem item) throws CompilationException;
 
@@ -189,7 +189,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item BreakItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item) throws CompilationException;
 
@@ -199,7 +199,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item ContinueItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item) throws CompilationException;
 
@@ -209,7 +209,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param commands List of GraphTargetItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, List<GraphTargetItem> commands) throws CompilationException;
 
@@ -220,7 +220,7 @@ public interface SourceGenerator {
      * @param item CommaExpressionItem
      * @param withReturnValue If true, the return value is used
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item, boolean withReturnValue) throws CompilationException;
 
@@ -230,7 +230,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item TypeItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException;
 
@@ -240,7 +240,7 @@ public interface SourceGenerator {
      * @param localData Local data
      * @param item GraphTargetItem
      * @return List of GraphSourceItem
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     public List<GraphSourceItem> generateDiscardValue(SourceGeneratorLocalData localData, GraphTargetItem item) throws CompilationException;
 }

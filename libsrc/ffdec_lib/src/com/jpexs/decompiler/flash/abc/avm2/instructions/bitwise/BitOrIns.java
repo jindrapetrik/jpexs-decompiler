@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class BitOrIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public BitOrIns() {
         super(0xa9, "bitor", new int[]{}, true);
     }

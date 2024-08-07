@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushNullIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushNullIns() {
         super(0x20, "pushnull", new int[]{}, false);
     }

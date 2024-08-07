@@ -31,6 +31,9 @@ import java.util.List;
  */
 public class KillIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public KillIns() {
         super(0x08, "kill", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX}, false);
     }

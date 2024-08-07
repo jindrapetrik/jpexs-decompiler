@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class URShiftIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public URShiftIns() {
         super(0xa7, "urshift", new int[]{}, true);
     }

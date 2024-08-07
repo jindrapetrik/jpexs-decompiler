@@ -38,6 +38,10 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionSetTarget2 extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionSetTarget2(String charset) {
         super(0x20, 0, charset);
     }

@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class GreaterEqualsIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GreaterEqualsIns() {
         super(0xb0, "greaterequals", new int[]{}, true);
     }

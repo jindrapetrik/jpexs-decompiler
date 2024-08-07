@@ -38,6 +38,9 @@ import java.util.List;
  */
 public class AsTypeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public AsTypeIns() {
         super(0x86, "astype", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

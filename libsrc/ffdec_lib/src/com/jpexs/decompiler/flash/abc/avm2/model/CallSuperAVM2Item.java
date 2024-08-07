@@ -32,14 +32,36 @@ import java.util.Objects;
  */
 public class CallSuperAVM2Item extends AVM2Item {
 
+    /**
+     * Receiver
+     */
     public GraphTargetItem receiver;
 
+    /**
+     * Multiname
+     */
     public GraphTargetItem multiname;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Is void
+     */
     public boolean isVoid;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param isVoid Is void
+     * @param receiver Receiver
+     * @param multiname Multiname
+     * @param arguments Arguments
+     */
     public CallSuperAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem multiname, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.receiver = receiver;

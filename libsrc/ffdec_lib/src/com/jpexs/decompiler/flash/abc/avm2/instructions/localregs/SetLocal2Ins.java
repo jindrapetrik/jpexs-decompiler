@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
  */
 public class SetLocal2Ins extends SetLocalTypeIns {
 
+    /**
+     * Constructor
+     */
     public SetLocal2Ins() {
         super(0xd6, "setlocal2", new int[]{}, false);
     }

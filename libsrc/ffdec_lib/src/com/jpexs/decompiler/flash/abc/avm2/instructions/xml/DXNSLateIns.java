@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class DXNSLateIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DXNSLateIns() {
         super(0x07, "dxnslate", new int[]{}, true);
     }

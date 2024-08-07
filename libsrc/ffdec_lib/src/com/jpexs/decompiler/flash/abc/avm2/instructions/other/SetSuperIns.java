@@ -39,6 +39,9 @@ import java.util.Objects;
  */
 public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
 
+    /**
+     * Constructor
+     */
     public SetSuperIns() {
         super(0x05, "setsuper", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

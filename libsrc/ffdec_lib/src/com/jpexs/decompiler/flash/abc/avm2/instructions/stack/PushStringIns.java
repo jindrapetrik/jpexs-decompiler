@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushStringIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushStringIns() {
         super(0x2c, "pushstring", new int[]{AVM2Code.DAT_STRING_INDEX}, false);
     }

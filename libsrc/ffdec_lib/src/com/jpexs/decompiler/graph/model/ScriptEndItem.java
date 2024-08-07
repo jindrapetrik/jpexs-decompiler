@@ -27,6 +27,9 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class ScriptEndItem extends GraphTargetItem implements ExitItem {
 
+    /**
+     * Constructor.
+     */
     public ScriptEndItem() {
         super(null, null, NOPRECEDENCE);
     }

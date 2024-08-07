@@ -39,6 +39,10 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionPushDuplicate extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionPushDuplicate(String charset) {
         super(0x4C, 0, charset);
     }

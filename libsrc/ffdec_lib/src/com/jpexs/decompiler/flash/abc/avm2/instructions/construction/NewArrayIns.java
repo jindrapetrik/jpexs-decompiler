@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class NewArrayIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewArrayIns() {
         super(0x56, "newarray", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
     }

@@ -36,6 +36,12 @@ import java.util.Set;
  */
 public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public NotItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "!", "Boolean");
     }
@@ -65,6 +71,10 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
         return value.isCompileTime(dependencies);
     }
 
+    /**
+     * Gets the original value.
+     * @return Original value
+     */
     public GraphTargetItem getOriginal() {
         return value;
     }

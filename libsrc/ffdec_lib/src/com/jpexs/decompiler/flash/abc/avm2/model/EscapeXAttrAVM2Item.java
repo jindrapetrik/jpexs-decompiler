@@ -35,6 +35,12 @@ import java.util.Objects;
  */
 public class EscapeXAttrAVM2Item extends AVM2Item {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param expression Expression
+     */
     public EscapeXAttrAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem expression) {
         super(instruction, lineStartIns, NOPRECEDENCE, expression);
     }

@@ -37,8 +37,14 @@ import java.util.Objects;
  */
 public class NewObjectActionItem extends ActionItem {
 
+    /**
+     * Object name
+     */
     public GraphTargetItem objectName;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
     @Override
@@ -47,6 +53,14 @@ public class NewObjectActionItem extends ActionItem {
         visitor.visitAll(arguments);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param objectName Object name
+     * @param arguments Arguments
+     */
     public NewObjectActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.objectName = objectName;

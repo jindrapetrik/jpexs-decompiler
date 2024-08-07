@@ -38,8 +38,14 @@ import java.util.Objects;
  */
 public class DeleteActionItem extends ActionItem {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
     @Override
@@ -48,6 +54,13 @@ public class DeleteActionItem extends ActionItem {
         visitor.visit(propertyName);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param object Object
+     * @param propertyName Property name
+     */
     public DeleteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;

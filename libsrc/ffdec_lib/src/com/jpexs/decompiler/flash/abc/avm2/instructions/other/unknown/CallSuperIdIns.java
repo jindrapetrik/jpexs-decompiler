@@ -34,6 +34,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class CallSuperIdIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallSuperIdIns() {
         super(0x4B, "callsuperid", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK);
     }

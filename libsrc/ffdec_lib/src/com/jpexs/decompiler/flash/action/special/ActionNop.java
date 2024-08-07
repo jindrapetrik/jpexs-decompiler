@@ -34,10 +34,19 @@ import java.util.Map;
  */
 public class ActionNop extends Action {
 
+    /**
+     * Constructor.
+     * @param charset Charset
+     */
     public ActionNop(String charset) {
         super(-1, 0, charset);
     }
 
+    /**
+     * Constructor.
+     * @param actionCode Action code
+     * @param charset Charset
+     */
     protected ActionNop(int actionCode, String charset) {
         super(actionCode, 0, charset);
     }

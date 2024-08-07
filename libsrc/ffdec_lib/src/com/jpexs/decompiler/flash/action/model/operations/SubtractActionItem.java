@@ -38,6 +38,14 @@ import java.util.List;
  */
 public class SubtractActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public SubtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-", "Number", "Number");
     }
@@ -47,6 +55,13 @@ public class SubtractActionItem extends BinaryOpItem implements CompoundableBina
         return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
     }
 
+    /**
+     * Gets result.
+     *
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static Double getResult(Double rightResult, Double leftResult) {
         return leftResult - rightResult;
     }

@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class Li32Ins extends InstructionDefinition implements AlchemyTypeIns {
 
+    /**
+     * Constructor
+     */
     public Li32Ins() {
         super(0x37, "li32", new int[]{}, true, AVM2InstructionFlag.DOMAIN_MEMORY);
     }

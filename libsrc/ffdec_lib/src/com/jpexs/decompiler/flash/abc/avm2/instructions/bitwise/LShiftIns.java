@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class LShiftIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public LShiftIns() {
         super(0xa5, "lshift", new int[]{}, true);
     }

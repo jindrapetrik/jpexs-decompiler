@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionTrace extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionTrace() {
         super(0x26, 0, Utf8Helper.charsetName);
     }

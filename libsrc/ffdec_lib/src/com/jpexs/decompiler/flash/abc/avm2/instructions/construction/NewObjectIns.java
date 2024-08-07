@@ -41,6 +41,9 @@ import java.util.List;
  */
 public class NewObjectIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewObjectIns() {
         super(0x55, "newobject", new int[]{AVM2Code.DAT_ARG_COUNT}, true);
     }

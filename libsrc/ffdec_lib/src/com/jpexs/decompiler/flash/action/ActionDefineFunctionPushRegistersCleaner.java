@@ -50,11 +50,17 @@ import java.util.TreeSet;
 public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapter {
 
     /**
+     * Constructor.
+     */
+    public ActionDefineFunctionPushRegistersCleaner() {
+    }
+
+    /**
      * Called when an action list is parsed
      *
      * @param actions Action list
      * @param swf SWF object
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {

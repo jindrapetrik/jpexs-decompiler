@@ -32,6 +32,11 @@ import java.util.List;
  */
 public class PopActionItem extends ActionItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     */
     public PopActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, NOPRECEDENCE);
     }

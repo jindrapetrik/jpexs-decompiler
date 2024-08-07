@@ -31,8 +31,18 @@ import java.util.Objects;
  */
 public class FilteredCheckAVM2Item extends AVM2Item {
 
+    /**
+     * Object.
+     */
     public GraphTargetItem object;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public FilteredCheckAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.object = object;

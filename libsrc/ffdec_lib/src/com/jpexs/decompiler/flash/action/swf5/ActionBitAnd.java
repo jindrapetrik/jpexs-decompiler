@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionBitAnd extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionBitAnd() {
         super(0x60, 0, Utf8Helper.charsetName);
     }

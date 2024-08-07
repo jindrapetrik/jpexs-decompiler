@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class IsTypeLateIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IsTypeLateIns() {
         super(0xb3, "istypelate", new int[]{}, true);
     }

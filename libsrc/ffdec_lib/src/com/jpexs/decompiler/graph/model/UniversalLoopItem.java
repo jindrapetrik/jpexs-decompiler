@@ -30,12 +30,23 @@ import java.util.List;
  */
 public class UniversalLoopItem extends WhileItem implements Block {
 
+    /**
+     * True expression.
+     */
     static final List<GraphTargetItem> TRUE_EXPRESSION = new ArrayList<>();
 
     static {
         TRUE_EXPRESSION.add(new TrueItem(null, null));
     }
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param loop Loop
+     * @param commands Commands
+     */
     public UniversalLoopItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop, TRUE_EXPRESSION, commands);
     }

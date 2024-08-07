@@ -24,6 +24,7 @@ import java.util.HashMap;
  * Hash array list.
  *
  * @author JPEXS
+ * @param <E> Element type
  */
 public class HashArrayList<E> extends ArrayList<E> {
 

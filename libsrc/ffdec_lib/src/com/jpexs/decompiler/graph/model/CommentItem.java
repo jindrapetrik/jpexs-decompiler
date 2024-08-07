@@ -27,13 +27,24 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class CommentItem extends GraphTargetItem {
 
+    /**
+     * Comment lines.
+     */
     private final String[] commentLines;
 
+    /**
+     * Constructor.
+     * @param comment Comment
+     */
     public CommentItem(String comment) {
         super(null, null, NOPRECEDENCE);
         this.commentLines = new String[]{comment};
     }
 
+    /**
+     * Constructor.
+     * @param commentLines Comment lines
+     */
     public CommentItem(String[] commentLines) {
         super(null, null, NOPRECEDENCE);
         this.commentLines = commentLines;
@@ -54,6 +65,10 @@ public class CommentItem extends GraphTargetItem {
         return writer.append(" */");
     }
 
+    /**
+     * Gets comment lines.
+     * @return Comment lines
+     */
     public String[] getCommentLines() {
         return commentLines;
     }

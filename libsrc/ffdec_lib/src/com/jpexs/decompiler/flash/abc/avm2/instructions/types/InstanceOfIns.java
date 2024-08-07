@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class InstanceOfIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public InstanceOfIns() {
         super(0xb1, "instanceof", new int[]{}, true);
     }

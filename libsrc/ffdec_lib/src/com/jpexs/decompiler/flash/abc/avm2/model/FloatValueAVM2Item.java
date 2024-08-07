@@ -39,8 +39,18 @@ import java.util.Set;
  */
 public class FloatValueAVM2Item extends NumberValueAVM2Item {
 
+    /**
+     * Value
+     */
     public Double value;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public FloatValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Double value) {
         super(instruction, lineStartIns);
         this.value = value;

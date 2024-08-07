@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class LookupSwitchIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public LookupSwitchIns() {
         super(0x1b, "lookupswitch", new int[]{AVM2Code.DAT_CASE_BASEOFFSET, AVM2Code.OPT_CASE_OFFSETS}, false);
     }

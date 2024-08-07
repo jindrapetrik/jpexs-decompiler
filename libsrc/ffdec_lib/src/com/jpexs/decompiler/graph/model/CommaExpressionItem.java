@@ -33,8 +33,18 @@ import java.util.List;
  */
 public class CommaExpressionItem extends GraphTargetItem {
 
+    /**
+     * Commands
+     */
     public List<GraphTargetItem> commands;
 
+    /**
+     * Constructor.
+     *
+     * @param src Source
+     * @param lineStartIns Line start instruction
+     * @param commands Commands
+     */
     public CommaExpressionItem(GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
         super(src, lineStartIns, PRECEDENCE_COMMA);
         this.commands = commands;

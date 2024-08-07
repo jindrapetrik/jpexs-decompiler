@@ -61,6 +61,12 @@ public class ActionListReader {
     private static final Logger logger = Logger.getLogger(ActionListReader.class.getName());
 
     /**
+     * Constructor.
+     */
+    public ActionListReader() {
+    }
+
+    /**
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
@@ -72,9 +78,9 @@ public class ActionListReader {
      * @param path Path
      * @param deobfuscationMode Deobfuscation mode
      * @return List of actions
-     * @throws IOException
-     * @throws java.lang.InterruptedException
-     * @throws java.util.concurrent.TimeoutException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     * @throws TimeoutException On timeout
      */
     public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
         try {
@@ -112,8 +118,8 @@ public class ActionListReader {
      * @param path Path
      * @param deobfuscationMode Deobfuscation mode
      * @return List of actions
-     * @throws IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
         // Map of the actions. Use TreeMap to sort the keys in ascending order
@@ -246,8 +252,8 @@ public class ActionListReader {
      * @param startIp Start IP
      * @param endIp End IP
      * @return List of actions
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public static List<Action> getOriginalActions(SWFInputStream sis, int startIp, int endIp) throws IOException, InterruptedException {
         // Map of the actions. Use TreeMap to sort the keys in ascending order

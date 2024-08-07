@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class AllocIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public AllocIns() {
         super(0xF6, "alloc", new int[]{}, true /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK);
     }

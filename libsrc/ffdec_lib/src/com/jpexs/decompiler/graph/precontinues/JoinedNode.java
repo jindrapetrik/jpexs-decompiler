@@ -26,6 +26,9 @@ import java.util.List;
  */
 public class JoinedNode extends Node {
 
+    /**
+     * Nodes
+     */
     public List<Node> nodes = new ArrayList<>();
 
     @Override

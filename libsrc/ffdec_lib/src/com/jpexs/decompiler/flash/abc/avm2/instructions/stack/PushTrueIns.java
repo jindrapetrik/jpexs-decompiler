@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class PushTrueIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PushTrueIns() {
         super(0x26, "pushtrue", new int[]{}, false);
     }

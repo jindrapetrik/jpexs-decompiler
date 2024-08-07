@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionBitOr extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionBitOr() {
         super(0x61, 0, Utf8Helper.charsetName);
     }

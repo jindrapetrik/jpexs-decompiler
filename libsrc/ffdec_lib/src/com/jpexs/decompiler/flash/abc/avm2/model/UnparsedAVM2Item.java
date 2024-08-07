@@ -30,8 +30,17 @@ import java.util.Objects;
  */
 public class UnparsedAVM2Item extends AVM2Item {
 
+    /**
+     * Unparsed data
+     */
     public String value;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Unparsed data
+     */
     public UnparsedAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.value = value;

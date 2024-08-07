@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionEndDrag extends Action {
 
+    /**
+     * Constructor
+     */
     public ActionEndDrag() {
         super(0x28, 0, Utf8Helper.charsetName);
     }

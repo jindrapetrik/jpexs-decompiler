@@ -41,27 +41,58 @@ import java.util.logging.Logger;
 @SWFVersion(from = 4)
 public class ActionJump extends Action {
 
+    /**
+     * Offset to jump to
+     */
     private int offset;
 
+    /**
+     * Identifier
+     */
     public String identifier;
 
+    /**
+     * Is continue
+     */
     public boolean isContinue = false;
 
+    /**
+     * Is break
+     */
     public boolean isBreak = false;
 
+    /**
+     * Gets the jump offset
+     * @return Offset
+     */
     public int getJumpOffset() {
         return offset;
     }
 
+    /**
+     * Sets the jump offset
+     * @param offset Offset
+     */
     public final void setJumpOffset(int offset) {
         this.offset = offset;
     }
 
+    /**
+     * Constructor
+     * @param offset Offset
+     * @param charset Charset
+     */
     public ActionJump(int offset, String charset) {
         super(0x99, 2, charset);
         setJumpOffset(offset);
     }
 
+    /**
+     * Constructor
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionJump(int actionLength, SWFInputStream sis) throws IOException {
         super(0x99, actionLength, sis.getCharset());
         setJumpOffset(sis.readSI16("offset"));
@@ -72,6 +103,10 @@ public class ActionJump extends Action {
         refs.add(getTargetAddress());
     }
 
+    /**
+     * Gets the target address
+     * @return Address
+     */
     public long getTargetAddress() {
         return getAddress() + 5 /*getTotalActionLength()*/ + offset;
     }
@@ -98,6 +133,13 @@ public class ActionJump extends Action {
         return "Jump loc" + ofsStr;
     }
 
+    /**
+     * Constructor
+     * @param lexer Lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionJump(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x99, 2, charset);
         identifier = lexIdentifier(lexer);

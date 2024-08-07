@@ -36,10 +36,24 @@ import java.util.Objects;
  */
 public class HasNextAVM2Item extends AVM2Item {
 
+    /**
+     * Index
+     */
     public GraphTargetItem index;
 
+    /**
+     * Object
+     */
     public GraphTargetItem obj;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param index Index
+     * @param obj Object
+     */
     public HasNextAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.index = index;

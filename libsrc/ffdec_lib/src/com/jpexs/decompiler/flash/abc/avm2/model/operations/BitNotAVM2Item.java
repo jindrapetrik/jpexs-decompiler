@@ -37,6 +37,12 @@ import java.util.List;
  */
 public class BitNotAVM2Item extends UnaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public BitNotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, value, "~", "int");
     }

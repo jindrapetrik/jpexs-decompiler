@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 
 /**
+ * Missing symbol handler.
  * @author JPEXS
  */
 public interface MissingSymbolHandler {

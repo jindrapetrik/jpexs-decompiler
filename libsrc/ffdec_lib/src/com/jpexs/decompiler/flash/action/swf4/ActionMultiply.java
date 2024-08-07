@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionMultiply extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionMultiply() {
         super(0x0C, 0, Utf8Helper.charsetName);
     }

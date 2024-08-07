@@ -40,6 +40,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionTargetPath extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionTargetPath() {
         super(0x45, 0, Utf8Helper.charsetName);
     }

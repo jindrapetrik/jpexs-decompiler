@@ -26,6 +26,12 @@ import java.util.Collection;
 public abstract class AbstractGraphTargetVisitor implements GraphTargetVisitorInterface {
 
     /**
+     * Constructs new AbstractGraphTargetVisitor
+     */
+    public AbstractGraphTargetVisitor() {
+    }
+
+    /**
      * Visits a graph target item.
      *
      * @param item Graph target item

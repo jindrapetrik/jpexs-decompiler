@@ -36,6 +36,13 @@ import java.util.Set;
  */
 public class StringLtActionItem extends BinaryOpItem implements Inverted {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide
+     */
     public StringLtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "lt", "String", "String");
     }
@@ -50,6 +57,12 @@ public class StringLtActionItem extends BinaryOpItem implements Inverted {
         return getResult(rightSide.getResult(), leftSide.getResult());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static boolean getResult(Object rightResult, Object leftResult) {
         return EcmaScript.toString(leftResult).compareTo(EcmaScript.toString(rightResult)) < 0;
     }

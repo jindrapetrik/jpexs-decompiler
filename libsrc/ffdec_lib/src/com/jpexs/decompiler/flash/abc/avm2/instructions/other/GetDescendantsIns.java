@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class GetDescendantsIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public GetDescendantsIns() {
         super(0x59, "getdescendants", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

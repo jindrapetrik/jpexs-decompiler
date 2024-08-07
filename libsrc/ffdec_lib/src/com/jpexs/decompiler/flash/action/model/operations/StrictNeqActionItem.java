@@ -38,6 +38,14 @@ import java.util.List;
  */
 public class StrictNeqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, NotEqualsTypeItem {
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public StrictNeqActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==", "", "");
     }

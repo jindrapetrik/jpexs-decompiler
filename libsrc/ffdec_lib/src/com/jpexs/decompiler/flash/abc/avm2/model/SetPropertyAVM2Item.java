@@ -40,20 +40,44 @@ import java.util.List;
  */
 public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, AssignmentAVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Property name
+     */
     public GraphTargetItem propertyName;
 
+    /**
+     * Declaration
+     */
     public DeclarationAVM2Item declaration;
 
+    /**
+     * Compound value
+     */
     public GraphTargetItem compoundValue;
 
+    /**
+     * Compound operator
+     */
     public String compoundOperator;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Call type
+     */
     public GraphTargetItem callType;
 
+    /**
+     * Is static
+     */
     public boolean isStatic;
 
     @Override
@@ -80,6 +104,17 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         }
     }
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     * @param propertyName Property name
+     * @param value Value
+     * @param type Type
+     * @param callType Call type
+     * @param isStatic Is static
+     */
     public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
         this.object = object;

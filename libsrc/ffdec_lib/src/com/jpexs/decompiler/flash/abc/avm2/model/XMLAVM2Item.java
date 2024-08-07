@@ -33,8 +33,17 @@ import java.util.Objects;
  */
 public class XMLAVM2Item extends AVM2Item {
 
+    /**
+     * Parts of XML.
+     */
     public List<GraphTargetItem> parts;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param parts Parts
+     */
     public XMLAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> parts) {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.parts = parts;

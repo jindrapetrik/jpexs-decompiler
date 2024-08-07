@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class RShiftIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public RShiftIns() {
         super(0xa6, "rshift", new int[]{}, true);
     }

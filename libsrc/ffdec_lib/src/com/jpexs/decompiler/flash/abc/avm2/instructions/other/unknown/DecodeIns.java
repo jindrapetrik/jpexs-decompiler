@@ -35,6 +35,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class DecodeIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DecodeIns() {
         super(0xFF, "decode", new int[]{}, false /*?*/, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_OPERANDS, AVM2InstructionFlag.UNKNOWN_STACK);
     }

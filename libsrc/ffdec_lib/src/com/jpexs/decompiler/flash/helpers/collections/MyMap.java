@@ -25,8 +25,8 @@ import java.util.Set;
 /**
  * Map implementation.
  *
- * @param <K>
- * @param <V>
+ * @param <K> Type of keys
+ * @param <V> Type of values
  * @author JPEXS
  */
 public class MyMap<K, V> implements Map<K, V> {

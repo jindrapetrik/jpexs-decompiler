@@ -45,6 +45,12 @@ import java.util.List;
  */
 public class PreDecrementActionItem extends UnaryOpItem {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param object Object
+     */
     public PreDecrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unneccessary ++Number(xx) when xx not number*/);
     }

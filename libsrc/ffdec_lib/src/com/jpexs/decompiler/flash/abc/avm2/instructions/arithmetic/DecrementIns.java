@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class DecrementIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DecrementIns() {
         super(0x93, "decrement", new int[]{}, true);
     }

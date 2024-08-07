@@ -39,6 +39,9 @@ import java.util.List;
  */
 public class CallPropVoidIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallPropVoidIns() {
         super(0x4f, "callpropvoid", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

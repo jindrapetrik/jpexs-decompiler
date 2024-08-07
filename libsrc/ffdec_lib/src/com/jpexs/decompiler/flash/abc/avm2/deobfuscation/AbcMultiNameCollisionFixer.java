@@ -33,6 +33,15 @@ import java.util.Set;
 public class AbcMultiNameCollisionFixer {
 
     /**
+     * Constructs new AbcMultiNameCollisionFixer.
+     */
+    public AbcMultiNameCollisionFixer() {
+
+    }
+
+
+
+    /**
      * Fixes collisions of multinames in SWF file.
      *
      * @param swf SWF file

@@ -53,6 +53,9 @@ import java.util.logging.Logger;
 @SWFVersion(from = 4)
 public class ActionSetProperty extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionSetProperty() {
         super(0x23, 0, Utf8Helper.charsetName);
     }

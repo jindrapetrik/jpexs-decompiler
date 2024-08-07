@@ -34,6 +34,9 @@ import java.util.List;
  */
 public class DupIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public DupIns() {
         super(0x2a, "dup", new int[]{}, false);
     }

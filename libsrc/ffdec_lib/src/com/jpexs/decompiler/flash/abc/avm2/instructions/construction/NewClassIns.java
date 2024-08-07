@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class NewClassIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NewClassIns() {
         super(0x58, "newclass", new int[]{AVM2Code.DAT_CLASS_INDEX}, true);
     }

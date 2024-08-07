@@ -45,13 +45,28 @@ import java.util.Map;
 @SWFVersion(from = 3)
 public class ActionGoToLabel extends Action {
 
+    /**
+     * Label
+     */
     public String label;
 
+    /**
+     * Constructor
+     * @param label Label
+     * @param charset Charset
+     */
     public ActionGoToLabel(String label, String charset) {
         super(0x8C, 0, charset);
         this.label = label;
     }
 
+    /**
+     * Constructor
+     * @param actionLength Length of action
+     * @param sis SWF input stream
+     * @param version SWF version
+     * @throws IOException On I/O error
+     */
     public ActionGoToLabel(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8C, actionLength, sis.getCharset());
         //byte[] data = sis.readBytes(actionLength);
@@ -85,6 +100,13 @@ public class ActionGoToLabel extends Action {
         return Utf8Helper.getBytesLength(label) + 1;
     }
 
+    /**
+     * Constructor
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionGoToLabel(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x8C, -1, charset);
         label = lexString(lexer);

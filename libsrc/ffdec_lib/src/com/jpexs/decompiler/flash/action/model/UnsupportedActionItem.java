@@ -30,8 +30,18 @@ import java.util.Objects;
  */
 public class UnsupportedActionItem extends ActionItem {
 
+    /**
+     * Value
+     */
     public String value;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param value Value
+     */
     public UnsupportedActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String value) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.value = value;

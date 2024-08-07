@@ -31,10 +31,24 @@ import java.util.Objects;
  */
 public class ExtendsActionItem extends ActionItem {
 
+    /**
+     * Subclass
+     */
     public GraphTargetItem subclass;
 
+    /**
+     * Super class
+     */
     public GraphTargetItem superclass;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param subclass Subclass
+     * @param superclass Superclass
+     */
     public ExtendsActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem subclass, GraphTargetItem superclass) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subclass = subclass;

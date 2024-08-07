@@ -57,6 +57,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionStoreRegister extends Action implements StoreTypeAction {
 
+    /**
+     * Register number
+     */
     public int registerNumber;
 
     @Override
@@ -70,16 +73,34 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         return true;
     }
 
+    /**
+     * Constructor.
+     * @param registerNumber Register number
+     * @param charset Charset
+     */
     public ActionStoreRegister(int registerNumber, String charset) {
         super(0x87, 1, charset);
         this.registerNumber = registerNumber;
     }
 
+    /**
+     * Constructor.
+     * @param actionLength Action length
+     * @param sis SWF input stream
+     * @throws IOException On I/O error
+     */
     public ActionStoreRegister(int actionLength, SWFInputStream sis) throws IOException {
         super(0x87, actionLength, sis.getCharset());
         registerNumber = sis.readUI8("registerNumber");
     }
 
+    /**
+     * Constructor.
+     * @param lexer Flasm lexer
+     * @param charset Charset
+     * @throws IOException On I/O error
+     * @throws ActionParseException On action parse error
+     */
     public ActionStoreRegister(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
         super(0x87, 0, charset);
         registerNumber = (int) lexLong(lexer);

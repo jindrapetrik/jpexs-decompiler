@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
+ * XFL XML writer.
  * @author JPEXS
  */
 public class XFLXmlWriter implements XMLStreamWriter {

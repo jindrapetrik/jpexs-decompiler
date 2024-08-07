@@ -28,18 +28,40 @@ import java.util.List;
  */
 public abstract class AbstractVectorType<T> implements WithSubValues, Amf3ValueType {
 
+    /**
+     * Fixed flag
+     */
     private boolean fixed;
+    /**
+     * Values
+     */
     private List<T> values;
 
+    /**
+     * Checks if the vector is fixed
+     *
+     * @return True if the vector is fixed
+     */
     public boolean isFixed() {
         return fixed;
     }
 
+    /**
+     * Constructs new AbstractVectorType.
+     *
+     * @param fixed Fixed flag
+     * @param values Values
+     */
     public AbstractVectorType(boolean fixed, List<T> values) {
         this.values = values;
         this.fixed = fixed;
     }
 
+    /**
+     * Gets values.
+     *
+     * @return Values
+     */
     public List<T> getValues() {
         return values;
     }
@@ -51,6 +73,11 @@ public abstract class AbstractVectorType<T> implements WithSubValues, Amf3ValueT
         return ret;
     }
 
+    /**
+     * Gets type name.
+     *
+     * @return Type name
+     */
     public abstract String getTypeName();
 
     @Override

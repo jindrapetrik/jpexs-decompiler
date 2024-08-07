@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 5)
 public class ActionAdd2 extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionAdd2() {
         super(0x47, 0, Utf8Helper.charsetName);
     }

@@ -41,8 +41,19 @@ import java.util.List;
  */
 public class GeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
 
+    /**
+     * Version 2 flag
+     */
     boolean version2;
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     * @param version2 Version 2 flag
+     */
     public GeActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=", "", "");
         this.version2 = version2;

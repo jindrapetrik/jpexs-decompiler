@@ -40,20 +40,54 @@ import java.util.Objects;
  */
 public class StartDragActionItem extends ActionItem {
 
+    /**
+     * Target
+     */
     public GraphTargetItem target;
 
+    /**
+     * Lock center
+     */
     public GraphTargetItem lockCenter;
 
+    /**
+     * Constrain
+     */
     public GraphTargetItem constrain;
 
+    /**
+     * Y2
+     */
     public GraphTargetItem y2;
 
+    /**
+     * X2
+     */
     public GraphTargetItem x2;
 
+    /**
+     * Y1
+     */
     public GraphTargetItem y1;
 
+    /**
+     * X1
+     */
     public GraphTargetItem x1;
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param target Target
+     * @param lockCenter Lock center
+     * @param constrain Constrain
+     * @param x1 X1
+     * @param y1 Y1
+     * @param x2 X2
+     * @param y2 Y2
+     */
     public StartDragActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, GraphTargetItem lockCenter, GraphTargetItem constrain, GraphTargetItem x1, GraphTargetItem y1, GraphTargetItem x2, GraphTargetItem y2) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;

@@ -40,6 +40,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionMBStringLength extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionMBStringLength() {
         super(0x31, 0, Utf8Helper.charsetName);
     }

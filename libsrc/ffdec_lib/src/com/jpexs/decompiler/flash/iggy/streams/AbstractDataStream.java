@@ -37,6 +37,12 @@ public abstract class AbstractDataStream implements DataStreamInterface {
     @Override
     public abstract long position();
 
+    /**
+     * Constructs new AbstractDataStream
+     */
+    public AbstractDataStream() {
+    }
+
     @Override
     public long readUI64() throws IOException {
         long lsb = readUI32();

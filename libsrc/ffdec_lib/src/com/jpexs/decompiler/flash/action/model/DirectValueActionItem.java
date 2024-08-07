@@ -46,18 +46,44 @@ import java.util.Set;
  */
 public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
+    /**
+     * Value.
+     */
     public Object value;
 
+    /**
+     * Constants.
+     */
     public final List<String> constants;
 
+    /**
+     * Computed register value.
+     */
     public GraphTargetItem computedRegValue;
 
+    /**
+     * Position.
+     */
     public final int pos;
 
+    /**
+     * Constructor.
+     *
+     * @param o Value
+     */
     public DirectValueActionItem(Object o) {
         this(null, null, 0, o, new ArrayList<>());
     }
 
+    /**
+     * Constructor.
+     *
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param instructionPos Instruction position
+     * @param value Value
+     * @param constants Constants
+     */
     public DirectValueActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, int instructionPos, Object value, List<String> constants) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.constants = constants;
@@ -161,6 +187,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         return writer.append(value.toString());
     }
 
+    /**
+     * To string no hilight.
+     * @param constants Constants
+     * @return String
+     */
     public String toStringNoH(ConstantPool constants) {
         if (value instanceof ConstantIndex) {
             return this.constants.get(((ConstantIndex) value).index);
@@ -272,10 +303,18 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         return true;
     }
 
+    /**
+     * Checks if value is string.
+     * @return True if value is string
+     */
     public boolean isString() {
         return (value instanceof String) || (value instanceof ConstantIndex);
     }
 
+    /**
+     * Gets value as string.
+     * @return Value as string
+     */
     public String getAsString() {
         if (!isString()) {
             return null;

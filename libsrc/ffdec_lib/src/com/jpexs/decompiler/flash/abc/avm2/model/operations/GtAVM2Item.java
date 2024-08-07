@@ -38,6 +38,13 @@ import java.util.List;
  */
 public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondition {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public GtAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">", "", "");
     }

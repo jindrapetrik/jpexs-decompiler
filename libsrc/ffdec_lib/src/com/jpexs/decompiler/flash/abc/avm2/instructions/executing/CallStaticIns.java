@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class CallStaticIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public CallStaticIns() {
         super(0x44, "callstatic", new int[]{AVM2Code.DAT_METHOD_INDEX, AVM2Code.DAT_ARG_COUNT}, true);
     }

@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class PopIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public PopIns() {
         super(0x29, "pop", new int[]{}, false);
     }

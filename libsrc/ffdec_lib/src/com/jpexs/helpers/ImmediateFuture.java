@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Future that happens now.
  *
- * @param <V>
+ * @param <V> Value type
  * @author JPEXS
  */
 public class ImmediateFuture<V> implements Future<V> {

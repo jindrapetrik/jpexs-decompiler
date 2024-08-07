@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class SubtractIIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public SubtractIIns() {
         super(0xc6, "subtract_i", new int[]{}, true);
     }

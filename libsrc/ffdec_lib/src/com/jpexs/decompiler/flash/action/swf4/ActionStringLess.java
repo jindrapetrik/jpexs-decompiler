@@ -39,6 +39,9 @@ import java.util.Map;
 @SWFVersion(from = 4)
 public class ActionStringLess extends Action {
 
+    /**
+     * Constructor.
+     */
     public ActionStringLess() {
         super(0x29, 0, Utf8Helper.charsetName);
     }

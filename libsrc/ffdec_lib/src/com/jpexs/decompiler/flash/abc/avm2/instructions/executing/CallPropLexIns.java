@@ -38,6 +38,9 @@ import java.util.List;
  */
 public class CallPropLexIns extends CallPropertyIns {
 
+    /**
+     * Constructor
+     */
     public CallPropLexIns() {
         instructionName = "callproplex";
         instructionCode = 0x4c;

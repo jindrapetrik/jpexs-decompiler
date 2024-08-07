@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class InitPropertyIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public InitPropertyIns() {
         super(0x68, "initproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }

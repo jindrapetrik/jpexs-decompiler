@@ -26,15 +26,30 @@ import java.util.List;
  */
 public class ConstantPool {
 
+    /**
+     * List of constants.
+     */
     public List<String> constants = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public ConstantPool() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param constants List of constants
+     */
     public ConstantPool(List<String> constants) {
         this.constants = constants;
     }
 
+    /**
+     * Sets new constants.
+     * @param constants List of constants
+     */
     public void setNew(List<String> constants) {
         this.constants = constants;
     }
@@ -44,6 +59,10 @@ public class ConstantPool {
         return "x " + constants.toString();
     }
 
+    /**
+     * Checks if constant pool is empty.
+     * @return True if empty, false otherwise
+     */
     public boolean isEmpty() {
         return constants.isEmpty();
     }

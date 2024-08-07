@@ -51,7 +51,7 @@ public interface SWFDecompilerListener {
      *
      * @param actions Action list
      * @param swf SWF object
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     void actionListParsed(ActionList actions, SWF swf) throws InterruptedException;
 
@@ -60,7 +60,7 @@ public interface SWFDecompilerListener {
      *
      * @param tree Action tree
      * @param swf SWF object
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     void actionTreeCreated(List<GraphTargetItem> tree, SWF swf) throws InterruptedException;
 
@@ -93,7 +93,7 @@ public interface SWFDecompilerListener {
      * @param trait Trait object
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException;
 }

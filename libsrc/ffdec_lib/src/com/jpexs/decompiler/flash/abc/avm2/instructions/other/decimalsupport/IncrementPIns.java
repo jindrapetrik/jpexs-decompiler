@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  */
 public class IncrementPIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public IncrementPIns() {
         super(0x9C, "increment_p", new int[]{AVM2Code.DAT_NUMBER_CONTEXT}, true /*?*/, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.NO_FLASH_PLAYER);
     }

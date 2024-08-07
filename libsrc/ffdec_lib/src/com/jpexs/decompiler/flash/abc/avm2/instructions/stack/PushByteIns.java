@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class PushByteIns extends InstructionDefinition implements PushIntegerTypeIns {
 
+    /**
+     * Constructor
+     */
     public PushByteIns() {
         super(0x24, "pushbyte", new int[]{AVM2Code.OPT_S8}, false);
     }

@@ -39,6 +39,9 @@ import java.util.List;
  */
 public class IfStrictEqIns extends InstructionDefinition implements IfTypeIns {
 
+    /**
+     * Constructor
+     */
     public IfStrictEqIns() {
         super(0x19, "ifstricteq", new int[]{AVM2Code.DAT_OFFSET}, false);
     }

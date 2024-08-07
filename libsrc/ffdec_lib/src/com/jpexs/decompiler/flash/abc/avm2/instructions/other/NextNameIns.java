@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class NextNameIns extends InstructionDefinition {
 
+    /**
+     * Constructor
+     */
     public NextNameIns() {
         super(0x1e, "nextname", new int[]{}, true);
     }

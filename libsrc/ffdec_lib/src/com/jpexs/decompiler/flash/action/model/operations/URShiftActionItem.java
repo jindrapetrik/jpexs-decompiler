@@ -35,6 +35,13 @@ import java.util.List;
  */
 public class URShiftActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
+    /**
+     * Constructor.
+     * @param instruction Instruction
+     * @param lineStartIns Line start instruction
+     * @param leftSide Left side
+     * @param rightSide Right side
+     */
     public URShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>", "Number", "Number");
     }
@@ -44,6 +51,12 @@ public class URShiftActionItem extends BinaryOpItem implements CompoundableBinar
         return getResult(rightSide.getResultAsNumber(), leftSide.getResultAsNumber());
     }
 
+    /**
+     * Gets result.
+     * @param rightResult Right result
+     * @param leftResult Left result
+     * @return Result
+     */
     public static long getResult(Double rightResult, Double leftResult) {
         long leftResult2 = ((long) (double) leftResult) & 0xffffffffL;
         long rightResult2 = ((long) (double) rightResult) & 0x1f;
