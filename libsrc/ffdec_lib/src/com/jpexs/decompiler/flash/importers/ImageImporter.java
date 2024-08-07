@@ -44,7 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Image importer.
  * @author JPEXS
  */
 public class ImageImporter extends TagImporter {

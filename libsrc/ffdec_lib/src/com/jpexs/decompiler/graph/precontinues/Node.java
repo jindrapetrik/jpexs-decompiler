@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Node in the graph.
  * @author JPEXS
  */
 public class Node {

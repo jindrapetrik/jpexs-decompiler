@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 /**
- *
+ * Code formatting settings.
  * @author JPEXS
  */
 public class CodeFormatting {

@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * For in loop.
  * @author JPEXS
  */
 public class ForInActionItem extends LoopActionItem implements Block {

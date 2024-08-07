@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+/**
+ * Item for As3ScriptReplaceException.
+ */
 public class As3ScriptReplaceExceptionItem {
 
     private String file;

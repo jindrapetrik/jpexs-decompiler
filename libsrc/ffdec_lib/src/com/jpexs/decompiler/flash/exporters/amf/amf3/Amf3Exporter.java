@@ -17,25 +17,16 @@
 package com.jpexs.decompiler.flash.exporters.amf.amf3;
 
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
-import com.jpexs.decompiler.flash.amf.amf3.types.AbstractVectorType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
-import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ByteArrayType;
-import com.jpexs.decompiler.flash.amf.amf3.types.DateType;
-import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
+import com.jpexs.decompiler.flash.amf.amf3.types.*;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * AMF3 exporter.
+ */
 public class Amf3Exporter {
 
     /**

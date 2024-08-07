@@ -17,12 +17,21 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * Interface for tags that can have a password.
  * @author JPEXS
  */
 public interface PasswordTag {
 
+    /**
+     * Sets the password for this tag.
+     * @param password Password
+     */
     public void setPassword(String password);
 
+    /**
+     * Checks if this tag has a password.
+     * @param password Password
+     * @return True if this tag has the password
+     */
     public boolean hasPassword(String password);
 }

@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.util.List;
 
 /**
- *
+ * SVG gradient.
  * @author JPEXS
  */
 abstract class SvgGradient extends SvgFill {

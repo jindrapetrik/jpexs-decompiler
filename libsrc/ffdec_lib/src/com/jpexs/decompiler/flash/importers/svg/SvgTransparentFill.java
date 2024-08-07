@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.importers.svg;
 import java.awt.Color;
 
 /**
- *
+ * SVG transparent fill.
  * @author JPEXS
  */
 class SvgTransparentFill extends SvgFill {

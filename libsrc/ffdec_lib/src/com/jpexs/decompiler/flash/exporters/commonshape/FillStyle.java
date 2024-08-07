@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.RGB;
 
 /**
- *
+ * Fill style, used in shape export.
  * @author JPEXS
  */
 public class FillStyle {

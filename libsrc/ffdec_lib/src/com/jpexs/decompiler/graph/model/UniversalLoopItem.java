@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Universal loop.
  * @author JPEXS
  */
 public class UniversalLoopItem extends WhileItem implements Block {

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cubic to quadratic Bezier curve conversion.
+ *
  * Ported from https://github.com/fontello/cubic2quad
  *
  * @author JPEXS, Vitaly Puzrin

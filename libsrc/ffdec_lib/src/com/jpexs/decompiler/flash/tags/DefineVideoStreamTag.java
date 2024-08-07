@@ -68,7 +68,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineVideoStream tag - defines video stream.
  * @author JPEXS
  */
 @SWFVersion(from = 6)
@@ -291,7 +291,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             players.add(mediaPlayer);
             mediaPlayer.addFrameListener(new FrameListener() {
                 @Override
-                public void newFrameRecieved(BufferedImage image) {
+                public void newFrameReceived(BufferedImage image) {
                     synchronized (getFrameLock) {
                         activeFrame = image;
                         //System.out.println("received frame");

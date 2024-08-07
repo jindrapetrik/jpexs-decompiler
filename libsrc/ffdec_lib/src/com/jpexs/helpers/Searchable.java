@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- *
+ * Interface for searchable objects.
  * @author JPEXS
  */
 public interface Searchable {

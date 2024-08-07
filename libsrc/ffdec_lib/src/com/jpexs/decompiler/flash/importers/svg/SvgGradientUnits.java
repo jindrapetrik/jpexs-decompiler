@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG gradient units.
  * @author JPEXS
  */
 enum SvgGradientUnits {

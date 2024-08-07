@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * Random access file data stream.
  * @author JPEXS
  */
 public class RandomAccessFileDataStream extends AbstractDataStream {

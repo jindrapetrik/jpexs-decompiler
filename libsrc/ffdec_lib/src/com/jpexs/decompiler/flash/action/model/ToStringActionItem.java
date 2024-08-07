@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * To string conversion.
  * @author JPEXS
  */
 public class ToStringActionItem extends ActionItem {

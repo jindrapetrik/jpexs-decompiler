@@ -25,7 +25,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * SetBackgroundColor tag - sets the background color of the SWF file.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

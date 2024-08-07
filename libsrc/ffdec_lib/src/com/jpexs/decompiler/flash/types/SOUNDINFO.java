@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- *
+ * Sound info.
  * @author JPEXS
  */
 public class SOUNDINFO implements Serializable {

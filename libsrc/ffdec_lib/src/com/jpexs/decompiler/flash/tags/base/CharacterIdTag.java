@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.types.HasCharacterId;
 
 /**
- *
+ * A tag that has a character id.
  * @author JPEXS
  */
 public interface CharacterIdTag extends HasCharacterId {

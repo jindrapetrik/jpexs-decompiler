@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Same style text record.
  * @author JPEXS
  */
 public class SameStyleTextRecord {

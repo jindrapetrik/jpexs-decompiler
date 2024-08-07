@@ -30,6 +30,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Harman binary data encryption/decryption.
+ */
 public class HarmanBinaryDataEncrypt {
 
     private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";

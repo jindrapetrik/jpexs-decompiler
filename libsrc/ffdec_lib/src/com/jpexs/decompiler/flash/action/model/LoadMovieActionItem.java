@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Load movie.
  * @author JPEXS
  */
 public class LoadMovieActionItem extends ActionItem {

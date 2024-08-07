@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * ExporterInfo tag - exporter info.
  * @author JPEXS
  */
 public class ExporterInfo extends Tag {

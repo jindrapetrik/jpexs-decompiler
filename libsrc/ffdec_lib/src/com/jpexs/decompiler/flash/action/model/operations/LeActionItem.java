@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Less or equal.
  * @author JPEXS
  */
 public class LeActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {

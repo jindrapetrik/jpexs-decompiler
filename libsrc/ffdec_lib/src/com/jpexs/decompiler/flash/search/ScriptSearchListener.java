@@ -17,12 +17,24 @@
 package com.jpexs.decompiler.flash.search;
 
 /**
- *
+ * Script search listener.
  * @author JPEXS
  */
 public interface ScriptSearchListener {
 
+    /**
+     * Called when a script is decompiled.
+     * @param pos Position of the script
+     * @param total Total number of scripts
+     * @param name Name of the script
+     */
     public void onDecompile(int pos, int total, String name);
 
+    /**
+     * Called when a script is searched.
+     * @param pos Position of the script
+     * @param total Total number of scripts
+     * @param name Name of the script
+     */
     public void onSearch(int pos, int total, String name);
 }

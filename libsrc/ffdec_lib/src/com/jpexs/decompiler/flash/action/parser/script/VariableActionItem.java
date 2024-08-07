@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Variable action item.
  * @author JPEXS
  */
 public class VariableActionItem extends ActionItem {

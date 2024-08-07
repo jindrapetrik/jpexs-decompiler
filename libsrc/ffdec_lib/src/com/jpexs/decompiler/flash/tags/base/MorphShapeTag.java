@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Base class for morph shape tags.
  * @author JPEXS
  */
 public abstract class MorphShapeTag extends DrawableTag {

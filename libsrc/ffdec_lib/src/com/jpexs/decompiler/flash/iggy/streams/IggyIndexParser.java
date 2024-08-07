@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- *
+ * Index parser.
  * @author JPEXS
  */
 public class IggyIndexParser {

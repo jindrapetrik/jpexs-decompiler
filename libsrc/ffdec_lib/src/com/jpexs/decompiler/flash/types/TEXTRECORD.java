@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *
+ * Text record.
  * @author JPEXS
  */
 public class TEXTRECORD implements Serializable {

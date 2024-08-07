@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers;
 
 /**
- *
+ * Tag importer.
  * @author JPEXS
  */
 public class TagImporter {

@@ -19,10 +19,14 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
- *
+ * Exportable object.
  * @author JPEXS
  */
 public interface Exportable extends TreeItem {
 
+    /**
+     * Gets the export file name.
+     * @return Export file name
+     */
     public String getExportFileName();
 }

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * To number conversion.
  * @author JPEXS
  */
 public class ToNumberActionItem extends ActionItem {

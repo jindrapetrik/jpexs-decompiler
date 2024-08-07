@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Statistics.
  * @author JPEXS
  */
 public class Statistics implements AutoCloseable {

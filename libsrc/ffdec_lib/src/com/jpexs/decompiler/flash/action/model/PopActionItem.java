@@ -26,7 +26,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Pop the object from the stack.
  * @author JPEXS
  */
 public class PopActionItem extends ActionItem {

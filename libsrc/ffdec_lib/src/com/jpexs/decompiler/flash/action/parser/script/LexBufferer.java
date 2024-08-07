@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Bufferer for lexer.
  * @author JPEXS
  */
 public class LexBufferer implements LexListener {

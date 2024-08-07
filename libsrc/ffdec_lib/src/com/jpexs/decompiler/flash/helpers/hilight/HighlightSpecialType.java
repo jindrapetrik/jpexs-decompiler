@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.helpers.hilight;
 
 /**
- *
+ * Special types of highlighting.
  * @author JPEXS
  */
 public enum HighlightSpecialType {

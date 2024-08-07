@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import lt.dkd.nellymoser.CodecImpl;
 
 /**
- *
+ * NellyMoser sound decoder.
  * @author JPEXS
  */
 public class NellyMoserDecoder extends SoundDecoder {

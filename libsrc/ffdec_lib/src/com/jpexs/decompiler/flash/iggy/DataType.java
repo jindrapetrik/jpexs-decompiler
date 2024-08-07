@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.iggy;
 
 /**
+ * Data type.
  * @author JPEXS
  */
 public enum DataType {

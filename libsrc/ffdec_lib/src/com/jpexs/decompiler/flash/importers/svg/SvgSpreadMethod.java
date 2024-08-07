@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG spread method.
  * @author JPEXS
  */
 enum SvgSpreadMethod {

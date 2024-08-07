@@ -27,16 +27,15 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
 /**
- *
+ * DefineExternalImage tag - external image.
  * @author JPEXS
  */
 public class DefineExternalImage extends AbstractGfxImageTag {

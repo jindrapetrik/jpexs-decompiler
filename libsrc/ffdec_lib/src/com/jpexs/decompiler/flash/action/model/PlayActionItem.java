@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Play.
  * @author JPEXS
  */
 public class PlayActionItem extends ActionItem {

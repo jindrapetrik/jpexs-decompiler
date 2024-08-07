@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.sound;
 
 /**
- *
+ * Sound export format.
  * @author JPEXS
  */
 public enum SoundExportFormat {

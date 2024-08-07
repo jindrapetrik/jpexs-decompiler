@@ -47,7 +47,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- *
+ * Exports SWF to XML.
  * @author JPEXS
  */
 public class SwfXmlExporter {

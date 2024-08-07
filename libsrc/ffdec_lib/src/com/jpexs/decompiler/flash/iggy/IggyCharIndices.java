@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Char indices.
  * @author JPEXS
  */
 public class IggyCharIndices implements StructureInterface {

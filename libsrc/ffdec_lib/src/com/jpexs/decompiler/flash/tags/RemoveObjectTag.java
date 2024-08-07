@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Removes the specified character
+ * RemoveObject tag - removes the specified character.
  *
  * @author JPEXS
  */

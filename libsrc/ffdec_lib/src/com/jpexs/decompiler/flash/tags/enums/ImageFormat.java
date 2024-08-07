@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.enums;
 
 /**
- *
+ * Image format.
  * @author JPEXS
  */
 public enum ImageFormat {

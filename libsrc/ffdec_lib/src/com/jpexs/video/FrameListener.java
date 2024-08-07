@@ -18,7 +18,10 @@ package com.jpexs.video;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Interface for listening to new frames
+ */
 public interface FrameListener {
 
-    public void newFrameRecieved(BufferedImage image);
+    public void newFrameReceived(BufferedImage image);
 }

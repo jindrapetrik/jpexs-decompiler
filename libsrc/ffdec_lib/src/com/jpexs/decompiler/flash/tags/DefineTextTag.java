@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * DefineText tag - defines text.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

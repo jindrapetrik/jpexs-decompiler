@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Delete property.
  * @author JPEXS
  */
 public class DeleteActionItem extends ActionItem {

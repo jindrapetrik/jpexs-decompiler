@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * SVG style property.
  * @author JPEXS
  */
 public class SvgStyleProperty {

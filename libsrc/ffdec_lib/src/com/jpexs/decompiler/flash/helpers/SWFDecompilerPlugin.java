@@ -44,7 +44,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
- *
+ * SWF decompiler plugin.
  * @author JPEXS
  */
 public class SWFDecompilerPlugin {

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * New method.
  * @author JPEXS
  */
 public class NewMethodActionItem extends ActionItem {

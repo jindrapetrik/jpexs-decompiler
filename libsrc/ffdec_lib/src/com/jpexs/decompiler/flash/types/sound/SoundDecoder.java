@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Base class for sound decoders.
  * @author JPEXS
  */
 public abstract class SoundDecoder {

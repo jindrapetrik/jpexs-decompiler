@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Distance calculation between two batches of Bezier edges.
  * @author JPEXS
  */
 public class Distances {

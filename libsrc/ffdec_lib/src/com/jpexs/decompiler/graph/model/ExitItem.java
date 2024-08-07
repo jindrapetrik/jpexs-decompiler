@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.graph.model;
 
 /**
- *
+ * Exit item interface.
+ * Commands like return, throw, etc...
  * @author JPEXS
  */
 public interface ExitItem {

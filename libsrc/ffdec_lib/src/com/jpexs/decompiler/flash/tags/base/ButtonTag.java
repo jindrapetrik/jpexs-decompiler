@@ -30,7 +30,8 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Shape;
+
+import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Base class for button tags.
  * @author JPEXS
  */
 public abstract class ButtonTag extends DrawableTag implements Timelined {

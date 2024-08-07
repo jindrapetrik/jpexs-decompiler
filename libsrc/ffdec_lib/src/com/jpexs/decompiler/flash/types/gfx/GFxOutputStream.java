@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Output stream for writing GFx data.
  * @author JPEXS
  */
 public class GFxOutputStream extends OutputStream {

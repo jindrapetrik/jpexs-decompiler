@@ -21,23 +21,19 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
-import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
-import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- *
+ * DefineMorphShape2 tag - defines morph shape.
+ * Extends functionality of DefineMorphshape.
  * @author JPEXS
  */
 @SWFVersion(from = 8)

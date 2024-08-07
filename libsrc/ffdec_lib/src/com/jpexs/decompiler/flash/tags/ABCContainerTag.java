@@ -20,14 +20,27 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 
 /**
- *
+ * Container of ABC.
+ * DoABC or DoABC2 tag.
  * @author JPEXS
  */
 public interface ABCContainerTag extends Comparable<ABCContainerTag> {
 
+    /**
+     * Gets ABC data.
+     * @return ABC data
+     */
     public ABC getABC();
 
+    /**
+     * Gets parent SWF.
+     * @return Parent SWF
+     */
     public SWF getSwf();
 
+    /**
+     * Sets ABC data.
+     * @param abc ABC data
+     */
     public void setABC(ABC abc);
 }

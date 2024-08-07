@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.text;
 
 /**
- *
+ * Text align.
  * @author JPEXS
  */
 public enum TextAlign {

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import java.util.Objects;
 
 /**
- *
+ * Sound info and sound tag cache entry.
  * @author JPEXS
  */
 public class SoundInfoSoundCacheEntry {

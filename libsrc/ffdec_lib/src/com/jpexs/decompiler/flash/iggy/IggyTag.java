@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.iggy;
 import com.jpexs.decompiler.flash.iggy.streams.StructureInterface;
 
 /**
- *
+ * Tag interface.
  * @author JPEXS
  */
 public abstract class IggyTag implements StructureInterface {

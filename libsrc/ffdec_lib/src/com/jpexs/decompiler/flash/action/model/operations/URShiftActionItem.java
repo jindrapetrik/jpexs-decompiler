@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Bitwise unsigned right shift.
  * @author JPEXS
  */
 public class URShiftActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

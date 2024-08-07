@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * To integer conversion.
  * @author JPEXS
  */
 public class ToIntegerActionItem extends ActionItem {

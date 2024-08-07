@@ -16,19 +16,16 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.SerializableImage;
-import java.util.ArrayList;
-import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Blur filter based on a sub-pixel precise median filter
+ * Blur filter based on a sub-pixel precise median filter.
  *
  * @author JPEXS
  */

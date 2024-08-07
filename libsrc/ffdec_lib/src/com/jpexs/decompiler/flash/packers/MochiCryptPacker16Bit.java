@@ -27,7 +27,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- *
+ * MochiCrypt 16bit packer.
  * @author JPEXS
  */
 public class MochiCryptPacker16Bit implements Packer {

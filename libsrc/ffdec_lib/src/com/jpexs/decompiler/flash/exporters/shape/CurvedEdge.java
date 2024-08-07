@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 /**
- *
+ * Curved edge.
  * @author JPEXS
  */
 public class CurvedEdge extends StraightEdge implements IEdge {

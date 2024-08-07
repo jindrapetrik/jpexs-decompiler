@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Morph shape generator.
  * @author JPEXS
  */
 public class MorphShapeGenerator {

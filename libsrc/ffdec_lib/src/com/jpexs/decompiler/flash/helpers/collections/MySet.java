@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Set implementation.
  * @param <T>
  * @author JPEXS
  */

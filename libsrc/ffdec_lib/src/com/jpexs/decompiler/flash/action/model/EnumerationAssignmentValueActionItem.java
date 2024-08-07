@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Enumeration assignment. Helper item for loop detection.
  * @author JPEXS
  */
 public class EnumerationAssignmentValueActionItem extends ActionItem {

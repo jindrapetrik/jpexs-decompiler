@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Extends.
  * @author JPEXS
  */
 public class ExtendsActionItem extends ActionItem {

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Actions to execute at particular button events
+ * Actions to execute at particular button events.
  *
  * @author JPEXS
  */

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * String equality.
  * @author JPEXS
  */
 public class StringEqActionItem extends BinaryOpItem implements Inverted {

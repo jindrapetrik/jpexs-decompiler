@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * Interface for tags that do not require any other tags.
  * @author JPEXS
  */
 public interface AloneTag {

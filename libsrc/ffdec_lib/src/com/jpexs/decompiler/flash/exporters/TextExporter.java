@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Text exporter.
  * @author JPEXS
  */
 public class TextExporter {

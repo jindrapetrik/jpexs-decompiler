@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Fill style.
  * @author JPEXS
  */
 public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializable {

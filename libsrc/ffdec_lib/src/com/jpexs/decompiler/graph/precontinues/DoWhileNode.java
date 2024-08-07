@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph.precontinues;
 
 /**
- *
+ * Do-while loop.
  * @author JPEXS
  */
 public class DoWhileNode extends Node {

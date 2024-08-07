@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
 /**
- *
+ * Parsed symbol type.
  * @author JPEXS
  */
 public enum SymbolType {

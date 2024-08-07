@@ -19,10 +19,14 @@ package com.jpexs.decompiler.flash.search;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
- *
+ * Search result.
  * @author JPEXS
  */
 public interface SearchResult {
 
+    /**
+     * Gets the openable this search result is related to.
+     * @return Openable
+     */
     public Openable getOpenable();
 }

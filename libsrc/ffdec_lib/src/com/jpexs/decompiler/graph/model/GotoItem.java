@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Goto.
  * @author JPEXS
  */
 public class GotoItem extends GraphTargetItem implements Block {

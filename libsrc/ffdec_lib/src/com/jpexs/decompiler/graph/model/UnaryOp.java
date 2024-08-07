@@ -19,7 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Unary operator interface.
  * @author JPEXS
  */
 public interface UnaryOp {

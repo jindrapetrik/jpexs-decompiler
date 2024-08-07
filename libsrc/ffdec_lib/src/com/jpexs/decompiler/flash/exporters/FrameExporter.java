@@ -97,7 +97,7 @@ import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
 
 /**
- *
+ * Frame exporter.
  * @author JPEXS
  */
 public class FrameExporter {

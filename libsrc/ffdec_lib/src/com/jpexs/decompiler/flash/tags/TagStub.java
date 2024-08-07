@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Non-resolved tag stub. Used for (non-yet)unknown tags.
  * @author JPEXS
  */
 public class TagStub extends Tag {

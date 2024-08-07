@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Defines a series of ActionScript 3 bytecodes to be executed
+ * DoABC2 tag - Defines a series of ActionScript 3 bytecodes to be executed.
  *
  * @author JPEXS
  */

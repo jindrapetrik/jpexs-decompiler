@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Throw an exception.
  * @author JPEXS
  */
 public class ThrowActionItem extends ActionItem implements ExitItem {

@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Sprite importer.
  * @author JPEXS
  */
 public class SpriteImporter {

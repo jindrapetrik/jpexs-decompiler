@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.script;
 
 /**
- *
+ * Listener for lexer.
  * @author JPEXS
  */
 public interface LexListener {

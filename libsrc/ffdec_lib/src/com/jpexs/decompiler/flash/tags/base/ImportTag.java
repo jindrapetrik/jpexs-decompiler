@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import java.util.Map;
 
 /**
- *
+ * Import tag interface.
  * @author JPEXS
  */
 public interface ImportTag {

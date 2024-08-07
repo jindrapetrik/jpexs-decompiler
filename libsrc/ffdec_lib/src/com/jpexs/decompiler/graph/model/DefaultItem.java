@@ -20,6 +20,9 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
+/**
+ * Default section of a Switch statement.
+ */
 public class DefaultItem extends GraphTargetItem {
 
     @Override

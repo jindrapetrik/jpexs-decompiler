@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Multibyte character to ASCII.
  * @author JPEXS
  */
 public class MBCharToAsciiActionItem extends ActionItem {

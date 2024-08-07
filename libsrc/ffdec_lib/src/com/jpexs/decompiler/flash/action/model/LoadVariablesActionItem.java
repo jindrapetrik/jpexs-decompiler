@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Load variables.
  * @author JPEXS
  */
 public class LoadVariablesActionItem extends ActionItem {

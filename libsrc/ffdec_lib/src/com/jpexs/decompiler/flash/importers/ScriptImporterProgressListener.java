@@ -17,12 +17,18 @@
 package com.jpexs.decompiler.flash.importers;
 
 /**
- *
+ * Listener for script importer progress.
  * @author JPEXS
  */
 public interface ScriptImporterProgressListener {
 
+    /**
+     * Called when script is imported.
+     */
     public void scriptImported();
 
+    /**
+     * Called when script import error occurs.
+     */
     public void scriptImportError();
 }

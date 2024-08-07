@@ -37,7 +37,7 @@ import java.util.Set;
 
 /**
  * Class LinkReportExporter - generates Linker reports similar to Flex
- * -link-report, but for SWF files
+ * -link-report, but for SWF files.
  *
  * @author JPEXS
  */

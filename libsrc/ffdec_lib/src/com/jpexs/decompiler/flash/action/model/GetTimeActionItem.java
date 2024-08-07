@@ -29,7 +29,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- *
+ * Get time.
  * @author JPEXS
  */
 public class GetTimeActionItem extends ActionItem {

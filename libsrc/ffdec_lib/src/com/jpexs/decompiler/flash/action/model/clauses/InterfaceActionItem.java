@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Interface.
  * @author JPEXS
  */
 public class InterfaceActionItem extends ActionItem {

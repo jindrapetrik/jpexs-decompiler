@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
+ * PlaceObject2 tag - adds character to the display list.
+ * Extends the functionality of the PlaceObjectTag.
  *
  * @author JPEXS
  */

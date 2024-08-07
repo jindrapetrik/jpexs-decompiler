@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Stop.
  * @author JPEXS
  */
 public class StopActionItem extends ActionItem {

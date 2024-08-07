@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.io.Serializable;
 
 /**
- *
+ * Advanced shape record with double precision.
  * @author JPEXS
  */
 public abstract class ShapeRecordAdvanced implements Serializable {

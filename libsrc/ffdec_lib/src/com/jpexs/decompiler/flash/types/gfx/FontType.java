@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Font.
  * @author JPEXS
  */
 public class FontType implements Serializable {

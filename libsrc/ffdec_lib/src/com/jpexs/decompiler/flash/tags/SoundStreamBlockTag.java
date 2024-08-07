@@ -24,7 +24,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * SoundStreamBlock tag - contains sound data for streaming sound.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

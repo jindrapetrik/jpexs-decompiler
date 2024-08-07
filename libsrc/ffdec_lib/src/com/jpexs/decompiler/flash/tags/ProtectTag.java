@@ -31,7 +31,7 @@ import com.jpexs.helpers.MD5Crypt;
 import java.io.IOException;
 
 /**
- * Marks the file is not importable for editing
+ * Protect tag - marks the file is not importable for editing.
  *
  * @author JPEXS
  */

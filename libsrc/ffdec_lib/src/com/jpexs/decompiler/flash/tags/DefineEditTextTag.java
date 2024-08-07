@@ -26,64 +26,39 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
-import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
-import com.jpexs.decompiler.flash.tags.dynamictext.CharacterWithStyle;
-import com.jpexs.decompiler.flash.tags.dynamictext.DynamicTextModel;
-import com.jpexs.decompiler.flash.tags.dynamictext.GlyphCharacter;
-import com.jpexs.decompiler.flash.tags.dynamictext.Paragraph;
-import com.jpexs.decompiler.flash.tags.dynamictext.SameStyleTextRecord;
-import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
-import com.jpexs.decompiler.flash.tags.dynamictext.Word;
+import com.jpexs.decompiler.flash.tags.base.*;
+import com.jpexs.decompiler.flash.tags.dynamictext.*;
 import com.jpexs.decompiler.flash.tags.enums.TextRenderMode;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
-import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.RGB;
-import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
-import com.jpexs.decompiler.flash.types.annotations.EnumValue;
-import com.jpexs.decompiler.flash.types.annotations.Multiline;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.annotations.*;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.Color;
-import java.awt.Font;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- *
+ * DefineEditText tag - defines an editable text field.
  * @author JPEXS
  */
 @SWFVersion(from = 4)

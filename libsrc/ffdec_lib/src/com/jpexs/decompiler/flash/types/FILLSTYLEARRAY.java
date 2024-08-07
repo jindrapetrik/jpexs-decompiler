@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *
+ * Fill style array.
  * @author JPEXS
  */
 public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {

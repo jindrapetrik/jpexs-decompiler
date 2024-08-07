@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * DoInitAction tag - Instructs Flash Player to perform a list of actions when a sprite is initialized.
  * @author JPEXS
  */
 @SWFVersion(from = 6)

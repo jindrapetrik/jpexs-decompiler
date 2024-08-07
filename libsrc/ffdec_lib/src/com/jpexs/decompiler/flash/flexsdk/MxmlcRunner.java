@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+/**
+ * Runs mxmlc compiler.
+ */
 public class MxmlcRunner {
 
     private String flexSdkPath;

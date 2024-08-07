@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Sound export mode.
  * @author JPEXS
  */
 public enum SoundExportMode {

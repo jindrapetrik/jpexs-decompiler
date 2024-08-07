@@ -17,11 +17,15 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * Exception thrown when there is a problem importing a sound.
  * @author JPEXS
  */
 public class SoundImportException extends Exception {
 
+    /**
+     * Constructs a new SoundImportException with the specified detail message.
+     * @param message The detail message
+     */
     public SoundImportException(String message) {
         super(message);
     }

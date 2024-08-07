@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Multibyte string length.
  * @author JPEXS
  */
 public class MBStringLengthActionItem extends ActionItem {

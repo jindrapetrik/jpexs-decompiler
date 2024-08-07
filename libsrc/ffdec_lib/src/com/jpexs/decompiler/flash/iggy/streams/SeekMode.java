@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.iggy.streams;
 
 /**
- *
+ * Seek mode.
  * @author JPEXS
  */
 public enum SeekMode {

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.action.parser.script;
 import java.util.List;
 
 /**
- *
+ * Exception that is thrown when the script needs to be generated again.
  * @author JPEXS
  */
 public class NeedsGenerateAgainException extends Exception {

@@ -24,7 +24,7 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 
 /**
- *
+ * A file object used to represent compiled classes in memory.
  * @author JPEXS
  */
 public class JavaClassObject extends SimpleJavaFileObject {

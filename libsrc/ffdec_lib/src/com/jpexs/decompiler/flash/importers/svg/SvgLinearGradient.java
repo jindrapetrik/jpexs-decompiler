@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG linear gradient.
  * @author JPEXS
  */
 class SvgLinearGradient extends SvgGradient {

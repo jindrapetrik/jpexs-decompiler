@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- *
+ * DefineBinaryData tag - Contains binary data.
  * @author JPEXS
  */
 @SWFVersion(from = 9)

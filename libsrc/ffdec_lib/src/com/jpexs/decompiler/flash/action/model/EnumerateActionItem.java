@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Enumerate.
  * @author JPEXS
  */
 public class EnumerateActionItem extends ActionItem {

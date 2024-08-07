@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- *
+ * Base class for place object tags.
  * @author JPEXS
  */
 public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, DepthTag {

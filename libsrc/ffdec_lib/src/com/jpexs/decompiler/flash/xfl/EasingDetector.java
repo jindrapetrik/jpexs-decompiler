@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.math.BezierEdge;
 import java.util.List;
 
 /**
- *
+ * Easing detector.
  * @author JPEXS
  */
 public class EasingDetector {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph.precontinues;
 
 /**
- *
+ * While loop.
  * @author JPEXS
  */
 public class WhileNode extends Node {

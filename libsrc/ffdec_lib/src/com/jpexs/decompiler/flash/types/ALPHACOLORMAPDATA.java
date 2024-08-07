@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import java.io.Serializable;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
+ * ALPHACOLORMAPDATA represents a color table and pixel data for an alpha color map.
  *
  * @author JPEXS
  */

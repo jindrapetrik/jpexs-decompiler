@@ -27,7 +27,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Line style, v2.
+ * Extends functionality of LINESTYLE.
  * @author JPEXS
  */
 public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {

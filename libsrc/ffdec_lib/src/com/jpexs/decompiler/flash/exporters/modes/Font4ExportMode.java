@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * DefineFont4 export mode.
  * @author JPEXS
  */
 public enum Font4ExportMode {

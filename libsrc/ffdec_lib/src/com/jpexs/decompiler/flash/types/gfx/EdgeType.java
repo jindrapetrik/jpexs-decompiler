@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * Edge.
  * @author JPEXS
  */
 public class EdgeType implements Serializable {

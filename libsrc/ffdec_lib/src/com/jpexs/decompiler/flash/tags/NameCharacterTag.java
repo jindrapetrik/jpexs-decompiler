@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- *
+ * NameCharacter tag - undocumented.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

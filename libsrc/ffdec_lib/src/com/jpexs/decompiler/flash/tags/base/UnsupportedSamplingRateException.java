@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 /**
- *
+ * Exception for unsupported sound rate.
  * @author JPEXS
  */
 public class UnsupportedSamplingRateException extends SoundImportException {

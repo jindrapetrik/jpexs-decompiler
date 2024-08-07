@@ -31,8 +31,8 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
-import java.awt.Rectangle;
-import java.awt.Shape;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * DefineScalingGrid tag - defines scaling grid.
  * @author JPEXS
  */
 @SWFVersion(from = 8)

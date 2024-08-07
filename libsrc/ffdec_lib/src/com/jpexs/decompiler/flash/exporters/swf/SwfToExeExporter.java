@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Exports SWF to EXE.
  * @author JPEXS
  */
 public class SwfToExeExporter {

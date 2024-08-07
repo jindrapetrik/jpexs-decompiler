@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG path reader.
  * @author JPEXS
  */
 public class SvgPathReader {

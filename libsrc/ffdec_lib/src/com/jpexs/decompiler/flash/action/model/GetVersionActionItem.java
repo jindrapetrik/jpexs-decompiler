@@ -28,7 +28,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Get version.
  * @author JPEXS
  */
 public class GetVersionActionItem extends ActionItem {

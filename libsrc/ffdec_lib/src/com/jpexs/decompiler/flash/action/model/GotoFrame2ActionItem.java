@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Goto frame, v2.
  * @author JPEXS
  */
 public class GotoFrame2ActionItem extends ActionItem {

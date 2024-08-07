@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
- *
+ * Entry implementation.
  * @param <K> Key
  * @param <V> Value
  * @author JPEXS

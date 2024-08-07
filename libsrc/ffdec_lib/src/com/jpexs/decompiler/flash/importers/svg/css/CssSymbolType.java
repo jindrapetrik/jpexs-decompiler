@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg.css;
 
 /**
- *
+ * Css symbol type.
  * @author JPEXS
  */
 public enum CssSymbolType {

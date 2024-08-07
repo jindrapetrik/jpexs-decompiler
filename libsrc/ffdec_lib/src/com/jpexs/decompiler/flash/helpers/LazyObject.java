@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.helpers;
 
 /**
- *
+ * Interface for objects that can be loaded lazily.
  * @author JPEXS
  */
 public interface LazyObject {

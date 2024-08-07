@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.RGBA;
 
 /**
- *
+ * Text style.
  * @author JPEXS
  */
 public final class TextStyle implements Cloneable {

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Header.
  * @author JPEXS
  *
  * little endian all

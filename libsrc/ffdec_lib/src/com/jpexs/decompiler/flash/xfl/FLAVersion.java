@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * FLA version enumeration.
  * @author JPEXS
  */
 public enum FLAVersion {

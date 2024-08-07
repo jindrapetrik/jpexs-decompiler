@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 /**
- *
+ * Straight morph edge.
  * @author JPEXS
  */
 public class StraightMorphEdge implements IMorphEdge {

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Strict mode.
  * @author JPEXS
  */
 public class StrictModeActionItem extends ActionItem {

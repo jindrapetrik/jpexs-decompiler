@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Style change record.
  * @author JPEXS
  */
 public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {

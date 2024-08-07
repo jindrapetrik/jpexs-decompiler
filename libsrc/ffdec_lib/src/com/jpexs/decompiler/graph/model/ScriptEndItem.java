@@ -21,7 +21,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * Script end.
  * @author JPEXS
  */
 public class ScriptEndItem extends GraphTargetItem implements ExitItem {

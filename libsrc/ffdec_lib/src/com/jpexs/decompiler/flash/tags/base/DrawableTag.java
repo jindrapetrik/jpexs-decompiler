@@ -27,7 +27,7 @@ import java.awt.Shape;
 import java.io.IOException;
 
 /**
- *
+ * A character that can be drawn on the screen.
  * @author JPEXS
  */
 public abstract class DrawableTag extends CharacterTag implements BoundedTag {

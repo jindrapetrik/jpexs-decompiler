@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 
 /**
- *
+ * Pop item from the stack.
  * @author JPEXS
  */
 public class PopItem extends GraphTargetItem {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.script;
 
 /**
- *
+ * ActionScript 1/2 symbol group.
  * @author JPEXS
  */
 public enum SymbolGroup {

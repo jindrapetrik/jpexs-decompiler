@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Gb18030 encoding.
  * @author JPEXS
  */
 public class Gb18030 extends AbstractCharsetConverter {

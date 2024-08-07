@@ -19,16 +19,13 @@ package com.jpexs.decompiler.flash.action.model.operations;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.SourceGenerator;
-import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Bitwise AND.
  * @author JPEXS
  */
 public class BitAndActionItem extends BitwiseBinaryOpActionItem {

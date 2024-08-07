@@ -16,16 +16,12 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
-import java.awt.Component;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.PixelGrabber;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
+ * BMP file writer.
  * Adapted from
  * http://www.javaworld.com/article/2077561/learn-java/java-tip-60--saving-bitmap-files-in-java.html
  */

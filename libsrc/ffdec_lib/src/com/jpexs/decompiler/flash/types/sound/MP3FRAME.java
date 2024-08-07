@@ -27,7 +27,7 @@ import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.SampleBuffer;
 
 /**
- *
+ * MP3 frame with samples.
  * @author JPEXS
  */
 public class MP3FRAME {

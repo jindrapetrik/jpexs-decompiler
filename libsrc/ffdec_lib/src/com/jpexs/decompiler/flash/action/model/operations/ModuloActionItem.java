@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Modulo.
  * @author JPEXS
  */
 public class ModuloActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {

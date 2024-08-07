@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.svg;
 
 /**
- *
+ * SVG line cap.
  * @author JPEXS
  */
 enum SvgLineCap {

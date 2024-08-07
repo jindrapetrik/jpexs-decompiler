@@ -21,7 +21,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * Any item.
  * @author JPEXS
  */
 public class AnyItem extends GraphTargetItem {

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Goto frame.
  * @author JPEXS
  */
 public class GotoFrameActionItem extends ActionItem {

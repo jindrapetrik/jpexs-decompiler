@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 /**
- *
+ * Straight edge.
  * @author JPEXS
  */
 public class StraightEdge implements IEdge {

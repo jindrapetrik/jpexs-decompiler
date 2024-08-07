@@ -19,7 +19,7 @@ package com.jpexs.helpers.sound;
 import java.io.InputStream;
 
 /**
- *
+ * Sound player.
  * @author JPEXS
  */
 public abstract class SoundPlayer {

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Shape exporter base.
  * @author JPEXS, Claus Wahlers
  */
 public abstract class ShapeExporterBase implements IShapeExporter {

@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.xfl.shapefixer;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 
 /**
- *
+ * Advanced curved edge record with double precision.
  * @author JPEXS
  */
 public class CurvedEdgeRecordAdvanced extends ShapeRecordAdvanced {

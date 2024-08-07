@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
+ * Path helper class.
  * @author JPEXS
  */
 public class Path {

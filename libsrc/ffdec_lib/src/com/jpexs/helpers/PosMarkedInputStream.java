@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Input stream that marks the current position.
  * @author JPEXS
  */
 public class PosMarkedInputStream extends InputStream {

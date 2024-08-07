@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Extract a substring from a string.
  * @author JPEXS
  */
 public class StringExtractActionItem extends ActionItem {

@@ -48,7 +48,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Image exporter.
  * @author JPEXS
  */
 public class ImageExporter {

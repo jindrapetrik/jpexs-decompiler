@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
+/**
+ * Dependency of a script.
+ */
 public enum DependencyType {
     INHERITANCE, NAMESPACE, SIGNATURE, EXPRESSION
 }

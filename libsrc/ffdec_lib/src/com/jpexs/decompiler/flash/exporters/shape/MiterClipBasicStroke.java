@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Miter clip basic stroke.
  * @author JPEXS
  */
 public class MiterClipBasicStroke implements Stroke {

@@ -24,7 +24,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * FreeAll tag - undocumented.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

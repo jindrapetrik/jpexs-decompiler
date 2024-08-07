@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 /**
- *
+ * Hash array list.
  * @author JPEXS
  */
 public class HashArrayList<E> extends ArrayList<E> {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
 /**
- *
+ * Parsed symbol group.
  * @author JPEXS
  */
 public enum SymbolGroup {

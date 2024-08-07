@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import java.util.Objects;
 
 /**
- *
+ * Display object cache key.
  * @author JPEXS
  */
 public class DisplayObjectCacheKey {

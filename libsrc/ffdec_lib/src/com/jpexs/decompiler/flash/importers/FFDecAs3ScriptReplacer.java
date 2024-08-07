@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * FFDec ActionScript 3 script replacer.
+ */
 public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
     private boolean air;

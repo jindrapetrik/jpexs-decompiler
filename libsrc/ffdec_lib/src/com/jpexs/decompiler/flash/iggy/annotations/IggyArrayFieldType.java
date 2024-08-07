@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Array field type annotation.
  * @author JPEXS
  */
 @Retention(RetentionPolicy.RUNTIME)

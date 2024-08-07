@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Sound exporter.
  * @author JPEXS
  */
 public class SoundExporter {

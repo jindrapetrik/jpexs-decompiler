@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Pre decrement.
  * @author JPEXS
  */
 public class PreDecrementActionItem extends UnaryOpItem {

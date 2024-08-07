@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Post increment.
  * @author JPEXS
  */
 public class PostIncrementActionItem extends ActionItem implements SetTypeActionItem {

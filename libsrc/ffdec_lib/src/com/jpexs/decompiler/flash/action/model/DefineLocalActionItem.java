@@ -22,18 +22,14 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
-import com.jpexs.decompiler.graph.CompilationException;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
-import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.*;
 import com.jpexs.decompiler.graph.model.LocalData;
+
 import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Define local variable.
  * @author JPEXS
  */
 public class DefineLocalActionItem extends ActionItem implements SetTypeActionItem {

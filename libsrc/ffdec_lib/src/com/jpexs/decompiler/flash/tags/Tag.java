@@ -62,7 +62,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * Represents Tag inside SWF file
+ * Tag inside SWF file
  *
  * @author JPEXS
  */

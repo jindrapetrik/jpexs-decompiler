@@ -64,7 +64,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class with helper method
+ * Class with helper methods.
  *
  * @author JPEXS, Paolo Cancedda
  */

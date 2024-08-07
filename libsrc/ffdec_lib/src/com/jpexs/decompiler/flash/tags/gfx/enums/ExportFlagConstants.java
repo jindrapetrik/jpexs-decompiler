@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags.gfx.enums;
 
 /**
- *
+ * Export flags constants.
  * @author JPEXS
  */
 public class ExportFlagConstants {

@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.IOException;
 
 /**
- *
+ * Sub file entry.
  * @author JPEXS
  *
  * Based of works of somebody called eternity.

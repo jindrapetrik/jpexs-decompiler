@@ -118,7 +118,7 @@ public class JpegMarker {
     }
 
     public static String markerToString(int marker) {
-        for (Field field : JpegAnalyzer.class.getDeclaredFields()) {
+        for (Field field : JpegMarker.class.getDeclaredFields()) {
             try {
                 if (field.getInt(null) == marker) {
                     return field.getName();

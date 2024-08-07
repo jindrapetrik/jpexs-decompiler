@@ -16,17 +16,13 @@
  */
 package com.jpexs.helpers.plugin;
 
+import javax.tools.*;
+import javax.tools.JavaFileObject.Kind;
 import java.io.IOException;
 import java.security.SecureClassLoader;
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.StandardJavaFileManager;
 
 /**
- *
+ * A file manager used to store the compiled classes.
  * @author JPEXS
  */
 public class ClassFileManager extends

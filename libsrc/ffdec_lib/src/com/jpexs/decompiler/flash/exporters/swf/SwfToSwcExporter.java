@@ -46,6 +46,9 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Exports SWF to SWC.
+ */
 public class SwfToSwcExporter {
 
     private static final String DEPENDENCY_NAMESPACE = "n";

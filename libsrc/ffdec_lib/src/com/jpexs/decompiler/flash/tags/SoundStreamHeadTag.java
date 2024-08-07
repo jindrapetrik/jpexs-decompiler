@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * SoundStreamHead tag - contains sound stream information for streaming sound.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

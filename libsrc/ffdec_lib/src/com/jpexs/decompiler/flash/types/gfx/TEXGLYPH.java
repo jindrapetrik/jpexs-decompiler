@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * Glyph texture.
  * @author JPEXS
  */
 public class TEXGLYPH implements Serializable {

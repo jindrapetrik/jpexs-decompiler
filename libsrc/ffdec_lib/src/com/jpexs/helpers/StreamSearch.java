@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Searches for byte sequences in a stream.
  * @author JPEXS
  */
 public class StreamSearch implements Searchable {

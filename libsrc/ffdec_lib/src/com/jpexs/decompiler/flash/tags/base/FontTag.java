@@ -52,7 +52,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Base class for font tags.
  * @author JPEXS
  */
 public abstract class FontTag extends DrawableTag implements AloneTag {

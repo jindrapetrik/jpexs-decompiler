@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Declared strings.
  * @author JPEXS
  */
 public class IggyDeclStrings implements StructureInterface {

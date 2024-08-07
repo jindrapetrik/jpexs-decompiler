@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Drop shadow filter based on the same median filter as the blur filter
+ * Drop shadow filter based on the same median filter as the blur filter.
  *
  * @author JPEXS
  */

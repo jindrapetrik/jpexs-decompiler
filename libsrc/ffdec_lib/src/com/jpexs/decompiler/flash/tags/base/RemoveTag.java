@@ -22,7 +22,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.util.Map;
 
 /**
- *
+ * Base class for remove object tags.
  * @author JPEXS
  */
 public abstract class RemoveTag extends Tag implements DepthTag {

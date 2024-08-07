@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 /**
- *
+ * Tag type info.
  * @author JPEXS
  */
 public class TagTypeInfo {

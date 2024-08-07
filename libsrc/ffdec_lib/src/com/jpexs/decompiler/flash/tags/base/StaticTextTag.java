@@ -52,7 +52,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Base class for static text tags.
  * @author JPEXS
  */
 public abstract class StaticTextTag extends TextTag {

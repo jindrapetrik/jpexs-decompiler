@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Print.
  * @author JPEXS
  */
 public class PrintActionItem extends ActionItem {

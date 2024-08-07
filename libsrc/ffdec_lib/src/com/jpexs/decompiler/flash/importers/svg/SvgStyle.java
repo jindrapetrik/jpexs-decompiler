@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * SVG style.
  * @author JPEXS
  */
 class SvgStyle {

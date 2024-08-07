@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Function.
  * @author JPEXS
  */
 public class FunctionActionItem extends ActionItem implements BranchStackResistant {

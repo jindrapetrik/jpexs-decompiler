@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
 /**
- *
+ * Label.
  * @author JPEXS
  */
 public class Label {

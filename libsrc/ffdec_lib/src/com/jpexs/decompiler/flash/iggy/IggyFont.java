@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Font tag.
  * @author JPEXS
  */
 public class IggyFont extends IggyTag {

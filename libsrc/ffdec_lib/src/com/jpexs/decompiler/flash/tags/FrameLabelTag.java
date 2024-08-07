@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *
+ * FrameLabel tag - defines a label for a frame.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

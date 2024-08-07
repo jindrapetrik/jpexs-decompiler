@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.flexsdk;
 
+/**
+ * Exception thrown when mxmlc fails to compile a file.
+ */
 public class MxmlcException extends Exception {
 
     private String mxmlcErrorOutput;

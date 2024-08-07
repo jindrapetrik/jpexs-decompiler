@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Multibyte string extract.
  * @author JPEXS
  */
 public class MBStringExtractActionItem extends ActionItem {

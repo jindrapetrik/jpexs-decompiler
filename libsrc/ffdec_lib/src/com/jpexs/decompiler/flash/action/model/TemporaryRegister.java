@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Temporary register.
  * @author JPEXS
  */
 public class TemporaryRegister extends ActionItem {

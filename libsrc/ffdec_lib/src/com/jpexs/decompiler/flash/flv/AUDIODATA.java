@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- *
+ * Audio data.
  * @author JPEXS
  */
 public class AUDIODATA extends DATA {

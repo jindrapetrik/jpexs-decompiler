@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * SWF file.
  * @author JPEXS
  */
 public class IggySwf implements StructureInterface {

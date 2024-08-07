@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * Font info.
  * @author JPEXS
  */
 public class FONTINFO implements Serializable {

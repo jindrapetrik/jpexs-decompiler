@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Profiler class for measuring time of actions.
  * @author JPEXS
  */
 public class Profiler {

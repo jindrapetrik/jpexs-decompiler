@@ -20,7 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 
 /**
- *
+ * Abstract data stream.
  * @author JPEXS
  */
 public abstract class AbstractDataStream implements DataStreamInterface {

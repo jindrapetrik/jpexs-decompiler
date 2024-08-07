@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.iggy.streams;
 import java.io.IOException;
 
 /**
- *
+ * Write data stream interface.
  * @author JPEXS
  */
 public interface WriteDataStreamInterface extends AutoCloseable {

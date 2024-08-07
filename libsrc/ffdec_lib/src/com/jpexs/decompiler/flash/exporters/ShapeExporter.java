@@ -61,7 +61,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Shape exporter.
  * @author JPEXS
  */
 public class ShapeExporter {

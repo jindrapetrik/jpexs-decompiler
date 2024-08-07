@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 /**
- *
+ * Curved morph edge.
  * @author JPEXS
  */
 public class CurvedMorphEdge extends StraightMorphEdge implements IMorphEdge {

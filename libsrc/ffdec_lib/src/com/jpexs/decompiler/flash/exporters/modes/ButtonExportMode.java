@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Button export mode.
  * @author JPEXS
  */
 public enum ButtonExportMode {

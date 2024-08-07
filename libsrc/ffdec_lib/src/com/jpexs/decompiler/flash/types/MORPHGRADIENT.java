@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- *
+ * Morph gradient.
  * @author JPEXS
  */
 public class MORPHGRADIENT implements Serializable {

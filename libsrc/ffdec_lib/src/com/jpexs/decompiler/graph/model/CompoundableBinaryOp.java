@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 /**
- *
+ * Compoundable binary operation interface.
  * @author JPEXS
  */
 public interface CompoundableBinaryOp extends BinaryOp {

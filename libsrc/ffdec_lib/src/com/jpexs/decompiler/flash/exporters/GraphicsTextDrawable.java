@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import java.util.List;
 
 /**
- *
+ * Interface for drawing text records.
  * @author JPEXS
  */
 public interface GraphicsTextDrawable {

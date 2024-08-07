@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- *
+ * Video data.
  * @author JPEXS
  */
 public class VIDEODATA extends DATA {

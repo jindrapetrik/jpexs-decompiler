@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.exporters.script.graphviz;
 import java.io.Reader;
 
 /**
- *
+ * Abstract lexer class
  * @author JPEXS
  */
 public abstract class AbstractLexer {

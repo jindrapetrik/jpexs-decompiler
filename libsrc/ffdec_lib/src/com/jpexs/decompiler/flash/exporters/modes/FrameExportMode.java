@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
- *
+ * Frame export mode.
  * @author JPEXS
  */
 public enum FrameExportMode {

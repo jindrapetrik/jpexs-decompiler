@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 
 /**
- *
+ * Straight edge record.
  * @author JPEXS
  */
 public class StraightEdgeRecord extends SHAPERECORD {

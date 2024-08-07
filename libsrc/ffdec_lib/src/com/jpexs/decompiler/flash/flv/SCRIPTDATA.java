@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Script data.
  * @author JPEXS
  */
 public class SCRIPTDATA extends DATA {

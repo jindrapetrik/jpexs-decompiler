@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Check if object is part of another object.
  * @author JPEXS
  */
 public class InActionItem extends BinaryOpItem {

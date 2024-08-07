@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * Kerning pair.
  * @author JPEXS
  */
 public class KerningPairType implements Serializable {

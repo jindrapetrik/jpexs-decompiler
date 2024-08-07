@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 /**
- *
+ * Edge interface.
  * @author JPEXS
  */
 public interface IEdge {

@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.LocalData;
 
 /**
- *
+ * Temporary register mark.
  * @author JPEXS
  */
 public class TemporaryRegisterMark extends ActionItem {

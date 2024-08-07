@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.iggy.streams.WriteDataStreamInterface;
 import java.io.IOException;
 
 /**
- *
+ * Font type info.
  * @author JPEXS
  */
 public class IggyFontTypeInfo implements StructureInterface {

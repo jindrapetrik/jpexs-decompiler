@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- *
+ * Focal gradient. Gradient with focal point. Used in radial gradients.
  * @author JPEXS
  */
 public class FOCALGRADIENT extends GRADIENT implements Serializable {

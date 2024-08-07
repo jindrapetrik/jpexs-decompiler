@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DefineFont4 exporter.
  * @author JPEXS
  */
 public class Font4Exporter {

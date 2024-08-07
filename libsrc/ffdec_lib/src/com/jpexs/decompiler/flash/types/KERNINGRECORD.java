@@ -22,7 +22,7 @@ import java.awt.Font;
 import java.io.Serializable;
 
 /**
- * Represents 24-bit red, green, blue value
+ * Kerning record.
  *
  * @author JPEXS
  */

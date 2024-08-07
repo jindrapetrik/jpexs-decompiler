@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * String less.
  * @author JPEXS
  */
 public class StringLtActionItem extends BinaryOpItem implements Inverted {

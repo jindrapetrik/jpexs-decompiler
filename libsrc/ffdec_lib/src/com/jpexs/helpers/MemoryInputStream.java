@@ -20,7 +20,7 @@ import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
 
 /**
- *
+ * Input stream that reads from memory.
  * @author JPEXS
  */
 public class MemoryInputStream extends SeekableInputStream {

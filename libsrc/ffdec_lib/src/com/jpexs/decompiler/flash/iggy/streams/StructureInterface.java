@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.iggy.streams;
 import java.io.IOException;
 
 /**
- *
+ * Structure interface.
  * @author JPEXS
  */
 public interface StructureInterface {

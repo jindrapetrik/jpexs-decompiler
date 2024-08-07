@@ -73,7 +73,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 
 /**
- *
+ * Base class for text tags.
  * @author JPEXS
  */
 public abstract class TextTag extends DrawableTag {

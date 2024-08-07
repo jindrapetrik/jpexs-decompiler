@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- *
+ * Morph line style.
  * @author JPEXS
  */
 public class MORPHLINESTYLE implements Serializable {

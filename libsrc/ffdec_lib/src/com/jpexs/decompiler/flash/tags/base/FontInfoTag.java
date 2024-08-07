@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Base class for font info tags.
  * @author JPEXS
  */
 public abstract class FontInfoTag extends Tag implements CharacterIdTag {

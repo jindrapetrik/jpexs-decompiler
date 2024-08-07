@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * True value.
  * @author JPEXS
  */
 public class TrueItem extends GraphTargetItem implements LogicalOpItem, SimpleValue {

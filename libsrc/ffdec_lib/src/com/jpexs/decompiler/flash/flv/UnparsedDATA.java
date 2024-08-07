@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.flv;
 
 /**
- *
+ * Unparsed data.
  * @author JPEXS
  */
 public class UnparsedDATA extends DATA {

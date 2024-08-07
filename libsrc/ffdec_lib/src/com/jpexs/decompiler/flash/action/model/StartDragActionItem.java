@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Start drag.
  * @author JPEXS
  */
 public class StartDragActionItem extends ActionItem {

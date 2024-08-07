@@ -24,10 +24,12 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 
 /**
- *
+ * DefineShape2 tag - defines shape.
+ * Extends functionality of DefineShape.
  * @author JPEXS
  */
 @SWFVersion(from = 2)

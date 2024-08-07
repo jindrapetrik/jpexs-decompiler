@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * While statement.
  * @author JPEXS
  */
 public class WhileItem extends LoopItem implements Block {

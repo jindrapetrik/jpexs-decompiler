@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.flv;
 
 /**
- *
+ * Data.
  * @author JPEXS
  */
 public abstract class DATA {

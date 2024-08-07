@@ -22,12 +22,9 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ZONERECORD;
-import com.jpexs.decompiler.flash.types.annotations.EnumValue;
-import com.jpexs.decompiler.flash.types.annotations.Reserved;
-import com.jpexs.decompiler.flash.types.annotations.SWFArray;
-import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.annotations.*;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * DefineFontAlignZones tag - defines font align zones.
  * @author JPEXS
  */
 @SWFVersion(from = 8)

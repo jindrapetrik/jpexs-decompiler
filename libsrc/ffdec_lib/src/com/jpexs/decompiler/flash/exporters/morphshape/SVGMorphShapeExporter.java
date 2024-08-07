@@ -35,7 +35,7 @@ import java.awt.Color;
 import org.w3c.dom.Element;
 
 /**
- *
+ * SVG morph shape exporter.
  * @author JPEXS, Claus Wahlers
  */
 public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {

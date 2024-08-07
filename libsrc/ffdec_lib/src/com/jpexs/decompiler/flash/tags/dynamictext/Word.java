@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Word.
  * @author JPEXS
  */
 public class Word {

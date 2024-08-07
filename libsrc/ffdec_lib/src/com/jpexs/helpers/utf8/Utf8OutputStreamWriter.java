@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
- *
+ * UTF-8 output stream writer.
  * @author JPEXS
  */
 public class Utf8OutputStreamWriter extends OutputStreamWriter {

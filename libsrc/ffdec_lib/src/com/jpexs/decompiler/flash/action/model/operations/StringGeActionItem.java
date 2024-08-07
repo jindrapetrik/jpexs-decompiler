@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * String greater or equal.
  * @author JPEXS
  */
 public class StringGeActionItem extends BinaryOpItem implements Inverted {

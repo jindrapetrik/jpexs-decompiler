@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 /**
- *
+ * Interface for items that have integer value type.
  * @author JPEXS
  */
 public interface IntegerValueTypeItem {

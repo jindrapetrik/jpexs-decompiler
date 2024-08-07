@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.parser.pcode;
 
 /**
- *
+ * ActionScript 1-2 P-code parsed symbol.
  * @author JPEXS
  */
 public class ASMParsedSymbol {

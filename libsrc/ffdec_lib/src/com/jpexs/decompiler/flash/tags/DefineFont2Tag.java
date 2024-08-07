@@ -21,11 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.types.BasicType;
-import com.jpexs.decompiler.flash.types.KERNINGRECORD;
-import com.jpexs.decompiler.flash.types.LANGCODE;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -33,14 +29,16 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.Font;
+
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * DefineFont2 tag - defines a font.
+ * Extends DefineFont functionality.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

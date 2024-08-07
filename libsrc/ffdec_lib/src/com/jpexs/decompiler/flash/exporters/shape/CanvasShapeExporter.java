@@ -21,20 +21,12 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.Point;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import com.jpexs.decompiler.flash.types.GRADIENT;
-import com.jpexs.decompiler.flash.types.GRADRECORD;
-import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.RECT;
-import com.jpexs.decompiler.flash.types.RGB;
-import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 
 /**
- *
+ * Canvas shape exporter.
  * @author JPEXS
  */
 public class CanvasShapeExporter extends ShapeExporterBase {

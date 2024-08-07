@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 /**
- * MD5 crypt - based on passlib.hash.md5_crypt
+ * MD5 crypt - based on passlib.hash.md5_crypt.
  *
  * @author JPEXS
  */

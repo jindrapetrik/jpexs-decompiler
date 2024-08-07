@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
+ * Get length of a string.
  * @author JPEXS
  */
 public class StringLengthActionItem extends ActionItem {

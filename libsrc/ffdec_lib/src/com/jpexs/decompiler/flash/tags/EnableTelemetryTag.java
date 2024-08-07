@@ -37,7 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Enable flash profiling information
+ * EnableTelemetry tag - Enable flash profiling information.
  *
  * @author JPEXS
  */

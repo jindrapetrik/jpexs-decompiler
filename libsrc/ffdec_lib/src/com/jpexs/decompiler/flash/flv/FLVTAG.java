@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.flv;
 
 /**
- *
+ * FLV tag.
  * @author JPEXS
  */
 public class FLVTAG {

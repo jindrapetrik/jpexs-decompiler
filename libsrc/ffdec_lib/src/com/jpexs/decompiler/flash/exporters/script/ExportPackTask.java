@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
- *
+ * Export script pack task.
  * @author JPEXS
  */
 public class ExportPackTask implements Callable<File> {

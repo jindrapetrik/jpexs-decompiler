@@ -29,7 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
 /**
- *
+ * Next frame.
  * @author JPEXS
  */
 public class NextFrameActionItem extends ActionItem {

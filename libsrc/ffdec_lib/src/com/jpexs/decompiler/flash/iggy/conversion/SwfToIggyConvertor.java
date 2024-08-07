@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * Converts SWF to Iggy.
  * @author JPEXS
  */
 public class SwfToIggyConvertor {

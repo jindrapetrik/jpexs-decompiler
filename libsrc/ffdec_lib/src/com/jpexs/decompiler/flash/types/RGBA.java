@@ -22,7 +22,7 @@ import java.awt.Color;
 import java.io.Serializable;
 
 /**
- * Represents 32-bit red, green, blue and alpha value
+ * 32-bit red, green, blue and alpha value.
  *
  * @author JPEXS
  */

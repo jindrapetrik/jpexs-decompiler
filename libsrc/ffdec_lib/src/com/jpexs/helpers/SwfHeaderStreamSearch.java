@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Searches for SWF header in a stream.
  * @author JPEXS
  */
 public class SwfHeaderStreamSearch implements Searchable {

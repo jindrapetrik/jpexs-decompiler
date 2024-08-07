@@ -50,7 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Try statement.
  * @author JPEXS
  */
 public class TryActionItem extends ActionItem implements Block {

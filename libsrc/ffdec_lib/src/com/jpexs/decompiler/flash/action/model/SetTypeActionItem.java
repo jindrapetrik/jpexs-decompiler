@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Set type action item interface.
  * @author JPEXS
  */
 public interface SetTypeActionItem {

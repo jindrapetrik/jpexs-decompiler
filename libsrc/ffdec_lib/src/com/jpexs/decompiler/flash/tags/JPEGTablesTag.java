@@ -24,7 +24,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * JPEGTables tag - JPEG tables for JPEG images (DefineBits tag) in the SWF file.
  * @author JPEXS
  */
 @SWFVersion(from = 1)

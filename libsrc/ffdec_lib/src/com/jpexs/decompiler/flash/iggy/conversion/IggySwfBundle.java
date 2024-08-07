@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *
+ * Iggy SWF bundle.
  * @author JPEXS
  */
 public class IggySwfBundle implements Bundle {

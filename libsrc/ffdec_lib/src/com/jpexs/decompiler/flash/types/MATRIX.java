@@ -24,7 +24,7 @@ import java.io.Serializable;
 
 /**
  * Represents a standard 2x3 transformation matrix of the sort commonly used in
- * 2D graphics
+ * 2D graphics.
  *
  * @author JPEXS
  */

@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *
+ * Morph fill style array.
  * @author JPEXS
  */
 public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {

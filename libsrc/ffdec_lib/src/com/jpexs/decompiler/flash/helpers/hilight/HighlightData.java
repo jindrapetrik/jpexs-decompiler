@@ -20,7 +20,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import java.io.Serializable;
 
 /**
- *
+ * Highlight data.
  * @author JPEXS
  */
 public class HighlightData implements Cloneable, Serializable {

@@ -23,7 +23,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.util.List;
 
 /**
- *
+ * Base class for sound tags.
  * @author JPEXS
  */
 public interface SoundTag extends TreeItem {

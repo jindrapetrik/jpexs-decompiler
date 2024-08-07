@@ -27,7 +27,8 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
 /**
- *
+ * RemoveObject2 tag - removes the specified character.
+ * Extends functionality of RemoveObject.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

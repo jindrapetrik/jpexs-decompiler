@@ -20,7 +20,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 
 /**
- *
+ * Logical operation item interface.
  * @author JPEXS
  */
 public interface LogicalOpItem {

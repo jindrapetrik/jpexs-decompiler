@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Get property.
  * @author JPEXS
  */
 public class GetPropertyActionItem extends ActionItem {

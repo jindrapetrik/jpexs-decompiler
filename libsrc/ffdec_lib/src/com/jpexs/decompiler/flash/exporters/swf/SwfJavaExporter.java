@@ -43,7 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Exports SWF to Java code.
  * @author JPEXS
  */
 public class SwfJavaExporter {

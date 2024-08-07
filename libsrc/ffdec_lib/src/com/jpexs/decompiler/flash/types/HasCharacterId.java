@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- * An item with characterId
+ * An item with characterId.
  * @author JPEXS
  */
 public interface HasCharacterId {

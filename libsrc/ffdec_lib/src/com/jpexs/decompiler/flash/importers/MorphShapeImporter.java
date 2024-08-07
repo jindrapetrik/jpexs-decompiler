@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
 
 /**
- *
+ * Morph shape importer.
  * @author JPEXS
  */
 public class MorphShapeImporter {

@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Text importer.
  * @author JPEXS
  */
 public class TextImporter {

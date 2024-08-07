@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * SymbolClass importer.
  * @author JPEXS
  */
 public class SymbolClassImporter {

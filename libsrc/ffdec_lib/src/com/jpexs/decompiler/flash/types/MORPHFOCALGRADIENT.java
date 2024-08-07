@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
 /**
- * Well, this structure is undocumented, but exists
- *
+ * Morph focal gradient.
+ * Undocumented structure, but it exists.
  * @author JPEXS
  */
 public class MORPHFOCALGRADIENT extends MORPHGRADIENT implements Serializable {

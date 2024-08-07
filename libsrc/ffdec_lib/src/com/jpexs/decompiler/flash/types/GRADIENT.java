@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- *
+ * Gradient.
  * @author JPEXS
  */
 public class GRADIENT implements Serializable {

@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * P-code GraphViz exporter.
  * @author JPEXS
  */
 public class PcodeGraphVizExporter {

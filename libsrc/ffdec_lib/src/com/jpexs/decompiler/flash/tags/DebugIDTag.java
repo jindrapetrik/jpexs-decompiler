@@ -24,12 +24,13 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.annotations.UUID;
 import com.jpexs.helpers.ByteArrayRange;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * DebugID tag - Contains a unique identifier for the SWF file.
  * @author JPEXS
  */
 @SWFVersion(from = 6)

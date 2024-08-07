@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 
 /**
- *
+ * Justify align glyph entry.
  * @author JPEXS
  */
 public class JustifyAlignGlyphEntry extends GLYPHENTRY implements InternalClass {

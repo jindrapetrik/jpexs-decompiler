@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *
+ * FontTextureInfo tag - font texture info.
  * @author JPEXS
  */
 public class FontTextureInfo extends Tag {

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 
 /**
- *
+ * Empty command.
  * @author JPEXS
  */
 public class EmptyCommand extends GraphTargetItem {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Exception for script replace errors.
  * @author JPEXS
  */
 public class As3ScriptReplaceException extends Exception {
