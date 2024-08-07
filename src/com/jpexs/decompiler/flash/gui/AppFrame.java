@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import javax.swing.*;
 import java.util.ResourceBundle;
-import javax.swing.JFrame;
 
 /**
  *

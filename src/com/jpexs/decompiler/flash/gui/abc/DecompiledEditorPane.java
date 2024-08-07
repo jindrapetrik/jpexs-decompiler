@@ -48,7 +48,13 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
-import java.awt.Point;
+import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
+
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,11 +64,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import jsyntaxpane.SyntaxDocument;
-import jsyntaxpane.Token;
-import jsyntaxpane.TokenType;
 
 /**
  *

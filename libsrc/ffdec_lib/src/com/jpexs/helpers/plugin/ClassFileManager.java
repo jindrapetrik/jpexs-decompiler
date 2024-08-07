@@ -16,8 +16,12 @@
  */
 package com.jpexs.helpers.plugin;
 
-import javax.tools.*;
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
+import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
 import java.security.SecureClassLoader;
 

@@ -18,9 +18,10 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.helpers.Helper;
-import java.util.ArrayList;
-import javax.swing.ListModel;
+
+import javax.swing.*;
 import javax.swing.event.ListDataListener;
+import java.util.ArrayList;
 
 /**
  *

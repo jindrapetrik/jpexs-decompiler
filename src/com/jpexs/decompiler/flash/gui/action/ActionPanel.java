@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
-import com.jpexs.debugger.flash.DebuggerConnection;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
@@ -73,38 +72,12 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CancellationException;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.Token;
+import jsyntaxpane.TokenType;
+import jsyntaxpane.actions.ActionUtils;
+
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
@@ -114,10 +87,17 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
 import javax.swing.tree.TreePath;
-import jsyntaxpane.SyntaxDocument;
-import jsyntaxpane.Token;
-import jsyntaxpane.TokenType;
-import jsyntaxpane.actions.ActionUtils;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

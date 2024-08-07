@@ -16,14 +16,15 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
-import javax.swing.text.JTextComponent;
 import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 import jsyntaxpane.actions.ActionUtils;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *

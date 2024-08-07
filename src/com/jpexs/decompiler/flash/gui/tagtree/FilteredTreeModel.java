@@ -21,15 +21,16 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-import javax.swing.JTree;
+
+import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  *

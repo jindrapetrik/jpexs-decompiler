@@ -21,10 +21,6 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.medialist.MediaList;
@@ -41,6 +37,11 @@ import uk.co.caprica.vlcj.player.list.MediaListPlayer;
 import uk.co.caprica.vlcj.player.list.MediaListPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.list.PlaybackMode;
 import uk.co.caprica.vlcj.support.version.LibVlcVersion;
+
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple media player that uses VLCJ library to play video files.

@@ -17,11 +17,9 @@
 package com.jpexs.decompiler.flash.gui.timeline;
 
 import com.jpexs.decompiler.flash.timeline.Timeline;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import javax.swing.JPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  *

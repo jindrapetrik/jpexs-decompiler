@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.gui.abc.NewTraitDialog;
 import com.jpexs.decompiler.flash.gui.abc.UsageFrame;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.helpers.Helper;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;

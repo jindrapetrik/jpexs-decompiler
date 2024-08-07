@@ -20,17 +20,10 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationScope;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.View;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Window;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 /**
  *

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.controls;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,9 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
 /**
  *

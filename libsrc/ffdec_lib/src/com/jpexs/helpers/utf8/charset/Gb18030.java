@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.helpers.utf8.Utf8Helper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

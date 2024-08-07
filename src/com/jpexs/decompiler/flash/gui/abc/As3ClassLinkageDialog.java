@@ -16,11 +16,11 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.gui.SelectTagOfTypeDialog;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppDialog;
+import com.jpexs.decompiler.flash.gui.SelectTagOfTypeDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -35,29 +35,19 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Window;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 /**
  *

@@ -16,12 +16,11 @@
  */
 package com.jpexs.helpers.plugin;
 
+import javax.tools.SimpleJavaFileObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.SimpleJavaFileObject;
 
 /**
  * A file object used to represent compiled classes in memory.

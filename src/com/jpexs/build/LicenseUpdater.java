@@ -18,6 +18,7 @@ package com.jpexs.build;
 
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

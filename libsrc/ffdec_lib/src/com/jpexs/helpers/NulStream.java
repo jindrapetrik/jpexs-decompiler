@@ -16,7 +16,6 @@
  */
 package com.jpexs.helpers;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**

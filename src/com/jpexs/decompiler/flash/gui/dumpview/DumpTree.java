@@ -90,8 +90,14 @@ import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
-import java.awt.Color;
-import java.awt.Component;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -103,17 +109,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.plaf.basic.BasicLabelUI;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 
 /**
  *

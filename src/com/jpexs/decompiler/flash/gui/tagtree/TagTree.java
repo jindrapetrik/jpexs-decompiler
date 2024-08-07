@@ -89,20 +89,16 @@ import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JTree;
-import javax.swing.plaf.basic.BasicLabelUI;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  *

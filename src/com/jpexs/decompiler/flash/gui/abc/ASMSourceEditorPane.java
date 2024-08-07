@@ -46,8 +46,13 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
-import java.awt.Color;
-import java.awt.Point;
+
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Utilities;
+import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -58,13 +63,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Utilities;
 
 /**
  *
