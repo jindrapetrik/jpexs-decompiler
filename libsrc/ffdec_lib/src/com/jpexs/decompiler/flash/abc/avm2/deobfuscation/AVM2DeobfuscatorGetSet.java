@@ -230,7 +230,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
                     return;
                 }
 
-                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                ins.translate(localData, stack, output, 0, "");
             }
 
             boolean ok = false;

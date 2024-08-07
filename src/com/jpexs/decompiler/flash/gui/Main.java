@@ -544,7 +544,7 @@ public class Main {
         }
         if (instrSWF != null) {
             if (origFile != null) {
-                for (Tag t : instrSWF.getLocalTags()) {
+                for (Tag t : instrSWF.getTags()) {
                     if (t instanceof ImportTag) {
                         ImportTag it = (ImportTag) t;
                         String url = it.getUrl();

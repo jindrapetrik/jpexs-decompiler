@@ -363,7 +363,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     }
                 }
 
-                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                ins.translate(localData, stack, output, 0, "");
             }
 
             if (inlineIns.contains(ins)) {

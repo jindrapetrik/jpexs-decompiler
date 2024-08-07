@@ -317,7 +317,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                     continue outer;
                 }
 
-                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, "");
+                ins.translate(localData, stack, output, 0, "");
                 if (def instanceof SetLocalTypeIns) {
                     int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                     if (!ignored.contains(regId)) {

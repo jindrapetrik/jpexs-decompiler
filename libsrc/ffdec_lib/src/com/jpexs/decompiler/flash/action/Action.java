@@ -987,7 +987,7 @@ public abstract class Action implements GraphSourceItem {
             tree = CancellableWorker.call(new Callable<List<GraphTargetItem>>() {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
-                    int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+                    int staticOperation = 0;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
                     List<GraphTargetItem> tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
