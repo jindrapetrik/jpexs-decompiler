@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -38,6 +38,7 @@ import java.util.Set;
 
 /**
  * AVM2 graph source.
+ *
  * @author JPEXS
  */
 public class AVM2GraphSource extends GraphSource {
@@ -94,6 +95,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Get AVM2 code
+     *
      * @return AVM2 code
      */
     public AVM2Code getCode() {
@@ -102,6 +104,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Constructs a new AVM2 graph source
+     *
      * @param code AVM2 code
      * @param isStatic Is static
      * @param scriptIndex Script index
@@ -129,6 +132,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Gets important addresses
+     *
      * @return Important addresses
      */
     @Override
@@ -138,6 +142,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Converts instruction at the specified position to string
+     *
      * @param pos Position of the instruction
      * @return Instruction as string
      */
@@ -151,6 +156,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Gets the size of the graph source
+     *
      * @return The size of the graph source
      */
     @Override
@@ -160,6 +166,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Gets the graph source item at the specified position
+     *
      * @param pos Position of the graph source item
      * @return The graph source item at the specified position
      */
@@ -170,6 +177,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Checks if the graph source is empty
+     *
      * @return True if the graph source is empty, false otherwise
      */
     @Override
@@ -179,6 +187,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Translates the part of the graph source
+     *
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -202,6 +211,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @return Position
      */
@@ -212,6 +222,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @param nearest Nearest
      * @return Position
@@ -223,6 +234,7 @@ public class AVM2GraphSource extends GraphSource {
 
     /**
      * Converts position to address
+     *
      * @param pos Position
      * @return Address
      */

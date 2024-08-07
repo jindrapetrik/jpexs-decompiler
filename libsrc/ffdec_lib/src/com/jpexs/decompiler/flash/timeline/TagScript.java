@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,6 +26,7 @@ import java.util.Objects;
 
 /**
  * A tag containing script.
+ *
  * @author JPEXS
  */
 public class TagScript implements TreeItem, Exportable {
@@ -47,6 +48,7 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Constructs TagScript.
+     *
      * @param swf SWF
      * @param tag Tag
      * @param frames Frames
@@ -59,7 +61,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Gets tag.
-     * @return 
+     *
+     * @return
      */
     public Tag getTag() {
         return tag;
@@ -67,7 +70,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Gets frames.
-     * @return 
+     *
+     * @return
      */
     public List<TreeItem> getFrames() {
         return frames;
@@ -75,7 +79,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -84,7 +89,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -93,7 +99,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Gets export filename.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getExportFileName() {
@@ -102,8 +109,9 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Equals.
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {
@@ -116,7 +124,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * HashCode.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -125,7 +134,8 @@ public class TagScript implements TreeItem, Exportable {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {

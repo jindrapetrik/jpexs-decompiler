@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -57,6 +57,7 @@ import java.util.Set;
 
 /**
  * Trait in ABC file.
+ *
  * @author JPEXS
  */
 public abstract class Trait implements Cloneable, Serializable {
@@ -168,6 +169,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Deletes trait.
+     *
      * @param abc ABC
      * @param d Deleted flag
      */
@@ -177,6 +179,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets metadata table.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param abc ABC
@@ -252,6 +255,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets package.
+     *
      * @param abc ABC
      * @return Package
      */
@@ -261,6 +265,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets dependencies.
+     *
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -292,6 +297,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Checks if class is built-in.
+     *
      * @param name Name
      * @return True if class is built-in
      */
@@ -306,6 +312,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets all class trait names.
+     *
      * @param traitNamesInThisScript Trait names in this script
      * @param abcIndex ABC indexing
      * @param abc ABC
@@ -345,6 +352,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Writes imports.
+     *
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -484,6 +492,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets metadata.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param abc ABC
@@ -525,6 +534,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Checks if trait is API versioned.
+     *
      * @param abc ABC
      * @return True if trait is API versioned
      */
@@ -534,6 +544,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets API versions.
+     *
      * @param abc ABC
      * @param writer Writer
      * @return Writer
@@ -548,6 +559,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets modifiers.
+     *
      * @param abc ABC
      * @param isStatic Is static
      * @param insideInterface Inside interface
@@ -632,6 +644,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -641,6 +654,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * To string.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -651,6 +665,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * To string.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -674,6 +689,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Converts trait.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -694,6 +710,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Converts trait header.
+     *
      * @param abc ABC
      * @param writer Writer
      * @return Writer
@@ -702,6 +719,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Converts common header flags.
+     *
      * @param traitType Trait type
      * @param abc ABC
      * @param writer Writer
@@ -783,6 +801,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * ToString conversion including package.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -818,6 +837,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Converts trait including package.
+     *
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -844,6 +864,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * ToString of header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -866,6 +887,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Converts header.
+     *
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -885,6 +907,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets name.
+     *
      * @param abc ABC
      * @return Name
      */
@@ -898,6 +921,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Removes traps - deobfuscation.
+     *
      * @param scriptIndex Script index
      * @param classIndex Class index
      * @param isStatic Is static
@@ -910,6 +934,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets class path.
+     *
      * @param abc ABC
      * @return Class path
      */
@@ -924,6 +949,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Clones trait.
+     *
      * @return Cloned trait
      */
     @Override
@@ -938,6 +964,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Checks if trait is visible.
+     *
      * @param isStatic Is static
      * @param abc ABC
      * @return True if trait is visible
@@ -948,6 +975,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Gets method infos.
+     *
      * @param abc ABC
      * @param traitId Trait ID
      * @param classIndex Class index
@@ -957,6 +985,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
     /**
      * Convets kind to string.
+     *
      * @return String
      */
     public String getKindToStr() {

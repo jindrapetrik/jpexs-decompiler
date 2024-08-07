@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -37,6 +37,7 @@ import java.util.TreeMap;
 
 /**
  * Single frame of a timeline.
+ *
  * @author JPEXS
  */
 public class Frame implements TreeItem, Exportable {
@@ -87,8 +88,7 @@ public class Frame implements TreeItem, Exportable {
     public List<ASMSourceContainer> actionContainers = new ArrayList<>();
 
     /**
-     * Inner nested tags in this frame.
-     * See ShowFrameTag.isNestedTagType
+     * Inner nested tags in this frame. See ShowFrameTag.isNestedTagType
      */
     public List<Tag> innerTags = new ArrayList<>();
 
@@ -98,8 +98,7 @@ public class Frame implements TreeItem, Exportable {
     public List<Tag> allInnerTags = new ArrayList<>();
 
     /**
-     * ShowFrame tag for this frame.
-     * Can be null for the last frame.
+     * ShowFrame tag for this frame. Can be null for the last frame.
      */
     public ShowFrameTag showFrameTag = null;
 
@@ -120,6 +119,7 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Constructs Frame.
+     *
      * @param timeline Timeline
      * @param frame Zero-based frame index
      */
@@ -130,6 +130,7 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Constructs Frame.
+     *
      * @param obj Source frame
      * @param frame New zero-based frame index
      */
@@ -146,7 +147,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -155,7 +157,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * ToString
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -174,7 +177,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Gets export file name.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getExportFileName() {
@@ -183,8 +187,9 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Equals.
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {
@@ -198,7 +203,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * HashCode.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -207,7 +213,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Checks whether some of "all inner frames" are moified.
-     * @return 
+     *
+     * @return
      */
     public boolean isAllInnerTagsModified() {
         for (Tag t : allInnerTags) {
@@ -220,7 +227,8 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {
@@ -247,6 +255,7 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Get needed characters for this frame.
+     *
      * @param needed Result
      */
     public void getNeededCharacters(Set<Integer> needed) {
@@ -263,6 +272,7 @@ public class Frame implements TreeItem, Exportable {
 
     /**
      * Get needed characters for this frame to deepest level.
+     *
      * @param needed Result
      */
     public void getNeededCharactersDeep(Set<Integer> needed) {

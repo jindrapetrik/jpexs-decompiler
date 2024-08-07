@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -30,6 +30,7 @@ import natorder.NaturalOrderComparator;
 
 /**
  * ActionScript 3 package AS3ClassTreeItem
+ *
  * @author JPEXS
  */
 public class AS3Package extends AS3ClassTreeItem {
@@ -67,7 +68,8 @@ public class AS3Package extends AS3ClassTreeItem {
     private List<ScriptPack> sortedScripts;
 
     /**
-     * Whether the package is flat = in the format "mypkg.sub1.sub2" instead of "sub1".
+     * Whether the package is flat = in the format "mypkg.sub1.sub2" instead of
+     * "sub1".
      */
     private final boolean flat;
 
@@ -97,14 +99,16 @@ public class AS3Package extends AS3ClassTreeItem {
     private final boolean partOfCompoundScript;
 
     /**
-     * 
      * @param packageName Package name
      * @param openable Openable
-     * @param flat Whether the package is flat = in the format "mypkg.sub1.sub2" instead of "sub1"
+     * @param flat Whether the package is flat = in the format "mypkg.sub1.sub2"
+     * instead of "sub1"
      * @param defaultPackage Whether this is default package
      * @param abc ABC of this package
-     * @param partOfCompoundScript Whether this package is part of compound script
-     * @param compoundScriptIndex If this package is compound script package itself, index of scriptInfo
+     * @param partOfCompoundScript Whether this package is part of compound
+     * script
+     * @param compoundScriptIndex If this package is compound script package
+     * itself, index of scriptInfo
      */
     public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage, ABC abc, boolean partOfCompoundScript, Integer compoundScriptIndex) {
         super(packageName, "", null);
@@ -116,10 +120,11 @@ public class AS3Package extends AS3ClassTreeItem {
         this.abc = abc;
         this.partOfCompoundScript = partOfCompoundScript;
     }
-    
+
     /**
      * Checks whether this package is part of compound script.
-     * @return 
+     *
+     * @return
      */
     public boolean isPartOfCompoundScript() {
         return partOfCompoundScript;
@@ -127,7 +132,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Sets ScriptPack with compound script initializer.
-     * @param compoundInitializerPack 
+     *
+     * @param compoundInitializerPack
      */
     public void setCompoundInitializerPack(ScriptPack compoundInitializerPack) {
         this.compoundInitializerPack = compoundInitializerPack;
@@ -135,7 +141,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets ScriptPack with compound script initializer.
-     * @return 
+     *
+     * @return
      */
     public ScriptPack getCompoundInitializerPack() {
         return compoundInitializerPack;
@@ -143,25 +150,27 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Checks whether it is default package.
-     * @return 
+     *
+     * @return
      */
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
 
     /**
-     * Checks whether the package is flat.
-     * Flat = in the format "mypkg.sub1.sub2" instead of "sub1".
-     * @return 
+     * Checks whether the package is flat. Flat = in the format
+     * "mypkg.sub1.sub2" instead of "sub1".
+     *
+     * @return
      */
     public boolean isFlat() {
         return flat;
     }
 
     /**
-     * Checks whether it is a compound script.
-     * Not just a part of it.
-     * @return 
+     * Checks whether it is a compound script. Not just a part of it.
+     *
+     * @return
      */
     public boolean isCompoundScript() {
         return compoundScriptIndex != null;
@@ -169,7 +178,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets index of compound scriptInfo.
-     * @return 
+     *
+     * @return
      */
     public Integer getCompoundScriptIndex() {
         return compoundScriptIndex;
@@ -177,7 +187,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets ABC.
-     * @return 
+     *
+     * @return
      */
     public ABC getAbc() {
         return abc;
@@ -185,7 +196,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets Openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -194,7 +206,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets subpackages.
-     * @return 
+     *
+     * @return
      */
     public List<AS3Package> getSubPackages() {
         if (sortedPackages == null) {
@@ -211,7 +224,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets ScriptPacks in this package.
-     * @return 
+     *
+     * @return
      */
     public List<ScriptPack> getScriptPacks() {
         if (sortedScripts == null) {
@@ -228,7 +242,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Adds ScriptPack to the package.
-     * @param script 
+     *
+     * @param script
      */
     public void addScriptPack(ScriptPack script) {
         ClassPath cp = script.getClassPath();
@@ -238,7 +253,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Adds subpackage.
-     * @param subPackage 
+     *
+     * @param subPackage
      */
     public void addSubPackage(AS3Package subPackage) {
         subPackages.put(subPackage.getNameWithNamespaceSuffix(), subPackage);
@@ -247,8 +263,9 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets subpackage by name.
+     *
      * @param packageName
-     * @return 
+     * @return
      */
     public AS3Package getSubPackage(String packageName) {
         return subPackages.get(packageName);
@@ -256,7 +273,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets all subpackages and scripts in this package.
-     * @return 
+     *
+     * @return
      */
     public List<AS3ClassTreeItem> getAllChildren() {
         List<AS3ClassTreeItem> result = new ArrayList<>(getChildCount());
@@ -267,8 +285,9 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets child at index.
+     *
      * @param index
-     * @return 
+     * @return
      */
     public AS3ClassTreeItem getChild(int index) {
         if (index < subPackages.size()) {
@@ -284,7 +303,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets child count.
-     * @return 
+     *
+     * @return
      */
     public int getChildCount() {
         return subPackages.size() + getScriptPacks().size();
@@ -292,8 +312,9 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets index of child.
+     *
      * @param child
-     * @return 
+     * @return
      */
     public int getIndexOfChild(AS3ClassTreeItem child) {
         int res = 0;
@@ -330,7 +351,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * ToString
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -342,7 +364,8 @@ public class AS3Package extends AS3ClassTreeItem {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {

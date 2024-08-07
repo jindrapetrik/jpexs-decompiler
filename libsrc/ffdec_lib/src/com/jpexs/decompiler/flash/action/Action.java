@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -99,7 +99,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents one ACTIONRECORD, also has some static method to work with Actions.
+ * Represents one ACTIONRECORD, also has some static method to work with
+ * Actions.
  *
  * @author JPEXS
  */
@@ -149,28 +150,28 @@ public abstract class Action implements GraphSourceItem {
      * Names of ActionScript properties
      */
     public static final String[] propertyNames = new String[]{
-            "_X",
-            "_Y",
-            "_xscale",
-            "_yscale",
-            "_currentframe",
-            "_totalframes",
-            "_alpha",
-            "_visible",
-            "_width",
-            "_height",
-            "_rotation",
-            "_target",
-            "_framesloaded",
-            "_name",
-            "_droptarget",
-            "_url",
-            "_highquality",
-            "_focusrect",
-            "_soundbuftime",
-            "_quality",
-            "_xmouse",
-            "_ymouse"
+        "_X",
+        "_Y",
+        "_xscale",
+        "_yscale",
+        "_currentframe",
+        "_totalframes",
+        "_alpha",
+        "_visible",
+        "_width",
+        "_height",
+        "_rotation",
+        "_target",
+        "_framesloaded",
+        "_name",
+        "_droptarget",
+        "_url",
+        "_highquality",
+        "_focusrect",
+        "_soundbuftime",
+        "_quality",
+        "_xmouse",
+        "_ymouse"
     };
 
     /**
@@ -194,9 +195,9 @@ public abstract class Action implements GraphSourceItem {
      */
     private static final Logger logger = Logger.getLogger(Action.class.getName());
 
-
     /**
      * Gets the line offset.
+     *
      * @return Line offset
      */
     @Override
@@ -206,12 +207,12 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets charset
+     *
      * @return Charset
      */
     public String getCharset() {
         return charset;
     }
-
 
     /**
      * Constructs new Action
@@ -233,6 +234,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the address.
+     *
      * @return Address
      */
     @Override
@@ -274,6 +276,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets total length of this action.
+     *
      * @return Total length of this action
      */
     public int getTotalActionLength() {
@@ -411,6 +414,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets content bytes of action.
+     *
      * @param sos SWFOutputStream
      * @throws IOException
      */
@@ -429,6 +433,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the length of content bytes of action.
+     *
      * @return Length
      */
     protected int getContentBytesLength() {
@@ -468,6 +473,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets file offset.
+     *
      * @return File offset
      */
     @Override
@@ -502,6 +508,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts list of Actions to bytes.
+     *
      * @param list List of actions
      * @param addZero Whether to add 0 UI8 value to the end
      * @param version SWF version
@@ -514,6 +521,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Sets constant pool of actions.
+     *
      * @param src ASMSource
      * @param constantPools List of constant pools
      * @param tryInline Whether to try to inline constant pools
@@ -804,6 +812,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts constant pool actions to String.
+     *
      * @param listeners List of listeners
      * @param address Address
      * @param list List of actions
@@ -852,6 +861,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Executes the action.
+     *
      * @param lda Local data area
      * @return Whether the action was executed successfully
      */
@@ -859,6 +869,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the number of stack items that are popped by this item.
+     *
      * @param localData Local data
      * @param stack Stack
      * @return Number of stack items that are popped by this item
@@ -870,6 +881,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the number of stack items that are pushed by this item.
+     *
      * @param localData Local data
      * @param stack Stack
      * @return Number of stack items that are pushed by this item
@@ -938,6 +950,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts actions to ActionScript source code - decompiles.
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param asm ASM source
      * @param actions List of actions
@@ -1027,6 +1040,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts list of actions to List of treeItems
+     *
      * @param uninitializedClassTraits Uninitialized class traits
      * @param insideDoInitAction Inside DoInitAction?
      * @param insideFunction Inside function?
@@ -1090,6 +1104,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Translate the item to target items.
+     *
      * @param localData Local data
      * @param stack Stack
      * @param output Output list
@@ -1105,6 +1120,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Checks whether this item is a jump.
+     *
      * @return True if this item is a jump, false otherwise
      */
     @Override
@@ -1114,6 +1130,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Checks whether this item is a branch.
+     *
      * @return True if this item is a branch, false otherwise
      */
     @Override
@@ -1123,6 +1140,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Checks whether this item is an exit (throw, return, etc.).
+     *
      * @return True if this item is an exit, false otherwise
      */
     @Override
@@ -1132,6 +1150,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets branches
+     *
      * @param code Code
      * @return List of IPs to branch to
      */
@@ -1142,6 +1161,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Checks whether this item is ignored.
+     *
      * @return True if this item is ignored, false otherwise
      */
     @Override
@@ -1151,6 +1171,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Sets whether this item is ignored.
+     *
      * @param ignored True if this item is ignored, false otherwise
      * @param pos Sub position
      */
@@ -1161,6 +1182,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Prepares variables for the given container.
+     *
      * @param cnt Container
      * @param variables Variables - map of variable names to variable items
      * @return
@@ -1179,6 +1201,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts list of actions to tree.
+     *
      * @param graph ActionGraph
      * @param switchParts Switch parts
      * @param secondPassData Second pass data
@@ -1340,6 +1363,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets item without global prefix.
+     *
      * @param ti Target item
      * @return Target item without global prefix
      */
@@ -1373,6 +1397,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Checks whether the loops are ignored.
+     *
      * @return True if the loops are ignored, false otherwise
      */
     @Override
@@ -1382,6 +1407,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Sets constant pool to actions.
+     *
      * @param actions List of actions
      * @param cpool Constant pool
      */
@@ -1407,6 +1433,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Get ASM source with replaced Actions.
+     *
      * @param container Container
      * @param knownAddreses Known addresses
      * @param exportMode Export mode
@@ -1420,6 +1447,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Converts ECMA object to float point.
+     *
      * @param o Object
      * @return Float point
      */
@@ -1453,8 +1481,8 @@ public abstract class Action implements GraphSourceItem {
     }
 
     /**
-     * Converts Get to Set.
-     * (variables, members, properties)
+     * Converts Get to Set. (variables, members, properties)
+     *
      * @param get Get item
      * @param value Value
      * @param variables Variables
@@ -1490,9 +1518,11 @@ public abstract class Action implements GraphSourceItem {
     }
 
     /**
-     * Checks whether this item is a DeobfuscatePop instruction.
-     * It is a special instruction for deobfuscation.
-     * @return True if this item is a DeobfuscatePop instruction, false otherwise
+     * Checks whether this item is a DeobfuscatePop instruction. It is a special
+     * instruction for deobfuscation.
+     *
+     * @return True if this item is a DeobfuscatePop instruction, false
+     * otherwise
      */
     @Override
     public boolean isDeobfuscatePop() {
@@ -1501,6 +1531,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the line in the high level source code.
+     *
      * @return Line
      */
     @Override
@@ -1510,6 +1541,7 @@ public abstract class Action implements GraphSourceItem {
 
     /**
      * Gets the high level source code file name.
+     *
      * @return File name
      */
     @Override

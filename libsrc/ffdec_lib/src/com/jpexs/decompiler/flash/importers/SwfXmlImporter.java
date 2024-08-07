@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -135,6 +135,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * SWF XML importer.
+ *
  * @author JPEXS
  */
 @SuppressWarnings("unchecked")
@@ -249,7 +250,8 @@ public class SwfXmlImporter {
         try {
             XMLStreamReader reader = xmlFactory.createXMLStreamReader(new StringReader(xml));
             return processObject(reader, requiredType, swf, null, 1);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException | XMLStreamException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException
+                | InvocationTargetException | XMLStreamException ex) {
             Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -352,7 +354,8 @@ public class SwfXmlImporter {
                 try {
                     Field field = getField(cls, name);
                     setFieldValue(field, obj, getAs(field.getType(), val, xmlExportMajor));
-                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                        | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
@@ -394,7 +397,8 @@ public class SwfXmlImporter {
                     Object childObj = processObject(reader, null, swf, tag, xmlExportMajor);
                     setFieldValue(field, obj, childObj);
                 }
-            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+                    | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, "Error while getting val from class " + cls + " field: " + name, ex);
             }
 

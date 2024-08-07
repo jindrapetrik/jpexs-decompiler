@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Represents a part of a graph.
- * Block of instructions which are executed in sequence.
- * No jumps or branches are allowed inside a GraphPart.
+ * Represents a part of a graph. Block of instructions which are executed in
+ * sequence. No jumps or branches are allowed inside a GraphPart.
+ *
  * @author JPEXS
  */
 public class GraphPart implements Serializable {
@@ -67,32 +67,29 @@ public class GraphPart implements Serializable {
     public int discoveredTime;
 
     /**
-     * Finished time in DFS
-     * Calculated in setTime.
+     * Finished time in DFS Calculated in setTime.
      */
     public int finishedTime;
 
     /**
-     * Closed time.
-     * The node is closed when all its input edges are already visited.
-     * Calculated in Graph.calculateClosedTime.
+     * Closed time. The node is closed when all its input edges are already
+     * visited. Calculated in Graph.calculateClosedTime.
      */
     public int closedTime;
 
     /**
-     * Order in DFS.
-     * Calculated in setTime.
+     * Order in DFS. Calculated in setTime.
      */
     public int order;
 
     /**
-     * Number of parts following this part.
-     * Calculated in setNumblocks.
+     * Number of parts following this part. Calculated in setNumblocks.
      */
     public int numBlocks = Integer.MAX_VALUE;
 
     /**
      * Sets the time of this part in DFS.
+     *
      * @param time Time
      * @param ordered Ordered parts
      * @param visited Visited parts
@@ -118,6 +115,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Sets the number of blocks following this part.
+     *
      * @param numBlocks Number of blocks
      */
     public void setNumblocks(int numBlocks) {
@@ -132,6 +130,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Checks if this part leads to another part.
+     *
      * @param localData Local data
      * @param gr Graph
      * @param code Code
@@ -215,6 +214,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Checks if this part leads to another part.
+     *
      * @param localData Local data
      * @param gr Graph
      * @param code Code
@@ -234,6 +234,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Constructs a new GraphPart.
+     *
      * @param start Start IP
      * @param end End IP
      */
@@ -244,6 +245,7 @@ public class GraphPart implements Serializable {
 
     /**
      * To string.
+     *
      * @return String representation
      */
     @Override
@@ -260,6 +262,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Checks if this part contains an IP.
+     *
      * @param ip IP
      * @return True if this part contains the IP
      */
@@ -269,6 +272,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Gets the height of this part - number of instructions in this part.
+     *
      * @return Height
      */
     public int getHeight() {
@@ -277,6 +281,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Gets IP at offset from start.
+     *
      * @param offset Offset
      * @return IP
      */
@@ -295,6 +300,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -306,6 +312,7 @@ public class GraphPart implements Serializable {
 
     /**
      * Equals.
+     *
      * @param obj Object
      * @return True if equals
      */

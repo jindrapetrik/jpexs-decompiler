@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -24,6 +24,7 @@ import java.util.Map;
 
 /**
  * Represents an ActionScript object.
+ *
  * @author JPEXS
  */
 public class ActionScriptObject implements Cloneable {
@@ -77,6 +78,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets implements objects
+     *
      * @return Implements objects
      */
     public List<Object> getImplementsObjs() {
@@ -85,6 +87,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Sets implements objects
+     *
      * @param implementsObjs Implements objects
      */
     public void setImplementsObjs(List<Object> implementsObjs) {
@@ -93,6 +96,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Sets extends object
+     *
      * @param extendsObj Extends object
      */
     public void setExtendsObj(Object extendsObj) {
@@ -101,6 +105,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets extends object
+     *
      * @return Extends object
      */
     public Object getExtendsObj() {
@@ -109,6 +114,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Removes a member from the object
+     *
      * @param path Path to the member
      */
     public void removeMember(String path) {
@@ -134,6 +140,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Enumerates all members of the object
+     *
      * @return List of member names
      */
     public List<String> enumerate() {
@@ -142,6 +149,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Sets a property of the object
+     *
      * @param index Index of the property
      * @param value Value of the property
      */
@@ -151,6 +159,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets a property of the object
+     *
      * @param index Index of the property
      * @return Value of the property
      */
@@ -163,6 +172,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Sets a member of the object
+     *
      * @param path Path to the member
      * @param value Value of the member
      */
@@ -189,6 +199,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Clones the object
+     *
      * @return Cloned object
      */
     @Override
@@ -203,6 +214,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets path to a member
+     *
      * @param obj Member
      * @return Path to the member
      */
@@ -228,6 +240,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets a member of the object
+     *
      * @param name Name of the member
      * @return Member
      */
@@ -237,6 +250,7 @@ public class ActionScriptObject implements Cloneable {
 
     /**
      * Gets a member of the object
+     *
      * @param path Path to the member
      * @return Member
      */

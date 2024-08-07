@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -286,7 +286,6 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          *
          * @param date The date to be converted
          * @return The filetime
-         *
          * @see #filetimeToDate
          */
         public static long dateToFileTime(final Date date) {
@@ -508,7 +507,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
             /**
              * System's processor architecture. This value can be one of the
              * following values:
-             *
+             * <p>
              * PROCESSOR_ARCHITECTURE_UNKNOWN PROCESSOR_ARCHITECTURE_INTEL
              * PROCESSOR_ARCHITECTURE_IA64 PROCESSOR_ARCHITECTURE_AMD64
              */
@@ -764,7 +763,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USEPOSITION, this member is the x offset
          * of the upper left corner of a window if a new window is created, in
          * pixels. Otherwise, this member is ignored.
-         *
+         * <p>
          * The offset is from the upper left corner of the screen. For GUI
          * processes, the specified position is used the first time the new
          * process calls CreateWindow to create an overlapped window if the x
@@ -776,7 +775,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USEPOSITION, this member is the y offset
          * of the upper left corner of a window if a new window is created, in
          * pixels. Otherwise, this member is ignored.
-         *
+         * <p>
          * The offset is from the upper left corner of the screen. For GUI
          * processes, the specified position is used the first time the new
          * process calls CreateWindow to create an overlapped window if the y
@@ -788,7 +787,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USESIZE, this member is the width of the
          * window if a new window is created, in pixels. Otherwise, this member
          * is ignored.
-         *
+         * <p>
          * For GUI processes, this is used only the first time the new process
          * calls CreateWindow to create an overlapped window if the nWidth
          * parameter of CreateWindow is CW_USEDEFAULT.
@@ -799,7 +798,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USESIZE, this member is the height of the
          * window if a new window is created, in pixels. Otherwise, this member
          * is ignored.
-         *
+         * <p>
          * For GUI processes, this is used only the first time the new process
          * calls CreateWindow to create an overlapped window if the nHeight
          * parameter of CreateWindow is CW_USEDEFAULT.
@@ -824,13 +823,13 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USEFILLATTRIBUTE, this member is the
          * initial text and background colors if a new console window is created
          * in a console application. Otherwise, this member is ignored.
-         *
+         * <p>
          * This value can be any combination of the following values:
          * FOREGROUND_BLUE, FOREGROUND_GREEN, FOREGROUND_RED,
          * FOREGROUND_INTENSITY, BACKGROUND_BLUE, BACKGROUND_GREEN,
          * BACKGROUND_RED, and BACKGROUND_INTENSITY. For example, the following
          * combination of values produces red text on a white background:
-         *
+         * <p>
          * FOREGROUND_RED| BACKGROUND_RED| BACKGROUND_GREEN| BACKGROUND_BLUE
          */
         public DWORD dwFillAttribute;
@@ -846,7 +845,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * the values that can be specified in the nCmdShow parameter for the
          * ShowWindow function, except for SW_SHOWDEFAULT. Otherwise, this
          * member is ignored.
-         *
+         * <p>
          * For GUI processes, the first time ShowWindow is called, its nCmdShow
          * parameter is ignored wShowWindow specifies the default value. In
          * subsequent calls to ShowWindow, the wShowWindow member is used if the
@@ -868,14 +867,14 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          * If dwFlags specifies STARTF_USESTDHANDLES, this member is the
          * standard input handle for the process. If STARTF_USESTDHANDLES is not
          * specified, the default for standard input is the keyboard buffer.
-         *
+         * <p>
          * If dwFlags specifies STARTF_USEHOTKEY, this member specifies a hotkey
          * value that is sent as the wParam parameter of a WM_SETHOTKEY message
          * to the first eligible top-level window created by the application
          * that owns the process. If the window is created with the WS_POPUP
          * window style, it is not eligible unless the WS_EX_APPWINDOW extended
          * window style is also set. For more information, see CreateWindowEx.
-         *
+         * <p>
          * Otherwise, this member is ignored.
          */
         public HANDLE hStdInput;
@@ -970,7 +969,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     /**
      * If the file is to be moved to a different volume, the function simulates
      * the move by using the CopyFile and DeleteFile functions.
-     *
+     * <p>
      * This value cannot be used with MOVEFILE_DELAY_UNTIL_REBOOT.
      */
     int MOVEFILE_COPY_ALLOWED = 0x2;
@@ -986,18 +985,18 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * executed, but before creating any paging files. Consequently, this
      * parameter enables the function to delete paging files from previous
      * startups.
-     *
+     * <p>
      * This value can be used only if the process is in the context of a user
      * who belongs to the administrators group or the LocalSystem account.
-     *
+     * <p>
      * This value cannot be used with MOVEFILE_COPY_ALLOWED.
-     *
+     * <p>
      * Windows Server 2003 and Windows XP: For information about special
      * situations where this functionality can fail, and a suggested workaround
      * solution, see Files are not exchanged when Windows Server 2003 restarts
      * if you use the MoveFileEx function to schedule a replacement for some
      * files in the Help and Support Knowledge Base.
-     *
+     * <p>
      * Windows 2000: If you specify the MOVEFILE_DELAY_UNTIL_REBOOT flag for
      * dwFlags, you cannot also prepend the file name that is specified by
      * lpExistingFileName with "\\?".
@@ -1016,7 +1015,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * with the contents of the lpExistingFileName file, provided that security
      * requirements regarding access control lists (ACLs) are met. For more
      * information, see the Remarks section of this topic.
-     *
+     * <p>
      * This value cannot be used if lpNewFileName or lpExistingFileName names a
      * directory.
      */
@@ -1025,11 +1024,11 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
     /**
      * The function does not return until the file is actually moved on the
      * disk.
-     *
+     * <p>
      * Setting this value guarantees that a move performed as a copy and delete
      * operation is flushed to disk before the function returns. The flush
      * occurs at the end of the copy operation.
-     *
+     * <p>
      * This value has no effect if MOVEFILE_DELAY_UNTIL_REBOOT is set.
      */
     int MOVEFILE_WRITE_THROUGH = 0x8;

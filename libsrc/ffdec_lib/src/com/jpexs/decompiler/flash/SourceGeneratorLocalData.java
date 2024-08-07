@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -29,6 +29,7 @@ import java.util.Map;
 
 /**
  * Local data for source generator.
+ *
  * @author JPEXS
  */
 public class SourceGeneratorLocalData implements Serializable {
@@ -176,6 +177,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     /**
      * Gets full class name.
+     *
      * @return Full class name
      */
     public String getFullClass() {
@@ -184,6 +186,7 @@ public class SourceGeneratorLocalData implements Serializable {
 
     /**
      * Constructs new SourceGeneratorLocalData.
+     *
      * @param registerVars Map of variable name to register number
      * @param inFunction In function level
      * @param inMethod In method

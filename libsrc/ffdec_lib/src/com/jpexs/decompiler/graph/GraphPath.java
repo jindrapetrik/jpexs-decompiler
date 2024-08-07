@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Objects;
 
 /**
  * Represents a path in a graph.
+ *
  * @author JPEXS
  */
 public class GraphPath implements Serializable {
@@ -43,7 +44,9 @@ public class GraphPath implements Serializable {
     public final String rootName;
 
     /**
-     * Constructs a GraphPath with the given root name, branch IPs and branch indices.
+     * Constructs a GraphPath with the given root name, branch IPs and branch
+     * indices.
+     *
      * @param rootName Root name
      * @param branchIps Branch IPs
      * @param branchIndices Branch indices
@@ -56,6 +59,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Constructs a GraphPath with the given branch IPs and branch indices.
+     *
      * @param branchIps Branch IPs
      * @param branchIndices Branch indices
      */
@@ -74,6 +78,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Checks whether the path starts with the given path.
+     *
      * @param p
      * @return True if the path starts with the given path, false otherwise
      */
@@ -98,6 +103,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Returns a new parent GraphPath with the given length.
+     *
      * @param len Length
      * @return
      */
@@ -111,7 +117,9 @@ public class GraphPath implements Serializable {
     }
 
     /**
-     * Returns a new sub GraphPath with the given branch index and code position.
+     * Returns a new sub GraphPath with the given branch index and code
+     * position.
+     *
      * @param branchIndex Branch index
      * @param codePos Code position
      * @return New sub GraphPath
@@ -125,6 +133,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Constructs a GraphPath with the given root name.
+     *
      * @param rootName Root name
      */
     public GraphPath(String rootName) {
@@ -133,6 +142,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Gets length of the path.
+     *
      * @return Length
      */
     public int length() {
@@ -141,6 +151,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Gets the branch index at the given index.
+     *
      * @param index Index
      * @return Branch index
      */
@@ -150,6 +161,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Gets the IP at the given index.
+     *
      * @param index Index
      * @return IP
      */
@@ -159,6 +171,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -172,6 +185,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Equals.
+     *
      * @param obj Eq
      * @return
      */
@@ -205,6 +219,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Hash code for a list of integers.
+     *
      * @param arr List of integers
      * @return Hash code
      */
@@ -223,6 +238,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Checks whether two lists of integers match.
+     *
      * @param arr List of integers
      * @param arr2 List of integers
      * @return True if the lists match, false otherwise
@@ -241,6 +257,7 @@ public class GraphPath implements Serializable {
 
     /**
      * Returns a string representation of the GraphPath.
+     *
      * @return String representation
      */
     @Override

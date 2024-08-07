@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * Class info.
+ *
  * @author JPEXS
  */
 public class ClassInfo {
@@ -61,6 +62,7 @@ public class ClassInfo {
 
     /**
      * Constructs a new ClassInfo.
+     *
      * @param traits Static traits
      */
     public ClassInfo(Traits traits) {
@@ -69,6 +71,7 @@ public class ClassInfo {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -78,6 +81,7 @@ public class ClassInfo {
 
     /**
      * To string.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -88,6 +92,7 @@ public class ClassInfo {
 
     /**
      * Gets next disp_id.
+     *
      * @return Next disp_id
      */
     public int getNextDispId() {

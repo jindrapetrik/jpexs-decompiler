@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -391,9 +391,8 @@ public final class PropertiesLexer {
     /**
      * Refills the input buffer.
      *
-     * @return      <code>false</code>, iff there was new input.
-     *
-     * @exception java.io.IOException if any I/O-Error occurs
+     * @return <code>false</code>, iff there was new input.
+     * @throws java.io.IOException if any I/O-Error occurs
      */
     private boolean zzRefill() throws java.io.IOException {
 
@@ -466,11 +465,11 @@ public final class PropertiesLexer {
     /**
      * Resets the scanner to read from a new input stream. Does not close the
      * old reader.
-     *
+     * <p>
      * All internal variables are reset, the old input stream
      * <b>cannot</b> be reused (internal buffer is discarded and lost). Lexical
      * state is set to <tt>ZZ_INITIAL</tt>.
-     *
+     * <p>
      * Internal scan buffer is resized down to its initial length, if it has
      * grown.
      *
@@ -516,12 +515,11 @@ public final class PropertiesLexer {
 
     /**
      * Returns the character at position <tt>pos</tt> from the matched text.
-     *
+     * <p>
      * It is equivalent to yytext().charAt(pos), but faster
      *
      * @param pos the position of the character to fetch. A value from 0 to
      * yylength()-1.
-     *
      * @return the character at position pos
      */
     public final char yycharat(int pos) {
@@ -537,12 +535,12 @@ public final class PropertiesLexer {
 
     /**
      * Reports an error that occured while scanning.
-     *
+     * <p>
      * In a wellformed scanner (no or only correct usage of yypushback(int) and
      * a match-all fallback rule) this method will only be called with things
      * that "Can't Possibly Happen". If this method is called, something is
      * seriously wrong (e.g. a JFlex bug producing a faulty scanner etc.).
-     *
+     * <p>
      * Usual syntax/scanner level error handling should be done in error
      * fallback rules.
      *
@@ -561,7 +559,7 @@ public final class PropertiesLexer {
 
     /**
      * Pushes the specified amount of characters back into the input stream.
-     *
+     * <p>
      * They will be read again by then next call of the scanning method
      *
      * @param number the number of characters to be read again. This number must
@@ -580,7 +578,7 @@ public final class PropertiesLexer {
      * input is encountered or an I/O-Error occurs.
      *
      * @return the next token
-     * @exception java.io.IOException if any I/O-Error occurs
+     * @throws java.io.IOException if any I/O-Error occurs
      */
     public ParsedSymbol yylex() throws java.io.IOException, PropertiesParseException {
         int zzInput;

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -41,6 +41,7 @@ import java.util.Stack;
 
 /**
  * Simple usage detector for ABC.
+ *
  * @author JPEXS
  */
 public class ABCSimpleUsageDetector {
@@ -343,7 +344,7 @@ public class ABCSimpleUsageDetector {
 
             @Override
             protected void handleTraitSlotConst(ABC abc, TraitSlotConst trait, int scriptIndex, int scriptTraitIndex, int classIndex, int traitIndex, int bodyIndex, int bodyTraitIndex, ABCWalker.WalkType walkType, Stack<Integer> callStack) {
-            
+
                 String description = "";
                 if (callStack.size() > 1) {
                     if (bodyTraitIndex != -1) {
@@ -442,7 +443,6 @@ public class ABCSimpleUsageDetector {
     }
 
     /**
-     *
      * @param kind
      * @param index
      * @param usageDescription

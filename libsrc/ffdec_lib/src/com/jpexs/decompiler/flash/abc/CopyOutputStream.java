@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import java.io.OutputStream;
 
 /**
  * Output stream that copies data to another output stream.
+ *
  * @author JPEXS
  */
 public class CopyOutputStream extends OutputStream {
@@ -63,6 +64,7 @@ public class CopyOutputStream extends OutputStream {
 
     /**
      * Constructs a new CopyOutputStream.
+     *
      * @param os Output stream to copy data to
      * @param is Input stream to compare data with
      */
@@ -73,6 +75,7 @@ public class CopyOutputStream extends OutputStream {
 
     /**
      * Writes a byte to the output stream.
+     *
      * @param b Byte to write
      * @throws IOException If an I/O error occurs
      */

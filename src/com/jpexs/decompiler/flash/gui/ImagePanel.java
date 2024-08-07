@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -129,7 +129,6 @@ import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.api.SubstanceSkin;
 
 /**
- *
  * @author JPEXS
  */
 public final class ImagePanel extends JPanel implements MediaDisplay {
@@ -1806,7 +1805,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     double m = (p1.y - p0.y) / (double) (p1.x - p0.x);
                                     double b = p0.y - m * p0.x;
 
-                                    double m_perp = - 1 / m;
+                                    double m_perp = -1 / m;
 
                                     double b_perp = p.getY() - m_perp * p.getX();
 

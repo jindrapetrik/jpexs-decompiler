@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -143,7 +143,6 @@ import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
 /**
- *
  * @author JPEXS
  */
 public class ABCPanel extends JPanel implements ItemListener, SearchListener<ScriptSearchResult>, TagEditorPanel {
@@ -364,7 +363,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             boolean useGetter = (var.flags & VariableFlags.IS_CONST) == 0;
 
             boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
-            
+
             if (parentObjectId == 0 && objectId != 0L && isAS3) {
                 igv = Main.getDebugHandler().getVariable(objectId, "", true, useGetter);
             } else {
@@ -592,35 +591,35 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             if ((flags & VariableFlags.DONT_ENUMERATE) > 0) {
                 flagsStr.add("dontEnumerate");
             }
-            
+
             if ((flags & VariableFlags.DONT_DELETE) > 0) {
                 flagsStr.add("dontDelete");
             }
-            
+
             if ((flags & VariableFlags.ONLY_SWF6_UP) > 0) {
                 flagsStr.add("onlySWF6Up");
             }
-            
+
             if ((flags & VariableFlags.IGNORE_SWF6) > 0) {
                 flagsStr.add("ignoreSWF6");
             }
-            
+
             if ((flags & VariableFlags.ONLY_SWF7_UP) > 0) {
                 flagsStr.add("onlySWF7Up");
             }
-            
+
             if ((flags & VariableFlags.ONLY_SWF8_UP) > 0) {
                 flagsStr.add("onlySWF8Up");
             }
-            
+
             if ((flags & VariableFlags.ONLY_SWF9_UP) > 0) {
                 flagsStr.add("onlySWF9Up");
             }
-            
+
             if ((flags & VariableFlags.ONLY_SWF10_UP) > 0) {
                 flagsStr.add("onlySWF10Up");
             }
-            
+
             for (Integer f : unknownFlags) {
                 if ((flags & f) > 0) {
                     flagsStr.add("unk" + f);
@@ -1442,7 +1441,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             openable = Main.getRunningSWF();
         } else if (swfHash.startsWith("loaded_")) {
             String hashToSearch = swfHash.substring("loaded_".length());
-            loop:for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
+            loop:
+            for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
                 for (int s = 0; s < sl.size(); s++) {
                     Openable op = sl.get(s);
                     String t = op.getTitleOrShortFileName();
@@ -1456,12 +1456,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
             }
         }
-        
+
         if (openable != null) {
             hilightScript(openable, name);
         }
     }
-    
+
     /**
      * Hilights specific script.
      *

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 
 /**
  * ActionScript 1/2 graph source
+ *
  * @author JPEXS
  */
 public class ActionGraphSource extends GraphSource {
@@ -87,6 +88,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets actions
+     *
      * @return Actions
      */
     public List<Action> getActions() {
@@ -95,6 +97,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Constructs new ActionGraphSource
+     *
      * @param path Path
      * @param insideDoInitAction Is inside doInitAction
      * @param actions Actions
@@ -117,6 +120,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets charset
+     *
      * @return Charset
      */
     public String getCharset() {
@@ -125,6 +129,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets the important addresses
+     *
      * @return Set of important addresses
      */
     @Override
@@ -134,6 +139,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Converts instruction at the specified position to string
+     *
      * @param pos Position of the instruction
      * @return Instruction as string
      */
@@ -147,6 +153,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets the size of the graph source
+     *
      * @return The size of the graph source
      */
     @Override
@@ -156,6 +163,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets the graph source item at the specified position
+     *
      * @param pos Position of the graph source item
      * @return The graph source item at the specified position
      */
@@ -166,6 +174,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Sets the graph source item at the specified position
+     *
      * @param pos Position of the graph source item
      * @param t The graph source item
      */
@@ -175,6 +184,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Checks if the graph source is empty
+     *
      * @return True if the graph source is empty, false otherwise
      */
     @Override
@@ -184,6 +194,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Translates the part of the graph source
+     *
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -205,7 +216,6 @@ public class ActionGraphSource extends GraphSource {
         return r;
     }
 
-
     /**
      * Rebuilds the position cache
      */
@@ -218,6 +228,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Converts position to address
+     *
      * @param pos Position
      * @return Address
      */
@@ -232,6 +243,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @return Position
      */
@@ -257,6 +269,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @param nearest Nearest
      * @return Position
@@ -287,6 +300,7 @@ public class ActionGraphSource extends GraphSource {
 
     /**
      * Gets variables
+     *
      * @return Map of variable name to variable item
      */
     public HashMap<String, GraphTargetItem> getVariables() {

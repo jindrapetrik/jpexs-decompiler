@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * Display object class.
+ *
  * @author JPEXS
  */
 public class DisplayObject extends ActionScriptObject {
@@ -68,6 +69,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Gets current frame.
+     *
      * @return Current frame.
      */
     public int getCurrentFrame() {
@@ -76,6 +78,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Gets total frames.
+     *
      * @return Total frames.
      */
     public int getTotalFrames() {
@@ -84,6 +87,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Goes to frame.
+     *
      * @param label Label.
      */
     public void gotoLabel(String label) {
@@ -92,6 +96,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Goes to frame.
+     *
      * @param frame Frame.
      */
     public void gotoFrame(int frame) {
@@ -120,6 +125,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Calls function.
+     *
      * @param functionAddress Function address.
      * @param functionLength Function length.
      * @param args Arguments.
@@ -134,6 +140,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Calls frame.
+     *
      * @param frame Frame.
      */
     public void callFrame(int frame) {
@@ -142,6 +149,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Adds to display list.
+     *
      * @param depth Depth.
      * @param obj Object.
      */
@@ -151,6 +159,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Removes from display list.
+     *
      * @param depth Depth.
      * @return
      */
@@ -160,6 +169,7 @@ public class DisplayObject extends ActionScriptObject {
 
     /**
      * Gets from display list.
+     *
      * @param depth Depth.
      * @return
      */

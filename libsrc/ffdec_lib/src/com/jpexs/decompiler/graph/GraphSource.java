@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -26,18 +26,21 @@ import java.util.Set;
 
 /**
  * Graph source abstract class
+ *
  * @author JPEXS
  */
 public abstract class GraphSource implements Serializable {
 
     /**
      * Gets the size of the graph source
+     *
      * @return The size of the graph source
      */
     public abstract int size();
 
     /**
      * Gets the graph source item at the specified position
+     *
      * @param pos Position of the graph source item
      * @return The graph source item at the specified position
      */
@@ -45,12 +48,14 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Checks if the graph source is empty
+     *
      * @return True if the graph source is empty, false otherwise
      */
     public abstract boolean isEmpty();
 
     /**
      * Translates the part of the graph source
+     *
      * @param graph Graph
      * @param part Graph part
      * @param localData Local data
@@ -67,12 +72,14 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Gets the important addresses
+     *
      * @return Set of important addresses
      */
     public abstract Set<Long> getImportantAddresses();
 
     /**
      * Converts instruction at the specified position to string
+     *
      * @param pos Position of the instruction
      * @return Instruction as string
      */
@@ -80,6 +87,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Visits the code
+     *
      * @param ip Start position
      * @param lastIp Last position
      * @param refs References
@@ -142,6 +150,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Visits the code
+     *
      * @param alternateEntries Alternate entries
      * @return References
      * @throws InterruptedException
@@ -163,6 +172,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @return Position
      */
@@ -170,6 +180,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Converts address to position
+     *
      * @param adr Address
      * @param nearest Nearest
      * @return Position
@@ -178,6 +189,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Gets the address after the code
+     *
      * @return Address after the code
      */
     public long getAddressAfterCode() {
@@ -190,6 +202,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Converts position to address
+     *
      * @param pos Position
      * @return Address
      */
@@ -197,6 +210,7 @@ public abstract class GraphSource implements Serializable {
 
     /**
      * Converts position to address
+     *
      * @param pos Position
      * @param allowPosAfterCode Allow position after code
      * @return Address

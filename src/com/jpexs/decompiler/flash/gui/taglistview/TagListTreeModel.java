@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2022-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,7 +46,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreePath;
 
 /**
- *
  * @author JPEXS
  */
 public class TagListTreeModel extends AbstractTagTreeModel {
@@ -58,7 +57,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
     private Map<SWF, HeaderItem> swfHeaders = new HashMap<>();
 
     private final Map<ABCContainerTag, ClassesListTreeModel> abcTagsClassesTree = new WeakHashMap<>();
-    private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();            
+    private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();
 
     public TagListTreeModel(List<OpenableList> swfs) {
         this.swfs = swfs;
@@ -110,8 +109,8 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         }
         return result;
     }
-    
-    private TreeItem getChildInternal(Object parent, int index) {    
+
+    private TreeItem getChildInternal(Object parent, int index) {
         if (getChildCount(parent) == 0) {
             return null;
         }
@@ -336,7 +335,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         }
         return ret;
     }
-    
+
     private List<? extends TreeItem> getAllChildrenInternal(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
@@ -393,8 +392,6 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         return ret;
     }
 
-    
-    
     @Override
     protected void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result) {
         for (TreeItem n : getAllChildren(parent)) {
@@ -408,10 +405,10 @@ public class TagListTreeModel extends AbstractTagTreeModel {
                 }
             }
 
-            searchTreeItemMulti(objs, n, newPath, result);            
+            searchTreeItemMulti(objs, n, newPath, result);
         }
     }
-    
+
     @Override
     protected void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result) {
         for (TreeItem n : getAllChildren(parent)) {
@@ -422,7 +419,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
                     if (result.size() == objs.size()) {
                         return;
                     }
-        
+
                 }
             }
 
@@ -432,8 +429,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             }
         }
     }
-    
-    
+
     @Override
     protected List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;

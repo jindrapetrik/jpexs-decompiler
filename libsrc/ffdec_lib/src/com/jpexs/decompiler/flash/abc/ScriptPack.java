@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -74,10 +74,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Script pack class.
- * A script pack is a collection of traits that are in the same script.
- * It can be a simple script pack (contains only one externally visible definition)
- * or a compound script pack (contains more than one externally visible definitions).
+ * Script pack class. A script pack is a collection of traits that are in the
+ * same script. It can be a simple script pack (contains only one externally
+ * visible definition) or a compound script pack (contains more than one
+ * externally visible definitions).
+ *
  * @author JPEXS
  */
 public class ScriptPack extends AS3ClassTreeItem {
@@ -113,8 +114,9 @@ public class ScriptPack extends AS3ClassTreeItem {
     private final ClassPath path;
 
     /**
-     * Whether the scriptpack is simple. ScriptPack can be either simple or compound.
-     * Compound = Contains more than one externally visible definitions.
+     * Whether the scriptpack is simple. ScriptPack can be either simple or
+     * compound. Compound = Contains more than one externally visible
+     * definitions.
      */
     public boolean isSimple = false;
 
@@ -125,6 +127,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets openable.
+     *
      * @return Openable
      */
     @Override
@@ -134,6 +137,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets class path.
+     *
      * @return Class path
      */
     public ClassPath getClassPath() {
@@ -142,6 +146,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Constructs a new script pack.
+     *
      * @param path Class path
      * @param abc ABC file
      * @param allAbcs All ABC files
@@ -159,6 +164,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets path package.
+     *
      * @return Dotted chain
      */
     public DottedChain getPathPackage() {
@@ -175,6 +181,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets public trait.
+     *
      * @return Trait or null if not found
      */
     public Trait getPublicTrait() {
@@ -190,6 +197,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets path script name.
+     *
      * @return Script name
      */
     public String getPathScriptName() {
@@ -206,6 +214,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets export file.
+     *
      * @param directory Directory
      * @param extension Extension including dot
      * @return File
@@ -221,6 +230,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets export file.
+     *
      * @param directory Directory
      * @param exportSettings Export settings
      * @return File
@@ -235,6 +245,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Converts the script pack.
+     *
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits
@@ -278,6 +289,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Append script to writer.
+     *
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits
@@ -349,6 +361,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Converts the script pack to source.
+     *
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits
@@ -401,6 +414,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Exports the script pack.
+     *
      * @param abcIndex Abc indexing
      * @param file File
      * @param exportSettings Export settings
@@ -426,7 +440,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             convertData.ignoreFrameScripts = exportSettings.ignoreFrameScripts;
             convertData.exportEmbed = exportSettings.exportEmbed;
             convertData.exportEmbedFlaMode = exportSettings.exportEmbedFlaMode;
-            convertData.assetsDir = exportSettings.assetsDir;           
+            convertData.assetsDir = exportSettings.assetsDir;
             toSource(abcIndex, writer2, abc.script_info.get(scriptIndex).traits.traits, convertData, exportSettings.mode, parallel, exportSettings.ignoreFrameScripts);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);
@@ -437,6 +451,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Hash code.
+     *
      * @return Hash code
      */
     @Override
@@ -450,6 +465,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Equals.
+     *
      * @param obj Object
      * @return True if equals
      */
@@ -473,6 +489,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets modified flag.
+     *
      * @return True if modified
      */
     @Override
@@ -493,7 +510,6 @@ public class ScriptPack extends AS3ClassTreeItem {
         abc.script_info.get(scriptIndex).setModified(false);
     }
 
-
     /**
      * Label with address.
      */
@@ -506,6 +522,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         /**
          * Constructs a new label.
+         *
          * @param addr Address
          */
         public Label(long addr) {
@@ -527,6 +544,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Injects debugfile, debugline instructions into the code.
+     *
      * @param directoryPath Directory path
      * @param swfHash SWF identifier
      */
@@ -827,6 +845,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Injects P-code debugfile, debugline instructions into the code.
+     *
      * @param abcIndex Abc indexing
      * @param swfHash SWF identifier
      */
@@ -917,6 +936,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Gets method ids.
+     *
      * @param methodInfos Result list of MethodIds
      */
     public void getMethodInfos(List<MethodId> methodInfos) {
@@ -932,6 +952,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     /**
      * Deletes the script pack.
+     *
      * @param abc ABC file
      * @param d Whether to delete
      */

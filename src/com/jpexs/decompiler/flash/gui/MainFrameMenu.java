@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -71,7 +71,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
- *
  * @author JPEXS
  */
 public abstract class MainFrameMenu implements MenuBuilder {
@@ -145,12 +144,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 Main.startSaving(savedFile);
                 Bundle bundle = openable.getOpenableList().bundle;
                 if (!bundle.isReadOnly()) {
-                    
+
                     if (openable instanceof SWF) {
                         SWF swf = (SWF) openable;
                         swf.saveNestedDefineBinaryData();
                     }
-                    
+
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
                         openable.saveTo(baos);
@@ -178,7 +177,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 }
             } else if (openable.getFile() == null) {
                 saved = saveAs(openable, SaveFileMode.SAVEAS);
-            } else {                
+            } else {
                 try {
                     Main.saveFile(openable, openable.getFile());
                     saved = true;
@@ -210,7 +209,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         return saveOpenable(openable);
     }
-           
+
     protected boolean saveAllActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return false;
@@ -222,9 +221,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         List<Openable> allOpenables = new ArrayList<>();
         for (OpenableList list : openableLists) {
             for (Openable openable : list.items) {
-                allOpenables.add(openable);                
+                allOpenables.add(openable);
             }
-        }            
+        }
         for (Openable openable : allOpenables) {
             if (openable.isModified()) {
                 if (!saveOpenable(openable)) {
@@ -483,7 +482,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         return false;
     }
-    
+
     protected void exportFlashDevelopActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -494,7 +493,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainFrame.getPanel().exportFlashDevelop((SWF) openable);
     }
-    
+
     protected void exportIdeaActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -578,7 +577,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         return false;
     }
-    
+
     protected boolean clearLog(ActionEvent evt) {
         ErrorLogFrame.getInstance().clearLog();
         return true;
@@ -1109,12 +1108,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
         setMenuEnabled("/tools/saveAsExe", swfSelected && !isWorking);
-        
+
         /*setMenuEnabled("/tools/debugger/debuggerSwitch", hasAbc);
          setMenuChecked("/tools/debugger/debuggerSwitch", hasDebugger);
          setMenuEnabled("/tools/debugger/debuggerReplaceTrace", hasAbc && hasDebugger);*/
         //setMenuEnabled("/tools/debugger/debuggerInjectLoader", hasAbc && hasDebugger);
-
         setMenuEnabled("_/checkUpdates", !isWorking);
         setMenuEnabled("/help/checkUpdates", !isWorking);
         //setMenuEnabled("/help/helpUs", !isWorking);
@@ -1202,7 +1200,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             finishMenu("/file/open");
         }
 
-        addMenuItem("/file/new", translate("menu.file.new"), "newswf32", this::newActionPerformed, PRIORITY_TOP, null, true, null, false);        
+        addMenuItem("/file/new", translate("menu.file.new"), "newswf32", this::newActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/saveAll", translate("menu.file.saveAll"), "saveall32", this::saveAllActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/save", translate("menu.file.save"), "save16", this::saveActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+S"), false);
         addMenuItem("/file/saveAs", translate("menu.file.saveas"), "saveas16", this::saveAsActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+A"), false);
@@ -1210,7 +1208,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/reloadAll", translate("menu.file.reloadAll"), "reload16", this::reloadAllActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/close", translate("menu.file.close"), "close32", this::closeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+X"), false);
-        
+
         addSeparator("/file");
 
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
@@ -1251,7 +1249,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/file/view");
 
         addSeparator("/file");
-        
+
         if (!supportsAppMenu()) {
             addSeparator("/file");
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true, null, false);
@@ -1305,7 +1303,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         }
-        addMenuItem("/tools/saveAsExe", translate("menu.file.saveasexe"), "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
+        addMenuItem("/tools/saveAsExe", translate("menu.file.saveasexe"), "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
 
         //addMenuItem("/tools/searchCache", translate("menu.tools.searchCache"), "loadcache16", this::searchCacheActionPerformed, PRIORITY_MEDIUM, null, true, null);
         addMenuItem("/tools/deobfuscation", translate("menu.tools.deobfuscation"), "deobfuscate16", null, 0, null, false, null, false);

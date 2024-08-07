@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * Exception when part of the graph is changed.
+ *
  * @author JPEXS
  */
 public class GraphPartChangeException extends Exception {
@@ -36,6 +37,7 @@ public class GraphPartChangeException extends Exception {
 
     /**
      * Constructs a new GraphPartChangeException
+     *
      * @param output Output
      * @param ip IP
      */
@@ -46,6 +48,7 @@ public class GraphPartChangeException extends Exception {
 
     /**
      * Gets the IP
+     *
      * @return IP
      */
     public int getIp() {
@@ -54,6 +57,7 @@ public class GraphPartChangeException extends Exception {
 
     /**
      * Gets the output
+     *
      * @return Output
      */
     public List<GraphTargetItem> getOutput() {

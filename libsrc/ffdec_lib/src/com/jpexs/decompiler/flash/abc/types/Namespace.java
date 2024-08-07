@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 
 /**
  * Namespace in ABC file.
+ *
  * @author JPEXS
  */
 public class Namespace {
@@ -104,6 +105,7 @@ public class Namespace {
 
     /**
      * Converts kind to string.
+     *
      * @param kind Kind
      * @return Kind as string
      */
@@ -118,6 +120,7 @@ public class Namespace {
 
     /**
      * Converts kind to prefix.
+     *
      * @param kind Kind
      * @return Prefix
      */
@@ -138,6 +141,7 @@ public class Namespace {
 
     /**
      * Constructs a new instance of Namespace.
+     *
      * @param kind Kind
      * @param name_index Name index
      */
@@ -148,6 +152,7 @@ public class Namespace {
 
     /**
      * Gets kind as string.
+     *
      * @return Kind as string
      */
     public String getKindStr() {
@@ -163,6 +168,7 @@ public class Namespace {
 
     /**
      * To string.
+     *
      * @return String representation
      */
     @Override
@@ -173,6 +179,7 @@ public class Namespace {
 
     /**
      * To string.
+     *
      * @param constants Constant pool
      * @return String representation
      */
@@ -182,6 +189,7 @@ public class Namespace {
 
     /**
      * Gets name with kind.
+     *
      * @param constants Constant pool
      * @return Name with kind
      */
@@ -193,6 +201,7 @@ public class Namespace {
 
     /**
      * Gets prefix.
+     *
      * @return Prefix
      */
     public String getPrefix() {
@@ -208,6 +217,7 @@ public class Namespace {
 
     /**
      * Gets prefix of a kind
+     *
      * @param kind Kind
      * @return Prefix
      */
@@ -224,6 +234,7 @@ public class Namespace {
 
     /**
      * Gets name.
+     *
      * @param constants Constant pool
      * @return Name
      */
@@ -237,6 +248,7 @@ public class Namespace {
 
     /**
      * Gets raw name.
+     *
      * @param constants Constant pool
      * @return Raw name
      */
@@ -250,6 +262,7 @@ public class Namespace {
 
     /**
      * Checks if namespace has specific name.
+     *
      * @param name Name to check
      * @param constants Constant pool
      * @return True if namespace has the name

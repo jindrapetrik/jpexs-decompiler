@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.exceptions;
 
 /**
  * AVM2 VerifyError exception.
+ *
  * @author JPEXS
  */
 public class AVM2VerifyErrorException extends AVM2ExecutionException {
@@ -39,17 +40,22 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
 
     /**
      * Constructs new AVM2VerifyErrorException with the specified error code.
+     *
      * @param code Error code
-     * @param debug If true, the error message will contain a description of the error
+     * @param debug If true, the error message will contain a description of the
+     * error
      */
     public AVM2VerifyErrorException(int code, boolean debug) {
         super(codeToMessage(code, debug, null));
     }
 
     /**
-     * Constructs new AVM2VerifyErrorException with the specified error code and parameters.
+     * Constructs new AVM2VerifyErrorException with the specified error code and
+     * parameters.
+     *
      * @param code Error code
-     * @param debug If true, the error message will contain a description of the error
+     * @param debug If true, the error message will contain a description of the
+     * error
      * @param params Parameters for the error message
      */
     public AVM2VerifyErrorException(int code, boolean debug, Object[] params) {
@@ -58,8 +64,10 @@ public class AVM2VerifyErrorException extends AVM2ExecutionException {
 
     /**
      * Converts error code to error message.
+     *
      * @param code Error code
-     * @param debug If true, the error message will contain a description of the error
+     * @param debug If true, the error message will contain a description of the
+     * error
      * @param params Parameters for the error message
      * @return Error message
      */

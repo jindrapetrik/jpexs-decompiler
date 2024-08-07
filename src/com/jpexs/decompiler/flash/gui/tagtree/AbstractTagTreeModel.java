@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2022-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,7 +36,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**
- *
  * @author JPEXS
  */
 public abstract class AbstractTagTreeModel implements TreeModel {
@@ -46,7 +45,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     public abstract void updateSwfs(CollectionChangedEvent e);
 
     private Map<TreeItem, Integer> indices = new WeakHashMap<>();
-    
+
     protected Map<TreeItem, TreeItem> itemToParentCache = new WeakHashMap<>();
 
     public final void calculateCollisions() {
@@ -148,10 +147,10 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     protected abstract List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path);
 
     protected abstract void searchTreeItemMulti(List<TreeItem> objs, TreeItem parent, List<TreeItem> path, Map<TreeItem, List<TreeItem>> result);
-    
+
     protected abstract void searchTreeItemParentMulti(List<TreeItem> objs, TreeItem parent, Map<TreeItem, TreeItem> result);
-   
-    public Map<TreeItem, TreeItem> getTreePathParentMulti(List<TreeItem> objs) {           
+
+    public Map<TreeItem, TreeItem> getTreePathParentMulti(List<TreeItem> objs) {
         Map<TreeItem, TreeItem> result = new IdentityHashMap<>();
         for (TreeItem item : objs) {
             if (itemToParentCache.containsKey(item)) {
@@ -163,16 +162,15 @@ public abstract class AbstractTagTreeModel implements TreeModel {
         if (result.size() == objs.size()) {
             return result;
         }
-                        
+
         TreeItem root = getRoot();
         //SLOW way
-        searchTreeItemParentMulti(objs, root, result);       
+        searchTreeItemParentMulti(objs, root, result);
         return result;
     }
-   
-    
+
     public Map<TreeItem, TreePath> getTreePathMulti(List<TreeItem> objs) {
-        TreeItem root = getRoot();        
+        TreeItem root = getRoot();
         List<TreeItem> path = new ArrayList<>();
         path.add(root);
         Map<TreeItem, List<TreeItem>> paths = new IdentityHashMap<>();
@@ -184,10 +182,10 @@ public abstract class AbstractTagTreeModel implements TreeModel {
             TreePath tp = new TreePath(p.toArray(new Object[p.size()]));
             result.put(item, tp);
         }
-        
+
         return result;
     }
-    
+
     public TreePath getTreePath(TreeItem obj) {
         List<TreeItem> path = new ArrayList<>();
         TreeItem root = getRoot();

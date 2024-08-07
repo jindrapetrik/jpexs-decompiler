@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2022-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,7 +42,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
  * @author JPEXS
  */
 public class BreakpointListDialog extends AppDialog {
@@ -176,7 +175,7 @@ public class BreakpointListDialog extends AppDialog {
             }
         }*/
         Pattern abcPcodePattern = Pattern.compile("^#PCODE abc:(?<abc>[0-9]+),body:(?<body>[0-9]+);.*");
-        Matcher m = abcPcodePattern.matcher(breakpoint.scriptName);        
+        Matcher m = abcPcodePattern.matcher(breakpoint.scriptName);
         if (m.matches()) {
             int abcIndex = Integer.parseInt(m.group("abc"));
             int bodyIndex = Integer.parseInt(m.group("body"));

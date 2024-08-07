@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -52,9 +52,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
  * AVM2 Deobfuscator removing single assigned local registers.
- *
+ * <p>
  * Example: var a = true; var b = false; ... if(a){ ...ok }else{ not executed }
  *
  * @author JPEXS
@@ -63,6 +62,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
     /**
      * Gets all register ids.
+     *
      * @param code AVM2 code
      * @return Set of register ids
      */
@@ -92,6 +92,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
     /**
      * Removes single assigned local registers.
+     *
      * @param path Path
      * @param classIndex Class index
      * @param isStatic Is static
@@ -171,6 +172,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
     /**
      * Gets first register with setter.
+     *
      * @param assignment Assignment
      * @param classIndex Class index
      * @param isStatic Is static
@@ -209,6 +211,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
         /**
          * Constructs a new instance of ExceptionTargetIpPair.
+         *
          * @param exception Exception
          * @param targetIp Target ip
          */
@@ -219,6 +222,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
         /**
          * Gets exception.
+         *
          * @return Exception
          */
         public ABCException getException() {
@@ -227,6 +231,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
         /**
          * Gets target ip.
+         *
          * @return Target ip
          */
         public int getTargetIp() {
@@ -237,6 +242,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
     /**
      * Visits code.
+     *
      * @param assignment Assignment
      * @param visited Visited
      * @param stack Stack

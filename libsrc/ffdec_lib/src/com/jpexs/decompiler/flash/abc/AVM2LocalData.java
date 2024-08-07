@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -39,6 +39,7 @@ import java.util.Set;
 
 /**
  * AVM2 local data.
+ *
  * @author JPEXS
  */
 public class AVM2LocalData extends BaseLocalData {
@@ -149,8 +150,8 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, GraphPart> pushDefaultPart = new HashMap<>();
 
     /**
-     * Mapping from finally index to finally kind
-     * See AVM2Graph.FINALLY_KIND_* constants.
+     * Mapping from finally index to finally kind See AVM2Graph.FINALLY_KIND_*
+     * constants.
      */
     public Map<Integer, Integer> finallyKinds = new HashMap<>();
 
@@ -175,7 +176,8 @@ public class AVM2LocalData extends BaseLocalData {
     public Integer scriptIndex;
 
     /**
-     * Local registers assignment ips. Maps register index to ip where it was assigned.
+     * Local registers assignment ips. Maps register index to ip where it was
+     * assigned.
      */
     public HashMap<Integer, Integer> localRegAssignmentIps;
 
@@ -228,6 +230,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Returns set of getLocal positions for given setLocal position
+     *
      * @param setLocalPos SetLocal position
      * @return Set of getLocal positions
      */
@@ -243,6 +246,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Constructs a new AVM2LocalData from another AVM2LocalData
+     *
      * @param localData Another AVM2LocalData
      */
     public AVM2LocalData(AVM2LocalData localData) {
@@ -287,6 +291,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Returns constant pool
+     *
      * @return Constant pool
      */
     public AVM2ConstantPool getConstants() {
@@ -295,6 +300,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Returns ABC method infos
+     *
      * @return List of MethodInfo
      */
     public List<MethodInfo> getMethodInfo() {
@@ -303,6 +309,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Returns ABC instance infos
+     *
      * @return List of InstanceInfo
      */
     public List<InstanceInfo> getInstanceInfo() {
@@ -311,6 +318,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     /**
      * Returns ABC script infos
+     *
      * @return List of ScriptInfo
      */
     public List<ScriptInfo> getScriptInfo() {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -309,7 +309,6 @@ import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
- *
  * @author JPEXS
  */
 public final class MainPanel extends JPanel implements TreeSelectionListener, SearchListener<TextTag>, Freed {
@@ -1876,7 +1875,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         String newFilter = findPanel.getFilter();
 
         if (isFilterEmpty(oldFilter)) {
-            unfilteredExpandedNodes.clear();;
+            unfilteredExpandedNodes.clear();
+            ;
             unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree));
         }
 
@@ -2674,7 +2674,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     });
                 }
             });
-        }        
+        }
         gotoScriptName(swf, scriptName);
     }
 
@@ -2703,8 +2703,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
      });
 
      }*/
-    
-        
     public void gotoScriptName(SWF mainSwf, String scriptNameWithSwfHash) {
         View.checkAccess();
 
@@ -2721,7 +2719,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             //abcPanel.setAbc(abcList.get(0).getABC());
             //if (!abcList.isEmpty()) {
             ABCPanel abcPanel = getABCPanel();
-                
+
             abcPanel.hilightScript(mainSwf, rawScriptName);
             //}
         } else {
@@ -3307,13 +3305,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
     }
-    
-    
+
     public void exportFlashDevelop(final SWF swf) {
         if (swf == null) {
             return;
         }
-        
+
         JFileChooser fc = View.getFileChooserWithIcon("exportflashdevelop");
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
@@ -3330,7 +3327,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             fileName = swfShortName + ".as3proj";
         }
-        
+
         FileFilter f = new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -3345,84 +3342,84 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         fc.setFileFilter(f);
         fc.setAcceptAllFileFilterUsed(false);
         fc.setSelectedFile(new File(selDir + fileName));
-        
+
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
-        }                
-                
+        }
+
         Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
         File sf = Helper.fixDialogFile(fc.getSelectedFile());
         SwfFlashDevelopExporter exporter = new SwfFlashDevelopExporter();
-        
+
         String path = sf.getAbsolutePath();
         if (path.endsWith(".as3proj")) {
             path = path.substring(0, path.length() - ".as3proj".length());
         }
         path += ".as3proj";
-        
+
         final String fpath = path;
-        
+
         long timeBefore = System.currentTimeMillis();
-            new CancellableWorker() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    Helper.freeMem();
+        new CancellableWorker() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Helper.freeMem();
 
-                    CancellableWorker w = this;
+                CancellableWorker w = this;
 
-                    ProgressListener prog = new ProgressListener() {
-                        @Override
-                        public void progress(int p) {
-                        }
+                ProgressListener prog = new ProgressListener() {
+                    @Override
+                    public void progress(int p) {
+                    }
 
-                        @Override
-                        public void status(String status) {
-                            Main.startWork(translate("work.exporting.flashDevelop") + "..." + status, w);
-                        }
-                    };
-                    EventListener evl = swf.getExportEventListener();
+                    @Override
+                    public void status(String status) {
+                        Main.startWork(translate("work.exporting.flashDevelop") + "..." + status, w);
+                    }
+                };
+                EventListener evl = swf.getExportEventListener();
+                try {
+                    AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+                    exporter.exportFlashDevelopProject(swf, new File(fpath), errorHandler, evl);
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "FlashDevelop export error", ex);
+                    ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                Helper.freeMem();
+                return null;
+            }
+
+            @Override
+            protected void onStart() {
+                Main.startWork(translate("work.exporting.flashDevelop") + "...", this);
+            }
+
+            @Override
+            protected void done() {
+                Main.stopWork();
+                long timeAfter = System.currentTimeMillis();
+                final long timeMs = timeAfter - timeBefore;
+
+                View.execInEventDispatch(() -> {
+                    setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                });
+
+                if (Configuration.openFolderAfterFlaExport.get()) {
                     try {
-                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-                        exporter.exportFlashDevelopProject(swf, new File(fpath), errorHandler, evl);   
-                    } catch (Exception ex) {
-                        logger.log(Level.SEVERE, "FlashDevelop export error", ex);
-                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
-                    }      
-                    Helper.freeMem();
-                    return null;
-                }
-
-                @Override
-                protected void onStart() {
-                    Main.startWork(translate("work.exporting.flashDevelop") + "...", this);
-                }
-
-                @Override
-                protected void done() {
-                    Main.stopWork();
-                    long timeAfter = System.currentTimeMillis();
-                    final long timeMs = timeAfter - timeBefore;
-
-                    View.execInEventDispatch(() -> {
-                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
-                    });
-
-                    if (Configuration.openFolderAfterFlaExport.get()) {
-                        try {
-                            Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
+                        Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
-            }.execute();                           
+            }
+        }.execute();
     }
-    
+
     public void exportIdea(final SWF swf) {
         if (swf == null) {
             return;
         }
-        
+
         JFileChooser chooser = View.getFileChooserWithIcon("exportidea");
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("export.project.select.directory"));
@@ -3432,64 +3429,63 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         final String fpath = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());                    
-        SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();                
-        
-        
+        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+        SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();
+
         long timeBefore = System.currentTimeMillis();
-            new CancellableWorker() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    Helper.freeMem();
+        new CancellableWorker() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Helper.freeMem();
 
-                    CancellableWorker w = this;
+                CancellableWorker w = this;
 
-                    ProgressListener prog = new ProgressListener() {
-                        @Override
-                        public void progress(int p) {
-                        }
+                ProgressListener prog = new ProgressListener() {
+                    @Override
+                    public void progress(int p) {
+                    }
 
-                        @Override
-                        public void status(String status) {
-                            Main.startWork(translate("work.exporting.idea") + "..." + status, w);
-                        }
-                    };
-                    EventListener evl = swf.getExportEventListener();
+                    @Override
+                    public void status(String status) {
+                        Main.startWork(translate("work.exporting.idea") + "..." + status, w);
+                    }
+                };
+                EventListener evl = swf.getExportEventListener();
+                try {
+                    AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+                    exporter.exportIntelliJIdeaProject(swf, new File(fpath), errorHandler, evl);
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "IDEA export error", ex);
+                    ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                Helper.freeMem();
+                return null;
+            }
+
+            @Override
+            protected void onStart() {
+                Main.startWork(translate("work.exporting.idea") + "...", this);
+            }
+
+            @Override
+            protected void done() {
+                Main.stopWork();
+                long timeAfter = System.currentTimeMillis();
+                final long timeMs = timeAfter - timeBefore;
+
+                View.execInEventDispatch(() -> {
+                    setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                });
+
+                if (Configuration.openFolderAfterFlaExport.get()) {
                     try {
-                        AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-                        exporter.exportIntelliJIdeaProject(swf, new File(fpath), errorHandler, evl);   
-                    } catch (Exception ex) {
-                        logger.log(Level.SEVERE, "IDEA export error", ex);
-                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
-                    }      
-                    Helper.freeMem();
-                    return null;
-                }
-
-                @Override
-                protected void onStart() {
-                    Main.startWork(translate("work.exporting.idea") + "...", this);
-                }
-
-                @Override
-                protected void done() {
-                    Main.stopWork();
-                    long timeAfter = System.currentTimeMillis();
-                    final long timeMs = timeAfter - timeBefore;
-
-                    View.execInEventDispatch(() -> {
-                        setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
-                    });
-
-                    if (Configuration.openFolderAfterFlaExport.get()) {
-                        try {
-                            Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
+                        Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
-            }.execute();                           
+            }
+        }.execute();
     }
 
     public void exportFla(final SWF swf) {
@@ -4040,8 +4036,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return r;
     }
 
-    
-    
     public void importScript(final Openable openable) {
         As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer(Main.isSwfAir(openable));
         if (as3ScriptReplacer == null) {
@@ -4621,7 +4615,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(true);
         updateMissingNeededCharacters();
         pinsPanel.refresh();
-        updateUiWithCurrentOpenable();        
+        updateUiWithCurrentOpenable();
     }
 
     public void refreshDecompiled() {
@@ -4920,7 +4914,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     Tag newTag = new ImageImporter().importImage(it, data, create ? -1 : 0);
                     SWF swf = it.getSwf();
                     refreshTree(swf);
-                    if (newTag != null) {                        
+                    if (newTag != null) {
                         setTagTreeSelectedNode(getCurrentTree(), newTag);
                     }
                     swf.clearImageCache();
@@ -4962,7 +4956,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 SWF swf = st.getSwf();
                 refreshTree(swf);
-                if (newTag != null) {                    
+                if (newTag != null) {
                     setTagTreeSelectedNode(getCurrentTree(), newTag);
                 }
 

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -73,6 +73,7 @@ import java.util.Set;
 
 /**
  * AVM2 Instruction definition.
+ *
  * @author JPEXS
  */
 public abstract class InstructionDefinition implements Serializable {
@@ -109,6 +110,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Constructs new instance
+     *
      * @param instructionCode Instruction code
      * @param instructionName Instruction name
      * @param operands Operands
@@ -125,6 +127,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Checks if instruction has flag
+     *
      * @param flag Flag
      * @return True if instruction has flag
      */
@@ -139,6 +142,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * To string
+     *
      * @return String representation
      */
     @Override
@@ -153,6 +157,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Verify instruction
+     *
      * @param lda Local data area
      * @param constants Constant pool
      * @param ins Instruction
@@ -212,7 +217,9 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Checks if instruction cannot be statically computed.
-     * @return True = cannot be statically computed, false = can be statically computed
+     *
+     * @return True = cannot be statically computed, false = can be statically
+     * computed
      */
     public boolean isNotCompileTimeSupported() {
         return false;
@@ -220,6 +227,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Executes instruction.
+     *
      * @param lda Local data area
      * @param constants Constant pool
      * @param ins Instruction
@@ -233,6 +241,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Throws illegal opcode exception.
+     *
      * @param lda Local data area
      * @param ins Instruction
      * @throws AVM2VerifyErrorException
@@ -243,6 +252,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Translates instruction to high level code.
+     *
      * @param localData Local data area
      * @param stack Translate stack
      * @param ins Instruction
@@ -255,6 +265,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Translates instruction to high level code.
+     *
      * @param switchParts Switch parts
      * @param callStack Call stack
      * @param abcIndex ABC indexing
@@ -309,6 +320,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets number of pops from stack.
+     *
      * @param ins Instruction
      * @param abc ABC
      * @return Number of pops from stack
@@ -319,6 +331,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets number of pushes to stack.
+     *
      * @param ins Instruction
      * @param abc ABC
      * @return Number of pushes to stack
@@ -329,6 +342,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Resolves multiname.
+     *
      * @param localData Local data area
      * @param constants Constant pool
      * @param multinameIndex Multiname index
@@ -347,6 +361,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Resolves multiname.
+     *
      * @param localData Local data area
      * @param property Property
      * @param stack Translate stack
@@ -373,6 +388,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets required stack size for multiname.
+     *
      * @param constants Constant pool
      * @param multinameIndex Multiname index
      * @return Required stack size
@@ -398,6 +414,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets stack delta. Stack push count - stack pop count.
+     *
      * @param ins Instruction
      * @param abc ABC
      * @return Stack delta
@@ -408,6 +425,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets scope stack delta. Scope stack push count - scope stack pop count.
+     *
      * @param ins Instruction
      * @param abc ABC
      * @return Scope stack delta
@@ -418,6 +436,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Checks if instruction is exit instruction. (e.g. return, throw)
+     *
      * @return True if instruction is exit instruction
      */
     public boolean isExitInstruction() {
@@ -426,6 +445,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Gets item IP.
+     *
      * @param localData Local data
      * @param item Item
      * @return Item IP or -1 if not found
@@ -440,6 +460,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Searches for slot name.
+     *
      * @param slotIndex Slot index
      * @param localData Local data
      * @param obj Object
@@ -452,6 +473,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Searches for slot name.
+     *
      * @param slotIndex Slot index
      * @param localData Local data
      * @param obj Object
@@ -505,6 +527,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Handles set property.
+     *
      * @param init Init
      * @param localData Local data
      * @param stack Translate stack
@@ -761,6 +784,7 @@ public abstract class InstructionDefinition implements Serializable {
 
     /**
      * Checks if increment or decrement.
+     *
      * @param standalone Standalone
      * @param multinameIndex Multiname index
      * @param ins Instruction

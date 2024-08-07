@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Set;
 
 /**
  * Instruction item for fast AVM2 list.
+ *
  * @author JPEXS
  */
 public class AVM2InstructionItem {
@@ -64,8 +65,8 @@ public class AVM2InstructionItem {
 
     //
     /**
-     * Whether this instruction is reachable.
-     * 1 means reachable, 2 means reachable and processed.
+     * Whether this instruction is reachable. 1 means reachable, 2 means
+     * reachable and processed.
      */
     int reachable;
 
@@ -76,6 +77,7 @@ public class AVM2InstructionItem {
 
     /**
      * Constructs a new AVM2InstructionItem
+     *
      * @param ins Instruction
      */
     public AVM2InstructionItem(AVM2Instruction ins) {
@@ -84,6 +86,7 @@ public class AVM2InstructionItem {
 
     /**
      * Checks whether this instruction is a jump target.
+     *
      * @return Whether this instruction is a jump target
      */
     public boolean isJumpTarget() {
@@ -92,6 +95,7 @@ public class AVM2InstructionItem {
 
     /**
      * Gets the number of jumps to this instruction.
+     *
      * @return Number of jumps to this instruction
      */
     public int jumpsHereSize() {
@@ -100,6 +104,7 @@ public class AVM2InstructionItem {
 
     /**
      * Checks whether this instruction is the last instruction of a container.
+     *
      * @return Whether this instruction is the last instruction of a container
      */
     public boolean isContainerLastInstruction() {
@@ -123,6 +128,7 @@ public class AVM2InstructionItem {
 
     /**
      * Get jump target.
+     *
      * @return Instruction item
      */
     public AVM2InstructionItem getJumpTarget() {
@@ -131,6 +137,7 @@ public class AVM2InstructionItem {
 
     /**
      * Get jump target instruction.
+     *
      * @return Instruction
      */
     public AVM2Instruction getJumpTargetInstruction() {
@@ -139,6 +146,7 @@ public class AVM2InstructionItem {
 
     /**
      * Set jump target.
+     *
      * @param item Instruction item
      */
     public void setJumpTarget(AVM2InstructionItem item) {
@@ -158,6 +166,7 @@ public class AVM2InstructionItem {
 
     /**
      * Get last instructions of container.
+     *
      * @return List of instruction items
      */
     public List<AVM2InstructionItem> getContainerLastInstructions() {
@@ -183,6 +192,7 @@ public class AVM2InstructionItem {
 
     /**
      * Replace container last instruction.
+     *
      * @param oldItem Old instruction item
      * @param newItem New instruction item
      */
@@ -205,6 +215,7 @@ public class AVM2InstructionItem {
 
     /**
      * Set container last instructions.
+     *
      * @param lastInstructions
      */
     public void setContainerLastInstructions(List<AVM2InstructionItem> lastInstructions) {
@@ -219,6 +230,7 @@ public class AVM2InstructionItem {
 
     /**
      * Ensure last instruction is non-null.
+     *
      * @return Set of instruction items
      */
     private Set<AVM2InstructionItem> ensureLastInstructionOf() {
@@ -231,6 +243,7 @@ public class AVM2InstructionItem {
 
     /**
      * Checks whether this instruction is excluded.
+     *
      * @return Whether this instruction is excluded
      */
     public boolean isExcluded() {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -35,6 +35,7 @@ import net.npe.dds.DDSReader;
 
 /**
  * Base class for GFX image tags.
+ *
  * @author JPEXS
  */
 public abstract class AbstractGfxImageTag extends ImageTag {
@@ -52,16 +53,16 @@ public abstract class AbstractGfxImageTag extends ImageTag {
 
     protected BufferedImage getExternalBufferedImage(String fileName, int bitmapFormat) {
         Path imagePath = null;
-        
+
         fileName = fileName.replace("\\", "/");
-        
+
         try {
-            imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));        
+            imagePath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
         } catch (InvalidPathException ip) {
             //ignore
         }
         if (imagePath == null || !imagePath.toFile().exists()) {
-            
+
             SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(getSwf().getShortPathTitle());
             if (cc == null) {
                 return null;
@@ -76,7 +77,7 @@ public abstract class AbstractGfxImageTag extends ImageTag {
                 String prefix = "";
                 String searchPath;
                 if (row.contains("|")) {
-                    prefix = row.substring(0, row.indexOf("|"));                            
+                    prefix = row.substring(0, row.indexOf("|"));
                     searchPath = row.substring(row.indexOf("|") + 1);
                 } else {
                     searchPath = row;
@@ -96,7 +97,7 @@ public abstract class AbstractGfxImageTag extends ImageTag {
             }
             if (!found) {
                 return null;
-            }                           
+            }
         }
 
         byte[] imageData;

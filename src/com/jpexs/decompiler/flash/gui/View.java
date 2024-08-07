@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -169,7 +169,8 @@ public class View {
 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException
+                | IllegalAccessException ignored) {
             //ignored
         }
 
@@ -323,7 +324,8 @@ public class View {
     }
 
     /**
-     * Sets icon of the window. 
+     * Sets icon of the window.
+     *
      * @param f
      * @param icon Icon identifier. Icon must exist in 16 and 32 variant
      */
@@ -333,6 +335,7 @@ public class View {
         images.add(loadImage(icon + "32"));
         f.setIconImages(images);
     }
+
     /**
      * Sets icon of specified frame to ASDec icon
      *
@@ -919,7 +922,8 @@ public class View {
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             try {
                 return Locale.class.getDeclaredConstructor(String.class, String.class).newInstance(language, country);
-            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException ex1) {
                 Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex1);
                 return null;
             }
@@ -939,7 +943,8 @@ public class View {
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException ex) {
             try {
                 return Locale.class.getDeclaredConstructor(String.class).newInstance(language);
-            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException ex1) {
                 Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex1);
                 return null;
             }
@@ -948,10 +953,10 @@ public class View {
 
     public static JFileChooser getFileChooserWithIcon(String iconName) {
         return new JFileChooser() {
-            
+
             @Override
             protected JDialog createDialog(Component parent) throws HeadlessException {
-                JDialog dialog = super.createDialog(parent);                
+                JDialog dialog = super.createDialog(parent);
                 setWindowIcon(dialog, iconName);
                 dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
                 return dialog;

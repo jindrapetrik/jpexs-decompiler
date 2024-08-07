@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -785,14 +785,12 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Changes the parent window of the specified child window.
      *
      * @param hWndChild A handle to the child window.
-     *
      * @param hWndNewParent A handle to the new parent window. If this parameter
      * is NULL, the desktop window becomes the new parent window. If this
      * parameter is HWND_MESSAGE, the child window becomes a message-only
      * window.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -802,11 +800,10 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Determines the visibility state of the specified window.
      *
      * @param hWnd A handle to the window to be tested.
-     *
      * @return If the specified window, its parent window, its parent's parent
      * window, and so forth, have the WS_VISIBLE style, the return value is
      * nonzero. Otherwise, the return value is zero.
-     *
+     * <p>
      * Because the return value specifies whether the window has the WS_VISIBLE
      * style, it may be nonzero even if the window is totally obscured by other
      * windows.
@@ -820,23 +817,17 @@ public interface User32 extends StdCallLibrary, WinUser {
      * the upper-left corner of the parent window's client area.
      *
      * @param hWnd A handle to the window.
-     *
      * @param X The new position of the left side of the window.
-     *
      * @param Y The new position of the top of the window.
-     *
      * @param nWidth The new width of the window.
-     *
      * @param nHeight The new height of the window.
-     *
      * @param bRepaint Indicates whether the window is to be repainted. If this
      * parameter is TRUE, the window receives a message. If the parameter is
      * FALSE, no repainting of any kind occurs. This applies to the client area,
      * the nonclient area (including the title bar and scroll bars), and any
      * part of the parent window uncovered as a result of moving a child window.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -850,24 +841,17 @@ public interface User32 extends StdCallLibrary, WinUser {
      * window in the Z order.
      *
      * @param hWnd A handle to the window.
-     *
      * @param hWndInsertAfter A handle to the window to precede the positioned
      * window in the Z order.
-     *
      * @param X The new position of the left side of the window, in client
      * coordinates.
-     *
      * @param Y The new position of the top of the window, in client
      * coordinates.
-     *
      * @param cx The new width of the window, in pixels.
-     *
      * @param cy The new height of the window, in pixels.
-     *
      * @param uFlags The window sizing and positioning flags.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -880,14 +864,11 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param idAttach The identifier of the thread to be attached to another
      * thread. The thread to be attached cannot be a system thread.
-     *
      * @param idAttachTo The identifier of the thread to which idAttach will be
      * attached. This thread cannot be a system thread. A thread cannot attach
      * to itself. Therefore, idAttachTo cannot equal idAttach.
-     *
      * @param fAttach If this parameter is TRUE, the two threads are attached.
      * If the parameter is FALSE, the threads are detached.
-     *
      * @return If the function succeeds, the return value is nonzero.
      */
     boolean AttachThreadInput(DWORD idAttach, DWORD idAttachTo, boolean fAttach);
@@ -901,7 +882,6 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param hWnd A handle to the window that should be activated and brought
      * to the foreground.
-     *
      * @return If the window was brought to the foreground, the return value is
      * nonzero.
      */
@@ -925,7 +905,6 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param hWnd A handle to the window that will receive the keyboard input.
      * If this parameter is NULL, keystrokes are ignored.
-     *
      * @return If the function succeeds, the return value is the handle to the
      * window that previously had the keyboard focus. If the hWnd parameter is
      * invalid or the window is not attached to the calling thread's message
@@ -938,18 +917,15 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Synthesizes keystrokes, mouse motions, and button clicks.
      *
      * @param nInputs The number of structures in the pInputs array.
-     *
      * @param pInputs An array of INPUT structures. Each structure represents an
      * event to be inserted into the keyboard or mouse input stream.
-     *
      * @param cbSize The size, in bytes, of an INPUT structure. If cbSize is not
      * the size of an INPUT structure, the function fails.
-     *
      * @return The function returns the number of events that it successfully
      * inserted into the keyboard or mouse input stream. If the function returns
      * zero, the input was already blocked by another thread. To get extended
      * error information, call GetLastError.
-     *
+     * <p>
      * This function fails when it is blocked by UIPI. Note that neither
      * GetLastError nor the return value will indicate the failure was caused by
      * UIPI blocking.
@@ -964,11 +940,9 @@ public interface User32 extends StdCallLibrary, WinUser {
      * @param hProcess A handle to the process. If this process is a console
      * application or does not have a message queue, WaitForInputIdle returns
      * immediately.
-     *
      * @param dwMilliseconds The time-out interval, in milliseconds. If
      * dwMilliseconds is INFINITE, the function does not return until the
      * process is idle.
-     *
      * @return The following table shows the possible return values for this
      * function. Return code: Description 0: The wait was satisfied
      * successfully. WAIT_TIMEOUT: The wait was terminated because the time-out
@@ -986,16 +960,13 @@ public interface User32 extends StdCallLibrary, WinUser {
      * not just the windows for this application, and sends the WM_ERASEBKGND
      * and WM_NCPAINT messages before the function returns. Setting this
      * parameter to NULL is not recommended.
-     *
      * @param lpRect A pointer to a RECT structure that contains the client
      * coordinates of the rectangle to be added to the update region. If this
      * parameter is NULL, the entire client area is added to the update region.
-     *
      * @param bErase Specifies whether the background within the update region
      * is to be erased when the update region is processed. If this parameter is
      * TRUE, the background is erased when the BeginPaint function is called. If
      * this parameter is FALSE, the background remains unchanged.
-     *
      * @return If the function succeeds, the return value is nonzero. If the
      * function fails, the return value is zero.
      */
@@ -1007,19 +978,15 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param hWnd A handle to the window to be redrawn. If this parameter is
      * NULL, the desktop window is updated.
-     *
      * @param lprcUpdate A pointer to a RECT structure containing the
      * coordinates, in device units, of the update rectangle. This parameter is
      * ignored if the hrgnUpdate parameter identifies a region.
-     *
      * @param hrgnUpdate A handle to the update region. If both the hrgnUpdate
      * and lprcUpdate parameters are NULL, the entire client area is added to
      * the update region.
-     *
      * @param flags One or more redraw flags. This parameter can be used to
      * invalidate or validate a window, control repainting, and control which
      * windows are affected by RedrawWindow.
-     *
      * @return If the function succeeds, the return value is nonzero. If the
      * function fails, the return value is zero.
      */
@@ -1032,10 +999,8 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param hWnd A handle to a window. The window handle retrieved is relative
      * to this window, based on the value of the uCmd parameter.
-     *
      * @param uCmd The relationship between the specified window and the window
      * whose handle is to be retrieved.
-     *
      * @return If the function succeeds, the return value is a window handle. If
      * no window exists with the specified relationship to the specified window,
      * the return value is NULL. To get extended error information, call
@@ -1051,7 +1016,6 @@ public interface User32 extends StdCallLibrary, WinUser {
      * queue. If the update region is empty, no message is sent.
      *
      * @param hWnd Handle to the window to be updated.
-     *
      * @return If the function succeeds, the return value is nonzero. If the
      * function fails, the return value is zero.
      */
@@ -1061,15 +1025,13 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Sets the specified window's show state.
      *
      * @param hWnd A handle to the window.
-     *
      * @param nCmdShow Controls how the window is to be shown. This parameter is
      * ignored the first time an application calls ShowWindow, if the program
      * that launched the application provides a STARTUPINFO structure.
      * Otherwise, the first time ShowWindow is called, the value should be the
      * value obtained by the WinMain function in its nCmdShow parameter.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -1079,9 +1041,8 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Minimizes (but does not destroy) the specified window.
      *
      * @param hWnd A handle to the window to be minimized.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -1096,7 +1057,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      * key specified by the uVirtKey parameter in order to generate the
      * @param vk The virtual-key code of the hot key
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      * {@link WinUser#WM_HOTKEY} messages generated by the hot key
@@ -1122,11 +1083,9 @@ public interface User32 extends StdCallLibrary, WinUser {
      * @param hWnd A handle to the window associated with the hot key to be
      * freed. This parameter should be NULL if the hot key is not associated
      * with a window.
-     *
      * @param id The identifier of the hot key to be freed.
-     *
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1137,7 +1096,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param plii structure that receives the time of the last input event
      * @return If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1150,13 +1109,12 @@ public interface User32 extends StdCallLibrary, WinUser {
      * @param lpwcx Type: const WNDCLASSEX* A pointer to a WNDCLASSEX structure.
      * You must fill the structure with the appropriate class attributes before
      * passing it to the function.
-     *
      * @return If the function succeeds, the return value is a class atom that
      * uniquely identifies the class being registered. This atom can only be
      * used by the CreateWindow, CreateWindowEx, GetClassInfo, GetClassInfoEx,
      * FindWindow, FindWindowEx, and UnregisterClass functions and the
      * IActiveIMMap::FilterClientWindows method.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1166,7 +1124,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      * Unregisters a window class, freeing the memory required for the class.
      *
      * @param lpClassName [in] Type: LPCTSTR
-     *
+     * <p>
      * A null-terminated string or a class atom. If lpClassName is a string, it
      * specifies the window class name. This class name must have been
      * registered by a previous call to the RegisterClass or RegisterClassEx
@@ -1175,12 +1133,11 @@ public interface User32 extends StdCallLibrary, WinUser {
      * created by a previous call to the RegisterClass or RegisterClassEx
      * function. The atom must be in the low-order word of lpClassName; the
      * high-order word must be zero.
-     *
      * @param hInstance [in,optional] Type: HINSTANCE A handle to the instance
-     * of the module that created the class. *
+     * of the module that created the class.
      *
      * @return Type: BOOL If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1193,12 +1150,11 @@ public interface User32 extends StdCallLibrary, WinUser {
      * descriptions of the other parameters of CreateWindowEx, see CreateWindow.
      *
      * @param dwExStyle [in] Type: DWORD
-     *
+     * <p>
      * The extended window style of the window being created. For a list of
      * possible values,see Extended Window Styles.
-     *
      * @param lpClassName [in, optional] Type: LPCTSTR
-     *
+     * <p>
      * A null-terminated string or a class atom created by a previous call to
      * the RegisterClass or RegisterClassEx function. The atom must be in the
      * low-order word of lpClassName; the high-order word must be zero. If
@@ -1207,9 +1163,8 @@ public interface User32 extends StdCallLibrary, WinUser {
      * provided that the module that registers the class is also the module that
      * creates the window. The class name can also be any of the predefined
      * system class names.
-     *
      * @param lpWindowName [in, optional] Type: LPCTSTR
-     *
+     * <p>
      * The window name. If the window style specifies a title bar, the window
      * title pointed to by lpWindowName is displayed in the title bar. When
      * using CreateWindow to create controls, such as buttons, check boxes, and
@@ -1217,15 +1172,13 @@ public interface User32 extends StdCallLibrary, WinUser {
      * When creating a static control with the SS_ICON style, use lpWindowName
      * to specify the icon name or identifier. To specify an identifier, use the
      * syntax "#num".
-     *
      * @param dwStyle [in] Type: DWORD
-     *
+     * <p>
      * The style of the window being created. This parameter can be a
      * combination of the window style values, plus the control styles indicated
      * in the Remarks section.
-     *
      * @param x [in] Type: int
-     *
+     * <p>
      * The initial horizontal position of the window. For an overlapped or
      * pop-up window, the x parameter is the initial x-coordinate of the
      * window's upper-left corner, in screen coordinates. For a child window, x
@@ -1235,9 +1188,8 @@ public interface User32 extends StdCallLibrary, WinUser {
      * upper-left corner and ignores the y parameter. CW_USEDEFAULT is valid
      * only for overlapped windows; if it is specified for a pop-up or child
      * window, the x and y parameters are set to zero.
-     *
      * @param y [in] Type: int
-     *
+     * <p>
      * The initial vertical position of the window. For an overlapped or pop-up
      * window, the y parameter is the initial y-coordinate of the window's
      * upper-left corner, in screen coordinates. For a child window, y is the
@@ -1246,16 +1198,15 @@ public interface User32 extends StdCallLibrary, WinUser {
      * a list box y is the initial y-coordinate of the upper-left corner of the
      * list box's client area relative to the upper-left corner of the parent
      * window's client area.
-     *
+     * <p>
      * If an overlapped window is created with the WS_VISIBLE style bit set and
      * the x parameter is set to CW_USEDEFAULT, then the y parameter determines
      * how the window is shown. If the y parameter is CW_USEDEFAULT, then the
      * window manager calls ShowWindow with the SW_SHOW flag after the window
      * has been created. If the y parameter is some other value, then the window
      * manager calls ShowWindow with that value as the nCmdShow parameter.
-     *
      * @param nWidth [in] Type: int
-     *
+     * <p>
      * The width, in device units, of the window. For overlapped windows, nWidth
      * is the window's width, in screen coordinates, or CW_USEDEFAULT. If nWidth
      * is CW_USEDEFAULT, the system selects a default width and height for the
@@ -1264,24 +1215,21 @@ public interface User32 extends StdCallLibrary, WinUser {
      * y-coordinate to the top of the icon area. CW_USEDEFAULT is valid only for
      * overlapped windows; if CW_USEDEFAULT is specified for a pop-up or child
      * window, the nWidth and nHeight parameter are set to zero.
-     *
      * @param nHeight [in] Type: int
-     *
+     * <p>
      * The height, in device units, of the window. For overlapped windows,
      * nHeight is the window's height, in screen coordinates. If the nWidth
      * parameter is set to CW_USEDEFAULT, the system ignores nHeight.
-     *
      * @param hWndParent [in, optional] Type: HWND
-     *
+     * <p>
      * A handle to the parent or owner window of the window being created. To
      * create a child window or an owned window, supply a valid window handle.
      * This parameter is optional for pop-up windows.
-     *
+     * <p>
      * To create a message-only window, supply HWND_MESSAGE or a handle to an
      * existing message-only window.
-     *
      * @param hMenu [in, optional] Type: HMENU
-     *
+     * <p>
      * A handle to a menu, or specifies a child-window identifier, depending on
      * the window style. For an overlapped or pop-up window, hMenu identifies
      * the menu to be used with the window; it can be NULL if the class menu is
@@ -1290,33 +1238,30 @@ public interface User32 extends StdCallLibrary, WinUser {
      * parent about events. The application determines the child-window
      * identifier; it must be unique for all child windows with the same parent
      * window.
-     *
      * @param hInstance [in, optional] Type: HINSTANCE
-     *
+     * <p>
      * A handle to the instance of the module to be associated with the window.
-     *
      * @param lpParam [in, optional] Type: LPVOID
-     *
+     * <p>
      * Pointer to a value to be passed to the window through the CREATESTRUCT
      * structure (lpCreateParams member) pointed to by the lParam param of the
      * WM_CREATE message. This message is sent to the created window by this
      * function before it returns.
-     *
+     * <p>
      * If an application calls CreateWindow to create a MDI client window,
      * lpParam should point to a CLIENTCREATESTRUCT structure. If an MDI client
      * window calls CreateWindow to create an MDI child window, lpParam should
      * point to a MDICREATESTRUCT structure. lpParam may be NULL if no
      * additional data is needed.
-     *
      * @return Type: HWND
-     *
+     * <p>
      * If the function succeeds, the return value is a handle to the new window.
-     *
+     * <p>
      * If the function fails, the return value is NULL. To get extended error
      * information, call GetLastError.
-     *
+     * <p>
      * This function typically fails for one of the following reasons:
-     *
+     * <p>
      * - an invalid parameter value - the system class was registered by a
      * different module - The WH_CBT hook is installed and returns a failure
      * code - if one of the controls in the dialog template is not registered,
@@ -1334,19 +1279,18 @@ public interface User32 extends StdCallLibrary, WinUser {
      * flushes the thread message queue, destroys timers, removes clipboard
      * ownership, and breaks the clipboard viewer chain (if the window is at the
      * top of the viewer chain).
-     *
+     * <p>
      * If the specified window is a parent or owner window, DestroyWindow
      * automatically destroys the associated child or owned windows when it
      * destroys the parent or owner window. The function first destroys child or
      * owned windows, and then it destroys the parent or owner window.
-     *
+     * <p>
      * DestroyWindow also destroys modeless dialog boxes created by the
      * CreateDialog function.
      *
      * @param hWnd [in] Type: HWND A handle to the window to be destroyed.
-     *
      * @return Type: BOOL If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1358,27 +1302,24 @@ public interface User32 extends StdCallLibrary, WinUser {
      * does not retrieve a handle to the small icon.
      *
      * @param hinst [in, optional] Type: HINSTANCE
-     *
+     * <p>
      * A handle to the instance of the application that created the class. To
      * retrieve information about classes defined by the system (such as buttons
      * or list boxes), set this parameter to NULL.
-     *
      * @param lpszClass [in] Type: LPCTSTR
-     *
+     * <p>
      * The class name. The name must be that of a preregistered class or a class
      * registered by a previous call to the RegisterClass or RegisterClassEx
      * function. Alternatively, this parameter can be a class atom created by a
      * previous call to RegisterClass or RegisterClassEx. The atom must be in
      * the low-order word of lpszClass; the high-order word must be zero.
-     *
      * @param lpwcx [out] Type: LPWNDCLASSEX
-     *
+     * <p>
      * A pointer to a WNDCLASSEX structure that receives the information about
      * the class.
-     *
      * @return Type: BOOL If the function finds a matching class and
      * successfully copies the data, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError} .
      */
@@ -1392,26 +1333,22 @@ public interface User32 extends StdCallLibrary, WinUser {
      * same parameters received by the window procedure.
      *
      * @param hWnd [in] Type: HWND
-     *
+     * <p>
      * A handle to the window procedure that received the message.
-     *
      * @param Msg [in] Type: UINT
-     *
+     * <p>
      * The message.
-     *
      * @param wParam [in] Type: WPARAM
-     *
+     * <p>
      * Additional message information. The content of this parameter depends on
      * the value of the Msg parameter.
-     *
      * @param lParam [in] Type: LPARAM
-     *
+     * <p>
      * Additional message information. The content of this parameter depends on
      * the value of the Msg parameter.
-     *
      * @return Type: LRESULT The return value is the result of the message
      * processing and depends on the message.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call {@link Kernel32#GetLastError}.
      */
@@ -1426,37 +1363,34 @@ public interface User32 extends StdCallLibrary, WinUser {
      * receive device events for the devices specified in the NotificationFilter
      * parameter. The same window handle can be used in multiple calls to
      * RegisterDeviceNotification.
-     *
+     * <p>
      * Services can specify either a window handle or service status handle.
-     *
      * @param notificationFilter [in] A pointer to a block of data that
      * specifies the type of device for which notifications should be sent. This
      * block always begins with the DEV_BROADCAST_HDR structure. The data
      * following this header is dependent on the value of the dbch_devicetype
      * member, which can be DBT_DEVTYP_DEVICEINTERFACE or DBT_DEVTYP_HANDLE. For
      * more information, see Remarks.
-     *
      * @param Flags [in] This parameter can be one of the following values.
      * DEVICE_NOTIFY_WINDOW_HANDLE0x00000000 The hRecipient parameter is a
      * window handle.
-     *
+     * <p>
      * DEVICE_NOTIFY_SERVICE_HANDLE0x00000001 The hRecipient parameter is a
      * service status handle.
-     *
+     * <p>
      * In addition, you can specify the following value.
-     *
+     * <p>
      * DEVICE_NOTIFY_ALL_INTERFACE_CLASSES0x00000004 Notifies the recipient of
      * device interface events for all device interface classes. (The
      * dbcc_classguid member is ignored.)
-     *
+     * <p>
      * This value can be used only if the dbch_devicetype member is
      * DBT_DEVTYP_DEVICEINTERFACE.
-     *
      * @return value
-     *
+     * <p>
      * If the function succeeds, the return value is a device notification
      * handle.
-     *
+     * <p>
      * If the function fails, the return value is NULL. To get extended error
      * information, call GetLastError.
      */
@@ -1468,11 +1402,10 @@ public interface User32 extends StdCallLibrary, WinUser {
      *
      * @param Handle [in] Device notification handle returned by the
      * RegisterDeviceNotification function.
-     *
      * @return Return value
-     *
+     * <p>
      * If the function succeeds, the return value is nonzero.
-     *
+     * <p>
      * If the function fails, the return value is zero. To get extended error
      * information, call GetLastError.
      */
@@ -1484,7 +1417,6 @@ public interface User32 extends StdCallLibrary, WinUser {
      * messages.
      *
      * @param string The message to be registered.
-     *
      * @return If the message is successfully registered, the return value is a
      * message identifier in the range 0xC000 through 0xFFFF.
      * <p>

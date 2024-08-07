@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import com.jpexs.helpers.Helper;
 
 /**
  * Value kind in ABC file.
+ *
  * @author JPEXS
  */
 public class ValueKind {
@@ -139,6 +140,7 @@ public class ValueKind {
 
     /**
      * Constructs new value kind
+     *
      * @param value_index Value index
      * @param value_kind Value kind
      */
@@ -149,6 +151,7 @@ public class ValueKind {
 
     /**
      * Convert namespace kind to value kind
+     *
      * @param nsKind Namespace kind
      * @return Value kind
      */
@@ -174,6 +177,7 @@ public class ValueKind {
 
     /**
      * Check if value is namespace
+     *
      * @return True if value is namespace
      */
     public boolean isNamespace() {
@@ -190,9 +194,9 @@ public class ValueKind {
         }
     }
 
-
     /**
      * Convert value kind to string
+     *
      * @return String representation of value kind
      */
     @Override
@@ -215,6 +219,7 @@ public class ValueKind {
 
     /**
      * Convert value kind to string
+     *
      * @param abc ABC file
      * @return String representation of value kind
      */
@@ -273,6 +278,7 @@ public class ValueKind {
 
     /**
      * Convert value kind to P-code string
+     *
      * @param abc ABC file
      * @return P-code string representation of value kind
      */

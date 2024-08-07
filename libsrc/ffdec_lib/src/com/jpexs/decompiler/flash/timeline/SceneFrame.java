@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Objects;
 
 /**
  * A frame in a Scene object.
+ *
  * @author JPEXS
  */
 public class SceneFrame implements TreeItem {
@@ -31,12 +32,12 @@ public class SceneFrame implements TreeItem {
      * SWF.
      */
     private final SWF swf;
-    
+
     /**
      * Scene.
      */
     private final Scene scene;
-    
+
     /**
      * Real frame index - from main SWF time line.
      */
@@ -44,6 +45,7 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Constructs SceneFrame.
+     *
      * @param swf SWF
      * @param scene Scene
      * @param realFrameIndex Real frame index - from main SWF time line
@@ -56,7 +58,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Gets scene frame index.
-     * @return 
+     *
+     * @return
      */
     public int getSceneFrameIndex() {
         return realFrameIndex - scene.startFrame;
@@ -64,7 +67,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Gets frame.
-     * @return 
+     *
+     * @return
      */
     public Frame getFrame() {
         return swf.getTimeline().getFrame(realFrameIndex);
@@ -72,7 +76,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -81,7 +86,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -90,7 +96,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {
@@ -99,7 +106,8 @@ public class SceneFrame implements TreeItem {
 
     /**
      * HashCode.
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -111,8 +119,9 @@ public class SceneFrame implements TreeItem {
 
     /**
      * Equals.
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {

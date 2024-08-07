@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -27,6 +27,7 @@ import java.util.Stack;
 
 /**
  * Local data area for ActionScript execution.
+ *
  * @author JPEXS
  */
 public class LocalDataArea {
@@ -98,6 +99,7 @@ public class LocalDataArea {
 
     /**
      * Constructs a new local data area.
+     *
      * @param stage Stage
      */
     public LocalDataArea(Stage stage) {
@@ -107,6 +109,7 @@ public class LocalDataArea {
 
     /**
      * Constructs a new local data area.
+     *
      * @param stage Stage
      * @param preserveVariableOrder Preserve variable order
      */
@@ -120,6 +123,7 @@ public class LocalDataArea {
 
     /**
      * Checks if the stack is empty.
+     *
      * @return True if the stack is empty, otherwise false
      */
     public boolean stackIsEmpty() {
@@ -131,6 +135,7 @@ public class LocalDataArea {
 
     /**
      * Checks if the stack has a minimum size.
+     *
      * @param count Count
      * @return True if the stack has a minimum size, otherwise false
      */
@@ -161,6 +166,7 @@ public class LocalDataArea {
 
     /**
      * Pushes a value onto the stack.
+     *
      * @param val Value
      * @return Value
      */
@@ -170,6 +176,7 @@ public class LocalDataArea {
 
     /**
      * Peeks at the top of the stack.
+     *
      * @return Value
      */
     public synchronized Object peek() {
@@ -183,6 +190,7 @@ public class LocalDataArea {
 
     /**
      * Pops a value from the stack.
+     *
      * @return Value
      */
     public synchronized Object pop() {
@@ -196,6 +204,7 @@ public class LocalDataArea {
 
     /**
      * Pops a value from the stack as a number.
+     *
      * @return Value
      */
     public synchronized Double popAsNumber() {
@@ -204,6 +213,7 @@ public class LocalDataArea {
 
     /**
      * Pops a value from the stack as a string.
+     *
      * @return Value
      */
     public synchronized String popAsString() {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 /**
  * Identifiers deobfuscation.
+ *
  * @author JPEXS
  */
 public class IdentifiersDeobfuscation {
@@ -131,7 +132,7 @@ public class IdentifiersDeobfuscation {
         "null", //can be in variable definition
         "on", "onClipEvent",
         "or", "private", "public", "return",
-        "set", //can be in variable definition        
+        "set", //can be in variable definition
         "static",
         //allow as variable:
         //"super",
@@ -139,7 +140,7 @@ public class IdentifiersDeobfuscation {
         //allow as variable:
         //"this",
         "throw",
-        "true", //can be in variable definition 
+        "true", //can be in variable definition
         "try",
         "typeof", "undefined", "var", "void", "while", "with"
     };
@@ -170,12 +171,14 @@ public class IdentifiersDeobfuscation {
         "with", "dynamic", "default", "final", "in", "static"};
 
     /**
-     * Syntactic keywords - can be used as identifiers, but that have special meaning in certain contexts
+     * Syntactic keywords - can be used as identifiers, but that have special
+     * meaning in certain contexts
      */
     public static final String[] syntacticKeywordsAS3 = {"each", "get", "set", "namespace", "include", "dynamic", "final", "native", "override", "static"};
 
     /**
      * Checks if string is reserved word.
+     *
      * @param s String
      * @param as3 Is ActionScript3
      */
@@ -195,6 +198,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * TODO: Why do we need this method???
+     *
      * @param s String
      * @return True if string is reserved word
      */
@@ -214,6 +218,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Generates random string.
+     *
      * @param firstUppercase First character uppercase
      * @param rndSize Random size
      * @return Random string
@@ -239,6 +244,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Deobfuscates instance names.
+     *
      * @param as3 Is ActionScript3
      * @param namesMap Names map
      * @param renameType Rename type
@@ -274,6 +280,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Deobfuscates package names.
+     *
      * @param as3 Is ActionScript3
      * @param pkg Package
      * @param namesMap Names map
@@ -307,6 +314,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Deobfuscates name with package.
+     *
      * @param as3 Is ActionScript3
      * @param n Name
      * @param namesMap Names map
@@ -346,6 +354,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Checks if string is valid slash path.
+     *
      * @param s String
      * @param exceptions Exceptions
      * @return True if string is valid slash path
@@ -375,6 +384,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Checks if string is valid name with slash.
+     *
      * @param s String
      * @param exceptions Exceptions
      * @return True if string is valid name with slash
@@ -398,6 +408,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Checks if string is valid name with dot.
+     *
      * @param as3 Is ActionScript3
      * @param s String
      * @param exceptions Exceptions
@@ -427,6 +438,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Checks if string is valid name.
+     *
      * @param as3 Is ActionScript3
      * @param s String
      * @param exceptions Exceptions
@@ -456,6 +468,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Deobfuscates name.
+     *
      * @param as3 Is ActionScript3
      * @param s String
      * @param firstUppercase First character uppercase
@@ -512,6 +525,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Appends obfuscated identifier.
+     *
      * @param s String
      * @param writer Writer
      * @return Writer
@@ -564,6 +578,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Escapes obfuscated identifier.
+     *
      * @param s String
      * @param writer Writer
      * @return Writer
@@ -609,6 +624,7 @@ public class IdentifiersDeobfuscation {
 
     /**
      * Escapes obfuscated identifier.
+     *
      * @param s String
      * @return Escaped string
      */

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -28,12 +28,12 @@ import java.util.Objects;
 
 /**
  * Type item.
+ *
  * @author JPEXS
  */
 public class TypeItem extends GraphTargetItem {
 
     //Basic type items
-
     public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
     public static TypeItem STRING = new TypeItem(DottedChain.STRING);
@@ -64,6 +64,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Constructs a new instance of TypeItem
+     *
      * @param s Full type name
      */
     public TypeItem(String s) {
@@ -72,6 +73,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Constructs a new instance of TypeItem
+     *
      * @param s Full type name
      * @param ns Namespace
      */
@@ -81,6 +83,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Constructs a new instance of TypeItem
+     *
      * @param fullTypeName Full type name
      */
     public TypeItem(DottedChain fullTypeName) {
@@ -89,6 +92,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Constructs a new instance of TypeItem
+     *
      * @param fullTypeName Full type name
      * @param ns Namespace
      */
@@ -98,6 +102,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Constructs a new instance of TypeItem
+     *
      * @param fullTypeName Full type name
      * @param subtypes Subtypes
      * @param ns Namespace
@@ -110,6 +115,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Hash code
+     *
      * @return Hash code
      */
     @Override
@@ -122,6 +128,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Equals
+     *
      * @param obj Object to compare
      * @return True if equal
      */
@@ -145,6 +152,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Appends to writer
+     *
      * @param writer Writer
      * @param localData Local data
      * @return Writer
@@ -165,6 +173,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Gets the return type
+     *
      * @return Return type
      */
     @Override
@@ -174,6 +183,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Checks whether this function has a return value
+     *
      * @return True if has a return value
      */
     @Override
@@ -183,6 +193,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Returns a string representation of this function
+     *
      * @return String representation
      */
     @Override
@@ -192,6 +203,7 @@ public class TypeItem extends GraphTargetItem {
 
     /**
      * Converts this item to low-level source code.
+     *
      * @param localData Local data
      * @param generator Source generator
      * @return List of graph source items

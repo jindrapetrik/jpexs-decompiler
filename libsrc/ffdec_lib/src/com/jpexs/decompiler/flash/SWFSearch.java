@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -30,6 +30,7 @@ import java.util.Set;
 
 /**
  * SWF search class.
+ *
  * @author JPEXS
  */
 public class SWFSearch {
@@ -66,6 +67,7 @@ public class SWFSearch {
 
     /**
      * Constructs SWF search object.
+     *
      * @param s Searchable object
      * @param noCheck No check for validity
      * @param searchMode Search mode
@@ -78,6 +80,7 @@ public class SWFSearch {
 
     /**
      * Adds progress listener.
+     *
      * @param l
      */
     public void addProgressListener(ProgressListener l) {
@@ -86,6 +89,7 @@ public class SWFSearch {
 
     /**
      * Removes progress listener.
+     *
      * @param l
      */
     public void removeProgressListener(ProgressListener l) {
@@ -94,6 +98,7 @@ public class SWFSearch {
 
     /**
      * Sets progress.
+     *
      * @param p Progress
      */
     private void setProgress(int p) {
@@ -124,7 +129,7 @@ public class SWFSearch {
                 "CFX".getBytes(), // Compressed ScaleForm GFx
                 "fWS".getBytes(), //Harman encrypted uncompressed Flash,
                 "cWS".getBytes(), //Harman encrypted ZLib compressed Flash,
-                "zWS".getBytes() //Harman encrypted LZMA compressed Flash    
+                "zWS".getBytes() //Harman encrypted LZMA compressed Flash
         );
 
         int pos = 0;
@@ -185,6 +190,7 @@ public class SWFSearch {
 
     /**
      * Gets SWF stream.
+     *
      * @param listener Progress listener
      * @param address Address
      * @return SWF stream
@@ -202,6 +208,7 @@ public class SWFSearch {
 
     /**
      * Gets list of addresses.
+     *
      * @return List of addresses
      */
     public Set<Long> getAddresses() {
@@ -210,6 +217,7 @@ public class SWFSearch {
 
     /**
      * Gets number of SWF streams.
+     *
      * @return Number of SWF streams
      */
     public int length() {

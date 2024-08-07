@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Unresolved - variable, property, type, etc.
- * To be resolved later.
+ * Unresolved - variable, property, type, etc. To be resolved later.
+ *
  * @author JPEXS
  */
 public class UnresolvedAVM2Item extends AssignableAVM2Item {
@@ -288,7 +288,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new CompilationException("Cannot assign", line);
     }
 
-    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {            
+    public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
             //search for variable
@@ -363,12 +363,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (currentClassFullName != null && !isProperty) {
             DottedChain classChain = DottedChain.parseWithSuffix(currentClassFullName);
             DottedChain pkg = classChain.getWithoutLast();
-            
+
             if (!pkg.isTopLevel()) { //toplevel in next step
                 TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
                 AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
-                if (ci != null) {                    
+                if (ci != null) {
                     resolved = ti;
                     for (int i = 1; i < name.size(); i++) {
                         resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>());
@@ -380,20 +380,20 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
             }
         }
-        
+
         //Search toplevel classes
         if (currentClassFullName != null && !isProperty) {
             DottedChain pkg = DottedChain.TOPLEVEL;
-            
+
             TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
             AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
-            if (ci != null) {                
+            if (ci != null) {
                 for (DottedChain imp : importedClasses) {
                     String impName = imp.getLast();
 
                     if (impName.equals(name.get(0))) {
-                        throw new CompilationException("The type \"" + name.get(0) +"\" exists on toplevel package and also as an import from different package. Please make it fully qualified so it matches the desired import.", line);
+                        throw new CompilationException("The type \"" + name.get(0) + "\" exists on toplevel package and also as an import from different package. Please make it fully qualified so it matches the desired import.", line);
                     }
                 }
                 resolved = ti;
@@ -404,9 +404,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                     }
                 }
                 return resolvedRoot = ti;
-            }            
-        }               
-        
+            }
+        }
+
         //Search for types in imported classes
         if (!isProperty) {
             for (DottedChain imp : importedClasses) {

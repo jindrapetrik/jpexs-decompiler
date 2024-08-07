@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * A folder TreeItem - container for items.
+ *
  * @author JPEXS
  */
 public class FolderItem implements TreeItem {
@@ -48,6 +49,7 @@ public class FolderItem implements TreeItem {
 
     /**
      * Constructs FolderItem
+     *
      * @param str ToString name
      * @param name Name
      * @param swf SWF
@@ -62,7 +64,8 @@ public class FolderItem implements TreeItem {
 
     /**
      * Gets name.
-     * @return 
+     *
+     * @return
      */
     public String getName() {
         return name;
@@ -70,7 +73,8 @@ public class FolderItem implements TreeItem {
 
     /**
      * Gets openable.
-     * @return 
+     *
+     * @return
      */
     @Override
     public Openable getOpenable() {
@@ -79,7 +83,8 @@ public class FolderItem implements TreeItem {
 
     /**
      * ToString.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -88,7 +93,8 @@ public class FolderItem implements TreeItem {
 
     /**
      * Gets modified flag.
-     * @return 
+     *
+     * @return
      */
     @Override
     public boolean isModified() {

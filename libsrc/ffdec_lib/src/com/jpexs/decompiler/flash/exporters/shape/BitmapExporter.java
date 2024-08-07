@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -55,6 +55,7 @@ import java.util.List;
 
 /**
  * Bitmap exporter.
+ *
  * @author JPEXS
  */
 public class BitmapExporter extends ShapeExporterBase {
@@ -150,7 +151,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
         /**
          * Strokes the given Shape with this stroke, creating an outline.
-         *
+         * <p>
          * This outline is distorted by our AffineTransform relative to the
          * outline which would be given by the base stroke, but only in terms of
          * scaling (i.e. thickness of the lines), as translation and rotation

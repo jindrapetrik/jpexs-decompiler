@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 /**
  * Stack for translation.
+ *
  * @author JPEXS
  */
 public class TranslateStack extends Stack<GraphTargetItem> {
@@ -48,6 +49,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Constructs new TranslateStack with the specified path.
+     *
      * @param path The path.
      */
     public TranslateStack(String path) {
@@ -56,6 +58,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Gets the path.
+     *
      * @return The path.
      */
     public String getPath() {
@@ -64,6 +67,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Gets the pop item.
+     *
      * @return The pop item.
      */
     private PopItem getPop() {
@@ -76,6 +80,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Gets the item at the specified index.
+     *
      * @param index index of the element to return
      * @return The element at the specified position in this list
      */
@@ -92,6 +97,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Gets the item at the top of the stack.
+     *
      * @return The item at the top of the stack.
      */
     @Override
@@ -107,6 +113,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Gets the item at the specified index from the top of the stack.
+     *
      * @param index The index.
      * @return The item at the specified index from the top of the stack.
      */
@@ -122,6 +129,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     /**
      * Pop the item at the top of the stack.
+     *
      * @return The item at the top of the stack.
      */
     @Override

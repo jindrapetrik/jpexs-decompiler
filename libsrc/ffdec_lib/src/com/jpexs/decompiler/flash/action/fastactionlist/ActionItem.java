@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -23,6 +23,7 @@ import java.util.Set;
 
 /**
  * Action in the fast action list.
+ *
  * @author JPEXS
  */
 public class ActionItem {
@@ -63,8 +64,7 @@ public class ActionItem {
     private List<ActionItem> containerLastActions;
 
     /**
-     * Reachable flag.
-     * 1 means reachable, 2 means reachable and processed
+     * Reachable flag. 1 means reachable, 2 means reachable and processed
      */
     int reachable;
 
@@ -75,6 +75,7 @@ public class ActionItem {
 
     /**
      * Constructs a new ActionItem.
+     *
      * @param action
      */
     public ActionItem(Action action) {
@@ -83,6 +84,7 @@ public class ActionItem {
 
     /**
      * Checks if this action is a jump target.
+     *
      * @return true if this action is a jump target
      */
     public boolean isJumpTarget() {
@@ -91,6 +93,7 @@ public class ActionItem {
 
     /**
      * Gets the number of jumps to this action.
+     *
      * @return Number of jumps to this action
      */
     public int jumpsHereSize() {
@@ -99,6 +102,7 @@ public class ActionItem {
 
     /**
      * Checks if this action is the last action of a container.
+     *
      * @return True if this action is the last action of a container
      */
     public boolean isContainerLastAction() {
@@ -122,6 +126,7 @@ public class ActionItem {
 
     /**
      * Gets the jump target.
+     *
      * @return Jump target
      */
     public ActionItem getJumpTarget() {
@@ -130,6 +135,7 @@ public class ActionItem {
 
     /**
      * Gets the jump target action.
+     *
      * @return Jump target action
      */
     public Action getJumpTargetAction() {
@@ -138,6 +144,7 @@ public class ActionItem {
 
     /**
      * Sets the jump target.
+     *
      * @param item Jump target
      */
     public void setJumpTarget(ActionItem item) {
@@ -157,6 +164,7 @@ public class ActionItem {
 
     /**
      * Gets container last actions.
+     *
      * @return Container last actions
      */
     public List<ActionItem> getContainerLastActions() {
@@ -182,6 +190,7 @@ public class ActionItem {
 
     /**
      * Replaces container last action.
+     *
      * @param oldItem Old action
      * @param newItem New action
      */
@@ -204,6 +213,7 @@ public class ActionItem {
 
     /**
      * Sets container last actions.
+     *
      * @param lastActions Container last actions
      */
     public void setContainerLastActions(List<ActionItem> lastActions) {
@@ -218,6 +228,7 @@ public class ActionItem {
 
     /**
      * Ensures last action of.
+     *
      * @return Last action of
      */
     private Set<ActionItem> ensureLastActionOf() {
@@ -230,6 +241,7 @@ public class ActionItem {
 
     /**
      * Checks if this action is excluded.
+     *
      * @return True if this action is excluded
      */
     public boolean isExcluded() {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -716,7 +716,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * The retrieved handle identifies the window of the same type that is
      * highest in the Z order.
-     *
+     * <p>
      * If the specified window is a topmost window, the handle identifies a
      * topmost window. If the specified window is a top-level window, the handle
      * identifies a top-level window. If the specified window is a child window,
@@ -727,7 +727,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * The retrieved handle identifies the window of the same type that is
      * lowest in the Z order.
-     *
+     * <p>
      * If the specified window is a topmost window, the handle identifies a
      * topmost window. If the specified window is a top-level window, the handle
      * identifies a top-level window. If the specified window is a child window,
@@ -738,7 +738,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * The retrieved handle identifies the window below the specified window in
      * the Z order.
-     *
+     * <p>
      * If the specified window is a topmost window, the handle identifies a
      * topmost window. If the specified window is a top-level window, the handle
      * identifies a top-level window. If the specified window is a child window,
@@ -749,7 +749,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * The retrieved handle identifies the window above the specified window in
      * the Z order.
-     *
+     * <p>
      * If the specified window is a topmost window, the handle identifies a
      * topmost window. If the specified window is a top-level window, the handle
      * identifies a top-level window. If the specified window is a child window,
@@ -1037,7 +1037,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * Contains window class information. It is used with the RegisterClassEx
      * and GetClassInfoEx functions.
-     *
+     * <p>
      * The WNDCLASSEX structure is similar to the WNDCLASS structure. There are
      * two differences. WNDCLASSEX includes the cbSize member, which specifies
      * the size of the structure, and the hIconSm member, which contains a
@@ -1145,33 +1145,29 @@ public interface WinUser extends StdCallLibrary, WinDef {
     /**
      * An application-defined function that processes messages sent to a window.
      * The WNDPROC type defines a pointer to this callback function.
-     *
+     * <p>
      * WindowProc is a placeholder for the application-defined function name.
      */
     public interface WindowProc extends Callback {
 
         /**
          * @param hwnd [in] Type: HWND
-         *
+         * <p>
          * A handle to the window.
-         *
          * @param uMsg [in] Type: UINT
-         *
+         * <p>
          * The message.
-         *
+         * <p>
          * For lists of the system-provided messages, see System-Defined
          * Messages.
-         *
          * @param wParam [in] Type: WPARAM
-         *
+         * <p>
          * Additional message information. The contents of this parameter depend
          * on the value of the uMsg parameter.
-         *
          * @param lParam [in] Type: LPARAM
-         *
+         * <p>
          * Additional message information. The contents of this parameter depend
          * on the value of the uMsg parameter.
-         *
          * @return the lresult
          */
         LRESULT callback(HWND hwnd, int uMsg, WPARAM wParam, LPARAM lParam);

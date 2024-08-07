@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -72,11 +72,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Graph class.
- * This is the main class where decompilation process is done.
- * It translates GraphSourceItems to GraphTargetItems.
- *
+ * Graph class. This is the main class where decompilation process is done. It
+ * translates GraphSourceItems to GraphTargetItems.
+ * <p>
  * Subclasses of Graph are used for different types of decompilation.
+ *
  * @author JPEXS
  */
 public class Graph {
@@ -98,6 +98,7 @@ public class Graph {
 
     /**
      * Constant not used anymore
+     *
      * @deprecated not used.
      */
     public static final int SOP_USE_STATIC = 0;
@@ -130,6 +131,7 @@ public class Graph {
 
     /**
      * Gets the graphSource
+     *
      * @return GraphSource
      */
     public GraphSource getGraphCode() {
@@ -138,6 +140,7 @@ public class Graph {
 
     /**
      * Gets sub-graphs
+     *
      * @return
      */
     public LinkedHashMap<String, Graph> getSubGraphs() {
@@ -146,6 +149,7 @@ public class Graph {
 
     /**
      * Constructs a new Graph.
+     *
      * @param code Graph source
      * @param exceptions Exceptions in the graph
      */
@@ -156,6 +160,7 @@ public class Graph {
 
     /**
      * Initializes the graph.
+     *
      * @param localData Local data
      * @throws InterruptedException
      */
@@ -177,7 +182,7 @@ public class Graph {
      * Calculates time of closing the node. The node is closed when all its
      * input edges are already visited (not counting back edges), then all its
      * output edges are processed.
-     *
+     * <p>
      * This time is useful when sorting nodes according their occurence in
      * getMostCommonPart method - used for switch detection
      *
@@ -243,6 +248,7 @@ public class Graph {
 
         /**
          * Constructs a new LevelMapEdge
+         *
          * @param from Source part
          * @param to Target part
          */
@@ -253,6 +259,7 @@ public class Graph {
 
         /**
          * Hash code
+         *
          * @return Hash code
          */
         @Override
@@ -265,6 +272,7 @@ public class Graph {
 
         /**
          * Equals
+         *
          * @param obj Object
          * @return True if equals
          */
@@ -291,6 +299,7 @@ public class Graph {
 
     /**
      * Gets graph exceptions.
+     *
      * @return List of exceptions
      */
     public List<GraphException> getExceptions() {
@@ -299,6 +308,7 @@ public class Graph {
 
     /**
      * Populates all parts available from the part.
+     *
      * @param part Source part
      * @param allParts Result
      */
@@ -314,6 +324,7 @@ public class Graph {
 
     /**
      * Deep copies GraphPart.
+     *
      * @param part Source part
      * @return Deep copy of the part
      */
@@ -323,6 +334,7 @@ public class Graph {
 
     /**
      * Deep copies GraphPart.
+     *
      * @param part Source part
      * @param copies Already copied parts
      * @return Deep copy of the part
@@ -350,6 +362,7 @@ public class Graph {
 
     /**
      * Resets the graph.
+     *
      * @param part Part to reset
      * @param visited Visited parts
      */
@@ -372,6 +385,7 @@ public class Graph {
 
     /**
      * Gets reachable parts from the part.
+     *
      * @param localData Local data
      * @param part Source part
      * @param ret Result
@@ -385,6 +399,7 @@ public class Graph {
 
     /**
      * Gets reachable parts from the part.
+     *
      * @param localData Local data
      * @param part Source part
      * @param ret Result
@@ -494,6 +509,7 @@ public class Graph {
 
     /**
      * Gets common successor of the next parts of the part.
+     *
      * @param localData Local data
      * @param part Part
      * @param loops Loops
@@ -507,8 +523,9 @@ public class Graph {
 
     /**
      * Gets common successor of the parts.
-     *
+     * <p>
      * TODO: Make this faster!
+     *
      * @param localData Local data
      * @param prev Previous part
      * @param parts Parts
@@ -578,7 +595,7 @@ public class Graph {
 
     /**
      * Gets common successor of most of the nextparts of the part.
-     *
+     * <p>
      * This is used mostly in switch detection.
      *
      * @param localData Local data
@@ -789,6 +806,7 @@ public class Graph {
 
         /**
          * Constructs a new PartCommon
+         *
          * @param part Part
          * @param level Level
          */
@@ -799,6 +817,7 @@ public class Graph {
 
         /**
          * Compares to another PartCommon
+         *
          * @param o Other PartCommon
          * @return Comparison result
          */
@@ -817,6 +836,7 @@ public class Graph {
 
         /**
          * To string
+         *
          * @return String representation
          */
         @Override
@@ -826,6 +846,7 @@ public class Graph {
 
         /**
          * Hash code
+         *
          * @return Hash code
          */
         @Override
@@ -838,6 +859,7 @@ public class Graph {
 
         /**
          * Equals
+         *
          * @param obj Object
          * @return True if equals
          */
@@ -863,6 +885,7 @@ public class Graph {
 
     /**
      * Method called after populating all parts.
+     *
      * @param allParts All parts
      */
     protected void afterPopupateAllParts(Set<GraphPart> allParts) {
@@ -870,8 +893,8 @@ public class Graph {
     }
 
     /**
-     * Gets throw states.
-     * Override this method to get throw states.
+     * Gets throw states. Override this method to get throw states.
+     *
      * @param localData Local data
      * @param allParts All parts
      * @return List of ThrowStates
@@ -882,6 +905,7 @@ public class Graph {
 
     /**
      * Translates the graph - decompiles.
+     *
      * @param localData Local data
      * @param staticOperation Unused
      * @param path Path
@@ -989,9 +1013,9 @@ public class Graph {
     }
 
     /**
-     * Prepares second pass data.
-     * Can return null when no second pass will happen.
-     * Override this method to prepare second pass data.
+     * Prepares second pass data. Can return null when no second pass will
+     * happen. Override this method to prepare second pass data.
+     *
      * @param list List of GraphTargetItems
      * @return Second pass data or null
      */
@@ -1001,6 +1025,7 @@ public class Graph {
 
     /**
      * Process various items. Override this method to process items.
+     *
      * @param list List of GraphTargetItems
      * @param lastLoopId Last loop id
      */
@@ -1010,6 +1035,7 @@ public class Graph {
 
     /**
      * Process switches.
+     *
      * @param list
      */
     protected final void processSwitches(List<GraphTargetItem> list) {
@@ -1054,9 +1080,9 @@ public class Graph {
     
     This will fix precontinue handler which detects multiple continues
      */
-
     /**
      * Process switches.
+     *
      * @param list List of GraphTargetItems
      * @param lastLoopId Last loop id
      */
@@ -1178,8 +1204,9 @@ public class Graph {
     }
 
     /**
-     * Gets data for final process.
-     * Override this method to provide data for final process.
+     * Gets data for final process. Override this method to provide data for
+     * final process.
+     *
      * @param localData
      * @param loops
      * @param throwStates
@@ -1190,8 +1217,9 @@ public class Graph {
     }
 
     /**
-     * Method called before getting loops.
-     * Override this method to provide custom behavior.
+     * Method called before getting loops. Override this method to provide
+     * custom behavior.
+     *
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
@@ -1203,8 +1231,9 @@ public class Graph {
     }
 
     /**
-     * Method called after getting loops.
-     * Override this method to provide custom behavior.
+     * Method called after getting loops. Override this method to provide custom
+     * behavior.
+     *
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
@@ -1215,8 +1244,9 @@ public class Graph {
     }
 
     /**
-     * Checks whether part is empty.
-     * Override this method to provide custom behavior.
+     * Checks whether part is empty. Override this method to provide custom
+     * behavior.
+     *
      * @param part Part
      * @return True if part is empty
      */
@@ -1226,6 +1256,7 @@ public class Graph {
 
     /**
      * Converts path to string
+     *
      * @param list Collection of objects
      * @return String representation of the path
      */
@@ -1239,6 +1270,7 @@ public class Graph {
 
     /**
      * Gets unique part list.
+     *
      * @param list List of parts
      * @return Unique list of parts
      */
@@ -1254,6 +1286,7 @@ public class Graph {
 
     /**
      * Gets list of unique references of part without going through throw edges.
+     *
      * @param part Part
      * @param throwEdges Throw edges
      * @return List of unique references
@@ -1272,6 +1305,7 @@ public class Graph {
 
     /**
      * Gets of loop backedges
+     *
      * @param localData Local data
      * @param loops Loops
      * @param throwStates Throw states
@@ -1293,8 +1327,8 @@ public class Graph {
     }
 
     /**
-     * Final process stack.
-     * Override this method to provide custom behavior.
+     * Final process stack. Override this method to provide custom behavior.
+     *
      * @param stack Translate stack
      * @param output Output
      * @param path Path
@@ -1304,6 +1338,7 @@ public class Graph {
 
     /**
      * Final process all.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -1327,10 +1362,11 @@ public class Graph {
     }
 
     /**
-     * Processes sub blocks.
-     * TODO: make this clearer what it does
+     * Processes sub blocks. TODO: make this clearer what it does
+     *
      * @param b Block
-     * @param replacement If not null, then if last item of block is PushItem, then it will be replaced with this item
+     * @param replacement If not null, then if last item of block is PushItem,
+     * then it will be replaced with this item
      * @return If all blocks ends with PushItem
      */
     private boolean processSubBlk(Block b, GraphTargetItem replacement) {
@@ -1373,8 +1409,8 @@ public class Graph {
     }
 
     /**
-     * Final process after.
-     * Override this method to provide custom behavior.
+     * Final process after. Override this method to provide custom behavior.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -1397,8 +1433,8 @@ public class Graph {
     }
 
     /**
-     * Final process.
-     * Override this method to provide custom behavior.
+     * Final process. Override this method to provide custom behavior.
+     *
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
@@ -1485,6 +1521,7 @@ public class Graph {
 
     /**
      * Expands gotos.
+     *
      * @param list
      */
     private void expandGotos(List<GraphTargetItem> list) {
@@ -1511,6 +1548,7 @@ public class Graph {
 
     /**
      * Processes if gotos.
+     *
      * @param alreadyProcessedBlocks Already processed blocks
      * @param allGotos All gotos
      * @param list List of GraphTargetItems
@@ -1553,12 +1591,12 @@ public class Graph {
 
     /**
      * Processes if gotos.
-     *
-     *  if (xxx) { y ; goto a } else { z ; goto a }
-     *
-     *   =>
-     *
-     *  if (xxx) { y } else { z } goto a
+     * <p>
+     * if (xxx) { y ; goto a } else { z ; goto a }
+     * <p>
+     * =>
+     * <p>
+     * if (xxx) { y } else { z } goto a
      *
      * @param allGotos All gotos
      * @param list List of GraphTargetItems
@@ -1633,6 +1671,7 @@ public class Graph {
 
     /**
      * Processes ifs.
+     *
      * @param list List of GraphTargetItems
      */
     protected final void processIfs(List<GraphTargetItem> list) {
@@ -1819,7 +1858,9 @@ public class Graph {
     }
 
     /**
-     * Checks continue at the end of block and remove it when its from nearest loop.
+     * Checks continue at the end of block and remove it when its from nearest
+     * loop.
+     *
      * @param commands List of GraphTargetItems
      * @param loop Loop
      */
@@ -1850,6 +1891,7 @@ public class Graph {
 
     /**
      * Checks whether list of items is empty.
+     *
      * @param output List of GraphTargetItems
      * @return True if list of items is empty
      */
@@ -1866,8 +1908,9 @@ public class Graph {
     }
 
     /**
-     * Check before decompiling next section.
-     * Override this method to provide custom behavior.
+     * Check before decompiling next section. Override this method to provide
+     * custom behavior.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -1887,7 +1930,8 @@ public class Graph {
      * @param currentLoop Current loop
      * @param staticOperation Unused
      * @param path Path
-     * @return List of GraphTargetItems to replace current output and stop further processing. Null to continue.
+     * @return List of GraphTargetItems to replace current output and stop
+     * further processing. Null to continue.
      * @throws InterruptedException
      */
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
@@ -1895,8 +1939,8 @@ public class Graph {
     }
 
     /**
-     * Check of Part passing output. Allows you to switch part for another.
-     * If not overriden, then it calls checkPart.
+     * Check of Part passing output. Allows you to switch part for another. If
+     * not overriden, then it calls checkPart.
      *
      * @param output List of GraphTargetItems
      * @param stack Translate stack
@@ -1904,7 +1948,8 @@ public class Graph {
      * @param prev Previous part
      * @param part Part
      * @param allParts All parts
-     * @return Return same part to continue processing or return another part to continue to other part. Or return null to stop.
+     * @return Return same part to continue processing or return another part to
+     * continue to other part. Or return null to stop.
      */
     protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
         return checkPart(stack, localData, prev, part, allParts);
@@ -1912,12 +1957,14 @@ public class Graph {
 
     /**
      * Check of part. Allows you to switch part for another.
+     *
      * @param stack Translate stack
      * @param localData Local data
      * @param prev Previous part
      * @param part Part
      * @param allParts All parts
-     * @return Return same part to continue processing or return another part to continue to other part. Or return null to stop.
+     * @return Return same part to continue processing or return another part to
+     * continue to other part. Or return null to stop.
      */
     protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
         return part;
@@ -1925,6 +1972,7 @@ public class Graph {
 
     /**
      * Translates part and get its stack.
+     *
      * @param localData Local data
      * @param part Part
      * @param stack Translate stack
@@ -1942,6 +1990,7 @@ public class Graph {
 
     /**
      * Translates part.
+     *
      * @param localData Local data
      * @param part Part
      * @param stack Translate stack
@@ -1973,6 +2022,7 @@ public class Graph {
 
     /**
      * Checks for Continue and Break items at current part.
+     *
      * @param output List of GraphTargetItems
      * @param part Part
      * @param stopPart Stop part
@@ -2007,8 +2057,8 @@ public class Graph {
     }
 
     /**
-     * Check loop.
-     * Can be overriden to provide custom behavior.
+     * Check loop. Can be overriden to provide custom behavior.
+     *
      * @param output List of GraphTargetItems
      * @param loopItem Loop item
      * @param localData Local data
@@ -2023,6 +2073,7 @@ public class Graph {
 
     /**
      * Sets loop phase to 0 on loops.
+     *
      * @param loops List of loops
      */
     private void clearLoops(List<Loop> loops) {
@@ -2033,6 +2084,7 @@ public class Graph {
 
     /**
      * Sets state to 0 on throw states.
+     *
      * @param throwStates List of throw states
      */
     private void clearThrowStates(List<ThrowState> throwStates) {
@@ -2043,6 +2095,7 @@ public class Graph {
 
     /**
      * Loop detection.
+     *
      * @param localData Local data
      * @param part Part
      * @param loops List of loops
@@ -2059,8 +2112,9 @@ public class Graph {
     }
 
     /**
-     * Checks whether a part can be a break candidate.
-     * Can be overriden to provide custom behavior.
+     * Checks whether a part can be a break candidate. Can be overriden to
+     * provide custom behavior.
+     *
      * @param localData Local data
      * @param part Part
      * @param throwStates List of throw states
@@ -2071,8 +2125,9 @@ public class Graph {
     }
 
     /**
-     * Check part in get loops walk.
-     * Can be overriden to provide custom behavior.
+     * Check part in get loops walk. Can be overriden to provide custom
+     * behavior.
+     *
      * @param part Graph part
      */
     protected void checkGetLoopsPart(GraphPart part) {
@@ -2081,6 +2136,7 @@ public class Graph {
 
     /**
      * Finds parts outside try statement
+     *
      * @param ts Throw state
      * @param part Graph part
      * @param ret List of Graph parts
@@ -2102,6 +2158,7 @@ public class Graph {
 
     /**
      * Walks parts to detect loops.
+     *
      * @param localData Local data
      * @param part Graph part
      * @param loops List of loops
@@ -2510,6 +2567,7 @@ public class Graph {
 
     /**
      * Gets all Continue commands in sub blocks.
+     *
      * @param commands List of GraphTargetItems
      * @param result Result
      * @param loopId Loop id
@@ -2532,8 +2590,8 @@ public class Graph {
     }
 
     /**
-     * Get next parts of a part.
-     * Can be overriden to provide custom behavior.
+     * Get next parts of a part. Can be overriden to provide custom behavior.
+     *
      * @param localData Local data
      * @param part Part
      * @return List of GraphParts
@@ -2544,6 +2602,7 @@ public class Graph {
 
     /**
      * Check before processing with output.
+     *
      * @param currentRet Current return
      * @param foundGotos Found gotos
      * @param partCodes Part codes
@@ -2572,6 +2631,7 @@ public class Graph {
 
     /**
      * Checks whether part is loop continue, break or precontinue.
+     *
      * @param part Graph part
      * @param loops List of loops
      * @param throwStates List of throw states
@@ -2595,9 +2655,9 @@ public class Graph {
     }
 
     /**
-     * Checks whether part can be continue of a loop.
-     * Defaults to true.
-     * Override this method to provide custom behavior.
+     * Checks whether part can be continue of a loop. Defaults to true. Override
+     * this method to provide custom behavior.
+     *
      * @param localData Local data
      * @param part Graph part
      * @param loops List of loops
@@ -2609,9 +2669,9 @@ public class Graph {
     }
 
     /**
-     * Checks whether part can be checked over visited parts list.
-     * Defaults to true.
-     * Can be overriden to provide custom behavior.
+     * Checks whether part can be checked over visited parts list. Defaults to
+     * true. Can be overriden to provide custom behavior.
+     *
      * @param localData Local data
      * @param part Graph part
      * @return True if part can be checked over visited parts list
@@ -2621,9 +2681,12 @@ public class Graph {
     }
 
     /**
-     * Checks whether the list of items can be converted to comma separated list.
+     * Checks whether the list of items can be converted to comma separated
+     * list.
+     *
      * @param list List of GraphTargetItems
-     * @return True if the list of items can be converted to comma separated list
+     * @return True if the list of items can be converted to comma separated
+     * list
      */
     protected final boolean canBeCommaised(List<GraphTargetItem> list) {
         for (GraphTargetItem item : list) {
@@ -2636,6 +2699,7 @@ public class Graph {
 
     /**
      * Walks graph parts and converts them to target items.
+     *
      * @param foundGotos Found gotos
      * @param partCodes Part codes
      * @param partCodePos Part code position
@@ -2660,6 +2724,7 @@ public class Graph {
 
     /**
      * Walks graph parts and converts them to target items.
+     *
      * @param foundGotos Found gotos
      * @param partCodes Part codes
      * @param partCodePos Part code position
@@ -2894,9 +2959,7 @@ public class Graph {
                     precontinueCommands = printGraph(foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
-                    
-                    
-                    
+
                     if (!precontinueCommands.isEmpty() && precontinueCommands.get(precontinueCommands.size() - 1) instanceof IfItem) {
                         IfItem ifi = (IfItem) precontinueCommands.get(precontinueCommands.size() - 1);
                         boolean ok = false;
@@ -2910,11 +2973,11 @@ public class Graph {
                                 && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof BreakItem) && (((BreakItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
                             ok = true;
                         }
-                        if (ok) {                            
+                        if (ok) {
                             doWhileCandidate = true;
                         }
-                    } 
-                    
+                    }
+
                     if (!doWhileCandidate) {
                         for (GraphTargetItem item : precontinueCommands) {
                             if (item instanceof Block) {
@@ -3370,13 +3433,13 @@ public class Graph {
 
             }
             if (isLoop && loopItem != null && currentLoop != null) {
-                
+
                 processIfs(loopItem.commands);
                 processSwitches(loopItem.commands, currentLoop.id);
                 processOther(loopItem.commands, currentLoop.id);
 
                 checkContinueAtTheEnd(loopItem.commands, currentLoop);
-                
+
                 //DoWhile based on precontinue
                 if (!loopTypeFound && (!loopItem.commands.isEmpty())) {
                     List<List<GraphTargetItem>> continueCommands1 = new ArrayList<>();
@@ -3391,19 +3454,19 @@ public class Graph {
                                 && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
                             invert = true;
                         }
-                        
+
                         GraphTargetItem expr = ifi.expression;
                         if (invert) {
                             expr = expr.invert(null);
                         }
                         exprList.add(expr);
                         ret.add(index, li = new DoWhileItem(null, expr.getLineStartItem(), currentLoop, loopItem.commands, exprList));
-                        loopTypeFound = true;                        
+                        loopTypeFound = true;
                     }
                 }
-                
+
                 //Loop with condition at the beginning (While)
-                if (!loopTypeFound && (!loopItem.commands.isEmpty())) {                   
+                if (!loopTypeFound && (!loopItem.commands.isEmpty())) {
                     if (loopItem.commands.get(0) instanceof IfItem) {
                         IfItem ifi = (IfItem) loopItem.commands.get(0);
 
@@ -3458,7 +3521,7 @@ public class Graph {
 
                             //findGotoTargets - comment this out:
                             if (!precontinueCommands.isEmpty()) {
-                                
+
                                 List<List<GraphTargetItem>> continueCommands = new ArrayList<>();
                                 getContinuesCommands(commands, continueCommands, currentLoop.id);
 
@@ -3476,7 +3539,7 @@ public class Graph {
                                 }
 
                                 finalComm.addAll(precontinueCommands);
-                            }                            
+                            }
                             if (!finalComm.isEmpty()) {
                                 ret.add(index, li = new ForItem(expr.getSrc(), expr.getLineStartItem(), currentLoop, new ArrayList<>(), exprList.get(exprList.size() - 1), finalComm, commands));
                             } else {
@@ -3490,7 +3553,7 @@ public class Graph {
                         }
                     }
                 }
-                
+
                 if (!loopTypeFound && !precontinueCommands.isEmpty()) {
                     loopItem.commands.addAll(precontinueCommands);
                 }
@@ -3567,8 +3630,9 @@ public class Graph {
     }
 
     /**
-     * Checks switch statement.
-     * Override this method to add custom switch handling.
+     * Checks switch statement. Override this method to add custom switch
+     * handling.
+     *
      * @param localData Local data
      * @param switchItem Switch item
      * @param otherSides Other sides
@@ -3579,16 +3643,18 @@ public class Graph {
     }
 
     /**
-     * Checks all parts of the graph after they are populated.
-     * Override this method to add custom checks.
+     * Checks all parts of the graph after they are populated. Override this
+     * method to add custom checks.
+     *
      * @param allBlocks All blocks
      */
     protected void checkGraph(List<GraphPart> allBlocks) {
     }
 
     /**
-     * Checks IP and allows to modify it.
-     * Override this method to add custom IP checks.
+     * Checks IP and allows to modify it. Override this method to add custom IP
+     * checks.
+     *
      * @param ip Current IP
      * @return New IP
      */
@@ -3598,6 +3664,7 @@ public class Graph {
 
     /**
      * Searches for part by IP.
+     *
      * @param ip IP
      * @param allParts All parts
      * @return
@@ -3616,6 +3683,7 @@ public class Graph {
 
     /**
      * Makes connected set of GraphParts from GraphSource.
+     *
      * @param code Graph source
      * @param allBlocks All blocks to populate parts into.
      * @param exceptions Exceptions
@@ -3644,6 +3712,7 @@ public class Graph {
 
     /**
      * Makes connected set of GraphParts from GraphSource.
+     *
      * @param parent Parent part
      * @param path Path
      * @param code Graph source
@@ -3795,8 +3864,9 @@ public class Graph {
     }
 
     /**
-     * Prepares local data for branch.
-     * Override this method to add custom branch handling.
+     * Prepares local data for branch. Override this method to add custom branch
+     * handling.
+     *
      * @param localData Local data
      * @return Local data for a branch
      */
@@ -3806,6 +3876,7 @@ public class Graph {
 
     /**
      * Get source items for a part
+     *
      * @param part Part
      * @return List of source items
      */
@@ -3834,6 +3905,7 @@ public class Graph {
 
     /**
      * Moves all pushitems from commands to stack.
+     *
      * @param commands Commands
      * @param stack Stack
      */
@@ -3853,8 +3925,9 @@ public class Graph {
     }
 
     /**
-     * Moves all stack items to commands.
-     * (If it's not a branch stack resistant or other special case)
+     * Moves all stack items to commands. (If it's not a branch stack resistant
+     * or other special case)
+     *
      * @param commands Commands
      * @param stack Stack
      */
@@ -3902,6 +3975,7 @@ public class Graph {
 
     /**
      * Handles switch statement.
+     *
      * @param switchedObject Switched object
      * @param switchStartItem Switch start item
      * @param foundGotos Found gotos
@@ -4172,9 +4246,9 @@ public class Graph {
     }
 
     /**
-     * Checks if part is a switch.
-     * Defaults to false.
-     * Override this method to add custom switch handling.
+     * Checks if part is a switch. Defaults to false. Override this method to
+     * add custom switch handling.
+     *
      * @param part Part
      * @return True if part is a switch
      */

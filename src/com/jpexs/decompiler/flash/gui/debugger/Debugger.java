@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author JPEXS
  */
 public class Debugger {
@@ -48,10 +47,10 @@ public class Debugger {
     public static final int MSG_DUMP_BYTEARRAY = 3;
 
     public static final int MSG_REQUEST_BYTEARRAY = 4;
-    
+
     public static final int MSG_LOADER_URL_INFO = 5;
-    
-    public static final int MSG_LOADER_MODIFY_BYTES = 6; 
+
+    public static final int MSG_LOADER_MODIFY_BYTES = 6;
 
     private static final Set<DebugListener> listeners = new HashSet<>();
 
@@ -289,7 +288,7 @@ public class Debugger {
                                 os.flush();
                                 logger.finer("listeners checked");
                                 break;
-                            case MSG_LOADER_URL_INFO:                                
+                            case MSG_LOADER_URL_INFO:
                                 logger.finer("reading string...");
                                 ret = readString(is);
                                 logger.finer("informing listeners...");
@@ -303,7 +302,7 @@ public class Debugger {
                                 String url = readString(is);
                                 logger.finer("reading bytes...");
                                 byte[] inputBytes = readBytes(is);
-                                
+
                                 logger.finer("checking listeners for data...");
                                 boolean modifyDataFound = false;
                                 for (DebugListener l : listeners) {
@@ -320,8 +319,8 @@ public class Debugger {
                                                     } catch (IOException ex) {
                                                         Logger.getLogger(Debugger.class.getName()).log(Level.SEVERE, null, ex);
                                                     }
-                                                    
-                                                    logger.finer("data written");                                                                                                        
+
+                                                    logger.finer("data written");
                                                 } else {
                                                     logger.finer("got empty modified data, writing original array");
                                                     try {
@@ -356,16 +355,16 @@ public class Debugger {
             try {
                 s.close();
             } catch (IOException ex) {
-                logger.log(Level.FINER, "Socked close exception in injected debugger thread: {0}", ex.getMessage());                
+                logger.log(Level.FINER, "Socked close exception in injected debugger thread: {0}", ex.getMessage());
                 //ignore
             }
             finished = true;
             active = false;
-            logger.log(Level.FINER, "Calling onFinish");                                
+            logger.log(Level.FINER, "Calling onFinish");
             for (DebugListener l : listeners) {
                 l.onFinish(clientName);
             }
-            logger.log(Level.FINER, "Injected debugger finished");                    
+            logger.log(Level.FINER, "Injected debugger finished");
         }
     }
 

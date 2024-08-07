@@ -298,9 +298,6 @@ Filters.gradientGlow = function (srcCanvas, src, blurX, blurY, angle, distance, 
     }
 
 
-
-
-
     for (var i = 0; i < shadow.length; i += 4) {
         var a = shadow[i + 3];
         shadow[i] = gradientPixels[a * 4];
@@ -318,8 +315,6 @@ Filters.gradientGlow = function (srcCanvas, src, blurX, blurY, angle, distance, 
 
     return retCanvas;
 };
-
-
 
 
 Filters.dropShadow = function (canvas, src, blurX, blurY, angle, distance, color, inner, iterations, strength, knockout) {
@@ -439,8 +434,7 @@ Filters.gradientBevel = function (canvas, src, colors, ratios, blurX, blurY, str
 
     var hilightIm;
     var shadowIm;
-    switch (type)
-    {
+    switch (type) {
         case Filters.OUTER:
             hilightIm = hilightOuter;
             shadowIm = shadowOuter;
@@ -507,8 +501,6 @@ Filters.bevel = function (canvas, src, blurX, blurY, strength, type, highlightCo
 }
 
 
-
-
 //http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
 Filters.convolution = function (canvas, ctx, weights, opaque) {
     var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -562,8 +554,7 @@ Filters.colorMatrix = function (canvas, ctx, m) {
     var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     var data = pixels.data;
-    for (var i = 0; i < data.length; i += 4)
-    {
+    for (var i = 0; i < data.length; i += 4) {
         var r = i;
         var g = i + 1;
         var b = i + 2;
@@ -1020,8 +1011,7 @@ var translateMatrix = function (m, x, y) {
 }
 
 var place = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
-    if ((typeof scalingGrids[obj]) !== "undefined")
-    {
+    if ((typeof scalingGrids[obj]) !== "undefined") {
         var swfScaleMatrix = [1 / 20, 0, 0, 1 / 20, 0, 0];
         var boundRect = boundRects[obj];
         var scalingRect = scalingGrids[obj];
@@ -1197,7 +1187,6 @@ var tocolor = function (c) {
     var r = "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + c[3] + ")";
     return r;
 };
-
 
 
 window.addEventListener('load', function () {

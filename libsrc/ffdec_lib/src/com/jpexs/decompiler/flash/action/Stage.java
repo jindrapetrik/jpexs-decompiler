@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -25,6 +25,7 @@ import java.util.List;
 
 /**
  * Stage object for ActionScript execution.
+ *
  * @author JPEXS
  */
 public class Stage extends DisplayObject {
@@ -51,6 +52,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Constructs a new Stage object.
+     *
      * @param timelined Timelined object
      */
     public Stage(Timelined timelined) {
@@ -62,6 +64,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Enumerates the instance names.
+     *
      * @return List of instance names
      */
     @Override
@@ -79,6 +82,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Gets the member with the given name.
+     *
      * @param name Name of the member
      * @return Member object
      */
@@ -96,6 +100,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Gets the current frame.
+     *
      * @return Current frame
      */
     public long getTime() {
@@ -104,6 +109,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Gets total frames.
+     *
      * @return Total frames
      */
     @Override
@@ -116,6 +122,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Goto frame.
+     *
      * @param frameNum Frame.
      */
     @Override
@@ -128,6 +135,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Goto label.
+     *
      * @param label Label
      */
     @Override
@@ -157,6 +165,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Gets the URL.
+     *
      * @param url URL
      * @param target Target
      */
@@ -166,6 +175,7 @@ public class Stage extends DisplayObject {
 
     /**
      * Traces the given values.
+     *
      * @param val Values
      */
     public void trace(Object... val) {

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -38,12 +38,14 @@ import java.util.List;
 
 /**
  * Source generator interface. A low-level code generator.
+ *
  * @author JPEXS
  */
 public interface SourceGenerator {
 
     /**
      * Generates source code for PushItem.
+     *
      * @param localData Local data
      * @param item PushItem
      * @return List of GraphSourceItem
@@ -53,6 +55,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for PopItem.
+     *
      * @param localData Local data
      * @param item PopItem
      * @return List of GraphSourceItem
@@ -62,6 +65,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for TrueItem.
+     *
      * @param localData Local data
      * @param item TrueItem
      * @return List of GraphSourceItem
@@ -71,6 +75,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for FalseItem.
+     *
      * @param localData Local data
      * @param item FalseItem
      * @return List of GraphSourceItem
@@ -80,6 +85,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for AndItem.
+     *
      * @param localData Local data
      * @param item AndItem
      * @return List of GraphSourceItem
@@ -89,6 +95,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for OrItem.
+     *
      * @param localData Local data
      * @param item OrItem
      * @return List of GraphSourceItem
@@ -98,6 +105,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for IfItem.
+     *
      * @param localData Local data
      * @param item IfItem
      * @return List of GraphSourceItem
@@ -107,6 +115,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for TernarOpItem.
+     *
      * @param localData Local data
      * @param item TernarOpItem
      * @return List of GraphSourceItem
@@ -116,6 +125,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for WhileItem.
+     *
      * @param localData Local data
      * @param item WhileItem
      * @return List of GraphSourceItem
@@ -125,6 +135,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for DoWhileItem.
+     *
      * @param localData Local data
      * @param item DoWhileItem
      * @return List of GraphSourceItem
@@ -134,6 +145,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for ForItem.
+     *
      * @param localData Local data
      * @param item ForItem
      * @return List of GraphSourceItem
@@ -143,6 +155,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for SwitchItem.
+     *
      * @param localData Local data
      * @param item SwitchItem
      * @return List of GraphSourceItem
@@ -152,6 +165,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for NotItem.
+     *
      * @param localData Local data
      * @param item NotItem
      * @return List of GraphSourceItem
@@ -161,6 +175,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for DuplicateItem.
+     *
      * @param localData Local data
      * @param item DuplicateItem
      * @return List of GraphSourceItem
@@ -170,6 +185,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for BreakItem.
+     *
      * @param localData Local data
      * @param item BreakItem
      * @return List of GraphSourceItem
@@ -179,6 +195,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for ContinueItem.
+     *
      * @param localData Local data
      * @param item ContinueItem
      * @return List of GraphSourceItem
@@ -188,6 +205,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for commands.
+     *
      * @param localData Local data
      * @param commands List of GraphTargetItem
      * @return List of GraphSourceItem
@@ -197,6 +215,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for CommaExpressionItem.
+     *
      * @param localData Local data
      * @param item CommaExpressionItem
      * @param withReturnValue If true, the return value is used
@@ -207,6 +226,7 @@ public interface SourceGenerator {
 
     /**
      * Generates source code for TypeItem.
+     *
      * @param localData Local data
      * @param item TypeItem
      * @return List of GraphSourceItem
@@ -216,6 +236,7 @@ public interface SourceGenerator {
 
     /**
      * Generates DiscardValue action.
+     *
      * @param localData Local data
      * @param item GraphTargetItem
      * @return List of GraphSourceItem

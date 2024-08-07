@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 /**
  * Decompiler thread pool.
+ *
  * @author JPEXS
  */
 public class DecompilerPool {
@@ -71,6 +72,7 @@ public class DecompilerPool {
 
     /**
      * Submits a task.
+     *
      * @param src Source
      * @param actions Actions
      * @param listener Listener
@@ -110,6 +112,7 @@ public class DecompilerPool {
 
     /**
      * Submits a task.
+     *
      * @param abcIndex ABC index
      * @param pack Script pack
      * @param listener Listener
@@ -153,6 +156,7 @@ public class DecompilerPool {
 
     /**
      * Submits a task.
+     *
      * @param callable Callable
      * @return Future
      */
@@ -179,6 +183,7 @@ public class DecompilerPool {
 
     /**
      * Gets statistics.
+     *
      * @return Statistics
      */
     public String getStat() {
@@ -193,6 +198,7 @@ public class DecompilerPool {
 
     /**
      * Decompiles ASM source.
+     *
      * @param src ASM source
      * @param actions Actions
      * @return Highlighted text
@@ -224,6 +230,7 @@ public class DecompilerPool {
 
     /**
      * Decompiles a script pack.
+     *
      * @param abcIndex ABC indexing
      * @param pack Script pack
      * @return Highlighted text
@@ -256,6 +263,7 @@ public class DecompilerPool {
 
     /**
      * Shuts down the pool.
+     *
      * @throws InterruptedException
      */
     public void shutdown() throws InterruptedException {
@@ -265,6 +273,7 @@ public class DecompilerPool {
 
     /**
      * Destroys a SWF.
+     *
      * @param swf SWF
      */
     public void destroySwf(SWF swf) {

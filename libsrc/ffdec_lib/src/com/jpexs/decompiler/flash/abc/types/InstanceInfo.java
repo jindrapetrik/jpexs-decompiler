@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2024 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -39,6 +39,7 @@ import java.util.List;
 
 /**
  * Instance info.
+ *
  * @author JPEXS
  */
 public class InstanceInfo {
@@ -54,14 +55,13 @@ public class InstanceInfo {
     public int super_index;
 
     /**
-     * Flags.
-     * 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 = ProtectedNs, 16 = non nullable
+     * Flags. 1 = sealed, 0 = dynamic, 2 = final, 4 = interface, 8 =
+     * ProtectedNs, 16 = non nullable
      */
     public int flags;
 
     /**
-     * Protected namespace.
-     * if flags & 8
+     * Protected namespace. if flags & 8
      */
     public int protectedNS;
 
@@ -101,9 +101,8 @@ public class InstanceInfo {
     public static final int CLASS_PROTECTEDNS = 8;
 
     /**
-     * Unknown.
-     * This is somehow used in Flex, probably through annotations or something with Vector datatype (?)
-     * TODO: Investigate this
+     * Unknown. This is somehow used in Flex, probably through annotations or
+     * something with Vector datatype (?) TODO: Investigate this
      */
     public static final int CLASS_NON_NULLABLE = 16;
 
@@ -122,6 +121,7 @@ public class InstanceInfo {
 
     /**
      * Constructs a new InstanceInfo.
+     *
      * @param traits Instance traits
      */
     public InstanceInfo(Traits traits) {
@@ -130,6 +130,7 @@ public class InstanceInfo {
 
     /**
      * To string.
+     *
      * @return String
      */
     @Override
@@ -139,6 +140,7 @@ public class InstanceInfo {
 
     /**
      * To string.
+     *
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @return String
@@ -153,6 +155,7 @@ public class InstanceInfo {
 
     /**
      * Gets class header string.
+     *
      * @param assetsDir Assets directory
      * @param writer Writer
      * @param abc ABC
@@ -177,7 +180,7 @@ public class InstanceInfo {
 
                     if (ct instanceof DefineBinaryDataTag) {
                         DefineBinaryDataTag db = (DefineBinaryDataTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + (db.innerSwf != null ? ".swf" : ".bin")+ "\", mimeType=\"application/octet-stream\")]").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + (db.innerSwf != null ? ".swf" : ".bin") + "\", mimeType=\"application/octet-stream\")]").newLine();
                     }
                     if (ct instanceof ImageTag) {
                         ImageTag it = (ImageTag) ct;
@@ -318,6 +321,7 @@ public class InstanceInfo {
 
     /**
      * Gets name.
+     *
      * @param constants Constants
      * @return Multiname
      */
@@ -327,6 +331,7 @@ public class InstanceInfo {
 
     /**
      * Checks if class is interface.
+     *
      * @return True if class is interface
      */
     public boolean isInterface() {
@@ -335,6 +340,7 @@ public class InstanceInfo {
 
     /**
      * Checks if class is dynamic.
+     *
      * @return True if class is dynamic
      */
     public boolean isDynamic() {
@@ -343,6 +349,7 @@ public class InstanceInfo {
 
     /**
      * Checks if class is final.
+     *
      * @return True if class is final
      */
     public boolean isFinal() {
@@ -351,6 +358,7 @@ public class InstanceInfo {
 
     /**
      * Checks if class is nullable.
+     *
      * @return True if class is nullable
      */
     public boolean isNullable() {
