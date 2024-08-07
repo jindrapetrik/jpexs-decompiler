@@ -126,7 +126,8 @@ if [ "$DO_DEPLOY" == 1 ]; then
   {"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'.deb","content_type":"application/vnd.debian.binary-package"},
   {"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'.pkg","content_type":"application/x-newton-compatible-pkg"},
   {"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'_macosx.zip","content_type":"application/zip"}, 
-  {"file_name":"ffdec_lib_'$DEPLOY_FILEVER_TAG'.zip","content_type":"application/zip"}
+  {"file_name":"ffdec_lib_'$DEPLOY_FILEVER_TAG'.zip","content_type":"application/zip"},
+  {"file_name":"ffdec_lib_javadoc_'$DEPLOY_FILEVER_TAG'.zip","content_type":"application/zip"}
   ]';
 
   #{"file_name":"ffdec_'$DEPLOY_FILEVER_TAG'_lang.zip","content_type":"application/zip"},

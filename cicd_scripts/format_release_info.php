@@ -69,6 +69,12 @@ if($load_from == "-filever")
                    "type_name" => "Library only (Java SE) - Zipped",
                    "type_icon" => "zip"
                ],
+               [
+                   "file_name" => "ffdec_lib_javadoc_${filever_tag}.zip",
+                   "ossupport" => [],
+                   "type_name" => "Library documentation (HTML Javadoc) - Zipped",
+                   "type_icon" => "zip"
+               ],
            ];
 }
 else //-json

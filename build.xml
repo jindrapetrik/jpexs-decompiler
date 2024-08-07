@@ -213,9 +213,10 @@
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
-    <target name="library" depends="-loadversion,release_lib,-copy-lib">
+    <target name="library" depends="-loadversion,release_lib,release_lib_javadoc,-copy-lib">
         <mkdir dir="${releases.dir}"/>
         <copy file="${lib.file}" todir="${releases.dir}" />
+        <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
     </target>
     
     <target name="archive" depends="-loadversion,dist">
@@ -596,7 +597,12 @@
     <target name="release_lib" depends="git-tag,-loadversion,-save-version-info,-suffix">
         <copy file="${version_info}" tofile="${core.lib.version_info}" />        
         <ant antfile="${core.lib.script}" target="release" inheritAll="false" usenativebasedir="true"/>
-        <property  name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />
+        <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
+    </target>
+    
+    <target name="release_lib_javadoc">
+        <ant antfile="${core.lib.script}" target="release_javadoc" inheritAll="false" usenativebasedir="true"/>
+        <property name="lib.javadoc.file" value="${lib.releases.dir}/${lib.prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip" />               
     </target>
     
     <target name="build_lib" depends="-loadversion,-save-version-info">
@@ -725,6 +731,7 @@
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javadoc>
+        <ant antfile="${core.lib.script}" target="javadoc" inheritAll="false" usenativebasedir="true"/>
     </target>
     <target name="clean" depends="clean_lib">        
         <delete dir="${compile.dir}"/>        
