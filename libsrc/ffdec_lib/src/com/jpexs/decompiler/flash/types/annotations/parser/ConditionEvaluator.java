@@ -113,6 +113,13 @@ public class ConditionEvaluator {
         }
     }
 
+    /**
+     * Evaluates condition.
+     * @param fields Fields
+     * @param parentTagId Parent tag ID
+     * @return True if condition is true
+     * @throws AnnotationParseException On parse error
+     */
     public boolean eval(Map<String, Boolean> fields, int parentTagId) throws AnnotationParseException {
         boolean result;
         if (tags.length > 0) {
