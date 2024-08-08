@@ -571,6 +571,7 @@ public class AS3ScriptExporter {
                 }
                 if (!spriteTagList.isEmpty()) {
                     new RetryTask(() -> {
+                        Path.createDirectorySafe(new File(ASSETS_DIR));
                         try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());

@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2267] Script decompilation - Loop detection causing `§§goto` instructions in some cases
+- [#2268] AS3 script export with embedded assets fails (_assets dir not exists)
+  when no other than sprite assets exist
 
 ## [21.0.0] - 2024-08-05
 ### Added
@@ -3470,6 +3472,8 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2221]: https://www.free-decompiler.com/flash/issues/2221
+[#2267]: https://www.free-decompiler.com/flash/issues/2267
+[#2268]: https://www.free-decompiler.com/flash/issues/2268
 [#2176]: https://www.free-decompiler.com/flash/issues/2176
 [#2179]: https://www.free-decompiler.com/flash/issues/2179
 [#2185]: https://www.free-decompiler.com/flash/issues/2185
