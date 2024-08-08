@@ -31,6 +31,13 @@ public class AppResources {
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.jpexs.decompiler.flash.locales.AppResources");
 
     /**
+     * Constructor.
+     */
+    public AppResources() {
+        
+    }    
+    
+    /**
      * Translates a key
      *
      * @param key The key

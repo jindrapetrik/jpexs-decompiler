@@ -28,6 +28,12 @@ import com.jpexs.decompiler.flash.tags.DefineFontTag;
  */
 public class FontImporter {
 
+    /**
+     * Gets font tag type by format.
+     *
+     * @param format Font format
+     * @return Font tag type
+     */
     public static int getFontTagType(String format) {
         int res = 0;
         switch (format) {

@@ -23,5 +23,18 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 enum SvgSpreadMethod {
 
-    PAD, REFLECT, REPEAT
+    /**
+     * Pad
+     */
+    PAD,
+
+    /**
+     * Reflect
+     */
+    REFLECT,
+
+    /**
+     * Repeat
+     */
+    REPEAT
 }

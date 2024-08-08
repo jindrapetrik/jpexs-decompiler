@@ -60,6 +60,19 @@ public class ExportPackTask implements Callable<File> {
 
     AbcIndexing abcIndex;
 
+    /**
+     * Constructor.
+     * @param abcIndex ABC indexing
+     * @param handler AbortRetryIgnoreHandler
+     * @param index Index
+     * @param count Count
+     * @param path Path
+     * @param pack Script pack
+     * @param file File
+     * @param exportSettings Export settings
+     * @param parallel Parallel
+     * @param evl Event listener
+     */
     public ExportPackTask(AbcIndexing abcIndex, AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         this.pack = pack;
         this.file = file;

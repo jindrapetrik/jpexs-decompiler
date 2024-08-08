@@ -25,10 +25,20 @@ import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
  */
 public class SymbolClassExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "symbolClass";
 
+    /**
+     * Mode
+     */
     public SymbolClassExportMode mode;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     */
     public SymbolClassExportSettings(SymbolClassExportMode mode) {
         this.mode = mode;
     }

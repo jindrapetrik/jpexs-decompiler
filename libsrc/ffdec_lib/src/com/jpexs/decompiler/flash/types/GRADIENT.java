@@ -38,12 +38,24 @@ public class GRADIENT implements Serializable {
     @EnumValue(value = SPREAD_REPEAT_MODE, text = "Repeat")
     public int spreadMode;
 
+    /**
+     * Spread mode - Pad
+     */
     public static final int SPREAD_PAD_MODE = 0;
 
+    /**
+     * Spread mode - Reflect
+     */
     public static final int SPREAD_REFLECT_MODE = 1;
 
+    /**
+     * Spread mode - Repeat
+     */
     public static final int SPREAD_REPEAT_MODE = 2;
 
+    /**
+     * Spread mode - Reserved
+     */
     public static final int SPREAD_RESERVED = 3;
 
     /**
@@ -54,17 +66,37 @@ public class GRADIENT implements Serializable {
     @EnumValue(value = INTERPOLATION_LINEAR_RGB_MODE, text = "Linear RGB")
     public int interpolationMode;
 
+    /**
+     * Interpolation mode - RGB
+     */
     public static final int INTERPOLATION_RGB_MODE = 0;
 
+    /**
+     * Interpolation mode - Linear RGB
+     */
     public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;
 
+    /**
+     * Interpolation mode - Reserved 1
+     */
     public static final int INTERPOLATION_RESERVED1 = 2;
 
+    /**
+     * Interpolation mode - Reserved 2
+     */
     public static final int INTERPOLATION_RESERVED2 = 3;
 
+    /**
+     * Gradient records
+     */
     @SWFArray(value = "record")
     public GRADRECORD[] gradientRecords = new GRADRECORD[0];
 
+    /**
+     * Checks if this gradient is compatible with other gradient.
+     * @param otherGradient Other gradient
+     * @return True if compatible
+     */
     public boolean isCompatibleGradient(GRADIENT otherGradient) {
         if (interpolationMode != otherGradient.interpolationMode) {
             return false;
@@ -78,6 +110,10 @@ public class GRADIENT implements Serializable {
         return true;
     }
 
+    /**
+     * Converts this gradient to morph gradient.
+     * @return Morph gradient
+     */
     public MORPHGRADIENT toMorphGradient() {
         MORPHGRADIENT morphGradient = new MORPHGRADIENT();
         morphGradient.interPolationMode = interpolationMode;
@@ -89,6 +125,11 @@ public class GRADIENT implements Serializable {
         return morphGradient;
     }
 
+    /**
+     * Converts this gradient to morph gradient.
+     * @param endGradient End gradient
+     * @return Morph gradient
+     */
     public MORPHGRADIENT toMorphGradient(GRADIENT endGradient) {
         if (!isCompatibleGradient(endGradient)) {
             return null;

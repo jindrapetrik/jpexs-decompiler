@@ -31,17 +31,41 @@ import java.util.Map;
  */
 public abstract class FontInfoTag extends Tag implements CharacterIdTag {
 
+    /**
+     * Font ID
+     */
     @SWFType(BasicType.UI16)
     public int fontID;
 
+    /**
+     * Constructor.
+     *
+     * @param swf SWF
+     * @param id Tag ID
+     * @param name Tag name
+     * @param data Tag data
+     */
     public FontInfoTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Gets the font character codes.
+     * @return List of font character codes
+     */
     public abstract List<Integer> getCodeTable();
 
+    /**
+     * Adds a character to the font.
+     * @param index Index
+     * @param character Character
+     */
     public abstract void addFontCharacter(int index, int character);
 
+    /**
+     * Removes a character from the font.
+     * @param index Index
+     */
     public abstract void removeFontCharacter(int index);
 
     @Override
@@ -54,18 +78,46 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
         this.fontID = characterId;
     }
 
+    /**
+     * Gets the font name.
+     * @return Font name
+     */
     public abstract String getFontName();
 
+    /**
+     * Gets the bold font flag.
+     * @return Bold font flag
+     */
     public abstract boolean getFontFlagsBold();
 
+    /**
+     * Sets the bold font flag.
+     * @param value Bold font flag
+     */
     public abstract void setFontFlagsBold(boolean value);
 
+    /**
+     * Gets the italic font flag.
+     * @return Italic font flag
+     */
     public abstract boolean getFontFlagsItalic();
 
+    /**
+     * Sets the italic font flag.
+     * @param value Italic font flag
+     */
     public abstract void setFontFlagsItalic(boolean value);
 
+    /**
+     * Checks if the font is Shift-JIS encoded.
+     * @return True if the font is Shift-JIS encoded
+     */
     public abstract boolean isShiftJIS();
 
+    /**
+     * Checks if the font is ANSI encoded.
+     * @return True if the font is ANSI encoded
+     */
     public abstract boolean isAnsi();
 
     @Override

@@ -25,10 +25,20 @@ import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
  */
 public class ImageExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "images";
 
+    /**
+     * Mode
+     */
     public ImageExportMode mode;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     */
     public ImageExportSettings(ImageExportMode mode) {
         this.mode = mode;
     }

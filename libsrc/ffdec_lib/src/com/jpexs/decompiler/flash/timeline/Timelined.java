@@ -32,14 +32,14 @@ public interface Timelined extends BoundedTag {
     /**
      * Gets SWF which this timelined is part of.
      *
-     * @return
+     * @return SWF
      */
     public SWF getSwf();
 
     /**
      * Gets the timeline object.
      *
-     * @return
+     * @return Timeline
      */
     public Timeline getTimeline();
 
@@ -51,66 +51,66 @@ public interface Timelined extends BoundedTag {
     /**
      * Sets modification flag.
      *
-     * @param value
+     * @param value True if modified
      */
     public void setModified(boolean value);
 
     /**
      * Gets tags.
      *
-     * @return
+     * @return Tags
      */
     public ReadOnlyTagList getTags();
 
     /**
      * Removes tag by index.
      *
-     * @param index
+     * @param index Index
      */
     public void removeTag(int index);
 
     /**
      * Removes tag.
      *
-     * @param tag
+     * @param tag Tag
      */
     public void removeTag(Tag tag);
 
     /**
      * Adds tag.
      *
-     * @param tag
+     * @param tag Tag
      */
     public void addTag(Tag tag);
 
     /**
      * Adds tag at the specified index.
      *
-     * @param index
-     * @param tag
+     * @param index Index
+     * @param tag Tag
      */
     public void addTag(int index, Tag tag);
 
     /**
      * Replaces tag at the specified index.
      *
-     * @param index
-     * @param newTag
+     * @param index Index
+     * @param newTag New tag
      */
     public void replaceTag(int index, Tag newTag);
 
     /**
      * Replaces old tag with new tag.
      *
-     * @param oldTag
-     * @param newTag
+     * @param oldTag Old tag
+     * @param newTag New tag
      */
     public void replaceTag(Tag oldTag, Tag newTag);
 
     /**
      * Gets index of tag.
      *
-     * @param tag
+     * @param tag Tag
      * @return Index or -1 when not found
      */
     public int indexOfTag(Tag tag);
@@ -118,14 +118,14 @@ public interface Timelined extends BoundedTag {
     /**
      * Sets frame count.
      *
-     * @param frameCount
+     * @param frameCount Frame count
      */
     public void setFrameCount(int frameCount);
 
     /**
      * Gets frame count.
      *
-     * @return
+     * @return Frame count
      */
     public int getFrameCount();
 }

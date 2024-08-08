@@ -23,10 +23,18 @@ public class MxmlcException extends Exception {
 
     private String mxmlcErrorOutput;
 
+    /**
+     * Constructor.
+     * @param mxmlcErrorOutput Output of mxmlc command.
+     */
     public MxmlcException(String mxmlcErrorOutput) {
         this.mxmlcErrorOutput = mxmlcErrorOutput;
     }
 
+    /**
+     * Gets the output of mxmlc command.
+     * @return Output of mxmlc command.
+     */
     public String getMxmlcErrorOutput() {
         return mxmlcErrorOutput;
     }

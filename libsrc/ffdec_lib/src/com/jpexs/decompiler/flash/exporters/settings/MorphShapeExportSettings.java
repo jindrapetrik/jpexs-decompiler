@@ -25,17 +25,35 @@ import com.jpexs.decompiler.flash.exporters.modes.MorphShapeExportMode;
  */
 public class MorphShapeExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "morphshapes";
 
+    /**
+     * Mode
+     */
     public MorphShapeExportMode mode;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param zoom Zoom
+     */
     public MorphShapeExportSettings(MorphShapeExportMode mode, double zoom) {
         this.mode = mode;
         this.zoom = zoom;
     }
 
+    /**
+     * Get file extension.
+     * @return File extension
+     */
     public String getFileExtension() {
         switch (mode) {
             case PNG_START_END:

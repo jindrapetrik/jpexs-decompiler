@@ -27,6 +27,10 @@ public class ExceptionMarkIns extends InstructionDefinition {
 
     private static final ExceptionMarkIns instance = new ExceptionMarkIns();
 
+    /**
+     * Gets the instance of this class.
+     * @return The instance of this class
+     */
     public static final ExceptionMarkIns getInstance() {
         return instance;
     }

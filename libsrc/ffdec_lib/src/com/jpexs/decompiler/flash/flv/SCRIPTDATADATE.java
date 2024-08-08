@@ -23,10 +23,22 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class SCRIPTDATADATE {
 
+    /**
+     * Date time
+     */
     public double dateTime;
 
+    /**
+     * Local date time offset
+     */
     public int localDateTimeOffset;
 
+    /**
+     * Constructor.
+     *
+     * @param dateTime Date time
+     * @param localDateTimeOffset Local date time offset
+     */
     public SCRIPTDATADATE(double dateTime, int localDateTimeOffset) {
         this.dateTime = dateTime;
         this.localDateTimeOffset = localDateTimeOffset;

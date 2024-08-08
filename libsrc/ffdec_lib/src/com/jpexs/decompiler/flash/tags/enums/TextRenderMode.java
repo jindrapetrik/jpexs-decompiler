@@ -23,5 +23,16 @@ package com.jpexs.decompiler.flash.tags.enums;
  */
 public enum TextRenderMode {
 
-    BITMAP, HTML5_CANVAS, SVG
+    /**
+     * Bitmap
+     */
+    BITMAP,
+    /**
+     * HTML5 canvas
+     */
+    HTML5_CANVAS,
+    /**
+     * SVG
+     */
+    SVG
 }

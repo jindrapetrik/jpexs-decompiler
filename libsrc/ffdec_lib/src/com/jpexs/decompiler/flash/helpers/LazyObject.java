@@ -23,5 +23,8 @@ package com.jpexs.decompiler.flash.helpers;
  */
 public interface LazyObject {
 
+    /**
+     * Loads the object.
+     */
     public void load();
 }

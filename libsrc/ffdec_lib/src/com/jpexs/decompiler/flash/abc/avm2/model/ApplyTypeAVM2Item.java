@@ -37,8 +37,14 @@ import java.util.Objects;
  */
 public class ApplyTypeAVM2Item extends AVM2Item {
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Parameters
+     */
     public List<GraphTargetItem> params;
 
     /**

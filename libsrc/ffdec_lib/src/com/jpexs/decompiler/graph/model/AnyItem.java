@@ -27,6 +27,13 @@ import com.jpexs.decompiler.graph.TypeItem;
  */
 public class AnyItem extends GraphTargetItem {
 
+    /**
+     * Constructor.
+     */
+    public AnyItem() {
+        
+    }
+    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer.append("§§any()");

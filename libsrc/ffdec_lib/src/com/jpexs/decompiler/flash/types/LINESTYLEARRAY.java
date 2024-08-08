@@ -34,10 +34,16 @@ import java.util.Set;
  */
 public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
+    /**
+     * Line styles
+     */
     @SWFArray(value = "lineStyle")
     @Conditional(tags = {DefineShapeTag.ID, DefineShape2Tag.ID, DefineShape3Tag.ID})
     public LINESTYLE[] lineStyles = new LINESTYLE[0];
 
+    /**
+     * Line styles 2
+     */
     @SWFArray(value = "lineStyle")
     @Conditional(tags = {DefineShape4Tag.ID})
     public LINESTYLE2[] lineStyles2 = new LINESTYLE2[0];
@@ -89,6 +95,10 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
         return modified;
     }
 
+    /**
+     * Converts to MORPHLINESTYLEARRAY
+     * @return MORPHLINESTYLEARRAY
+     */
     public MORPHLINESTYLEARRAY toMorphLineStyleArray() {
         MORPHLINESTYLEARRAY morphLineStyleArray = new MORPHLINESTYLEARRAY();
         if (lineStyles != null) {

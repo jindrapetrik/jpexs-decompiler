@@ -168,7 +168,7 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
         }
 
         try {
-            return ImageHelper.getDimesion(getOriginalImageData());
+            return ImageHelper.getDimension(getOriginalImageData());
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
         }

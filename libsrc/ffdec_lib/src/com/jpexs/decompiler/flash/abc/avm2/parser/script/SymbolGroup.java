@@ -23,19 +23,60 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
  */
 public enum SymbolGroup {
 
+    /**
+     * Operator
+     */
     OPERATOR,
+    /**
+     * Keyword
+     */
     KEYWORD,
+    /**
+     * Separator
+     */
     STRING,
+    /**
+     * Comment
+     */
     COMMENT,
+    /**
+     * XML
+     */
     XML,
+    /**
+     * Identifier
+     */
     IDENTIFIER,
+    /**
+     * Integer
+     */
     INTEGER,
+    /**
+     * Double
+     */
     DOUBLE,
+    /**
+     * Type name
+     */
     TYPENAME,
+    /**
+     * End of file
+     */
     EOF,
-    //GLOBALFUNC,
+    /**
+     * Global constant
+     */
     GLOBALCONST,
+    /**
+     * Preprocessor directive
+     */
     PREPROCESSOR,
+    /**
+     * Regular expression
+     */
     REGEXP,
+    /**
+     * Namespace suffix
+     */
     NAMESPACESUFFIX
 }

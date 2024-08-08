@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -63,13 +62,20 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
         return scriptName;
     }
 
-    // Constructor for Generic tag editor.
+    /**
+     * Constructor for Generic tag editor.
+     */
     public BUTTONCONDACTION() {
         swf = null;
         tag = null;
         actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
     }
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param tag Tag
+     */
     public BUTTONCONDACTION(SWF swf, Tag tag) {
         this.swf = swf;
         this.tag = tag;
@@ -81,6 +87,13 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
         this.scriptName = scriptName;
     }
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param sis SWF input stream
+     * @param tag Tag
+     * @throws IOException On I/O error
+     */
     public BUTTONCONDACTION(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
         this.swf = swf;
         this.tag = tag;
@@ -156,6 +169,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     public boolean condIdleToOverUp;
 
     /**
+     * Key pres condition
      * @since SWF 4 key code
      */
     @SWFType(value = BasicType.UB, count = 7)
@@ -187,10 +201,10 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
      * Converts actions to ASM source
      *
      * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
+     * @param writer Writer
+     * @param actions Actions
      * @return ASM source
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {
@@ -219,7 +233,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     /**
-     * Whether or not this object contains ASM source
+     * Whether this object contains ASM source
      *
      * @return True when contains
      */
@@ -232,7 +246,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
      * Returns actions associated with this object
      *
      * @return List of actions
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public ActionList getActions() throws InterruptedException {

@@ -26,10 +26,20 @@ import java.util.List;
  */
 public class ArrayType extends ObjectType {
 
+    /**
+     * Empty array object.
+     */
     public static final ObjectType EMPTY_ARRAY = new ArrayType();
 
+    /**
+     * Values
+     */
     public List<Object> values;
 
+    /**
+     * Constructor.
+     * @param values Values
+     */
     public ArrayType(List<Object> values) {
         this.values = values;
     }

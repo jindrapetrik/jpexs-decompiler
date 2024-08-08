@@ -28,6 +28,9 @@ import java.util.Set;
  */
 public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
 
+    /**
+     * Fill styles
+     */
     public MORPHFILLSTYLE[] fillStyles;
 
     @Override
@@ -55,6 +58,11 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
         return modified;
     }
 
+    /**
+     * Gets fill styles at given ratio.
+     * @param ratio Ratio
+     * @return Fill styles at given ratio
+     */
     public FILLSTYLEARRAY getFillStylesAt(int ratio) {
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
         ret.fillStyles = new FILLSTYLE[fillStyles.length];
@@ -64,6 +72,10 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Gets start fill styles.
+     * @return Start fill styles
+     */
     public FILLSTYLEARRAY getStartFillStyles() {
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
         ret.fillStyles = new FILLSTYLE[fillStyles.length];
@@ -73,6 +85,10 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Gets end fill styles.
+     * @return End fill styles
+     */
     public FILLSTYLEARRAY getEndFillStyles() {
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
         ret.fillStyles = new FILLSTYLE[fillStyles.length];

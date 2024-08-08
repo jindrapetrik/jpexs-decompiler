@@ -45,20 +45,47 @@ import java.util.logging.Logger;
  */
 public abstract class CharacterTag extends Tag implements CharacterIdTag {
 
+    /**
+     * Export name
+     */
+    protected String exportName;
+
+    /**
+     * Class names
+     */
     protected LinkedHashSet<String> classNames = new LinkedHashSet<>();
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public CharacterTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Sets class names.
+     * @param classNames Class names
+     */
     public void setClassNames(LinkedHashSet<String> classNames) {
         this.classNames = new LinkedHashSet<>(classNames);
     }
 
+    /**
+     * Gets class names.
+     * @return Class names
+     */
     public LinkedHashSet<String> getClassNames() {
         return new LinkedHashSet<>(classNames);
     }
 
+    /**
+     * Adds class name.
+     * @param className Class name
+     */
     public void addClassName(String className) {
         classNames.add(className);
     }
@@ -92,6 +119,10 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         return result;
     }
 
+    /**
+     * Gets character export file name
+     * @return Character export file name
+     */
     public String getCharacterExportFileName() {
         String result = "" + getCharacterId();
         if (exportName != null) {
@@ -103,8 +134,10 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         return result;
     }
 
-    protected String exportName;
-
+    /**
+     * Sets export name.
+     * @param exportName Export name
+     */
     public void setExportName(String exportName) {
         if ("".equals(exportName)) {
             exportName = null;
@@ -112,10 +145,18 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         this.exportName = exportName;
     }
 
+    /**
+     * Gets export name.
+     * @return Export name
+     */
     public String getExportName() {
         return exportName;
     }
 
+    /**
+     * Gets scaling grid tag.
+     * @return Scaling grid tag, null if not found
+     */
     public DefineScalingGridTag getScalingGridTag() {
         if (swf == null) { //???
             return null;
@@ -161,6 +202,10 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         return String.join(".", ret);
     }
 
+    /**
+     * Gets AS2 class name.
+     * @return AS2 class name
+     */
     public String getAs2ClassName() {
         String linkageIdentifier = getExportName();
         if (linkageIdentifier == null) {

@@ -37,6 +37,18 @@ public class HarmanBinaryDataEncrypt {
 
     private static final String GLOBAL_KEY = "Adobe AIR SDK (c) 2021 HARMAN Internation Industries Incorporated";
 
+    /**
+     * Constructor.
+     */
+    private HarmanBinaryDataEncrypt() {
+
+    }
+
+    /**
+     * Encrypts data.
+     * @param data Data to encrypt
+     * @return Encrypted data
+     */
     public static byte[] encrypt(byte[] data) {
         byte[] result;
         try {
@@ -138,6 +150,11 @@ public class HarmanBinaryDataEncrypt {
         return ret;
     }
 
+    /**
+     * Decrypts data.
+     * @param data Encrypted data
+     * @return Decrypted data
+     */
     public static byte[] decrypt(byte[] data) {
         if (data.length < 32) {
             return null;
@@ -179,6 +196,11 @@ public class HarmanBinaryDataEncrypt {
         }
     }
 
+    /**
+     * Test encryption/decryption.
+     * @param args Command line arguments
+     * @throws IOException On I/O error
+     */
     public static void main(String[] args) throws IOException {
         byte[] data = new byte[]{'A', 'B', 'C'};
         byte[] encrypted = encrypt(data);

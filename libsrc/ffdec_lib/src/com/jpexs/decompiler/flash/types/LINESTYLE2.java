@@ -33,60 +33,117 @@ import java.util.Set;
  */
 public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
 
+    /**
+     * Width
+     */
     @SWFType(BasicType.UI16)
     public int width;
 
+    /**
+     * Start cap style
+     */
     @SWFType(value = BasicType.UB, count = 2)
     @EnumValue(value = ROUND_CAP, text = "Round cap")
     @EnumValue(value = NO_CAP, text = "No cap")
     @EnumValue(value = SQUARE_CAP, text = "Square cap")
     public int startCapStyle;
 
+    /**
+     * Join style
+     */
     @SWFType(value = BasicType.UB, count = 2)
     @EnumValue(value = ROUND_JOIN, text = "Round join")
     @EnumValue(value = BEVEL_JOIN, text = "Bevel join")
     @EnumValue(value = MITER_JOIN, text = "Miter join")
     public int joinStyle;
 
+    /**
+     * Cap style - round
+     */
     public static final int ROUND_CAP = 0;
 
+    /**
+     * Cap style - no cap
+     */
     public static final int NO_CAP = 1;
 
+    /**
+     * Cap style - square
+     */
     public static final int SQUARE_CAP = 2;
 
+    /**
+     * Join style - round
+     */
     public static final int ROUND_JOIN = 0;
 
+    /**
+     * Join style - bevel
+     */
     public static final int BEVEL_JOIN = 1;
 
+    /**
+     * Join style - miter
+     */
     public static final int MITER_JOIN = 2;
 
+    /**
+     * Has fill flag
+     */
     public boolean hasFillFlag;
 
+    /**
+     * No horizontal scale flag
+     */
     public boolean noHScaleFlag;
 
+    /**
+     * No vertical scale flag
+     */
     public boolean noVScaleFlag;
 
+    /**
+     * Pixel hinting flag
+     */
     public boolean pixelHintingFlag;
 
+    /**
+     * Reserved
+     */
     @Reserved
     @SWFType(value = BasicType.UB, count = 5)
     public int reserved;
 
+    /**
+     * No close flag
+     */
     public boolean noClose;
 
+    /**
+     * End cap style
+     */
     @SWFType(value = BasicType.UB, count = 2)
     @EnumValue(value = ROUND_CAP, text = "Round cap")
     @EnumValue(value = NO_CAP, text = "No cap")
     @EnumValue(value = SQUARE_CAP, text = "Square cap")
     public int endCapStyle;
 
+    /**
+     * Miter limit factor
+     */
     @SWFType(BasicType.FIXED8)
     @Conditional(value = "joinStyle", options = {MITER_JOIN})
     public float miterLimitFactor;
 
+    /**
+     * Color
+     */
     @Conditional(value = "!hasFillFlag")
     public RGBA color;
 
+    /**
+     * Fill type
+     */
     @Conditional(value = "hasFillFlag")
     public FILLSTYLE fillType;
 
@@ -145,6 +202,12 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         this.width = width;
     }
 
+    /**
+     * Checks if this line style is compatible with another line style
+     * @param otherLineStyle The other line style
+     * @param swf The SWF
+     * @return True if compatible, false otherwise
+     */
     public boolean isCompatibleLineStyle(LINESTYLE2 otherLineStyle, SWF swf) {
         if (startCapStyle != otherLineStyle.startCapStyle) {
             return false;
@@ -183,6 +246,10 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         return true;
     }
 
+    /**
+     * Converts this line style to a MORPHLINESTYLE2
+     * @return The MORPHLINESTYLE2
+     */
     public MORPHLINESTYLE2 toMorphLineStyle2() {
         MORPHLINESTYLE2 morphLineStyle2 = new MORPHLINESTYLE2();
         morphLineStyle2.startWidth = width;
@@ -206,6 +273,12 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
         return morphLineStyle2;
     }
 
+    /**
+     * Converts this line style to a MORPHLINESTYLE2
+     * @param endLineStyle The end line style
+     * @param swf The SWF
+     * @return The MORPHLINESTYLE2
+     */
     public MORPHLINESTYLE2 toMorphLineStyle2(LINESTYLE2 endLineStyle, SWF swf) {
         if (!isCompatibleLineStyle(endLineStyle, swf)) {
             return null;

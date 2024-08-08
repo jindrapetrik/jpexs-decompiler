@@ -41,14 +41,28 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
     private boolean serialized;
     private Traits traits;
 
+    /**
+     * Checks if the object is serialized.
+     * @return True if the object is serialized.
+     */
     public boolean isSerialized() {
         return serialized;
     }
 
+    /**
+     * Gets the traits of the object.
+     * @return The traits of the object.
+     */
     public Traits getTraits() {
         return traits;
     }
 
+    /**
+     * Constructor.
+     * @param traits The traits of the object.
+     * @param serializedData The serialized data.
+     * @param serializedMembers The serialized members.
+     */
     public ObjectType(Traits traits, byte[] serializedData, Map<String, Object> serializedMembers) {
         this.traits = traits;
         this.serializedData = serializedData;
@@ -58,10 +72,20 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         this.serialized = true;
     }
 
+    /**
+     * Constructor.
+     * @param traits The traits of the object.
+     */
     public ObjectType(Traits traits) {
         this(traits, new HashMap<>(), new HashMap<>());
     }
 
+    /**
+     * Constructor.
+     * @param traits The traits of the object.
+     * @param sealedMembers The sealed members.
+     * @param dynamicMembers The dynamic members.
+     */
     public ObjectType(Traits traits, Map<String, Object> sealedMembers, Map<String, Object> dynamicMembers) {
         this.sealedMembers = new ListMap<>(sealedMembers);
         this.dynamicMembers = new ListMap<>(dynamicMembers);
@@ -70,10 +94,18 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         this.traits = traits;
     }
 
+    /**
+     * Checks if the object is dynamic.
+     * @return True if the object is dynamic.
+     */
     public boolean isDynamic() {
         return traits.isDynamic();
     }
 
+    /**
+     * Gets the class name of the object.
+     * @return The class name of the object.
+     */
     public String getClassName() {
         return traits.getClassName();
     }
@@ -97,28 +129,52 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return Amf3Exporter.amfToString(this);
     }
 
+    /**
+     * Sets the serialized data.
+     * @param serializedData The serialized data.
+     */
     public void setSerializedData(byte[] serializedData) {
         this.serializedData = serializedData;
     }
 
+    /**
+     * Gets the serialized data.
+     * @return The serialized data.
+     */
     public byte[] getSerializedData() {
         return serializedData;
     }
 
+    /**
+     * Sets the serialized members.
+     * @param serializedMembers The serialized members.
+     */
     public void setSerializedMembers(Map<String, Object> serializedMembers) {
         this.serializedMembers = new ListMap<>(serializedMembers);
     }
 
+    /**
+     * Gets the serialized members.
+     * @return The serialized members.
+     */
     public Map<String, Object> getSerializedMembers() {
         return new ListMap<>(serializedMembers);
     }
 
+    /**
+     * Sets the sealed members.
+     * @param sealedMembers The sealed members.
+     */
     public void setSealedMembers(Map<String, Object> sealedMembers) {
         this.sealedMembers = new ListMap<>(sealedMembers);
     }
 
-    public void setDynamicMembers(Map<String, Object> sealedMembers) {
-        this.dynamicMembers = new ListMap<>(sealedMembers);
+    /**
+     * Sets the dynamic members.
+     * @param dynamicMembers The dynamic members.
+     */
+    public void setDynamicMembers(Map<String, Object> dynamicMembers) {
+        this.dynamicMembers = new ListMap<>(dynamicMembers);
     }
 
     @Override
@@ -126,14 +182,26 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return keySet().size();
     }
 
+    /**
+     * Gets the size of the sealed members.
+     * @return The size of the sealed members.
+     */
     public int sealedMembersSize() {
         return sealedMembers.size();
     }
 
+    /**
+     * Gets the size of the dynamic members.
+     * @return The size of the dynamic members.
+     */
     public int dynamicMembersSize() {
         return dynamicMembers.size();
     }
 
+    /**
+     * Gets the size of the serialized members.
+     * @return The size of the serialized members.
+     */
     public int serializedMembersSize() {
         return serializedMembers.size();
     }
@@ -152,14 +220,29 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return containsDynamicMember(keyString) || containsSealedMember(keyString) || containsSerializedMember(keyString);
     }
 
+    /**
+     * Checks if the object contains a sealed member.
+     * @param name The name of the member.
+     * @return True if the object contains a sealed member.
+     */
     public boolean containsSealedMember(String name) {
         return sealedMembers.containsKey(name);
     }
 
+    /**
+     * Checks if the object contains a dynamic member.
+     * @param name The name of the member.
+     * @return True if the object contains a dynamic member.
+     */
     public boolean containsDynamicMember(String name) {
         return dynamicMembers.containsKey(name);
     }
 
+    /**
+     * Checks if the object contains a serialized member.
+     * @param name The name of the member.
+     * @return True if the object contains a serialized member.
+     */
     public boolean containsSerializedMember(String name) {
         return serializedMembers.containsKey(name);
     }
@@ -188,6 +271,11 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return null;
     }
 
+    /**
+     * Gets a sealed member.
+     * @param key The key of the member.
+     * @return The sealed member.
+     */
     public Object getSealedMember(Object key) {
         if (!(key instanceof String)) {
             return null;
@@ -197,6 +285,11 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return sealedMembers.get(stringKey);
     }
 
+    /**
+     * Gets a dynamic member.
+     * @param key The key of the member.
+     * @return The dynamic member.
+     */
     public Object getDynamicMember(Object key) {
         if (!(key instanceof String)) {
             return null;
@@ -206,6 +299,11 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return dynamicMembers.get(stringKey);
     }
 
+    /**
+     * Gets a serialized member.
+     * @param key The key of the member.
+     * @return The serialized member.
+     */
     public Object getSerializedMember(Object key) {
         if (!(key instanceof String)) {
             return null;
@@ -220,16 +318,34 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return putDynamicMember(key, value);
     }
 
+    /**
+     * Puts a dynamic member.
+     * @param key The key of the member.
+     * @param value The value of the member.
+     * @return The previous value of the member.
+     */
     public Object putDynamicMember(String key, Object value) {
         remove(key);
         return dynamicMembers.put(key, value);
     }
 
+    /**
+     * Puts a sealed member.
+     * @param key The key of the member.
+     * @param value The value of the member.
+     * @return The previous value of the member.
+     */
     public Object putSealedMember(String key, Object value) {
         remove(key);
         return sealedMembers.put(key, value);
     }
 
+    /**
+     * Puts a serialized member.
+     * @param key The key of the member.
+     * @param value The value of the member.
+     * @return The previous value of the member.
+     */
     public Object putSerializedMember(String key, Object value) {
         remove(key);
         return serializedMembers.put(key, value);
@@ -260,18 +376,30 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         }
     }
 
+    /**
+     * Puts all dynamic members.
+     * @param m The map of dynamic members.
+     */
     public void putAllDynamicMember(Map<? extends String, ? extends Object> m) {
         for (Map.Entry<? extends String, ? extends Object> e : m.entrySet()) {
             putDynamicMember(e.getKey(), e.getValue());
         }
     }
 
+    /**
+     * Puts all sealed members.
+     * @param m The map of sealed members.
+     */
     public void putAllSealedMember(Map<? extends String, ? extends Object> m) {
         for (Map.Entry<? extends String, ? extends Object> e : m.entrySet()) {
             putSealedMember(e.getKey(), e.getValue());
         }
     }
 
+    /**
+     * Puts all serialized members.
+     * @param m The map of serialized members.
+     */
     public void putAllSerializedMember(Map<? extends String, ? extends Object> m) {
         for (Map.Entry<? extends String, ? extends Object> e : m.entrySet()) {
             putSerializedMember(e.getKey(), e.getValue());
@@ -285,14 +413,23 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         clearSerializedMembers();
     }
 
+    /**
+     * Clears all dynamic members.
+     */
     public void clearDynamicMembers() {
         dynamicMembers.clear();
     }
 
+    /**
+     * Clears all sealed members.
+     */
     public void clearSealedMembers() {
         sealedMembers.clear();
     }
 
+    /**
+     * Clears all serialized members.
+     */
     public void clearSerializedMembers() {
         serializedMembers.clear();
     }
@@ -306,14 +443,26 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
         return ret;
     }
 
+    /**
+     * Gets the key set of the sealed members.
+     * @return The key set of the sealed members.
+     */
     public Set<String> sealedMembersKeySet() {
         return new ListSet<>(sealedMembers.keySet());
     }
 
+    /**
+     * Gets the key set of the dynamic members.
+     * @return The key set of the dynamic members.
+     */
     public Set<String> dynamicMembersKeySet() {
         return new ListSet<>(dynamicMembers.keySet());
     }
 
+    /**
+     * Gets the key set of the serialized members.
+     * @return The key set of the serialized members.
+     */
     public Set<String> serializedMembersKeySet() {
         return new ListSet<>(serializedMembers.keySet());
     }

@@ -27,6 +27,9 @@ public class TgaSupport {
 
     private static boolean inited = false;
 
+    /**
+     * Initializes TGA file format support.
+     */
     public static void init() {
         if (inited) {
             return;

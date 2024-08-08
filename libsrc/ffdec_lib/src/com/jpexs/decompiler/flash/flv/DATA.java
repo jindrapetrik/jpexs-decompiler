@@ -23,5 +23,9 @@ package com.jpexs.decompiler.flash.flv;
  */
 public abstract class DATA {
 
+    /**
+     * Gets the data as byte array.
+     * @return Data as byte array
+     */
     public abstract byte[] getBytes();
 }

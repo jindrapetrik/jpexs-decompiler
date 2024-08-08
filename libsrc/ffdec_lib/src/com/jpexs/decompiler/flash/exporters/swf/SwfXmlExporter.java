@@ -53,13 +53,27 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class SwfXmlExporter {
 
+    /**
+     * XML export version major.
+     */
     public static final int XML_EXPORT_VERSION_MAJOR = 2;
+
+    /**
+     * XML export version minor.
+     */
     public static final int XML_EXPORT_VERSION_MINOR = 1;
 
     private static final Logger logger = Logger.getLogger(SwfXmlExporter.class.getName());
 
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
 
+    /**
+     * Exports SWF to XML.
+     * @param swf SWF to export
+     * @param outFile Target file to save to
+     * @return List of exported files
+     * @throws IOException On I/O error
+     */
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
         try {
             File tmp = File.createTempFile("FFDEC", "XML");
@@ -90,6 +104,13 @@ public class SwfXmlExporter {
         return ret;
     }
 
+    /**
+     * Exports SWF to XML.
+     * @param swf SWF to export
+     * @param writer XML writer
+     * @throws IOException On I/O error
+     * @throws XMLStreamException On XML error
+     */
     public void exportXml(SWF swf, XMLStreamWriter writer) throws IOException, XMLStreamException {
         generateXml(writer, "swf", swf, false);
     }

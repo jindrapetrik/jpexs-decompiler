@@ -29,43 +29,133 @@ import java.util.List;
  */
 public interface SoundTag extends TreeItem {
 
+    /**
+     * Gets export format.
+     * @return Export format
+     */
     public SoundExportFormat getExportFormat();
 
+    /**
+     * Checks if sound import is supported.
+     * @return True if sound import is supported
+     */
     public boolean importSupported();
 
+    /**
+     * Gets sound rate.
+     *
+     * @return Sound rate. 0 = 5.5 kHz, 1 = 11 kHz, 2 = 22 kHz, 3 = 44 kHz
+     */
     public int getSoundRate();
 
+    /**
+     * Gets sound type.
+     * @return Sound type. True = Stereo, False = Mono
+     */
     public boolean getSoundType();
 
+    /**
+     * Gets raw sound data.
+     * @return Raw sound data
+     */
     public List<ByteArrayRange> getRawSoundData();
 
+    /**
+     * Gets sound format id.
+     *
+     * See SoundFormat.FORMAT_* constants.
+     *
+     * @return Sound format id
+     */
     public int getSoundFormatId();
 
+    /**
+     * Gets total sound sample count.
+     * @return Total sound sample count
+     */
     public long getTotalSoundSampleCount();
 
+    /**
+     * Gets sound size.
+     * True = 16-bit, False = 8-bit
+     * @return Sound size
+     */
     public boolean getSoundSize();
 
+    /**
+     * Gets character export file name.
+     * @return Character export file name
+     */
     public String getCharacterExportFileName();
 
+    /**
+     * Gets sound format.
+     * See SoundFormat.FORMAT_* constants.
+     * @return Sound format
+     */
     public SoundFormat getSoundFormat();
 
+    /**
+     * Sets sound size.
+     * True = 16-bit, False = 8-bit
+     * @param soundSize Sound size
+     */
     public void setSoundSize(boolean soundSize);
 
+    /**
+     * Sets sound type.
+     * True = Stereo, False = Mono
+     * @param soundType Sound type
+     */
     public void setSoundType(boolean soundType);
 
+    /**
+     * Sets sound sample count.
+     * @param soundSampleCount Sound sample count
+     */
     public void setSoundSampleCount(long soundSampleCount);
 
+    /**
+     * Sets sound compression.
+     * See SoundFormat.FORMAT_* constants.
+     * @param soundCompression Sound compression
+     */
     public void setSoundCompression(int soundCompression);
 
+    /**
+     * Sets sound rate.
+     * 0 = 5.5 kHz, 1 = 11 kHz, 2 = 22 kHz, 3 = 44 kHz
+     * @param soundRate Sound rate.
+     */
     public void setSoundRate(int soundRate);
 
+    /**
+     * Gets character id.
+     * @return Character id
+     */
     public int getCharacterId();
 
+    /**
+     * Checks if sound is read only.
+     * @return True if sound is read only
+     */
     public boolean isReadOnly();
 
+    /**
+     * Gets sound name.
+     * @return Sound name
+     */
     public String getName();
 
+    /**
+     * Gets FLA export name.
+     * @return FLA export name
+     */
     public String getFlaExportName();
 
+    /**
+     * Gets initial latency.
+     * @return Initial latency
+     */
     public int getInitialLatency();
 }

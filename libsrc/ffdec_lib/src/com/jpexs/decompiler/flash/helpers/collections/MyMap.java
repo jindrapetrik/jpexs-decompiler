@@ -31,6 +31,9 @@ import java.util.Set;
  */
 public class MyMap<K, V> implements Map<K, V> {
 
+    /**
+     * List of key-value pairs.
+     */
     List<MyEntry<K, V>> values = new ArrayList<>();
 
     @Override

@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -53,37 +52,9 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     private String exportedScriptName = "-";
     private CLIPACTIONS parentClipActions;
 
-    @Override
-    public String getScriptName() {
-        return scriptName;
-    }
-
-    public CLIPACTIONS getParentClipActions() {
-        return parentClipActions;
-    }
-
-    public static String keyToString(int key) {
-        if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {
-            return CLIPACTIONRECORD.KEYNAMES[key];
-        } else {
-            return "" + (char) key;
-        }
-    }
-
-    public static Integer stringToKey(String str) {
-        for (int i = 0; i < KEYNAMES.length; i++) {
-            if (KEYNAMES[i] != null) {
-                if (str.equals(KEYNAMES[i])) {
-                    return i;
-                }
-            }
-        }
-        if (str.length() == 1) {
-            return (int) str.charAt(0);
-        }
-        return null;
-    }
-
+    /**
+     * Key names
+     */
     public static final String[] KEYNAMES = {
         null,
         "<Left>",
@@ -120,13 +91,80 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         "<Space>"
     };
 
+    /**
+     * Events to which this handler applies
+     */
+    public CLIPEVENTFLAGS eventFlags;
+
+    /**
+     * If EventFlags contain ClipEventKeyPress: Key code to trap
+     */
+    @Conditional("eventFlags.clipEventKeyPress")
+    public int keyCode;
+
+    /**
+     * Actions to perform
+     */
+    @HideInRawEdit
+    public ByteArrayRange actionBytes;
+
     @Internal
     private SWF swf;
 
     @Internal
     private Tag tag;
 
-    // Constructor for Generic tag editor. TODO:Handle this somehow better
+    @Override
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    /**
+     * Get parent CLIPACTIONS object
+     * @return Parent CLIPACTIONS object
+     */
+    public CLIPACTIONS getParentClipActions() {
+        return parentClipActions;
+    }
+
+    /**
+     * Converts key code to string
+     * @param key Key code
+     * @return String representation of key code
+     */
+    public static String keyToString(int key) {
+        if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {
+            return CLIPACTIONRECORD.KEYNAMES[key];
+        } else {
+            return "" + (char) key;
+        }
+    }
+
+    /**
+     * Converts string to key code
+     * @param str String representation of key code
+     * @return Key code
+     */
+    public static Integer stringToKey(String str) {
+        for (int i = 0; i < KEYNAMES.length; i++) {
+            if (KEYNAMES[i] != null) {
+                if (str.equals(KEYNAMES[i])) {
+                    return i;
+                }
+            }
+        }
+        if (str.length() == 1) {
+            return (int) str.charAt(0);
+        }
+        return null;
+    }
+
+
+
+
+    /**
+     * Constructor for Generic tag editor.
+     */
     public CLIPACTIONRECORD() {
         swf = null;
         tag = null;
@@ -134,6 +172,11 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         actionBytes = ByteArrayRange.EMPTY;
     }
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param tag Tag
+     */
     public CLIPACTIONRECORD(SWF swf, Tag tag) {
         this.swf = swf;
         this.tag = tag;
@@ -146,6 +189,10 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         this.scriptName = scriptName;
     }
 
+    /**
+     * Sets parent CLIPACTIONS object
+     * @param parentClipActions Parent CLIPACTIONS object
+     */
     public void setParentClipActions(CLIPACTIONS parentClipActions) {
         this.parentClipActions = parentClipActions;
     }
@@ -161,6 +208,14 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
         return tag;
     }
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param sis SWF input stream
+     * @param tag Tag
+     * @param parentClipActions Parent CLIPACTIONS object
+     * @throws IOException On I/O error
+     */
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag, CLIPACTIONS parentClipActions) throws IOException {
         this.swf = swf;
         this.tag = tag;
@@ -188,24 +243,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     /**
-     * Events to which this handler applies
-     */
-    public CLIPEVENTFLAGS eventFlags;
-
-    /**
-     * If EventFlags contain ClipEventKeyPress: Key code to trap
-     */
-    @Conditional("eventFlags.clipEventKeyPress")
-    public int keyCode;
-
-    /**
-     * Actions to perform
-     */
-    @HideInRawEdit
-    public ByteArrayRange actionBytes;
-
-    /**
-     * Returns a string representation of the object
+     * Returns a string representation of the object.
      *
      * @return a string representation of the object.
      */
@@ -215,7 +253,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     /**
-     * Returns header with events converted to string
+     * Returns header with events converted to string.
      *
      * @return String representation of events
      */
@@ -229,13 +267,13 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     /**
-     * Converts actions to ASM source
+     * Converts actions to ASM source.
      *
      * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
+     * @param writer Writer
+     * @param actions Actions
      * @return ASM source
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {
@@ -264,7 +302,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     /**
-     * Whether or not this object contains ASM source
+     * Whether this object contains ASM source.
      *
      * @return True when contains
      */

@@ -28,12 +28,21 @@ import java.io.Serializable;
  */
 public class KERNINGRECORD implements Serializable {
 
+    /**
+     * Font code 1
+     */
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode1;
 
+    /**
+     * Font code 2
+     */
     @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public int fontKerningCode2;
 
+    /**
+     * Kerning adjustment
+     */
     @SWFType(BasicType.SI16)
     public int fontKerningAdjustment;
 
@@ -42,15 +51,30 @@ public class KERNINGRECORD implements Serializable {
         return "[KERNINGRECORD fontKerningCode1=" + fontKerningCode1 + ", fontKerningCode2=" + fontKerningCode2 + ", fontKerningAdjustment=" + fontKerningAdjustment + "]";
     }
 
+    /**
+     * Constructor.
+     * @param fontKerningCode1 Font code 1
+     * @param fontKerningCode2 Font code 2
+     * @param fontKerningAdjustment Kerning adjustment
+     */
     public KERNINGRECORD(int fontKerningCode1, int fontKerningCode2, int fontKerningAdjustment) {
         this.fontKerningCode1 = fontKerningCode1;
         this.fontKerningCode2 = fontKerningCode2;
         this.fontKerningAdjustment = fontKerningAdjustment;
     }
 
+    /**
+     * Constructor.
+     */
     public KERNINGRECORD() {
     }
 
+    /**
+     * Constructor.
+     * @param font Font
+     * @param char1 Font code 1
+     * @param char2 Font code 2
+     */
     public KERNINGRECORD(Font font, char char1, char char2) {
         fontKerningCode1 = char1;
         fontKerningCode2 = char2;

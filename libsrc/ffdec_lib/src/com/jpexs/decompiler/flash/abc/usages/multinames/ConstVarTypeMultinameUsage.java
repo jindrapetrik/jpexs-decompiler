@@ -26,6 +26,17 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  */
 public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage {
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param traitsType Traits type
+     * @param traits Traits
+     * @param parentTraitIndex Parent trait index
+     */
     public ConstVarTypeMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
         super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, traits, parentTraitIndex);
     }

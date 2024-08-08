@@ -41,6 +41,9 @@ import java.util.logging.Logger;
  */
 public class Amf3OutputStream extends OutputStream {
 
+    /**
+     * Logger
+     */
     public static final Logger LOGGER = Logger.getLogger(Amf3OutputStream.class.getName());
 
     private final OutputStream os;
@@ -50,14 +53,29 @@ public class Amf3OutputStream extends OutputStream {
     private static final int TRAIT_EXT_FLAG = 4;
     private static final int DYNAMIC_FLAG = 8;
 
+    /**
+     * Constructor.
+     *
+     * @param os Output stream
+     */
     public Amf3OutputStream(OutputStream os) {
         this.os = os;
     }
 
+    /**
+     * Writes U8 (unsigned 8-bit integer).
+     * @param v Value
+     * @throws IOException On I/O error
+     */
     public void writeU8(int v) throws IOException {
         write(v);
     }
 
+    /**
+     * Writes U16 (unsigned 16-bit integer).
+     * @param v Value
+     * @throws IOException On I/O error
+     */
     public void writeU16(int v) throws IOException {
         int b1 = (v >> 8) & 0xff;
         int b2 = v & 0xff;
@@ -65,6 +83,11 @@ public class Amf3OutputStream extends OutputStream {
         write(b2);
     }
 
+    /**
+     * Writes long.
+     * @param value Value
+     * @throws IOException On I/O error
+     */
     private void writeLong(long value) throws IOException {
         byte[] writeBuffer = new byte[8];
         writeBuffer[0] = (byte) (value >>> 56);
@@ -78,6 +101,11 @@ public class Amf3OutputStream extends OutputStream {
         write(writeBuffer);
     }
 
+    /**
+     * Writes U32 (unsigned 32-bit integer).
+     * @param v Value
+     * @throws IOException On I/O error
+     */
     public void writeU32(long v) throws IOException {
         int b1 = (int) ((v >> 24) & 0xff);
         int b2 = (int) ((v >> 16) & 0xff);
@@ -90,14 +118,29 @@ public class Amf3OutputStream extends OutputStream {
         write(b4);
     }
 
+    /**
+     * Writes double.
+     * @param v Value
+     * @throws IOException On I/O error
+     */
     public void writeDouble(double v) throws IOException {
         writeLong(Double.doubleToLongBits(v));
     }
 
+    /**
+     * Writes bytes.
+     * @param data Data
+     * @throws IOException On I/O error
+     */
     public void writeBytes(byte[] data) throws IOException {
         os.write(data);
     }
 
+    /**
+     * Writes U29 (unsigned 29-bit integer).
+     * @param v Value
+     * @throws IOException On I/O error
+     */
     public void writeU29(long v) throws IOException {
         v = v & 0x3FFFFFFF; //make unsigned
 
@@ -133,6 +176,12 @@ public class Amf3OutputStream extends OutputStream {
         }
     }
 
+    /**
+     * Writes UTF-8 Vr.
+     * @param val Value
+     * @param stringTable String table
+     * @throws IOException On I/O error
+     */
     private void writeUtf8Vr(String val, List<String> stringTable) throws IOException {
         int stringIndex = stringTable.indexOf(val);
         if (stringIndex == -1) {
@@ -147,6 +196,12 @@ public class Amf3OutputStream extends OutputStream {
         }
     }
 
+    /**
+     * Writes byte array.
+     * @param val Value
+     * @param objectTable Object table
+     * @throws IOException On I/O error
+     */
     private void writeByteArray(ByteArrayType val, List<Object> objectTable) throws IOException {
         int objectIndex = objectTable.indexOf(val);
         if (objectIndex == -1) {
@@ -260,10 +315,23 @@ public class Amf3OutputStream extends OutputStream {
         }
     }
 
+    /**
+     * Writes value.
+     * @param object Object
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
     public void writeValue(Object object) throws IOException, NoSerializerExistsException {
         writeValue(object, new HashMap<>());
     }
 
+    /**
+     * Writes value.
+     * @param object Object
+     * @param serializers Serializers
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
     public void writeValue(Object object, Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
         writeValue(object, serializers, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }

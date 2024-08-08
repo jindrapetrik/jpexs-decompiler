@@ -34,6 +34,11 @@ public class StringBuilderTextWriter extends GraphTextWriter {
 
     private int writtenBytes;
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     * @param writer StringBuilder to write to
+     */
     public StringBuilderTextWriter(CodeFormatting formatting, StringBuilder writer) {
         super(formatting);
         this.writer = writer;

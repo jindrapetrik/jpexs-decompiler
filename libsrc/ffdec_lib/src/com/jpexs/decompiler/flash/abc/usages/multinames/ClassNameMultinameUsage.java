@@ -28,6 +28,13 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     private final int classIndex;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param classIndex Class index
+     * @param scriptIndex Script index
+     */
     public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;

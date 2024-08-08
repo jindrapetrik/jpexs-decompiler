@@ -23,5 +23,24 @@ package com.jpexs.decompiler.flash.helpers.hilight;
  */
 public enum HighlightType {
 
-    TRAIT, CLASS, METHOD, OFFSET, SPECIAL
+    /**
+     * Trait
+     */
+    TRAIT,
+    /**
+     * Class
+     */
+    CLASS,
+    /**
+     * Method
+     */
+    METHOD,
+    /**
+     * Offset
+     */
+    OFFSET,
+    /**
+     * Special
+     */
+    SPECIAL
 }

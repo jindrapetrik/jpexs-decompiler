@@ -27,18 +27,40 @@ import java.util.List;
  */
 public class Word {
 
+    /**
+     * Records
+     */
     public List<SameStyleTextRecord> records = new ArrayList<>();
 
+    /**
+     * Record
+     */
     private SameStyleTextRecord record;
 
+    /**
+     * Model
+     */
     private final DynamicTextModel model;
 
+    /**
+     * Width
+     */
     public int width;
 
+    /**
+     * Constructor.
+     *
+     * @param model Model
+     */
     public Word(DynamicTextModel model) {
         this.model = model;
     }
 
+    /**
+     * Adds glyph.
+     * @param character Character
+     * @param glyphEntry Glyph entry
+     */
     public void addGlyph(char character, GLYPHENTRY glyphEntry) {
 
         if (record == null) {
@@ -49,11 +71,18 @@ public class Word {
         record.glyphEntries.add(new GlyphCharacter(character, glyphEntry));
     }
 
+    /**
+     * New record.
+     */
     public void newRecord() {
 
         record = null;
     }
 
+    /**
+     * Calculates text widths.
+     * @return Width
+     */
     public int calculateTextWidths() {
 
         int width = 0;

@@ -66,8 +66,20 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private boolean canUseSmoothing = true;
 
+    /**
+     * Winding rule
+     */
     protected int windingRule;
 
+    /**
+     * Constructor.
+     *
+     * @param windingRule Winding rule
+     * @param shapeNum Shape number
+     * @param swf SWF
+     * @param shape Shape
+     * @param colorTransform Color transform
+     */
     public ShapeExporterBase(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
@@ -130,10 +142,17 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         _linePaths = cachedData.linePaths;
     }
 
+    /**
+     * Sets if smoothing can be used.
+     * @param canUseSmoothing If smoothing can be used
+     */
     public void setCanUseSmoothing(boolean canUseSmoothing) {
         this.canUseSmoothing = canUseSmoothing;
     }
 
+    /**
+     * Exports shape.
+     */
     public void export() {
         // Let the doc handler know that a shape export starts
         beginShape();

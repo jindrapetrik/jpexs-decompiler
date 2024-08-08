@@ -27,6 +27,9 @@ class SvgTransparentFill extends SvgFill {
 
     private static final Color TRANSPARENT = new Color(0, true);
 
+    /**
+     * Singleton instance.
+     */
     public static SvgTransparentFill INSTANCE = new SvgTransparentFill();
 
     private SvgTransparentFill() {

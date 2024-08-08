@@ -38,62 +38,181 @@ import java.util.Objects;
  */
 public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, DepthTag {
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id Id
+     * @param name Name
+     * @param data Data
+     */
     public PlaceObjectTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Gets place object number.
+     * PlaceObject = 1, PlaceObject2 = 2, ...
+     * @return Place object number
+     */
     public abstract int getPlaceObjectNum();
 
+    /**
+     * Gets matrix.
+     * @return Matrix
+     */
     public abstract MATRIX getMatrix();
 
+    /**
+     * Sets matrix.
+     * @param matrix Matrix
+     */
     public abstract void setMatrix(MATRIX matrix);
 
+    /**
+     * Gets instance name.
+     * @return Instance name
+     */
     public abstract String getInstanceName();
 
+    /**
+     * Sets instance name.
+     * @param name Instance name
+     */
     public abstract void setInstanceName(String name);
 
+    /**
+     * Sets class name.
+     * @param className Class name
+     */
     public abstract void setClassName(String className);
 
+    /**
+     * Gets color transform.
+     * @return Color transform
+     */
     public abstract ColorTransform getColorTransform();
 
+    /**
+     * Gets blend mode.
+     * @return Blend mode
+     */
     public abstract int getBlendMode();
 
+    /**
+     * Gets filters.
+     * @return Filters
+     */
     public abstract List<FILTER> getFilters();
 
+    /**
+     * Gets clip depth.
+     * @return Clip depth
+     */
     public abstract int getClipDepth();
 
+    /**
+     * Gets class name.
+     * @return Class name
+     */
     public abstract String getClassName();
 
+    /**
+     * Checks if cache as bitmap.
+     * @return True if cache as bitmap
+     */
     public abstract boolean cacheAsBitmap();
 
+    /**
+     * Checks if has image.
+     * @return True if has image
+     */
     public abstract boolean hasImage();
 
+    /**
+     * Gets bitmap cache.
+     * @return Bitmap cache
+     */
     public abstract Integer getBitmapCache();
 
+    /**
+     * Checks if visible.
+     * @return True if visible
+     */
     public abstract boolean isVisible();
 
+    /**
+     * Gets visible.
+     * @return Visible
+     */
     public abstract Integer getVisible();
 
+    /**
+     * Gets background color.
+     * @return Background color
+     */
     public abstract RGBA getBackgroundColor();
 
+    /**
+     * Checks if flag move.
+     * @return True if flag move
+     */
     public abstract boolean flagMove();
 
+    /**
+     * Gets ratio.
+     * @return Ratio
+     */
     public abstract int getRatio();
 
+    /**
+     * Gets clip actions.
+     * @return Clip actions
+     */
     public abstract CLIPACTIONS getClipActions();
 
+    /**
+     * Writes tag with matrix.
+     * @param sos SWF output stream
+     * @param m Matrix
+     * @throws IOException On I/O error
+     */
     public abstract void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
 
+    /**
+     * Gets AMF data.
+     * @return AMF data
+     */
     public abstract Amf3Value getAmfData();
 
+    /**
+     * Sets clip actions.
+     * @param clipActions Clip actions
+     */
     public abstract void setClipActions(CLIPACTIONS clipActions);
 
+    /**
+     * Sets place flag has clip actions.
+     * @param placeFlagHasClipActions Place flag has clip actions
+     */
     public abstract void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions);
 
+    /**
+     * Sets place flag has matrix.
+     * @param placeFlagHasMatrix Place flag has matrix
+     */
     public abstract void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix);
 
+    /**
+     * Sets place flag move.
+     * @param placeFlagMove Place flag move
+     */
     public abstract void setPlaceFlagMove(boolean placeFlagMove);
 
+    /**
+     * Checks if place equals.
+     * @param other Other place object type tag
+     * @return True if place equals
+     */
     public boolean placeEquals(PlaceObjectTypeTag other) {
         if (getDepth() != other.getDepth()) {
             return false;

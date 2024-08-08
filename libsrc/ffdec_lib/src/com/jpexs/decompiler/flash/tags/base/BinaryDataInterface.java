@@ -28,40 +28,113 @@ import com.jpexs.helpers.ByteArrayRange;
  */
 public interface BinaryDataInterface extends Exportable {
 
+    /**
+     * Gets sub binary data.
+     * @return Sub binary data
+     */
     public PackedBinaryData getSub();
 
+    /**
+     * Checks if the data is SWF data.
+     * @return True if the data is SWF data
+     */
     public boolean isSwfData();
 
+    /**
+     * Unpacks the data.
+     * @param packer Packer
+     * @return True if the data was unpacked
+     */
     public boolean unpack(Packer packer);
 
+    /**
+     * Detects the packer.
+     */
     public void detectPacker();
 
+    /**
+     * Gets the used packer.
+     * @return Used packer
+     */
     public Packer getUsedPacker();
 
+    /**
+     * Sets the data bytes.
+     * @param data Data bytes
+     */
     public void setDataBytes(ByteArrayRange data);
 
+    /**
+     * Gets the data bytes.
+     * @return Data bytes
+     */
     public ByteArrayRange getDataBytes();
 
+    /**
+     * Sets the modified flag.
+     * @param value Modified flag
+     */
     public void setModified(boolean value);
 
+    /**
+     * Packs the data.
+     * @return True if the data was packed
+     */
     public boolean pack();
 
+    /**
+     * Gets the SWF.
+     * @return SWF
+     */
     public SWF getSwf();
 
+    /**
+     * Sets inner SWF.
+     * @param swf SWF
+     */
     public void setInnerSwf(SWF swf);
 
+    /**
+     * Gets inner SWF.
+     * @return Inner SWF
+     */
     public SWF getInnerSwf();
 
+    /**
+     * Gets the path identifier.
+     * @return Path identifier
+     */
     public String getPathIdentifier();
 
+    /**
+     * Gets the storages path identifier.
+     * @return Storages path identifier
+     */
     public String getStoragesPathIdentifier();
 
+    /**
+     * Gets the top level binary data.
+     * @return Top level binary data
+     */
     public BinaryDataInterface getTopLevelBinaryData();
 
+    /**
+     * Gets the character export file name.
+     * @return Character export file name
+     */
     public String getCharacterExportFileName();
 
+    /**
+     * Gets the name.
+     * @return Name
+     */
     public String getName();
 
+    /**
+     * Gets the class export file name.
+     * @param className Class name
+     * @return Class export file
+     */
     public String getClassExportFileName(String className);
 
 }

@@ -23,7 +23,13 @@ package com.jpexs.decompiler.flash.tags.dynamictext;
  */
 public class CharacterWithStyle {
 
+    /**
+     * Character
+     */
     public char character;
 
+    /**
+     * Style
+     */
     public TextStyle style;
 }

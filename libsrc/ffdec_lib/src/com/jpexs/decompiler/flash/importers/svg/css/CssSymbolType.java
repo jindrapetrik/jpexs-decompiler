@@ -22,32 +22,116 @@ package com.jpexs.decompiler.flash.importers.svg.css;
  * @author JPEXS
  */
 public enum CssSymbolType {
+    /**
+     * S
+     */
     S,
+    /**
+     * CDO
+     */
     CDO,
+    /**
+     * CDC
+     */
     CDC,
+    /**
+     * Includes
+     */
     INCLUDES,
+    /**
+     * Dashmatch
+     */
     DASHMATCH,
+    /**
+     * String
+     */
     STRING,
+    /**
+     * Bad string
+     */
     BAD_STRING,
+    /**
+     * Ident
+     */
     IDENT,
+    /**
+     * Hash
+     */
     HASH,
+    /**
+     * Import sym
+     */
     IMPORT_SYM,
+    /**
+     * Page sym
+     */
     PAGE_SYM,
+    /**
+     * Media sym
+     */
     MEDIA_SYM,
+    /**
+     * Charset sym
+     */
     CHARSET_SYM,
+    /**
+     * Important sym
+     */
     IMPORTANT_SYM,
+    /**
+     * EMS
+     */
     EMS,
+    /**
+     * EXS
+     */
     EXS,
+    /**
+     * Length
+     */
     LENGTH,
+    /**
+     * Angle
+     */
     ANGLE,
+    /**
+     * Time
+     */
     TIME,
+    /**
+     * Freq
+     */
     FREQ,
+    /**
+     *  Dimension
+     */
     DIMENSION,
+    /**
+     * Percentage
+     */
     PERCENTAGE,
+    /**
+     * Number
+     */
     NUMBER,
+    /**
+     * URI
+     */
     URI,
+    /**
+     * Bad URI
+     */
     BAD_URI,
+    /**
+     * Function
+     */
     FUNCTION,
+    /**
+     * End of file
+     */
     EOF,
+    /**
+     * Other
+     */
     OTHER
 }

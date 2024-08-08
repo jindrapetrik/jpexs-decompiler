@@ -23,7 +23,15 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
  */
 public interface LexListener {
 
+    /**
+     * Called when a symbol is parsed.
+     * @param s Parsed symbol
+     */
     public void onLex(ParsedSymbol s);
 
+    /**
+     * Called when a symbol is pushed back.
+     * @param s Parsed symbol
+     */
     public void onPushBack(ParsedSymbol s);
 }

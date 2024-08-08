@@ -23,6 +23,11 @@ import java.util.List;
  */
 public class VectorUIntType extends AbstractVectorType<Long> {
 
+    /**
+     * Constructor.
+     * @param fixed Fixed size
+     * @param values Values
+     */
     public VectorUIntType(boolean fixed, List<Long> values) {
         super(fixed, values);
     }

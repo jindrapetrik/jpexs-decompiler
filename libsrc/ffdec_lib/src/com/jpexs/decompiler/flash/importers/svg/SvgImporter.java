@@ -103,26 +103,68 @@ public class SvgImporter {
 
     private Rectangle2D.Double viewBox;
 
+    /**
+     * Constructor.
+     * @param st Shape tag
+     * @param svgXml SVG XML
+     * @return Imported tag
+     */
     public Tag importSvg(ShapeTag st, String svgXml) {
         return importSvg((Tag) st, null, svgXml, true);
     }
 
+    /**
+     * Constructor.
+     * @param mst Morph shape tag
+     * @param svgXml SVG XML
+     * @return Imported tag
+     */
     public Tag importSvg(MorphShapeTag mst, String svgXml) {
         return importSvg((Tag) mst, null, svgXml, true);
     }
 
+    /**
+     * Constructor.
+     * @param st Shape tag
+     * @param svgXml SVG XML
+     * @param fill Fill flag
+     * @return Imported tag
+     */
     public Tag importSvg(ShapeTag st, String svgXml, boolean fill) {
         return importSvg((Tag) st, null, svgXml, fill);
     }
 
+    /**
+     * Constructor.
+     * @param mst Morph shape tag
+     * @param svgXml SVG XML
+     * @param fill Fill flag
+     * @return Imported tag
+     */
     public Tag importSvg(MorphShapeTag mst, String svgXml, boolean fill) {
         return importSvg((Tag) mst, null, svgXml, fill);
     }
 
+    /**
+     * Constructor.
+     * @param startShape Start shape tag
+     * @param endShape End shape tag
+     * @param svgXml SVG XML
+     * @param fill Fill flag
+     * @return Imported tag
+     */
     public Tag importSvg(ShapeTag startShape, ShapeTag endShape, String svgXml, boolean fill) {
         return importSvg((Tag) startShape, endShape, svgXml, fill);
     }
 
+    /**
+     * Constructor.
+     * @param st Start shape tag
+     * @param endShape End shape tag
+     * @param svgXml SVG XML
+     * @param fill Fill flag
+     * @return Imported tag
+     */
     private Tag importSvg(Tag st, ShapeTag endShape, String svgXml, boolean fill) {
         shapeTag = st;
         this.endShape = endShape;
@@ -285,6 +327,11 @@ public class SvgImporter {
         return (Tag) st;
     }
 
+    /**
+     * Applies animation to the element.
+     * @param element Element
+     * @return True if animation was applied
+     */
     protected boolean applyAnimation(Element element) {
         NodeList nodeList = element.getChildNodes();
         boolean result = false;
@@ -388,7 +435,12 @@ public class SvgImporter {
         return result;
     }
 
-    // Generate id-element map, because getElementById does not work in some cases (namespaces?)
+    /**
+     * Populates IDs.
+     * Generates id-element map, because getElementById does not work in some cases (namespaces?)
+     * @param el Element
+     * @param out Output map
+     */
     protected void populateIds(Element el, Map<String, Element> out) {
         if (el.hasAttribute("id")) {
             out.put(el.getAttribute("id"), el);
@@ -407,7 +459,7 @@ public class SvgImporter {
         CssSelectorToXPath selectorToXPath = new CssSelectorToXPath();
         Document doc = element.getOwnerDocument();
         try {
-            cssParser.styleshet();
+            cssParser.stylesheet();
             XPath xPath = XPathFactory.newInstance().newXPath();
             for (int i = 0; i < cssParser.getCountRulesets(); i++) {
                 String selector = cssParser.getSelector(i);
@@ -1421,7 +1473,12 @@ public class SvgImporter {
         new ShapeExporter().exportShapes(null, "./outex/", swf, new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null, 1);
     }
 
-    //Test for SVG
+    /**
+     * Test for SVG.
+     * @param args The command line arguments
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         //svgTest("animate-elem-02-t");
         //svgTest("animate-elem-03-t");
@@ -2084,6 +2141,11 @@ public class SvgImporter {
         return result;
     }
 
+    /**
+     * Parses a number from a string.
+     * @param value The string
+     * @return The number
+     */
     public double parseNumber(String value) {
         if (value == null) {
             throw new NumberFormatException();
@@ -2093,6 +2155,11 @@ public class SvgImporter {
         return result;
     }
 
+    /**
+     * Parses a number or percent from a string.
+     * @param value The string
+     * @return The number
+     */
     public double parseNumberOrPercent(String value) {
         if (value == null) {
             throw new NumberFormatException();

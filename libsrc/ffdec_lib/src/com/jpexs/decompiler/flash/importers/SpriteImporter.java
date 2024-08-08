@@ -83,6 +83,14 @@ public class SpriteImporter {
         }
     }
 
+    /**
+     * Imports sprite from GIF image.
+     *
+     * @param spriteTag Sprite tag
+     * @param is Input stream
+     * @return True if import was successful
+     * @throws IOException On I/O error
+     */
     public boolean importSprite(DefineSpriteTag spriteTag, InputStream is) throws IOException {
         final GifImage gif = GifDecoder.read(is);
         final int frameCount = gif.getFrameCount();
@@ -154,6 +162,13 @@ public class SpriteImporter {
         return true;
     }
 
+    /**
+     * Bulk import sprites from directory.
+     * @param spritesDir Directory with sprites
+     * @param swf SWF
+     * @param printOut Print out
+     * @return Number of imported sprites
+     */
     public int bulkImport(File spritesDir, SWF swf, boolean printOut) {
         Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int spriteCount = 0;

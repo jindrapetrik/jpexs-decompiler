@@ -47,14 +47,14 @@ public class LinkReportExporter {
     private String indentStr = "  ";
 
     /**
-     * Constructs reporter with LF as newline, two spaces as indent
+     * Constructs reporter with LF as newline, two spaces as indent.
      */
     public LinkReportExporter() {
 
     }
 
     /**
-     * Constructs reporter with custom newline char, two spaces as indent
+     * Constructs reporter with custom newline char, two spaces as indent.
      *
      * @param newLineChar
      */
@@ -63,7 +63,7 @@ public class LinkReportExporter {
     }
 
     /**
-     * Constructs reporter with custom newline char and indent string
+     * Constructs reporter with custom newline char and indent string.
      *
      * @param newLineChar
      * @param indentStr
@@ -82,6 +82,14 @@ public class LinkReportExporter {
         return sb.toString();
     }
 
+    /**
+     * Generates report.
+     * @param swf SWF file
+     * @param as3scripts List of scripts
+     * @param evl Event listener
+     * @return Report
+     * @throws InterruptedException On interrupt
+     */
     public String generateReport(SWF swf, List<ScriptPack> as3scripts, EventListener evl) throws InterruptedException {
         StringBuilder sb = new StringBuilder();
         Set<String> extDeps = new HashSet<>();

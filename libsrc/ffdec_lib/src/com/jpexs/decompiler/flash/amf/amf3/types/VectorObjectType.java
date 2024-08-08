@@ -23,8 +23,17 @@ import java.util.List;
  */
 public class VectorObjectType extends AbstractVectorType<Object> {
 
+    /**
+     * Type name
+     */
     private String typeName;
 
+    /**
+     * Constructor.
+     * @param fixed Fixed size
+     * @param typeName Type name
+     * @param values Values
+     */
     public VectorObjectType(boolean fixed, String typeName, List<Object> values) {
         super(fixed, values);
         this.typeName = typeName;

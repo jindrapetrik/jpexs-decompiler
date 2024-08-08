@@ -23,13 +23,28 @@ package com.jpexs.decompiler.flash.helpers;
  */
 public class LoopWithType {
 
+    /**
+     * Loop type - loop
+     */
     public static int LOOP_TYPE_LOOP = 0;
 
+    /**
+     * Loop type - switch
+     */
     public static int LOOP_TYPE_SWITCH = 1;
 
+    /**
+     * Loop id
+     */
     public long loopId;
 
+    /**
+     * Loop type
+     */
     public int type;
 
+    /**
+     * Used flag
+     */
     public boolean used;
 }

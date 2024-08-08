@@ -30,5 +30,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ConcreteClasses {
 
+    /**
+     * Concrete classes.
+     * @return Concrete classes
+     */
     Class<?>[] value();
 }

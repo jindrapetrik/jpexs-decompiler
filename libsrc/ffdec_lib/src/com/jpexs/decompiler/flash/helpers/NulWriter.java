@@ -37,6 +37,11 @@ public class NulWriter extends GraphTextWriter {
         super(new CodeFormatting());
     }
 
+    /**
+     * Starts a new loop.
+     * @param loopId Loop id
+     * @param loopType Loop type
+     */
     public void startLoop(long loopId, int loopType) {
         LoopWithType loop = new LoopWithType();
         loop.loopId = loopId;
@@ -44,6 +49,11 @@ public class NulWriter extends GraphTextWriter {
         loopStack.add(loop);
     }
 
+    /**
+     * Ends a loop.
+     * @param loopId Loop id
+     * @return LoopWithType
+     */
     public LoopWithType endLoop(long loopId) {
         LoopWithType loopIdInStack = loopStack.pop();
         if (loopId != loopIdInStack.loopId) {
@@ -52,6 +62,10 @@ public class NulWriter extends GraphTextWriter {
         return loopIdInStack;
     }
 
+    /**
+     * Gets the current loop id.
+     * @return Loop id
+     */
     public long getLoop() {
         if (loopStack.isEmpty()) {
             return -1;
@@ -59,6 +73,10 @@ public class NulWriter extends GraphTextWriter {
         return loopStack.peek().loopId;
     }
 
+    /**
+     * Gets the current non-switch loop id.
+     * @return Loop id
+     */
     public long getNonSwitchLoop() {
         if (loopStack.isEmpty()) {
             return -1;
@@ -78,6 +96,10 @@ public class NulWriter extends GraphTextWriter {
         return loop.loopId;
     }
 
+    /**
+     * Sets the loop as used.
+     * @param loopId Loop id
+     */
     public void setLoopUsed(long loopId) {
         if (loopStack.isEmpty()) {
             return;
@@ -149,11 +171,18 @@ public class NulWriter extends GraphTextWriter {
         return this;
     }
 
+    /**
+     * Creates mark.
+     */
     public void mark() {
         stringAddedStack.add(stringAdded);
         stringAdded = false;
     }
 
+    /**
+     * Gets the mark.
+     * @return Mark
+     */
     public boolean getMark() {
         boolean result = stringAdded;
         stringAdded = stringAddedStack.pop() || result;

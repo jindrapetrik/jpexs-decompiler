@@ -25,7 +25,19 @@ import java.io.Serializable;
  */
 public class COLORMAPDATA implements Serializable {
 
+    /**
+     * Color table RGB
+     */
     public int[] colorTableRGB;
 
+    /**
+     * Color map pixel data
+     */
     public byte[] colorMapPixelData;
+
+    /**
+     * Constructor.
+     */
+    public COLORMAPDATA() {
+    }
 }

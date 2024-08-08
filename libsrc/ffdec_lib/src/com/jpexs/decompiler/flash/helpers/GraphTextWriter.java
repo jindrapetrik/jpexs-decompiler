@@ -27,29 +27,62 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  */
 public abstract class GraphTextWriter {
 
+    /**
+     * Start time
+     */
     protected long startTime;
 
+    /**
+     * Suspend time
+     */
     protected long suspendTime;
 
+    /**
+     * Code formatting
+     */
     protected CodeFormatting formatting;
 
+    /**
+     * Trait index - instance initializer
+     */
     public static final int TRAIT_INSTANCE_INITIALIZER = -1;
 
+    /**
+     * Trait index - class initializer
+     */
     public static final int TRAIT_CLASS_INITIALIZER = -2;
 
+    /**
+     * Trait index - script initializer
+     */
     public static final int TRAIT_SCRIPT_INITIALIZER = -3;
 
+    /**
+     * Trait index - unknown
+     */
     public static final int TRAIT_UNKNOWN = -4;
 
+    /**
+     * Gets code formatting
+     * @return Code formatting
+     */
     public CodeFormatting getFormatting() {
         return formatting;
     }
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     */
     public GraphTextWriter(CodeFormatting formatting) {
         startTime = System.currentTimeMillis();
         this.formatting = formatting;
     }
 
+    /**
+     * Gets is highlighted.
+     * @return Is highlighted
+     */
     public boolean getIsHighlighted() {
         return false;
     }
@@ -57,16 +90,20 @@ public abstract class GraphTextWriter {
     /**
      * Highlights specified text as instruction
      *
-     * @param src
-     * @param startLineItem
+     * @param src Graph source item
+     * @param startLineItem Start line item
      * @param pos Offset of instruction
-     * @param data
+     * @param data Highlight data
      * @return GraphTextWriter
      */
     public GraphTextWriter startOffset(GraphSourceItem src, GraphSourceItem startLineItem, int pos, HighlightData data) {
         return this;
     }
 
+    /**
+     * Ends offset.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter endOffset() {
         return this;
     }
@@ -75,7 +112,7 @@ public abstract class GraphTextWriter {
      * Highlights specified text as method
      *
      * @param index MethodInfo index
-     * @param name
+     * @param name Method name
      * @return GraphTextWriter
      */
     public GraphTextWriter startMethod(long index, String name) {
@@ -92,10 +129,18 @@ public abstract class GraphTextWriter {
         return this;
     }
 
+    /**
+     * Ends method.
+     * @return
+     */
     public GraphTextWriter endMethod() {
         return this;
     }
 
+    /**
+     * Ends function.
+     * @return
+     */
     public GraphTextWriter endFunction() {
         return this;
     }
@@ -110,10 +155,19 @@ public abstract class GraphTextWriter {
         return this;
     }
 
+    /**
+     * Highlights specified text as class
+     * @param className Class name
+     * @return GraphTextWriter
+     */
     public GraphTextWriter startClass(String className) {
         return this;
     }
 
+    /**
+     * Ends class.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter endClass() {
         return this;
     }
@@ -128,84 +182,203 @@ public abstract class GraphTextWriter {
         return this;
     }
 
+    /**
+     * Ends trait.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter endTrait() {
         return this;
     }
 
+    /**
+     * Hilights special type.
+     * @param text Text
+     * @param type Highlight special type
+     * @return GraphTextWriter
+     */
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type) {
         return hilightSpecial(text, type, "");
     }
 
+    /**
+     * Hilights special type.
+     * @param text Text
+     * @param type Highlight special type
+     * @param specialValue Special value
+     * @return GraphTextWriter
+     */
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue) {
         return hilightSpecial(text, type, Integer.toString(specialValue), null);
     }
 
+    /**
+     * Hilights special type.
+     * @param text Text
+     * @param type Highlight special type
+     * @param specialValue Special value
+     * @return GraphTextWriter
+     */
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, int specialValue, HighlightData data) {
         return hilightSpecial(text, type, Integer.toString(specialValue), data);
     }
 
+    /**
+     * Hilights special type.
+     * @param text Text
+     * @param type Highlight special type
+     * @param specialValue Special value
+     * @return GraphTextWriter
+     */
     public final GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue) {
         return hilightSpecial(text, type, specialValue, null);
     }
 
+    /**
+     * Hilights special type.
+     * @param text Text
+     * @param type Highlight special type
+     * @param specialValue Special value
+     * @param data Highlight data
+     * @return GraphTextWriter
+     */
     protected GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
         return this;
     }
 
+    /**
+     * Hilights offset.
+     * @param text Text
+     * @param offset Offset
+     * @return GraphTextWriter
+     */
     public static String hilighOffset(String text, long offset) {
         return "";
     }
 
+    /**
+     * Appends text with data.
+     * @param str Text
+     * @param data Highlight data
+     * @return GraphTextWriter
+     */
     public abstract GraphTextWriter appendWithData(String str, HighlightData data);
 
+    /**
+     * Appends text.
+     * @param value Value
+     * @return GraphTextWriter
+     */
     public GraphTextWriter append(char value) {
         return append(Character.toString(value));
     }
 
+    /**
+     * Appends text.
+     * @param value Value
+     * @return GraphTextWriter
+     */
     public GraphTextWriter append(int value) {
         return append(Integer.toString(value));
     }
 
+    /**
+     * Appends text.
+     * @param value Value
+     * @return GraphTextWriter
+     */
     public GraphTextWriter append(long value) {
         return append(Long.toString(value));
     }
 
+    /**
+     * Appends text.
+     * @param value Value
+     * @return GraphTextWriter
+     */
     public GraphTextWriter append(double value) {
         return append(Double.toString(value));
     }
 
+    /**
+     * Appends text.
+     * @param str Text
+     * @return GraphTextWriter
+     */
     public abstract GraphTextWriter append(String str);
 
+    /**
+     * Appends text.
+     * @param str Text
+     * @param offset Offset
+     * @param fileOffset File offset
+     * @return GraphTextWriter
+     */
     public abstract GraphTextWriter append(String str, long offset, long fileOffset);
 
+    /**
+     * Appends text without highlight.
+     * @param i Text
+     * @return GraphTextWriter
+     */
     public abstract GraphTextWriter appendNoHilight(int i);
 
+    /**
+     * Appends text without highlight.
+     * @param str Text
+     * @return GraphTextWriter
+     */
     public abstract GraphTextWriter appendNoHilight(String str);
 
+    /**
+     * Indents text.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter indent() {
         return this;
     }
 
+    /**
+     * Unindents text.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter unindent() {
         return this;
     }
 
+    /**
+     * New line.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter newLine() {
         return this;
     }
 
+    /**
+     * Gets length.
+     * @return Length
+     */
     public int getLength() {
         return 0;
     }
 
+    /**
+     * Gets indent.
+     * @return Indent
+     */
     public int getIndent() {
         return 0;
     }
 
+    /**
+     * Suspends measure.
+     */
     public void suspendMeasure() {
         suspendTime = System.currentTimeMillis();
     }
 
+    /**
+     * Continues measure.
+     */
     public void continueMeasure() {
         long time = System.currentTimeMillis();
         startTime += time - suspendTime;
@@ -225,22 +398,44 @@ public abstract class GraphTextWriter {
         return append(opening).newLine().indent();
     }
 
+    /**
+     * Starts block.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter startBlock() {
         return startBlock("{");
     }
 
+    /**
+     * Ends block.
+     * @param closing Closing
+     * @return GraphTextWriter
+     */
     private GraphTextWriter endBlock(String closing) {
         return unindent().append(closing);
     }
 
+    /**
+     * Ends block.
+     * @return GraphTextWriter
+     */
     public GraphTextWriter endBlock() {
         return endBlock("}");
     }
 
+    /**
+     * Space
+     * @return GraphTextWriter
+     */
     public GraphTextWriter space() {
         return append(" ");
     }
 
+    /**
+     * Space before call parenthesies.
+     * @param argCount Argument count
+     * @return GraphTextWriter
+     */
     public GraphTextWriter spaceBeforeCallParenthesies(int argCount) {
         if (argCount > 0) {
             if (formatting.spaceBeforeParenthesesMethodCallParentheses) {
@@ -252,6 +447,11 @@ public abstract class GraphTextWriter {
         return this;
     }
 
+    /**
+     * Adds current method data.
+     * @param data Highlight data
+     * @return GraphTextWriter
+     */
     public GraphTextWriter addCurrentMethodData(HighlightData data) {
         return this;
     }

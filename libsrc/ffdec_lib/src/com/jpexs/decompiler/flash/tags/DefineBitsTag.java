@@ -173,7 +173,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
         InputStream imageStream = getOriginalImageData();
         if (imageStream != null) {
             try {
-                return ImageHelper.getDimesion(imageStream);
+                return ImageHelper.getDimension(imageStream);
             } catch (IOException ex) {
                 Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
             }

@@ -151,6 +151,11 @@ public class ListMap<K, V> implements Map<K, V> {
         return ret;
     }
 
+    /**
+     * Entry implementation
+     * @param <K> Key type
+     * @param <V> Value type
+     */
     public static class MyEntry<K, V> implements Entry<K, V> {
 
         private K key;

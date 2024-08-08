@@ -23,9 +23,24 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum ImageExportMode {
 
+    /**
+     * PNG, GIF or JPEG, depending on what suits the best
+     */
     PNG_GIF_JPEG,
+    /**
+     * PNG - Portable Network Graphics
+     */
     PNG,
+    /**
+     * JPEG - Joint Photographic Experts Group
+     */
     JPEG,
+    /**
+     * BMP - Windows Bitmap
+     */
     BMP,
+    /**
+     * PNG, GIF or JPEG, depending on what suits the best, plus alpha channel
+     */
     PNG_GIF_JPEG_ALPHA
 }

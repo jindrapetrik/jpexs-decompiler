@@ -29,34 +29,67 @@ import java.util.Arrays;
  */
 public class SOUNDINFO implements Serializable {
 
+    /**
+     * Reserved
+     */
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
 
+    /**
+     * Sync stop
+     */
     public boolean syncStop;
 
+    /**
+     * Sync no multiple
+     */
     public boolean syncNoMultiple;
 
+    /**
+     * Has envelope
+     */
     public boolean hasEnvelope;
 
+    /**
+     * Has loops
+     */
     public boolean hasLoops;
 
+    /**
+     * Has out point
+     */
     public boolean hasOutPoint;
 
+    /**
+     * Has in point
+     */
     public boolean hasInPoint;
 
+    /**
+     * In point
+     */
     @Conditional("hasInPoint")
     @SWFType(BasicType.UI32)
     public long inPoint;
 
+    /**
+     * Out point
+     */
     @Conditional("hasOutPoint")
     @SWFType(BasicType.UI32)
     public long outPoint;
 
+    /**
+     * Loop count
+     */
     @Conditional("hasLoops")
     @SWFType(BasicType.UI16)
     public int loopCount;
 
+    /**
+     * Envelope records
+     */
     @Conditional("hasEnvelope")
     public SOUNDENVELOPE[] envelopeRecords = new SOUNDENVELOPE[0];
 

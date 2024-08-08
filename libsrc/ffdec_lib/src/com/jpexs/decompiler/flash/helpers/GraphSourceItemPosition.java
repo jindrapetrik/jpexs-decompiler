@@ -26,11 +26,23 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  */
 public class GraphSourceItemPosition {
 
+    /**
+     * Graph source item.
+     */
     public GraphSourceItem graphSourceItem;
 
+    /**
+     * Position
+     */
     public int position;
 
+    /**
+     * Start line item
+     */
     public GraphSourceItem startLineItem;
 
+    /**
+     * Data
+     */
     public HighlightData data;
 }

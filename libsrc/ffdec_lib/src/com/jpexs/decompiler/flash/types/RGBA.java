@@ -34,10 +34,18 @@ public class RGBA extends RGB implements Serializable {
     @SWFType(BasicType.UI8)
     public int alpha;
 
+    /**
+     * Get alpha value as float from 0.0 to 1.0
+     * @return Alpha value as float from 0.0 to 1.0
+     */
     public float getAlphaFloat() {
         return ((float) alpha) / 255.0f;
     }
 
+    /**
+     * Convert to hex string in format #AARRGGBB
+     * @return Hex string in format #AARRGGBB
+     */
     public String toHexARGB() {
         String ra = Integer.toHexString(alpha);
         if (ra.length() < 2) {
@@ -58,21 +66,40 @@ public class RGBA extends RGB implements Serializable {
         return "#" + ra + rh + gh + bh;
     }
 
+    /**
+     * Constructor.
+     * @param red Red value
+     * @param green Green value
+     * @param blue Blue value
+     * @param alpha Alpha value
+     */
     public RGBA(int red, int green, int blue, int alpha) {
         super(red, green, blue);
         this.alpha = alpha;
     }
 
+    /**
+     * Constructor.
+     * @param color Color
+     */
     public RGBA(Color color) {
         super(color);
         alpha = color.getAlpha();
     }
 
+    /**
+     * Constructor.
+     * @param rgb RGB value
+     */
     public RGBA(int rgb) {
         super(rgb);
         alpha = (rgb >> 24) & 0xFF;
     }
 
+    /**
+     * Constructor.
+     * @param color Color
+     */
     public RGBA(RGB color) {
         super(color);
         if (color instanceof RGBA) {
@@ -82,6 +109,9 @@ public class RGBA extends RGB implements Serializable {
         }
     }
 
+    /**
+     * Constructor.
+     */
     public RGBA() {
     }
 
@@ -95,6 +125,14 @@ public class RGBA extends RGB implements Serializable {
         return toInt(red, green, blue, alpha);
     }
 
+    /**
+     * Converts red, green, blue and alpha values to 32-bit integer.
+     * @param red Red value
+     * @param green Green value
+     * @param blue Blue value
+     * @param alpha Alpha value
+     * @return 32-bit integer
+     */
     public static int toInt(int red, int green, int blue, int alpha) {
         return ((alpha & 0xFF) << 24)
                 | ((red & 0xFF) << 16)

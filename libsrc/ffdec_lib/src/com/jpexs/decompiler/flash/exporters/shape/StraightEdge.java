@@ -23,18 +23,45 @@ package com.jpexs.decompiler.flash.exporters.shape;
  */
 public class StraightEdge implements IEdge {
 
+    /**
+     * X coordinate of the start point
+     */
     protected final int fromX;
 
+    /**
+     * Y coordinate of the start point
+     */
     protected final int fromY;
 
+    /**
+     * X coordinate of the end point
+     */
     protected final int toX;
 
+    /**
+     * Y coordinate of the end point
+     */
     protected final int toY;
 
+    /**
+     * Line style index
+     */
     protected final int lineStyleIdx;
 
+    /**
+     * Fill style index
+     */
     private final int fillStyleIdx;
 
+    /**
+     * Constructor.
+     * @param fromX X coordinate of the start point
+     * @param fromY Y coordinate of the start point
+     * @param toX X coordinate of the end point
+     * @param toY Y coordinate of the end point
+     * @param lineStyleIdx Line style index
+     * @param fillStyleIdx Fill style index
+     */
     StraightEdge(int fromX, int fromY, int toX, int toY, int lineStyleIdx, int fillStyleIdx) {
         this.fromX = fromX;
         this.fromY = fromY;

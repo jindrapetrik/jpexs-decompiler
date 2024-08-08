@@ -30,24 +30,60 @@ import java.util.Map;
  */
 public class SlotAVM2Item extends AVM2Item {
 
+    /**
+     * Is static
+     */
     private final boolean isStatic;
 
+    /**
+     * Variable
+     */
     public String var;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Custom namespace
+     */
     public String customNamespace;
 
+    /**
+     * Line
+     */
     public int line;
 
+    /**
+     * Metadata
+     */
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
+    /**
+     * Package
+     */
     public NamespaceItem pkg;
 
+    /**
+     * Is static.
+     * @return Is static
+     */
     public boolean isStatic() {
         return isStatic;
     }
 
+    /**
+     * Constructor.
+     * @param metadata Metadata
+     * @param pkg Package
+     * @param customNamespace Custom namespace
+     * @param isStatic Is static
+     * @param var Variable
+     * @param type Type
+     * @param value Value
+     * @param line Line
+     */
     public SlotAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line) {
         super(null, null, NOPRECEDENCE, value);
         this.metadata = metadata;

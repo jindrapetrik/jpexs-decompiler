@@ -63,6 +63,14 @@ import java.util.logging.Logger;
  */
 public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
 
+
+    /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorRegisters() {
+
+    }
+
     /**
      * Gets registers used in the code.
      *
@@ -104,7 +112,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
@@ -186,7 +194,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
      * @param trait Trait
      * @param minfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void replaceSingleUseRegisters(Map<Integer, GraphTargetItem> singleRegisters, List<AVM2Instruction> setInss, int classIndex, boolean isStatic, int scriptIndex, ABC abc, AVM2ConstantPool cpool, Trait trait, MethodInfo minfo, MethodBody body) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -224,7 +232,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
      * @param ignoredRegisters Ignored registers
      * @param ignoredGets Ignored gets
      * @return first register id
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, MethodBody body, ABC abc, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -250,7 +258,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
      * @param ignored Ignored
      * @param ignoredGets Ignored gets
      * @return Register id
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, Stack<Object> stack, MethodBody body, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
         LocalDataArea localData = new LocalDataArea();

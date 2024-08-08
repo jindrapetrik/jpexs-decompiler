@@ -27,13 +27,28 @@ import java.util.List;
  */
 public class ShapeExportData {
 
+    /**
+     * Fill styles
+     */
     public List<FillStyle> fillStyles;
 
+    /**
+     * Line styles
+     */
     public List<LineStyle> lineStyles;
 
+    /**
+     * Fill paths
+     */
     public List<List<IEdge>> fillPaths;
 
+    /**
+     * Aliased fill paths
+     */
     public List<List<IEdge>> aliasedFillPaths;
 
+    /**
+     * Line paths
+     */
     public List<List<IEdge>> linePaths;
 }

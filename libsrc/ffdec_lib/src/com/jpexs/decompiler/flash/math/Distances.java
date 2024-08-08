@@ -30,6 +30,12 @@ import java.util.List;
  */
 public class Distances {
 
+    /**
+     * Get distance between two batches of Bezier edges.
+     * @param batch1 Batch of Bezier edges 1
+     * @param batch2 Batch of Bezier edges 2
+     * @return Distance between two batches of Bezier edges
+     */
     public static double getBatchDistance(List<BezierEdge> batch1, List<BezierEdge> batch2) {
         Area a1 = batchToArea(batch1);
         Area a2 = batchToArea(batch2);

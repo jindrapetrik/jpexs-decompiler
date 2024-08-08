@@ -35,11 +35,27 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
     private boolean isInitializer;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param traitsType Traits type
+     * @param isInitializer Is initializer
+     * @param traits Traits
+     * @param parentTraitIndex Parent trait index
+     */
     public MethodMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, boolean isInitializer, Traits traits, int parentTraitIndex) {
         super(abc, multinameIndex, scriptIndex, classIndex, traitIndex, traitsType, traits, parentTraitIndex);
         this.isInitializer = isInitializer;
     }
 
+    /**
+     * Is initializer.
+     * @return Is initializer
+     */
     public boolean isInitializer() {
         return isInitializer;
     }
@@ -123,6 +139,10 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
         return true;
     }
 
+    /**
+     * Is static.
+     * @return Is static
+     */
     public boolean isStatic() {
         return traitsType == TRAITS_TYPE_CLASS;
     }

@@ -166,6 +166,21 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
+    /**
+     * Exports a shape to a bitmap.
+     * @param windingRule Winding rule
+     * @param shapeNum Shape number
+     * @param swf SWF
+     * @param shape Shape
+     * @param defaultColor Default color
+     * @param image Image
+     * @param unzoom Unzoom
+     * @param transformation Transformation
+     * @param strokeTransformation Stroke transformation
+     * @param colorTransform Color transform
+     * @param scaleStrokes Scale strokes
+     * @param canUseSmoothing Can use smoothing
+     */
     public static void export(int windingRule, int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing) {
         BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
         exporter.setCanUseSmoothing(canUseSmoothing);
@@ -209,6 +224,10 @@ public class BitmapExporter extends ShapeExporterBase {
         System.out.println("realZoom=" + realZoom);*/
     }
 
+    /**
+     * Returns the image.
+     * @return Image
+     */
     public SerializableImage getImage() {
         return image;
     }
@@ -535,6 +554,9 @@ public class BitmapExporter extends ShapeExporterBase {
         path.quadTo(controlX, controlY, anchorX, anchorY);
     }
 
+    /**
+     * Finalizes the path.
+     */
     protected void finalizePath() {
         if (fillPaint != null) {
             Shape shp = path;

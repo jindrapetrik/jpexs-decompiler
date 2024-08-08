@@ -23,10 +23,17 @@ package com.jpexs.decompiler.flash.importers.svg.css;
  */
 public class CssParseException extends Exception {
 
+    /**
+     * Constructor.
+     * @param s Message
+     */
     public CssParseException(String s) {
         super(s);
     }
 
+    /**
+     * Constructor.
+     */
     public CssParseException() {
 
     }

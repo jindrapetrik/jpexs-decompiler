@@ -22,12 +22,36 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions;
  * @author JPEXS
  */
 public enum AVM2InstructionFlag {
+    /**
+     * Undocumented instruction
+     */
     UNDOCUMENTED,
+    /**
+     * The stack handling is unknown
+     */
     UNKNOWN_STACK,
+    /**
+     * Requires ES4 numerics minor version
+     */
     ES4_NUMERICS_MINOR,
+    /**
+     * Requires Float major version
+     */
     FLOAT_MAJOR,
+    /**
+     * Operands are unknown
+     */
     UNKNOWN_OPERANDS,
+    /**
+     * Do not work in standard flash player
+     */
     NO_FLASH_PLAYER,
+    /**
+     * Deprecated instruction
+     */
     DEPRECATED,
+    /**
+     * Works with domain memory
+     */
     DOMAIN_MEMORY
 }

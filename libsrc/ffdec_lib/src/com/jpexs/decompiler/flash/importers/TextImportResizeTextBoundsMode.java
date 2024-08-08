@@ -23,5 +23,16 @@ package com.jpexs.decompiler.flash.importers;
  */
 public enum TextImportResizeTextBoundsMode {
 
-    NO_RESIZE, GROW_ONLY, GROW_AND_SHRINK
+    /**
+     * No resize
+     */
+    NO_RESIZE,
+    /**
+     * Grow only
+     */
+    GROW_ONLY,
+    /**
+     * Grow and shrink
+     */
+    GROW_AND_SHRINK
 }

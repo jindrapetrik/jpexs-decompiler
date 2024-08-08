@@ -25,5 +25,8 @@ import com.jpexs.decompiler.graph.DottedChain;
  */
 public interface AlchemyTypeIns {
 
+    /**
+     * Alchemy package name
+     */
     public static final DottedChain ALCHEMY_PACKAGE = new DottedChain(new String[]{"avm2", "intrinsics", "memory"});
 }

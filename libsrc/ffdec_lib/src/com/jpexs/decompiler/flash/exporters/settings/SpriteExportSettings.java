@@ -25,12 +25,26 @@ import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
  */
 public class SpriteExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "sprites";
 
+    /**
+     * Mode
+     */
     public SpriteExportMode mode;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param zoom Zoom
+     */
     public SpriteExportSettings(SpriteExportMode mode, double zoom) {
         this.mode = mode;
         this.zoom = zoom;

@@ -81,32 +81,60 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      */
     public boolean forceWriteAsLong = false;
 
+    /**
+     * Tag name
+     */
     protected String tagName;
 
+    /**
+     * SWF
+     */
     @Internal
     protected transient SWF swf;
 
+    /**
+     * Timelined
+     */
     @Internal
     protected transient Timelined timelined;
 
     @Internal
     private boolean modified;
 
+    /**
+     * Imported flag
+     */
     @Internal
     protected boolean imported = false;
 
+    /**
+     * Imported deep flag
+     */
     @Internal
     protected boolean importedDeep = false;
 
+    /**
+     * Sets imported flag
+     * @param imported True if imported
+     * @param deep True if imported deep
+     */
     public void setImported(boolean imported, boolean deep) {
         this.imported = imported;
         this.importedDeep = deep;
     }
 
+    /**
+     * Returns true if tag is imported
+     * @return True if imported
+     */
     public boolean isImported() {
         return imported;
     }
 
+    /**
+     * Returns true if tag is imported deep
+     * @return True if imported deep
+     */
     public boolean isImportedDeep() {
         return importedDeep;
     }
@@ -143,14 +171,26 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    /**
+     * Returns tag name.
+     * @return Tag name
+     */
     public String getTagName() {
         return tagName;
     }
 
+    /**
+     * Gets name properties.
+     * @return Name properties
+     */
     public Map<String, String> getNameProperties() {
         return new LinkedHashMap<>();
     }
 
+    /**
+     * Gets name
+     * @return Name
+     */
     public String getName() {
         StringBuilder sb = new StringBuilder();
         sb.append(tagName);
@@ -187,14 +227,27 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return swf;
     }
 
+    /**
+     * Gets SWF
+     * @return SWF
+     */
     public SWF getSwf() {
         return swf;
     }
 
+    /**
+     * Sets SWF
+     * @param swf SWF
+     */
     public void setSwf(SWF swf) {
         setSwf(swf, false);
     }
 
+    /**
+     * Sets SWF
+     * @param swf SWF
+     * @param deep True if deep
+     */
     public void setSwf(SWF swf, boolean deep) {
         this.swf = swf;
         if (deep) {
@@ -207,14 +260,33 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    /**
+     * Gets timelined.
+     * @return Timelined
+     */
     public Timelined getTimelined() {
         return timelined;
     }
 
+    /**
+     * Sets timelined.
+     * @param timelined Timelined
+     */
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
     }
 
+    /**
+     * Reads tag data from the stream-
+     * @param sis SWF input stream
+     * @param data Data
+     * @param level Level
+     * @param parallel Parallel
+     * @param skipUnusualTags Skip unusual tags
+     * @param lazy Lazy
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public abstract void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException;
 
     private static final Object lockObject = new Object();
@@ -227,6 +299,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     private static volatile List<Integer> requiredTagIds;
 
+    /**
+     * Gets known tag identifiers
+     * @return Known tag identifiers
+     */
     public static Integer[] getKnownTags() {
         if (knownTagIds == null) {
             synchronized (lockObject) {
@@ -240,6 +316,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagIds;
     }
 
+    /**
+     * Gets known classes.
+     * @return Known classes
+     */
     public static Map<Integer, TagTypeInfo> getKnownClasses() {
         if (knownTagInfosById == null) {
             synchronized (lockObject) {
@@ -333,6 +413,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return knownTagInfosById;
     }
 
+    /**
+     * Gets known classes by name.
+     * @return Known classes by name
+     */
     public static Map<String, TagTypeInfo> getKnownClassesByName() {
         // map is filled together with knownTagInfosById
         if (knownTagInfosByName == null) {
@@ -347,6 +431,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         map2.put(name, new TagTypeInfo(id, cls, name));
     }
 
+    /**
+     * Gets required tag identifiers
+     * @return Required tag identifiers
+     */
     public static List<Integer> getRequiredTags() {
         if (requiredTagIds == null) {
             synchronized (lockObject) {
@@ -397,6 +485,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return requiredTagIds;
     }
 
+    /**
+     * Gets SWF version.
+     * @return SWF version
+     */
     public int getVersion() {
         if (swf == null) {
             return SWF.DEFAULT_VERSION;
@@ -404,6 +496,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return swf.version;
     }
 
+    /**
+     * Gets header.
+     * @param dataLength Data length
+     * @return Header
+     */
     protected byte[] getHeader(int dataLength) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -426,6 +523,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return baos.toByteArray();
     }
 
+    /**
+     * Gets tag header.
+     * @param tagIDTagLength Tag ID tag length
+     * @param tagLength Tag length
+     * @param writeLong Write long
+     * @param version Version
+     * @return Tag header
+     */
     public static byte[] getTagHeader(int tagIDTagLength, long tagLength, boolean writeLong, int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -458,6 +563,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    /**
+     * Clones the tag.
+     * @return Cloned tag
+     * @throws InterruptedException On interrupt
+     * @throws IOException On I/O error
+     */
     public Tag cloneTag() throws InterruptedException, IOException {
         byte[] data = getData();
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, 0, data.length);
@@ -466,6 +577,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
     }
 
+    /**
+     * Gets original tag.
+     * @return Original tag
+     * @throws InterruptedException On interrupt
+     * @throws IOException On I/O error
+     */
     public Tag getOriginalTag() throws InterruptedException, IOException {
         byte[] data = getOriginalData();
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
@@ -474,10 +591,19 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
     }
 
+    /**
+     * Checks if the tag changes can be undone.
+     * @return True if can be undone
+     */
     public boolean canUndo() {
         return originalRange != null && isModified();
     }
 
+    /**
+     * Undoes the tag changes.
+     * @throws InterruptedException On interrupt
+     * @throws IOException On I/O error
+     */
     public void undo() throws InterruptedException, IOException {
         if (originalRange == null) { //If the tag is newly created in GUI it has no original data
             return;
@@ -488,11 +614,6 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         setModified(false);
     }
 
-    /**
-     * Returns string representation of the object
-     *
-     * @return String representation of the object
-     */
     @Override
     public String toString() {
         return getName();
@@ -533,6 +654,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return baos.toByteArray();
     }
 
+    /**
+     * Gets original byte range.
+     * @return Original byte range
+     */
     public final ByteArrayRange getOriginalRange() {
         return originalRange;
     }
@@ -556,6 +681,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return data;
     }
 
+    /**
+     * Gets original data length.
+     * @return Original data length
+     */
     public final int getOriginalDataLength() {
         if (originalRange == null) {
             return 0;
@@ -569,6 +698,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return shortLength == 0x3f;
     }
 
+    /**
+     * Gets position in original Range.
+     * @return Position
+     */
     public long getPos() {
         if (originalRange == null) {
             return -1;
@@ -577,6 +710,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return originalRange.getPos();
     }
 
+    /**
+     * Gets data position.
+     * @return Data position
+     */
     public long getDataPos() {
         if (originalRange == null) {
             return -1;
@@ -585,6 +722,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return originalRange.getPos() + (isLongOriginal() ? 6 : 2);
     }
 
+    /**
+     * Sets modified flag
+     * @param value True if modified
+     */
     public void setModified(boolean value) {
         boolean oldValue = modified;
         modified = value;
@@ -593,20 +734,34 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    /**
+     * Adds event listener.
+     * @param listener Listener
+     */
     public final void addEventListener(TagChangedListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Removes event listener.
+     * @param listener Listener
+     */
     public final void removeEventListener(TagChangedListener listener) {
         listeners.remove(listener);
     }
 
+    /**
+     * Informs listeners.
+     */
     protected void informListeners() {
         for (TagChangedListener listener : listeners) {
             listener.handleEvent(this);
         }
     }
 
+    /**
+     * Creates original data.
+     */
     public void createOriginalData() {
         byte[] data = getData();
         byte[] headerData = getHeader(data.length);
@@ -621,6 +776,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return modified;
     }
 
+    /**
+     * Checks if the tag is read only.
+     * @return True if read only
+     */
     public boolean isReadOnly() {
         return isImported();
     }
@@ -629,6 +788,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
     }
 
+    /**
+     * Gets missing needed characters.
+     * @param needed Needed
+     * @return Missing needed characters
+     */
     public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
         Set<Integer> needed2 = new ListSet<>(needed);
         if (needed2.isEmpty()) {
@@ -668,6 +832,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return false;
     }
 
+    /**
+     * Gets needed characters deep.
+     * @param needed Needed
+     */
     public void getNeededCharactersDeep(Set<Integer> needed) {
         Set<Integer> needed2 = new LinkedHashSet<>();
         getNeededCharacters(needed2, swf);
@@ -732,10 +900,18 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
+    /**
+     * Gets dependent characters.
+     * @param dependent Result
+     */
     public void getDependentCharacters(Set<Integer> dependent) {
         getDependentCharactersOnTimelined(swf, dependent);
     }
 
+    /**
+     * Gets tag info.
+     * @param tagInfo Tag info
+     */
     public void getTagInfo(TagInfo tagInfo) {
 
         tagInfo.addInfo("general", "tagType", String.format("%s (%d)", tagName, id));
@@ -784,6 +960,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }*/
     }
 
+    /**
+     * Gets charset.
+     * @return Charset
+     */
     public String getCharset() {
         if (swf == null) {
             return Utf8Helper.charsetName;
@@ -791,6 +971,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         return swf.getCharset();
     }
 
+    /**
+     * Gets unique id.
+     * @return Unique id
+     */
     public String getUniqueId() {
         return null;
     }

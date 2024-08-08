@@ -25,12 +25,26 @@ import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
  */
 public class SoundExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "sounds";
 
+    /**
+     * Mode
+     */
     public SoundExportMode mode;
 
+    /**
+     * Resample WAV
+     */
     public boolean resampleWav;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param resampleWav Resample WAV
+     */
     public SoundExportSettings(SoundExportMode mode, boolean resampleWav) {
         this.mode = mode;
         this.resampleWav = resampleWav;

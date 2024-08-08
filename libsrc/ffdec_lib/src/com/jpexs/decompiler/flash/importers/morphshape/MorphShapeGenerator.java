@@ -47,6 +47,14 @@ import java.util.Set;
  */
 public class MorphShapeGenerator {
 
+    /**
+     * Generates morph shape.
+     *
+     * @param morphShape Morph shape
+     * @param startShape Start shape
+     * @param endShape End shape
+     * @throws StyleMismatchException On style mismatch
+     */
     public void generate(DefineMorphShape2Tag morphShape, ShapeTag startShape, ShapeTag endShape) throws StyleMismatchException {
 
         SWF swf = morphShape.getSwf();

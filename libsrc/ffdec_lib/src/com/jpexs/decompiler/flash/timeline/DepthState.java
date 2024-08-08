@@ -44,102 +44,102 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DepthState {
 
     /**
-     * Depth.
+     * Depth
      */
     public int depth = -1;
 
     /**
-     * CharacterId.
+     * CharacterId
      */
     public int characterId = -1;
 
     /**
-     * Matrix.
+     * Matrix
      */
     public MATRIX matrix;
 
     /**
-     * Instance name.
+     * Instance name
      */
     public String instanceName;
 
     /**
-     * Class name.
+     * Class name
      */
     public String className;
 
     /**
-     * Color transform.
+     * Color transform
      */
     public ColorTransform colorTransForm;
 
     /**
-     * Whether to cache as bitmap.
+     * Whether to cache as bitmap
      */
     public boolean cacheAsBitmap = false;
 
     /**
-     * Blend mode.
+     * Blend mode
      */
     public int blendMode = 0;
 
     /**
-     * Filters.
+     * Filters
      */
     public List<FILTER> filters = new ArrayList<>();
 
     /**
-     * Whether is visible.
+     * Whether is visible
      */
     public boolean isVisible = true;
 
     /**
-     * Background color.
+     * Background color
      */
     public RGBA backGroundColor;
 
     /**
-     * Clip actions.
+     * Clip actions
      */
     public CLIPACTIONS clipActions;
 
     /**
-     * AMF data.
+     * AMF data
      */
     public byte[] amfData;
 
     /**
-     * Ratio.
+     * Ratio
      */
     public int ratio = -1;
 
     /**
-     * Whether this is a keyframe.
+     * Whether this is a keyframe
      */
     public boolean key = false;
 
     /**
-     * Clip depth.
+     * Clip depth
      */
     public int clipDepth = -1;
 
     /**
-     * How many frames this depthstate is the same.
+     * How many frames this depthstate is the same
      */
     public int time = 0;
 
     /**
-     * SWF file.
+     * SWF file
      */
     private final SWF swf;
 
     /**
-     * Frame.
+     * Frame
      */
     public Frame frame;
 
     /**
-     * Frame of placeobject.
+     * Frame of placeobject
      */
     public Frame placeFrame;
 
@@ -149,27 +149,27 @@ public class DepthState {
     public PlaceObjectTypeTag placeObjectTag;
 
     /**
-     * Minimum required PlaceObject version.
+     * Minimum required PlaceObject version
      */
     public int minPlaceObjectNum;
 
     /**
-     * Instance identifier.
+     * Instance identifier
      */
     public long instanceId;
 
     /**
-     * Whether this is a motion tween.
+     * Whether this is a motion tween
      */
     public boolean motionTween = false;
 
     /**
-     * Whether this state has an image placed.
+     * Whether this state has an image placed
      */
     public boolean hasImage = false;
 
     /**
-     * Instance ids counter.
+     * Instance ids counter
      */
     private static AtomicLong lastInstanceId = new AtomicLong(0);
 

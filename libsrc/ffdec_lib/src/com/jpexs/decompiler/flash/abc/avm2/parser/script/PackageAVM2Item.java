@@ -32,12 +32,27 @@ import java.util.List;
  */
 public class PackageAVM2Item extends AVM2Item {
 
+    /**
+     * Items
+     */
     public List<GraphTargetItem> items;
 
+    /**
+     * Package name
+     */
     public DottedChain packageName;
 
+    /**
+     * Imported classes
+     */
     public List<DottedChain> importedClasses = new ArrayList<>();
 
+    /**
+     * Constructor.
+     * @param importedClasses Imported classes
+     * @param packageName Package name
+     * @param items Items
+     */
     public PackageAVM2Item(List<DottedChain> importedClasses, DottedChain packageName, List<GraphTargetItem> items) {
         super(null, null, NOPRECEDENCE);
         this.importedClasses = importedClasses;

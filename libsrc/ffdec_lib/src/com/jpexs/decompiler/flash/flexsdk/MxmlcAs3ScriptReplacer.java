@@ -24,8 +24,6 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
-import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -64,6 +62,10 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
     private File swcFile;
     private List<File> dependenciesSwcFiles = new ArrayList<>();
 
+    /**
+     * Constructor.
+     * @param flexSdkPath Path to Flex SDK.
+     */
     public MxmlcAs3ScriptReplacer(String flexSdkPath) {
         super(flexSdkPath);
     }

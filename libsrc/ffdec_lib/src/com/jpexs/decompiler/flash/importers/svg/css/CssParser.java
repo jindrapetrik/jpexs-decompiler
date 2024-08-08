@@ -40,12 +40,21 @@ public class CssParser {
 
     private final List<Integer> specifities = new ArrayList<>();
 
+    /**
+     * Constructor.
+     * @param s CSS string
+     */
     public CssParser(String s) {
         this.s = s;
         this.lexer = new CssLexer(new StringReader(s));
     }
 
-    public void styleshet() throws IOException, CssParseException {
+    /**
+     * Parse CSS stylesheet.
+     * @throws IOException On I/O error
+     * @throws CssParseException On parse error
+     */
+    public void stylesheet() throws IOException, CssParseException {
         CssParsedSymbol symb = lex();
         if (symb.type == CssSymbolType.CHARSET_SYM) {
             expect(CssSymbolType.STRING);
@@ -459,30 +468,66 @@ public class CssParser {
         throw new CssParseException(String.join(",", toPrint) + " expected but " + symb + " found");
     }
 
+    /**
+     * Gets count of rulesets.
+     * @return Count of rulesets
+     */
     public int getCountRulesets() {
         return declarations.size();
     }
 
+    /**
+     * Gets selector.
+     * @param index Index of selector
+     * @return Selector
+     */
     public String getSelector(int index) {
         return selectors.get(index);
     }
 
+    /**
+     * Gets declarations.
+     * @param index Index of declarations
+     * @return Declarations
+     */
     public String getDeclarations(int index) {
         return declarations.get(index);
     }
 
+    /**
+     * Gets count of properties in ruleset.
+     * @param index Index of ruleset
+     * @return Count of properties
+     */
     public int getPropertyCount(int index) {
         return propNames.get(index).size();
     }
 
+    /**
+     * Gets property name.
+     * @param ruleSetIndex Index of ruleset
+     * @param propertyIndex Index of property
+     * @return Property name
+     */
     public String getPropertyName(int ruleSetIndex, int propertyIndex) {
         return propNames.get(ruleSetIndex).get(propertyIndex);
     }
 
+    /**
+     * Gets property value.
+     * @param ruleSetIndex Index of ruleset
+     * @param propertyIndex Index of property
+     * @return Property value
+     */
     public String getPropertyValue(int ruleSetIndex, int propertyIndex) {
         return propValues.get(ruleSetIndex).get(propertyIndex);
     }
 
+    /**
+     * Gets specifity of ruleset.
+     * @param index Index of ruleset
+     * @return Specifity
+     */
     public int getSpecifity(int index) {
         return specifities.get(index);
     }

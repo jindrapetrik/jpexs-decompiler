@@ -35,6 +35,11 @@ public class Clip {
      */
     public int depth;
 
+    /**
+     * Constructor.
+     * @param shape Shape
+     * @param depth Clipping depth
+     */
     public Clip(Shape shape, int depth) {
         this.shape = shape;
         this.depth = depth;

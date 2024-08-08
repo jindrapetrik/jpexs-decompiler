@@ -49,7 +49,7 @@ public class FontHelper {
         return clFmFactory.getDeclaredMethod("getInstance").invoke(null);
     }*/
     /**
-     * Gets all available fonts in the system
+     * Gets all available fonts in the system.
      *
      * @return Map of FamilyName to Map FontName to Font
      */
@@ -107,6 +107,11 @@ public class FontHelper {
         return ret;
     }
 
+    /**
+     * Converts font to string.
+     * @param font Font
+     * @return String
+     */
     public static String fontToString(Font font) {
         int style = font.getStyle();
         String styleString;
@@ -128,12 +133,17 @@ public class FontHelper {
         return font.getName() + "-" + styleString + "-" + font.getSize();
     }
 
+    /**
+     * Converts string to font.
+     * @param fontString String
+     * @return Font
+     */
     public static Font stringToFont(String fontString) {
         return Font.decode(fontString);
     }
 
     /**
-     * Gets kerning offset for two characters of the font
+     * Gets kerning offset for two characters of the font.
      *
      * @param font Font
      * @param char1 First character
@@ -159,6 +169,12 @@ public class FontHelper {
         return withKerningX - noKerningX;
     }
 
+    /**
+     * Gets kerning pairs for the font.
+     * @param fontFile Font file
+     * @param size Size
+     * @return List of kerning pairs
+     */
     public static List<KerningPair> getFontKerningPairs(File fontFile, int size) {
 
         KerningLoader k = new KerningLoader();
@@ -219,14 +235,32 @@ public class FontHelper {
         return ret;
     }
 
+    /**
+     * Kerning pair.
+     */
     public static class KerningPair {
 
+        /**
+         * First character
+         */
         public final char char1;
 
+        /**
+         * Second character
+         */
         public final char char2;
 
+        /**
+         * Kerning
+         */
         public int kerning;
 
+        /**
+         * Constructor.
+         * @param char1 First character
+         * @param char2 Second character
+         * @param kerning Kerning
+         */
         public KerningPair(char char1, char char2, int kerning) {
             this.char1 = char1;
             this.char2 = char2;
@@ -288,6 +322,10 @@ public class FontHelper {
         }
     }*/
 
+    /**
+     * Gets installed font files.
+     * @return Map of FamilyName to Map FontName to File
+     */
     public static Map<String, Map<String, File>> getInstalledFontFiles() {
         Map<String, Map<String, File>> ret = new HashMap<>();
 

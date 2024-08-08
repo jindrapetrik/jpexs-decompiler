@@ -66,6 +66,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class SoundImporter {
 
+    /**
+     * Imports sound from input stream.
+     * @param soundTag Sound tag
+     * @param is Input stream
+     * @param newSoundFormat New sound format
+     * @return True if sound was imported successfully
+     * @throws SoundImportException
+     */
     public boolean importDefineSound(DefineSoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
         int newSoundRate = -1;
         boolean newSoundSize = false;
@@ -225,6 +233,14 @@ public class SoundImporter {
         return (size + 10);
     }
 
+    /**
+     * Imports sound stream from input stream.
+     * @param streamHead Sound stream head
+     * @param is Input stream
+     * @param newSoundFormat New sound format
+     * @return True if sound stream was imported successfully
+     * @throws UnsupportedSamplingRateException On unsupported sampling rate
+     */
     public boolean importSoundStream(SoundStreamHeadTypeTag streamHead, InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException {
         List<MP3FRAME> mp3Frames = null;
         int newSoundRate = -1;
@@ -471,6 +487,14 @@ public class SoundImporter {
         return true;
     }
 
+    /**
+     * Imports sound from input stream.
+     * @param soundTag Sound tag
+     * @param is Input stream
+     * @param newSoundFormat New sound format
+     * @return True if sound was imported successfully
+     * @throws SoundImportException On sound import error
+     */
     public boolean importSound(SoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
         if (soundTag instanceof DefineSoundTag) {
             return importDefineSound((DefineSoundTag) soundTag, is, newSoundFormat);
@@ -481,6 +505,13 @@ public class SoundImporter {
         return false;
     }
 
+    /**
+     * Bulk imports sounds from directory.
+     * @param soundDir Sound directory
+     * @param swf SWF
+     * @param printOut Print out
+     * @return Number of imported sounds
+     */
     public int bulkImport(File soundDir, SWF swf, boolean printOut) {
 
         Map<Integer, CharacterTag> characters = swf.getCharacters(false);

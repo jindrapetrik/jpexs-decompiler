@@ -25,17 +25,35 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
  */
 public class ShapeExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "shapes";
 
+    /**
+     * Mode
+     */
     public ShapeExportMode mode;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param zoom Zoom
+     */
     public ShapeExportSettings(ShapeExportMode mode, double zoom) {
         this.mode = mode;
         this.zoom = zoom;
     }
 
+    /**
+     * Get file extension.
+     * @return File extension
+     */
     public String getFileExtension() {
         switch (mode) {
             case SVG:

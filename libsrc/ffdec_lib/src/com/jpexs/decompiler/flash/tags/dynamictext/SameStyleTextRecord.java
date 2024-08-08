@@ -26,14 +26,30 @@ import java.util.List;
  */
 public class SameStyleTextRecord {
 
+    /**
+     * Text style
+     */
     public TextStyle style;
 
+    /**
+     * X offset
+     */
     public int xOffset;
 
+    /**
+     * Width
+     */
     public int width;
 
+    /**
+     * Glyph entries
+     */
     public List<GlyphCharacter> glyphEntries = new ArrayList<>();
 
+    /**
+     * Calculates text widths
+     * @return
+     */
     public int calculateTextWidths() {
 
         int width = 0;

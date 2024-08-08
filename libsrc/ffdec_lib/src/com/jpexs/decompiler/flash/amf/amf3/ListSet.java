@@ -31,10 +31,18 @@ public class ListSet<E> implements Set<E> {
 
     private final List<E> list = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public ListSet() {
 
     }
 
+    /**
+     * Constructor.
+     *
+     * @param c Collection
+     */
     public ListSet(Collection<? extends E> c) {
         addAll(c);
     }

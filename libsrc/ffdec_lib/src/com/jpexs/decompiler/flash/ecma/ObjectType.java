@@ -29,26 +29,53 @@ import java.util.Set;
  */
 public class ObjectType implements Callable {
 
+    /**
+     * Empty object
+     */
     public static final ObjectType EMPTY_OBJECT = new ObjectType();
 
+    /**
+     * Attributes
+     */
     protected Map<String, Object> attributes;
 
+    /**
+     * Sets attribute.
+     * @param name Name
+     * @param value Value
+     */
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
     }
 
+    /**
+     * Gets attribute names.
+     * @return Attribute names
+     */
     public Set<String> getAttributeNames() {
         return attributes.keySet();
     }
 
+    /**
+     * Constructor.
+     */
     protected ObjectType() {
         this.attributes = new HashMap<>();
     }
 
+    /**
+     * Constructor.
+     * @param attributes Attributes
+     */
     public ObjectType(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 
+    /**
+     * Gets attribute.
+     * @param name Name
+     * @return Attribute
+     */
     public Object getAttribute(String name) {
         if (attributes.containsKey(name)) {
             return attributes.get(name);
@@ -61,14 +88,26 @@ public class ObjectType implements Callable {
         return "[object " + getTypeName() + "]";
     }
 
+    /**
+     * Gets type name.
+     * @return Type name
+     */
     public String getTypeName() {
         return "Object";
     }
 
+    /**
+     * Converts to primitive.
+     * @return Primitive
+     */
     public Object toPrimitive() {
         return toString();
     }
 
+    /**
+     * Converts to number.
+     * @return Number
+     */
     public Object valueOf() {
         return EcmaScript.toNumber(toString());
     }

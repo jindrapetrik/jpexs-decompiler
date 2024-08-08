@@ -39,6 +39,9 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
      */
     public boolean hasMultTerms;
 
+    /**
+     * Number of bits
+     */
     @Calculated
     @SWFType(value = BasicType.UB, count = 4)
     public int nbits;
@@ -139,9 +142,16 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
         return hasMultTerms ? alphaMultTerm : super.getAlphaMulti();
     }
 
+    /**
+     * Constructor.
+     */
     public CXFORMWITHALPHA() {
     }
 
+    /**
+     * Constructor.
+     * @param cxform CXFORM object
+     */
     public CXFORMWITHALPHA(CXFORM cxform) {
         redMultTerm = cxform.redMultTerm;
         greenMultTerm = cxform.greenMultTerm;
@@ -153,6 +163,10 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
         alphaMultTerm = 255;
     }
 
+    /**
+     * Constructor.
+     * @param colorTransform Color transform
+     */
     public CXFORMWITHALPHA(ColorTransform colorTransform) {
         redMultTerm = colorTransform.getRedMulti();
         greenMultTerm = colorTransform.getGreenMulti();

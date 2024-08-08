@@ -27,6 +27,9 @@ import java.util.List;
  */
 public class LexBufferer implements LexListener {
 
+    /**
+     * List of stored symbols
+     */
     private final List<ParsedSymbol> items = new ArrayList<>();
 
     @Override
@@ -41,6 +44,10 @@ public class LexBufferer implements LexListener {
         }
     }
 
+    /**
+     * Pushes all stored symbols back to lexer
+     * @param lexer Lexer
+     */
     public void pushAllBack(ActionScriptLexer lexer) {
         for (int i = items.size() - 1; i >= 0; i--) {
             lexer.pushback(items.get(i));

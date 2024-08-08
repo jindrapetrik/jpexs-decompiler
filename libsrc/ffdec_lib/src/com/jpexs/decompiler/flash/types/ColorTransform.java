@@ -28,19 +28,45 @@ import java.awt.image.RescaleOp;
  */
 public class ColorTransform implements Cloneable {
 
+    /**
+     * Constructor.
+     */
+    public ColorTransform() {
+
+    }
+
+    /**
+     * Converts this color transform to RescaleOp.
+     * @return RescaleOp
+     */
     public RescaleOp toRescaleOp() {
         return new RescaleOp(new float[]{getRedMulti() / 256f, getGreenMulti() / 256f, getBlueMulti() / 256f, getAlphaMulti() / 256f},
                 new float[]{getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd()}, null);
     }
 
+    /**
+     * Applies this color transform to the given image.
+     * @param src Source image
+     * @return Transformed image
+     */
     public SerializableImage apply(SerializableImage src) {
         return Filtering.colorEffect(src, getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti());
     }
 
+    /**
+     * Applies this color transform to the given color.
+     * @param color Color
+     * @return Transformed color
+     */
     public int apply(int color) {
         return Filtering.colorEffect(color, getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti());
     }
 
+    /**
+     * Applies this color transform to the given color.
+     * @param color Color
+     * @return Transformed color
+     */
     public RGB apply(RGB color) {
         if (color == null) {
             return null;
@@ -48,6 +74,11 @@ public class ColorTransform implements Cloneable {
         return new RGBA(Filtering.colorEffect(color.toInt(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
+    /**
+     * Applies this color transform to the given color.
+     * @param color Color
+     * @return Transformed color
+     */
     public RGBA apply(RGBA color) {
         if (color == null) {
             return null;
@@ -55,6 +86,11 @@ public class ColorTransform implements Cloneable {
         return new RGBA(Filtering.colorEffect(color.toInt(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
+    /**
+     * Applies this color transform to the given color.
+     * @param color Color
+     * @return Transformed color
+     */
     public Color apply(Color color) {
         if (color == null) {
             return null;
@@ -62,6 +98,11 @@ public class ColorTransform implements Cloneable {
         return new Color(Filtering.colorEffect(color.getRGB(), getRedAdd(), getGreenAdd(), getBlueAdd(), getAlphaAdd(), getRedMulti(), getGreenMulti(), getBlueMulti(), getAlphaMulti()));
     }
 
+    /**
+     * Applies this color transform to gradient records.
+     * @param gradRecords Gradient records
+     * @return Transformed gradient records
+     */
     public GRADRECORD[] apply(GRADRECORD[] gradRecords) {
         GRADRECORD[] ret = new GRADRECORD[gradRecords.length];
         for (int i = 0; i < gradRecords.length; i++) {
@@ -75,38 +116,75 @@ public class ColorTransform implements Cloneable {
         return ret;
     }
 
+    /**
+     * Gets red addition.
+     * @return Red addition
+     */
     public int getRedAdd() {
         return 0;
     }
 
+    /**
+     * Gets green addition.
+     * @return Green addition
+     */
     public int getGreenAdd() {
         return 0;
     }
 
+    /**
+     * Gets blue addition.
+     * @return Blue addition
+     */
     public int getBlueAdd() {
         return 0;
     }
 
+    /**
+     * Gets alpha addition.
+     * @return Alpha addition
+     */
     public int getAlphaAdd() {
         return 0;
     }
 
+    /**
+     * Gets red multiplier.
+     * @return Red multiplier
+     */
     public int getRedMulti() {
         return 256;
     }
 
+    /**
+     * Gets green multiplier.
+     * @return Green multiplier
+     */
     public int getGreenMulti() {
         return 256;
     }
 
+    /**
+     * Gets blue multiplier.
+     * @return Blue multiplier
+     */
     public int getBlueMulti() {
         return 256;
     }
 
+    /**
+     * Gets alpha multiplier.
+     * @return Alpha multiplier
+     */
     public int getAlphaMulti() {
         return 256;
     }
 
+    /**
+     * Merges this color transform with another one.
+     * @param c Another color transform
+     * @return Merged color transform
+     */
     public ColorTransform merge(final ColorTransform c) {
         final ColorTransform t = this;
         return new ColorTransform() {

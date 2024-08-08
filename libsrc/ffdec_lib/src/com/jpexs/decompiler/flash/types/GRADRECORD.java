@@ -28,18 +28,35 @@ import java.util.Objects;
  */
 public class GRADRECORD implements Serializable {
 
+    /**
+     * Ratio
+     */
     @SWFType(BasicType.UI8)
     public int ratio;
 
+    /**
+     * In shape 3
+     */
     @Internal
     public boolean inShape3;
 
+    /**
+     * Color
+     */
     public RGB color;
 
+    /**
+     * Gets the ratio as a float
+     * @return Ratio as a float
+     */
     public float getRatioFloat() {
         return ((float) ratio) / 255.0f;
     }
 
+    /**
+     * Converts this record to a morph gradient record
+     * @return Morph gradient record
+     */
     public MORPHGRADRECORD toMorphGradRecord() {
         MORPHGRADRECORD morphGradRecord = new MORPHGRADRECORD();
         morphGradRecord.startColor = new RGBA(color);
@@ -49,6 +66,11 @@ public class GRADRECORD implements Serializable {
         return morphGradRecord;
     }
 
+    /**
+     * Converts this record to a morph gradient record
+     * @param endGradRecord End gradient record
+     * @return Morph gradient record
+     */
     public MORPHGRADRECORD toMorphGradRecord(GRADRECORD endGradRecord) {
         MORPHGRADRECORD morphGradRecord = new MORPHGRADRECORD();
         morphGradRecord.startColor = new RGBA(color);

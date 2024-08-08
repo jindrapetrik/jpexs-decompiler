@@ -23,24 +23,84 @@ package com.jpexs.decompiler.flash.exporters.script.graphviz;
  */
 public enum TokenType {
 
-    OPERATOR, // Language operators
-    DELIMITER, // Delimiters.  Constructs that are not necessarily operators for a language
-    KEYWORD, // language reserved keywords
-    KEYWORD2, // Other language reserved keywords, like C #defines
-    IDENTIFIER, // identifiers, variable names, class names
-    NUMBER, // numbers in various formats
-    STRING, // String
-    STRING2, // For highlighting meta chars within a String
-    COMMENT, // comments
-    COMMENT2, // special stuff within comments
-    REGEX, // regular expressions
-    REGEX2, // special chars within regular expressions
-    TYPE, // Types, usually not keywords, but supported by the language
-    TYPE2, // Types from standard libraries
-    TYPE3, // Types for users
-    DEFAULT, // any other text
-    WARNING, // Text that should be highlighted as a warning    
-    ERROR, // Text that signals an error
+    /**
+     * Language operators
+     */
+    OPERATOR,
+    /**
+     * Delimiters.  Constructs that are not necessarily operators for a language
+     */
+    DELIMITER,
+    /**
+     * Language reserved keywords
+     */
+    KEYWORD,
+    /**
+     * Other language reserved keywords, like C #defines
+     */
+    KEYWORD2,
+    /**
+     * Identifiers, variable names, class names
+     */
+    IDENTIFIER,
+    /**
+     * Numbers in various formats
+     */
+    NUMBER,
+    /**
+     * String
+     */
+    STRING,
+    /**
+     * For highlighting meta chars within a String
+     */
+    STRING2,
+    /**
+     * Comments
+     */
+    COMMENT,
+    /**
+     * Special stuff within comments
+     */
+    COMMENT2,
+    /**
+     * Regular expressions
+     */
+    REGEX,
+    /**
+     * Special chars within regular expressions
+     */
+    REGEX2,
+    /**
+     * Types, usually not keywords, but supported by the language
+     */
+    TYPE,
+    /**
+     * Types from standard libraries
+     */
+    TYPE2,
+    /**
+     * Types for users
+     */
+    TYPE3,
+    /**
+     * Any other text
+     */
+    DEFAULT,
+    /**
+     * Text that should be highlighted as a warning
+     */
+    WARNING,
+    /**
+     * Text that signals an error
+     */
+    ERROR,
+    /**
+     * Whitespace
+     */
     WHITESPACE,
+    /**
+     * Newline
+     */
     NEWLINE;
 }

@@ -23,19 +23,59 @@ package com.jpexs.decompiler.flash.docs;
  */
 public class ParsedSymbol {
 
+    /**
+     * End of file
+     */
     public static int TYPE_EOF = 0;
+    /**
+     * Identifier
+     */
     public static int TYPE_IDENTIFIER = 1;
+    /**
+     * Colon
+     */
     public static int TYPE_COLON = 2;
+    /**
+     * Open bracket
+     */
     public static int TYPE_BRACKET_OPEN = 3;
+    /**
+     * Close bracket
+     */
     public static int TYPE_BRACKET_CLOSE = 4;
+    /**
+     * Dots
+     */
     public static int TYPE_DOTS = 5;
+    /**
+     * Comma
+     */
     public static int TYPE_COMMA = 6;
+    /**
+     * Pipe
+     */
     public static int TYPE_PIPE = 7;
+    /**
+     * Star
+     */
     public static int TYPE_STAR = 8;
 
+    /**
+     * Type
+     */
     public final int type;
+
+    /**
+     * Value
+     */
     public final String value;
 
+    /**
+     * Constructor.
+     *
+     * @param type Type
+     * @param value Value
+     */
     public ParsedSymbol(int type, String value) {
         this.type = type;
         this.value = value;

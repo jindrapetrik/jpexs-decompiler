@@ -26,24 +26,60 @@ import com.jpexs.decompiler.flash.helpers.FileTextWriter;
  */
 public class ScriptExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "scripts";
 
+    /**
+     * Mode
+     */
     public ScriptExportMode mode;
 
+    /**
+     * Single file
+     */
     public boolean singleFile;
 
+    /**
+     * Single file writer
+     */
     public FileTextWriter singleFileWriter;
 
+    /**
+     * Ignore frame scripts
+     */
     public boolean ignoreFrameScripts;
 
+    /**
+     * Export embed
+     */
     public boolean exportEmbed;
 
+    /**
+     * Export embed fla mode
+     */
     public boolean exportEmbedFlaMode;
 
+    /**
+     * Resample WAV
+     */
     public boolean resampleWav;
 
+    /**
+     * Assets directory
+     */
     public String assetsDir;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param singleFile Single file
+     * @param ignoreFrameScripts Ignore frame scripts
+     * @param exportEmbed Export embed
+     * @param exportEmbedFlaMode Export embed fla mode
+     * @param resampleWav Resample WAV
+     */
     public ScriptExportSettings(
             ScriptExportMode mode,
             boolean singleFile,

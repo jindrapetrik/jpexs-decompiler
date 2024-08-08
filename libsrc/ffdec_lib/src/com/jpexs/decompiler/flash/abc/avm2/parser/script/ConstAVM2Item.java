@@ -30,26 +30,66 @@ import java.util.Map;
  */
 public class ConstAVM2Item extends AVM2Item {
 
+    /**
+     * Is static
+     */
     private final boolean isStatic;
 
+    /**
+     * Variable name
+     */
     public String var;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
+    /**
+     * Custom namespace
+     */
     public String customNamespace;
 
+    /**
+     * Metadata
+     */
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
+    /**
+     * Line
+     */
     public int line;
 
+    /**
+     * Package
+     */
     public NamespaceItem pkg;
 
+    /**
+     * Generated namespace
+     */
     public boolean generatedNs;
 
+    /**
+     * Check if is static
+     * @return Is static
+     */
     public boolean isStatic() {
         return isStatic;
     }
 
+    /**
+     * Constructor.
+     * @param metadata Metadata
+     * @param pkg Package
+     * @param customNamespace Custom namespace
+     * @param isStatic Is static
+     * @param var Variable name
+     * @param type Type
+     * @param value Value
+     * @param line Line
+     * @param generatedNs Generated namespace
+     */
     public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line, boolean generatedNs) {
 
         super(null, null, NOPRECEDENCE, value);

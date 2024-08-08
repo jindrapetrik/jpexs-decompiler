@@ -56,27 +56,64 @@ import java.util.Set;
  */
 public abstract class MorphShapeTag extends DrawableTag {
 
+    /**
+     * Maximum ratio value
+     */
     public static final int MAX_RATIO = 65535;
 
+    /**
+     * Character ID
+     */
     @SWFType(BasicType.UI16)
     public int characterId;
 
+    /**
+     * Start bounds
+     */
     public RECT startBounds;
 
+    /**
+     * End bounds
+     */
     public RECT endBounds;
 
+    /**
+     * Morph fill styles
+     */
     public MORPHFILLSTYLEARRAY morphFillStyles;
 
+    /**
+     * Morph line styles
+     */
     public MORPHLINESTYLEARRAY morphLineStyles;
 
+    /**
+     * Start edges
+     */
     public SHAPE startEdges;
 
+    /**
+     * End edges
+     */
     public SHAPE endEdges;
 
+    /**
+     * Constructor.
+     *
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public MorphShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Get morph shape number.
+     * DefineMorphShape = 1, DefineMorphShape2 = 2
+     * @return Morph shape number
+     */
     public abstract int getShapeNum();
 
     @Override
@@ -167,40 +204,82 @@ public abstract class MorphShapeTag extends DrawableTag {
         return rect;
     }
 
+    /**
+     * Gets start bounds.
+     * @return Start bounds
+     */
     public RECT getStartBounds() {
         return startBounds;
     }
 
+    /**
+     * Gets end bounds.
+     * @return End bounds
+     */
     public RECT getEndBounds() {
         return endBounds;
     }
 
+    /**
+     * Gets morph fill styles.
+     * @return Morph fill styles
+     */
     public MORPHFILLSTYLEARRAY getFillStyles() {
         return morphFillStyles;
     }
 
+    /**
+     * Gets morph line styles.
+     * @return Morph line styles
+     */
     public MORPHLINESTYLEARRAY getLineStyles() {
         return morphLineStyles;
     }
 
+    /**
+     * Gets start edges.
+     * @return Start edges
+     */
     public SHAPE getStartEdges() {
         return startEdges;
     }
 
+    /**
+     * Gets end edges.
+     * @return End edges
+     */
     public SHAPE getEndEdges() {
         return endEdges;
     }
 
+    /**
+     * Gets shape tag at ratio.
+     * @param ratio Ratio
+     * @return Shape tag
+     */
     public abstract ShapeTag getShapeTagAtRatio(int ratio);
 
+    /**
+     * Gets start shape tag.
+     * @return Start shape tag
+     */
     public ShapeTag getStartShapeTag() {
         return getShapeTagAtRatio(0);
     }
 
+    /**
+     * Gets end shape tag.
+     * @return End shape tag
+     */
     public ShapeTag getEndShapeTag() {
         return getShapeTagAtRatio(65535);
     }
 
+    /**
+     * Gets shape at ratio.
+     * @param ratio Ratio
+     * @return Shape
+     */
     public SHAPEWITHSTYLE getShapeAtRatio(int ratio) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(ratio);
@@ -378,14 +457,23 @@ public abstract class MorphShapeTag extends DrawableTag {
         result.append(cmse.getShapeData());
     }
 
+    /**
+     * Updates start bounds.
+     */
     public void updateStartBounds() {
         startBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, morphLineStyles.getStartLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
     }
 
+    /**
+     * Updates end bounds.
+     */
     public void updateEndBounds() {
         endBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, morphLineStyles.getEndLineStyles(getShapeNum()), getShapeNum() == 2 ? 4 : 3, false);
     }
 
+    /**
+     * Updates bounds.
+     */
     public void updateBounds() {
         updateStartBounds();
         updateEndBounds();

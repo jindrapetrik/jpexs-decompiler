@@ -24,20 +24,36 @@ public class UnsupportedValueTypeException extends RuntimeException {
     private Integer marker = null;
     private Class cls = null;
 
+    /**
+     * Constructor.
+     * @param cls Unsupported class.
+     */
     public UnsupportedValueTypeException(Class cls) {
         super("Unsupported type of value - class: " + cls.getSimpleName());
         this.cls = cls;
     }
 
+    /**
+     * Constructor.
+     * @param marker Unsupported marker.
+     */
     public UnsupportedValueTypeException(int marker) {
         super("Unsupported type of value - marker: 0x" + Integer.toHexString(marker));
         this.marker = marker;
     }
 
+    /**
+     * Gets marker.
+     * @return Marker.
+     */
     public Integer getMarker() {
         return marker;
     }
 
+    /**
+     * Gets unsupported class.
+     * @return Unsupported class.
+     */
     public Class getUnsupportedClass() {
         return this.cls;
     }

@@ -34,20 +34,38 @@ public class SvgStyleProperty {
 
     private final Object initial;
 
+    /**
+     * Constructor.
+     * @param name Name
+     * @param inherited Is inherited
+     * @param initial Initial value
+     */
     public SvgStyleProperty(String name, boolean inherited, Object initial) {
         this.name = name;
         this.inherited = inherited;
         this.initial = initial;
     }
 
+    /**
+     * Gets name.
+     * @return Name
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * Checks if is inherited.
+     * @return Is inherited
+     */
     public boolean isInherited() {
         return inherited;
     }
 
+    /**
+     * Gets initial value.
+     * @return Initial value
+     */
     public Object getInitialValue() {
         return initial;
     }
@@ -73,10 +91,19 @@ public class SvgStyleProperty {
         properties = p;
     }
 
+    /**
+     * Gets all properties.
+     * @return All properties
+     */
     public static Collection<SvgStyleProperty> getProperties() {
         return properties.values();
     }
 
+    /**
+     * Gets property by name.
+     * @param name Name
+     * @return Property
+     */
     public static SvgStyleProperty getByName(String name) {
         return properties.get(name);
     }

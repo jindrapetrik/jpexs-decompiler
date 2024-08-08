@@ -25,10 +25,22 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
  */
 public class GlyphCharacter {
 
+    /**
+     * Glyph entry
+     */
     public GLYPHENTRY glyphEntry;
 
+    /**
+     * Character
+     */
     public char character;
 
+    /**
+     * Constructor.
+     *
+     * @param character Character
+     * @param glyphEntry Glyph entry
+     */
     public GlyphCharacter(char character, GLYPHENTRY glyphEntry) {
 
         this.character = character;

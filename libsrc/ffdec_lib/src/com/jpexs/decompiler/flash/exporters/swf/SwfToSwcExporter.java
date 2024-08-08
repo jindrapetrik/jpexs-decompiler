@@ -51,9 +51,21 @@ import java.util.zip.ZipOutputStream;
  */
 public class SwfToSwcExporter {
 
+    /**
+     * Dependency - namespace
+     */
     private static final String DEPENDENCY_NAMESPACE = "n";
+    /**
+     * Dependency - inheritance
+     */
     private static final String DEPENDENCY_INHERITANCE = "i";
+    /**
+     * Dependency - expression
+     */
     private static final String DEPENDENCY_EXPRESSION = "e";
+    /**
+     * Dependency - signature
+     */
     private static final String DEPENDENCY_SIGNATURE = "s";
 
     private static String sha256(InputStream is) {
@@ -79,6 +91,9 @@ public class SwfToSwcExporter {
         return output;
     }
 
+    /**
+     * Constructor.
+     */
     public SwfToSwcExporter() {
 
     }
@@ -210,6 +225,14 @@ public class SwfToSwcExporter {
         //System.out.println("time " + title + ": " + (t2 - t1));
     }
 
+    /**
+     * Exports SWF to SWC.
+     * @param swf SWF to export
+     * @param outSwcFile Output SWC file
+     * @param skipDependencies Skip dependencies
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies) throws IOException, InterruptedException {
         long t4 = 0;
         //Make local copy of SWF so we do not modify original

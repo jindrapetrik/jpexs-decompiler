@@ -37,12 +37,20 @@ public class ConditionEvaluator {
     private final int[] tags;
     private final boolean revert;
 
+    /**
+     * Constructor.
+     * @param cond Conditional annotation
+     */
     public ConditionEvaluator(Conditional cond) {
         values = cond.value();
         tags = cond.tags();
         revert = cond.revert();
     }
 
+    /**
+     * Constructor.
+     * @param cond ConditionalType annotation
+     */
     public ConditionEvaluator(ConditionalType cond) {
         values = cond.value();
         tags = cond.tags();
@@ -163,6 +171,11 @@ public class ConditionEvaluator {
         return val;
     }
 
+    /**
+     * Gets fields used in condition.
+     * @return Fields used in condition
+     * @throws AnnotationParseException On parse error
+     */
     public Set<String> getFields() throws AnnotationParseException {
         Set<String> ret = new HashSet<>();
         ConditionLexer lex = new ConditionLexer(new StringReader(prepareCond()));

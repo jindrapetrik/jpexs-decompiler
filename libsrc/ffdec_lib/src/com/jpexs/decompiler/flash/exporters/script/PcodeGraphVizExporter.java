@@ -80,12 +80,26 @@ public class PcodeGraphVizExporter {
         }
     }
 
+    /**
+     * Exports ActionScript 1.0/2.0 graph to GraphViz format.
+     * @param src ActionScript source
+     * @param writer GraphTextWriter
+     * @throws InterruptedException On interrupt
+     */
     public void exportAs12(ASMSource src, GraphTextWriter writer) throws InterruptedException {
         ActionList alist = src.getActions();
         ActionGraph gr = new ActionGraph(new HashMap<>(), "", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
         export(gr, writer);
     }
 
+    /**
+     * Exports ActionScript 3.0 graph to GraphViz format.
+     * @param abcIndex ABC indexing
+     * @param abc ABC
+     * @param body Method body
+     * @param writer Writer
+     * @throws InterruptedException On interrupt
+     */
     public void exportAs3(AbcIndexing abcIndex, ABC abc, MethodBody body, GraphTextWriter writer) throws InterruptedException {
         AVM2Graph gr = new AVM2Graph(abcIndex, body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>()); // body.getCode().visitCode(body));
         export(gr, writer);
@@ -284,6 +298,12 @@ public class PcodeGraphVizExporter {
         return hilight(lexer, code);
     }
 
+    /**
+     * Exports graph to GraphViz format.
+     * @param graph Graph
+     * @param writer Writer
+     * @throws InterruptedException On interrupt
+     */
     public void export(Graph graph, GraphTextWriter writer) throws InterruptedException {
         writer.append("digraph pcode {\r\n");
         exportGraph(graph, writer);

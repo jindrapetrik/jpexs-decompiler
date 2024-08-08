@@ -26,8 +26,18 @@ import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
  */
 public class SuperClassMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
 
+    /**
+     * Class index
+     */
     private final int classIndex;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param classIndex Class index
+     * @param scriptIndex Script index
+     */
     public SuperClassMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;

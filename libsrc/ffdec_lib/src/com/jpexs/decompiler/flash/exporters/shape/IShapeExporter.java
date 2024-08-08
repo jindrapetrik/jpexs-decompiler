@@ -28,37 +28,130 @@ import com.jpexs.decompiler.flash.types.RGB;
  */
 public interface IShapeExporter {
 
+    /**
+     * Begins shape.
+     */
     public void beginShape();
 
+    /**
+     * Ends shape.
+     */
     public void endShape();
 
+    /**
+     * Begins aliased fills.
+     */
     public void beginAliasedFills();
 
+    /**
+     * Begins fills.
+     */
     public void beginFills();
 
+    /**
+     * Ends fills.
+     */
     public void endFills();
 
+    /**
+     * Begins lines.
+     */
     public void beginLines();
 
+    /**
+     * Ends lines.
+     *
+     * @param close Close path
+     */
     public void endLines(boolean close);
 
+    /**
+     * Begins fill.
+     * @param color Color
+     */
     public void beginFill(RGB color);
 
+    /**
+     * Begins gradient fill.
+     * @param type Type
+     * @param gradientRecords Gradient records
+     * @param matrix Matrix
+     * @param spreadMethod Spread method
+     * @param interpolationMethod Interpolation method
+     * @param focalPointRatio Focal point ratio
+     */
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
+    /**
+     * Begins bitmap fill.
+     * @param bitmapId Bitmap ID
+     * @param matrix Matrix
+     * @param repeat Repeat
+     * @param smooth Smooth
+     * @param colorTransform Color transform
+     */
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform);
 
+    /**
+     * Ends fill.
+     */
     public void endFill();
 
+    /**
+     * Sets line style.
+     * @param thickness Thickness
+     * @param color Color
+     * @param pixelHinting Pixel hinting
+     * @param scaleMode Scale mode
+     * @param startCaps Start caps
+     * @param endCaps End caps
+     * @param joints Joints
+     * @param miterLimit Miter limit
+     * @param noClose No close
+     */
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose);
 
+    /**
+     * Sets line style to gradient.
+     * @param type Type
+     * @param gradientRecords Gradient records
+     * @param matrix Matrix
+     * @param spreadMethod Spread method
+     * @param interpolationMethod Interpolation method
+     * @param focalPointRatio Focal point ratio
+     */
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio);
 
+    /**
+     * Sets line style to bitmap.
+     * @param bitmapId Bitmap ID
+     * @param matrix Matrix
+     * @param repeat Repeat
+     * @param smooth Smooth
+     * @param colorTransform Color transform
+     */
     public void lineBitmapStyle(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform);
 
+    /**
+     * Moves cursor to.
+     * @param x X
+     * @param y Y
+     */
     public void moveTo(double x, double y);
 
+    /**
+     * Draws line to.
+     * @param x X
+     * @param y Y
+     */
     public void lineTo(double x, double y);
 
+    /**
+     * Draws curve to.
+     * @param controlX Control X
+     * @param controlY Control Y
+     * @param anchorX Anchor X
+     * @param anchorY Anchor Y
+     */
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY);
 }

@@ -29,12 +29,24 @@ import java.util.Map;
  */
 public class DictionaryType extends ListMap<Object, Object> implements WithSubValues, Amf3ValueType {
 
+    /**
+     * True if keys are weak
+     */
     private final boolean weakKeys;
 
+    /**
+     * Constructor.
+     * @param weakKeys True if keys are weak
+     */
     public DictionaryType(boolean weakKeys) {
         this(weakKeys, new HashMap<>());
     }
 
+    /**
+     * Constructor.
+     * @param weakKeys True if keys are weak
+     * @param entries Entries
+     */
     public DictionaryType(boolean weakKeys, Map<Object, Object> entries) {
         super(true /*IdentityMap*/, entries);
         this.weakKeys = weakKeys; //TODO? Really make the Map weak - something like WeakIdentityMap - but is it neccessary for serialization?
@@ -53,6 +65,10 @@ public class DictionaryType extends ListMap<Object, Object> implements WithSubVa
         return Amf3Exporter.amfToString(this);
     }
 
+    /**
+     * Checks if keys are weak.
+     * @return True if keys are weak
+     */
     public boolean hasWeakKeys() {
         return weakKeys;
     }

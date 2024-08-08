@@ -26,11 +26,20 @@ import java.io.Serializable;
  */
 public class ZONERECORD implements Serializable {
 
+    /**
+     * Zone data
+     */
     @SWFArray(value = "zone", countField = "numZoneData")
     public ZONEDATA[] zonedata = new ZONEDATA[0];
 
+    /**
+     * Zone mask X
+     */
     public boolean zoneMaskX;
 
+    /**
+     * Zone mask Y
+     */
     public boolean zoneMaskY;
 
     @Override

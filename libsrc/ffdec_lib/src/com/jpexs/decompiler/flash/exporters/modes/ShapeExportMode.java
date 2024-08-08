@@ -22,9 +22,24 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum ShapeExportMode {
+    /**
+     * SVG - Scalable Vector Graphics
+     */
     SVG,
+    /**
+     * PNG - Portable Network Graphics
+     */
     PNG,
+    /**
+     * HTML5 Canvas
+     */
     CANVAS,
+    /**
+     * BMP - Windows Bitmap
+     */
     BMP,
+    /**
+     * SWF - Shockwave Flash
+     */
     SWF,
 }

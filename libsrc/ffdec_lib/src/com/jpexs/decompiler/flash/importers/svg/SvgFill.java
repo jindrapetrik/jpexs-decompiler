@@ -25,5 +25,16 @@ import java.awt.Color;
  */
 abstract class SvgFill implements Cloneable {
 
+    /**
+     * Constructor.
+     */
+    public SvgFill() {
+
+    }
+
+    /**
+     * Converts this fill to a color.
+     * @return Color
+     */
     public abstract Color toColor();
 }

@@ -23,10 +23,28 @@ package com.jpexs.decompiler.flash.types.annotations.parser;
  */
 public enum ConditionTokenType {
 
+    /**
+     * Field
+     */
     FIELD,
+    /**
+     * Or
+     */
     OR,
+    /**
+     * And
+     */
     AND,
+    /**
+     * Parenthesis open
+     */
     PARENT_OPEN,
+    /**
+     * Parenthesis close
+     */
     PARENT_CLOSE,
+    /**
+     * Not
+     */
     NOT
 }

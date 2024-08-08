@@ -32,6 +32,11 @@ import java.util.Map;
  */
 public class SymbolClassImporter {
 
+    /**
+     * Imports SymbolClasses from a file.
+     * @param importFile File to import from
+     * @param swf SWF to import to
+     */
     public void importSymbolClasses(File importFile, SWF swf) {
         String texts = Helper.readTextFile(importFile.getPath());
         String[] lines = texts.split(Helper.newLine);

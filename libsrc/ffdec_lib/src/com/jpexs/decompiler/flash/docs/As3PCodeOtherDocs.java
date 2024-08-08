@@ -34,6 +34,19 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         prop = ResourceBundle.getBundle("com.jpexs.decompiler.flash.locales.docs.pcode.AS3other");
     }
 
+    /**
+     * Constructor.
+     */
+    public As3PCodeOtherDocs() {
+
+    }
+
+    /**
+     * Gets documentation for path.
+     * @param path Path
+     * @param nightMode Night mode
+     * @return Documentation
+     */
     public static String getDocsForPath(String path, boolean nightMode) {
 
         return getDocsForPath(path, true, nightMode);
@@ -108,6 +121,12 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         return r;
     }
 
+    /**
+     * Gets HTML header.
+     * @param js JavaScript
+     * @param style Style
+     * @return HTML header
+     */
     protected static String htmlHeader(String js, String style) {
         Date dateGenerated = new Date();
         StringBuilder sb = new StringBuilder();
@@ -132,6 +151,11 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         return sb.toString();
     }
 
+    /**
+     * Gets property.
+     * @param name Name
+     * @return Property
+     */
     protected static String getProperty(String name) {
         if (prop.containsKey(name)) {
             return Helper.escapeHTML(prop.getString(name));

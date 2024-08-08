@@ -29,21 +29,21 @@ public interface HasSwfAndTag {
     /**
      * Sets tag.
      *
-     * @param tag
+     * @param tag Tag
      */
     public void setSourceTag(Tag tag);
 
     /**
      * Gets SWF.
      *
-     * @return
+     * @return SWF
      */
     public SWF getSwf();
 
     /**
      * Gets tag.
      *
-     * @return
+     * @return Tag
      */
     public Tag getTag();
 }

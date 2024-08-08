@@ -39,6 +39,10 @@ import java.util.List;
  */
 public class XMLAVM2Item extends AVM2Item {
 
+    /**
+     * Constructor.
+     * @param value Value
+     */
     public XMLAVM2Item(GraphTargetItem value) {
         super(null, null, PRECEDENCE_PRIMARY, value);
     }

@@ -33,12 +33,35 @@ public class BezierUtils {
     private static final double[] Z_QUAD = new double[]{1.0, 2.0 / 3.0, 1.0 / 3.0, 1 / 3.0, 2.0 / 3.0, 1.0};
     private static final double EPSILON = 1.0 * Math.pow(2, -MAX_DEPTH - 1); // flatness tolerance
 
+    /**
+     * Constructor.
+     */
+    public BezierUtils() {
+
+    }
+
+    /**
+     * Calculate point at t.
+     * @param t Position
+     * @param p0 Start point
+     * @param p1 Control point
+     * @param p2 End point
+     * @return Point
+     */
     public Point2D pointAt(double t, Point2D p0, Point2D p1, Point2D p2) {
         double xt = (1 - t) * (1 - t) * p0.getX() + 2 * (1 - t) * t * p1.getX() + t * t * p2.getX();
         double yt = (1 - t) * (1 - t) * p0.getY() + 2 * (1 - t) * t * p1.getY() + t * t * p2.getY();
         return new Point2D.Double(xt, yt);
     }
 
+    /**
+     * Calculate closest point to bezier.
+     * @param _p Point
+     * @param p0 Start point
+     * @param p1 Control point
+     * @param p2 End point
+     * @return Position
+     */
     public double closestPointToBezier(Point2D _p, Point2D p0, Point2D p1, Point2D p2) {
         Point2D p = p0;
         double deltaX = p.getX() - _p.getX();

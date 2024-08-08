@@ -35,10 +35,22 @@ import java.util.List;
  */
 public class XMLFilterAVM2Item extends AVM2Item {
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Constructor.
+     * @param object Object
+     * @param value Value
+     * @param openedNamespaces Opened namespaces
+     */
     public XMLFilterAVM2Item(GraphTargetItem object, GraphTargetItem value, List<NamespaceItem> openedNamespaces) {
         super(null, null, NOPRECEDENCE, value);
         this.openedNamespaces = openedNamespaces;

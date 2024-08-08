@@ -25,8 +25,14 @@ import java.io.Serializable;
  */
 public class NotCompileTime implements Serializable {
 
+    /**
+     * Singleton instance.
+     */
     public static NotCompileTime INSTANCE = new NotCompileTime();
 
+    /**
+     * Private constructor.
+     */
     private NotCompileTime() {
     }
 

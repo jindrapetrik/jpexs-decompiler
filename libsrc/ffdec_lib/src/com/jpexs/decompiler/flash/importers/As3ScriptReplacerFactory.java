@@ -26,6 +26,18 @@ import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
  */
 public class As3ScriptReplacerFactory {
 
+    /**
+     * Constructor.
+     */
+    private As3ScriptReplacerFactory() {
+
+    }
+
+    /**
+     * Creates As3ScriptReplacerInterface instance based on configuration.
+     * @param air If true, AIR is used, otherwise Flash
+     * @return As3ScriptReplacerInterface instance
+     */
     public static As3ScriptReplacerInterface createByConfig(boolean air) {
         if (air) {
             return createFFDecAir();
@@ -36,14 +48,26 @@ public class As3ScriptReplacerFactory {
         }
     }
 
+    /**
+     * Creates As3ScriptReplacerInterface instance for Flex SDK.
+     * @return As3ScriptReplacerInterface instance
+     */
     public static As3ScriptReplacerInterface createFlex() {
         return new MxmlcAs3ScriptReplacer(Configuration.flexSdkLocation.get());
     }
 
+    /**
+     * Creates As3ScriptReplacerInterface instance for FFDec.
+     * @return As3ScriptReplacerInterface instance
+     */
     public static As3ScriptReplacerInterface createFFDec() {
         return new FFDecAs3ScriptReplacer(false);
     }
 
+    /**
+     * Creates As3ScriptReplacerInterface instance for FFDec AIR.
+     * @return As3ScriptReplacerInterface instance
+     */
     public static As3ScriptReplacerInterface createFFDecAir() {
         return new FFDecAs3ScriptReplacer(true);
     }

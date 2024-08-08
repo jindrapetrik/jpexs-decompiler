@@ -48,6 +48,12 @@ public class Amf3Importer {
 
     private Amf3Lexer lexer;
 
+    /**
+     * Constructor.
+     */
+    public Amf3Importer() {
+    }
+
     private ParsedSymbol lex() throws IOException, Amf3ParseException {
         ParsedSymbol ret = lexer.lex();
         return ret;
@@ -558,6 +564,14 @@ public class Amf3Importer {
         }
     }
 
+    /**
+     * Convert AMF3 string to object
+     *
+     * @param val AMF3 string
+     * @return Object
+     * @throws IOException On I/O error
+     * @throws Amf3ParseException On parse error    
+     */
     public Object stringToAmf(String val) throws IOException, Amf3ParseException {
         lexer = new Amf3Lexer(new StringReader(val));
         Map<String, Object> objectsTable = new HashMap<>();

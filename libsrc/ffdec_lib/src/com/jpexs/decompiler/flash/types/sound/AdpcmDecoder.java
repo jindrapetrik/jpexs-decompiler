@@ -57,6 +57,10 @@ public class AdpcmDecoder extends SoundDecoder {
         27086, 29794, 32767
     };
 
+    /**
+     * Constructor.
+     * @param soundFormat Sound format
+     */
     public AdpcmDecoder(SoundFormat soundFormat) {
         super(soundFormat);
     }

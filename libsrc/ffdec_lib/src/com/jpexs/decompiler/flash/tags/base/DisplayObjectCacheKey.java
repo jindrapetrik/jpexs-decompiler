@@ -26,10 +26,26 @@ import java.util.Objects;
  */
 public class DisplayObjectCacheKey {
 
+    /**
+     * Place object
+     */
     public PlaceObjectTypeTag placeObject;
+    /**
+     * Zoom
+     */
     public double zoom;
+    /**
+     * View rectangle
+     */
     public ExportRectangle viewRect;
 
+    /**
+     * Constructor.
+     *
+     * @param placeObject Place object
+     * @param zoom Zoom
+     * @param viewRect View rectangle
+     */
     public DisplayObjectCacheKey(PlaceObjectTypeTag placeObject, double zoom, ExportRectangle viewRect) {
         this.placeObject = placeObject;
         this.zoom = zoom;

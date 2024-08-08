@@ -26,11 +26,33 @@ import java.util.List;
  */
 public interface As3ScriptReplacerInterface {
 
+    /**
+     * Checks if this replacer is available.
+     * @return True if available, false otherwise
+     */
     public boolean isAvailable();
 
+    /**
+     * Initializes the replacement.
+     * @param pack Script pack
+     * @param dependencies List of dependencies
+     */
     public void initReplacement(ScriptPack pack, List<SWF> dependencies);
 
+    /**
+     * Replaces the script.
+     * @param pack Script pack
+     * @param text Script text
+     * @param dependencies List of dependencies
+     * @throws As3ScriptReplaceException If the script cannot be replaced
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public void replaceScript(ScriptPack pack, String text, List<SWF> dependencies) throws As3ScriptReplaceException, IOException, InterruptedException;
 
+    /**
+     * Deinitializes the replacement.
+     * @param pack Script pack
+     */
     public void deinitReplacement(ScriptPack pack);
 }

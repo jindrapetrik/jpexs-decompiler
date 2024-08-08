@@ -25,6 +25,11 @@ import java.io.FileOutputStream;
  */
 public class FileTextWriter extends StreamTextWriter implements AutoCloseable {
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     * @param os Output stream
+     */
     public FileTextWriter(CodeFormatting formatting, FileOutputStream os) {
         super(formatting, os);
     }

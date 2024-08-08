@@ -146,6 +146,12 @@ public class ASMParser {
 
     private static final Logger logger = Logger.getLogger(ASMParser.class.getName());
 
+    /**
+     * Constructor.
+     */
+    public ASMParser() {
+    }
+
     private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
         Action a = null;
         if (instructionName.compareToIgnoreCase("GetURL") == 0) {
@@ -398,6 +404,20 @@ public class ASMParser {
         }
     }
 
+    /**
+     * Parses ActionScript 1-2.
+     * @param ignoreNops Ignore NOPs
+     * @param labels Labels
+     * @param lineMap Line map
+     * @param address Address
+     * @param lexer Lexer
+     * @param constantPool Constant pool
+     * @param version Version
+     * @param charset Charset
+     * @return Action list
+     * @throws IOException On I/O error
+     * @throws ActionParseException On parse error
+     */
     public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
         ActionList list = new ActionList(charset);
         Stack<GraphSourceItemContainer> containers = new Stack<>();
@@ -467,6 +487,18 @@ public class ASMParser {
         }
     }
 
+    /**
+     * Parses ActionScript 1-2.
+     * @param address Address
+     * @param ignoreNops Ignore NOPs
+     * @param source Source
+     * @param version Version
+     * @param throwOnError Throw on error
+     * @param charset Charset
+     * @return Action list
+     * @throws IOException On I/O error
+     * @throws ActionParseException On parse error
+     */
     public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError, String charset) throws IOException, ActionParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
         List<Action> list = parseAllActions(lexer, version, charset);

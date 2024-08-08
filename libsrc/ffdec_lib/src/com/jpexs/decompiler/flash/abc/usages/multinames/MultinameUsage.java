@@ -30,12 +30,27 @@ import java.util.Objects;
  */
 public abstract class MultinameUsage implements Usage {
 
+    /**
+     * ABC
+     */
     protected final ABC abc;
 
+    /**
+     * Multiname index
+     */
     private final int multinameIndex;
 
+    /**
+     * Script index
+     */
     protected int scriptIndex;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param scriptIndex Script index
+     */
     public MultinameUsage(ABC abc, int multinameIndex, int scriptIndex) {
         this.abc = abc;
         this.multinameIndex = multinameIndex;
@@ -43,6 +58,10 @@ public abstract class MultinameUsage implements Usage {
 
     }
 
+    /**
+     * Gets multiname index.
+     * @return Multiname index
+     */
     public int getMultinameIndex() {
         return multinameIndex;
     }
@@ -52,6 +71,11 @@ public abstract class MultinameUsage implements Usage {
         return abc;
     }
 
+    /**
+     * Checks if this multiname name is the same as other multiname name.
+     * @param other Other multiname usage
+     * @return True if names are the same
+     */
     protected boolean sameMultinameName(MultinameUsage other) {
         Multiname thisM = abc.constants.getMultiname(multinameIndex);
         Multiname otherM = other.abc.constants.getMultiname(other.multinameIndex);
@@ -126,6 +150,11 @@ public abstract class MultinameUsage implements Usage {
         return true;
     }
 
+    /**
+     * Checks if this multiname collides with other multiname.
+     * @param other Other multiname usage
+     * @return True if collides
+     */
     public abstract boolean collides(MultinameUsage other);
 
     @Override

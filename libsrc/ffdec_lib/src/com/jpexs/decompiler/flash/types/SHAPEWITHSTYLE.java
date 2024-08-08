@@ -36,8 +36,14 @@ import java.util.Set;
  */
 public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializable {
 
+    /**
+     * Fill styles
+     */
     public FILLSTYLEARRAY fillStyles;
 
+    /**
+     * Line styles
+     */
     public LINESTYLEARRAY lineStyles;
 
     @Override
@@ -88,6 +94,11 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         return ret;
     }
 
+    /**
+     * Creates empty shape with style.
+     * @param shapeNum Shape number - 1 for DefineShape, 2 for DefineShape2, etc.
+     * @return Empty shape with style
+     */
     public static SHAPEWITHSTYLE createEmpty(int shapeNum) {
         SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
         ret.shapeRecords = new ArrayList<>();
@@ -109,6 +120,11 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum, false);
     }
 
+    /**
+     * Updates morph shape tag.
+     * @param morphShapeTag Morph shape tag
+     * @param fill Fill
+     */
     public void updateMorphShapeTag(MorphShapeTag morphShapeTag, boolean fill) {
         morphShapeTag.startEdges.shapeRecords.clear();
         morphShapeTag.endEdges.shapeRecords.clear();

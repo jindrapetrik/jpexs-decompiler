@@ -27,10 +27,18 @@ public class BreakJumpIns extends JumpIns {
 
     private final long loopId;
 
+    /**
+     * Constructor.
+     * @param loopId Loop id
+     */
     public BreakJumpIns(long loopId) {
         this.loopId = loopId;
     }
 
+    /**
+     * Gets loop id.
+     * @return Loop id
+     */
     public long getLoopId() {
         return loopId;
     }

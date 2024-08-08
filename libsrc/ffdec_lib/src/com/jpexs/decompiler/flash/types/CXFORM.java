@@ -115,9 +115,16 @@ public class CXFORM extends ColorTransform implements Serializable {
         return hasMultTerms ? blueMultTerm : super.getBlueMulti();
     }
 
+    /**
+     * Constructor.
+     */
     public CXFORM() {
     }
 
+    /**
+     * Constructor.
+     * @param colorTransform Color transform
+     */
     public CXFORM(ColorTransform colorTransform) {
         redMultTerm = colorTransform.getRedMulti();
         greenMultTerm = colorTransform.getGreenMulti();

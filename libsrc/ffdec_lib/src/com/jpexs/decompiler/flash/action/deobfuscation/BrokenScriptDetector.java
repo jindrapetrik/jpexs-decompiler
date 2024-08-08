@@ -23,6 +23,19 @@ package com.jpexs.decompiler.flash.action.deobfuscation;
  */
 public class BrokenScriptDetector {
 
+    /**
+     * Constructor.
+     */
+    public BrokenScriptDetector() {
+
+    }
+
+    /**
+     * Checks if the code is broken.
+     *
+     * @param code Code
+     * @return True if the code is broken
+     */
     public boolean codeIsBroken(String code) {
         return code.contains("\u00A7\u00A7");
     }

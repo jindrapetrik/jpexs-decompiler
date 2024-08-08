@@ -23,6 +23,11 @@ import java.util.List;
  */
 public class VectorDoubleType extends AbstractVectorType<Double> {
 
+    /**
+     * Constructor.
+     * @param fixed Fixed size
+     * @param values Values
+     */
     public VectorDoubleType(boolean fixed, List<Double> values) {
         super(fixed, values);
     }

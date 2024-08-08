@@ -37,6 +37,13 @@ import java.util.Map;
 public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
     /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorJumps() {
+
+    }
+
+    /**
      * Removes jumps/ifs targeting other jumps.
      *
      * @param path Path
@@ -47,7 +54,7 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {

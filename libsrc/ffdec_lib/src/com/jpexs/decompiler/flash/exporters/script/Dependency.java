@@ -24,18 +24,41 @@ import java.util.Objects;
  */
 public class Dependency {
 
+    /**
+     * Id
+     */
     private DottedChain id;
+
+    /**
+     * Type
+     */
     private DependencyType type;
 
+    /**
+     * Constructor.
+     *
+     * @param id ID of the dependency
+     * @param type Type of the dependency
+     */
     public Dependency(DottedChain id, DependencyType type) {
         this.id = id;
         this.type = type;
     }
 
+    /**
+     * Gets ID of the dependency.
+     *
+     * @return ID of the dependency
+     */
     public DottedChain getId() {
         return id;
     }
 
+    /**
+     * Gets type of the dependency.
+     *
+     * @return Type of the dependency
+     */
     public DependencyType getType() {
         return type;
     }

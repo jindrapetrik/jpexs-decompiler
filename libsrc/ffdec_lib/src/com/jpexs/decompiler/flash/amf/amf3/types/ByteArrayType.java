@@ -25,10 +25,18 @@ public class ByteArrayType {
 
     private byte[] data;
 
+    /**
+     * Constructor.
+     * @param data Byte array data
+     */
     public ByteArrayType(byte[] data) {
         this.data = data;
     }
 
+    /**
+     * Gets byte array data.
+     * @return Byte array data
+     */
     public byte[] getData() {
         return data;
     }

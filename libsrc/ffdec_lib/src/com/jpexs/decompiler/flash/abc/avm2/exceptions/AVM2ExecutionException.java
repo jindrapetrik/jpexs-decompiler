@@ -26,7 +26,7 @@ public class AVM2ExecutionException extends Exception {
     /**
      * Constructs new AVM2ExecutionException with the specified detail message.
      *
-     * @param message
+     * @param message The detail message
      */
     public AVM2ExecutionException(String message) {
         super(message);

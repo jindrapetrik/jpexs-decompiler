@@ -51,14 +51,58 @@ public abstract class FILTER implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Applies filter to image.
+     * @param src Image to apply filter to
+     * @param zoom Zoom level
+     * @param srcX X coordinate of the source rectangle
+     * @param srcY Y coordinate of the source rectangle
+     * @param srcW Width of the source rectangle
+     * @param srcH Height of the source rectangle
+     * @return Filtered image
+     */
     public abstract SerializableImage apply(SerializableImage src, double zoom, int srcX, int srcY, int srcW, int srcH);
 
+    /**
+     * Gets delta X
+     * @return Delta X
+     */
     public abstract double getDeltaX();
 
+    /**
+     * Gets delta Y
+     * @return Delta Y
+     */
     public abstract double getDeltaY();
 
+    /**
+     * Converts filter to SVG.
+     * @param document Document
+     * @param filtersElement Filters element
+     * @param exporter SVG exporter
+     * @param in Input
+     * @return SVG representation of the filter
+     */
     public abstract String toSvg(Document document, Element filtersElement, SVGExporter exporter, String in);
 
+    /**
+     * Converts drop shadow to SVG.
+     * @param distance Distance
+     * @param angle Angle
+     * @param dropShadowColor Drop shadow color
+     * @param innerShadow Inner shadow
+     * @param knockout Knockout
+     * @param compositeSource Composite source
+     * @param blurX Blur X
+     * @param blurY Blur Y
+     * @param strength Strength
+     * @param iterations Iterations
+     * @param document Document
+     * @param filtersElement Filters element
+     * @param exporter SVG exporter
+     * @param in Input
+     * @return SVG id of the drop shadow
+     */
     protected String dropShadowSvg(
             double distance,
             double angle,
@@ -201,6 +245,17 @@ public abstract class FILTER implements Serializable {
         }
     }
 
+    /**
+     * Converts blur to SVG.
+     * @param blurX Blur X
+     * @param blurY Blur Y
+     * @param iterations Iterations
+     * @param document Document
+     * @param filtersElement Filters element
+     * @param exporter SVG exporter
+     * @param in Input
+     * @return SVG id of the blur
+     */
     protected String blurSvg(double blurX, double blurY, int iterations, Document document, Element filtersElement, SVGExporter exporter, String in) {
         if (iterations == 0) {
             return in;

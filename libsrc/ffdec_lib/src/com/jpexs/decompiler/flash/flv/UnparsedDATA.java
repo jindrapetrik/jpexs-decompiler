@@ -23,9 +23,20 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class UnparsedDATA extends DATA {
 
+    /**
+     * Data type
+     */
     private int dataType;
+    /**
+     * Data
+     */
     private byte[] data;
 
+    /**
+     * Constructor.
+     * @param dataType Data type
+     * @param data Data
+     */
     public UnparsedDATA(int dataType, byte[] data) {
         this.dataType = dataType;
         this.data = data;
@@ -36,6 +47,10 @@ public class UnparsedDATA extends DATA {
         return this.data;
     }
 
+    /**
+     * Get data type.
+     * @return Data type
+     */
     public int getDataType() {
         return dataType;
     }

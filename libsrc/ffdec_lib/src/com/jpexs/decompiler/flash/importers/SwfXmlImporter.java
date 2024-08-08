@@ -141,6 +141,9 @@ import javax.xml.stream.XMLStreamReader;
 @SuppressWarnings("unchecked")
 public class SwfXmlImporter {
 
+    /**
+     * Maximum XML import version major.
+     */
     public static final int MAX_XML_IMPORT_VERSION_MAJOR = 2;
 
     private static final Logger logger = Logger.getLogger(SwfXmlImporter.class.getName());
@@ -211,6 +214,12 @@ public class SwfXmlImporter {
         return cls != null && (cls.isArray() || List.class.isAssignableFrom(cls));
     }
 
+    /**
+     * Imports SWF from input stream.
+     * @param swf SWF object
+     * @param in Input stream
+     * @throws IOException On I/O error
+     */
     public void importSwf(SWF swf, InputStream in) throws IOException {
         XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
 
@@ -245,6 +254,14 @@ public class SwfXmlImporter {
         }
     }
 
+    /**
+     * Imports object from XML string.
+     * @param xml XML string
+     * @param requiredType Required type
+     * @param swf SWF object
+     * @return Imported object
+     * @throws IOException On I/O error
+     */
     public Object importObject(String xml, Class requiredType, SWF swf) throws IOException {
         XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
         try {

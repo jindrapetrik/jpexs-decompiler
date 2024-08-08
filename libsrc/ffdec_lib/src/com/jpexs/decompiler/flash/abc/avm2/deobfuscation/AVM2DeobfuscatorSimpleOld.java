@@ -93,7 +93,6 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -129,6 +128,13 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
      * Execution limit
      */
     private final int executionLimit = 30000;
+
+    /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorSimpleOld() {
+
+    }
 
     /**
      * Creates a push instruction from a graph target item.
@@ -170,7 +176,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
      * @param body Method body
      * @param inlineIns Inline instructions
      * @return True if removed, false otherwise
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -289,7 +295,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
      * @param jumpTargets Jump targets
      * @param minChangedIpRef Minimal changed IP reference
      * @return True if executed, false otherwise
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private boolean executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets, Reference<Integer> minChangedIpRef) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
@@ -611,7 +617,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {

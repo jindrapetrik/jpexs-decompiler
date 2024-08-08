@@ -22,6 +22,8 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum Font4ExportMode {
-
+    /**
+     * CFF - Compact Font Format
+     */
     CFF
 }

@@ -41,10 +41,20 @@ public class FLVInputStream {
 
     private long pos = 0;
 
+    /**
+     * Constructor.
+     * @param is Input stream
+     */
     public FLVInputStream(InputStream is) {
         this.is = new DataInputStream(is);
     }
 
+    /**
+     * Reads header.
+     * @param audioPresent Audio present
+     * @param videoPresent Video present
+     * @throws IOException On I/O error
+     */
     public void readHeader(Reference<Boolean> audioPresent, Reference<Boolean> videoPresent) throws IOException {
         byte[] signature = new byte[3];
         is.readFully(signature);
@@ -67,6 +77,11 @@ public class FLVInputStream {
         readUI32(); //should be 0                
     }
 
+    /**
+     * Reads tags
+     * @return List of tags
+     * @throws IOException On I/O error
+     */
     public List<FLVTAG> readTags() throws IOException {
         List<FLVTAG> ret = new ArrayList<>();
         while (available() > 0) {
@@ -148,21 +163,42 @@ public class FLVInputStream {
         bitPos = 0;
     }
 
+    /**
+     * Reads one byte from the stream
+     * @return byte
+     * @throws IOException On I/O error
+     */
     public int read() throws IOException {
         alignByte();
         pos++;
         return is.read();
     }
 
+    /**
+     * Reads UI8 (Unsigned 8bit integer) value from the stream
+     * @return UI8 value
+     * @throws IOException On I/O error
+     */
     public int readUI8() throws IOException {
         return read();
     }
 
+    /**
+     * Reads one UI24 (Unsigned 24bit integer) value from the stream
+     * @return UI24 value
+     * @throws IOException On I/O error
+     */
     public int readUI24() throws IOException {
         int ret = (readEx() << 16) + (readEx() << 8) + (readEx());
         return ret;
     }
 
+    /**
+     * Reads bytes from the stream
+     * @param len Number of bytes to read
+     * @return Bytes
+     * @throws IOException On I/O error
+     */
     public byte[] readBytes(int len) throws IOException {
         byte[] data = new byte[len];
         is.readFully(data);
@@ -170,10 +206,20 @@ public class FLVInputStream {
         return data;
     }
 
+    /**
+     * Gets number of available bytes in the stream
+     * @return Number of available bytes
+     * @throws IOException On I/O error
+     */
     public int available() throws IOException {
         return is.available();
     }
 
+    /**
+     * Reads one tag from the stream
+     * @return Tag
+     * @throws IOException On I/O error
+     */
     public FLVTAG readTag() throws IOException {
         int tagType = readUI8();
         int dataLen = readUI24();
@@ -201,12 +247,17 @@ public class FLVInputStream {
      * Reads one UI16 (Unsigned 16bit integer) value from the stream
      *
      * @return UI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readUI16() throws IOException {
         return (readEx() << 8) + readEx();
     }
 
+    /**
+     * Reads SCRIPTDATA from the stream
+     * @return SCRIPTDATA
+     * @throws IOException On I/O error
+     */
     public SCRIPTDATA readSCRIPTDATA() throws IOException {
         SCRIPTDATAVALUE name = readSCRIPTDATAVALUE();
         SCRIPTDATAVALUE value = readSCRIPTDATAVALUE();
@@ -218,7 +269,7 @@ public class FLVInputStream {
      * stream
      *
      * @return DOUBLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public double readDOUBLE() throws IOException {
         long el = readLong();
@@ -238,6 +289,11 @@ public class FLVInputStream {
                 + ((readBuffer[7] & 0xff)));
     }
 
+    /**
+     * Reads AUDIODATA from the stream
+     * @return AUDIODATA
+     * @throws IOException On I/O error
+     */
     public AUDIODATA readAUDIODATA() throws IOException {
         int soundFormat = (int) readUB(4);
         int soundRate = (int) readUB(2);
@@ -248,6 +304,11 @@ public class FLVInputStream {
 
     }
 
+    /**
+     * Reads SCRIPTDATAOBJECT from the stream
+     * @return SCRIPTDATAOBJECT
+     * @throws IOException On I/O error
+     */
     public SCRIPTDATAOBJECT readSCRIPTDATAOBJECT() throws IOException {
         System.out.println("reading obj");
         String objectName = readSCRIPTDATASTRING();
@@ -263,6 +324,11 @@ public class FLVInputStream {
         return new SCRIPTDATAOBJECT(objectName, objectData);
     }
 
+    /**
+     * Reads VIDEODATA from the stream
+     * @return VIDEODATA
+     * @throws IOException On I/O error
+     */
     public VIDEODATA readVIDEODATA() throws IOException {
         int frameType = (int) readUB(4);
         int codecId = (int) readUB(4);
@@ -270,6 +336,11 @@ public class FLVInputStream {
         return new VIDEODATA(frameType, codecId, videoData);
     }
 
+    /**
+     * Reads SCRIPTDATAVALUE from the stream
+     * @return SCRIPTDATAVALUE
+     * @throws IOException On I/O error
+     */
     public SCRIPTDATAVALUE readSCRIPTDATAVALUE() throws IOException {
         int type = readUI8();
         switch (type) {
@@ -329,11 +400,21 @@ public class FLVInputStream {
         }
     }
 
+    /**
+     * Reads SCRIPTDATALONGSTRING from the stream
+     * @return SCRIPTDATALONGSTRING
+     * @throws IOException On I/O error
+     */
     public String readSCRIPTDATALONGSTRING() throws IOException {
         int len = (int) readUI32(); //? should be unsinged
         return new String(readBytes(len), Utf8Helper.charset);
     }
 
+    /**
+     * Reads SCRIPTDATADATE from the stream
+     * @return SCRIPTDATADATE
+     * @throws IOException On I/O error
+     */
     public SCRIPTDATADATE readSCRIPTDATADATE() throws IOException {
         double time = readDOUBLE();
         int localDateTimeOffset = readSI16();
@@ -344,7 +425,7 @@ public class FLVInputStream {
      * Reads one SI16 (Signed 16bit integer) value from the stream
      *
      * @return SI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readSI16() throws IOException {
         int uval = (readEx() << 8) + readEx();
@@ -354,6 +435,11 @@ public class FLVInputStream {
         return uval;
     }
 
+    /**
+     * Reads SCRIPTDATAVARIABLE from the stream
+     * @return SCRIPTDATAVARIABLE
+     * @throws IOException On I/O error
+     */
     public SCRIPTDATAVARIABLE readSCRIPTDATAVARIABLE() throws IOException {
         String variableName = readSCRIPTDATASTRING();
         if (variableName.length() == 0) {
@@ -367,6 +453,11 @@ public class FLVInputStream {
         return new SCRIPTDATAVARIABLE(variableName, variableValue);
     }
 
+    /**
+     * Reads SCRIPTDATASTRING from the stream
+     * @return SCRIPTDATASTRING
+     * @throws IOException On I/O error
+     */
     public String readSCRIPTDATASTRING() throws IOException {
         int len = readUI16();
         return new String(readBytes(len), Utf8Helper.charset);

@@ -64,8 +64,14 @@ public final class Configuration {
 
     private static File directory = unspecifiedFile;
 
+    /**
+     * Log level
+     */
     public static final Level logLevel;
 
+    /**
+     * Show stats
+     */
     public static boolean showStat;
 
     @ConfigurationDefaultBoolean(true)

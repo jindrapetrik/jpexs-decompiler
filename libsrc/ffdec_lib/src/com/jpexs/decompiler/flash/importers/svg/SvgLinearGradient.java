@@ -23,12 +23,24 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 class SvgLinearGradient extends SvgGradient {
 
+    /**
+     * Start x coordinate.
+     */
     public String x1;
 
+    /**
+     * Start y coordinate.
+     */
     public String y1;
 
+    /**
+     * End x coordinate.
+     */
     public String x2;
 
+    /**
+     * End y coordinate.
+     */
     public String y2;
     //xlink?
 }

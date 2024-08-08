@@ -23,14 +23,31 @@ package com.jpexs.decompiler.flash.importers.svg.css;
  */
 public class CssParsedSymbol {
 
+    /**
+     * Value
+     */
     public String value;
+    /**
+     * Type
+     */
     public CssSymbolType type;
 
+    /**
+     * Constructor.
+     *
+     * @param value Value
+     * @param type Type
+     */
     public CssParsedSymbol(String value, CssSymbolType type) {
         this.value = value;
         this.type = type;
     }
 
+    /**
+     * Constructor.
+     * @param ss Value
+     * @return CssParsedSymbol
+     */
     public boolean isType(String... ss) {
         if (type == CssSymbolType.OTHER) {
             for (String s : ss) {
@@ -42,6 +59,11 @@ public class CssParsedSymbol {
         return false;
     }
 
+    /**
+     * Check if type is in types.
+     * @param types Types
+     * @return True if type is in types
+     */
     public boolean isType(CssSymbolType... types) {
         for (CssSymbolType type : types) {
             if (this.type == type) {

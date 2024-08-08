@@ -33,47 +33,97 @@ public class ArrayType implements WithSubValues, Amf3ValueType {
     private List<Object> denseValues;
     private Map<String, Object> associativeValues;
 
+    /**
+     * Constructor.
+     * @param associativeValues Associative values
+     */
     public ArrayType(Map<? extends String, ? extends Object> associativeValues) {
         this(new ArrayList<>(), associativeValues);
     }
 
+    /**
+     * Constructor.
+     * @param denseValues Dense values
+     */
     public ArrayType(List<Object> denseValues) {
         this(denseValues, new HashMap<>());
     }
 
+    /**
+     * Constructor.
+     */
     public ArrayType() {
         this(new ArrayList<>(), new HashMap<>());
     }
 
+    /**
+     * Constructor.
+     * @param denseValues Dense values
+     * @param associativeValues Associative values
+     */
     public ArrayType(List<Object> denseValues, Map<? extends String, ? extends Object> associativeValues) {
         this.denseValues = new ArrayList<>(denseValues);
         this.associativeValues = new ListMap<>(associativeValues);
     }
 
+    /**
+     * Gets dense values.
+     * @return Dense values
+     */
     public List<Object> getDenseValues() {
         return new ArrayList<>(denseValues);
     }
 
+    /**
+     * Sets dense values.
+     * @param denseValues Dense values
+     */
     public void setDenseValues(List<Object> denseValues) {
         this.denseValues = new ArrayList<>(denseValues);
     }
 
+    /**
+     * Sets dense value.
+     * @param key Key
+     * @param value Value
+     * @return Previous value
+     */
     public Object setDense(int key, Object value) {
         return denseValues.set(key, value);
     }
 
+    /**
+     * Puts associative value.
+     * @param key Key
+     * @param value Value
+     * @return Previous value
+     */
     public Object putAssociative(String key, Object value) {
         return associativeValues.put(key, value);
     }
 
+    /**
+     * Gets associative values.
+     * @return Associative values
+     */
     public Map<String, Object> getAssociativeValues() {
         return new ListMap<>(associativeValues);
     }
 
+    /**
+     * Gets associative value.
+     * @param key Key
+     * @return Value
+     */
     public Object getAssociative(String key) {
         return associativeValues.get(key);
     }
 
+    /**
+     * Gets dense value.
+     * @param index Index
+     * @return Value
+     */
     public Object getDense(int index) {
         if (index >= 0 && index < denseValues.size()) {
             return denseValues.get(index);
@@ -81,6 +131,10 @@ public class ArrayType implements WithSubValues, Amf3ValueType {
         return null;
     }
 
+    /**
+     * Gets associative key set.
+     * @return Associative key set
+     */
     public Set<String> associativeKeySet() {
         return associativeValues.keySet();
     }
@@ -99,6 +153,10 @@ public class ArrayType implements WithSubValues, Amf3ValueType {
         return ret;
     }
 
+    /**
+     * Sets associative values.
+     * @param associativeValues Associative values
+     */
     public void setAssociativeValues(Map<String, Object> associativeValues) {
         this.associativeValues = new ListMap<>(associativeValues);
     }

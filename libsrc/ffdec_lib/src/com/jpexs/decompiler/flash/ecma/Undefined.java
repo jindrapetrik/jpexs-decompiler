@@ -25,8 +25,14 @@ import java.io.Serializable;
  */
 public class Undefined implements Serializable {
 
+    /**
+     * Singleton instance of Undefined.
+     */
     public static Undefined INSTANCE = new Undefined();
 
+    /**
+     * Private constructor.
+     */
     private Undefined() {
     }
 

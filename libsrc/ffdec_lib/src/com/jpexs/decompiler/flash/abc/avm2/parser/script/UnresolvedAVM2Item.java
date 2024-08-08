@@ -54,25 +54,54 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     private int nsKind = -1;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Line
+     */
     public int line;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
-    //private GraphTargetItem ns = null;
+    /**
+     * Resolved
+     */
     public GraphTargetItem resolved;
 
+    /**
+     * Resolved root
+     */
     public GraphTargetItem resolvedRoot;
 
+    /**
+     * Must be type
+     */
     private final boolean mustBeType;
 
+    /**
+     * Imported classes
+     */
     public List<DottedChain> importedClasses;
 
+    /**
+     * Scope stack
+     */
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
+    /**
+     * Subtypes
+     */
     public List<GraphTargetItem> subtypes;
 
+    /**
+     * ABC index
+     */
     private AbcIndexing abcIndex;
 
     @Override
@@ -84,12 +113,20 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return c;
     }
 
+    /**
+     * Sets slot scope.
+     * @param slotScope Slot scope
+     */
     public void setSlotScope(int slotScope) {
         if (resolved instanceof NameAVM2Item) {
             ((NameAVM2Item) resolved).setSlotScope(slotScope);
         }
     }
 
+    /**
+     * Gets slot scope.
+     * @return Slot scope
+     */
     public int getSlotScope() {
         if (resolved instanceof NameAVM2Item) {
             return ((NameAVM2Item) resolved).getSlotScope();
@@ -97,15 +134,20 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return -1;
     }
 
-    /*public void setNs(GraphTargetItem ns) {
-     this.ns = ns;
-     }*/
+    /**
+     * Sets reg number.
+     * @param regNumber Reg number
+     */
     public void setRegNumber(int regNumber) {
         if (resolved instanceof NameAVM2Item) {
             ((NameAVM2Item) resolved).setRegNumber(regNumber);
         }
     }
 
+    /**
+     * Gets slot number.
+     * @return Slot number
+     */
     public int getSlotNumber() {
         if (resolved instanceof NameAVM2Item) {
             return ((NameAVM2Item) resolved).getSlotNumber();
@@ -113,12 +155,20 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return -1;
     }
 
+    /**
+     * Sets slot number.
+     * @param slotNumber Slot number
+     */
     public void setSlotNumber(int slotNumber) {
         if (resolved instanceof NameAVM2Item) {
             ((NameAVM2Item) resolved).setSlotNumber(slotNumber);
         }
     }
 
+    /**
+     * Gets reg number.
+     * @return Reg number
+     */
     public int getRegNumber() {
         if (resolved instanceof NameAVM2Item) {
             return ((NameAVM2Item) resolved).getRegNumber();
@@ -126,25 +176,36 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return -1;
     }
 
-    /*
-     public GraphTargetItem getNs() {
-     return ns;
-     }
+    /**
+     * Appends name.
+     * @param name Name
      */
     public void appendName(String name) {
         this.name = this.name.addWithSuffix(name);
     }
 
+    /**
+     * Sets definition.
+     * @param definition Definition
+     */
     public void setDefinition(boolean definition) {
         if (resolved instanceof NameAVM2Item) {
             ((NameAVM2Item) resolved).setDefinition(definition);
         }
     }
 
+    /**
+     * Sets namespace kind.
+     * @param nsKind Namespace kind
+     */
     public void setNsKind(int nsKind) {
         this.nsKind = nsKind;
     }
 
+    /**
+     * Gets namespace kind.
+     * @return Namespace kind
+     */
     public int getNsKind() {
         return nsKind;
     }
@@ -154,14 +215,34 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         this.assignedValue = storeValue;
     }
 
+    /**
+     * Gets variable name.
+     * @return Variable name
+     */
     public DottedChain getVariableName() {
         return name;
     }
 
+    /**
+     * Sets variable name.
+     * @param name Variable name
+     */
     public void setVariableName(DottedChain name) {
         this.name = name;
     }
 
+    /**
+     * Constructor.
+     * @param subtypes Subtypes
+     * @param importedClasses Imported classes
+     * @param mustBeType Must be type
+     * @param type Type
+     * @param line Line
+     * @param name Name
+     * @param storeValue Store value
+     * @param openedNamespaces Opened namespaces
+     * @param abcIndex ABC index
+     */
     public UnresolvedAVM2Item(List<GraphTargetItem> subtypes, List<DottedChain> importedClasses, boolean mustBeType, GraphTargetItem type, int line, DottedChain name, GraphTargetItem storeValue, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
         super(storeValue);
         this.name = name;
@@ -175,6 +256,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         this.abcIndex = abcIndex;
     }
 
+    /**
+     * Checks if is definition.
+     * @return True if is definition
+     */
     public boolean isDefinition() {
         if (resolved instanceof NameAVM2Item) {
             return ((NameAVM2Item) resolved).isDefinition();
@@ -182,6 +267,10 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return false;
     }
 
+    /**
+     * Gets store value.
+     * @return Store value
+     */
     public GraphTargetItem getStoreValue() {
         return assignedValue;
     }
@@ -191,6 +280,11 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         return writer;
     }
 
+    /**
+     * Gets default value for type.
+     * @param type Type
+     * @return Default value
+     */
     public static GraphTargetItem getDefaultValue(String type) {
         switch (type) {
             case "*":
@@ -206,6 +300,14 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         }
     }
 
+    /**
+     * Generates coerce.
+     * @param localData Local data
+     * @param generator Generator
+     * @param type Type
+     * @return Coerce instruction
+     * @throws CompilationException On compilation error
+     */
     public static AVM2Instruction generateCoerce(SourceGeneratorLocalData localData, SourceGenerator generator, GraphTargetItem type) throws CompilationException {
         AVM2Instruction ins;
         switch (type.toString()) {
@@ -288,6 +390,19 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new CompilationException("Cannot assign", line);
     }
 
+    /**
+     * Resolves.
+     * @param localData Local data
+     * @param currentClassFullName Current class full name
+     * @param thisType This type
+     * @param paramTypes Parameter types
+     * @param paramNames Parameter names
+     * @param abc ABC
+     * @param callStack Call stack
+     * @param variables Variables
+     * @return Resolved item
+     * @throws CompilationException On compilation error
+     */
     public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 

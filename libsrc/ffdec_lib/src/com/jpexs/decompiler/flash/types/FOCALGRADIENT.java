@@ -26,6 +26,9 @@ import java.io.Serializable;
  */
 public class FOCALGRADIENT extends GRADIENT implements Serializable {
 
+    /**
+     * Focal point
+     */
     @SWFType(BasicType.FIXED8)
     public float focalPoint;
 

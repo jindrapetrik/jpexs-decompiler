@@ -32,6 +32,9 @@ import java.util.logging.Logger;
  */
 public class CLIPACTIONS implements Serializable {
 
+    /**
+     * Reserved
+     */
     @Reserved
     @SWFType(BasicType.UI16)
     public int reserved;
@@ -46,6 +49,16 @@ public class CLIPACTIONS implements Serializable {
      */
     public List<CLIPACTIONRECORD> clipActionRecords = new ArrayList<>();
 
+    /**
+     * Constructor
+     */
+    public CLIPACTIONS() {
+
+    }
+
+    /**
+     * Calculates allEventFlags
+     */
     public void calculateAllEventFlags() {
 
         allEventFlags = new CLIPEVENTFLAGS();

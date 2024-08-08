@@ -27,6 +27,9 @@ import java.io.Serializable;
  */
 public class PIX15 implements Serializable {
 
+    /**
+     * Reserved
+     */
     @SWFType(value = BasicType.UB, count = 1)
     @Reserved
     public int reserved;
@@ -48,4 +51,10 @@ public class PIX15 implements Serializable {
      */
     @SWFType(value = BasicType.UB, count = 5)
     public int blue;
+
+    /**
+     * Constructor.
+     */
+    public PIX15() {
+    }
 }

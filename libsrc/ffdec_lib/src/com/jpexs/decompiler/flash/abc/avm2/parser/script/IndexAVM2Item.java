@@ -40,14 +40,34 @@ import java.util.Objects;
  */
 public class IndexAVM2Item extends AssignableAVM2Item {
 
+    /**
+     * Opened namespaces
+     */
     private final List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Object
+     */
     public GraphTargetItem object;
 
+    /**
+     * Index
+     */
     public GraphTargetItem index;
 
+    /**
+     * Attribute
+     */
     public boolean attr;
 
+    /**
+     * Constructor.
+     * @param attr Attribute
+     * @param object Object
+     * @param index Index
+     * @param storeValue Store value
+     * @param openedNamespaces Opened namespaces
+     */
     public IndexAVM2Item(boolean attr, GraphTargetItem object, GraphTargetItem index, GraphTargetItem storeValue, List<NamespaceItem> openedNamespaces) {
         super(storeValue);
         this.object = object;
@@ -110,6 +130,18 @@ public class IndexAVM2Item extends AssignableAVM2Item {
 
     }
 
+    /**
+     * Convert to source.
+     * @param localData Local data
+     * @param generator Generator
+     * @param needsReturn Needs return
+     * @param call Call
+     * @param callargs Call arguments
+     * @param delete Delete
+     * @param construct Construct
+     * @return Source
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex)), true);

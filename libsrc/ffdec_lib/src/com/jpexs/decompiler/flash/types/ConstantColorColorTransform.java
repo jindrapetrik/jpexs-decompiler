@@ -43,7 +43,7 @@ public class ConstantColorColorTransform extends ColorTransform implements Seria
      * Apply colortransform.
      *
      * @param color Color
-     * @return
+     * @return Transformed color
      */
     @Override
     public int apply(int color) {

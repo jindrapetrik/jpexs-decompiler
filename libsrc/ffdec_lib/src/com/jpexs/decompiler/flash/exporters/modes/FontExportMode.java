@@ -23,6 +23,12 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum FontExportMode {
 
+    /**
+     * TTF - TrueType font
+     */
     TTF,
+    /**
+     * WOFF - Web Open Font Format
+     */
     WOFF
 }

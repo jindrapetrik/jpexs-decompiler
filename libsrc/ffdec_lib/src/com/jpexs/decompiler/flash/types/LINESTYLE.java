@@ -33,9 +33,15 @@ import java.util.Set;
  */
 public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
 
+    /**
+     * Width
+     */
     @SWFType(BasicType.UI16)
     public int width;
 
+    /**
+     * Color
+     */
     @ConditionalType(type = RGBA.class, tags = {DefineShape3Tag.ID, DefineShape4Tag.ID})
     public RGB color;
 
@@ -78,6 +84,10 @@ public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
         this.width = width;
     }
 
+    /**
+     * Converts to MORPHLINESTYLE
+     * @return MORPHLINESTYLE
+     */
     public MORPHLINESTYLE toMorphLineStyle() {
         MORPHLINESTYLE morphLineStyle = new MORPHLINESTYLE();
         morphLineStyle.startColor = new RGBA(color);

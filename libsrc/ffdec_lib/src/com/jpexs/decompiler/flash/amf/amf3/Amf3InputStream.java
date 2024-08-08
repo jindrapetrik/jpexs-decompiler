@@ -50,18 +50,35 @@ import java.util.logging.Logger;
  */
 public class Amf3InputStream extends InputStream {
 
+    /**
+     * Logger
+     */
     public static final Logger LOGGER = Logger.getLogger(Amf3InputStream.class.getName());
     private final MemoryInputStream is;
+    /**
+     * Dump info
+     */
     public DumpInfo dumpInfo;
     private static final String NO_REFERENCE_BIT_TEXT = "not reference";
     private static final String OBJECT_INDEX_TEXT = "object index";
     private static final String STRING_INDEX_TEXT = "string index";
     private static final String TRAIT_INDEX_TEXT = "trait index";
 
+    /**
+     * Constructor.
+     *
+     * @param is Input stream
+     */
     public Amf3InputStream(MemoryInputStream is) {
         this.is = is;
     }
 
+    /**
+     * New dump level.
+     * @param name Name
+     * @param type Type
+     * @return Dump info
+     */
     public DumpInfo newDumpLevel(String name, String type) {
         if (dumpInfo != null) {
             long startByte = is.getPos();
@@ -74,10 +91,17 @@ public class Amf3InputStream extends InputStream {
         return dumpInfo;
     }
 
+    /**
+     * Ends dump level
+     */
     public void endDumpLevel() {
         endDumpLevel(null);
     }
 
+    /**
+     * Ends dump level
+     * @param value Value
+     */
     public void endDumpLevel(Object value) {
         if (dumpInfo != null) {
             dumpInfo.lengthBytes = is.getPos() - dumpInfo.startByte;
@@ -86,6 +110,10 @@ public class Amf3InputStream extends InputStream {
         }
     }
 
+    /**
+     * Ends dump level until
+     * @param di Dump info
+     */
     public void endDumpLevelUntil(DumpInfo di) {
         if (di != null) {
             while (dumpInfo != null && dumpInfo != di) {
@@ -94,6 +122,12 @@ public class Amf3InputStream extends InputStream {
         }
     }
 
+    /**
+     * Reads U8 (unsigned 8-bit integer) value.
+     * @param name Name
+     * @return U8 value
+     * @throws IOException On I/O error
+     */
     public int readU8(String name) throws IOException {
         newDumpLevel(name, "U8");
         int ret = readInternal();
@@ -101,6 +135,12 @@ public class Amf3InputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads U16 (unsigned 16-bit integer) value.
+     * @param name Name
+     * @return U16 value
+     * @throws IOException On I/O error
+     */
     public int readU16(String name) throws IOException {
         newDumpLevel(name, "U16");
         int b1 = readInternal();
@@ -110,6 +150,12 @@ public class Amf3InputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads U32 (unsigned 32-bit integer) value.
+     * @param name Name
+     * @return U32 value
+     * @throws IOException On I/O error
+     */
     public long readU32(String name) throws IOException {
         newDumpLevel(name, "U32");
         long ret = readU32Internal();
@@ -117,6 +163,11 @@ public class Amf3InputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads U32 (unsigned 32-bit integer) value.
+     * @return U32 value
+     * @throws IOException On I/O error
+     */
     private long readU32Internal() throws IOException {
         int b1 = readInternal();
         int b2 = readInternal();
@@ -126,6 +177,12 @@ public class Amf3InputStream extends InputStream {
         return ((b1 << 24) + (b2 << 16) + (b3 << 8) + b4) & 0xffffffff;
     }
 
+    /**
+     * Reads S32 (signed 32-bit integer) value.
+     * @param name Name
+     * @return S32 value
+     * @throws IOException On I/O error
+     */
     public long readS32(String name) throws IOException {
         newDumpLevel(name, "S32");
         long ret = signExtend(readU32Internal(), 32);
@@ -133,6 +190,11 @@ public class Amf3InputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Reads long value.
+     * @return Long value
+     * @throws IOException On I/O error
+     */
     private long readLong() throws IOException {
         byte[] readBuffer = new byte[8];
         for (int i = 0; i < 8; i++) {
@@ -148,6 +210,12 @@ public class Amf3InputStream extends InputStream {
                 + ((readBuffer[7] & 0xff)));
     }
 
+    /**
+     * Reads double value.
+     * @param name Name
+     * @return Double value
+     * @throws IOException On I/O error
+     */
     public double readDouble(String name) throws IOException {
         newDumpLevel(name, "DOUBLE");
         long lval = readLong();
@@ -155,6 +223,13 @@ public class Amf3InputStream extends InputStream {
         endDumpLevel(EcmaScript.toString(ret));
         return ret;
     }
+
+    /**
+     * Reads U29 (Unsigned 29-bit integer) value.
+     * @param name Name
+     * @return U29 value
+     * @throws IOException On I/O error
+     */
 
     public long readU29(String name) throws IOException {
         newDumpLevel(name, "U29");
@@ -225,6 +300,12 @@ public class Amf3InputStream extends InputStream {
         }
     }
 
+    /**
+     * Reads S29 (Signed 29-bit integer) value.
+     * @param name Name
+     * @return S29 value
+     * @throws IOException On I/O error
+     */
     public long readS29(String name) throws IOException {
         newDumpLevel(name, "S29");
         long val = signExtend(readU29Internal(), 29);
@@ -232,7 +313,7 @@ public class Amf3InputStream extends InputStream {
         return val;
     }
 
-    public long readU29Internal() throws IOException {
+    private long readU29Internal() throws IOException {
         long val = 0;
         for (int i = 1; i <= 4; i++) {
             int b = readInternal();
@@ -274,6 +355,13 @@ public class Amf3InputStream extends InputStream {
         return retString;
     }
 
+    /**
+     * Reads UTF-8 Vr value.
+     * @param name Name
+     * @param stringTable String table
+     * @return UTF-8 Vr value
+     * @throws IOException On I/O error
+     */
     public String readUtf8Vr(String name, List<String> stringTable) throws IOException {
         newDumpLevel(name, "UTF-8-vr");
         long u = readU29("U29S");
@@ -313,10 +401,25 @@ public class Amf3InputStream extends InputStream {
         return is.read();
     }
 
+    /**
+     * Reads value.
+     * @param name Name
+     * @return Value
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
     public Object readValue(String name) throws IOException, NoSerializerExistsException {
         return readValue(name, new HashMap<>());
     }
 
+    /**
+     * Reads value.
+     * @param name Name
+     * @param serializers Serializers
+     * @return Value
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
     public Object readValue(String name, Map<String, ObjectTypeSerializeHandler> serializers) throws IOException, NoSerializerExistsException {
         return readValue(name, serializers, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }

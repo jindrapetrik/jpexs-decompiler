@@ -23,7 +23,22 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum SoundExportMode {
 
-    MP3_WAV_FLV(true, true, true), FLV(false, false, true), MP3_WAV(true, true, false), WAV(false, true, false);
+    /**
+     * MP3, WAV or FLV, depending on what suits best
+     */
+    MP3_WAV_FLV(true, true, true),
+    /**
+     * FLV - Flash Video
+     */
+    FLV(false, false, true),
+    /**
+     * MP3 or WAV, depending on what suits best.
+     */
+    MP3_WAV(true, true, false),
+    /**
+     * WAV - Uncompressed audio
+     */
+    WAV(false, true, false);
 
     private final boolean mp3;
     private final boolean wav;
