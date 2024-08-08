@@ -65,6 +65,20 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.0.1" date="2024-08-08">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2221 AS3 P-code - add new function button (creates methodinfo, methodbody)</li>
+					<li>Javadoc HTML documentation for library (Separate download)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2267 Script decompilation - Loop detection causing `§§goto` instructions in some cases</li>
+					<li>#2268 AS3 script export with embedded assets fails (_assets dir not exists) when no other than sprite assets exist</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.0" date="2024-08-05">
 			<description>
 				<p>Added</p>
