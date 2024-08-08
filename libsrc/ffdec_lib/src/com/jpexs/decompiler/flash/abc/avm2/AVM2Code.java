@@ -3088,7 +3088,7 @@ public class AVM2Code implements Cloneable {
      * @param scope Scope
      * @param abc ABC
      * @param autoFill Auto fill
-     * @return
+     * @return True if success
      */
     private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc, boolean autoFill) {
         while (pos < code.size()) {

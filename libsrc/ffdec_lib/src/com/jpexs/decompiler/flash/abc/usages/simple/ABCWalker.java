@@ -108,7 +108,7 @@ public abstract class ABCWalker {
      * @param scriptTraitIndex Script trait index
      * @param traitIndex Trait index
      * @param walkType Walk type
-     * @return
+     * @return True if handled
      */
     private boolean optionalHandleClass(Set<Integer> handledClasses, Set<Integer> handledMethodBodies, Set<Integer> handledMethodInfos, ABC abc, int index, int scriptIndex, int scriptTraitIndex, int traitIndex, WalkType walkType) {
         if (handledClasses.contains(index)) {

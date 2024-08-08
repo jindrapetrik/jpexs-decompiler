@@ -214,7 +214,7 @@ public class Timeline {
     /**
      * Gets list of frames.
      *
-     * @return
+     * @return List of frames
      */
     public synchronized List<Frame> getFrames() {
         ensureInitialized();
@@ -225,7 +225,7 @@ public class Timeline {
      * Gets frame object.
      *
      * @param index 0-based frame index
-     * @return
+     * @return Frame object or null if index is out of bounds
      */
     public synchronized Frame getFrame(int index) {
         ensureInitialized();
@@ -238,7 +238,7 @@ public class Timeline {
     /**
      * Adds a frame.
      *
-     * @param frame
+     * @param frame Frame to add
      */
     public synchronized void addFrame(Frame frame) {
         ensureInitialized();
@@ -250,7 +250,7 @@ public class Timeline {
     /**
      * Gets AS2 root package.
      *
-     * @return
+     * @return AS2 root package
      */
     public AS2Package getAS2RootPackage() {
         ensureInitialized();
@@ -260,7 +260,7 @@ public class Timeline {
     /**
      * Gets map of depth to max frame.
      *
-     * @return
+     * @return Map of depth to max frame
      */
     public Map<Integer, Integer> getDepthMaxFrame() {
         ensureInitialized();
@@ -270,8 +270,8 @@ public class Timeline {
     /**
      * Gets map of soundStream id to SoundStreamFrameRanges.
      *
-     * @param head
-     * @return
+     * @param head Head
+     * @return List of SoundStreamFrameRanges
      */
     public List<SoundStreamFrameRange> getSoundStreamBlocks(SoundStreamHeadTypeTag head) {
         ensureInitialized();
@@ -281,7 +281,7 @@ public class Timeline {
     /**
      * Gets parent tag.
      *
-     * @return
+     * @return Parent tag
      */
     public Tag getParentTag() {
         return timelined instanceof Tag ? (Tag) timelined : null;
@@ -290,7 +290,7 @@ public class Timeline {
     /**
      * Resets timeline to given SWF file timeline.
      *
-     * @param swf
+     * @param swf SWF
      */
     public void reset(SWF swf) {
         reset(swf, swf, 0, swf.displayRect);
@@ -300,7 +300,7 @@ public class Timeline {
      * Resets timeline to given Timelined object
      *
      * @param swf SWF this timelined resides
-     * @param timelined
+     * @param timelined Timelined
      * @param id Timeline id - usually characterId or 0 for SWF main timeline
      * @param displayRect Display rect
      */
@@ -324,7 +324,7 @@ public class Timeline {
     /**
      * Gets maximum depth.
      *
-     * @return
+     * @return Maximum depth
      */
     public final int getMaxDepth() {
         ensureInitialized();
@@ -334,7 +334,7 @@ public class Timeline {
     /**
      * Calculates max depth manually.
      *
-     * @return
+     * @return Maximum depth
      */
     private synchronized int getMaxDepthInternal() {
         int max_depth = 0;
@@ -355,7 +355,7 @@ public class Timeline {
     /**
      * Gets frame count.
      *
-     * @return
+     * @return Frame count
      */
     public synchronized int getFrameCount() {
         ensureInitialized();
@@ -365,7 +365,7 @@ public class Timeline {
     /**
      * Gets real frame count. Real = when frame has actions or layerschanged.
      *
-     * @return
+     * @return Real frame count
      */
     public synchronized int getRealFrameCount() {
         ensureInitialized();
@@ -387,8 +387,8 @@ public class Timeline {
     /**
      * Gets frame for ASMSource.
      *
-     * @param asm
-     * @return
+     * @param asm ASMSource
+     * @return Frame index or -1 if not found
      */
     public int getFrameForAction(ASMSource asm) {
         Integer frame = actionFrames.get(asm);
@@ -402,7 +402,7 @@ public class Timeline {
     /**
      * Constructs timeline from SWF.
      *
-     * @param swf
+     * @param swf SWF
      */
     public Timeline(SWF swf) {
         this(swf, swf, 0, swf.displayRect);
@@ -412,7 +412,7 @@ public class Timeline {
      * Constructs timeline from Timelined object.
      *
      * @param swf SWF the timelined object resides in
-     * @param timelined
+     * @param timelined Timelined
      * @param id Timeline id - usually characterId or 0 for SWF main timeline
      * @param displayRect Display rect
      */
@@ -428,7 +428,7 @@ public class Timeline {
     /**
      * Gets frame with label name.
      *
-     * @param label
+     * @param label Label name
      * @return frame index (zero based) or -1 when not found
      */
     public int getFrameWithLabel(String label) {
@@ -773,8 +773,8 @@ public class Timeline {
     /**
      * Populates sound stream blocks.
      *
-     * @param containerId
-     * @param tags
+     * @param containerId Container id
+     * @param tags Tags
      */
     private void populateSoundStreamBlocks(int containerId, Iterable<Tag> tags) {
         List<SoundStreamFrameRange> ranges = null;
@@ -885,8 +885,8 @@ public class Timeline {
     /**
      * Gets needed characters for a frame.
      *
-     * @param frame
-     * @param usedCharacters
+     * @param frame Frame index
+     * @param usedCharacters Result
      */
     public void getNeededCharacters(int frame, Set<Integer> usedCharacters) {
         Frame frameObj = getFrame(frame);
@@ -904,9 +904,9 @@ public class Timeline {
     /**
      * Replaces characterId with another.s
      *
-     * @param oldCharacterId
-     * @param newCharacterId
-     * @return
+     * @param oldCharacterId Old character id
+     * @param newCharacterId New character id
+     * @return True if modified
      */
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
@@ -924,9 +924,9 @@ public class Timeline {
     /**
      * Removes character.
      *
-     * @param characterId
+     * @param characterId Character id
      * @param listener Called on tag remove
-     * @return
+     * @return True if removed
      */
     public boolean removeCharacter(int characterId, TagRemoveListener listener) {
         return swf.removeCharacterFromTimeline(characterId, this, listener);
@@ -935,8 +935,8 @@ public class Timeline {
     /**
      * Rounds value to pixels.
      *
-     * @param val
-     * @return
+     * @param val Value
+     * @return Rounded value
      */
     public double roundToPixel(double val) {
         return Math.rint(val / SWF.unitDivisor) * SWF.unitDivisor;
@@ -945,34 +945,34 @@ public class Timeline {
     /**
      * Draws drawableTag
      *
-     * @param swf
-     * @param strokeTransform
-     * @param layer
-     * @param layerMatrix
-     * @param g
-     * @param colorTransForm
-     * @param blendMode
-     * @param parentBlendMode
-     * @param clips
-     * @param transformation
-     * @param isClip
-     * @param clipDepth
-     * @param absMat
-     * @param time
-     * @param ratio
-     * @param renderContext
-     * @param image
-     * @param fullImage
-     * @param drawable
-     * @param filters
-     * @param unzoom
-     * @param clrTrans
-     * @param sameImage
-     * @param viewRect
-     * @param fullTransformation
-     * @param scaleStrokes
-     * @param drawMode
-     * @param canUseSmoothing
+     * @param swf SWF
+     * @param strokeTransform Stroke transform
+     * @param layer Layer
+     * @param layerMatrix Layer matrix
+     * @param g Graphics
+     * @param colorTransForm Color transform
+     * @param blendMode Blend mode
+     * @param parentBlendMode Parent blend mode
+     * @param clips Clips
+     * @param transformation Transformation
+     * @param isClip Is clip
+     * @param clipDepth Clip depth
+     * @param absMat Absolute matrix
+     * @param time Time
+     * @param ratio Ratio
+     * @param renderContext Render context
+     * @param image Image
+     * @param fullImage Full image
+     * @param drawable Drawable
+     * @param filters Filters
+     * @param unzoom Unzoom
+     * @param clrTrans Color transform
+     * @param sameImage Same image
+     * @param viewRect View rect
+     * @param fullTransformation Full transformation
+     * @param scaleStrokes Scale strokes
+     * @param drawMode Draw mode
+     * @param canUseSmoothing Can use smoothing
      */
     private void drawDrawable(SWF swf, Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, int parentBlendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, boolean canUseSmoothing) {
         Matrix drawMatrix = new Matrix();
@@ -1277,24 +1277,24 @@ public class Timeline {
     /**
      * Converts specified frame to an image.
      *
-     * @param frame
-     * @param time
-     * @param renderContext
-     * @param image
-     * @param fullImage
-     * @param isClip
-     * @param transformation
-     * @param strokeTransformation
-     * @param absoluteTransformation
-     * @param colorTransform
-     * @param unzoom
-     * @param sameImage
-     * @param viewRect
-     * @param fullTransformation
-     * @param scaleStrokes
-     * @param drawMode
-     * @param blendMode
-     * @param canUseSmoothing
+     * @param frame Frame
+     * @param time Time
+     * @param renderContext Render context
+     * @param image Image
+     * @param fullImage Full image
+     * @param isClip Is clip
+     * @param transformation Transformation
+     * @param strokeTransformation Stroke transformation
+     * @param absoluteTransformation Absolute transformation
+     * @param colorTransform Color transform
+     * @param unzoom Unzoom
+     * @param sameImage Same image
+     * @param viewRect View rect
+     * @param fullTransformation Full transformation
+     * @param scaleStrokes Scale strokes
+     * @param drawMode Draw mode
+     * @param blendMode Blend mode
+     * @param canUseSmoothing Can use smoothing
      */
     public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         if (getFrameCount() <= frame) {
@@ -1470,14 +1470,14 @@ public class Timeline {
     /**
      * Converts specified frame to SVG.
      *
-     * @param frame
-     * @param time
-     * @param stateUnderCursor
-     * @param mouseButton
-     * @param exporter
-     * @param colorTransform
-     * @param level
-     * @throws IOException
+     * @param frame Frame
+     * @param time Time
+     * @param stateUnderCursor State under cursor
+     * @param mouseButton Mouse button
+     * @param exporter SVG exporter
+     * @param colorTransform Color transform
+     * @param level Level
+     * @throws IOException On I/O error
      */
     public void toSVG(int frame, int time, DepthState stateUnderCursor, int mouseButton, SVGExporter exporter, ColorTransform colorTransform, int level) throws IOException {
         if (getFrameCount() <= frame) {
@@ -1580,9 +1580,9 @@ public class Timeline {
     /**
      * Gets tag type prefix for SVG export.
      *
-     * @param tag
-     * @param exporter
-     * @return
+     * @param tag Tag
+     * @param exporter SVG exporter
+     * @return Tag type prefix
      */
     private static String getTagIdPrefix(Tag tag, SVGExporter exporter) {
         if (tag instanceof ShapeTag) {
@@ -1606,9 +1606,9 @@ public class Timeline {
     /**
      * Converts list of frames to HTML Canvas.
      *
-     * @param result
-     * @param unitDivisor
-     * @param frames
+     * @param result Result
+     * @param unitDivisor Unit divisor
+     * @param frames Frames
      */
     public void toHtmlCanvas(StringBuilder result, double unitDivisor, List<Integer> frames) {
         FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
@@ -1617,13 +1617,13 @@ public class Timeline {
     /**
      * Gets all sounds from the frame.
      *
-     * @param frame
-     * @param time
-     * @param mouseOverButton
-     * @param mouseButton
-     * @param sounds
-     * @param soundClasses
-     * @param soundInfos
+     * @param frame Frame
+     * @param time Time
+     * @param mouseOverButton Mouse over button
+     * @param mouseButton Mouse button
+     * @param sounds Sounds
+     * @param soundClasses Sound classes
+     * @param soundInfos Sound infos
      */
     public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
         Frame fr = getFrame(frame);
@@ -1659,15 +1659,15 @@ public class Timeline {
     /**
      * Gets outline of the frame.
      *
-     * @param fast
-     * @param frame
-     * @param time
-     * @param renderContext
-     * @param transformation
-     * @param stroked
-     * @param viewRect
-     * @param unzoom
-     * @return
+     * @param fast Fast
+     * @param frame Frame
+     * @param time Time
+     * @param renderContext Render context
+     * @param transformation Transformation
+     * @param stroked Stroked
+     * @param viewRect View rect
+     * @param unzoom Unzoom
+     * @return Outline
      */
     public Shape getOutline(boolean fast, int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         Frame fr = getFrame(frame);
@@ -1743,7 +1743,7 @@ public class Timeline {
      * Checks whether all frames are singleframe. Single frame = each frame has
      * no animated parts inside.
      *
-     * @return
+     * @return True if all frames are single frame, otherwise false
      */
     public boolean isSingleFrame() {
         for (int i = 0; i < getFrameCount(); i++) {
@@ -1758,8 +1758,8 @@ public class Timeline {
      * Checks whether specified frame is single frame. Single frame = has no
      * animated parts inside.
      *
-     * @param frame
-     * @return
+     * @param frame Frame
+     * @return True if frame is single frame, otherwise false
      */
     public boolean isSingleFrame(int frame) {
         Frame frameObj = getFrame(frame);
@@ -1786,12 +1786,6 @@ public class Timeline {
         return true;
     }
 
-    /**
-     * Equals test.
-     *
-     * @param obj
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Timeline) {
@@ -1805,7 +1799,7 @@ public class Timeline {
     /**
      * Gets scenes list.
      *
-     * @return
+     * @return Scenes list
      */
     public List<Scene> getScenes() {
         ensureInitialized();

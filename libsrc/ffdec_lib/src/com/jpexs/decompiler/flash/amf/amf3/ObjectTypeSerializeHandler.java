@@ -32,7 +32,7 @@ public interface ObjectTypeSerializeHandler {
      * @param className Class name of the object.
      * @param is Input stream.
      * @return Map of object members.
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Map<String, Object> readObject(String className, InputStream is) throws IOException;
 
@@ -41,7 +41,7 @@ public interface ObjectTypeSerializeHandler {
      *
      * @param members Map of object members.
      * @param os Output stream.
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void writeObject(Map<String, Object> members, OutputStream os) throws IOException;
 }

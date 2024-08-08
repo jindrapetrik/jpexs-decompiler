@@ -42,22 +42,22 @@ import java.util.zip.ZipOutputStream;
 public class ZippedBundle implements Bundle {
 
     /**
-     *
+     * Key set
      */
     protected Set<String> keySet = new HashSet<>();
 
     /**
-     * File input stream for the ZIP file.
+     * File input stream for the ZIP file
      */
     protected FileInputStream fis;
 
     /**
-     * Re-readable input stream for the ZIP file.
+     * Re-readable input stream for the ZIP file
      */
     protected ReReadableInputStream is;
 
     /**
-     * File name of the ZIP file.
+     * File name of the ZIP file
      */
     protected File filename;
 
@@ -65,7 +65,7 @@ public class ZippedBundle implements Bundle {
      * Constructs a new ZippedBundle from an input stream.
      *
      * @param is Input stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ZippedBundle(InputStream is) throws IOException {
         this(is, null);
@@ -75,7 +75,7 @@ public class ZippedBundle implements Bundle {
      * Constructs a new ZippedBundle from a file.
      *
      * @param filename File
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ZippedBundle(File filename) throws IOException {
         this(null, filename);
@@ -86,7 +86,7 @@ public class ZippedBundle implements Bundle {
      *
      * @param is Input stream
      * @param filename File
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     protected ZippedBundle(InputStream is, File filename) throws IOException {
         initBundle(is, filename);
@@ -97,7 +97,7 @@ public class ZippedBundle implements Bundle {
      *
      * @param is Input stream
      * @param filename File
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     protected void initBundle(InputStream is, File filename) throws IOException {
         if (filename != null) {
@@ -119,33 +119,17 @@ public class ZippedBundle implements Bundle {
         }
     }
 
-    /**
-     * Gets the number of entries in the bundle.
-     *
-     * @return
-     */
     @Override
     public int length() {
         return keySet.size();
     }
 
-    /**
-     * Gets the keys in the bundle.
-     *
-     * @return
-     */
+
     @Override
     public Set<String> getKeys() {
         return keySet;
     }
 
-    /**
-     * Gets the input stream for a key.
-     *
-     * @param key Key
-     * @return Input stream
-     * @throws IOException
-     */
     @Override
     public SeekableInputStream getOpenable(String key) throws IOException {
         if (!keySet.contains(key)) {
@@ -171,12 +155,6 @@ public class ZippedBundle implements Bundle {
         //return cachedSWFs.get(key);
     }
 
-    /**
-     * Gets all input streams in the bundle.
-     *
-     * @return Map of key to input stream
-     * @throws IOException
-     */
     @Override
     public Map<String, SeekableInputStream> getAll() throws IOException {
         Map<String, SeekableInputStream> ret = new HashMap<>();
@@ -186,34 +164,16 @@ public class ZippedBundle implements Bundle {
         return ret;
     }
 
-    /**
-     * Gets the extension of the bundle.
-     *
-     * @return Extension
-     */
     @Override
     public String getExtension() {
         return "zip";
     }
 
-    /**
-     * Gets whether the bundle is read-only.
-     *
-     * @return Whether the bundle is read-only
-     */
     @Override
     public boolean isReadOnly() {
         return this.filename == null || !this.filename.canWrite();
     }
 
-    /**
-     * Replaces the input stream for a key.
-     *
-     * @param key Key
-     * @param swfIs New input stream
-     * @return Whether the operation was successful
-     * @throws IOException
-     */
     @Override
     public boolean putOpenable(String key, InputStream swfIs) throws IOException {
         if (this.isReadOnly()) {

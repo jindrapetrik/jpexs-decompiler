@@ -98,7 +98,7 @@ public class FLVInputStream {
      * Reads one byte from the stream
      *
      * @return byte
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readEx() throws IOException {
         bitPos = 0;
@@ -110,7 +110,7 @@ public class FLVInputStream {
      *
      * @param nBits Number of bits which represent value
      * @return Unsigned value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readUB(int nBits) throws IOException {
         if (nBits == 0) {
@@ -135,7 +135,7 @@ public class FLVInputStream {
      *
      * @param nBits Number of bits which represent value
      * @return Unsigned value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readUBInternal(int nBits) throws IOException {
         if (nBits == 0) {

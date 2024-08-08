@@ -252,7 +252,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param convertData Convert data
      * @param exportMode Export mode
      * @param parallel Parallel
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convert(AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
@@ -296,7 +296,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param convertData Convert data
      * @param exportMode Export mode
      * @param parallel Parallel
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
         boolean first = true;
@@ -369,7 +369,7 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param exportMode Export mode
      * @param parallel Parallel
      * @param ignoreFrameScripts Whether to ignore frame scripts
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void toSource(AbcIndexing abcIndex, GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts) throws InterruptedException {
         writer.suspendMeasure();
@@ -420,8 +420,8 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param exportSettings Export settings
      * @param parallel Parallel
      * @return File
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public File export(AbcIndexing abcIndex, File file, ScriptExportSettings exportSettings, boolean parallel) throws IOException, InterruptedException {
         if (!exportSettings.singleFile) {

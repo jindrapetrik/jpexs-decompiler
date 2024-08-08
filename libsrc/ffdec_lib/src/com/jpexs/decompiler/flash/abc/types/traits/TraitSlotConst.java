@@ -170,7 +170,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param writer Writer
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
@@ -247,7 +247,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
@@ -298,7 +298,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
      * @param scopeStack Scope stack
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
@@ -366,7 +366,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
      * @param uses Uses
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {

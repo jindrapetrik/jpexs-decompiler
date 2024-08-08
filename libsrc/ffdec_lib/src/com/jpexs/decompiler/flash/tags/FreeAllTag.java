@@ -38,7 +38,7 @@ public class FreeAllTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public FreeAllTag(SWF swf) {
         super(swf, ID, NAME, null);

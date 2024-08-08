@@ -77,14 +77,16 @@ public class IggyHeader implements StructureInterface {
     }
 
     /**
-     * @param version
-     * @param platform1
-     * @param platform2 32/64
-     * @param platform3
-     * @param platform4
-     * @param unk_0C
-     * @param reserved
-     * @param num_subfiles
+     * Constructor.
+     *
+     * @param version Version
+     * @param platform1 Platform 1
+     * @param platform2 Platform 2 (32/64)
+     * @param platform3 Platform 3
+     * @param platform4 Platform 4
+     * @param unk_0C Unknown 0C
+     * @param reserved Reserved
+     * @param num_subfiles Number of subfiles
      */
     public IggyHeader(long version, int platform1, int platform2, int platform3, int platform4, long unk_0C, byte[] reserved, long num_subfiles) {
         this.version = version;

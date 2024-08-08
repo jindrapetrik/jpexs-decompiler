@@ -193,7 +193,7 @@ public class ActionScript2ClassDetector {
      *
      * @param nobj Item
      * @return Converted item
-     * @throws AssertException
+     * @throws AssertException If item is not NewMethod or NewObject
      */
     private GraphTargetItem newToGetMember(GraphTargetItem nobj) throws AssertException {
         if (nobj instanceof NewMethodActionItem) {
@@ -307,7 +307,7 @@ public class ActionScript2ClassDetector {
      * @param item Item
      * @param itemName Item name for exception
      * @return String
-     * @throws AssertException
+     * @throws AssertException If item is not DirectValue or not string
      */
     private String getAsString(GraphTargetItem item, String itemName) throws AssertException {
         if (!(item instanceof DirectValueActionItem)) {

@@ -83,7 +83,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      *
      * @param item Item to insert before
      * @param action Action to insert
-     * @return
+     * @return New item
      */
     public final AVM2InstructionItem insertItemBefore(AVM2InstructionItem item, AVM2Instruction action) {
         AVM2InstructionItem newItem = new AVM2InstructionItem(action);
@@ -111,7 +111,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      *
      * @param item Item to insert after
      * @param action Action to insert
-     * @return
+     * @return New item
      */
     public final AVM2InstructionItem insertItemAfter(AVM2InstructionItem item, AVM2Instruction action) {
         AVM2InstructionItem newItem = new AVM2InstructionItem(action);
@@ -240,7 +240,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      * @param instructions Instructions
      * @param address Address
      * @param next Next
-     * @return
+     * @return Nearby address
      */
     private long getNearAddress(List<AVM2Instruction> instructions, long address, boolean next) {
         int min = 0;
@@ -451,7 +451,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      *
      * @param jump Jump
      * @param jumpTarget Jump target
-     * @return
+     * @return Unreachable action count
      */
     public int getUnreachableActionCount(AVM2InstructionItem jump, AVM2InstructionItem jumpTarget) {
         AVM2InstructionItem item = firstItem;
@@ -703,7 +703,7 @@ public class FastAVM2List implements Collection<AVM2InstructionItem> {
      * @param a the array into which the elements of this collection are to be
      * stored, if it is big enough; otherwise, a new array of the same runtime
      * type is allocated for this purpose.
-     * @param <T>
+     * @param <T> Type
      * @return Array
      */
     @Override

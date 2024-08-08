@@ -160,7 +160,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         return writer.append(getNameAsStr(localData));

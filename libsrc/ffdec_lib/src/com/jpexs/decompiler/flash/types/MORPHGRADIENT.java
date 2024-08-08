@@ -59,7 +59,7 @@ public class MORPHGRADIENT implements Serializable {
      * @param c1 Color 1
      * @param c2 Color 2
      * @param ratio Ratio
-     * @return
+     * @return Morphed color
      */
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
         int r = (int) (c1.red + (c2.red - c1.red) * ratio / 65535.0 + 0.5);

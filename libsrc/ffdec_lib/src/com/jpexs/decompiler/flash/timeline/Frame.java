@@ -148,18 +148,13 @@ public class Frame implements TreeItem, Exportable {
     /**
      * Gets openable.
      *
-     * @return
+     * @return Openable
      */
     @Override
     public Openable getOpenable() {
         return timeline.swf;
     }
 
-    /**
-     * ToString
-     *
-     * @return
-     */
     @Override
     public String toString() {
         String name = "frame " + (frame + 1);
@@ -178,19 +173,13 @@ public class Frame implements TreeItem, Exportable {
     /**
      * Gets export file name.
      *
-     * @return
+     * @return Export file name
      */
     @Override
     public String getExportFileName() {
         return "frame_" + (frame + 1);
     }
 
-    /**
-     * Equals.
-     *
-     * @param obj
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Frame) {
@@ -201,20 +190,15 @@ public class Frame implements TreeItem, Exportable {
         return false;
     }
 
-    /**
-     * HashCode.
-     *
-     * @return
-     */
     @Override
     public int hashCode() {
         return timeline.hashCode() ^ Integer.hashCode(frame);
     }
 
     /**
-     * Checks whether some of "all inner frames" are moified.
+     * Checks whether some of "all inner frames" are modified.
      *
-     * @return
+     * @return If some of "all inner frames" are modified
      */
     public boolean isAllInnerTagsModified() {
         for (Tag t : allInnerTags) {
@@ -228,7 +212,7 @@ public class Frame implements TreeItem, Exportable {
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return Modified flag
      */
     @Override
     public boolean isModified() {

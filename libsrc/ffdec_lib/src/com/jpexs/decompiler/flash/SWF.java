@@ -164,7 +164,6 @@ import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
 import com.jpexs.decompiler.graph.DottedChain;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -662,7 +661,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Sets main GFX exporterinfo tag
      *
-     * @param exporterInfo
+     * @param exporterInfo ExporterInfo
      */
     public void setExporterInfo(ExporterInfo exporterInfo) {
         this.exporterInfo = exporterInfo;
@@ -671,7 +670,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets main GFX exporterinfo tag
      *
-     * @return
+     * @return ExporterInfo
      */
     public ExporterInfo getExporterInfo() {
         return exporterInfo;
@@ -780,8 +779,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Init main AbcIndexes of playerGlobal and airGlobal
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public static void initPlayer() throws IOException, InterruptedException {
         if (playerGlobalAbcIndex == null) {
@@ -1727,7 +1726,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param os OutputStream
      * @param gfx GFX
      * @param includeImported Include imported characters
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
         checkCharset();
@@ -1845,7 +1844,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param includeImported Include imported characterss
      * @return Byte array
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private byte[] saveToByteArray(boolean includeImported) throws IOException {
         return saveToByteArray(gfx, includeImported);
@@ -1857,7 +1856,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param gfx GFX
      * @param includeImported Include imported characterss
      * @return Byte array
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private byte[] saveToByteArray(boolean gfx, boolean includeImported) throws IOException {
         byte[] data;
@@ -1968,8 +1967,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, true);
@@ -1982,8 +1981,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, true, charset);
@@ -1995,8 +1994,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param is Stream to read SWF from
      * @param parallelRead Use parallel threads?
      * @param lazy Do not parse all data, load it as necessary.
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, boolean parallelRead, boolean lazy) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, lazy);
@@ -2010,8 +2009,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param lazy Do not parse all data, load it as necessary.
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, boolean parallelRead, boolean lazy, String charset) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, lazy, charset);
@@ -2024,8 +2023,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param file Path to the file
      * @param fileTitle Title of the SWF
      * @param parallelRead Use parallel threads?
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, boolean parallelRead) throws IOException, InterruptedException {
         this(is, file, fileTitle, null, parallelRead, false, true);
@@ -2040,8 +2039,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, null, parallelRead, false, true, charset);
@@ -2066,8 +2065,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, ProgressListener listener, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, null, null, listener, parallelRead, false, true, charset);
@@ -2081,8 +2080,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param fileTitle Title of the SWF
      * @param listener Progress listener
      * @param parallelRead Use parallel threads?
-     * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, false, true);
@@ -2098,8 +2097,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallelRead Use parallel threads?
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, false, true, charset);
@@ -2109,7 +2108,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Constructs SWF from stream - Faster constructor to check SWF only.
      *
      * @param is Stream to read SWF from
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public SWF(InputStream is) throws IOException {
         decompress(is, new NulStream(), true);
@@ -2127,8 +2126,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param lazy Do not parse all data, load it as necessary.
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, charset, true);
@@ -2144,8 +2143,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallelRead Use parallel threads?
      * @param checkOnly Check only file validity
      * @param lazy Do not parse all data, load it as necessary.
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Charset.defaultCharset().name(), true);
@@ -2162,8 +2161,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param checkOnly Check only file validity
      * @param lazy Do not parse all data, load it as necessary.
      * @param resolver URL resolver for importAssets/2 tags
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Charset.defaultCharset().name(), true);
@@ -2182,8 +2181,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param resolver URL resolver for importAssets/2 tags
      * @param charset Charset for SWFs with version 5 or lower (they do not use
      * unicode)
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, charset, true);
@@ -2718,7 +2717,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param is InputStream
      * @param os OutputStream
      * @return True on success
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public static boolean encrypt(InputStream is, OutputStream os) throws IOException {
         byte[] hdr = new byte[8];
@@ -2747,7 +2746,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param is InputStream
      * @param os OutputStream
      * @return True on success
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public static boolean decrypt(InputStream is, OutputStream os) throws IOException {
         byte[] hdr = new byte[8];
@@ -2784,7 +2783,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param os OutputStream
      * @param lzmaProperties LZMA properties
      * @param fileSize File size
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private static void decodeLZMAStream(InputStream is, OutputStream os, byte[] lzmaProperties, long fileSize) throws IOException {
         Decoder decoder = new Decoder();
@@ -2801,7 +2800,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param headerData First 8 bytes of the file
      * @return SWF header
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public static SWFHeader decodeHeader(byte[] headerData) throws IOException {
         String signature = new String(headerData, 0, 3, Utf8Helper.charset);
@@ -2846,7 +2845,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param allowUncompressed When true, it will fail when file is not
      * compressed.
      * @return SWF header
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private static SWFHeader decompress(InputStream is, OutputStream os, boolean allowUncompressed) throws IOException {
 
@@ -2994,7 +2993,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param classNames List of class names
      * @return List of ScriptPacks
-     * @throws Exception
+     * @throws Exception On error
      */
     public List<ScriptPack> getScriptPacksByClassNames(List<String> classNames) throws Exception {
         Set<ScriptPack> resultSet = new HashSet<>();
@@ -3123,7 +3122,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallel Use parallel threads?
      * @param evl Event listener
      * @return List of exported files
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
         return exportActionScript(handler, outdir, null, exportSettings, parallel, evl, true, true);
@@ -3141,7 +3140,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param as2 Export AS1/2
      * @param as3 Export AS3
      * @return List of exported files
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, List<ScriptPack> as3scripts, ScriptExportSettings exportSettings, boolean parallel, EventListener evl, boolean as2, boolean as3) throws IOException {
         List<File> ret = new ArrayList<>();
@@ -3468,7 +3467,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param os OutputStream
      * @param val Value
      * @param size Size
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private static void writeLE(OutputStream os, long val, int size) throws IOException {
         for (int i = 0; i < size; i++) {
@@ -3485,7 +3484,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param soundSize True = 16 bit, false = 8b bit.
      * @param soundType True = stereo, false = mono
      * @param data PCM data
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public static void createWavFromPcmData(OutputStream fos, int soundRateHz, boolean soundSize, boolean soundType, byte[] data) throws IOException {
         ByteArrayOutputStream subChunk1Data = new ByteArrayOutputStream();
@@ -3557,7 +3556,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param fswf SWF
      * @param library Set of characterIds
      * @param fos OutputStream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public static void libraryToHtmlCanvas(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
         for (int c : library) {
@@ -3620,7 +3619,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param visited Visited
      * @param usageTypes Usage types
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
         ActionLocalData aLocalData = (ActionLocalData) localData;
@@ -3792,7 +3791,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param code Code
      * @param addr Address
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
         ActionLocalData localData = new ActionLocalData(null, insideDoInitAction, new HashMap<>() /*??*/);
@@ -3811,7 +3810,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param src Source
      * @param path Path
      * @return List of variables
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(boolean insideDefineFunction1, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ASMSource src, String path) throws InterruptedException {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
@@ -3833,7 +3832,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param functions Functions
      * @param strings Strings
      * @param usageTypes Usage types
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void getVariables(boolean insideDefineFunction1, Iterable<Tag> tags, String path, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
         List<String> processed = new ArrayList<>();
@@ -3866,7 +3865,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param functions Functions
      * @param strings Strings
      * @param usageTypes Usage types
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void addVariable(boolean insideDefineFunction1, ASMSource asm, String path, List<String> processed, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
         int pos = 1;
@@ -3979,7 +3978,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param renameType Rename type
      * @return Number of changes
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int deobfuscateIdentifiers(RenameType renameType) throws InterruptedException {
         FileAttributesTag fileAttributes = getFileAttributes();
@@ -4000,7 +3999,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param identifier Identifier
      * @param newname New name
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void renameAS2Identifier(String identifier, String newname) throws InterruptedException {
         Map<DottedChain, DottedChain> selected = new HashMap<>();
@@ -4013,7 +4012,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param renameType Rename type
      * @return Number of changes
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int deobfuscateAS2Identifiers(RenameType renameType) throws InterruptedException {
         return renameAS2Identifiers(renameType, null);
@@ -4026,7 +4025,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param selected Preselected identifiers map. Can be null when no
      * preselected.
      * @return Number of changes
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int renameAS2Identifiers(RenameType renameType, Map<DottedChain, DottedChain> selected) throws InterruptedException {
         boolean wrongConstantIndices = false;
@@ -4297,8 +4296,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallel Use parallel threads?
      * @param version FLA version
      * @param progressListener Progress listener
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, ProgressListener progressListener) throws IOException, InterruptedException {
         XFLExportSettings settings = new XFLExportSettings();
@@ -4318,8 +4317,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param parallel Use parallel threads?
      * @param version FLA version
      * @param progressListener Progress listener
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, ProgressListener progressListener) throws IOException, InterruptedException {
         XFLExportSettings settings = new XFLExportSettings();
@@ -4340,8 +4339,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param version FLA version
      * @param settings Export settings
      * @param progressListener Progress listener
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion version, XFLExportSettings settings, ProgressListener progressListener) throws IOException, InterruptedException {
         new XFLConverter().convertSWF(handler, this, swfName, outfile, settings, generator, generatorVerName, generatorVersion, parallel, version, progressListener);
@@ -4484,7 +4483,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Removes ASMSource from cache.
      *
-     * @param src
+     * @param src ASMSource
      */
     public static void uncache(ASMSource src) {
         if (src != null) {
@@ -4652,7 +4651,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param src ASMSource
      * @param listeners Disassembly listeners
      * @return ActionList
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static ActionList getCachedActionList(ASMSource src, final List<DisassemblyListener> listeners) throws InterruptedException {
         synchronized (src) {
@@ -4700,7 +4699,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param src ASMSource
      * @param actions ActionList
      * @return HighlightedText
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static HighlightedText getCached(ASMSource src, ActionList actions) throws InterruptedException {
         SWF swf = src.getSwf();
@@ -4721,7 +4720,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param pack ScriptPack
      * @return HighlightedText
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
         Openable openable = pack.getOpenable();
@@ -4744,7 +4743,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param actions ActionList
      * @param listener Decompiled listeners
      * @return Future of HighlightedText
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static Future<HighlightedText> getCachedFuture(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
         SWF swf = src.getSwf();
@@ -4769,7 +4768,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param pack ScriptPack
      * @param listener Decompiled listeners
      * @return Future of HighlightedText
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static Future<HighlightedText> getCachedFuture(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
         Openable openable = pack.getOpenable();
@@ -4829,8 +4828,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param colorTransform Color transform
      * @param backGroundColor Background color
      * @param zoom Zoom
-     * @param canUseSmoothing
-     * @return
+     * @param canUseSmoothing Can use smoothing
+     * @return Image
      */
     public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom, boolean canUseSmoothing) {
         if (timeline.getFrameCount() == 0) {
@@ -4902,7 +4901,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param timeline Timeline
      * @param dependingChars Depending characters
      * @param listener Listener to call after removing each of character.
-     * @return
+     * @return True if modified
      */
     private boolean removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, Set<Integer> dependingChars, TagRemoveListener listener) {
         Map<Integer, Integer> stage = new HashMap<>();
@@ -5317,7 +5316,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Deobfuscates SWF file.
      *
      * @param level Deobfuscation level
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void deobfuscate(DeobfuscationLevel level) throws InterruptedException {
         List<ABCContainerTag> atags = getAbcList();
@@ -5348,7 +5347,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Injects debugline and debugfile instructions to AS3 P-code (lines of
      * P-code).
      *
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void injectAS3PcodeDebugInfo() throws InterruptedException {
         injectAS3PcodeDebugInfo("main");
@@ -5359,7 +5358,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * P-code).
      *
      * @param swfHash SWF identifier
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void injectAS3PcodeDebugInfo(String swfHash) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
@@ -5381,7 +5380,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Injects debugline and debugfile instructions to AS3 code.
      *
      * @param decompileDir Directory to set file information paths
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {
         injectAS3DebugInfo(decompileDir, "main");
@@ -5392,7 +5391,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param decompileDir Directory to set file information paths
      * @param swfHash SWF identifier
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void injectAS3DebugInfo(File decompileDir, String swfHash) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
@@ -5420,7 +5419,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param injectAS3Code Modify AS3 code with debugfile / debugline ?
      * @param decompileDir Directory to virtual decompile (will affect
      * debugfile)
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void enableDebugging(boolean injectAS3Code, File decompileDir) throws InterruptedException {
         enableDebugging(injectAS3Code, decompileDir, false);
@@ -5429,7 +5428,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Enables debugging. Adds tags to enable debugging.
      *
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void enableDebugging() throws InterruptedException {
         enableDebugging(false, null, false);
@@ -5443,7 +5442,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param decompileDir Directory to virtual decompile (will affect
      * debugfile)
      * @param telemetry Enable telemetry info?
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) throws InterruptedException {
         enableDebugging(injectAS3Code, decompileDir, telemetry, false);
@@ -5473,7 +5472,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param telemetry Enable telemetry info?
      * @param pcodeLevel inject Pcode lines instead of decompiled lines
      * @param swfHash SWF identifier
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel, String swfHash) throws InterruptedException {
 
@@ -5565,8 +5564,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @return True on success
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException, InterruptedException {
         return generatePCodeSwdFile(file, breakpoints, "main");
@@ -5579,8 +5578,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @param swfHash SWF identifier
      * @return True on success
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints, String swfHash) throws IOException, InterruptedException {
         DebugIDTag dit = getDebugId();
@@ -5669,7 +5668,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param file SWD file
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @return True on success
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
         return generateSwdFile(file, breakpoints, "main");
@@ -5682,7 +5681,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param breakpoints Breakpoints - map of script name to list of lines
      * @param swfHash SWF identifier
      * @return True on success
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public boolean generateSwdFile(File file, Map<String, Set<Integer>> breakpoints, String swfHash) throws IOException {
         DebugIDTag dit = getDebugId();

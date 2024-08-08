@@ -143,7 +143,7 @@ public class Intersections {
      * @param p1 Start point
      * @param p2 Control point
      * @param p3 End point
-     * @return
+     * @return List of points
      */
     public static List<Point2D> quadraticBezierToToPolyline(Point2D p1, Point2D p2, Point2D p3) {
         return quadraticBezierToToPolyline(p1, p2, p3, null);

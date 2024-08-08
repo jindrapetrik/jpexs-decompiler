@@ -44,7 +44,7 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
     /**
      * Constructs a new FastActionListIterator.
      *
-     * @param list
+     * @param list List
      */
     FastActionListIterator(FastActionList list) {
         item = list.first();
@@ -54,8 +54,8 @@ public final class FastActionListIterator implements Iterator<ActionItem> {
     /**
      * Constructs a new FastActionListIterator.
      *
-     * @param list
-     * @param index
+     * @param list List
+     * @param index Index
      */
     FastActionListIterator(FastActionList list, int index) {
         item = list.first();

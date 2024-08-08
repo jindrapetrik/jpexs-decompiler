@@ -50,7 +50,7 @@ public class PathExporter extends ShapeExporterBase {
      * @param shapeNum Shape number
      * @param swf SWF
      * @param shape Shape
-     * @return
+     * @return List of GeneralPath
      */
     public static List<GeneralPath> export(int windingRule, int shapeNum, SWF swf, SHAPE shape) {
         return export(windingRule, shapeNum, swf, shape, new ArrayList<>());

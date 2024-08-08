@@ -43,18 +43,13 @@ public class HeaderItem implements TreeItem {
     /**
      * Gets openable.
      *
-     * @return
+     * @return Openable
      */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         return name;
@@ -63,7 +58,7 @@ public class HeaderItem implements TreeItem {
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return Modified flag
      */
     @Override
     public boolean isModified() {

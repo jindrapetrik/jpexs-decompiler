@@ -32,7 +32,7 @@ public class GraphPartQueue extends LinkedList<GraphPart> {
      * Constructs a GraphPartQueue containing the elements of the specified
      * collection.
      *
-     * @param c
+     * @param c Collection
      */
     public GraphPartQueue(Collection<? extends GraphPart> c) {
         super(c);

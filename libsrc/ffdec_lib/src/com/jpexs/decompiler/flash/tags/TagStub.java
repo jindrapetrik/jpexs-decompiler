@@ -37,11 +37,11 @@ public class TagStub extends Tag {
     /**
      * Constructor
      *
-     * @param swf
-     * @param id
-     * @param data
-     * @param name
-     * @param sis
+     * @param swf SWF
+     * @param id ID
+     * @param data Data
+     * @param name Name
+     * @param sis SWF input stream
      */
     public TagStub(SWF swf, int id, String name, ByteArrayRange data, SWFInputStream sis) {
         super(swf, id, name, data);

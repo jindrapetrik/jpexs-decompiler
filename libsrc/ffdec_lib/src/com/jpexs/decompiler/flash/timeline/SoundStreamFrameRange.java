@@ -63,71 +63,36 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
         this.head = head;
     }
 
-    /**
-     * Gets openable.
-     *
-     * @return
-     */
     @Override
     public Openable getOpenable() {
         return head.getOpenable();
     }
 
-    /**
-     * Gets modified flag
-     *
-     * @return
-     */
     @Override
     public boolean isModified() {
         return false;
     }
 
-    /**
-     * Gets sound export format.
-     *
-     * @return
-     */
     @Override
     public SoundExportFormat getExportFormat() {
         return head.getExportFormat();
     }
 
-    /**
-     * Checks whether import is supported.
-     *
-     * @return
-     */
     @Override
     public boolean importSupported() {
         return false; //??
     }
 
-    /**
-     * Gets sound rate.
-     *
-     * @return
-     */
     @Override
     public int getSoundRate() {
         return head.getSoundRate();
     }
 
-    /**
-     * Gets sound type. True = stereo, false = mono.
-     *
-     * @return
-     */
     @Override
     public boolean getSoundType() {
         return head.getSoundType();
     }
 
-    /**
-     * Gets raw sound data.
-     *
-     * @return
-     */
     @Override
     public List<ByteArrayRange> getRawSoundData() {
         List<ByteArrayRange> ret = new ArrayList<>();
@@ -142,121 +107,62 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
         return ret;
     }
 
-    /**
-     * Gets sound format id.
-     *
-     * @return
-     */
     @Override
     public int getSoundFormatId() {
         return head.getSoundFormatId();
     }
 
-    /**
-     * Gets total sound sample count.
-     *
-     * @return
-     */
     @Override
     public long getTotalSoundSampleCount() {
         return blocks.size() * head.getSoundSampleCount();
     }
 
-    /**
-     * Gets sound size. True = 16 bit, false = 8 bit.
-     *
-     * @return
-     */
     @Override
     public boolean getSoundSize() {
         return head.getSoundSize();
     }
 
-    /**
-     * Gets character export filename.
-     *
-     * @return
-     */
     @Override
     public String getCharacterExportFileName() {
         return head.getCharacterExportFileName() + "_" + (startFrame + 1) + "-" + (endFrame + 1);
     }
 
-    /**
-     * Gets name.
-     *
-     * @return
-     */
     @Override
     public String getName() {
         return "SoundStreamBlocks";
     }
 
-    /**
-     * Gets sound format.
-     *
-     * @return
-     */
+
     @Override
     public SoundFormat getSoundFormat() {
         return head.getSoundFormat();
     }
 
-    /**
-     * Sets sound size. True = 16 bit, false = 8 bit
-     *
-     * @param soundSize
-     */
     @Override
     public void setSoundSize(boolean soundSize) {
         //?
     }
 
-    /**
-     * Sets sound type. True = stereo, false = mono
-     *
-     * @param soundType
-     */
     @Override
     public void setSoundType(boolean soundType) {
         //?
     }
 
-    /**
-     * Sets sound sample count.
-     *
-     * @param soundSampleCount
-     */
     @Override
     public void setSoundSampleCount(long soundSampleCount) {
         //?
     }
 
-    /**
-     * Sets sound compression.
-     *
-     * @param soundCompression
-     */
     @Override
     public void setSoundCompression(int soundCompression) {
         //?
     }
 
-    /**
-     * Sets sound rate.
-     *
-     * @param soundRate
-     */
     @Override
     public void setSoundRate(int soundRate) {
         //?
     }
 
-    /**
-     * Gets character id.
-     *
-     * @return
-     */
     @Override
     public int getCharacterId() {
         return head.getCharacterId();
@@ -265,47 +171,28 @@ public class SoundStreamFrameRange implements TreeItem, SoundTag {
     /**
      * Gets sound stream head.
      *
-     * @return
+     * @return Sound stream head
      */
     public SoundStreamHeadTypeTag getHead() {
         return head;
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
+
     @Override
     public String toString() {
         return "SoundStreamBlocks (frame " + (startFrame + 1) + " - " + (endFrame + 1) + ")";
     }
 
-    /**
-     * Checks whether the sound is readonly.
-     *
-     * @return
-     */
     @Override
     public boolean isReadOnly() {
         return head.isReadOnly();
     }
 
-    /**
-     * Gets FLA export name.
-     *
-     * @return
-     */
     @Override
     public String getFlaExportName() {
         return head.getFlaExportName() + "_" + (startFrame + 1) + "-" + (endFrame + 1);
     }
 
-    /**
-     * Gets initial latency.
-     *
-     * @return
-     */
     @Override
     public int getInitialLatency() {
         return 0;

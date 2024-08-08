@@ -47,7 +47,7 @@ public class MarkItem extends GraphTargetItem {
      *
      * @param writer Writer
      * @param localData Local data
-     * @return
+     * @return Writer
      */
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
@@ -57,7 +57,7 @@ public class MarkItem extends GraphTargetItem {
     /**
      * Gets the mark string.
      *
-     * @return
+     * @return Mark string
      */
     public String getMark() {
         return mark;

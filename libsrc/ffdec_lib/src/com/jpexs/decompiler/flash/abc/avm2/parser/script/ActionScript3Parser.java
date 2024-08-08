@@ -1993,7 +1993,7 @@ public class ActionScript3Parser {
      * Lexer can return XML opentags instead of greater. In expression, we need
      * greater sign only
      *
-     * @param symb
+     * @param symb Symbol to fix
      */
     private void xmlToLowerThanFix(ParsedSymbol symb) {
         if (symb.isType(SymbolType.XML_STARTVARTAG_BEGIN, SymbolType.XML_STARTTAG_BEGIN)) {

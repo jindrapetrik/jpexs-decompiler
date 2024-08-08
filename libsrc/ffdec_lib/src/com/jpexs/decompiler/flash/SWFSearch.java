@@ -81,7 +81,7 @@ public class SWFSearch {
     /**
      * Adds progress listener.
      *
-     * @param l
+     * @param l Progress listener
      */
     public void addProgressListener(ProgressListener l) {
         listeners.add(l);
@@ -90,7 +90,7 @@ public class SWFSearch {
     /**
      * Removes progress listener.
      *
-     * @param l
+     * @param l Progress listener
      */
     public void removeProgressListener(ProgressListener l) {
         listeners.remove(l);
@@ -194,7 +194,7 @@ public class SWFSearch {
      * @param listener Progress listener
      * @param address Address
      * @return SWF stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MemoryInputStream get(ProgressListener listener, long address) throws IOException {
         if (!processed) {

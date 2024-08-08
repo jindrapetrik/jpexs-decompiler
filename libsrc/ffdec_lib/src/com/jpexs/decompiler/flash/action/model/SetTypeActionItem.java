@@ -39,7 +39,7 @@ public interface SetTypeActionItem {
 
     /**
      * Sets temp register.
-     * @param regIndex
+     * @param regIndex Temp register
      */
     public void setTempRegister(int regIndex);
 

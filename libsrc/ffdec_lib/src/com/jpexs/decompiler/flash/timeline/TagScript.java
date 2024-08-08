@@ -62,7 +62,7 @@ public class TagScript implements TreeItem, Exportable {
     /**
      * Gets tag.
      *
-     * @return
+     * @return Tag
      */
     public Tag getTag() {
         return tag;
@@ -71,48 +71,27 @@ public class TagScript implements TreeItem, Exportable {
     /**
      * Gets frames.
      *
-     * @return
+     * @return Frames
      */
     public List<TreeItem> getFrames() {
         return frames;
     }
 
-    /**
-     * Gets openable.
-     *
-     * @return
-     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         return tag.toString();
     }
 
-    /**
-     * Gets export filename.
-     *
-     * @return
-     */
     @Override
     public String getExportFileName() {
         return tag.getExportFileName();
     }
 
-    /**
-     * Equals.
-     *
-     * @param obj
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TagScript) {
@@ -122,21 +101,11 @@ public class TagScript implements TreeItem, Exportable {
         return false;
     }
 
-    /**
-     * HashCode.
-     *
-     * @return
-     */
     @Override
     public int hashCode() {
         return tag.hashCode();
     }
 
-    /**
-     * Gets modified flag.
-     *
-     * @return
-     */
     @Override
     public boolean isModified() {
         for (TreeItem f : frames) {

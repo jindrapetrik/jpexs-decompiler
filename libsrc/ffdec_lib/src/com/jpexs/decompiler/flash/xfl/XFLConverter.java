@@ -4564,19 +4564,19 @@ public class XFLConverter {
     /**
      * Converts SWF to FLA/XFL
      *
-     * @param handler
-     * @param swf
-     * @param swfFileName
-     * @param outfile
-     * @param settings
-     * @param generator
-     * @param generatorVerName
-     * @param generatorVersion
-     * @param parallel
-     * @param flaVersion
-     * @param progressListener
-     * @throws IOException
-     * @throws InterruptedException
+     * @param handler AbortRetryIgnoreHandler
+     * @param swf SWF to convert
+     * @param swfFileName SWF file name
+     * @param outfile Output file name
+     * @param settings Export settings
+     * @param generator Generator name
+     * @param generatorVerName Generator version name
+     * @param generatorVersion Generator version
+     * @param parallel Parallel conversion
+     * @param flaVersion FLA version
+     * @param progressListener Progress listener
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
 

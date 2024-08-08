@@ -45,7 +45,7 @@ public class RemoveObject2Tag extends RemoveTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public RemoveObject2Tag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -54,9 +54,9 @@ public class RemoveObject2Tag extends RemoveTag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public RemoveObject2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -72,7 +72,7 @@ public class RemoveObject2Tag extends RemoveTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

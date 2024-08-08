@@ -33,14 +33,14 @@ public @interface Table {
     /**
      * Table name.
      *
-     * @return
+     * @return Table name
      */
     String value();
 
     /**
      * One item name.
      *
-     * @return
+     * @return One item name
      */
     String itemName() default "";
 }

@@ -65,7 +65,7 @@ public class FolderItem implements TreeItem {
     /**
      * Gets name.
      *
-     * @return
+     * @return Name
      */
     public String getName() {
         return name;
@@ -74,18 +74,14 @@ public class FolderItem implements TreeItem {
     /**
      * Gets openable.
      *
-     * @return
+     * @return Openable
      */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
+
     @Override
     public String toString() {
         return str;
@@ -94,7 +90,7 @@ public class FolderItem implements TreeItem {
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return Modified flag
      */
     @Override
     public boolean isModified() {

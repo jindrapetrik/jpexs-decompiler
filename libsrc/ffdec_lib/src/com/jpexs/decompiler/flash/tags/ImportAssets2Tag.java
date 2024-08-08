@@ -78,7 +78,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public ImportAssets2Tag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -89,9 +89,9 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public ImportAssets2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -121,7 +121,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

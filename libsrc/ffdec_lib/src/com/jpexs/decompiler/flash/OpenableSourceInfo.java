@@ -212,7 +212,7 @@ public class OpenableSourceInfo {
      * @param noCheck Whether to check the bundle
      * @param searchMode Search mode
      * @return Bundle or null
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Bundle getBundle(boolean noCheck, SearchMode searchMode) throws IOException {
         if (!isBundle()) {

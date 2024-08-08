@@ -59,7 +59,7 @@ public class DefineFont4Tag extends CharacterTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineFont4Tag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -88,7 +88,7 @@ public class DefineFont4Tag extends CharacterTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

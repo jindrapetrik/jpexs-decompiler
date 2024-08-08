@@ -867,8 +867,8 @@ public class AVM2Graph extends Graph {
     /**
      * Gets real references. Real = start >= 0
      *
-     * @param part
-     * @return
+     * @param part Part
+     * @return List of graph parts
      */
     private List<GraphPart> getRealRefs(GraphPart part) {
         List<GraphPart> ret = new ArrayList<>();

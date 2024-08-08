@@ -41,7 +41,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     /**
      * Constructs GraphPartMarkedArrayList from another collection.
      *
-     * @param collection
+     * @param collection Collection
      */
     @SuppressWarnings("unchecked")
     public GraphPartMarkedArrayList(Collection<? extends E> collection) {
@@ -117,8 +117,8 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     /**
      * Gets the index of the part in the list.
      *
-     * @param part
-     * @return
+     * @param part Part
+     * @return Index of the part in the list
      */
     public int indexOfPart(GraphPart part) {
         for (int i = 0; i < listParts.size(); i++) {

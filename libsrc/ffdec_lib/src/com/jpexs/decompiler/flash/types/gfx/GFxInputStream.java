@@ -93,9 +93,9 @@ public class GFxInputStream {
     /**
      * Reads one SI16 (Signed 16bit integer) value from the stream
      *
-     * @param name
+     * @param name Name
      * @return SI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readSI16(String name) throws IOException {
         newDumpLevel(name, "SI16");
@@ -207,9 +207,9 @@ public class GFxInputStream {
      * Reads bytes from the stream
      *
      * @param count Number of bytes to read
-     * @param name
+     * @param name Name
      * @return Array of read bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public byte[] readBytes(long count, String name) throws IOException {
         if (count <= 0) {
@@ -235,9 +235,9 @@ public class GFxInputStream {
     /**
      * Reads one string value from the stream
      *
-     * @param name
+     * @param name Name
      * @return String value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public String readString(String name) throws IOException {
         newDumpLevel(name, "string");

@@ -112,7 +112,7 @@ public class DefineFont3Tag extends FontTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineFont3Tag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -249,7 +249,7 @@ public class DefineFont3Tag extends FontTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public synchronized void getData(SWFOutputStream sos) throws IOException {

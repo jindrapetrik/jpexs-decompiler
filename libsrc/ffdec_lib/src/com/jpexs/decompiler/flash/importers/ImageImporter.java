@@ -183,7 +183,7 @@ public class ImageImporter extends TagImporter {
      * Converts image.
      * @param it Image tag
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void convertImage(ImageTag it, int tagType) throws IOException {
         importImage(it, Helper.readStream(it.getConvertedImageData()), tagType);

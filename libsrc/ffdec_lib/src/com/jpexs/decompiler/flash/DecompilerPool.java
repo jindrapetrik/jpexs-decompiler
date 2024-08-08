@@ -202,7 +202,7 @@ public class DecompilerPool {
      * @param src ASM source
      * @param actions Actions
      * @return Highlighted text
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public HighlightedText decompile(ASMSource src, ActionList actions) throws InterruptedException {
         Future<HighlightedText> future = submitTask(src, actions, null);
@@ -234,7 +234,7 @@ public class DecompilerPool {
      * @param abcIndex ABC indexing
      * @param pack Script pack
      * @return Highlighted text
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public HighlightedText decompile(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
         Future<HighlightedText> future = submitTask(abcIndex, pack, null);
@@ -264,7 +264,7 @@ public class DecompilerPool {
     /**
      * Shuts down the pool.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void shutdown() throws InterruptedException {
         executor.shutdown();

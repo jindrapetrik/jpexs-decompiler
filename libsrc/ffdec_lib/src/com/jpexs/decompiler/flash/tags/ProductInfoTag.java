@@ -64,7 +64,7 @@ public class ProductInfoTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public ProductInfoTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -107,7 +107,7 @@ public class ProductInfoTag extends Tag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

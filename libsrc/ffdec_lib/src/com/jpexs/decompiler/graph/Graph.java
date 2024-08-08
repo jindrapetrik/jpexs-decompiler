@@ -1515,7 +1515,7 @@ public class Graph {
     /**
      * Expands gotos.
      *
-     * @param list
+     * @param list List of GraphTargetItems
      */
     private void expandGotos(List<GraphTargetItem> list) {
         if (!list.isEmpty() && (list.get(list.size() - 1) instanceof GotoItem)) {

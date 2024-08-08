@@ -63,7 +63,7 @@ public class ShapeImporter {
      * @param st Shape tag
      * @param newData New image data
      * @return Imported tag
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Tag importImage(ShapeTag st, byte[] newData) throws IOException {
         return importImage((Tag) st, newData, 0, true);
@@ -87,7 +87,7 @@ public class ShapeImporter {
      * @param tagType Tag type
      * @param fill Fill flag
      * @return Imported tag
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Tag importImage(MorphShapeTag mst, byte[] newData, int tagType, boolean fill) throws IOException {
         return importImage((Tag) mst, newData, tagType, fill);

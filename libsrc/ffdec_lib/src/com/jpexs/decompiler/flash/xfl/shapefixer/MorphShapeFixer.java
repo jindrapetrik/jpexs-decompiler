@@ -46,16 +46,16 @@ public class MorphShapeFixer extends ShapeFixer {
     /**
      * Hook from base ShapeFixer
      *
-     * @param shapeNum
-     * @param shapes
-     * @param fillStyles0
-     * @param fillStyles1
-     * @param lineStyles
-     * @param layers
-     * @param baseFillStyles
-     * @param baseLineStyles
-     * @param fillStyleLayers
-     * @param lineStyleLayers
+     * @param shapeNum Shape number (1 = DefineMorphShape, 2 = DefineMorphShape2)
+     * @param shapes Shapes
+     * @param fillStyles0 Fill styles 0
+     * @param fillStyles1 Fill styles 1
+     * @param lineStyles Line styles
+     * @param layers Layers
+     * @param baseFillStyles Base fill styles
+     * @param baseLineStyles Base line styles
+     * @param fillStyleLayers Fill style layers
+     * @param lineStyleLayers Line style layers
      */
     @Override
     protected void beforeHandle(int shapeNum, List<List<BezierEdge>> shapes, List<Integer> fillStyles0, List<Integer> fillStyles1, List<Integer> lineStyles, List<Integer> layers, FILLSTYLEARRAY baseFillStyles, LINESTYLEARRAY baseLineStyles, List<FILLSTYLEARRAY> fillStyleLayers, List<LINESTYLEARRAY> lineStyleLayers) {
@@ -71,11 +71,11 @@ public class MorphShapeFixer extends ShapeFixer {
      * shape 1 [FS0:A, FS1:-, LS:n], shape 2 [FS0:-, FS1:B, LS:n] => shape 1
      * [FS0:A, FS1:B], remove shape 2
      *
-     * @param shapes
-     * @param fillStyles0
-     * @param fillStyles1
-     * @param lineStyles
-     * @param layers
+     * @param shapes Shapes
+     * @param fillStyles0 Fill styles 0
+     * @param fillStyles1 Fill styles 1
+     * @param lineStyles Line styles
+     * @param layers Layers
      */
     private void mergeSamePathsWithOppositeFillstyles(
             List<List<BezierEdge>> shapes,
@@ -420,15 +420,15 @@ public class MorphShapeFixer extends ShapeFixer {
      * Merges similar paths. This happens in morphshapes when one shape is
      * transformed into multiple shapes.
      *
-     * @param shapeNum
-     * @param shapes
-     * @param fillStyles0
-     * @param lineStyles
-     * @param layers
-     * @param baseFillStyles
-     * @param baseLineStyles
-     * @param fillStyleLayers
-     * @param lineStyleLayers
+     * @param shapeNum Shape number (1 = DefineMorphShape, 2 = DefineMorphShape2)
+     * @param shapes Shapes
+     * @param fillStyles0 Fill styles 0
+     * @param lineStyles Fill styles 1
+     * @param layers Layers
+     * @param baseFillStyles Base fill styles
+     * @param baseLineStyles Base line styles
+     * @param fillStyleLayers Fill style layers
+     * @param lineStyleLayers Line style layers
      */
     private void mergeSimilar(
             int shapeNum,
@@ -603,7 +603,7 @@ public class MorphShapeFixer extends ShapeFixer {
     }
 
     /**
-     * @param shapes
+     * @param shapes Shapes
      */
     private void removeEmptyEdges(List<List<BezierEdge>> shapes) {
         for (int i = 0; i < shapes.size(); i++) {

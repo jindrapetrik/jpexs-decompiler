@@ -90,10 +90,6 @@ public class Gb18030 extends AbstractCharsetConverter {
         }
     }
 
-    /**
-     * @param codepoint
-     * @return
-     */
     @Override
     public int toUnicode(int codepoint) {
         int result = 0;

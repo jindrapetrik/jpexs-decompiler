@@ -41,7 +41,7 @@ public class StringLtActionItem extends BinaryOpItem implements Inverted {
      * @param instruction Instruction
      * @param lineStartIns Line start instruction
      * @param leftSide Left side
-     * @param rightSide
+     * @param rightSide Right side
      */
     public StringLtActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_RELATIONAL, leftSide, rightSide, "lt", "String", "String");

@@ -55,7 +55,7 @@ public interface Packer {
      * @param os Stream to write unpacked data to
      * @return True if it was unpacked correctly, False if it is not suitable
      * for unpacking or an error happened.
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public boolean decrypt(InputStream is, OutputStream os) throws IOException;
 
@@ -65,7 +65,7 @@ public interface Packer {
      * @param is Data to pack
      * @param os Stream to write packed data to
      * @return True if packed successfully, False if error happened.
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public boolean encrypt(InputStream is, OutputStream os) throws IOException;
 

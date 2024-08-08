@@ -156,7 +156,7 @@ public class TypeItem extends GraphTargetItem {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
@@ -207,7 +207,7 @@ public class TypeItem extends GraphTargetItem {
      * @param localData Local data
      * @param generator Source generator
      * @return List of graph source items
-     * @throws CompilationException
+     * @throws CompilationException On compilation error
      */
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {

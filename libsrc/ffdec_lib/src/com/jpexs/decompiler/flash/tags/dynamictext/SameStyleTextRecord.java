@@ -48,7 +48,7 @@ public class SameStyleTextRecord {
 
     /**
      * Calculates text widths
-     * @return
+     * @return Total width
      */
     public int calculateTextWidths() {
 

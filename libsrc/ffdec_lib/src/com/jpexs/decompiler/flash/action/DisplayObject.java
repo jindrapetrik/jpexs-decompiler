@@ -161,7 +161,7 @@ public class DisplayObject extends ActionScriptObject {
      * Removes from display list.
      *
      * @param depth Depth.
-     * @return
+     * @return Object
      */
     public Object removeFromDisplayList(int depth) {
         return displayList.remove(depth);
@@ -171,7 +171,7 @@ public class DisplayObject extends ActionScriptObject {
      * Gets from display list.
      *
      * @param depth Depth.
-     * @return
+     * @return Object
      */
     public Object getFromDisplayList(int depth) {
         return displayList.get(depth);

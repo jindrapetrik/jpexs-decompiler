@@ -49,8 +49,8 @@ public class CharSequenceJavaFileObject extends SimpleJavaFileObject {
      * Answers the CharSequence to be compiled. It will give the source code
      * stored in variable "content"
      *
-     * @param ignoreEncodingErrors
-     * @return
+     * @param ignoreEncodingErrors Ignore encoding errors
+     * @return CharSequence
      */
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) {

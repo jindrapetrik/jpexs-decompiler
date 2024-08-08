@@ -57,7 +57,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineBitsTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -69,9 +69,9 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public DefineBitsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -88,7 +88,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

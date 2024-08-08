@@ -63,8 +63,8 @@ public class JavaClassObject extends SimpleJavaFileObject {
      * array. This way the compiler will write everything into the byte array
      * that we will instantiate later
      *
-     * @return
-     * @throws java.io.IOException
+     * @return Output stream
+     * @throws IOException On I/O error
      */
     @Override
     public OutputStream openOutputStream() throws IOException {

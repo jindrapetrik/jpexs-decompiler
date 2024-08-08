@@ -496,9 +496,9 @@ public class Amf3Importer {
     /**
      * Deeply replace all ReferencedObjectType with the correct value
      *
-     * @param object
-     * @param objectsTable
-     * @return
+     * @param object Object
+     * @param objectsTable Objects table
+     * @return Replaced object
      */
     private Object replaceReferences(Object object, Map<String, Object> objectsTable) throws Amf3ParseException {
         if (object instanceof ReferencedObjectType) {
