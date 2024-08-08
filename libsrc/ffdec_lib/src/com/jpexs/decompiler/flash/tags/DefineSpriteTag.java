@@ -97,7 +97,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineSpriteTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -108,13 +108,13 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @param level
-     * @param parallel
-     * @param skipUnusualTags
-     * @throws IOException
-     * @throws java.lang.InterruptedException
+     * @param sis SWF input stream
+     * @param data Data
+     * @param level Level
+     * @param parallel Parallel
+     * @param skipUnusualTags Skip unusual tags
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public DefineSpriteTag(SWFInputStream sis, int level, ByteArrayRange data, boolean parallel, boolean skipUnusualTags) throws IOException, InterruptedException {
         super(sis.getSwf(), ID, NAME, data);
@@ -138,7 +138,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

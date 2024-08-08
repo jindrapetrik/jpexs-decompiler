@@ -49,8 +49,8 @@ public class RetryTask {
     /**
      * Runs the task.
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public void run() throws IOException, InterruptedException {
         boolean retry;

@@ -778,8 +778,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     /**
-     * Converts font to classic font. (= not GFX and such)
-     * @return
+     * Converts font to classic font tag. (= not GFX and such)
+     * @return Classic font tag
      */
     public FontTag toClassicFont() {
         return this;

@@ -433,7 +433,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param data SWF data
      * @param startingPos Starting position in bytes in the stream
      * @param limit Maximum limit of reading
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public SWFInputStream(SWF swf, byte[] data, long startingPos, int limit) throws IOException {
         this.swf = swf;
@@ -448,7 +448,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param swf SWF to read
      * @param data SWF data
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public SWFInputStream(SWF swf, byte[] data) throws IOException {
         this(swf, data, 0L, data.length);
@@ -490,7 +490,7 @@ public class SWFInputStream implements AutoCloseable {
      * Sets position in bytes in the stream
      *
      * @param pos Number of bytes
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     public void seek(long pos) throws IOException {
         is.seek(pos - startingPos);
@@ -501,7 +501,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @param type Type
-     * @return
+     * @return Dump info
      */
     private DumpInfo newDumpLevel(String name, String type) {
         return newDumpLevel(name, type, DumpInfoSpecialType.NONE, null);
@@ -514,7 +514,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param type Type
      * @param specialType Special type
      * @param specialValue Special value
-     * @return
+     * @return Dump info
      */
     private DumpInfo newDumpLevel(String name, String type, DumpInfoSpecialType specialType, Object specialValue) {
         if (dumpInfo != null) {
@@ -574,7 +574,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one byte from the stream.
      *
      * @return byte
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readEx() throws IOException {
         bitPos = 0;
@@ -592,8 +592,8 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one byte from the stream.
      *
      * @return Byte
-     * @throws IOException
-     * @throws EndOfStreamException
+     * @throws IOException On I/O error
+     * @throws EndOfStreamException On end of stream
      */
     private int readNoBitReset() throws IOException, EndOfStreamException {
         int r = is.read();
@@ -610,7 +610,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return UI8 value or -1 on error
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readUI8(String name) throws IOException {
         newDumpLevel(name, "UI8");
@@ -624,7 +624,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return String value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public String readString(String name) throws IOException {
         newDumpLevel(name, "string");
@@ -648,7 +648,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return String value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public String readNetString(String name) throws IOException {
         newDumpLevel(name, "string");
@@ -663,7 +663,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return UI32 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readUI32(String name) throws IOException {
         newDumpLevel(name, "UI32");
@@ -676,7 +676,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one UI32 (Unsigned 32bit integer) value from the stream.
      *
      * @return UI32 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readUI32Internal() throws IOException {
         return (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffffL;
@@ -687,7 +687,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return UI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readUI16(String name) throws IOException {
         newDumpLevel(name, "UI16");
@@ -700,7 +700,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one UI16 (Unsigned 16bit integer) value from the stream.
      *
      * @return UI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readUI16Internal() throws IOException {
         return readEx() + (readEx() << 8);
@@ -710,8 +710,8 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one UI24 (Unsigned 24bit integer) value from the stream.
      *
      * @param name Name
-     * @return
-     * @throws IOException
+     * @return UI24 value
+     * @throws IOException On I/O error
      */
     public int readUI24(String name) throws IOException {
         newDumpLevel(name, "UI24");
@@ -725,7 +725,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return SI32 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readSI32(String name) throws IOException {
         newDumpLevel(name, "SI32");
@@ -738,7 +738,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one SI32 (Signed 32bit integer) value from the stream.
      *
      * @return SI32 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readSI32Internal() throws IOException {
         long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
@@ -753,7 +753,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return SI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readSI16(String name) throws IOException {
         newDumpLevel(name, "SI16");
@@ -766,7 +766,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one SI16 (Signed 16bit integer) value from the stream.
      *
      * @return SI16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private int readSI16Internal() throws IOException {
         int uval = readEx() + (readEx() << 8);
@@ -781,7 +781,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return SI8 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readSI8(String name) throws IOException {
         newDumpLevel(name, "SI8");
@@ -794,7 +794,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one SI8 (Signed 8bit integer) value from the stream.
      *
      * @return SI8 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readSI8Internal() throws IOException {
         int uval = readEx();
@@ -809,7 +809,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return FIXED value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public double readFIXED(String name) throws IOException {
         newDumpLevel(name, "FIXED");
@@ -824,7 +824,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return FIXED8 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public float readFIXED8(String name) throws IOException {
         newDumpLevel(name, "FIXED8");
@@ -838,7 +838,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads long value from the stream.
      *
      * @return Long value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readLong() throws IOException {
         byte[] readBuffer = readBytesInternalEx(8);
@@ -858,7 +858,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return DOUBLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public double readDOUBLE(String name) throws IOException {
         newDumpLevel(name, "DOUBLE");
@@ -874,7 +874,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return FLOAT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public float readFLOAT(String name) throws IOException {
         newDumpLevel(name, "FLOAT");
@@ -893,7 +893,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return FLOAT16 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public float readFLOAT16(String name) throws IOException {
         newDumpLevel(name, "FLOAT16");
@@ -912,7 +912,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param count Number of bytes to read
      * @param name Name
      * @return Array of read bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public byte[] readBytesEx(long count, String name) throws IOException {
         if (count <= 0) {
@@ -930,7 +930,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return AMF3 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Amf3Value readAmf3Object(String name) throws IOException, NoSerializerExistsException {
         Amf3InputStream ai = new Amf3InputStream(is);
@@ -945,7 +945,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param count Number of bytes to read
      * @param name Name
      * @return ByteArrayRange object
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ByteArrayRange readByteRangeEx(long count, String name) throws IOException {
         return readByteRangeEx(count, name, DumpInfoSpecialType.NONE, null);
@@ -959,7 +959,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param specialType Special type
      * @param specialValue Special value
      * @return ByteArrayRange object
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ByteArrayRange readByteRangeEx(long count, String name, DumpInfoSpecialType specialType, Object specialValue) throws IOException {
         if (count <= 0) {
@@ -982,7 +982,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param count Number of bytes to read
      * @return Array of read bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private byte[] readBytesInternalEx(long count) throws IOException {
         if (count <= 0) {
@@ -1003,7 +1003,7 @@ public class SWFInputStream implements AutoCloseable {
      * Skip bytes from the stream.
      *
      * @param count Number of bytes to skip
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void skipBytesEx(long count) throws IOException {
         if (count <= 0) {
@@ -1024,7 +1024,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param count Number of bytes to skip
      * @param name Name
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void skipBytesEx(long count, String name) throws IOException {
         if (count <= 0) {
@@ -1040,7 +1040,7 @@ public class SWFInputStream implements AutoCloseable {
      * Skip bytes from the stream.
      *
      * @param count Number of bytes to skip
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void skipBytes(long count) throws IOException {
         try {
@@ -1056,7 +1056,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param count Number of bytes to read
      * @param name Name
      * @return Array of read bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public byte[] readBytes(int count, String name) throws IOException {
         if (count <= 0) {
@@ -1082,8 +1082,8 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param count Number of bytes to read
      * @param name Name
-     * @return
-     * @throws IOException
+     * @return Array of read bytes
+     * @throws IOException On I/O error
      */
     public byte[] readBytesZlib(long count, String name) throws IOException {
         if (count == 0) {
@@ -1101,7 +1101,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param data Data
      * @return Uncompressed data
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public static byte[] uncompressByteArray(byte[] data) throws IOException {
         return uncompressByteArray(data, 0, data.length);
@@ -1114,7 +1114,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param offset Offset
      * @param length Length
      * @return Uncompressed data
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public static byte[] uncompressByteArray(byte[] data, int offset, int length) throws IOException {
         InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data, offset, length));
@@ -1133,7 +1133,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return U32 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readEncodedU32(String name) throws IOException {
         newDumpLevel(name, "encodedU32");
@@ -1168,7 +1168,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param nBits Number of bits which represent value
      * @param name Name
      * @return Unsigned value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readUB(int nBits, String name) throws IOException {
         if (nBits == 0) {
@@ -1185,7 +1185,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param nBits Number of bits which represent value
      * @return Unsigned value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readUBInternal(int nBits) throws IOException {
         if (nBits == 0) {
@@ -1215,7 +1215,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param nBits Number of bits which represent value
      * @param name Name
      * @return Signed value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long readSB(int nBits, String name) throws IOException {
         if (nBits == 0) {
@@ -1232,7 +1232,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param nBits Number of bits which represent value
      * @return Signed value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private long readSBInternal(int nBits) throws IOException {
         int uval = (int) readUBInternal(nBits);
@@ -1249,7 +1249,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param nBits Number of bits which represent value
      * @param name Name
      * @return Fixed-point value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public float readFB(int nBits, String name) throws IOException {
         if (nBits == 0) {
@@ -1267,7 +1267,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return RECT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public RECT readRECT(String name) throws IOException {
         RECT ret = new RECT();
@@ -1380,7 +1380,7 @@ public class SWFInputStream implements AutoCloseable {
          * Call.
          *
          * @return Tag
-         * @throws Exception
+         * @throws Exception On error
          */
         @Override
         public Tag call() throws Exception {
@@ -1410,8 +1410,8 @@ public class SWFInputStream implements AutoCloseable {
      * @param parseTags Parse tags
      * @param lazy Lazy loading
      * @return List of tags
-     * @throws IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public List<Tag> readTagList(Timelined timelined, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags, boolean lazy) throws IOException, InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -1510,7 +1510,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param lazy Lazy loading
      * @param logErrors Log errors
      * @return Tag
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean lazy, boolean logErrors) throws InterruptedException {
         Tag ret;
@@ -1830,8 +1830,8 @@ public class SWFInputStream implements AutoCloseable {
      * @param skipUnusualTags Skip unusual tags
      * @param lazy Lazy loading
      * @return Tag or null when End tag
-     * @throws IOException
-     * @throws java.lang.InterruptedException
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
      */
     public Tag readTag(Timelined timelined, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException, InterruptedException {
         if (data == null) {
@@ -1917,7 +1917,7 @@ public class SWFInputStream implements AutoCloseable {
      * Reads one Action from the stream.
      *
      * @return Action or null when ActionEndFlag or end of the stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Action readAction() throws IOException {
         int actionCode;
@@ -2159,7 +2159,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MATRIX value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MATRIX readMatrix(String name) throws IOException {
         MATRIX ret = new MATRIX();
@@ -2192,7 +2192,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return CXFORMWITHALPHA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CXFORMWITHALPHA readCXFORMWITHALPHA(String name) throws IOException {
         CXFORMWITHALPHA ret = new CXFORMWITHALPHA();
@@ -2223,7 +2223,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return CXFORM value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CXFORM readCXFORM(String name) throws IOException {
         CXFORM ret = new CXFORM();
@@ -2252,7 +2252,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return CLIPEVENTFLAGS value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CLIPEVENTFLAGS readCLIPEVENTFLAGS(String name) throws IOException {
         CLIPEVENTFLAGS ret = new CLIPEVENTFLAGS();
@@ -2290,9 +2290,9 @@ public class SWFInputStream implements AutoCloseable {
      * @param swf SWF
      * @param tag Tag
      * @param name Name
-     * @param parentClipActions
+     * @param parentClipActions Parent clip actions
      * @return CLIPACTIONRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag, String name, CLIPACTIONS parentClipActions) throws IOException {
         newDumpLevel(name, "CLIPACTIONRECORD");
@@ -2311,7 +2311,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param tag Tag
      * @param name Name
      * @return CLIPACTIONS value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CLIPACTIONS readCLIPACTIONS(SWF swf, Tag tag, String name) throws IOException {
         CLIPACTIONS ret = new CLIPACTIONS();
@@ -2332,7 +2332,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return COLORMATRIXFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public COLORMATRIXFILTER readCOLORMATRIXFILTER(String name) throws IOException {
         COLORMATRIXFILTER ret = new COLORMATRIXFILTER();
@@ -2350,7 +2350,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return RGBA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public RGBA readRGBA(String name) throws IOException {
         RGBA ret = new RGBA();
@@ -2368,7 +2368,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return RGBA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readRGBAInt(String name) throws IOException {
         newDumpLevel(name, "RGBA");
@@ -2385,7 +2385,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return ARGB value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ARGB readARGB(String name) throws IOException {
         ARGB ret = new ARGB();
@@ -2403,7 +2403,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return ARGB value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readARGBInt(String name) throws IOException {
         newDumpLevel(name, "ARGB");
@@ -2420,7 +2420,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return RGB value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public RGB readRGB(String name) throws IOException {
         RGB ret = new RGB();
@@ -2437,7 +2437,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return RGB value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readRGBInt(String name) throws IOException {
         newDumpLevel(name, "RGB");
@@ -2454,7 +2454,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return CONVOLUTIONFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public CONVOLUTIONFILTER readCONVOLUTIONFILTER(String name) throws IOException {
         CONVOLUTIONFILTER ret = new CONVOLUTIONFILTER();
@@ -2480,7 +2480,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return BLURFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BLURFILTER readBLURFILTER(String name) throws IOException {
         BLURFILTER ret = new BLURFILTER();
@@ -2498,7 +2498,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return DROPSHADOWFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public DROPSHADOWFILTER readDROPSHADOWFILTER(String name) throws IOException {
         DROPSHADOWFILTER ret = new DROPSHADOWFILTER();
@@ -2522,7 +2522,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return GLOWFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GLOWFILTER readGLOWFILTER(String name) throws IOException {
         GLOWFILTER ret = new GLOWFILTER();
@@ -2544,7 +2544,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return BEVELFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BEVELFILTER readBEVELFILTER(String name) throws IOException {
         BEVELFILTER ret = new BEVELFILTER();
@@ -2570,7 +2570,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return GRADIENTGLOWFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GRADIENTGLOWFILTER readGRADIENTGLOWFILTER(String name) throws IOException {
         GRADIENTGLOWFILTER ret = new GRADIENTGLOWFILTER();
@@ -2603,7 +2603,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return GRADIENTBEVELFILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GRADIENTBEVELFILTER readGRADIENTBEVELFILTER(String name) throws IOException {
         GRADIENTBEVELFILTER ret = new GRADIENTBEVELFILTER();
@@ -2636,7 +2636,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return List of FILTER values
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public List<FILTER> readFILTERLIST(String name) throws IOException {
         newDumpLevel(name, "FILTERLIST");
@@ -2654,7 +2654,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return FILTER value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public FILTER readFILTER(String name) throws IOException {
         newDumpLevel(name, "FILTER");
@@ -2697,7 +2697,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param buttonTag ButtonTag
      * @param name Name
      * @return List of BUTTONRECORD values
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public List<BUTTONRECORD> readBUTTONRECORDList(SWF swf, ButtonTag buttonTag, String name) throws IOException {
         List<BUTTONRECORD> ret = new ArrayList<>();
@@ -2717,7 +2717,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param tag ButtonTag
      * @param name Name
      * @return BUTTONRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BUTTONRECORD readBUTTONRECORD(SWF swf, ButtonTag tag, String name) throws IOException {
         BUTTONRECORD ret = new BUTTONRECORD(swf, tag);
@@ -2760,7 +2760,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param tag Tag
      * @param name Name
      * @return List of BUTTONCONDACTION values
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public List<BUTTONCONDACTION> readBUTTONCONDACTIONList(SWF swf, Tag tag, String name) throws IOException {
         List<BUTTONCONDACTION> ret = new ArrayList<>();
@@ -2781,7 +2781,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param tag Tag
      * @param name Name
      * @return BUTTONCONDACTION value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BUTTONCONDACTION readBUTTONCONDACTION(SWF swf, Tag tag, String name) throws IOException {
         newDumpLevel(name, "BUTTONCONDACTION");
@@ -2797,7 +2797,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return GRADRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GRADRECORD readGRADRECORD(int shapeNum, String name) throws IOException {
         GRADRECORD ret = new GRADRECORD();
@@ -2819,7 +2819,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return GRADIENT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GRADIENT readGRADIENT(int shapeNum, String name) throws IOException {
         GRADIENT ret = new GRADIENT();
@@ -2842,7 +2842,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return FOCALGRADIENT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public FOCALGRADIENT readFOCALGRADIENT(int shapeNum, String name) throws IOException {
         FOCALGRADIENT ret = new FOCALGRADIENT();
@@ -2865,7 +2865,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return FILLSTYLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public FILLSTYLE readFILLSTYLE(int shapeNum, String name) throws IOException {
         FILLSTYLE ret = new FILLSTYLE();
@@ -2909,7 +2909,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return FILLSTYLEARRAY value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public FILLSTYLEARRAY readFILLSTYLEARRAY(int shapeNum, String name) throws IOException {
 
@@ -2933,7 +2933,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return LINESTYLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public LINESTYLE readLINESTYLE(int shapeNum, String name) throws IOException {
         LINESTYLE ret = new LINESTYLE();
@@ -2954,7 +2954,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return LINESTYLE2 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public LINESTYLE2 readLINESTYLE2(int shapeNum, String name) throws IOException {
         LINESTYLE2 ret = new LINESTYLE2();
@@ -2987,7 +2987,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @param name Name
      * @return LINESTYLEARRAY value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public LINESTYLEARRAY readLINESTYLEARRAY(int shapeNum, String name) throws IOException {
         LINESTYLEARRAY ret = new LINESTYLEARRAY();
@@ -3018,7 +3018,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param lineBits Line bits
      * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return SHAPERECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum, boolean morphShape, String name) throws IOException {
         SHAPERECORD ret;
@@ -3103,7 +3103,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param morphShape Is this a morph shape
      * @param name Name
      * @return SHAPE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SHAPE readSHAPE(int shapeNum, boolean morphShape, String name) throws IOException {
         SHAPE ret = new SHAPE();
@@ -3122,7 +3122,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param morphShape Is this a morph shape
      * @param name Name
      * @return SHAPEWITHSTYLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SHAPEWITHSTYLE readSHAPEWITHSTYLE(int shapeNum, boolean morphShape, String name) throws IOException {
         SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
@@ -3143,7 +3143,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param fillBits Fill bits
      * @param lineBits Line bits
      * @return SHAPERECORDs array
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits, boolean morphShape, String name) throws IOException {
         List<SHAPERECORD> ret = new ArrayList<>();
@@ -3170,7 +3170,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return SOUNDINFO value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SOUNDINFO readSOUNDINFO(String name) throws IOException {
         SOUNDINFO ret = new SOUNDINFO();
@@ -3207,7 +3207,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return SOUNDENVELOPE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SOUNDENVELOPE readSOUNDENVELOPE(String name) throws IOException {
         SOUNDENVELOPE ret = new SOUNDENVELOPE();
@@ -3226,7 +3226,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param advanceBits Advance bits
      * @param name Name
      * @return GLYPHENTRY value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public GLYPHENTRY readGLYPHENTRY(int glyphBits, int advanceBits, String name) throws IOException {
         GLYPHENTRY ret = new GLYPHENTRY();
@@ -3245,7 +3245,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param advanceBits Advance bits
      * @param name Name
      * @return TEXTRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public TEXTRECORD readTEXTRECORD(int defineTextNum, int glyphBits, int advanceBits, String name) throws IOException {
         TEXTRECORD ret = new TEXTRECORD();
@@ -3294,7 +3294,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHGRADRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHGRADRECORD readMORPHGRADRECORD(String name) throws IOException {
         MORPHGRADRECORD ret = new MORPHGRADRECORD();
@@ -3312,7 +3312,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHGRADIENT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHGRADIENT readMORPHGRADIENT(String name) throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
@@ -3338,7 +3338,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHGRADIENT value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHFOCALGRADIENT readMORPHFOCALGRADIENT(String name) throws IOException {
         MORPHFOCALGRADIENT ret = new MORPHFOCALGRADIENT();
@@ -3361,7 +3361,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHFILLSTYLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHFILLSTYLE readMORPHFILLSTYLE(String name) throws IOException {
         MORPHFILLSTYLE ret = new MORPHFILLSTYLE();
@@ -3402,7 +3402,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHFILLSTYLEARRAY value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHFILLSTYLEARRAY readMORPHFILLSTYLEARRAY(String name) throws IOException {
 
@@ -3425,7 +3425,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHLINESTYLE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHLINESTYLE readMORPHLINESTYLE(String name) throws IOException {
         MORPHLINESTYLE ret = new MORPHLINESTYLE();
@@ -3443,7 +3443,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return MORPHLINESTYLE2 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHLINESTYLE2 readMORPHLINESTYLE2(String name) throws IOException {
         MORPHLINESTYLE2 ret = new MORPHLINESTYLE2();
@@ -3478,7 +3478,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param morphShapeNum 1 on DefineMorphShape, 2 on DefineMorphShape2
      * @param name Name
      * @return MORPHLINESTYLEARRAY value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MORPHLINESTYLEARRAY readMORPHLINESTYLEARRAY(int morphShapeNum, String name) throws IOException {
         MORPHLINESTYLEARRAY ret = new MORPHLINESTYLEARRAY();
@@ -3508,7 +3508,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param fontFlagsWideCodes Font flags wide codes
      * @param name Name
      * @return KERNINGRECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public KERNINGRECORD readKERNINGRECORD(boolean fontFlagsWideCodes, String name) throws IOException {
         KERNINGRECORD ret = new KERNINGRECORD();
@@ -3530,7 +3530,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return LANGCODE value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public LANGCODE readLANGCODE(String name) throws IOException {
         LANGCODE ret = new LANGCODE();
@@ -3545,7 +3545,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return ZONERECORD value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ZONERECORD readZONERECORD(String name) throws IOException {
         ZONERECORD ret = new ZONERECORD();
@@ -3567,7 +3567,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return ZONEDATA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ZONEDATA readZONEDATA(String name) throws IOException {
         ZONEDATA ret = new ZONEDATA();
@@ -3583,7 +3583,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return PIX15 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public PIX15 readPIX15(String name) throws IOException {
         PIX15 ret = new PIX15();
@@ -3601,7 +3601,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return PIX15 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readPIX15Int(String name) throws IOException {
         newDumpLevel(name, "PIX15");
@@ -3618,7 +3618,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return PIX24 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public PIX24 readPIX24(String name) throws IOException {
         PIX24 ret = new PIX24();
@@ -3636,7 +3636,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param name Name
      * @return PIX24 value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int readPIX24Int(String name) throws IOException {
         newDumpLevel(name, "PIX24");
@@ -3656,7 +3656,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param bitmapHeight Bitmap height
      * @param name Name
      * @return COLORMAPDATA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public COLORMAPDATA readCOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         COLORMAPDATA ret = new COLORMAPDATA();
@@ -3691,7 +3691,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param bitmapHeight Bitmap height
      * @param name Name
      * @return COLORMAPDATA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BITMAPDATA readBITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         BITMAPDATA ret = new BITMAPDATA();
@@ -3735,7 +3735,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param bitmapHeight Bitmap height
      * @param name Name
      * @return COLORMAPDATA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ALPHABITMAPDATA readALPHABITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         ALPHABITMAPDATA ret = new ALPHABITMAPDATA();
@@ -3758,7 +3758,7 @@ public class SWFInputStream implements AutoCloseable {
      * @param bitmapHeight Bitmap height
      * @param name Name
      * @return ALPHACOLORMAPDATA value
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public ALPHACOLORMAPDATA readALPHACOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight, String name) throws IOException {
         ALPHACOLORMAPDATA ret = new ALPHACOLORMAPDATA();
@@ -3789,7 +3789,7 @@ public class SWFInputStream implements AutoCloseable {
      * Gets number of available bytes in the stream.
      *
      * @return Number of available bytes
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public int available() throws IOException {
         return is.available();
@@ -3799,7 +3799,7 @@ public class SWFInputStream implements AutoCloseable {
      * Gets number of available bits in the stream.
      *
      * @return Number of available bits
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public long availableBits() throws IOException {
         if (bitPos > 0) {
@@ -3812,7 +3812,7 @@ public class SWFInputStream implements AutoCloseable {
      * Gets base stream.
      *
      * @return Base stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public MemoryInputStream getBaseStream() throws IOException {
         int pos = (int) is.getPos();
@@ -3826,7 +3826,7 @@ public class SWFInputStream implements AutoCloseable {
      *
      * @param limit Limit
      * @return Limited stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SWFInputStream getLimitedStream(int limit) throws IOException {
         SWFInputStream sis = new SWFInputStream(swf, is.getAllRead(), startingPos, (int) (is.getPos() + limit));

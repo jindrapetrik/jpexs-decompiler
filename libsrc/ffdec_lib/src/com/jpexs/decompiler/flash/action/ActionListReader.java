@@ -810,7 +810,7 @@ public class ActionListReader {
      * @param visitedContainers Visited containers
      * @param charset Charset
      * @return Action
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
             SWFInputStream sis, Map<Long, Action> actions, Map<Long, Long> nextOffsets,
@@ -959,7 +959,7 @@ public class ActionListReader {
      * @param indeterminate Indeterminate
      * @param visitedContainers Visited containers
      * @return True if constant pools were fixed, false otherwise
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     private static boolean fixConstantPools(List<DisassemblyListener> listeners, ConstantPool cpool,
             List<Action> actions, Map<Integer, Action> actionMap,

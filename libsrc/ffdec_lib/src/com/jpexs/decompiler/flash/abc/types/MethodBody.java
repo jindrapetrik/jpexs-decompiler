@@ -271,7 +271,7 @@ public final class MethodBody implements Cloneable {
      * @param trait Trait
      * @param info Method info
      * @return Number of removed instructions
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeDeadCode(AVM2ConstantPool constants, Trait trait, MethodInfo info) throws InterruptedException {
         return getCode().removeDeadCode(this);
@@ -287,7 +287,7 @@ public final class MethodBody implements Cloneable {
      * @param isStatic Is static
      * @param path Path
      * @return Number of removed instructions
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeTraps(ABC abc, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
 
@@ -303,7 +303,7 @@ public final class MethodBody implements Cloneable {
      * @param classIndex Class index
      * @param isStatic Is static
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void deobfuscate(DeobfuscationLevel level, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         if (level == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE) {
@@ -329,8 +329,8 @@ public final class MethodBody implements Cloneable {
      * newinstruction is jump, the offset operand must be handled properly by
      * caller.
      *
-     * @param pos
-     * @param instruction
+     * @param pos Position
+     * @param instruction Instruction
      */
     public void replaceInstruction(int pos, AVM2Instruction instruction) {
         getCode().replaceInstruction(pos, instruction, this);
@@ -446,7 +446,7 @@ public final class MethodBody implements Cloneable {
      * @param initTraits Initial traits
      * @param firstLevel First level
      * @param seenMethods Seen methods
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convert(List<MethodBody> callStack, AbcIndexing abcIndex, final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, Traits initTraits, boolean firstLevel, Set<Integer> seenMethods) throws InterruptedException {
         seenMethods.add(this.method_info);
@@ -532,7 +532,7 @@ public final class MethodBody implements Cloneable {
      * @param fullyQualifiedNames Fully qualified names
      * @param seenMethods Seen methods
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         seenMethods.add(method_info);
@@ -590,7 +590,7 @@ public final class MethodBody implements Cloneable {
      * @param abc ABC file
      * @param trait Trait
      * @return Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public MethodBody convertMethodBodyCanUseLast(boolean deobfuscate, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait) throws InterruptedException {
         if (lastConvertedBody != null) {
@@ -617,7 +617,7 @@ public final class MethodBody implements Cloneable {
      * @param abc ABC file
      * @param trait Trait
      * @return Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public MethodBody convertMethodBody(boolean deobfuscate, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait) throws InterruptedException {
         MethodBody body = clone();

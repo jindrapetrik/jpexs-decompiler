@@ -68,7 +68,7 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DoABC2Tag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -79,9 +79,9 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public DoABC2Tag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -104,7 +104,7 @@ public class DoABC2Tag extends Tag implements ABCContainerTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -73,7 +72,7 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DoActionTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -83,8 +82,8 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * Constructor
      *
-     * @param swf
-     * @param data
+     * @param swf SWF
+     * @param data Data
      */
     public DoActionTag(SWF swf, ByteArrayRange data) {
         super(swf, ID, NAME, data);
@@ -94,9 +93,9 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws java.io.IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public DoActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -117,7 +116,7 @@ public class DoActionTag extends Tag implements ASMSource {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
@@ -128,10 +127,10 @@ public class DoActionTag extends Tag implements ASMSource {
      * Converts actions to ASM source
      *
      * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
+     * @param writer Writer
+     * @param actions Actions
      * @return ASM source
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {

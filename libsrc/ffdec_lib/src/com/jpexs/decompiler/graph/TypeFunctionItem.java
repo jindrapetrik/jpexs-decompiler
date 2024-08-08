@@ -86,7 +86,7 @@ public class TypeFunctionItem extends GraphTargetItem {
      * @param writer Writer
      * @param localData Local data
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {

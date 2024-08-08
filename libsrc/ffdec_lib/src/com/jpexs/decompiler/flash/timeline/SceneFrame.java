@@ -59,7 +59,7 @@ public class SceneFrame implements TreeItem {
     /**
      * Gets scene frame index.
      *
-     * @return
+     * @return Frame index
      */
     public int getSceneFrameIndex() {
         return realFrameIndex - scene.startFrame;
@@ -68,47 +68,27 @@ public class SceneFrame implements TreeItem {
     /**
      * Gets frame.
      *
-     * @return
+     * @return Frame
      */
     public Frame getFrame() {
         return swf.getTimeline().getFrame(realFrameIndex);
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         return "scene frame " + (getSceneFrameIndex() + 1);
     }
 
-    /**
-     * Gets openable.
-     *
-     * @return
-     */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
-    /**
-     * Gets modified flag.
-     *
-     * @return
-     */
     @Override
     public boolean isModified() {
         return getFrame().isModified();
     }
 
-    /**
-     * HashCode.
-     *
-     * @return
-     */
     @Override
     public int hashCode() {
         int hash = 5;
@@ -117,12 +97,6 @@ public class SceneFrame implements TreeItem {
         return hash;
     }
 
-    /**
-     * Equals.
-     *
-     * @param obj
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

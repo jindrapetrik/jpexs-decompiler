@@ -35,19 +35,21 @@ public @interface EnumValue {
     /**
      * Value.
      *
-     * @return
+     * @return Value
      */
     int value();
 
     /**
      * Description.
      *
-     * @return
+     * @return Description
      */
     String text();
 
     /**
      * Minimum SWF version. TODO: check in generic tag editor
+     *
+     * @return Minimum SWF version
      */
     int minSwfVersion() default 1;
 }

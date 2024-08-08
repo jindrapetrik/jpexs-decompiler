@@ -38,7 +38,7 @@ public class SwfFile {
      * Saves SWF to file
      *
      * @param fileName File name
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public void saveTo(String fileName) throws IOException {
         /*SWF swf = getSwf();

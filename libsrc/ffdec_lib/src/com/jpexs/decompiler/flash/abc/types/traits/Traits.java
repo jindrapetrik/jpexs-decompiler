@@ -105,7 +105,7 @@ public class Traits implements Cloneable, Serializable {
      * @param abc ABC file
      * @param path Path
      * @return Number of removed traps
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {
         int ret = 0;
@@ -278,7 +278,7 @@ public class Traits implements Cloneable, Serializable {
          * Calls the task.
          *
          * @return Null
-         * @throws InterruptedException
+         * @throws InterruptedException On interrupt
          */
         @Override
         public Void call() throws InterruptedException {
@@ -311,7 +311,7 @@ public class Traits implements Cloneable, Serializable {
      * @param ignoredTraitNames Ignored trait names
      * @param insideInterface Inside interface flag
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
 
@@ -406,7 +406,7 @@ public class Traits implements Cloneable, Serializable {
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel flag
      * @param scopeStack Scope stack
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         if (!parallel || traits.size() < 2) {
@@ -476,7 +476,7 @@ public class Traits implements Cloneable, Serializable {
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
      * @param uses Uses
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         for (Trait t : traits) {

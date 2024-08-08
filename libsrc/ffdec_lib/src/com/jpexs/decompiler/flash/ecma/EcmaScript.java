@@ -119,9 +119,9 @@ public class EcmaScript {
 
     /**
      * Object.getProperty.
-     * @param o
-     * @param p
-     * @return
+     * @param o Object
+     * @param p Property
+     * @return Value
      */
     public static Object object_getProperty(ObjectType o, String p) {
         //TODO: getownproperty, etc... ECMA 8.12.2

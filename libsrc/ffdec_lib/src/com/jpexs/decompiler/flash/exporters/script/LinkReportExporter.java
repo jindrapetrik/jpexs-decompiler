@@ -56,7 +56,7 @@ public class LinkReportExporter {
     /**
      * Constructs reporter with custom newline char, two spaces as indent.
      *
-     * @param newLineChar
+     * @param newLineChar Newline char
      */
     public LinkReportExporter(String newLineChar) {
         this.newLineChar = newLineChar;
@@ -65,8 +65,8 @@ public class LinkReportExporter {
     /**
      * Constructs reporter with custom newline char and indent string.
      *
-     * @param newLineChar
-     * @param indentStr
+     * @param newLineChar Newline char
+     * @param indentStr Indent string
      */
     public LinkReportExporter(String newLineChar, String indentStr) {
         this.newLineChar = newLineChar;

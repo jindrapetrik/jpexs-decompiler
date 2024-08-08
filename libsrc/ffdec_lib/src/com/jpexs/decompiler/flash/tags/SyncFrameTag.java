@@ -38,7 +38,7 @@ public class SyncFrameTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public SyncFrameTag(SWF swf) {
         super(swf, ID, NAME, null);

@@ -58,7 +58,7 @@ public class ShowFrameTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public ShowFrameTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -67,8 +67,8 @@ public class ShowFrameTag extends Tag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
+     * @param sis SWF input stream
+     * @param data Data bytes
      */
     public ShowFrameTag(SWFInputStream sis, ByteArrayRange data) {
         super(sis.getSwf(), ID, NAME, data);

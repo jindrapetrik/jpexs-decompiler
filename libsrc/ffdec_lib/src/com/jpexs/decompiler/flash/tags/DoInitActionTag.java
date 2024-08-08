@@ -34,7 +34,6 @@ import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -83,7 +82,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DoInitActionTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -98,9 +97,9 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public DoInitActionTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -117,7 +116,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
@@ -140,10 +139,10 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
      * Converts actions to ASM source
      *
      * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
+     * @param writer Writer
+     * @param actions Actions
      * @return ASM source
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {

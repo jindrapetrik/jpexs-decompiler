@@ -91,7 +91,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineBitsLosslessTag(SWF swf) {
         this(swf, null, swf.getNextCharacterId());
@@ -129,7 +129,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

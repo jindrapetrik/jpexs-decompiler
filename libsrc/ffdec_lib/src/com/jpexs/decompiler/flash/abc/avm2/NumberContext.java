@@ -77,7 +77,7 @@ public class NumberContext {
     /**
      * Sets the usage of the number.
      *
-     * @param usage
+     * @param usage Usage
      */
     public void setUsage(int usage) {
         if (usage > 6 || usage < 0) {

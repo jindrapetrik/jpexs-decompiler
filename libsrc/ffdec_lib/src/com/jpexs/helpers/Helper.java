@@ -1668,7 +1668,7 @@ public class Helper {
     /**
      * Formats double value (removes .0 from end)
      *
-     * @param d
+     * @param d Double value
      * @return String
      */
     public static String doubleStr(double d) {

@@ -33,7 +33,7 @@ public interface ImportTag {
 
     /**
      * Set URL of the imported file.
-     * @param url
+     * @param url URL of the imported file
      */
     public void setUrl(String url);
 

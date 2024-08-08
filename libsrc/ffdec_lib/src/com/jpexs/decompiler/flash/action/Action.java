@@ -1190,7 +1190,7 @@ public abstract class Action implements GraphSourceItem {
      *
      * @param cnt Container
      * @param variables Variables - map of variable names to variable items
-     * @return
+     * @return Variables
      */
     private static HashMap<String, GraphTargetItem> prepareVariables(GraphSourceItemContainer cnt, HashMap<String, GraphTargetItem> variables) {
         HashMap<String, GraphTargetItem> variables2 = new LinkedHashMap<>(variables);

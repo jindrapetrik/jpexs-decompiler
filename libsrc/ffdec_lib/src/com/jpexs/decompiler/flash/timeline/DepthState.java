@@ -176,7 +176,7 @@ public class DepthState {
     /**
      * Gets new instance id.
      *
-     * @return
+     * @return New instance id
      */
     public static long getNewInstanceId() {
         return lastInstanceId.addAndGet(1);
@@ -236,7 +236,7 @@ public class DepthState {
     /**
      * Sets matrix.
      *
-     * @param matrix
+     * @param matrix Matrix
      */
     public void setMATRIX(MATRIX matrix) {
         this.matrix = matrix;
@@ -246,7 +246,7 @@ public class DepthState {
     /**
      * Checks whether cache as bitmap is on.
      *
-     * @return
+     * @return Whether cache as bitmap is on
      */
     public boolean cacheAsBitmap() {
         return (placeObjectTag != null && placeObjectTag.cacheAsBitmap())
@@ -257,7 +257,7 @@ public class DepthState {
      * Converts DepthState to PlaceObject tag of required version.
      *
      * @param depth Depth
-     * @return
+     * @return PlaceObject tag
      */
     public PlaceObjectTypeTag toPlaceObjectTag(int depth) {
         if (minPlaceObjectNum <= 1) {
@@ -278,7 +278,7 @@ public class DepthState {
     /**
      * Gets character tag.
      *
-     * @return
+     * @return Character tag
      */
     public CharacterTag getCharacter() {
         if (characterId == -1) {
@@ -293,11 +293,6 @@ public class DepthState {
         return swf.getCharacter(characterId);
     }
 
-    /**
-     * Hashcode.
-     *
-     * @return
-     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -321,12 +316,6 @@ public class DepthState {
         return hash;
     }
 
-    /**
-     * Equals.
-     *
-     * @param obj
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

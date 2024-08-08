@@ -29,7 +29,7 @@ public interface Searchable {
     /**
      * Searches for byte sequences
      *
-     * @param data
+     * @param data Data
      * @return Map Position=>Input stream
      */
     public Map<Long, InputStream> search(byte[]... data);
@@ -38,7 +38,7 @@ public interface Searchable {
      * Searches for byte sequences with progress listener
      *
      * @param progListener Listener
-     * @param data
+     * @param data Data
      * @return Map Position=>Input stream
      */
     public Map<Long, InputStream> search(ProgressListener progListener, byte[]... data);

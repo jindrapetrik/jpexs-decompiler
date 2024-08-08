@@ -275,7 +275,7 @@ public class FastActionList implements Collection<ActionItem> {
      * @param actions Action list
      * @param action Action
      * @param actionItemMap Action item map
-     * @return
+     * @return Last actions
      */
     private List<ActionItem> getContainerLastActions(ActionList actions, Action action, Map<Action, ActionItem> actionItemMap) {
         GraphSourceItemContainer container = (GraphSourceItemContainer) action;

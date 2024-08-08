@@ -48,7 +48,7 @@ public class FreeCharacterTag extends Tag implements CharacterIdTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public FreeCharacterTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -68,7 +68,7 @@ public class FreeCharacterTag extends Tag implements CharacterIdTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

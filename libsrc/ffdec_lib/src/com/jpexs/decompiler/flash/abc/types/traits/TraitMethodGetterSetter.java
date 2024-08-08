@@ -101,7 +101,7 @@ public class TraitMethodGetterSetter extends Trait {
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
      * @param uses Uses
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
@@ -179,7 +179,7 @@ public class TraitMethodGetterSetter extends Trait {
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
      * @param scopeStack Scope stack
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
@@ -231,7 +231,7 @@ public class TraitMethodGetterSetter extends Trait {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
@@ -295,7 +295,7 @@ public class TraitMethodGetterSetter extends Trait {
      * @param abc ABC
      * @param path Path
      * @return Number of removed traps
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException {

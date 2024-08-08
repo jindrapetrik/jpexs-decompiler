@@ -32,7 +32,7 @@ public class Traits {
      * Constructor.
      * @param className Class name
      * @param dynamic Dynamic
-     * @param sealedMemberNames
+     * @param sealedMemberNames Sealed member names
      */
     public Traits(String className, boolean dynamic, Collection<? extends String> sealedMemberNames) {
         this.className = className;

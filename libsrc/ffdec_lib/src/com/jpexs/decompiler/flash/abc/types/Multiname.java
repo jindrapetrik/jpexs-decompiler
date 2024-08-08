@@ -970,8 +970,8 @@ public class Multiname {
      * Checks if this multiname is effectively a QName. Efectively means that it
      * is a QName or QNameA or MULTINAME with only one namespace.
      *
-     * @param thisCpool
-     * @return
+     * @param thisCpool This constant pool
+     * @return True if it's effectively a QName
      */
     private boolean isEfectivelyQname(AVM2ConstantPool thisCpool) {
         return kind == QNAME || kind == QNAMEA || isMULTINAMEwithOneNs(thisCpool);

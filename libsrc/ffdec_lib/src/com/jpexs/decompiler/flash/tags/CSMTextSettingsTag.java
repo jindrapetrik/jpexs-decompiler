@@ -67,7 +67,7 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public CSMTextSettingsTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -76,9 +76,9 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public CSMTextSettingsTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
@@ -100,7 +100,7 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

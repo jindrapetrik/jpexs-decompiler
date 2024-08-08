@@ -131,7 +131,7 @@ public abstract class GraphTextWriter {
 
     /**
      * Ends method.
-     * @return
+     * @return Writer
      */
     public GraphTextWriter endMethod() {
         return this;
@@ -139,7 +139,7 @@ public abstract class GraphTextWriter {
 
     /**
      * Ends function.
-     * @return
+     * @return Writer
      */
     public GraphTextWriter endFunction() {
         return this;

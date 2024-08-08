@@ -34,7 +34,7 @@ public enum DeobfuscationLevel {
     /**
      * Get level of deobfuscation as number
      *
-     * @return
+     * @return Level of deobfuscation as number
      */
     public int getLevel() {
         return level;

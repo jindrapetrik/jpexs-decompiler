@@ -43,7 +43,7 @@ public class DefineTextTag extends StaticTextTag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public DefineTextTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -68,9 +68,9 @@ public class DefineTextTag extends StaticTextTag {
     /**
      * Constructor
      *
-     * @param sis
-     * @param data
-     * @throws IOException
+     * @param sis SWF input stream
+     * @param data Data
+     * @throws IOException On I/O error
      */
     public DefineTextTag(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);

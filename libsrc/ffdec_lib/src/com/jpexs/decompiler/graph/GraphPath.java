@@ -79,7 +79,7 @@ public class GraphPath implements Serializable {
     /**
      * Checks whether the path starts with the given path.
      *
-     * @param p
+     * @param p Path
      * @return True if the path starts with the given path, false otherwise
      */
     public boolean startsWith(GraphPath p) {
@@ -105,7 +105,7 @@ public class GraphPath implements Serializable {
      * Returns a new parent GraphPath with the given length.
      *
      * @param len Length
-     * @return
+     * @return New parent GraphPath
      */
     public GraphPath parent(int len) {
         GraphPath par = new GraphPath(rootName);
@@ -169,11 +169,6 @@ public class GraphPath implements Serializable {
         return branchIps.get(index);
     }
 
-    /**
-     * Hash code.
-     *
-     * @return Hash code
-     */
     @Override
     public int hashCode() {
         int hash = 5;
@@ -183,12 +178,6 @@ public class GraphPath implements Serializable {
         return hash;
     }
 
-    /**
-     * Equals.
-     *
-     * @param obj Eq
-     * @return
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

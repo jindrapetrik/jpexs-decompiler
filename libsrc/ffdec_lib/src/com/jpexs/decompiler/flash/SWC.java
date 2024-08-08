@@ -38,7 +38,7 @@ public class SWC extends ZippedBundle {
      * Constructs SWC from input stream.
      *
      * @param is Input stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SWC(InputStream is) throws IOException {
         super(is);
@@ -48,7 +48,7 @@ public class SWC extends ZippedBundle {
      * Constructs SWC from file.
      *
      * @param filename File
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SWC(File filename) throws IOException {
         super(filename);
@@ -59,7 +59,7 @@ public class SWC extends ZippedBundle {
      *
      * @param is Input stream
      * @param filename File
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     @Override
     protected void initBundle(InputStream is, File filename) throws IOException {

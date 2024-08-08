@@ -276,7 +276,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
      * @param uses Uses
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
         if (customNamespace == null) {
@@ -361,7 +361,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param writer Writer
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
@@ -680,7 +680,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
@@ -703,7 +703,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
      * @param scopeStack Scope stack
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
     }
@@ -816,7 +816,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
@@ -851,7 +851,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
      * @param scopeStack Scope stack
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convertPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
@@ -878,7 +878,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param parallel Parallel
      * @param insideInterface Inside interface
      * @return Writer
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         toString(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
@@ -899,7 +899,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param writer Writer
      * @param fullyQualifiedNames Fully qualified names
      * @param parallel Parallel
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         convert(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
@@ -928,7 +928,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param abc ABC
      * @param path Path
      * @return Number of removed traps
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) throws InterruptedException;
 

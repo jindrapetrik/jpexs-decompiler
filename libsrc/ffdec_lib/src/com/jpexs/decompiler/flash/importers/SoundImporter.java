@@ -72,7 +72,7 @@ public class SoundImporter {
      * @param is Input stream
      * @param newSoundFormat New sound format
      * @return True if sound was imported successfully
-     * @throws SoundImportException
+     * @throws SoundImportException On sound import error
      */
     public boolean importDefineSound(DefineSoundTag soundTag, InputStream is, int newSoundFormat) throws SoundImportException {
         int newSoundRate = -1;
@@ -215,7 +215,7 @@ public class SoundImporter {
      *
      * @param in MP3 InputStream
      * @return size of ID3v2 frames + header
-     * @throws IOException
+     * @throws IOException On I/O error
      * @author JavaZOOM
      */
     private int readID3v2Header(InputStream in) throws IOException {

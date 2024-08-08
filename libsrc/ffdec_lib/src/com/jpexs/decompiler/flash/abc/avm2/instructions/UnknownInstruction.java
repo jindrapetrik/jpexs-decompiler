@@ -43,7 +43,7 @@ public class UnknownInstruction extends InstructionDefinition {
      * @param lda Local data area
      * @param constants Constant pool
      * @param ins Instruction
-     * @throws AVM2VerifyErrorException
+     * @throws AVM2VerifyErrorException On verify error
      */
     @Override
     public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
@@ -57,7 +57,7 @@ public class UnknownInstruction extends InstructionDefinition {
      * @param constants Constant pool
      * @param ins Instruction
      * @return True if instruction was executed, false if not
-     * @throws AVM2ExecutionException
+     * @throws AVM2ExecutionException On execution error
      */
     @Override
     public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2ExecutionException {

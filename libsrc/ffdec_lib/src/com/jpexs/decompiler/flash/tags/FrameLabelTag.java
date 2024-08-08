@@ -45,7 +45,7 @@ public class FrameLabelTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public FrameLabelTag(SWF swf) {
         super(swf, ID, NAME, null);
@@ -71,7 +71,7 @@ public class FrameLabelTag extends Tag {
      * Gets data bytes
      *
      * @param sos SWF output stream
-     * @throws java.io.IOException
+     * @throws IOException On I/O error
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {

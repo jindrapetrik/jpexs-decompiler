@@ -122,7 +122,7 @@ public abstract class TextTag extends DrawableTag {
      * @param formattedText Formatted text
      * @param texts Texts
      * @return True if the text was set successfully
-     * @throws TextParseException
+     * @throws TextParseException On parse error
      */
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;
 

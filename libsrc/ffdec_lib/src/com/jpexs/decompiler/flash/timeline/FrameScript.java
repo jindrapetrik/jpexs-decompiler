@@ -52,7 +52,7 @@ public class FrameScript implements TreeItem, Exportable {
     /**
      * Gets Frame.
      *
-     * @return
+     * @return Frame
      */
     public Frame getFrame() {
         return frame;
@@ -61,18 +61,13 @@ public class FrameScript implements TreeItem, Exportable {
     /**
      * Gets openable.
      *
-     * @return
+     * @return Openable
      */
     @Override
     public Openable getOpenable() {
         return swf;
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         return frame.toString();
@@ -81,7 +76,7 @@ public class FrameScript implements TreeItem, Exportable {
     /**
      * Gets export filename.
      *
-     * @return
+     * @return Export filename
      */
     @Override
     public String getExportFileName() {
@@ -91,7 +86,7 @@ public class FrameScript implements TreeItem, Exportable {
     /**
      * Gets modified flag.
      *
-     * @return
+     * @return Modified flag
      */
     @Override
     public boolean isModified() {

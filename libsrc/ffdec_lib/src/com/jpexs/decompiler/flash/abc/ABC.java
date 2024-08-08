@@ -770,7 +770,7 @@ public class ABC implements Openable {
      *
      * @param minMajor Minimum major version
      * @param minMinor Minimum minor version
-     * @return
+     * @return Whether the ABC has minimum version
      */
     private boolean minVersionCheck(int minMajor, int minMinor) {
         return version.compareTo(new ABCVersion(minMajor, minMinor)) >= 0;

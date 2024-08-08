@@ -286,7 +286,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
      * Gets the sub-chain of specific length.
      *
      * @param count Length
-     * @return
+     * @return Sub-chain
      */
     public DottedChain subChain(int count) {
         if (count > parts.size()) {
@@ -599,11 +599,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             this.namespaceSuffix = namespaceSuffix;
         }
 
-        /**
-         * Hash code.
-         *
-         * @return
-         */
         @Override
         public int hashCode() {
             int hash = 5;
@@ -613,12 +608,6 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             return hash;
         }
 
-        /**
-         * Equals.
-         *
-         * @param obj Object
-         * @return Whether this object is equal to the given object
-         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {

@@ -38,7 +38,7 @@ public class PathsArePostScriptTag extends Tag {
     /**
      * Constructor
      *
-     * @param swf
+     * @param swf SWF
      */
     public PathsArePostScriptTag(SWF swf) {
         super(swf, ID, NAME, null);
