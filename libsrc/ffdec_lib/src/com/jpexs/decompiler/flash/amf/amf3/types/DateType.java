@@ -26,14 +26,26 @@ public class DateType implements Amf3ValueType {
 
     private double val;
 
+    /**
+     * Constructor.
+     * @param val Date value
+     */
     public DateType(double val) {
         this.val = val;
     }
 
+    /**
+     * Gets date value.
+     * @return Date value
+     */
     public double getVal() {
         return val;
     }
 
+    /**
+     * Sets date value.
+     * @param val Date value
+     */
     public void setVal(double val) {
         this.val = val;
     }
@@ -43,6 +55,10 @@ public class DateType implements Amf3ValueType {
         return Amf3Exporter.amfToString(this);
     }
 
+    /**
+     * Converts this to date.
+     * @return Date
+     */
     public Date toDate() {
         return new Date((long) val);
     }

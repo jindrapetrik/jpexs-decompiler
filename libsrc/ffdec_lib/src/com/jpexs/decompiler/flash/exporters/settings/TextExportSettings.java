@@ -25,14 +25,32 @@ import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
  */
 public class TextExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "texts";
 
+    /**
+     * Mode
+     */
     public TextExportMode mode;
 
+    /**
+     * Single file
+     */
     public boolean singleFile;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param singleFile Single file
+     * @param zoom Zoom
+     */
     public TextExportSettings(TextExportMode mode, boolean singleFile, double zoom) {
         this.mode = mode;
         this.singleFile = singleFile;

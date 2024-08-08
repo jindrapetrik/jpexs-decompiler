@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -71,6 +70,12 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
     private final int executionLimit = 30000;
 
     /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorGetSet() {
+    }
+
+    /**
      * Remove obfuscation get sets
      *
      * @param classIndex Class index
@@ -80,7 +85,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
      * @param body Method body
      * @param inlineIns Inline instructions
      * @return True if removed
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeObfuscationGetSets(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, List<AVM2Instruction> inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -124,7 +129,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
      *
      * @param code AVM2 code
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected void removeUnreachableInstructions(AVM2Code code, MethodBody body) throws InterruptedException {
         code.removeDeadCode(body);
@@ -186,7 +191,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
      * @param localData AVM2 local data
      * @param idx Index
      * @param endIdx End index
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void executeInstructions(MethodBody body, AVM2Code code, AVM2LocalData localData, int idx, int endIdx) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
@@ -283,7 +288,7 @@ public class AVM2DeobfuscatorGetSet extends SWFDecompilerAdapter {
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {

@@ -23,5 +23,20 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum ExeExportMode {
 
-    WRAPPER, PROJECTOR_WIN, PROJECTOR_MAC, PROJECTOR_LINUX
+    /**
+     * Wrapper
+     */
+    WRAPPER,
+    /**
+     * Projector for Windows
+     */
+    PROJECTOR_WIN,
+    /**
+     * Projector for macOS
+     */
+    PROJECTOR_MAC,
+    /**
+     * Projector for Linux
+     */
+    PROJECTOR_LINUX
 }

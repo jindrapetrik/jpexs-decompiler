@@ -29,6 +29,9 @@ import java.util.Set;
  */
 public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
 
+    /**
+     * Fill styles
+     */
     @SWFArray(value = "fillStyle")
     public FILLSTYLE[] fillStyles;
 
@@ -57,6 +60,10 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
         return modified;
     }
 
+    /**
+     * Converts to MORPHFILLSTYLEARRAY.
+     * @return MORPHFILLSTYLEARRAY
+     */
     public MORPHFILLSTYLEARRAY toMorphFillStyleArray() {
         MORPHFILLSTYLEARRAY morphFillStyleArray = new MORPHFILLSTYLEARRAY();
         morphFillStyleArray.fillStyles = new MORPHFILLSTYLE[fillStyles.length];

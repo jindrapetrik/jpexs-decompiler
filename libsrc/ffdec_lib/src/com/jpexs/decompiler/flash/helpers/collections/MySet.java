@@ -30,6 +30,9 @@ import java.util.Set;
  */
 public class MySet<T> implements Set<T> {
 
+    /**
+     * List of items.
+     */
     List<T> items = new ArrayList<>();
 
     @Override

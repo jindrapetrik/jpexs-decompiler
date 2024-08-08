@@ -23,10 +23,21 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class SCRIPTDATAOBJECT {
 
+    /**
+     * Object name
+     */
     public String objectName;
 
+    /**
+     * Object data
+     */
     public SCRIPTDATAVALUE objectData;
 
+    /**
+     * Constructor.
+     * @param objectName Object name
+     * @param objectData Object data
+     */
     public SCRIPTDATAOBJECT(String objectName, SCRIPTDATAVALUE objectData) {
         this.objectName = objectName;
         this.objectData = objectData;

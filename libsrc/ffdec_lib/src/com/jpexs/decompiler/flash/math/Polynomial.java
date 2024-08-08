@@ -32,6 +32,10 @@ public class Polynomial {
     private String _variable;
     private int _s;
 
+    /**
+     * Constructor.
+     * @param coefs Coefficients of the polynomial
+     */
     public Polynomial(List<Double> coefs) {
         this.coefs = new double[coefs.size()];
 
@@ -43,6 +47,10 @@ public class Polynomial {
         this._s = 0;
     }
 
+    /**
+     * Get the degree of the polynomial.
+     * @return Degree of the polynomial
+     */
     public int getDegree() {
         return this.coefs.length - 1;
     }
@@ -228,10 +236,19 @@ public class Polynomial {
         return result;
     }
 
+    /**
+     * Estimate the error of the polynomial.
+     * @return Error estimate
+     */
     public double zeroErrorEstimate() {
         return zeroErrorEstimate(null);
     }
 
+    /**
+     * Estimate the error of the polynomial.
+     * @param maxAbsX Maximum absolute value of x
+     * @return Error estimate
+     */
     public double zeroErrorEstimate(Double maxAbsX) {
         Polynomial poly = this;
         double ERRF = 1e-15;
@@ -260,6 +277,10 @@ public class Polynomial {
         return x;
     }
 
+    /**
+     * Gets the roots of the polynomial.
+     * @return List of roots
+     */
     public List<Double> getCubicRoots() {
         List<Double> results = new ArrayList<>();
 
@@ -330,10 +351,17 @@ public class Polynomial {
         return results;
     }
 
+    /**
+     * Simplify the polynomial.
+     */
     public void simplifyEquals() {
         simplifyEquals(1e-12);
     }
 
+    /**
+     * Simplify the polynomial.
+     * @param tolerance Tolerance
+     */
     public void simplifyEquals(double tolerance) {
         for (int i = this.getDegree(); i >= 0; i--) {
             if (Math.abs(this.coefs[i]) <= tolerance) {
@@ -365,6 +393,10 @@ public class Polynomial {
         return pol;
     }
 
+    /**
+     * Get the roots of the polynomial.
+     * @return List of roots
+     */
     public List<Double> getRoots() {
         List<Double> result;
 

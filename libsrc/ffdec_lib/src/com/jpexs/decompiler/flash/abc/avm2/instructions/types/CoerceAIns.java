@@ -64,6 +64,10 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
         return 1;
     }
 
+    /**
+     * Get target type
+     * @return Target type
+     */
     public String getTargetType() {
         return "*";
     }

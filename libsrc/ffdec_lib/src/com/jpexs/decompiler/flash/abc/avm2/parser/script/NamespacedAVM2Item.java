@@ -42,18 +42,46 @@ import java.util.Objects;
  */
 public class NamespacedAVM2Item extends AssignableAVM2Item {
 
+    /**
+     * Namespace
+     */
     public GraphTargetItem ns;
 
+    /**
+     * Name
+     */
     public String name;
 
+    /**
+     * Name item
+     */
     public GraphTargetItem nameItem;
 
+    /**
+     * Object
+     */
     public GraphTargetItem obj;
 
+    /**
+     * Attribute
+     */
     public boolean attr;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Constructor.
+     * @param ns Namespace
+     * @param name Name
+     * @param nameItem Name item
+     * @param obj Object
+     * @param attr Attribute
+     * @param openedNamespaces Opened namespaces
+     * @param storeValue Store value
+     */
     public NamespacedAVM2Item(GraphTargetItem ns, String name, GraphTargetItem nameItem, GraphTargetItem obj, boolean attr, List<NamespaceItem> openedNamespaces, GraphTargetItem storeValue) {
         super(storeValue);
         this.ns = ns;
@@ -150,6 +178,18 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         return TypeItem.UNBOUNDED;
     }
 
+    /**
+     * Converts to source.
+     * @param localData Local data
+     * @param generator Generator
+     * @param needsReturn Needs return
+     * @param call Call
+     * @param callargs Call arguments
+     * @param delete Delete
+     * @param construct Construct
+     * @return Source
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn, boolean call, List<GraphTargetItem> callargs, boolean delete, boolean construct) throws CompilationException {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         Reference<Integer> ns_temp = new Reference<>(-1);

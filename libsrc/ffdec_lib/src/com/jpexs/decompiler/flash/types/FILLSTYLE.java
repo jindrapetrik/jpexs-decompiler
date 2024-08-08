@@ -40,6 +40,9 @@ import java.util.Set;
  */
 public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializable {
 
+    /**
+     * Fill style type
+     */
     @SWFType(BasicType.UI8)
     @EnumValue(value = SOLID, text = "Solid")
     @EnumValue(value = LINEAR_GRADIENT, text = "Linear gradient")
@@ -51,42 +54,84 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
     @EnumValue(value = NON_SMOOTHED_CLIPPED_BITMAP, text = "Non smoothed clipped bitmap")
     public int fillStyleType;
 
+    /**
+     * Type - Solid color
+     */
     public static final int SOLID = 0x0;
 
+    /**
+     * Type - Linear gradient
+     */
     public static final int LINEAR_GRADIENT = 0x10;
 
+    /**
+     * Type - Radial gradient
+     */
     public static final int RADIAL_GRADIENT = 0x12;
 
+    /**
+     * Type - Focal radial gradient
+     */
     @SWFVersion(from = 8)
     public static final int FOCAL_RADIAL_GRADIENT = 0x13;
 
+    /**
+     * Type - Repeating bitmap
+     */
     public static final int REPEATING_BITMAP = 0x40;
 
+    /**
+     * Type - Clipped bitmap
+     */
     public static final int CLIPPED_BITMAP = 0x41;
 
+    /**
+     * Type - Non smoothed repeating bitmap
+     */
     @SWFVersion(from = 7)
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
 
+    /**
+     * Type - Non smoothed clipped bitmap
+     */
     @SWFVersion(from = 7)
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
 
+    /**
+     * In shape 3
+     */
     @Internal
     public boolean inShape3;
 
+    /**
+     * Color
+     */
     @Conditional(value = "fillStyleType", options = {SOLID})
     @ConditionalType(type = RGBA.class, tags = {DefineShape3Tag.ID, DefineShape4Tag.ID})
     public RGB color;
 
+    /**
+     * Gradient matrix
+     */
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
     public MATRIX gradientMatrix;
 
+    /**
+     * Gradient
+     */
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
     @ConditionalType(value = "fillStyleType", type = FOCALGRADIENT.class, options = {FOCAL_RADIAL_GRADIENT})
     public GRADIENT gradient;
 
+    /**
+     * Bitmap id
+     */
     @Conditional(value = "fillStyleType", options = {REPEATING_BITMAP, CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public int bitmapId;
 
+    /**
+     * Bitmap matrix
+     */
     @Conditional(value = "fillStyleType", options = {REPEATING_BITMAP, CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public MATRIX bitmapMatrix;
 
@@ -155,6 +200,10 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         }
     }
 
+    /**
+     * Checks if fill style has bitmap
+     * @return True if fill style has bitmap
+     */
     public boolean hasBitmap() {
         switch (fillStyleType) {
             case CLIPPED_BITMAP:
@@ -166,6 +215,10 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         return false;
     }
 
+    /**
+     * Checks if fill style has gradient
+     * @return True if fill style has gradient
+     */
     public boolean hasGradient() {
         switch (fillStyleType) {
             case LINEAR_GRADIENT:
@@ -176,6 +229,12 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         return false;
     }
 
+    /**
+     * Checks whether fill style is compatible with other fill style
+     * @param otherFillStyle Other fill style
+     * @param swf SWF
+     * @return True if fill styles are compatible
+     */
     public boolean isCompatibleFillStyle(FILLSTYLE otherFillStyle, SWF swf) {
         if (fillStyleType != otherFillStyle.fillStyleType) {
             return false;
@@ -202,6 +261,10 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         return true;
     }
 
+    /**
+     * Converts fill style to morph fill style
+     * @return Morph fill style
+     */
     public MORPHFILLSTYLE toMorphStyle() {
         MORPHFILLSTYLE morphFillStyle = new MORPHFILLSTYLE();
         morphFillStyle.bitmapId = bitmapId;
@@ -223,6 +286,12 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         return morphFillStyle;
     }
 
+    /**
+     * Converts fill style to morph fill style
+     * @param endFillStyle End fill style
+     * @param swf SWF
+     * @return Morph fill style
+     */
     public MORPHFILLSTYLE toMorphStyle(FILLSTYLE endFillStyle, SWF swf) {
         if (!isCompatibleFillStyle(endFillStyle, swf)) {
             return null;

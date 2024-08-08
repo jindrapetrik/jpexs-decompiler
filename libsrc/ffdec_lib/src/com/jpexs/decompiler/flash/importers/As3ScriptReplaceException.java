@@ -28,16 +28,28 @@ public class As3ScriptReplaceException extends Exception {
 
     private List<As3ScriptReplaceExceptionItem> exceptionItems;
 
+    /**
+     * Constructor.
+     * @param message Message
+     */
     public As3ScriptReplaceException(String message) {
         super(message);
         this.exceptionItems = new ArrayList<>();
     }
 
+    /**
+     * Constructor.
+     * @param exceptionItems List of exception items
+     */
     public As3ScriptReplaceException(List<As3ScriptReplaceExceptionItem> exceptionItems) {
         super("Script replace exception");
         this.exceptionItems = exceptionItems;
     }
 
+    /**
+     * Constructor.
+     * @param exceptionItem Exception item
+     */
     public As3ScriptReplaceException(As3ScriptReplaceExceptionItem exceptionItem) {
         this.exceptionItems = new ArrayList<>();
         this.exceptionItems.add(exceptionItem);
@@ -60,6 +72,10 @@ public class As3ScriptReplaceException extends Exception {
         return getMessage();
     }
 
+    /**
+     * Gets exception items.
+     * @return Exception items
+     */
     public List<As3ScriptReplaceExceptionItem> getExceptionItems() {
         return exceptionItems;
     }

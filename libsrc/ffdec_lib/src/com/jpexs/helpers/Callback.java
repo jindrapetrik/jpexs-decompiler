@@ -24,5 +24,16 @@ package com.jpexs.helpers;
  */
 public abstract class Callback<T> {
 
+    /**
+     * Calls
+     * @param arg1 Argument
+     */
     public abstract void call(T arg1);
+
+    /**
+     * Constructor.
+     */
+    public Callback() {
+
+    }
 }

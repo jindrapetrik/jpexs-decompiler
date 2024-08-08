@@ -33,45 +33,123 @@ import java.awt.image.WritableRaster;
  */
 public final class BlendComposite implements Composite {
 
+    /**
+     * Blending mode.
+     */
     public enum BlendingMode {
 
+        /**
+         * Layer
+         */
         LAYER, //TODO!
+        /**
+         * Darken
+         */
         DARKEN,
+        /**
+         * Multiply
+         */
         MULTIPLY,
+        /**
+         * Lighten
+         */
         LIGHTEN,
+        /**
+         * Screen
+         */
         SCREEN,
+        /**
+         * Overlay
+         */
         OVERLAY,
+        /**
+         * Hard light
+         */
         HARD_LIGHT,
+        /**
+         * Add
+         */
         ADD,
+        /**
+         * Subtract
+         */
         SUBTRACT,
+        /**
+         * Difference
+         */
         DIFFERENCE,
+        /**
+         * Invert
+         */
         INVERT,
+        /**
+         * Alpha
+         */
         ALPHA,
+        /**
+         * Erase
+         */
         ERASE
     }
 
+    /**
+     * Alpha
+     */
     public static final BlendComposite Alpha = new BlendComposite(BlendingMode.ALPHA);
 
+    /**
+     * Erase
+     */
     public static final BlendComposite Erase = new BlendComposite(BlendingMode.ERASE);
 
+    /**
+     * Invert
+     */
     public static final BlendComposite Invert = new BlendComposite(BlendingMode.INVERT);
 
+    /**
+     * Multiply
+     */
     public static final BlendComposite Multiply = new BlendComposite(BlendingMode.MULTIPLY);
 
+    /**
+     * Screen
+     */
     public static final BlendComposite Screen = new BlendComposite(BlendingMode.SCREEN);
 
+    /**
+     * Darken
+     */
     public static final BlendComposite Darken = new BlendComposite(BlendingMode.DARKEN);
 
+    /**
+     * Lighten
+     */
     public static final BlendComposite Lighten = new BlendComposite(BlendingMode.LIGHTEN);
 
+    /**
+     * Overlay
+     */
     public static final BlendComposite Overlay = new BlendComposite(BlendingMode.OVERLAY);
 
+    /**
+     * Hard light
+     */
     public static final BlendComposite HardLight = new BlendComposite(BlendingMode.HARD_LIGHT);
 
+    /**
+     * Difference
+     */
     public static final BlendComposite Difference = new BlendComposite(BlendingMode.DIFFERENCE);
 
+    /**
+     * Add
+     */
     public static final BlendComposite Add = new BlendComposite(BlendingMode.ADD);
 
+    /**
+     * Subtract
+     */
     public static final BlendComposite Subtract = new BlendComposite(BlendingMode.SUBTRACT);
 
     private final float alpha;
@@ -92,13 +170,16 @@ public final class BlendComposite implements Composite {
         this.alpha = alpha;
     }
 
+    /**
+     * Gets alpha.
+     * @return Alpha
+     */
     public float getAlpha() {
         return alpha;
     }
 
     /**
-     * <p>
-     * Returns the blending mode of this composite.</p>
+     * Returns the blending mode of this composite.
      *
      * @return the blending mode used by this object
      */
@@ -106,11 +187,6 @@ public final class BlendComposite implements Composite {
         return mode;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
     @Override
     public int hashCode() {
         return Float.floatToIntBits(alpha) * 31 + mode.ordinal();

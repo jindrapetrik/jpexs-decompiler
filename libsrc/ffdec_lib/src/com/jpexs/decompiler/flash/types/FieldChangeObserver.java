@@ -25,5 +25,9 @@ import java.lang.reflect.Field;
  */
 public interface FieldChangeObserver {
 
+    /**
+     * Field changed.
+     * @param field Field
+     */
     void fieldChanged(Field field);
 }

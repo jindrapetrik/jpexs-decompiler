@@ -23,5 +23,8 @@ package com.jpexs.decompiler.flash.exporters.modes;
  */
 public enum MovieExportMode {
 
+    /**
+     * FLV - Flash Video
+     */
     FLV
 }

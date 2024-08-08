@@ -23,18 +23,38 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
  */
 public class ParsedSymbol {
 
+    /**
+     * Group
+     */
     public SymbolGroup group;
 
+    /**
+     * Value
+     */
     public Object value;
 
+    /**
+     * Type
+     */
     public SymbolType type;
 
+    /**
+     * Constructor.
+     * @param group Group
+     * @param type Type
+     */
     public ParsedSymbol(SymbolGroup group, SymbolType type) {
         this.group = group;
         this.type = type;
         this.value = null;
     }
 
+    /**
+     * Constructor.
+     * @param group Group
+     * @param type Type
+     * @param value Value
+     */
     public ParsedSymbol(SymbolGroup group, SymbolType type, Object value) {
         this.group = group;
         this.type = type;
@@ -46,6 +66,11 @@ public class ParsedSymbol {
         return group.toString() + " " + type.toString() + " " + (value != null ? value.toString() : "");
     }
 
+    /**
+     * Check if type is in types.
+     * @param types Types
+     * @return True if type is in types
+     */
     public boolean isType(Object... types) {
         for (Object t : types) {
             if (t instanceof SymbolGroup) {

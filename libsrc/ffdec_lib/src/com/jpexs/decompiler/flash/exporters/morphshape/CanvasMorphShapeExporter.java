@@ -41,54 +41,138 @@ import com.jpexs.helpers.SerializableImage;
  */
 public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
+    /**
+     * Draw command M
+     */
     protected static final String DRAW_COMMAND_M = "M";
 
+    /**
+     * Draw command L
+     */
     protected static final String DRAW_COMMAND_L = "L";
 
+    /**
+     * Draw command Q
+     */
     protected static final String DRAW_COMMAND_Q = "Q";
 
+    /**
+     * Draw command Z
+     */
     protected static final String DRAW_COMMAND_Z = "Z";
 
+    /**
+     * Current draw command
+     */
     protected String currentDrawCommand = "";
 
+    /**
+     * Delta X
+     */
     protected double deltaX = 0;
 
+    /**
+     * Delta Y
+     */
     protected double deltaY = 0;
 
+    /**
+     * Path data
+     */
     protected StringBuilder pathData = new StringBuilder();
 
+    /**
+     * Fill data
+     */
     protected StringBuilder fillData = new StringBuilder();
 
+    /**
+     * Unit divisor
+     */
     protected double unitDivisor;
 
+    /**
+     * Shape data
+     */
     protected StringBuilder shapeData = new StringBuilder();
 
+    /**
+     * Stroke data
+     */
     protected StringBuilder strokeData = new StringBuilder();
 
+    /**
+     * Fill matrix
+     */
     protected Matrix fillMatrix = null;
 
+    /**
+     * Fill matrix end
+     */
     protected Matrix fillMatrixEnd = null;
 
-    protected String lastRadColor = null;
+    /**
+     * Last gradient color
+     */
+    protected String lastGradColor = null;
 
+    /**
+     * Repeat count
+     */
     protected int repeatCnt = 0;
 
+    /**
+     * SWF
+     */
     protected SWF swf;
 
+    /**
+     * Line fill data
+     */
     protected StringBuilder lineFillData = null;
 
-    protected String lineLastRadColor = null;
+    /**
+     * Line last gradient color
+     */
+    protected String lineLastGradColor = null;
 
+    /**
+     * Line fill matrix
+     */
     protected Matrix lineFillMatrix = null;
 
+    /**
+     * Line fill matrix end
+     */
     protected Matrix lineFillMatrixEnd = null;
 
+    /**
+     * Line repeat count
+     */
     protected int lineRepeatCnt = 0;
 
+    /**
+     * Fill width
+     */
     protected int fillWidth;
 
+    /**
+     * Fill height
+     */
     protected int fillHeight;
 
+    /**
+     * Constructor.
+     *
+     * @param morphShapeNum Morph shape number
+     * @param swf SWF
+     * @param shape Shape
+     * @param endShape End shape
+     * @param colorTransform Color transform
+     * @param unitDivisor Unit divisor
+     * @param deltaX Delta X
+     * @param deltaY Delta Y
+     */
     public CanvasMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
         super(morphShapeNum, shape, endShape, colorTransform);
         this.deltaX = deltaX;
@@ -105,6 +189,13 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 + "\tctx.restore();\r\n}\r\n";
     }
 
+    /**
+     * Gets HTML.
+     * @param needed Needed
+     * @param id ID
+     * @param rect Rectangle
+     * @return HTML
+     */
     public String getHtml(String needed, String id, RECT rect) {
         int width = (int) (rect.getWidth() / unitDivisor);
         int height = (int) (rect.getHeight() / unitDivisor);
@@ -216,7 +307,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                         pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0)
                 )).append(";\r\n\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n");
                 fillData.append("\tgrd.addColorStop(s,").append(useRatioColor(r.color, r2.color)).append(");\r\n");
-                lastRadColor = useRatioColor(r.color, r2.color);
+                lastGradColor = useRatioColor(r.color, r2.color);
             }
             pos += oneHeight;
         }
@@ -334,7 +425,7 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 lineFillData.append("\tvar s=").append(useRatioDouble(pos + (oneHeight * (revert ? 255 - r.ratio : r.ratio) / 255.0), pos + (oneHeight * (revert ? 255 - r2.ratio : r2.ratio) / 255.0))).append(";\r\n");
                 lineFillData.append("\tif(s<0) s = 0;\r\n\tif(s>1) s = 1;\r\n");
                 lineFillData.append("\tgrd.addColorStop(s,").append(useRatioColor(r.color, r2.color)).append(");\r\n");
-                lineLastRadColor = useRatioColor(r.color, r2.color);
+                lineLastGradColor = useRatioColor(r.color, r2.color);
             }
             pos += oneHeight;
         }
@@ -408,6 +499,9 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 .append(Helper.doubleStr(anchorY2 / unitDivisor)).append(" ");
     }
 
+    /**
+     * Finalizes path.
+     */
     protected void finalizePath() {
         if (pathData != null && pathData.length() > 0) {
             shapeData.append("\tvar pathData=\"").append(pathData.toString().trim()).append("\";\r\n");
@@ -428,8 +522,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
                 preLineFillData.append("\tenhanceContext(lfctx);\r\n");
                 preLineFillData.append("\tlfctx.applyTransforms(ctx._matrix);\r\n");
                 preLineFillData.append("\tctx = lfctx;");
-                if (lineLastRadColor != null) {
-                    preLineFillData.append("\tctx.fillStyle=").append(lineLastRadColor).append(";\r\n ctx.fill(\"evenodd\");\r\n");
+                if (lineLastGradColor != null) {
+                    preLineFillData.append("\tctx.fillStyle=").append(lineLastGradColor).append(";\r\n ctx.fill(\"evenodd\");\r\n");
                 }
                 preLineFillData.append("\tctx.transform(").append(useRatioDouble(lineFillMatrix.scaleX / unitDivisor, lineFillMatrixEnd.scaleX / unitDivisor))
                         .append(",").append(useRatioDouble(lineFillMatrix.rotateSkew0 / unitDivisor, lineFillMatrixEnd.rotateSkew0 / unitDivisor))
@@ -463,8 +557,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
             }
             if (fillMatrix != null) {
                 pathData.append(drawFill);
-                if (lastRadColor != null) {
-                    pathData.append("\tctx.fillStyle=").append(lastRadColor).append(";\r\n\tctx.fill(\"evenodd\");\r\n");
+                if (lastGradColor != null) {
+                    pathData.append("\tctx.fillStyle=").append(lastGradColor).append(";\r\n\tctx.fill(\"evenodd\");\r\n");
                 }
                 pathData.append("\tctx.save();\r\n");
                 pathData.append("\tctx.clip();\r\n");
@@ -506,11 +600,11 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         strokeData = new StringBuilder();
         fillMatrix = null;
         fillMatrixEnd = null;
-        lastRadColor = null;
+        lastGradColor = null;
 
         lineRepeatCnt = 0;
         lineFillData = null;
-        lineLastRadColor = null;
+        lineLastGradColor = null;
         lineFillMatrix = null;
         lineFillMatrixEnd = null;
 
@@ -530,6 +624,10 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
         return "" + a + "+ratio*(" + (Helper.doubleStr(b - a)) + ")/" + DefineMorphShapeTag.MAX_RATIO;
     }
 
+    /**
+     * Gets shape data.
+     * @return Shape data
+     */
     public String getShapeData() {
         return shapeData.toString();
     }

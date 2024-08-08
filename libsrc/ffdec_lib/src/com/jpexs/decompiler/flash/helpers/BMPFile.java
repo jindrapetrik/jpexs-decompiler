@@ -85,6 +85,12 @@ public class BMPFile extends Component {
     private BMPFile() {
     }
 
+    /**
+     * Save bitmap to file.
+     * @param image Image to save
+     * @param file File to save to
+     * @throws IOException On I/O error
+     */
     public static void saveBitmap(Image image, File file) throws IOException {
         BMPFile b = new BMPFile();
         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {

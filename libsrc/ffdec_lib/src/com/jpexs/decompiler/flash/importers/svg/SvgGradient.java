@@ -26,15 +26,37 @@ import java.util.List;
  */
 abstract class SvgGradient extends SvgFill {
 
+    /**
+     * Stops
+     */
     public List<SvgStop> stops;
 
+    /**
+     * Gradient units
+     */
     public SvgGradientUnits gradientUnits;
 
+    /**
+     * Gradient transform
+     */
     public String gradientTransform;
 
+    /**
+     * Spread method
+     */
     public SvgSpreadMethod spreadMethod;
 
+    /**
+     * Interpolation
+     */
     public SvgInterpolation interpolation;
+
+    /**
+     * Constructor.
+     */
+    public SvgGradient() {
+
+    }
 
     @Override
     public Color toColor() {

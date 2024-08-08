@@ -26,9 +26,15 @@ import java.io.Serializable;
  */
 public class GLYPHENTRY implements Serializable {
 
+    /**
+     * Glyph index
+     */
     @SWFType(value = BasicType.UB, countField = "glyphBits")
     public int glyphIndex;
 
+    /**
+     * Glyph advance
+     */
     @SWFType(value = BasicType.SB, countField = "advanceBits")
     public int glyphAdvance;
 

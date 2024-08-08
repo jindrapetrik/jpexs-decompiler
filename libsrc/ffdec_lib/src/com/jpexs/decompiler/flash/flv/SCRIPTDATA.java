@@ -30,9 +30,20 @@ import java.util.logging.Logger;
  */
 public class SCRIPTDATA extends DATA {
 
+    /**
+     * Name
+     */
     public SCRIPTDATAVALUE name;
+    /**
+     * Value
+     */
     public SCRIPTDATAVALUE value;
 
+    /**
+     * Constructor.
+     * @param name Name
+     * @param value Value
+     */
     public SCRIPTDATA(SCRIPTDATAVALUE name, SCRIPTDATAVALUE value) {
         this.name = name;
         this.value = value;
@@ -50,6 +61,15 @@ public class SCRIPTDATA extends DATA {
         return baos.toByteArray();
     }
 
+    /**
+     * Creates simple onMetaData script data.
+     * @param duration Duration
+     * @param width Width
+     * @param height Height
+     * @param framerate Framerate
+     * @param videocodecid Video codec id
+     * @return Script data
+     */
     public static SCRIPTDATA simpleVideOnMetadata(double duration, double width, double height, double framerate, double videocodecid) {
         List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
@@ -62,6 +82,21 @@ public class SCRIPTDATA extends DATA {
         return new SCRIPTDATA(onMetadataKey, valuesList);
     }
 
+    /**
+     * Creates onMetaData script data.
+     * @param duration Duration
+     * @param width Width
+     * @param height Height
+     * @param videodatarate Video data rate
+     * @param framerate Framerate
+     * @param videocodecid Video codec id
+     * @param audiosamplerate Audio sample rate
+     * @param audiosamplesize Audio sample size
+     * @param stereo Stereo
+     * @param audiocodecid Audio codec id
+     * @param filesize File size
+     * @return Script data
+     */
     public static SCRIPTDATA onMetaData(double duration, double width, double height, double videodatarate, double framerate, double videocodecid, double audiosamplerate, double audiosamplesize, boolean stereo, double audiocodecid, double filesize) {
         List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));

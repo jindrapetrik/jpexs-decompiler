@@ -216,7 +216,7 @@ public class AVM2InstructionItem {
     /**
      * Set container last instructions.
      *
-     * @param lastInstructions
+     * @param lastInstructions List of instruction items
      */
     public void setContainerLastInstructions(List<AVM2InstructionItem> lastInstructions) {
         removeContainerLastInstructions();

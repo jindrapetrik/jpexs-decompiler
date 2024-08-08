@@ -23,10 +23,21 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class SCRIPTDATAVARIABLE {
 
+    /**
+     * Variable name
+     */
     public String variableName;
 
+    /**
+     * Variable data
+     */
     public SCRIPTDATAVALUE variableData;
 
+    /**
+     * Constructor.
+     * @param variableName Variable name
+     * @param variableData Variable data
+     */
     public SCRIPTDATAVARIABLE(String variableName, SCRIPTDATAVALUE variableData) {
         this.variableName = variableName;
         this.variableData = variableData;

@@ -42,6 +42,18 @@ import java.util.List;
  */
 public class DependencyParser {
 
+    /**
+     * Parses dependencies from namespace.
+     * @param abcIndex AbcIndexing
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param dependencies Dependencies
+     * @param namespace_index Namespace index
+     * @param ignorePackage Ignore package
+     * @param name Name
+     * @param dependencyType Dependency type
+     * @param uses Uses
+     */
     public static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, int namespace_index, DottedChain ignorePackage, String name, DependencyType dependencyType, List<String> uses) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         if (name.isEmpty()) {
@@ -90,6 +102,18 @@ public class DependencyParser {
         }
     }
 
+    /**
+     * Parses dependencies from multiname.
+     * @param abcIndex AbcIndexing
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param dependencies Dependencies
+     * @param m Multiname
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param dependencyType Dependency type
+     * @param uses Uses
+     */
     public static void parseDependenciesFromMultiname(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
@@ -117,6 +141,23 @@ public class DependencyParser {
         }
     }
 
+    /**
+     * Parses dependencies from method info.
+     * @param abcIndex AbcIndexing
+     * @param trait Trait
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param isStatic Is static
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param method_index Method index
+     * @param dependencies Dependencies
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param visitedMethods Visited methods
+     * @param uses Uses
+     * @throws InterruptedException On interrupt
+     */
     public static void parseDependenciesFromMethodInfo(AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods, List<String> uses) throws InterruptedException {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;

@@ -26,6 +26,18 @@ import com.jpexs.helpers.ByteArrayRange;
  */
 public class BinaryDataImporter extends TagImporter {
 
+    /**
+     * Constructor.
+     */
+    public BinaryDataImporter() {
+        super();
+    }
+
+    /**
+     * Imports new data to binary data tag.
+     * @param binaryDataTag Binary data tag
+     * @param newData New data
+     */
     public void importData(DefineBinaryDataTag binaryDataTag, byte[] newData) {
         binaryDataTag.binaryData = new ByteArrayRange(newData);
         binaryDataTag.innerSwf = null;

@@ -26,16 +26,32 @@ import java.io.Serializable;
  */
 public class MORPHLINESTYLE implements Serializable {
 
+    /**
+     * Start width
+     */
     @SWFType(BasicType.UI16)
     public int startWidth;
 
+    /**
+     * End width
+     */
     @SWFType(BasicType.UI16)
     public int endWidth;
 
+    /**
+     * Start color
+     */
     public RGBA startColor;
 
+    /**
+     * End color
+     */
     public RGBA endColor;
 
+    /**
+     * Gets start line style.
+     * @return Start line style
+     */
     public LINESTYLE getStartLineStyle() {
         LINESTYLE ret = new LINESTYLE();
         ret.color = startColor;
@@ -43,6 +59,11 @@ public class MORPHLINESTYLE implements Serializable {
         return ret;
     }
 
+    /**
+     * Gets line style at given ratio.
+     * @param ratio Ratio
+     * @return Line style
+     */
     public LINESTYLE getLineStyleAt(int ratio) {
         LINESTYLE ret = new LINESTYLE();
         ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
@@ -50,6 +71,10 @@ public class MORPHLINESTYLE implements Serializable {
         return ret;
     }
 
+    /**
+     * Gets end line style.
+     * @return End line style
+     */
     public LINESTYLE getEndLineStyle() {
         LINESTYLE ret = new LINESTYLE();
         ret.color = endColor;

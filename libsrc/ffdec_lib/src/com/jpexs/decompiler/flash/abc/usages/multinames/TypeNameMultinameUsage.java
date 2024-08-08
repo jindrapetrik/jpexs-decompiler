@@ -26,8 +26,18 @@ import java.util.ArrayList;
  */
 public class TypeNameMultinameUsage extends MultinameUsage {
 
+    /**
+     * Type name index
+     */
     protected int typename_index;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param typename_index Type name index
+     * @param scriptIndex Script index
+     */
     public TypeNameMultinameUsage(ABC abc, int multinameIndex, int typename_index, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.typename_index = typename_index;
@@ -71,6 +81,10 @@ public class TypeNameMultinameUsage extends MultinameUsage {
         return false;
     }
 
+    /**
+     * Get type name index.
+     * @return Type name index
+     */
     public int getTypenameIndex() {
         return typename_index;
     }

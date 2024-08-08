@@ -26,10 +26,21 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
  */
 public class ExceptionMarkAVM2Instruction extends AVM2Instruction {
 
+    /**
+     * Mark type
+     */
     public int markType;
 
+    /**
+     * Exception id
+     */
     public int exceptionId;
 
+    /**
+     * Constructor.
+     * @param exceptionId Exception id
+     * @param markType Mark type
+     */
     public ExceptionMarkAVM2Instruction(int exceptionId, int markType) {
         super(0, null, null);
         this.markType = markType;

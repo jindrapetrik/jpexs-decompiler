@@ -125,6 +125,13 @@ public class AS3ScriptExporter {
         return new XmlPrettyFormat().prettyFormat(input, 5, false);
     }
 
+    /**
+     * Constructor.
+     */
+    public AS3ScriptExporter() {
+
+    }
+
     private String handleMxmlMethod(AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
         StringBuilder out = new StringBuilder();
         int method = t.method_info;
@@ -372,6 +379,17 @@ public class AS3ScriptExporter {
         return hdr + prettyFormatXML(out.toString());
     }
 
+    /**
+     * Export ActionScript 3 scripts.
+     * @param swf SWF
+     * @param handler AbortRetryIgnoreHandler
+     * @param outdir Output directory
+     * @param as3scripts List of AS3 scripts
+     * @param exportSettings Export settings
+     * @param parallel Parallel
+     * @param evl EventListener
+     * @return List of exported files
+     */
     public List<File> exportActionScript3(SWF swf, AbortRetryIgnoreHandler handler, String outdir, List<ScriptPack> as3scripts, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         final List<File> ret = new ArrayList<>();
         final List<ScriptPack> packs = as3scripts != null ? as3scripts : swf.getAS3Packs();

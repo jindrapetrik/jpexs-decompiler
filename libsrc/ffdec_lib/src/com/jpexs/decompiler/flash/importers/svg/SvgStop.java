@@ -25,10 +25,21 @@ import java.awt.Color;
  */
 class SvgStop implements Comparable<SvgStop> {
 
+    /**
+     * Color
+     */
     public Color color;
 
+    /**
+     * Offset
+     */
     public double offset;
 
+    /**
+     * Constructor.
+     * @param color Color
+     * @param offset Offset
+     */
     public SvgStop(Color color, double offset) {
         this.color = color;
         this.offset = offset;

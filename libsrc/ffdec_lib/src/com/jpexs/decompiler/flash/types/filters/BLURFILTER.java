@@ -49,10 +49,16 @@ public class BLURFILTER extends FILTER {
     @SWFType(value = BasicType.UB, count = 5)
     public int passes = 1;
 
+    /**
+     * Reserved
+     */
     @Reserved
     @SWFType(value = BasicType.UB, count = 3)
     public int reserved;
 
+    /**
+     * Constructor.
+     */
     public BLURFILTER() {
         super(1);
     }

@@ -28,17 +28,39 @@ import java.io.OutputStream;
  */
 public abstract class SoundDecoder {
 
+    /**
+     * Sound format
+     */
     public SoundFormat soundFormat;
 
+    /**
+     * Constructor.
+     *
+     * @param soundFormat Sound format
+     */
     public SoundDecoder(SoundFormat soundFormat) {
         this.soundFormat = soundFormat;
     }
 
+    /**
+     * Decodes sound data from SWF input stream.
+     *
+     * @param sis SWF input stream
+     * @return Decoded sound data
+     * @throws IOException On I/O error
+     */
     public byte[] decode(SWFInputStream sis) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         decode(sis, baos);
         return baos.toByteArray();
     }
 
+    /**
+     * Decodes sound data from SWF input stream and writes it to output stream.
+     *
+     * @param sis SWF input stream
+     * @param os Output stream
+     * @throws IOException On I/O error
+     */
     public abstract void decode(SWFInputStream sis, OutputStream os) throws IOException;
 }

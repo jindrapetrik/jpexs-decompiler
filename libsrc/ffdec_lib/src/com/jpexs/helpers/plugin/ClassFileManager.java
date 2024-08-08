@@ -42,7 +42,7 @@ public class ClassFileManager extends
     /**
      * Will initialize the manager with the specified standard java file manager
      *
-     * @param standardManager
+     * @param standardManager The standard file manager
      */
     public ClassFileManager(StandardJavaFileManager standardManager) {
         super(standardManager);
@@ -54,8 +54,8 @@ public class ClassFileManager extends
      * byte code created by the compiler and stored in the JavaClassObject, and
      * returns the Class for it
      *
-     * @param location
-     * @return
+     * @param location Location
+     * @return Class loader
      */
     @Override
     public ClassLoader getClassLoader(Location location) {
@@ -74,12 +74,12 @@ public class ClassFileManager extends
      * Gives the compiler an instance of the JavaClassObject so that the
      * compiler can write the byte code into it.
      *
-     * @param location
-     * @param className
-     * @param kind
-     * @param sibling
-     * @return
-     * @throws java.io.IOException
+     * @param location Location
+     * @param className Class name
+     * @param kind Kind
+     * @param sibling Sibling
+     * @return Java file object
+     * @throws IOException On I/O error
      */
     @Override
     public JavaFileObject getJavaFileForOutput(Location location,

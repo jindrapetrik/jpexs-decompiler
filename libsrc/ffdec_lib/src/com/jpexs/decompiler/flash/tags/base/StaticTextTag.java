@@ -57,21 +57,52 @@ import java.util.regex.Pattern;
  */
 public abstract class StaticTextTag extends TextTag {
 
+    /**
+     * Character ID
+     */
     @SWFType(BasicType.UI16)
     public int characterID;
 
+    /**
+     * Glyph bits
+     */
     protected int glyphBits;
 
+    /**
+     * Advance bits
+     */
     protected int advanceBits;
 
+    /**
+     * Text bounds
+     */
     public RECT textBounds;
 
+    /**
+     * Text matrix
+     */
     public MATRIX textMatrix;
 
+    /**
+     * Text records
+     */
     public List<TEXTRECORD> textRecords;
 
+    /**
+     * Gets text number.
+     * DefineText = 1, DefineText2 = 2
+     *
+     * @return Text num
+     */
     public abstract int getTextNum();
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public StaticTextTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -637,6 +668,15 @@ public abstract class StaticTextTag extends TextTag {
         return true;
     }
 
+    /**
+     * Gets advance.
+     * @param font Font
+     * @param glyphIndex Glyph index
+     * @param textHeight Text height
+     * @param c Character
+     * @param nextChar Next character
+     * @return Advance
+     */
     public static int getAdvance(FontTag font, int glyphIndex, int textHeight, char c, Character nextChar) {
         int advance;
         if (font.hasLayout()) {
@@ -653,6 +693,13 @@ public abstract class StaticTextTag extends TextTag {
         return advance;
     }
 
+    /**
+     * Detects letter spacing.
+     * @param textRecord Text record
+     * @param font Font
+     * @param textHeight Text height
+     * @return Letter spacing
+     */
     public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
         int minLetterSpacing = Integer.MAX_VALUE;
         int numNegatives = 0;

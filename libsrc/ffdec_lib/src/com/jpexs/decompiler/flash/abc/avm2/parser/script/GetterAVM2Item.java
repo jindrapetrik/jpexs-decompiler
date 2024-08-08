@@ -27,6 +27,30 @@ import java.util.Map;
  */
 public class GetterAVM2Item extends MethodAVM2Item {
 
+    /**
+     * Constructor.
+     * @param allOpenedNamespaces All opened namespaces
+     * @param outsidePackage Outside package
+     * @param isPrivate Is private
+     * @param metadata Metadata
+     * @param pkg Package
+     * @param isInterface Is interface
+     * @param isNative Is native
+     * @param customNamespace Custom namespace
+     * @param needsActivation Needs activation
+     * @param hasRest Has rest
+     * @param line Line
+     * @param override Override
+     * @param isFinal Is final
+     * @param isStatic Is static
+     * @param methodName Method name
+     * @param paramTypes Parameter types
+     * @param paramNames Parameter names
+     * @param paramValues Parameter values
+     * @param body Body
+     * @param subvariables Subvariables
+     * @param retType Return type
+     */
     public GetterAVM2Item(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean isNative, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(allOpenedNamespaces, outsidePackage, isPrivate, metadata, pkg, isInterface, isNative, customNamespace, needsActivation, hasRest, line, override, isFinal, isStatic, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
     }

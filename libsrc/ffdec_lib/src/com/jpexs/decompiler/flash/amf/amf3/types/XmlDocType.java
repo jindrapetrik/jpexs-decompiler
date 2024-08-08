@@ -23,14 +23,26 @@ public class XmlDocType implements Amf3ValueType {
 
     private String data;
 
+    /**
+     * Constructor.
+     * @param data Data
+     */
     public XmlDocType(String data) {
         this.data = data;
     }
 
+    /**
+     * Gets data.
+     * @return Data
+     */
     public String getData() {
         return data;
     }
 
+    /**
+     * Sets data.
+     * @param data Data
+     */
     public void setData(String data) {
         this.data = data;
     }

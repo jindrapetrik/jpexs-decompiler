@@ -26,10 +26,21 @@ import java.util.Map;
  */
 public class MissingCharacterHandler {
 
+    /**
+     * Checks if missing characters should be ignored.
+     * @return True if missing characters should be ignored, false otherwise.
+     */
     public boolean getIgnoreMissingCharacters() {
         return false;
     }
 
+    /**
+     * Handles missing character.
+     * @param textTag Text tag
+     * @param font Font tag
+     * @param character Missing character
+     * @return True if character was handled, false otherwise.
+     */
     public boolean handle(TextTag textTag, FontTag font, char character) {
         String fontName = font.getFontNameIntag();
         if (!FontTag.getInstalledFontsByFamily().containsKey(fontName)) {

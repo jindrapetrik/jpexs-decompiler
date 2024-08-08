@@ -124,14 +124,29 @@ import java.util.regex.Pattern;
  */
 public class AVM2SourceGenerator implements SourceGenerator {
 
+    /**
+     * ABC indexing
+     */
     public final AbcIndexing abcIndex;
 
+    /**
+     * Mark - exception start
+     */
     public static final int MARK_E_START = 0;
 
+    /**
+     * Mark - exception end
+     */
     public static final int MARK_E_END = 1;
 
+    /**
+     * Mark - exception target
+     */
     public static final int MARK_E_TARGET = 2;
 
+    /**
+     * Mark - exception finally part
+     */
     public static final int MARK_E_FINALLYPART = 3;
 
     private static int currentFinId = 1;
@@ -142,11 +157,23 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     private long uniqLast = 0;
 
+    /**
+     * Generate a new unique id
+     * @return Unique id
+     */
     public String uniqId() {
         uniqLast++;
         return "" + uniqLast;
     }
 
+    /**
+     * Resolve type.
+     * @param localData Local data
+     * @param item Item
+     * @param abcIndex ABC indexing
+     * @return Type index
+     * @throws CompilationException On compilation error
+     */
     public static int resolveType(SourceGeneratorLocalData localData, GraphTargetItem item, AbcIndexing abcIndex) throws CompilationException {
         int name_index = 0;
         GraphTargetItem typeItem = null;
@@ -271,6 +298,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return SWFInputStream.BYTE_ARRAY_EMPTY;
     }
 
+    /**
+     * Converts list of source items to list of instructions
+     * @param items List of source items
+     * @return List of instructions
+     */
     public ArrayList<AVM2Instruction> toInsList(List<GraphSourceItem> items) {
         ArrayList<AVM2Instruction> ret = new ArrayList<>();
         for (GraphSourceItem s : items) {
@@ -373,6 +405,17 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
+    /**
+     * Generate for (each) in loop.
+     * @param localData Local data
+     * @param loop Loop
+     * @param collection Collection
+     * @param assignable Assignable
+     * @param commands Commands
+     * @param each Each
+     * @return List of source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generateForIn(SourceGeneratorLocalData localData, Loop loop, GraphTargetItem collection, AssignableAVM2Item assignable, List<GraphTargetItem> commands, final boolean each) throws CompilationException {
         localData.openedLoops.add(loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -452,38 +495,83 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return toInsList(command.toSource(localData, this));
     }
 
+    /**
+     * Gets register variables.
+     * @param localData Local data
+     * @return Register variables
+     */
     public HashMap<String, Integer> getRegisterVars(SourceGeneratorLocalData localData) {
         return localData.registerVars;
     }
 
+    /**
+     * Sets register variables.
+     * @param localData Local data
+     * @param value Value
+     */
     public void setRegisterVars(SourceGeneratorLocalData localData, HashMap<String, Integer> value) {
         localData.registerVars = value;
     }
 
+    /**
+     * Sets in function.
+     * @param localData Local data
+     * @param value Value
+     */
     public void setInFunction(SourceGeneratorLocalData localData, int value) {
         localData.inFunction = value;
     }
 
+    /**
+     * Gets in function.
+     * @param localData Local data
+     * @return In function
+     */
     public int isInFunction(SourceGeneratorLocalData localData) {
         return localData.inFunction;
     }
 
+    /**
+     * Checks if in method.
+     * @param localData Local data
+     * @return True if in method
+     */
     public boolean isInMethod(SourceGeneratorLocalData localData) {
         return localData.inMethod;
     }
 
+    /**
+     * Sets in method.
+     * @param localData Local data
+     * @param value Value
+     */
     public void setInMethod(SourceGeneratorLocalData localData, boolean value) {
         localData.inMethod = value;
     }
 
+    /**
+     * Gets for in level.
+     * @param localData Local data
+     * @return For in level
+     */
     public int getForInLevel(SourceGeneratorLocalData localData) {
         return localData.forInLevel;
     }
 
+    /**
+     * Sets for in level.
+     * @param localData Local data
+     * @param value Value
+     */
     public void setForInLevel(SourceGeneratorLocalData localData, int value) {
         localData.forInLevel = value;
     }
 
+    /**
+     * Gets temp register.
+     * @param localData Local data
+     * @return Temp register
+     */
     public int getTempRegister(SourceGeneratorLocalData localData) {
         HashMap<String, Integer> registerVars = getRegisterVars(localData);
         int tmpReg = 0;
@@ -496,6 +584,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return tmpReg;
     }
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     */
     public AVM2SourceGenerator(AbcIndexing abc) {
         this.abcIndex = abc;
     }
@@ -503,6 +595,33 @@ public class AVM2SourceGenerator implements SourceGenerator {
     /*public ABC getABC() {
      return abc;
      }*/
+
+    /**
+     * Generate class.
+     * @param importedClasses Imported classes
+     * @param cinitVariables Cinit variables
+     * @param cinitNeedsActivation Cinit needs activation
+     * @param cinit Cinit
+     * @param openedNamespaces Opened namespaces
+     * @param namespace Namespace
+     * @param initScope Init scope
+     * @param pkg Package
+     * @param classInfo Class info
+     * @param instanceInfo Instance info
+     * @param localData Local data
+     * @param isInterface Is interface
+     * @param baseClassName Base class name
+     * @param superName Super name
+     * @param extendsVal Extends value
+     * @param implementsStr Implements
+     * @param iinit Instance initializer
+     * @param iinitVariables Instance initializer variables
+     * @param iinitNeedsActivation Instance initializer needs activation
+     * @param traitItems Trait items
+     * @param class_index Class index
+     * @throws AVM2ParseException On parse error
+     * @throws CompilationException On compilation error
+     */
     public void generateClass(List<DottedChain> importedClasses, List<AssignableAVM2Item> cinitVariables, boolean cinitNeedsActivation, List<GraphTargetItem> cinit, List<NamespaceItem> openedNamespaces, int namespace, int initScope, DottedChain pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String baseClassName, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, boolean iinitNeedsActivation, List<GraphTargetItem> traitItems, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         localData.currentClassBaseName = baseClassName;
         localData.pkg = pkg;
@@ -715,6 +834,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
+    /**
+     * Generates class.
+     * @param namespace Namespace
+     * @param ci Class info
+     * @param ii Instance info
+     * @param initScope Init scope
+     * @param pkg Package
+     * @param localData Local data
+     * @param cls Class
+     * @param class_index Class index
+     * @return Class index
+     * @throws AVM2ParseException On parse error
+     * @throws CompilationException On compilation error
+     */
     public int generateClass(int namespace, ClassInfo ci, InstanceInfo ii, int initScope, DottedChain pkg, SourceGeneratorLocalData localData, AVM2Item cls, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         /*ClassInfo ci = new ClassInfo();
          InstanceInfo ii = new InstanceInfo();
@@ -755,10 +888,23 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abcIndex.getSelectedAbc().instance_info.size() - 1;
     }
 
+    /**
+     * Gets trait name.
+     * @param namespace Namespace
+     * @param var Variable
+     * @return Multiname index
+     */
     public int traitName(int namespace, String var) {
         return abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createQName(false, str(var), namespace), true);
     }
 
+    /**
+     * Gets type name.
+     * @param localData Local data
+     * @param type Type
+     * @return Multiname index
+     * @throws CompilationException On compilation error
+     */
     public int typeName(SourceGeneratorLocalData localData, GraphTargetItem type) throws CompilationException {
         if (type.equals(TypeItem.UNBOUNDED)) {
             return 0;
@@ -787,6 +933,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
          }*/
     }
 
+    /**
+     * Gets identifier from name.
+     * @param name Name
+     * @return Identifier
+     */
     public int ident(GraphTargetItem name) {
         if (name instanceof NameAVM2Item) {
             return str(((NameAVM2Item) name).getVariableName());
@@ -794,14 +945,30 @@ public class AVM2SourceGenerator implements SourceGenerator {
         throw new RuntimeException("no ident"); //FIXME
     }
 
+    /**
+     * Gets namespace.
+     * @param nsKind Namespace kind
+     * @param name Name
+     * @return Namespace index
+     */
     public int namespace(int nsKind, String name) {
         return abcIndex.getSelectedAbc().constants.getNamespaceId(nsKind, str(name), 0, true);
     }
 
+    /**
+     * Gets string
+     * @param name Name
+     * @return String index
+     */
     public int str(String name) {
         return abcIndex.getSelectedAbc().constants.getStringId(name, true);
     }
 
+    /**
+     * Gets property name.
+     * @param name Name
+     * @return Multiname index
+     */
     public int propertyName(GraphTargetItem name) {
         if (name instanceof NameAVM2Item) {
             NameAVM2Item va  = (NameAVM2Item) name;
@@ -810,6 +977,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         throw new RuntimeException("no prop"); //FIXME
     }
 
+    /**
+     * Gets free register.
+     * @param localData Local data
+     * @return Register
+     */
     public int getFreeRegister(SourceGeneratorLocalData localData) {
         for (int i = 0;; i++) {
             if (!localData.registerVars.containsValue(i)) {
@@ -819,6 +991,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
+    /**
+     * Kills register.
+     * @param localData Local data
+     * @param i Register
+     * @return True if register was killed
+     */
     public boolean killRegister(SourceGeneratorLocalData localData, int i) {
         String key = null;
         for (String k : localData.registerVars.keySet()) {
@@ -834,6 +1012,32 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
+    /**
+     * Gets method.
+     * @param isStatic Is static
+     * @param name_index Name index
+     * @param subMethod Sub method
+     * @param isInterface Is interface
+     * @param isNative Is native
+     * @param callStack Call stack
+     * @param pkg Package
+     * @param needsActivation Needs activation
+     * @param subvariables Subvariables
+     * @param initScope Init scope
+     * @param hasRest Has rest
+     * @param line Line
+     * @param classBaseName Class base name
+     * @param superType Super type
+     * @param constructor Constructor
+     * @param localData Local data
+     * @param paramTypes Parameter types
+     * @param paramNames Parameter names
+     * @param paramValues Parameter values
+     * @param body Body
+     * @param retType Return type
+     * @return Method index
+     * @throws CompilationException On compilation error
+     */
     public int method(boolean isStatic, int name_index, boolean subMethod, boolean isInterface, boolean isNative, List<MethodBody> callStack, DottedChain pkg, boolean needsActivation, List<AssignableAVM2Item> subvariables, int initScope, boolean hasRest, int line, String classBaseName, String superType, boolean constructor, SourceGeneratorLocalData localData, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, GraphTargetItem retType) throws CompilationException {
         //Reference<Boolean> hasArgs = new Reference<>(Boolean.FALSE);
         //calcRegisters(localData,needsActivation,paramNames,subvariables,body, hasArgs);
@@ -1301,6 +1505,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return mindex;
     }
 
+    /**
+     * Gets value kind.
+     * @param ns Namespace
+     * @param type Type
+     * @param val Value
+     * @param generatedNs Generated namespace
+     * @return Value kind
+     */
     public ValueKind getValueKind(int ns, GraphTargetItem type, GraphTargetItem val, boolean generatedNs) {
 
         if (val instanceof BooleanAVM2Item) {
@@ -1358,6 +1570,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ns.getCpoolIndex(abcIndex);
     }
 
+    /**
+     * Generates traits phase 2.
+     * @param importedClasses Imported classes
+     * @param pkg Package
+     * @param items Items
+     * @param traits Traits
+     * @param openedNamespaces Opened namespaces
+     * @param localData Local data
+     * @throws CompilationException On compilation error
+     */
     public void generateTraitsPhase2(List<DottedChain> importedClasses, DottedChain pkg, List<GraphTargetItem> items, Trait[] traits, List<NamespaceItem> openedNamespaces, SourceGeneratorLocalData localData) throws CompilationException {
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
@@ -1407,6 +1629,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
+    /**
+     * Generates traits phase 3.
+     * @param items Items
+     * @param traits Traits
+     * @param localData Local data
+     * @throws CompilationException On compilation error
+     */
     public void generateTraitsPhase3(List<GraphTargetItem> items, Trait[] traits, SourceGeneratorLocalData localData) throws CompilationException {
         for (int k = 0; k < items.size(); k++) {
             GraphTargetItem item = items.get(k);
@@ -1473,6 +1702,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
+    /**
+     * Gets super interface name.
+     * @param localData Local data
+     * @param un Unresolved item
+     * @return Multiname index
+     * @throws CompilationException On compilation error
+     */
     public int superIntName(SourceGeneratorLocalData localData, GraphTargetItem un) throws CompilationException {
         if (un instanceof UnresolvedAVM2Item) {
             ((UnresolvedAVM2Item) un).resolve(localData, localData.getFullClass(), null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
@@ -1488,6 +1724,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
+    /**
+     * Generates metadata
+     * @param metadata Metadata
+     * @param abc ABC
+     * @return Metadata indices
+     */
     public int[] generateMetadata(List<Map.Entry<String, Map<String, String>>> metadata, ABC abc) {
         List<Integer> retList = new ArrayList<>();
         for (int i = 0; i < metadata.size(); i++) {
@@ -1514,6 +1756,25 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates traits phase 4.
+     * @param importedClasses Imported classes
+     * @param openedNamespaces Opened namespaces
+     * @param methodInitScope Method init scope
+     * @param isInterface Is interface
+     * @param className Class name
+     * @param superName Super name
+     * @param generateStatic Generate static
+     * @param localData Local data
+     * @param items Items
+     * @param ts Traits
+     * @param traits Traits
+     * @param initScopes Init scopes
+     * @param class_index Class index
+     * @param isScriptTraits Is script traits
+     * @throws AVM2ParseException On parse error
+     * @throws CompilationException On compilation error
+     */
     public void generateTraitsPhase4(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, int methodInitScope, boolean isInterface, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Trait[] traits, Map<Trait, Integer> initScopes, Reference<Integer> class_index, boolean isScriptTraits) throws AVM2ParseException, CompilationException {
 
         //Note: Names must be generated first before accesed in inner subs
@@ -1651,6 +1912,22 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return abcIndex.getSelectedAbc().constants.getStringId(sb.toString(), true);
     }
 
+    /**
+     * Generates traits phase 1.
+     * @param importedClasses Imported classes
+     * @param openedNamespaces Opened namespaces
+     * @param className Class name
+     * @param superName Super name
+     * @param generateStatic Generate static
+     * @param localData Local data
+     * @param items Items
+     * @param ts Traits
+     * @param classIndex Class index
+     * @param isScriptTraits Is script traits
+     * @return Traits
+     * @throws AVM2ParseException On parse error
+     * @throws CompilationException On compilation error
+     */
     public Trait[] generateTraitsPhase1(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, String className, String superName, boolean generateStatic, SourceGeneratorLocalData localData, List<GraphTargetItem> items, Traits ts, Reference<Integer> classIndex, boolean isScriptTraits) throws AVM2ParseException, CompilationException {
         Trait[] traits = new Trait[items.size()];
         int slot_id = 1;
@@ -1801,6 +2078,17 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return traits;
     }
 
+    /**
+     * Generates script info.
+     * @param scriptIndex Script index
+     * @param scriptInfo Script info
+     * @param allOpenedNamespaces All opened namespaces
+     * @param localData Local data
+     * @param commands Commands
+     * @param classPos Class position
+     * @throws AVM2ParseException On parse error
+     * @throws CompilationException On compilation error
+     */
     public void generateScriptInfo(int scriptIndex, ScriptInfo scriptInfo, List<List<NamespaceItem>> allOpenedNamespaces, SourceGeneratorLocalData localData, List<GraphTargetItem> commands, int classPos) throws AVM2ParseException, CompilationException {
         Reference<Integer> class_index = new Reference<>(classPos);
         localData.currentScript = scriptInfo;
@@ -1925,6 +2213,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     }
 
+    /**
+     * Parent names add names.
+     * @param abc ABC
+     * @param name_index Name index
+     * @param indices Indices
+     * @param names Names
+     * @param namespaces Namespaces
+     */
     public static void parentNamesAddNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
         List<Integer> cindices = new ArrayList<>();
 
@@ -1947,6 +2243,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
     }
 
+    /**
+     * Gets trait return type.
+     * @param abc ABC
+     * @param t Trait
+     * @return Trait return type
+     */
     public static GraphTargetItem getTraitReturnType(AbcIndexing abc, Trait t) {
         if (t instanceof TraitSlotConst) {
             TraitSlotConst tsc = (TraitSlotConst) t;
@@ -1974,6 +2276,28 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return TypeItem.UNBOUNDED;
     }
 
+    /**
+     * Searches prototype chain.
+     * @param namespaceSuffix Namespace suffix
+     * @param otherNs Other namespaces
+     * @param privateNs Private namespace
+     * @param protectedNs Protected namespace
+     * @param instanceOnly Instance only
+     * @param abc ABC
+     * @param pkg Package
+     * @param obj Object
+     * @param propertyName Property name
+     * @param outName Out name
+     * @param outNs Out namespace
+     * @param outPropNs Out property namespace
+     * @param outPropNsKind Out property namespace kind
+     * @param outPropNsIndex Out property namespace index
+     * @param outPropType Out property type
+     * @param outPropValue Out property value
+     * @param outPropValueAbc Out property value ABC
+     * @param isType Is type
+     * @return True if found
+     */
     public static boolean searchPrototypeChain(Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType) {
         // private and protected namespaces first so we find overriding functions before overridden functions
         if (namespaceSuffix != null) {
@@ -2025,6 +2349,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return false;
     }
 
+    /**
+     * Parent names.
+     * @param abc ABC
+     * @param name_index Name index
+     * @param indices Indices
+     * @param names Names
+     * @param namespaces Namespaces
+     * @param outABCs Out ABCs
+     */
     public static void parentNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
         AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc().constants, true /*FIXME!!*/)), null, null/*FIXME?*/);
         while (ci != null) {
@@ -2047,6 +2380,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.PushTrue));
     }
 
+    /**
+     * Generates GetDescendants.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, GetDescendantsAVM2Item item) throws CompilationException {
 
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
@@ -2096,6 +2436,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates XMLFilter.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, XMLFilterAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         final Reference<Integer> counterReg = new Reference<>(0);
@@ -2206,10 +2553,24 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates for each in loop.
+     * @param localData Local data
+     * @param item Loop item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForEachInAVM2Item item) throws CompilationException {
         return generateForIn(localData, item.loop, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, true);
     }
 
+    /**
+     * Generates for in loop.
+     * @param localData Local data
+     * @param item Loop item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForInAVM2Item item) throws CompilationException {
         return generateForIn(localData, item.loop, item.expression.collection, (AssignableAVM2Item) item.expression.object, item.commands, false);
     }
@@ -2249,6 +2610,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates with statement.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WithAVM2Item item) throws CompilationException {
 
         List<GraphSourceItem> ret = new ArrayList<>();
@@ -2442,6 +2810,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates function.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, FunctionAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         int scope = 0;
@@ -2464,6 +2839,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates try-catch-finally.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TryAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
 
@@ -2822,6 +3204,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates return value.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ReturnValueAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(item.value.toSource(localData, this));
@@ -2852,6 +3241,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates return void.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ReturnVoidAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         if (!localData.finallyCatches.isEmpty()) {
@@ -2878,6 +3274,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return ret;
     }
 
+    /**
+     * Generates throw.
+     * @param localData Local data
+     * @param item Item
+     * @return Source items
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ThrowAVM2Item item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(item.value.toSource(localData, this));

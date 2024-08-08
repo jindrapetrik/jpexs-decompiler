@@ -18,9 +18,6 @@ package com.jpexs.decompiler.flash.helpers.hilight;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -31,8 +28,14 @@ import java.util.WeakHashMap;
  */
 public class Highlighting implements Serializable {
 
+    /**
+     * Type
+     */
     public HighlightType type;
 
+    /**
+     * Highlighted text
+     */
     public String HighlightedText;
 
     /**
@@ -47,10 +50,22 @@ public class Highlighting implements Serializable {
 
     private final HighlightData properties;
 
+    /**
+     * Gets properties.
+     * @return Properties
+     */
     public HighlightData getProperties() {
         return properties;
     }
 
+    /**
+     * Searches for a highlighting with the specified properties.
+     * @param list List of highlightings
+     * @param properties Highlighting properties
+     * @param from Starting position
+     * @param to Ending position
+     * @return Highlighting
+     */
     public static Highlighting search(HighlightingList list, HighlightData properties, long from, long to) {
         Highlighting ret = null;
         looph:
@@ -85,14 +100,36 @@ public class Highlighting implements Serializable {
         return null;
     }
 
+    /**
+     * Searches for a highlighting with the specified position.
+     * @param list List of highlightings
+     * @param pos Position
+     * @return Highlighting
+     */
     public static Highlighting searchPos(HighlightingList list, long pos) {
         return searchPos(list, pos, -1, -1);
     }
 
+    /**
+     * Searches for a highlighting with the specified position.
+     * @param list List of highlightings
+     * @param pos Position
+     * @param from Starting position
+     * @param to Ending position
+     * @return Highlighting
+     */
     public static Highlighting searchPos(HighlightingList list, long pos, long from, long to) {
         return searchPosNew(list, pos, from, to);
     }
 
+    /**
+     * Searches for a highlighting with the specified position. New version.
+     * @param list List of highlightings
+     * @param pos Position
+     * @param from Starting position
+     * @param to Ending position
+     * @return Highlighting
+     */
     public static Highlighting searchPosNew(HighlightingList list, long pos, long from, long to) {
         Highlighting[] hmap = posToHighlightMap(list);
         if (pos > -1) {
@@ -143,6 +180,7 @@ public class Highlighting implements Serializable {
 
         return ret;
     }*/
+
     private static final Map<HighlightingList, Highlighting[]> listToPosMap = new WeakHashMap<>();
 
     private static Highlighting[] posToHighlightMap(HighlightingList list) {
@@ -171,10 +209,24 @@ public class Highlighting implements Serializable {
         return map;
     }
 
+    /**
+     * Searches for a highlighting with the specified offset.
+     * @param list List of highlightings
+     * @param offset Offset
+     * @return Highlighting
+     */
     public static Highlighting searchOffset(HighlightingList list, long offset) {
         return searchOffset(list, offset, -1, -1);
     }
 
+    /**
+     * Searches for a highlighting with the specified offset.
+     * @param list List of highlightings
+     * @param offset Offset
+     * @param from Starting position
+     * @param to Ending position
+     * @return Highlighting
+     */
     public static Highlighting searchOffset(HighlightingList list, long offset, long from, long to) {
         looph:
         for (Highlighting h : list) {
@@ -198,10 +250,24 @@ public class Highlighting implements Serializable {
         return null;
     }
 
+    /**
+     * Searches for a highlighting with the specified index.
+     * @param list List of highlightings
+     * @param index Index
+     * @return Highlighting
+     */
     public static Highlighting searchIndex(HighlightingList list, long index) {
         return searchIndex(list, index, -1, -1);
     }
 
+    /**
+     * Searches for a highlighting with the specified index.
+     * @param list List of highlightings
+     * @param index Index
+     * @param from Starting position
+     * @param to Ending position
+     * @return Highlighting
+     */
     public static Highlighting searchIndex(HighlightingList list, long index, long from, long to) {
         looph:
         for (Highlighting h : list) {
@@ -225,6 +291,12 @@ public class Highlighting implements Serializable {
         return null;
     }
 
+    /**
+     * Searche all highlightings with the specified position.
+     * @param list List of highlightings
+     * @param pos Position
+     * @return List of highlightings
+     */
     public static HighlightingList searchAllPos(HighlightingList list, long pos) {
         HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
@@ -236,6 +308,12 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
+    /**
+     * Searche all highlightings with the specified index.
+     * @param list List of highlightings
+     * @param index Index
+     * @return List of highlightings
+     */
     public static HighlightingList searchAllIndexes(HighlightingList list, long index) {
         HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
@@ -248,6 +326,13 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
+
+    /**
+     * Searche all highlightings with the specified local name.
+     * @param list List of highlightings
+     * @param localName Local name
+     * @return List of highlightings
+     */
     public static HighlightingList searchAllLocalNames(HighlightingList list, String localName) {
         HighlightingList ret = new HighlightingList();
         for (Highlighting h : list) {
@@ -259,11 +344,6 @@ public class Highlighting implements Serializable {
         return ret;
     }
 
-    /**
-     * Returns a string representation of the object
-     *
-     * @return a string representation of the object.
-     */
     @Override
     public String toString() {
         return startPos + "-" + (startPos + len) + " type:" + type;
@@ -273,7 +353,7 @@ public class Highlighting implements Serializable {
      * @param startPos Starting position
      * @param data Highlighting data
      * @param type Highlighting type
-     * @param text
+     * @param text Highlighted text
      */
     public Highlighting(int startPos, HighlightData data, HighlightType type, String text) {
         this.startPos = startPos;

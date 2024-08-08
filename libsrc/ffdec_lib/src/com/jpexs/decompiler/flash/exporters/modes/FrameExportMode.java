@@ -22,12 +22,36 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum FrameExportMode {
+    /**
+     * PNG - Portable Network Graphics
+     */
     PNG,
+    /**
+     * GIF - Graphics Interchange Format
+     */
     GIF,
+    /**
+     * AVI - Audio Video Interleave
+     */
     AVI,
+    /**
+     * SVG - Scalable Vector Graphics
+     */
     SVG,
+    /**
+     * HTML5 Canvas
+     */
     CANVAS,
+    /**
+     * PDF - Portable Document Format
+     */
     PDF,
+    /**
+     * BMP - Windows Bitmap
+     */
     BMP,
+    /**
+     * SWF - Shockwave Flash
+     */
     SWF,
 }

@@ -48,12 +48,19 @@ import java.util.Set;
 public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
 
     /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorZeroJumpsNullPushes() {
+
+    }
+
+    /**
      * Removes zero jumps from the code.
      *
      * @param code AVM2 code
      * @param body Method body
      * @return True if any zero jumps were removed
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
         return removeZeroJumps(code, body, new Reference<>(-1));
@@ -67,7 +74,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
      * @param minChangedIpRef Reference to the minimum changed instruction
      * pointer
      * @return True if any zero jumps were removed
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         boolean result = false;
@@ -119,7 +126,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
      * @param code AVM2 code
      * @param body Method body
      * @return True if any null pushes were removed
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeNullPushes(AVM2Code code, MethodBody body) throws InterruptedException {
         boolean result = false;
@@ -180,7 +187,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {

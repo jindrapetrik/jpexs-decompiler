@@ -23,14 +23,36 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 class SvgRadialGradient extends SvgGradient {
 
+    /**
+     * Center x coordinate
+     */
     public String cx;
 
+    /**
+     * Center y coordinate
+     */
     public String cy;
 
+    /**
+     * Radius
+     */
     public String r;
 
+    /**
+     * Focal x coordinate
+     */
     public String fx;
 
+    /**
+     * Focal y coordinate
+     */
     public String fy;
     //xlink?
+
+    /**
+     * Constructor.
+     */
+    public SvgRadialGradient() {
+
+    }
 }

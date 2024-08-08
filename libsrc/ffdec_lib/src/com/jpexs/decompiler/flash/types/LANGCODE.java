@@ -26,12 +26,23 @@ import java.io.Serializable;
  */
 public class LANGCODE implements Serializable {
 
+    /**
+     * Language code.
+     */
     @SWFType(BasicType.UI8)
     public int languageCode;
 
+    /**
+     * Constructor.
+     */
     public LANGCODE() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param languageCode Language code
+     */
     public LANGCODE(int languageCode) {
         this.languageCode = languageCode;
     }

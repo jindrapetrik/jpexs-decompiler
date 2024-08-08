@@ -80,21 +80,37 @@ public class MATRIX implements Serializable {
     @SWFType(value = BasicType.SB, countField = "nTranslateBits")
     public int translateY;
 
+    /**
+     * Number of bits used for the translate values
+     */
     @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nTranslateBits;
 
+    /**
+     * Number of bits used for the rotate values
+     */
     @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nRotateBits;
 
+    /**
+     * Number of bits used for the scale values
+     */
     @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nScaleBits;
 
+    /**
+     * Constructor.
+     */
     public MATRIX() {
     }
 
+    /**
+     * Constructor.
+     * @param m Matrix to copy
+     */
     public MATRIX(MATRIX m) {
         if (m == null) {
             return;
@@ -114,10 +130,20 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
+    /**
+     * Converts (fixed point) integer to float
+     * @param i Integer
+     * @return Float
+     */
     public static float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
 
+    /**
+     * Applies the matrix to a point
+     * @param p Point
+     * @return Transformed point
+     */
     public Point apply(Point p) {
         Point ret = new Point();
         ret.x = (int) (p.x * (hasScale ? scaleX : 1) + p.y * (hasRotate ? rotateSkew1 : 0) + translateX);
@@ -125,6 +151,11 @@ public class MATRIX implements Serializable {
         return ret;
     }
 
+    /**
+     * Applies the matrix to a rectangle
+     * @param r Rectangle
+     * @return Transformed rectangle
+     */
     public RECT apply(RECT r) {
         Point topLeft = apply(r.getTopLeft());
         Point bottomRight = apply(r.getBottomRight());
@@ -140,38 +171,74 @@ public class MATRIX implements Serializable {
         return (int) (f * (1 << 16));
     }
 
+    /**
+     * Gets the rotate skew 0 value as an integer
+     * @return Integer
+     */
     public int getRotateSkew0Integer() {
         return hasRotate ? fromFloat(rotateSkew0) : 0;
     }
 
+    /**
+     * Gets the rotate skew 1 value as an integer
+     * @return Integer
+     */
     public int getRotateSkew1Integer() {
         return hasRotate ? fromFloat(rotateSkew1) : 0;
     }
 
+    /**
+     * Gets rotate skew 0 as a float
+     * @return Float
+     */
     public float getRotateSkew0Float() {
         return (hasRotate ? rotateSkew0 : 0);
     }
 
+    /**
+     * Gets rotate skew 1 as a float
+     * @return Float
+     */
     public float getRotateSkew1Float() {
         return (hasRotate ? rotateSkew1 : 0);
     }
 
+    /**
+     * Gets the scale X value as a float
+     * @return Float
+     */
     public float getScaleXFloat() {
         return (hasScale ? scaleX : 1);
     }
 
+    /**
+     * Gets the scale Y value as a float
+     * @return Float
+     */
     public float getScaleYFloat() {
         return (hasScale ? scaleY : 1);
     }
 
+    /**
+     * Gets the scale X value as an integer
+     * @return Integer
+     */
     public int getScaleXInteger() {
         return (hasScale ? fromFloat(scaleX) : (1 << 16));
     }
 
+    /**
+     * Gets the scale Y value as an integer
+     * @return Integer
+     */
     public int getScaleYInteger() {
         return (hasScale ? fromFloat(scaleY) : (1 << 16));
     }
 
+    /**
+     * Checks if the matrix is empty
+     * @return True if empty
+     */
     public boolean isEmpty() {
         return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
     }

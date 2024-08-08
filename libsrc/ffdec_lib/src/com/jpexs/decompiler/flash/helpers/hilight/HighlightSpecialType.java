@@ -23,14 +23,136 @@ package com.jpexs.decompiler.flash.helpers.hilight;
  */
 public enum HighlightSpecialType {
 
-    PARAM_NAME, PARAM, OPTIONAL, RETURNS,
-    TYPE_NAME, CLASS_NAME, METHOD_NAME,
-    TRAIT_TYPE, TRAIT_NAME, TRAIT_TYPE_NAME, TRAIT_VALUE,
-    SLOT_ID, DISP_ID,
-    FLAG_NEED_REST, FLAG_NATIVE, FLAG_HAS_OPTIONAL, FLAG_HAS_PARAM_NAMES,
-    FLAG_IGNORE_REST, FLAG_NEED_ACTIVATION, FLAG_NEED_ARGUMENTS, FLAG_SET_DXNS,
-    TRY_TYPE, TRY_NAME,
+    /**
+     * Parameter name
+     */
+    PARAM_NAME,
+    /**
+     * Parameter
+     */
+    PARAM,
+    /**
+     * Optional
+     */
+    OPTIONAL,
+    /**
+     * Returns
+     */
+    RETURNS,
+    /**
+     * Type name
+     */
+    TYPE_NAME,
+    /**
+     * Class name
+     */
+    CLASS_NAME,
+    /**
+     * Method name
+     */
+    METHOD_NAME,
+    /**
+     * Trait type
+     */
+    TRAIT_TYPE,
+    /**
+     * Trait name
+     */
+    TRAIT_NAME,
+    /**
+     * Trait type name
+     */
+    TRAIT_TYPE_NAME,
+    /**
+     * Trait value
+     */
+    TRAIT_VALUE,
+    /**
+     * Slot id
+     */
+    SLOT_ID,
+    /**
+     * Dispatch id
+     */
+    DISP_ID,
+    /**
+     * Flag need rest
+     */
+    FLAG_NEED_REST,
+    /**
+     * Flag native
+     */
+    FLAG_NATIVE,
+    /**
+     * Flag has optional
+     */
+    FLAG_HAS_OPTIONAL,
+    /**
+     * Flag has param names
+     */
+    FLAG_HAS_PARAM_NAMES,
+    /**
+     * Flag ignore rest
+     */
+    FLAG_IGNORE_REST,
+    /**
+     * Flag need activation
+     */
+    FLAG_NEED_ACTIVATION,
+    /**
+     * Flag need arguments
+     */
+    FLAG_NEED_ARGUMENTS,
+    /**
+     * Flag set dxns
+     */
+    FLAG_SET_DXNS,
+    /**
+     * Try type
+     */
+    TRY_TYPE,
+    /**
+     * Try name
+     */
+    TRY_NAME,
+    /**
+     * Text
+     */
     TEXT,
-    ATTR_METADATA, ATTR_FINAL, ATTR_OVERRIDE, ATTR_0x8,
-    PROPERTY_TYPE, INSTANCE_NAME, IMPLEMENTS, EXTENDS, PROTECTEDNS
+    /**
+     * Attr metadata
+     */
+    ATTR_METADATA,
+    /**
+     * Attr final
+     */
+    ATTR_FINAL,
+    /**
+     * Attr override
+     */
+    ATTR_OVERRIDE,
+    /**
+     * Attr 0x8
+     */
+    ATTR_0x8,
+    /**
+     * Property type
+     */
+    PROPERTY_TYPE,
+    /**
+     * Instance name
+     */
+    INSTANCE_NAME,
+    /**
+     * Implements
+     */
+    IMPLEMENTS,
+    /**
+     * Extends
+     */
+    EXTENDS,
+    /**
+     * Protected namespace
+     */
+    PROTECTEDNS
 }

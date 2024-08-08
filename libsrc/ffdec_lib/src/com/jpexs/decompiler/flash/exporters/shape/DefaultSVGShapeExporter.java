@@ -30,18 +30,45 @@ import com.jpexs.decompiler.flash.types.SHAPE;
  */
 public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
+    /**
+     * Draw command L
+     */
     protected static final String DRAW_COMMAND_L = "L";
 
+    /**
+     * Draw command Q
+     */
     protected static final String DRAW_COMMAND_Q = "Q";
 
+    /**
+     * Current draw command
+     */
     protected String currentDrawCommand = "";
 
+    /**
+     * Path data
+     */
     protected StringBuilder pathData;
 
+    /**
+     * Zoom
+     */
     protected double zoom;
 
+    /**
+     * Aliased fill
+     */
     protected boolean aliasedFill;
 
+    /**
+     * Constructor.
+     * @param windingRule Winding rule
+     * @param shapeNum Shape number (1 for DefineShape, 2 for DefineShape2, etc.)
+     * @param swf SWF
+     * @param shape Shape
+     * @param colorTransform Color transform
+     * @param zoom Zoom
+     */
     public DefaultSVGShapeExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
         this.zoom = zoom;
@@ -150,11 +177,19 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
                 .append(roundPixels20(anchorY * zoom / SWF.unitDivisor)).append(" ");
     }
 
+    /**
+     * Finalizes path.
+     */
     protected void finalizePath() {
         pathData = new StringBuilder();
         currentDrawCommand = "";
     }
 
+    /**
+     * Rounds pixels to 20.
+     * @param pixels Pixels
+     * @return Rounded pixels
+     */
     protected double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }

@@ -23,21 +23,59 @@ package com.jpexs.decompiler.flash.exporters.shape;
  */
 public interface IEdge {
 
+    /**
+     * Returns the x coordinate of the start point of the edge.
+     * @return X coordinate of the start point of the edge
+     */
     public int getFromX();
 
+    /**
+     * Returns the y coordinate of the start point of the edge.
+     * @return Y coordinate of the start point of the edge
+     */
     public int getFromY();
 
+    /**
+     * Returns the x coordinate of the end point of the edge.
+     * @return X coordinate of the end point of the edge
+     */
     public int getToX();
 
+    /**
+     * Returns the y coordinate of the end point of the edge.
+     * @return Y coordinate of the end point of the edge
+     */
     public int getToY();
 
+    /**
+     * Returns the line style index of the edge.
+     * @return Line style index of the edge
+     */
     public int getLineStyleIdx();
 
+    /**
+     * Returns the fill style index of the edge.
+     * @return Fill style index of the edge
+     */
     public int getFillStyleIdx();
 
+    /**
+     * Gets reverse edge with new fill style.
+     * @param newFillStyleIdx New fill style index
+     * @return Reverse edge with new fill style
+     */
     public IEdge reverseWithNewFillStyle(int newFillStyleIdx);
 
+    /**
+     * Gets reverse edge.
+     * @return Reverse edge
+     */
     public IEdge reverse();
 
+    /**
+     * Returns the same edge with new fill style.
+     * @param newFillStyleIdx New fill style index
+     * @return Same edge with new fill style
+     */
     public IEdge sameWithNewFillStyle(int newFillStyleIdx);
 }

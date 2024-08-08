@@ -23,7 +23,26 @@ package com.jpexs.decompiler.flash.tags.enums;
  */
 public enum ImageFormat {
 
-    UNKNOWN(""), JPEG(".jpg"), GIF(".gif"), PNG(".png"), BMP(".bmp");
+    /**
+     * Unknown
+     */
+    UNKNOWN(""),
+    /**
+     * JPEG
+     */
+    JPEG(".jpg"),
+    /**
+     * GIF
+     */
+    GIF(".gif"),
+    /**
+     * PNG
+     */
+    PNG(".png"),
+    /**
+     * BMP
+     */
+    BMP(".bmp");
 
     private final String extension;
 
@@ -31,6 +50,10 @@ public enum ImageFormat {
         this.extension = extension;
     }
 
+    /**
+     * Get extension of the image format.
+     * @return Extension of the image format.
+     */
     public String getExtension() {
         return extension;
     }

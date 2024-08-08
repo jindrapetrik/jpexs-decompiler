@@ -63,6 +63,13 @@ public class SwfJavaExporter {
         "ContourType", "EdgeType", "FONTINFO", "FontType", "GLYPHIDX", "GlyphInfoType", "GlyphType", "KerningPairType", "TEXGLYPH"
     };
 
+    /**
+     * Exports SWF to Java code.
+     * @param swf SWF to export
+     * @param outdir Output directory
+     * @return List of exported files
+     * @throws IOException On I/O error
+     */
     public List<File> exportJavaCode(SWF swf, String outdir) throws IOException {
         final File file = new File(outdir + File.separator + Helper.makeFileName("SwfFile.java"));
         CodeFormatting codeFormatting = Configuration.getCodeFormatting();
@@ -76,6 +83,12 @@ public class SwfJavaExporter {
         return ret;
     }
 
+    /**
+     * Exports SWF to Java code.
+     * @param swf SWF to export
+     * @param writer Writer to write to
+     * @throws IOException On I/O error
+     */
     public void exportJavaCode(SWF swf, GraphTextWriter writer) throws IOException {
         Map<String, Integer> objectNames = new HashMap<>();
         writer.append("package com.jpexs.decompiler.flash.exporters.swf;").newLine();

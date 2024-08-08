@@ -39,18 +39,30 @@ import java.util.Set;
  */
 public class SHAPE implements NeedsCharacters, Serializable {
 
+    /**
+     * Number of fill bits
+     */
     @SWFType(value = BasicType.UB, count = 4)
     public int numFillBits;
 
+    /**
+     * Number of line bits
+     */
     @SWFType(value = BasicType.UB, count = 4)
     public int numLineBits;
 
+    /**
+     * Shape records
+     */
     @SWFArray(value = "record")
     public List<SHAPERECORD> shapeRecords;
 
     private Shape cachedOutline;
     private Shape fastCachedOutline;
 
+    /**
+     * Constructor.
+     */
     public SHAPE() {
         shapeRecords = new ArrayList<>();
         shapeRecords.add(new EndShapeRecord());
@@ -81,6 +93,11 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return modified;
     }
 
+    /**
+     * Get bounds of shape.
+     * @param shapeNum Version of DefineShape, 2 for DefineShape2 etc.
+     * @return Bounds of shape
+     */
     public RECT getBounds(int shapeNum) {
         LINESTYLEARRAY lsa = new LINESTYLEARRAY();
         lsa.lineStyles = new LINESTYLE[0];
@@ -88,22 +105,30 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return SHAPERECORD.getBounds(shapeRecords, lsa, shapeNum, false);
     }
 
+    /**
+     * Get edge bounds of shape.
+     * @return Edge bounds of shape
+     */
     public RECT getEdgeBounds() {
         return SHAPERECORD.getBounds(shapeRecords, null, 1, true);
     }
 
+    /**
+     * Clears cached outline.
+     */
     public void clearCachedOutline() {
         cachedOutline = null;
         fastCachedOutline = null;
     }
 
     /**
+     * Get outline of shape.
      * @param fast When the shape is large, can approximate to rectangles
      * instead of being slow.
      * @param shapeNum Version of DefineShape, 2 for DefineShape2 etc.
-     * @param swf
-     * @param stroked
-     * @return
+     * @param swf SWF
+     * @param stroked If stroked
+     * @return Outline
      */
     public Shape getOutline(boolean fast, int shapeNum, SWF swf, boolean stroked) {
         if (cachedOutline != null) {
@@ -141,10 +166,21 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return area;
     }
 
+    /**
+     * Resizes shape.
+     * @param multiplier Multiplier
+     * @return Resized shape
+     */
     public SHAPE resize(double multiplier) {
         return resize(multiplier, multiplier);
     }
 
+    /**
+     * Resizes shape.
+     * @param multiplierX Multiplier X
+     * @param multiplierY Multiplier Y
+     * @return Resized shape
+     */
     public SHAPE resize(double multiplierX, double multiplierY) {
         SHAPE ret = new SHAPE();
         ret.numFillBits = numFillBits;
@@ -159,6 +195,11 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Creates empty shape.
+     * @param shapeNum Version of DefineShape, 2 for DefineShape2 etc.
+     * @return Empty shape
+     */
     public static SHAPE createEmpty(int shapeNum) {
         SHAPE ret = new SHAPE();
         ret.shapeRecords = new ArrayList<>();

@@ -586,7 +586,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
      * @param output Output list
      * @param staticOperation Unused
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void translate(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, int staticOperation, String path) throws InterruptedException {

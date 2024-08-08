@@ -41,6 +41,11 @@ public class StreamTextWriter extends GraphTextWriter implements AutoCloseable {
 
     private int writtenBytes;
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     * @param os Output stream
+     */
     public StreamTextWriter(CodeFormatting formatting, OutputStream os) {
         super(formatting);
         this.writer = new Utf8OutputStreamWriter(new BufferedOutputStream(os));

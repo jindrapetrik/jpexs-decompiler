@@ -33,6 +33,11 @@ public class MxmlcRunner {
         this.flexSdkPath = flexSdkPath;
     }
 
+    /**
+     * Gets the path to mxmlc compiler.
+     * @param flexSdkPath Path to Flex SDK.
+     * @return Path to mxmlc compiler.
+     */
     public static String getMxmlcPath(String flexSdkPath) {
         boolean isWin = System.getProperty("os.name").toLowerCase().contains("win");
         String path = flexSdkPath + File.separator + "bin" + File.separator + "mxmlc";
@@ -55,6 +60,13 @@ public class MxmlcRunner {
         return null;
     }
 
+    /**
+     * Runs mxmlc compiler.
+     * @param arguments Arguments for mxmlc.
+     * @throws MxmlcException If mxmlc fails to compile a file
+     * @throws InterruptedException On interrupt
+     * @throws IOException On I/O error
+     */
     public void mxmlc(List<String> arguments) throws MxmlcException, InterruptedException, IOException {
         String[] runArgs = new String[arguments.size() + 1];
         runArgs[0] = getMxmlcPath(flexSdkPath);

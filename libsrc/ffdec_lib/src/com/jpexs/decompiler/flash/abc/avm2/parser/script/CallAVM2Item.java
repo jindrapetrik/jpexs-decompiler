@@ -42,16 +42,39 @@ import java.util.List;
  */
 public class CallAVM2Item extends AVM2Item {
 
+    /**
+     * Name
+     */
     public GraphTargetItem name;
 
+    /**
+     * Arguments
+     */
     public List<GraphTargetItem> arguments;
 
+    /**
+     * Line
+     */
     public int line;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * ABC indexing
+     */
     private AbcIndexing abcIndex;
 
+    /**
+     * Constructor.
+     * @param openedNamespaces Opened namespaces
+     * @param line Line
+     * @param name Name
+     * @param arguments Arguments
+     * @param abcIndex ABC indexing
+     */
     public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex) {
         super(null, null, NOPRECEDENCE);
         this.openedNamespaces = openedNamespaces;
@@ -66,6 +89,14 @@ public class CallAVM2Item extends AVM2Item {
         return writer;
     }
 
+    /**
+     * Converts to source.
+     * @param localData Local data
+     * @param generator Generator
+     * @param needsReturn Needs return
+     * @return Source
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
 
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;

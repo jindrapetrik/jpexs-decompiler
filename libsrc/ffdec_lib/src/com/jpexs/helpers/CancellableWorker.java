@@ -52,6 +52,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     private Thread thread;
 
+    /**
+     * Constructor.
+     */
     public CancellableWorker() {
         super();
         Callable<T> callable = new Callable<T>() {
@@ -71,6 +74,11 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         };
     }
 
+    /**
+     * Do in background.
+     * @return Result
+     * @throws Exception On error
+     */
     protected abstract T doInBackground() throws Exception;
 
     @Override
@@ -79,12 +87,21 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         future.run();
     }
 
+    /**
+     * Called before starting the worker.
+     */
     protected void onStart() {
     }
 
+    /**
+     * Called after the worker is done.
+     */
     protected void done() {
     }
 
+    /**
+     * Executes the worker.
+     */
     @SuppressWarnings("unchecked")
     public final void execute() {
         Thread t = Thread.currentThread();
@@ -108,6 +125,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         return r;
     }
 
+    /**
+     * Called when the worker is cancelled.
+     */
     public void workerCancelled() {
 
     }
@@ -141,6 +161,17 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         done();
     }
 
+    /**
+     * Calls a callable with a timeout.
+     * @param c Callable
+     * @param timeout Timeout
+     * @param timeUnit Time unit
+     * @return Result
+     * @param <T> Result type
+     * @throws InterruptedException On interrupt
+     * @throws ExecutionException On execution error
+     * @throws TimeoutException On timeout
+     */
     public static <T> T call(final Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
         Thread t = Thread.currentThread();
         if (t.isInterrupted()) {
@@ -161,6 +192,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         }
     }
 
+    /**
+     * Cancels all background threads.
+     */
     public static void cancelBackgroundThreads() {
         List<CancellableWorker> oldWorkers = workers;
         workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
@@ -173,6 +207,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         }
     }
 
+    /**
+     * Frees the worker.
+     */
     public void free() {
         future = null;
         for (CancellableWorker w : subWorkers) {

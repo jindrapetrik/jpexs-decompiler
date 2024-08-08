@@ -25,10 +25,20 @@ import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
  */
 public class BinaryDataExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "binaryData";
 
+    /**
+     * Mode
+     */
     public BinaryDataExportMode mode;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     */
     public BinaryDataExportSettings(BinaryDataExportMode mode) {
         this.mode = mode;
     }

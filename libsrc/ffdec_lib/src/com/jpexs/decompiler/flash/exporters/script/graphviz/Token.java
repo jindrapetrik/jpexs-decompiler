@@ -25,13 +25,37 @@ import java.io.Serializable;
  */
 public class Token implements Serializable, Comparable {
 
+    /**
+     * Token type
+     */
     public final TokenType type;
+    /**
+     * Start
+     */
     public final int start;
+
+    /**
+     * Length
+     */
     public final int length;
 
+    /**
+     * Pair value
+     */
     public final byte pairValue;
+
+    /**
+     * Kind
+     */
     public final short kind = 0;
 
+    /**
+     * Constructor.
+     *
+     * @param type Token type
+     * @param start Start
+     * @param length Length
+     */
     public Token(TokenType type, int start, int length) {
         this.type = type;
         this.start = start;
@@ -39,6 +63,14 @@ public class Token implements Serializable, Comparable {
         this.pairValue = 0;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param type Token type
+     * @param start Start
+     * @param length Length
+     * @param pairValue Pair value
+     */
     public Token(TokenType type, int start, int length, byte pairValue) {
         this.type = type;
         this.start = start;

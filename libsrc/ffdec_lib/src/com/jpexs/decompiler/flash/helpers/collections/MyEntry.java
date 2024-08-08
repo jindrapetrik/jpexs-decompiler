@@ -33,6 +33,12 @@ public class MyEntry<K, V> implements Entry<K, V>, Serializable {
 
     private V value;
 
+    /**
+     * Constructor.
+     *
+     * @param key Key
+     * @param value Value
+     */
     public MyEntry(K key, V value) {
         this.key = key;
         this.value = value;

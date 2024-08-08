@@ -23,11 +23,29 @@ package com.jpexs.decompiler.flash.ecma;
  */
 public enum EcmaType {
 
+    /**
+     * Null
+     */
     NULL(null),
+    /**
+     * String
+     */
     STRING("String"),
+    /**
+     * Number
+     */
     NUMBER("Number"),
+    /**
+     * Undefined
+     */
     UNDEFINED(null),
+    /**
+     * Object
+     */
     OBJECT("Object"),
+    /**
+     * Boolean
+     */
     BOOLEAN("Boolean");
 
     private final String clsName;
@@ -36,10 +54,20 @@ public enum EcmaType {
         this.clsName = clsName;
     }
 
+    /**
+     * Gets class name.
+     * @return Class name
+     */
     public String getClassName() {
         return clsName;
     }
 
+    /**
+     * Gets property of object.
+     * @param val Object
+     * @param propName Property name
+     * @return Property value
+     */
     public Object getProperty(Object val, String propName) {
         String cls = getClassName();
         if (cls == null) {

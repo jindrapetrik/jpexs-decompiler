@@ -25,11 +25,27 @@ import java.awt.Color;
  */
 class SvgBitmapFill extends SvgFill {
 
+    /**
+     * Pattern transform
+     */
     public String patternTransform;
 
+    /**
+     * Character id
+     */
     public int characterId;
 
+    /**
+     * Smoothed
+     */
     public boolean smoothed = true;
+
+    /**
+     * Constructor.
+     */
+    public SvgBitmapFill() {
+
+    }
 
     @Override
     public Color toColor() {

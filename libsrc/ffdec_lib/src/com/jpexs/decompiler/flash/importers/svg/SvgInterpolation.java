@@ -23,5 +23,12 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 enum SvgInterpolation {
 
-    SRGB, LINEAR_RGB
+    /**
+     * sRGB
+     */
+    SRGB,
+    /**
+     * Linear RGB
+     */
+    LINEAR_RGB
 }

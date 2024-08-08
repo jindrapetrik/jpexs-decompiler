@@ -25,16 +25,36 @@ import java.awt.Color;
  */
 class SvgColor extends SvgFill {
 
+    /**
+     * Color
+     */
     public Color color;
 
+    /**
+     * Constructor.
+     * @param r Red
+     * @param g Green
+     * @param b Blue
+     * @param opacity Opacity
+     */
     public SvgColor(int r, int g, int b, int opacity) {
         this(new Color(r, g, b, opacity));
     }
 
+    /**
+     * Constructor.
+     * @param r Red
+     * @param g Green
+     * @param b Blue
+     */
     public SvgColor(int r, int g, int b) {
         this(new Color(r, g, b));
     }
 
+    /**
+     * Constructor.
+     * @param color Color
+     */
     public SvgColor(Color color) {
         this.color = color;
     }
@@ -44,6 +64,11 @@ class SvgColor extends SvgFill {
         return this.color;
     }
 
+    /**
+     * Parse color from string.
+     * @param colorString Color string
+     * @return Color
+     */
     public static SvgColor parse(String colorString) {
         if (colorString == null) {
             return null;

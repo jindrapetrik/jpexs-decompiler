@@ -31,19 +31,35 @@ public class IndentedStringBuilder {
 
     private int indent;
 
+    /**
+     * Constructor.
+     *
+     * @param indentString String to use for indentation
+     */
     public IndentedStringBuilder(String indentString) {
         super();
         this.indentString = indentString;
     }
 
+    /**
+     * Indents.
+     */
     public void indent() {
         indent++;
     }
 
+    /**
+     * Unindents.
+     */
     public void unindent() {
         indent--;
     }
 
+    /**
+     * Appends a line.
+     *
+     * @param str String to append
+     */
     public void appendLine(String str) {
         for (int i = 0; i < indent; i++) {
             builder.append(indentString);

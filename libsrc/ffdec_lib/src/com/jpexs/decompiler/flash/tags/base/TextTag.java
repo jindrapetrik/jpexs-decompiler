@@ -79,25 +79,70 @@ import org.w3c.dom.Element;
  */
 public abstract class TextTag extends DrawableTag {
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public TextTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Gets text matrix.
+     * @return Text matrix
+     */
     public abstract MATRIX getTextMatrix();
 
+    /**
+     * Gets texts.
+     * @return Texts
+     */
     public abstract List<String> getTexts();
 
+    /**
+     * Gets font IDs.
+     * @return Font IDs
+     */
     public abstract List<Integer> getFontIds();
 
+    /**
+     * Gets formatted text.
+     * @param ignoreLetterSpacing Ignore letter spacing
+     * @return Formatted text
+     */
     public abstract HighlightedText getFormattedText(boolean ignoreLetterSpacing);
 
-    // use the texts from the "texts" argument when it is not null
+    /**
+     * Sets formatted text.
+     * Use the texts from the "texts" argument when it is not null.
+     * @param missingCharHandler Missing character handler
+     * @param formattedText Formatted text
+     * @param texts Texts
+     * @return True if the text was set successfully
+     * @throws TextParseException
+     */
     public abstract boolean setFormattedText(MissingCharacterHandler missingCharHandler, String formattedText, String[] texts) throws TextParseException;
 
+    /**
+     * Changes text x position by diff.
+     * @param diff Difference
+     * @return True if the text was moved successfully
+     */
     public abstract boolean translateText(int diff);
 
+    /**
+     * Gets text bounds.
+     * @return Text bounds
+     */
     public abstract RECT getBounds();
 
+    /**
+     * Sets text bounds.
+     * @param r Bounds
+     */
     public abstract void setBounds(RECT r);
 
     @Override
@@ -105,6 +150,12 @@ public abstract class TextTag extends DrawableTag {
         return getRect(null); // parameter not used
     }
 
+    /**
+     * Updates text bounds.
+     * @param ret Bounds
+     * @param x X
+     * @param y Y
+     */
     private static void updateRect(RECT ret, int x, int y) {
         if (x < ret.Xmin) {
             ret.Xmin = x;
@@ -120,8 +171,19 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Aligns text.
+     * @param textAlign Text align
+     * @return True if the text was aligned successfully
+     */
     public abstract boolean alignText(TextAlign textAlign);
 
+    /**
+     * Aligns text.
+     * @param swf SWF
+     * @param textRecords Text records
+     * @param textAlign Text align
+     */
     public static void alignText(SWF swf, List<TEXTRECORD> textRecords, TextAlign textAlign) {
         // Remove Justify align entries
         for (TEXTRECORD tr : textRecords) {
@@ -235,6 +297,12 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Gets text records attributes.
+     * @param list Text records
+     * @param swf SWF
+     * @return Text records attributes
+     */
     public static Map<String, Object> getTextRecordsAttributes(List<TEXTRECORD> list, SWF swf) {
         Map<String, Object> att = new HashMap<>();
         RECT textBounds = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
@@ -376,6 +444,13 @@ public abstract class TextTag extends DrawableTag {
         return att;
     }
 
+    /**
+     * Gets border shape.
+     * @param borderColor Border color
+     * @param fillColor Fill color
+     * @param rect Rectangle
+     * @return Border shape
+     */
     public static SHAPE getBorderShape(RGB borderColor, RGB fillColor, RECT rect) {
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = new FILLSTYLEARRAY();
@@ -432,6 +507,17 @@ public abstract class TextTag extends DrawableTag {
         return shape;
     }
 
+    /**
+     * Draws border.
+     * @param swf SWF
+     * @param image Image
+     * @param borderColor Border color
+     * @param fillColor Fill color
+     * @param rect Rectangle
+     * @param textMatrix Text matrix
+     * @param transformation Transformation
+     * @param colorTransform Color transform
+     */
     public static void drawBorder(SWF swf, SerializableImage image, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
@@ -439,6 +525,17 @@ public abstract class TextTag extends DrawableTag {
         BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
     }
 
+    /**
+     * Draws border to HTML canvas.
+     * @param swf SWF
+     * @param result Result
+     * @param borderColor Border color
+     * @param fillColor Fill color
+     * @param rect Rectangle
+     * @param textMatrix Text matrix
+     * @param colorTransform Color transform
+     * @param unitDivisor Unit divisor
+     */
     public static void drawBorderHtmlCanvas(SWF swf, StringBuilder result, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
         Matrix mat = new Matrix(textMatrix);
         result.append("\tctx.save();\r\n");
@@ -450,6 +547,17 @@ public abstract class TextTag extends DrawableTag {
         result.append("\tctx.restore();\r\n");
     }
 
+    /**
+     * Draws border to SVG.
+     * @param swf SWF
+     * @param exporter Exporter
+     * @param borderColor Border color
+     * @param fillColor Fill color
+     * @param rect Rectangle
+     * @param textMatrix Text matrix
+     * @param colorTransform Color transform
+     * @param zoom Zoom
+     */
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
@@ -458,6 +566,16 @@ public abstract class TextTag extends DrawableTag {
         exporter.endGroup();
     }
 
+    /**
+     * Converts static text to image.
+     * @param swf SWF
+     * @param textRecords Text records
+     * @param numText Number of text (DefineText = 1, DefineText2 = 2)
+     * @param image Image
+     * @param textMatrix Text matrix
+     * @param transformation Transformation
+     * @param colorTransform Color transform
+     */
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
         if (image.getGraphics() instanceof GraphicsTextDrawable) {
             //custom drawing
@@ -541,8 +659,19 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Calculates text bounds.
+     * @return Text bounds
+     */
     public abstract ExportRectangle calculateTextBounds();
 
+    /**
+     * Calculates text bounds.
+     * @param swf SWF
+     * @param textRecords Text records
+     * @param textMatrix Text matrix
+     * @return Text bounds
+     */
     public static ExportRectangle calculateTextBounds(SWF swf, List<TEXTRECORD> textRecords, MATRIX textMatrix) {
         FontTag font = null;
         int textHeight = 12;
@@ -600,8 +729,15 @@ public abstract class TextTag extends DrawableTag {
         return result;
     }
 
+    /**
+     * Updates text bounds.
+     */
     public abstract void updateTextBounds();
 
+    /**
+     * Updates text bounds.
+     * @param textBounds Text bounds
+     */
     protected void updateTextBounds(RECT textBounds) {
         TextImportResizeTextBoundsMode resizeMode = Configuration.textImportResizeTextBoundsMode.get();
         if (resizeMode != null && (resizeMode.equals(TextImportResizeTextBoundsMode.GROW_ONLY) || resizeMode.equals(TextImportResizeTextBoundsMode.GROW_AND_SHRINK))) {
@@ -626,6 +762,17 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Converts static text to HTML canvas.
+     * @param unitDivisor Unit divisor
+     * @param swf SWF
+     * @param textRecords Text records
+     * @param numText Number of text (DefineText = 1, DefineText2 = 2)
+     * @param result Result
+     * @param bounds Bounds
+     * @param textMatrix Text matrix
+     * @param colorTransform Color transform
+     */
     public static void staticTextToHtmlCanvas(double unitDivisor, SWF swf, List<TEXTRECORD> textRecords, int numText, StringBuilder result, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform) {
         int textColor = 0;
         FontTag font = null;
@@ -677,6 +824,17 @@ public abstract class TextTag extends DrawableTag {
         }
     }
 
+    /**
+     * Converts static text to SVG.
+     * @param swf SWF
+     * @param textRecords Text records
+     * @param numText Number of text (DefineText = 1, DefineText2 = 2)
+     * @param exporter Exporter
+     * @param bounds Bounds
+     * @param textMatrix Text matrix
+     * @param colorTransform Color transform
+     * @param zoom Zoom
+     */
     public static void staticTextToSVG(SWF swf, List<TEXTRECORD> textRecords, int numText, SVGExporter exporter, RECT bounds, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         int textColor = 0;
         FontTag font = null;

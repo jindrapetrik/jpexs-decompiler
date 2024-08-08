@@ -29,24 +29,62 @@ import java.util.Objects;
  */
 public abstract class TraitMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
 
+    /**
+     * Trait index
+     */
     protected final int traitIndex;
 
+    /**
+     * Traits type - class
+     */
     public static final int TRAITS_TYPE_CLASS = 1;
 
+    /**
+     * Traits type - instance
+     */
     public static final int TRAITS_TYPE_INSTANCE = 2;
 
+    /**
+     * Traits type - script
+     */
     public static final int TRAITS_TYPE_SCRIPT = 3;
 
+    /**
+     * Traits type
+     */
     protected final int traitsType;
 
+    /**
+     * Class index
+     */
     protected final int classIndex;
 
+    /**
+     * Script index
+     */
     protected final int scriptIndex;
 
+    /**
+     * Traits
+     */
     protected final Traits traits;
 
+    /**
+     * Parent trait index
+     */
     protected final int parentTraitIndex;
 
+    /**
+     * Constructor.
+     * @param abc ABC
+     * @param multinameIndex Multiname index
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param traitIndex Trait index
+     * @param traitsType Traits type
+     * @param traits Traits
+     * @param parentTraitIndex Parent trait index
+     */
     public TraitMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.scriptIndex = scriptIndex;
@@ -126,22 +164,42 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
         return classIndex;
     }
 
+    /**
+     * Gets trait index.
+     * @return Trait index
+     */
     public int getTraitIndex() {
         return traitIndex;
     }
 
+    /**
+     * Gets traits type.
+     * @return Traits type
+     */
     public int getTraitsType() {
         return traitsType;
     }
 
+    /**
+     * Gets class index.
+     * @return Class index
+     */
     public int getScriptIndex() {
         return scriptIndex;
     }
 
+    /**
+     * Gets traits.
+     * @return Traits
+     */
     public Traits getTraits() {
         return traits;
     }
 
+    /**
+     * Gets parent trait index.
+     * @return Parent trait index
+     */
     public int getParentTraitIndex() {
         return parentTraitIndex;
     }

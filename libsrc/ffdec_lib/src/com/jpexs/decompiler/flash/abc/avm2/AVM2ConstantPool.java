@@ -588,9 +588,9 @@ public class AVM2ConstantPool implements Cloneable {
      * Converts kind MULTINAME with one namespace to QNAME with that namespace
      * (must exist in the abc). Ignores others.
      *
-     * @param cpool
-     * @param index MULTINAME index
-     * @return QNAME index
+     * @param cpool Constant pool
+     * @param index Multiname index
+     * @return QName index
      */
     public int convertToQname(AVM2ConstantPool cpool, int index) {
         Multiname mx = cpool.getMultiname(index);
@@ -859,6 +859,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param kind Kind
      * @param name Name
      * @param index Sub index
+     * @param add Whether to add the namespace if it does not exist
      * @return Namespace id
      */
     public int getNamespaceId(int kind, DottedChain name, int index, boolean add) {

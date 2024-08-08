@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -50,19 +49,15 @@ public class ButtonAction implements ASMSource {
 
     private final DefineButtonTag buttonTag;
 
+    /**
+     * Constructor.
+     *
+     * @param buttonTag Button tag
+     */
     public ButtonAction(DefineButtonTag buttonTag) {
         this.buttonTag = buttonTag;
     }
 
-    /**
-     * Converts actions to ASM source
-     *
-     * @param exportMode PCode or hex?
-     * @param writer
-     * @param actions
-     * @return ASM source
-     * @throws java.lang.InterruptedException
-     */
     @Override
     public GraphTextWriter getASMSource(ScriptExportMode exportMode, GraphTextWriter writer, ActionList actions) throws InterruptedException {
         if (actions == null) {
@@ -104,7 +99,7 @@ public class ButtonAction implements ASMSource {
      * Returns actions associated with this object
      *
      * @return List of actions
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public ActionList getActions() throws InterruptedException {

@@ -39,8 +39,15 @@ import java.util.List;
  */
 public class ImportedSlotConstItem extends AssignableAVM2Item {
 
+    /**
+     * Type
+     */
     public TypeItem type;
 
+    /**
+     * Constructor.
+     * @param type Type
+     */
     public ImportedSlotConstItem(TypeItem type) {
         this.type = type;
     }
@@ -65,6 +72,14 @@ public class ImportedSlotConstItem extends AssignableAVM2Item {
         return new ImportedSlotConstItem(type);
     }
 
+    /**
+     * Converts to source.
+     * @param localData Local data
+     * @param generator Generator
+     * @param needsReturn Needs return
+     * @return Source
+     * @throws CompilationException On compilation error
+     */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         int propertyId = ((AVM2SourceGenerator) generator).typeName(localData, type);
         Object obj = new FindPropertyAVM2Item(null, null, type);

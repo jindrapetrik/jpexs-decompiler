@@ -32,22 +32,57 @@ import java.util.Map;
  */
 public class InterfaceAVM2Item extends AVM2Item {
 
+    /**
+     * Base name
+     */
     public String baseName;
 
+    /**
+     * Super interfaces
+     */
     public List<GraphTargetItem> superInterfaces;
 
+    /**
+     * Methods
+     */
     public List<GraphTargetItem> methods;
 
+    /**
+     * Is final
+     */
     public boolean isFinal;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Package
+     */
     public NamespaceItem pkg;
 
+    /**
+     * Imported classes
+     */
     public List<DottedChain> importedClasses;
 
+    /**
+     * Metadata
+     */
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
+    /**
+     * Constructor.
+     * @param metadata Metadata
+     * @param importedClasses Imported classes
+     * @param pkg Package
+     * @param openedNamespaces Opened namespaces
+     * @param isFinal Is final
+     * @param name Name
+     * @param superInterfaces Super interfaces
+     * @param traits Traits
+     */
     public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
         super(null, null, NOPRECEDENCE);
         this.metadata = metadata;

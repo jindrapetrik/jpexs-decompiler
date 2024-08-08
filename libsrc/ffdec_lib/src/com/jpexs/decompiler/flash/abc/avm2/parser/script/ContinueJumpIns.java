@@ -25,12 +25,23 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
  */
 public class ContinueJumpIns extends JumpIns {
 
+    /**
+     * Loop id
+     */
     private final long loopId;
 
+    /**
+     * Constructor.
+     * @param loopId Loop id
+     */
     public ContinueJumpIns(long loopId) {
         this.loopId = loopId;
     }
 
+    /**
+     * Gets loop id.
+     * @return Loop id
+     */
     public long getLoopId() {
         return loopId;
     }

@@ -23,7 +23,15 @@ package com.jpexs.decompiler.flash.helpers;
  */
 public interface Freed {
 
+    /**
+     * Returns true if the object is being freed.
+     *
+     * @return true if the object is being freed
+     */
     public boolean isFreeing();
 
+    /**
+     * Frees the object.
+     */
     public void free();
 }

@@ -25,9 +25,21 @@ import java.util.Map;
  */
 public interface ImportTag {
 
+    /**
+     * Get URL of the imported file.
+     * @return URL of the imported file
+     */
     public String getUrl();
 
+    /**
+     * Set URL of the imported file.
+     * @param url
+     */
     public void setUrl(String url);
 
+    /**
+     * Gets map of assets.
+     * @return Map of assets - character id to name
+     */
     public Map<Integer, String> getAssets();
 }

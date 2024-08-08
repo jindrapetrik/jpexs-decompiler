@@ -26,26 +26,59 @@ import com.jpexs.decompiler.flash.types.RGBA;
  */
 public final class TextStyle implements Cloneable {
 
+    /**
+     * Font tag
+     */
     public FontTag font;
 
+    /**
+     * Font face
+     */
     public String fontFace;
 
+    /**
+     * Font height
+     */
     public int fontHeight;
 
+    /**
+     * Font leading
+     */
     public int fontLeading;
 
+    /**
+     * Bold
+     */
     public boolean bold;
 
+    /**
+     * Italic
+     */
     public boolean italic;
 
+    /**
+     * Underlined
+     */
     public boolean underlined;
 
+    /**
+     * Text color
+     */
     public RGBA textColor;
 
+    /**
+     * Letter spacing
+     */
     public double letterSpacing;
 
+    /**
+     * Kerning
+     */
     public boolean kerning;
 
+    /**
+     * Left margin
+     */
     public double leftMargin;
 
     @Override

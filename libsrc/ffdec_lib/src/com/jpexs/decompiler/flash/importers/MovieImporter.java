@@ -57,6 +57,14 @@ import java.util.logging.Logger;
  */
 public class MovieImporter {
 
+    /**
+     * Bulk import movies from a directory.
+     *
+     * @param moviesDir Directory with movies
+     * @param swf SWF
+     * @param printOut Print out messages
+     * @return Number of imported movies
+     */
     public int bulkImport(File moviesDir, SWF swf, boolean printOut) {
         Map<Integer, CharacterTag> characters = swf.getCharacters(false);
         int movieCount = 0;
@@ -136,6 +144,12 @@ public class MovieImporter {
         return movieCount;
     }
 
+    /**
+     * Imports movie.
+     * @param movie Movie
+     * @param data Data
+     * @throws IOException On I/O error
+     */
     public void importMovie(DefineVideoStreamTag movie, byte[] data) throws IOException {
         List<FLVTAG> videoTags = new ArrayList<>();
 

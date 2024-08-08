@@ -43,4 +43,10 @@ public abstract class BaseLocalData {
      * Second pass data
      */
     public SecondPassData secondPassData = null;
+
+    /**
+     * Constructor.
+     */
+    public BaseLocalData() {
+    }
 }

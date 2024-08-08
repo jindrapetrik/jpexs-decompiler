@@ -45,6 +45,24 @@ import java.util.Set;
  */
 public class BinaryDataExporter {
 
+    /**
+     * Constructor.
+     */
+    public BinaryDataExporter() {
+
+    }
+
+    /**
+     * Export binary data.
+     * @param handler AbortRetryIgnoreHandler
+     * @param outdir Output directory
+     * @param tags Tags
+     * @param settings Binary data export settings
+     * @param evl Event listener
+     * @return List of exported files
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<BinaryDataInterface> binaryDatas = new ArrayList<>();
         for (Tag t : tags) {
@@ -55,6 +73,17 @@ public class BinaryDataExporter {
         return exportBinaryData(handler, outdir, binaryDatas, settings, evl);
     }
 
+    /**
+     * Export binary data.
+     * @param handler AbortRetryIgnoreHandler
+     * @param outdir Output directory
+     * @param binaryDatas Binary data
+     * @param settings Binary data export settings
+     * @param evl Event listener
+     * @return List of exported files
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
     public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<BinaryDataInterface> binaryDatas, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (Thread.currentThread().isInterrupted()) {

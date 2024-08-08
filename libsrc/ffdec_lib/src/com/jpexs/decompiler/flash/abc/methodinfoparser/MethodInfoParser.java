@@ -33,6 +33,14 @@ import java.util.List;
  */
 public class MethodInfoParser {
 
+    /**
+     * Parses slot const.
+     * @param text Text to parse
+     * @param trait Trait to update
+     * @param abc ABC file
+     * @return True if successful
+     * @throws MethodInfoParseException On parse error
+     */
     public static boolean parseSlotConst(String text, TraitSlotConst trait, ABC abc) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         ParsedSymbol symb;
@@ -123,6 +131,13 @@ public class MethodInfoParser {
         return true;
     }
 
+    /**
+     * Parses return type.
+     * @param text Text to parse
+     * @param update Method info to update
+     * @return True if successful
+     * @throws MethodInfoParseException On parse error
+     */
     public static boolean parseReturnType(String text, MethodInfo update) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         ParsedSymbol symb;
@@ -148,6 +163,14 @@ public class MethodInfoParser {
         return false;
     }
 
+    /**
+     * Parses parameters.
+     * @param text Text to parse
+     * @param update Method info to update
+     * @param abc ABC file
+     * @return True if successful
+     * @throws MethodInfoParseException On parse error
+     */
     public static boolean parseParams(String text, MethodInfo update, ABC abc) throws MethodInfoParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new java.io.InputStreamReader(new ByteArrayInputStream(text.getBytes())));
         List<String> paramNames = new ArrayList<>();

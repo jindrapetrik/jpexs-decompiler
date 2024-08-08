@@ -57,22 +57,37 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     private int nsKind = -1;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Line
+     */
     public int line;
 
+    /**
+     * Type
+     */
     public GraphTargetItem type;
 
     private GraphTargetItem ns = null;
 
     private int regNumber = -1;
 
+    /**
+     * Unresolved
+     */
     public boolean unresolved = false;
 
     private int slotNumber = -1;
 
     private int slotScope = 0;
 
+    /**
+     * Redirect
+     */
     public GraphTargetItem redirect;
 
     private AbcIndexing abcIndex;
@@ -89,66 +104,138 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return c;
     }
 
+    /**
+     * Is attribute.
+     * @return Is attribute
+     */
     public boolean isAttribute() {
         return attribute;
     }
 
+    /**
+     * Sets slot scope.
+     * @param slotScope Slot scope
+     */
     public void setSlotScope(int slotScope) {
         this.slotScope = slotScope;
     }
 
+    /**
+     * Gets slot scope.
+     * @return Slot scope
+     */
     public int getSlotScope() {
         return slotScope;
     }
 
+    /**
+     * Sets namespace.
+     * @param ns Namespace
+     */
     public void setNs(GraphTargetItem ns) {
         this.ns = ns;
     }
 
+    /**
+     * Sets register number.
+     * @param regNumber Register number
+     */
     public void setRegNumber(int regNumber) {
         this.regNumber = regNumber;
     }
 
+    /**
+     * Gets slot number.
+     * @return Slot number
+     */
     public int getSlotNumber() {
         return slotNumber;
     }
 
+    /**
+     * Sets slot number.
+     * @param slotNumber Slot number
+     */
     public void setSlotNumber(int slotNumber) {
         this.slotNumber = slotNumber;
     }
 
+    /**
+     * Gets register number.
+     * @return Register number
+     */
     public int getRegNumber() {
         return regNumber;
     }
 
+    /**
+     * Gets namespace.
+     * @return Namespace
+     */
     public GraphTargetItem getNs() {
         return ns;
     }
 
+    /**
+     * Appends name.
+     * @param name Name
+     */
     public void appendName(String name) {
         this.variableName += "." + name;
     }
 
+    /**
+     * Sets definition.
+     * @param definition Definition
+     */
     public void setDefinition(boolean definition) {
         this.definition = definition;
     }
 
+    /**
+     * Sets namespace kind.
+     * @param nsKind Namespace kind
+     */
     public void setNsKind(int nsKind) {
         this.nsKind = nsKind;
     }
 
+    /**
+     * Gets namespace kind.
+     * @return Namespace kind
+     */
     public int getNsKind() {
         return nsKind;
     }
 
+    /**
+     * Gets variable name.
+     * @return Variable name
+     */
     public String getVariableName() {
         return variableName;
     }
 
+    /**
+     * Get namespace suffix.
+     * @return Namespace suffix
+     */
     public String getNamespaceSuffix() {
         return namespaceSuffix;
     }
 
+    /**
+     * Constructor.
+     * @param type Type
+     * @param line Line
+     * @param attribute Is attribute
+     * @param variableName Variable name
+     * @param namespaceSuffix Namespace suffix
+     * @param storeValue Store value
+     * @param definition Is definition
+     * @param openedNamespaces Opened namespaces
+     * @param abcIndex ABC index
+     */
     public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
         super(storeValue);
         this.attribute = attribute;
@@ -162,10 +249,18 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.abcIndex = abcIndex;
     }
 
+    /**
+     * Is definition.
+     * @return Is definition
+     */
     public boolean isDefinition() {
         return definition;
     }
 
+    /**
+     * Gets store value.
+     * @return Store value
+     */
     public GraphTargetItem getStoreValue() {
         return assignedValue;
     }
@@ -175,6 +270,11 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return writer;
     }
 
+    /**
+     * Gets default value for a type.
+     * @param type Type
+     * @return Default value
+     */
     public static GraphTargetItem getDefaultValue(String type) {
         switch (type) {
             case "*":
@@ -190,6 +290,14 @@ public class NameAVM2Item extends AssignableAVM2Item {
         }
     }
 
+    /**
+     * Generates coerce.
+     * @param localData Local data
+     * @param generator Generator
+     * @param ttype Target type
+     * @return Coerce instruction
+     * @throws CompilationException On compilation error
+     */
     public static AVM2Instruction generateCoerce(SourceGeneratorLocalData localData, SourceGenerator generator, GraphTargetItem ttype) throws CompilationException {
         if (ttype instanceof UnresolvedAVM2Item) {
             ttype = ((UnresolvedAVM2Item) ttype).resolved;

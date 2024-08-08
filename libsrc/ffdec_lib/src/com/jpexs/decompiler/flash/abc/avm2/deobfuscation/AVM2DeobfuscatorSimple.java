@@ -96,6 +96,13 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
     private final int executionLimit = 30000;
 
     /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorSimple() {
+
+    }
+
+    /**
      * Removes obfuscation ifs.
      *
      * @param classIndex Class index
@@ -105,7 +112,7 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
      * @param body Method body
      * @param inlineIns Inline instruction
      * @return True if code was modified
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     protected boolean removeObfuscationIfs(int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, AVM2Instruction inlineIns) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -174,7 +181,7 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
      * @param result Execution result
      * @param inlineIns Inline instruction
      * @return True if code was modified
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private boolean executeInstructions(Map<Integer, Object> staticRegs, MethodBody body, ABC abc, AVM2Code code, LocalDataArea localData, int idx, int endIdx, ExecutionResult result, AVM2Instruction inlineIns) throws InterruptedException {
         int instructionsProcessed = 0;
@@ -398,7 +405,7 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {

@@ -50,16 +50,24 @@ import java.util.logging.Logger;
  */
 public class ImageImporter extends TagImporter {
 
+    /**
+     * Imports image.
+     * @param it Image tag
+     * @param newData New data
+     * @return Imported tag
+     * @throws IOException On I/O error
+     */
     public Tag importImage(ImageTag it, byte[] newData) throws IOException {
         return importImage(it, newData, 0);
     }
 
     /**
-     * @param it
-     * @param newData
+     * Imports image.
+     * @param it Image tag
+     * @param newData New data
      * @param tagType 0 = can change for defineBits, -1 = detect based on data
-     * @return
-     * @throws IOException
+     * @return Imported tag
+     * @throws IOException On I/O error
      */
     public Tag importImage(ImageTag it, byte[] newData, int tagType) throws IOException {
         if (newData.length >= 2 && newData[0] == 'B' && newData[1] == 'M') {
@@ -136,6 +144,13 @@ public class ImageImporter extends TagImporter {
         return null;
     }
 
+    /**
+     * Imports image alpha.
+     * @param it Image tag
+     * @param newData New data
+     * @return Imported tag
+     * @throws IOException On I/O error
+     */
     public Tag importImageAlpha(ImageTag it, byte[] newData) throws IOException {
 
         try {
@@ -164,10 +179,21 @@ public class ImageImporter extends TagImporter {
         return null;
     }
 
+    /**
+     * Converts image.
+     * @param it Image tag
+     * @param tagType 0 = can change for defineBits, -1 = detect based on data
+     * @throws IOException
+     */
     public void convertImage(ImageTag it, int tagType) throws IOException {
         importImage(it, Helper.readStream(it.getConvertedImageData()), tagType);
     }
 
+    /**
+     * Gets image tag type.
+     * @param format Format
+     * @return Image tag type
+     */
     public static int getImageTagType(String format) {
         int res = 0;
         switch (format) {
@@ -191,6 +217,13 @@ public class ImageImporter extends TagImporter {
         return res;
     }
 
+    /**
+     * Bulk import images.
+     * @param imagesDir Images directory
+     * @param swf SWF
+     * @param printOut Print out
+     * @return Number of imported images
+     */
     public int bulkImport(File imagesDir, SWF swf, boolean printOut) {
         int count = 0;
         Map<Integer, CharacterTag> characters = swf.getCharacters(false);

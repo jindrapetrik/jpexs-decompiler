@@ -24,9 +24,23 @@ import java.io.IOException;
  */
 public interface HasSeparateAlphaChannel {
 
+    /**
+     * Checks if this has an alpha channel.
+     * @return True if this has an alpha channel, false otherwise.
+     */
     public boolean hasAlphaChannel();
 
+    /**
+     * Gets the image alpha channel.
+     * @return Image alpha channel
+     * @throws IOException On I/O error
+     */
     public byte[] getImageAlpha() throws IOException;
 
+    /**
+     * Sets the image alpha channel.
+     * @param data Image alpha channel
+     * @throws IOException On I/O error
+     */
     public void setImageAlpha(byte[] data) throws IOException;
 }

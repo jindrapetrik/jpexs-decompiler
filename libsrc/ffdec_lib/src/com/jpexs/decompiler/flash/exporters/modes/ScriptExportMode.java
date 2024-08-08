@@ -22,11 +22,32 @@ package com.jpexs.decompiler.flash.exporters.modes;
  * @author JPEXS
  */
 public enum ScriptExportMode {
+    /**
+     * ActionScript source code
+     */
     AS,
+    /**
+     * ActionScript P-code source code
+     */
     PCODE,
+    /**
+     * ActionScript P-code source code with hex values
+     */
     PCODE_HEX,
+    /**
+     * ActionScript P-code source code Graphviz dot
+     */
     PCODE_GRAPHVIZ,
+    /**
+     * Hex values
+     */
     HEX,
-    CONSTANTS, // AS1/2 ConstantPool
+    /**
+     * ActionScript 1/2 ConstantPool
+     */
+    CONSTANTS,
+    /**
+     * ActionScript method stubs
+     */
     AS_METHOD_STUBS
 }

@@ -60,6 +60,14 @@ import java.util.Set;
  */
 public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
+
+    /**
+     * Constructor.
+     */
+    public AVM2DeobfuscatorRegistersOld() {
+
+    }
+
     /**
      * Gets all register ids.
      *
@@ -101,7 +109,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
      * @param trait Trait
      * @param methodInfo Method info
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     public void avm2CodeRemoveTraps(String path, int classIndex, boolean isStatic, int scriptIndex, ABC abc, Trait trait, int methodInfo, MethodBody body) throws InterruptedException {
@@ -182,7 +190,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
      * @param ignoredRegisters Ignored registers
      * @param ignoredGets Ignored gets
      * @return Register id
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int getFirstRegisterSetter(Reference<AVM2Instruction> assignment, int classIndex, boolean isStatic, int scriptIndex, ABC abc, MethodBody body, Set<Integer> ignoredRegisters, Set<Integer> ignoredGets) throws InterruptedException {
         AVM2Code code = body.getCode();
@@ -257,7 +265,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
      * @param ignored Ignored
      * @param ignoredGets Ignored gets
      * @return Register id
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
 

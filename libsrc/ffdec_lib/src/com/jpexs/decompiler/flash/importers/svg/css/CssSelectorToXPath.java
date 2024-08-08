@@ -561,10 +561,23 @@ public class CssSelectorToXPath {
         return -1;
     }
 
+    /**
+     * Convert CSS selector to XPath.
+     *
+     * @param s CSS selector
+     * @return XPath
+     */
     public String css2xpath(String s) {
         return css2xpath(s, false);
     }
 
+    /**
+     * Convert CSS selector to XPath.
+     *
+     * @param s CSS selector
+     * @param nested true if nested
+     * @return XPath
+     */
     public String css2xpath(String s, boolean nested) {
         if (nested == true) {
             // Replace :pseudo-classes

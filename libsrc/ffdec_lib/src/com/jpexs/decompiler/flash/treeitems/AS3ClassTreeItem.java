@@ -57,7 +57,7 @@ public abstract class AS3ClassTreeItem implements TreeItem {
     /**
      * Gets name with namespace suffix.
      *
-     * @return
+     * @return Name with namespace suffix
      */
     public String getNameWithNamespaceSuffix() {
         String ret = name;
@@ -70,7 +70,7 @@ public abstract class AS3ClassTreeItem implements TreeItem {
     /**
      * Gets name with namespace suffix but printable.
      *
-     * @return
+     * @return Name with namespace suffix but printable
      */
     public String getPrintableNameWithNamespaceSuffix() {
         String ret = IdentifiersDeobfuscation.printIdentifier(true, name);
@@ -83,17 +83,12 @@ public abstract class AS3ClassTreeItem implements TreeItem {
     /**
      * Gets class path as string.
      *
-     * @return
+     * @return Class path as string
      */
     public String getPath() {
         return path.toString();
     }
 
-    /**
-     * ToString.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         return getPrintableNameWithNamespaceSuffix();

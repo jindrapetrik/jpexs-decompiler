@@ -23,5 +23,12 @@ package com.jpexs.decompiler.flash.abc.avm2;
  */
 public enum AVM2Runtime {
 
-    UNKNOWN, ADOBE_FLASH
+    /**
+     * Unknown
+     */
+    UNKNOWN,
+    /**
+     * Adobe Flash
+     */
+    ADOBE_FLASH
 }

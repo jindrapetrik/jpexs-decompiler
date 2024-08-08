@@ -43,10 +43,33 @@ public class AS2ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS2ScriptImporter.class.getName());
 
+
+    /**
+     * Constructor.
+     */
+    public AS2ScriptImporter() {
+
+    }
+
+    /**
+     * Imports scripts from given folder.
+     * @param scriptsFolder Folder with scripts
+     * @param asms Map of ASMSource objects
+     * @return Number of imported scripts
+     * @throws InterruptedException On I/O error
+     */
     public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) throws InterruptedException {
         return importScripts(scriptsFolder, asms, null);
     }
 
+    /**
+     * Imports scripts from given folder.
+     * @param scriptsFolder Folder with scripts
+     * @param asms Map of ASMSource objects
+     * @param listener Progress listener
+     * @return Number of imported scripts
+     * @throws InterruptedException On I/O error
+     */
     public int importScripts(String scriptsFolder, Map<String, ASMSource> asms, ScriptImporterProgressListener listener) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;

@@ -23,5 +23,16 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 enum SvgLineJoin {
 
-    MITER, ROUND, BEVEL
+    /**
+     * Miter
+     */
+    MITER,
+    /**
+     * Round
+     */
+    ROUND,
+    /**
+     * Bevel
+     */
+    BEVEL
 }

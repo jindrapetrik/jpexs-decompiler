@@ -65,6 +65,17 @@ public class ExportScriptTask implements Callable<File> {
 
     EventListener eventListener;
 
+    /**
+     * Constructor.
+     * @param handler AbortRetryIgnoreHandler
+     * @param index Index
+     * @param count Count
+     * @param name Name
+     * @param asm ASMSource
+     * @param directory Directory
+     * @param exportSettings Export settings
+     * @param evl Event listener
+     */
     public ExportScriptTask(AbortRetryIgnoreHandler handler, int index, int count, String name, ASMSource asm, String directory, ScriptExportSettings exportSettings, EventListener evl) {
         this.asm = asm;
         this.directory = directory;

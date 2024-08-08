@@ -44,10 +44,27 @@ public class PathExporter extends ShapeExporterBase {
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
+    /**
+     * Exports shape to GeneralPath.
+     * @param windingRule GeneralPath winding rule
+     * @param shapeNum Shape number
+     * @param swf SWF
+     * @param shape Shape
+     * @return
+     */
     public static List<GeneralPath> export(int windingRule, int shapeNum, SWF swf, SHAPE shape) {
         return export(windingRule, shapeNum, swf, shape, new ArrayList<>());
     }
 
+    /**
+     * Exports shape to GeneralPath.
+     * @param windingRule GeneralPath winding rule
+     * @param shapeNum Shape number (1 for DefineShape, 2 for DefineShape2, etc.)
+     * @param swf SWF
+     * @param shape Shape
+     * @param strokes List of strokes
+     * @return List of GeneralPath
+     */
     public static List<GeneralPath> export(int windingRule, int shapeNum, SWF swf, SHAPE shape, List<GeneralPath> strokes) {
         PathExporter exporter = new PathExporter(windingRule, shapeNum, swf, shape, null);
         exporter.export();
@@ -55,6 +72,14 @@ public class PathExporter extends ShapeExporterBase {
         return exporter.paths;
     }
 
+    /**
+     * Constructor.
+     * @param windingRule GeneralPath winding rule
+     * @param shapeNum Shape number
+     * @param swf SWF
+     * @param shape Shape
+     * @param colorTransform Color transform
+     */
     protected PathExporter(int windingRule, int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
     }
@@ -145,6 +170,9 @@ public class PathExporter extends ShapeExporterBase {
         path.quadTo(controlX, controlY, anchorX, anchorY);
     }
 
+    /**
+     * Finalizes path.
+     */
     protected void finalizePath() {
         if (thickness == 0) {
             strokes.add(new GeneralPath());

@@ -38,10 +38,36 @@ public class AS3ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptImporter.class.getName());
 
+    /**
+     * Constructor.
+     */
+    public AS3ScriptImporter() {
+
+    }
+
+    /**
+     * Imports scripts from a folder.
+     * @param scriptReplacer Replacer for the scripts
+     * @param scriptsFolder Folder with scripts
+     * @param packs List of script packs
+     * @param dependencies List of dependencies
+     * @return Number of imported scripts
+     * @throws InterruptedException On interrupt
+     */
     public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, List<SWF> dependencies) throws InterruptedException {
         return importScripts(scriptReplacer, scriptsFolder, packs, null, dependencies);
     }
 
+    /**
+     * Imports scripts from a folder.
+     * @param scriptReplacer Replacer for the scripts
+     * @param scriptsFolder Folder with scripts
+     * @param packs List of script packs
+     * @param listener Listener for progress
+     * @param dependencies List of dependencies
+     * @return Number of imported scripts
+     * @throws InterruptedException On interrupt
+     */
     public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, ScriptImporterProgressListener listener, List<SWF> dependencies) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;

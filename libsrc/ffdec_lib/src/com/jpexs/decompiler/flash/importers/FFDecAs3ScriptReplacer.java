@@ -39,6 +39,10 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
     private boolean air;
 
+    /**
+     * Constructor.
+     * @param air True if AIR is used, false if Flash Player is used
+     */
     public FFDecAs3ScriptReplacer(boolean air) {
         this.air = air;
     }
@@ -101,6 +105,10 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
         return !(swc == null || !swc.exists());
     }
 
+    /**
+     * Check if AIR is used.
+     * @return True if AIR is used, false if Flash Player is used
+     */
     public boolean isAir() {
         return air;
     }

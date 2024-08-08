@@ -44,10 +44,25 @@ public class SwfFlashDevelopExporter {
         return ds;
     }
 
+    /**
+     * Exports SWF to FlashDevelop project.
+     * @param swf SWF to export
+     * @param outFile Output file
+     * @param handler Handler for abort, retry, ignore
+     * @throws IOException On I/O error
+     */
     public void exportFlashDevelopProject(SWF swf, File outFile, AbortRetryIgnoreHandler handler) throws IOException {
         exportFlashDevelopProject(swf, outFile, handler, null);
     }
 
+    /**
+     * Exports SWF to FlashDevelop project.
+     * @param swf SWF to export
+     * @param outFile Output file
+     * @param handler Handler for abort, retry, ignore
+     * @param eventListener Event listener
+     * @throws IOException On I/O error
+     */
     public void exportFlashDevelopProject(SWF swf, File outFile, AbortRetryIgnoreHandler handler, EventListener eventListener) throws IOException {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");

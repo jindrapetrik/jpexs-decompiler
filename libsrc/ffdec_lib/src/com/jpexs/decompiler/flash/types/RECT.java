@@ -53,10 +53,20 @@ public class RECT implements Serializable {
     @SWFType(value = BasicType.SB, countField = "nbits")
     public int Ymax;
 
+    /**
+     * Number of bits
+     */
     @Calculated
     @SWFType(value = BasicType.UB, count = 5)
     public int nbits;
 
+    /**
+     * Constructor.
+     * @param Xmin X minimum position for rectangle in twips
+     * @param Xmax X maximum position for rectangle in twips
+     * @param Ymin Y minimum position for rectangle in twips
+     * @param Ymax Y maximum position for rectangle in twips
+     */
     public RECT(int Xmin, int Xmax, int Ymin, int Ymax) {
         this.Xmin = Xmin;
         this.Xmax = Xmax;
@@ -64,9 +74,16 @@ public class RECT implements Serializable {
         this.Ymax = Ymax;
     }
 
+    /**
+     * Constructor.
+     */
     public RECT() {
     }
 
+    /**
+     * Copy constructor.
+     * @param r RECT to copy
+     */
     public RECT(RECT r) {
         Xmin = r.Xmin;
         Xmax = r.Xmax;
@@ -79,26 +96,49 @@ public class RECT implements Serializable {
         return "[RECT x=" + Xmin + " to " + Xmax + ", y=" + Ymin + " to " + Ymax + "]";
     }
 
+    /**
+     * Gets width of rectangle.
+     * @return Width of rectangle
+     */
     public int getWidth() {
         return (Xmax - Xmin) < 0 ? 0 : Xmax - Xmin;
     }
 
+    /**
+     * Gets height of rectangle.
+     * @return Height of rectangle
+     */
     public int getHeight() {
         return (Ymax - Ymin) < 0 ? 0 : Ymax - Ymin;
     }
 
+    /**
+     * Gets top left point of rectangle.
+     * @return Top left point of rectangle
+     */
     public Point getTopLeft() {
         return new Point(Xmin, Ymin);
     }
 
+    /**
+     * Gets bottom right point of rectangle.
+     * @return Bottom right point of rectangle
+     */
     public Point getBottomRight() {
         return new Point(Xmax, Ymax);
     }
 
+    /**
+     * Calculates number of bits needed to store this RECT.
+     */
     public void calculateBits() {
         nbits = SWFOutputStream.getNeededBitsS(Xmin, Xmax, Ymin, Ymax);
     }
 
+    /**
+     * Checks if this RECT is too large to number of bits be stored in 5 bits.
+     * @return True if this RECT is too large
+     */
     public boolean isTooLarge() {
         calculateBits();
         return !SWFOutputStream.fitsInUB(5, nbits);

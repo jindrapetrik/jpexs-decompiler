@@ -42,17 +42,22 @@ import java.util.List;
  */
 public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCharacterId {
 
+    /**
+     * Reserved
+     */
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
     public int reserved;
 
     /**
-     * @since SWF 8 Has blend mode?
+     * Has blend mode?
+     * @since SWF 8
      */
     public boolean buttonHasBlendMode;
 
     /**
-     * @since SWF 8 Has filter list?
+     * Has filter list?
+     * @since SWF 8
      */
     public boolean buttonHasFilterList;
 
@@ -138,11 +143,19 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     @Internal
     private boolean modified;
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param tag Button tag
+     */
     public BUTTONRECORD(SWF swf, ButtonTag tag) {
         this.swf = swf;
         this.tag = tag;
     }
 
+    /**
+     * Constructor.
+     */
     public BUTTONRECORD() {
         swf = null;
         tag = null;
@@ -163,6 +176,10 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
         return swf;
     }
 
+    /**
+     * Sets the modified flag.
+     * @param value Modified flag
+     */
     public void setModified(boolean value) {
         modified = value;
     }
@@ -193,6 +210,10 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
         this.characterId = characterId;
     }
 
+    /**
+     * Converts this BUTTONRECORD to a place tag.
+     * @return Place tag
+     */
     public PlaceObject3Tag toPlaceObject() {
         PlaceObject3Tag placeTag = new PlaceObject3Tag(swf);
         placeTag.depth = placeDepth;

@@ -35,28 +35,58 @@ import java.util.Objects;
  */
 public class NamespaceItem {
 
+    /**
+     * Custom namespace.
+     */
     public static final int KIND_NAMESPACE_CUSTOM = -2;
 
+    /**
+     * Name
+     */
     public DottedChain name;
 
+    /**
+     * Kind
+     */
     public int kind;
 
+    /**
+     * Namespace index
+     */
     private int nsIndex = -1;
 
+    /**
+     * Force resolves namespace.
+     * @param abcIndex ABC indexing
+     */
     public void forceResolve(AbcIndexing abcIndex) {
         nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(kind, name, 0, true);
     }
 
+    /**
+     * Constructor.
+     * @param name Name
+     * @param kind Kind
+     */
     public NamespaceItem(DottedChain name, int kind) {
         this.name = name;
         this.kind = kind;
     }
 
+    /**
+     * Constructor.
+     * @param name Name
+     * @param kind Kind
+     */
     public NamespaceItem(String name, int kind) {
         this.name = DottedChain.parseWithSuffix(name);
         this.kind = kind;
     }
 
+    /**
+     * Constructor.
+     * @param nsIndex Namespace index
+     */
     public NamespaceItem(int nsIndex) {
         this.nsIndex = nsIndex;
     }
@@ -87,6 +117,15 @@ public class NamespaceItem {
         return (this.kind == other.kind);
     }
 
+    /**
+     * Resolves custom namespace.
+     * @param abcIndex ABC indexing
+     * @param importedClasses Imported classes
+     * @param pkg Package
+     * @param openedNamespaces Opened namespaces
+     * @param localData Local data
+     * @throws CompilationException On compilation error
+     */
     public void resolveCustomNs(AbcIndexing abcIndex, List<DottedChain> importedClasses, DottedChain pkg, List<NamespaceItem> openedNamespaces, SourceGeneratorLocalData localData) throws CompilationException {
         if (nsIndex > -1) { //already resolved
             return;
@@ -139,10 +178,20 @@ public class NamespaceItem {
         }
     }
 
+    /**
+     * Checks if namespace is resolved.
+     * @return True if namespace is resolved
+     */
     public boolean isResolved() {
         return nsIndex > -1;
     }
 
+    /**
+     * Gets constant pool index.
+     * @param abcIndex ABC indexing
+     * @return Constant pool index
+     * @throws CompilationException On compilation error
+     */
     public int getCpoolIndex(AbcIndexing abcIndex) throws CompilationException {
         if (nsIndex > -1) {
             return nsIndex;
@@ -154,6 +203,13 @@ public class NamespaceItem {
         return nsIndex;
     }
 
+    /**
+     * Gets namespace set index.
+     * @param abcIndex ABC indexing
+     * @param namespaces Namespaces
+     * @return Namespace set index
+     * @throws CompilationException On compilation error
+     */
     public static int getCpoolSetIndex(AbcIndexing abcIndex, List<NamespaceItem> namespaces) throws CompilationException {
         int[] nssa = new int[namespaces.size()];
         for (int i = 0; i < nssa.length; i++) {

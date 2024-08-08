@@ -33,8 +33,19 @@ import java.util.List;
  */
 public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Constructor.
+     * @param line Line
+     * @param openedNamespaces Opened namespaces
+     * @param name Name
+     * @param arguments Arguments
+     * @param abcIndex ABC index
+     */
     public ConstructSomethingAVM2Item(int line, List<NamespaceItem> openedNamespaces, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex) {
         super(openedNamespaces, line, name, arguments, abcIndex);
         this.openedNamespaces = openedNamespaces;

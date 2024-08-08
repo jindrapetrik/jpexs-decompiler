@@ -39,6 +39,11 @@ public final class DotId {
     private final boolean isHtml;
     private final String toStringValue;
 
+    /**
+     * Constructor.
+     * @param value Value
+     * @param isHtml Is HTML
+     */
     public DotId(String value, boolean isHtml) {
         this.value = value;
         this.isHtml = isHtml;
@@ -96,18 +101,42 @@ public final class DotId {
         return true;
     }
 
+    /**
+     * Join DotIds with delimiter.
+     * @param delimiter Delimiter
+     * @param ids DotIds
+     * @return Joined DotId
+     */
     public static DotId join(CharSequence delimiter, DotId... ids) {
         return join(new DotId(delimiter.toString(), false), ids);
     }
 
+    /**
+     * Join DotIds with delimiter.
+     * @param delimiter Delimiter
+     * @param ids DotIds
+     * @return Joined DotId
+     */
     public static DotId join(DotId delimiter, DotId... ids) {
         return join(delimiter, Arrays.asList(ids));
     }
 
+    /**
+     * Join DotIds with delimiter.
+     * @param delimiter Delimiter
+     * @param ids DotIds
+     * @return Joined DotId
+     */
     public static DotId join(CharSequence delimiter, Iterable<? extends DotId> ids) {
         return join(new DotId(delimiter.toString(), false), ids);
     }
 
+    /**
+     * Join DotIds with delimiter.
+     * @param delimiter Delimiter
+     * @param ids DotIds
+     * @return Joined DotId
+     */
     public static DotId join(DotId delimiter, Iterable<? extends DotId> ids) {
         StringBuilder sb = new StringBuilder();
         boolean retHtml = false;

@@ -23,5 +23,16 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 enum SvgLineCap {
 
-    BUTT, ROUND, SQUARE
+    /**
+     * Butt
+     */
+    BUTT,
+    /**
+     * Round
+     */
+    ROUND,
+    /**
+     * Square
+     */
+    SQUARE
 }

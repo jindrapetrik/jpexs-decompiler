@@ -26,9 +26,15 @@ import java.io.Serializable;
  */
 public class MORPHFOCALGRADIENT extends MORPHGRADIENT implements Serializable {
 
+    /**
+     * Start focal point
+     */
     @SWFType(BasicType.FIXED8)
     public float startFocalPoint;
 
+    /**
+     * End focal point
+     */
     @SWFType(BasicType.FIXED8)
     public float endFocalPoint;
 

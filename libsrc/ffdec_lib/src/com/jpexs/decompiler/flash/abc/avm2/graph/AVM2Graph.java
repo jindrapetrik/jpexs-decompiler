@@ -239,7 +239,7 @@ public class AVM2Graph extends Graph {
      * @param path Path
      * @param allParts All parts
      * @param throwStates Throw states
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
@@ -276,7 +276,7 @@ public class AVM2Graph extends Graph {
      * @param localData Local data
      * @param path Path
      * @param allParts All parts
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected void afterGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts) throws InterruptedException {
@@ -288,7 +288,7 @@ public class AVM2Graph extends Graph {
      *
      * @param localData Local data
      * @param allParts All parts
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void getIgnoredSwitches(AVM2LocalData localData, Set<GraphPart> allParts) throws InterruptedException {
 
@@ -736,7 +736,7 @@ public class AVM2Graph extends Graph {
      * @param localRegAssigmentIps Local register assignment IPs
      * @param thisHasDefaultToPrimitive This has default to primitive
      * @return List of graph target items
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         ScopeStack localScopeStack = new ScopeStack();
@@ -1086,7 +1086,7 @@ public class AVM2Graph extends Graph {
      * @param path Path
      * @param recursionLevel Recursion level
      * @return True if try is found
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private boolean checkTry(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (localData.parsedExceptions == null) {
@@ -1647,7 +1647,7 @@ public class AVM2Graph extends Graph {
      * @param path Path
      * @param recursionLevel Recursion level
      * @return True to stop processing. False to continue.
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
@@ -1689,7 +1689,7 @@ public class AVM2Graph extends Graph {
      * @param path Path
      * @return List of GraphTargetItems to replace current output and stop
      * further processing. Null to continue.
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
@@ -2421,7 +2421,7 @@ public class AVM2Graph extends Graph {
      * @param level Level
      * @param localData Local data
      * @param path Path
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
@@ -2775,14 +2775,6 @@ public class AVM2Graph extends Graph {
         super.finalProcess(list, level, localData, path);
     }
 
-    /**
-     * Gets data for final process.
-     *
-     * @param localData
-     * @param loops
-     * @param throwStates
-     * @return
-     */
     @Override
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
         FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames, ((AVM2LocalData) localData).setLocalPosToGetLocalPos);
@@ -2790,12 +2782,6 @@ public class AVM2Graph extends Graph {
         return finalProcess;
     }
 
-    /**
-     * Prepares local data for branch.
-     *
-     * @param localData Local data
-     * @return Local data for a branch
-     */
     @Override
     public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;

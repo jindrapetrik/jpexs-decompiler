@@ -25,8 +25,14 @@ import java.io.Serializable;
  */
 public class Null implements Serializable {
 
+    /**
+     * Singleton instance of Null.
+     */
     public static Null INSTANCE = new Null();
 
+    /**
+     * Private constructor.
+     */
     private Null() {
     }
 

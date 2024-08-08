@@ -49,10 +49,39 @@ public class AS2ScriptExporter {
 
     private static final Logger logger = Logger.getLogger(AS2ScriptExporter.class.getName());
 
+    /**
+     * Constructor.
+     */
+    public AS2ScriptExporter() {
+        
+    }
+
+    /**
+     * Export ActionScript 2 scripts.
+     * @param swf SWF
+     * @param handler AbortRetryIgnoreHandler
+     * @param outdir Output directory
+     * @param exportSettings Export settings
+     * @param parallel Parallel
+     * @param evl EventListener
+     * @return List of exported files
+     * @throws IOException On I/O error
+     */
     public List<File> exportActionScript2(SWF swf, AbortRetryIgnoreHandler handler, String outdir, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
         return exportAS2Scripts(handler, outdir, swf.getASMs(true), exportSettings, parallel, evl);
     }
 
+    /**
+     * Export ActionScript 2 scripts.
+     * @param handler AbortRetryIgnoreHandler
+     * @param outdir Output directory
+     * @param asms ASM sources
+     * @param exportSettings Export settings
+     * @param parallel Parallel
+     * @param evl EventListener
+     * @return List of exported files
+     * @throws IOException On I/O error
+     */
     public List<File> exportAS2Scripts(AbortRetryIgnoreHandler handler, String outdir, Map<String, ASMSource> asms, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {

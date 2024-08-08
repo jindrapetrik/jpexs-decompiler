@@ -41,10 +41,19 @@ import org.w3c.dom.Element;
  */
 public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
+    /**
+     * Path
+     */
     protected Element path;
 
+    /**
+     * Id
+     */
     protected int id;
 
+    /**
+     * Last pattern id
+     */
     protected int lastPatternId;
 
     private final Color defaultColor;
@@ -53,6 +62,18 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
 
     private final SVGExporter exporter;
 
+    /**
+     * Constructor.
+     * @param morphShapeNum Morph shape number (1 = DefineMorphShape, 2 = DefineMorphShape2)
+     * @param swf SWF
+     * @param shape Shape
+     * @param endShape End shape
+     * @param id Id
+     * @param exporter SVG exporter
+     * @param defaultColor Default color
+     * @param colorTransform Color transform
+     * @param zoom Zoom
+     */
     public SVGMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
         super(morphShapeNum, shape, endShape, colorTransform, zoom);
         this.swf = swf;
@@ -415,6 +436,19 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
          element.appendChild(animateSkewX);*/
     }
 
+    /**
+     * Populates gradient element.
+     * @param gradient Element
+     * @param type Type
+     * @param gradientRecords Gradient records
+     * @param gradientRecordsEnd Gradient records end
+     * @param matrix Matrix
+     * @param matrixEnd Matrix end
+     * @param spreadMethod Spread method
+     * @param interpolationMethod Interpolation method
+     * @param focalPointRatio Focal point ratio
+     * @param focalPointRatioEnd Focal point ratio end
+     */
     protected void populateGradientElement(Element gradient, int type, GRADRECORD[] gradientRecords, GRADRECORD[] gradientRecordsEnd, Matrix matrix, Matrix matrixEnd, int spreadMethod, int interpolationMethod, float focalPointRatio, float focalPointRatioEnd) {
         gradient.setAttribute("gradientUnits", "userSpaceOnUse");
         if (type == FILLSTYLE.LINEAR_GRADIENT) {
@@ -487,6 +521,11 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
         path.setAttribute("stroke", "#ff0000");
     }
 
+    /**
+     * Rounds pixels to 400.
+     * @param pixels Pixels
+     * @return Rounded pixels
+     */
     protected double roundPixels400(double pixels) {
         return Math.round(pixels * 10000) / 10000.0;
     }

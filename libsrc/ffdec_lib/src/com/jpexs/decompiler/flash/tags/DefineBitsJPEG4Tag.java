@@ -277,7 +277,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
 
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
-            return ImageHelper.getDimesion(bis);
+            return ImageHelper.getDimension(bis);
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
         }

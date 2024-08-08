@@ -40,10 +40,25 @@ import java.util.List;
  */
 public class ShapeForMorphExporter extends ShapeExporterBase {
 
+    /**
+     * List of shapes.
+     */
     public List<List<BezierEdge>> shapes = new ArrayList<>();
+    /**
+     * List of fill style indices.
+     */
     public List<Integer> fillStyleIndices = new ArrayList<>();
+    /**
+     * List of line style indices.
+     */
     public List<Integer> lineStyleIndices = new ArrayList<>();
+    /**
+     * List of points position percent.
+     */
     public List<List<Double>> pointsPosPercent = new ArrayList<>();
+    /**
+     * List of central position.
+     */
     public List<Point2D.Double> centralPos = new ArrayList<>();
     private final List<Point2D.Double> pointsSum = new ArrayList<>();
     private final List<Integer> segmentCount = new ArrayList<>();
@@ -56,12 +71,22 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
     private int currentLineStyle = -1;
     private int currentFillStyle = -1;
 
+    /**
+     * List of fill styles.
+     */
     public List<FILLSTYLE> fillStyles = new ArrayList<>();
+    /**
+     * List of line styles.
+     */
     public List<LINESTYLE2> lineStyles = new ArrayList<>();
 
     private double lastX = 0;
     private double lastY = 0;
 
+    /**
+     * Constructor.
+     * @param shape Shape tag
+     */
     public ShapeForMorphExporter(ShapeTag shape) {
         super(ShapeTag.WIND_EVEN_ODD, shape.getShapeNum(), shape.getSwf(), shape.shapes, new ColorTransform());
     }

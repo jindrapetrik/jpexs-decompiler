@@ -33,6 +33,13 @@ import java.util.List;
  */
 public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdTag, SoundTag {
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public SoundStreamHeadTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -44,6 +51,10 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
     public abstract List<SoundStreamFrameRange> getRanges();
 
+    /**
+     * Checks if the MP3 sound is higher than 160 kbps.
+     * @return True if the MP3 sound is higher than 160 kbps, false otherwise
+     */
     protected boolean isMp3HigherThan160Kbps() {
         List<SoundStreamFrameRange> ranges = getRanges();
         if (ranges.isEmpty()) {

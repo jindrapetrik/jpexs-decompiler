@@ -26,36 +26,85 @@ import java.io.Serializable;
  */
 public class HighlightData implements Cloneable, Serializable {
 
+    /**
+     * Declaration flag
+     */
     public boolean declaration;
 
+    /**
+     * Declared type
+     */
     public DottedChain declaredType;
 
+    /**
+     * Local name
+     */
     public String localName;
 
+    /**
+     * Subtype
+     */
     public HighlightSpecialType subtype;
 
+    /**
+     * Special value
+     */
     public String specialValue;
 
+    /**
+     * Index
+     */
     public long index;
 
+    /**
+     * Offset
+     */
     public long offset;
 
+    /**
+     * File offset
+     */
     public long fileOffset = -1;
 
+    /**
+     * First line offset
+     */
     public long firstLineOffset = -1;
 
+    /**
+     * Register index
+     */
     public int regIndex = -1;
 
+    /**
+     * Namespace index
+     */
     public int namespaceIndex = -1;
 
+    /**
+     * Activation register index
+     */
     public int activationRegIndex = -1;
 
+    /**
+     * Is static
+     */
     public boolean isStatic = false;
 
+    /**
+     * Property type
+     */
     public String propertyType;
 
+    /**
+     * Property subtype
+     */
     public String propertySubType;
 
+    /**
+     * Checks if the data is empty.
+     * @return True if the data is empty, false otherwise.
+     */
     public boolean isEmpty() {
         return !declaration && declaredType == null && localName == null
                 && subtype == null && specialValue == null
@@ -67,6 +116,10 @@ public class HighlightData implements Cloneable, Serializable {
                 && activationRegIndex == -1;
     }
 
+    /**
+     * Merges the data.
+     * @param data Data to merge.
+     */
     public void merge(HighlightData data) {
         if (data == null) {
             return;

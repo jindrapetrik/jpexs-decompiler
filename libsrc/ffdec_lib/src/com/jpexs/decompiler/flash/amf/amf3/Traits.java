@@ -28,32 +28,62 @@ public class Traits {
     private boolean dynamic;
     private Set<String> sealedMemberNames;
 
+    /**
+     * Constructor.
+     * @param className Class name
+     * @param dynamic Dynamic
+     * @param sealedMemberNames
+     */
     public Traits(String className, boolean dynamic, Collection<? extends String> sealedMemberNames) {
         this.className = className;
         this.dynamic = dynamic;
         this.sealedMemberNames = new ListSet<>(sealedMemberNames);
     }
 
+    /**
+     * Gets class name.
+     * @return Class name
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Checks if dynamic.
+     * @return True if dynamic
+     */
     public boolean isDynamic() {
         return dynamic;
     }
 
+    /**
+     * Gets sealed member names.
+     * @return Sealed member names
+     */
     public Set<String> getSealedMemberNames() {
         return new ListSet<>(sealedMemberNames);
     }
 
+    /**
+     * Sets class name.
+     * @param className Class name
+     */
     public void setClassName(String className) {
         this.className = className;
     }
 
+    /**
+     * Sets dynamic.
+     * @param dynamic Dynamic
+     */
     public void setDynamic(boolean dynamic) {
         this.dynamic = dynamic;
     }
 
+    /**
+     * Sets sealed member names.
+     * @param sealedMemberNames Sealed member names
+     */
     public void setSealedMemberNames(Collection<? extends String> sealedMemberNames) {
         this.sealedMemberNames = new ListSet<>(sealedMemberNames);
     }

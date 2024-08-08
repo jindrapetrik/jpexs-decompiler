@@ -25,14 +25,32 @@ import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
  */
 public class FrameExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "frames";
 
+    /**
+     * Mode
+     */
     public FrameExportMode mode;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Transparent background
+     */
     public boolean transparentBackground;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param zoom Zoom
+     * @param transparentBackground Transparent background
+     */
     public FrameExportSettings(FrameExportMode mode, double zoom, boolean transparentBackground) {
         this.mode = mode;
         this.zoom = zoom;

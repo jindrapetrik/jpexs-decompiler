@@ -25,12 +25,26 @@ import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
  */
 public class ButtonExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "buttons";
 
+    /**
+     * Mode
+     */
     public ButtonExportMode mode;
 
+    /**
+     * Zoom
+     */
     public double zoom;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     * @param zoom Zoom
+     */
     public ButtonExportSettings(ButtonExportMode mode, double zoom) {
         this.mode = mode;
         this.zoom = zoom;

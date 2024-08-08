@@ -61,6 +61,12 @@ import java.util.Stack;
  */
 public class ASM3Parser {
 
+    /**
+     * Constructor.
+     */
+    public ASM3Parser() {
+    }
+
     private static class OffsetItem {
 
         public String label = "";
@@ -211,6 +217,16 @@ public class ASM3Parser {
 
     }
 
+    /**
+     * Parses a class.
+     * @param abc ABC
+     * @param reader Reader
+     * @param constants Constant pool
+     * @param tc Trait class
+     * @return True if parsed successfully
+     * @throws IOException On I/O error
+     * @throws AVM2ParseException On parse error
+     */
     public static boolean parseClass(ABC abc, Reader reader, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
         Flasm3Lexer lexer = new Flasm3Lexer(reader);
         return parseClass(abc, lexer, constants, tc);
@@ -326,6 +342,16 @@ public class ASM3Parser {
         return true;
     }
 
+    /**
+     * Parses a slot or const.
+     * @param abc ABC
+     * @param reader Reader
+     * @param constants Constant pool
+     * @param tsc Trait slot/const
+     * @return True if parsed successfully
+     * @throws IOException On I/O error
+     * @throws AVM2ParseException On parse error
+     */
     public static boolean parseSlotConst(ABC abc, Reader reader, AVM2ConstantPool constants, TraitSlotConst tsc) throws IOException, AVM2ParseException {
         Flasm3Lexer lexer = new Flasm3Lexer(reader);
         return parseSlotConst(abc, lexer, constants, tsc);
@@ -579,6 +605,14 @@ public class ASM3Parser {
         return constants.getMultinameId(multiname, true);
     }
 
+    /**
+     * Parses value.
+     * @param constants Constant pool
+     * @param lexer Lexer
+     * @return Value kind
+     * @throws IOException On I/O error
+     * @throws AVM2ParseException On parse error
+     */
     public static ValueKind parseValue(AVM2ConstantPool constants, Flasm3Lexer lexer) throws IOException, AVM2ParseException {
         ParsedSymbol type = lexer.lex();
         ParsedSymbol value;
@@ -735,10 +769,35 @@ public class ASM3Parser {
         return new ValueKind(value_index, value_kind);
     }
 
+    /**
+     * Parses code.
+     * @param abc ABC
+     * @param reader Reader
+     * @param trait Trait
+     * @param body Method body
+     * @param info Method info
+     * @return AVM2 code
+     * @throws IOException On I/O error
+     * @throws AVM2ParseException On parse error
+     * @throws InterruptedException On interrupt
+     */
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         return parse(abc, reader, trait, null, body, info);
     }
 
+    /**
+     * Parses code.
+     * @param abc ABC
+     * @param reader Reader
+     * @param trait Trait
+     * @param missingHandler Missing symbol handler
+     * @param body Method body
+     * @param info Method info
+     * @return AVM2 code
+     * @throws IOException On I/O error
+     * @throws AVM2ParseException On parse error
+     * @throws InterruptedException On interrupt
+     */
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MissingSymbolHandler missingHandler, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
         AVM2ConstantPool constants = abc.constants;
         AVM2Code code = new AVM2Code();

@@ -27,16 +27,35 @@ public class CurvedEdge extends StraightEdge implements IEdge {
 
     private final int controlY;
 
+    /**
+     * Constructor.
+     * @param fromX From X
+     * @param fromY From Y
+     * @param controlX Control X
+     * @param controlY Control Y
+     * @param toX To X
+     * @param toY To Y
+     * @param lineStyleIdx Line style index
+     * @param fillStyleIdx Fill style index
+     */
     CurvedEdge(int fromX, int fromY, int controlX, int controlY, int toX, int toY, int lineStyleIdx, int fillStyleIdx) {
         super(fromX, fromY, toX, toY, lineStyleIdx, fillStyleIdx);
         this.controlX = controlX;
         this.controlY = controlY;
     }
 
+    /**
+     * Gets control X.
+     * @return Control X
+     */
     public int getControlX() {
         return controlX;
     }
 
+    /**
+     * Gets control Y.
+     * @return Control Y
+     */
     public int getControlY() {
         return controlY;
     }

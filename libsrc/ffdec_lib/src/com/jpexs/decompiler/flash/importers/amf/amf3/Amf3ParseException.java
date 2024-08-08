@@ -25,6 +25,11 @@ import com.jpexs.decompiler.flash.ParseException;
  */
 public class Amf3ParseException extends ParseException {
 
+    /**
+     * Constructor.
+     * @param text Text
+     * @param line Line
+     */
     public Amf3ParseException(String text, long line) {
         super(text, line);
     }

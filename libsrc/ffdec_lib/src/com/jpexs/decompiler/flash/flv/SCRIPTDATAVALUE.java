@@ -23,20 +23,39 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class SCRIPTDATAVALUE {
 
+    /**
+     * Type
+     */
     public int type;
 
+    /**
+     * Value
+     */
     public Object value;
 
+    /**
+     * Constructor.
+     * @param type Type
+     * @param value Value
+     */
     public SCRIPTDATAVALUE(int type, Object value) {
         this.type = type;
         this.value = value;
     }
 
+    /**
+     * Constructor.
+     * @param b Value
+     */
     public SCRIPTDATAVALUE(boolean b) {
         this.value = (Boolean) b;
         type = 1;
     }
 
+    /**
+     * Constructor.
+     * @param d Value
+     */
     public SCRIPTDATAVALUE(double d) {
         this.value = (Double) d;
         type = 0;

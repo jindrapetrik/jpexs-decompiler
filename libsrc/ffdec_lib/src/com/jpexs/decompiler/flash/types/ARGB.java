@@ -56,14 +56,25 @@ public class ARGB implements Serializable {
         return "[ARGB a=" + alpha + ",r=" + red + ",g=" + green + ",b=" + blue + "]";
     }
 
+    /**
+     * Converts this to color.
+     * @return Color
+     */
     public Color toColor() {
         return new Color(red, green, blue, alpha);
     }
 
+    /**
+     * Convers this to integer.
+     * @return Integer
+     */
     public int toInt() {
         return RGBA.toInt(red, green, blue, alpha);
     }
 
+    /**
+     * Constructor.
+     */
     public ARGB() {
 
     }

@@ -49,7 +49,7 @@ public interface Bundle {
      *
      * @param key Key
      * @return Openable file
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public SeekableInputStream getOpenable(String key) throws IOException;
 
@@ -57,7 +57,7 @@ public interface Bundle {
      * Gets all openable files in the bundle.
      *
      * @return Map from key to seekable input stream
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public Map<String, SeekableInputStream> getAll() throws IOException;
 
@@ -81,7 +81,7 @@ public interface Bundle {
      * @param key Key
      * @param is New input stream
      * @return True if the file was replaced, false otherwise
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public boolean putOpenable(String key, InputStream is) throws IOException;
 }

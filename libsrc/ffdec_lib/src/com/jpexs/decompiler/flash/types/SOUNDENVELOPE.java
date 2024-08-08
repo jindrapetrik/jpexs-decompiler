@@ -26,12 +26,21 @@ import java.io.Serializable;
  */
 public class SOUNDENVELOPE implements Serializable {
 
+    /**
+     * Position in 44 kHz samples
+     */
     @SWFType(BasicType.UI32)
     public long pos44;
 
+    /**
+     * Left level
+     */
     @SWFType(BasicType.UI16)
     public int leftLevel;
 
+    /**
+     * Right level
+     */
     @SWFType(BasicType.UI16)
     public int rightLevel;
 

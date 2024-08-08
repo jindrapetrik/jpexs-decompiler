@@ -43,7 +43,7 @@ public class BinarySWFBundle implements Bundle {
      * @param is Input stream
      * @param noCheck Do not check
      * @param searchMode Search mode
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public BinarySWFBundle(InputStream is, boolean noCheck, SearchMode searchMode) throws IOException {
         search = new SWFSearch(new SwfHeaderStreamSearch(is), noCheck, searchMode);

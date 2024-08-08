@@ -21,22 +21,76 @@ package com.jpexs.decompiler.flash.amf.amf3;
  */
 public class Marker {
 
+    /**
+     * Undefined
+     */
     public static final int UNDEFINED = 0x00;
+    /**
+     * Null
+     */
     public static final int NULL = 0x01;
+    /**
+     * False
+     */
     public static final int FALSE = 0x02;
+    /**
+     * True
+     */
     public static final int TRUE = 0x03;
+    /**
+     * Integer
+     */
     public static final int INTEGER = 0x04;
+    /**
+     * Double
+     */
     public static final int DOUBLE = 0x05;
+    /**
+     * String
+     */
     public static final int STRING = 0x06;
+    /**
+     * XML document
+     */
     public static final int XML_DOC = 0x07;
+    /**
+     * Date
+     */
     public static final int DATE = 0x08;
+    /**
+     * Array
+     */
     public static final int ARRAY = 0x09;
+    /**
+     * Object
+     */
     public static final int OBJECT = 0x0A;
+    /**
+     * XML
+     */
     public static final int XML = 0x0B;
+    /**
+     * Byte array
+     */
     public static final int BYTE_ARRAY = 0x0C;
+    /**
+     * Vector of integers
+     */
     public static final int VECTOR_INT = 0x0D;
+    /**
+     * Vector of unsigned integers
+     */
     public static final int VECTOR_UINT = 0x0E;
+    /**
+     * Vector of doubles
+     */
     public static final int VECTOR_DOUBLE = 0x0F;
+    /**
+     * Vector of objects
+     */
     public static final int VECTOR_OBJECT = 0x10;
+    /**
+     * Dictionary
+     */
     public static final int DICTIONARY = 0x11;
 }

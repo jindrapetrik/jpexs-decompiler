@@ -39,15 +39,48 @@ public class MethodAVM2Item extends FunctionAVM2Item {
 
     public final boolean outsidePackage;
 
+    /**
+     * Is private method.
+     * @return Is private method.
+     */
     public boolean isPrivate() {
         return isPrivate;
     }
 
+    /**
+     * Custom namespace
+     */
     public String customNamespace;
 
+    /**
+     * All opened namespaces
+     */
     public List<List<NamespaceItem>> allOpenedNamespaces;
 
-    //public boolean isInterface;
+    /**
+     * Constructor.
+     * @param allOpenedNamespaces All opened namespaces
+     * @param outsidePackage Is outside package
+     * @param isPrivate Is private
+     * @param metadata Metadata
+     * @param pkg Package
+     * @param isInterface Is interface
+     * @param isNative Is native
+     * @param customNamespace Custom namespace
+     * @param needsActivation Needs activation
+     * @param hasRest Has rest
+     * @param line Line
+     * @param override Override
+     * @param isFinal Is final
+     * @param isStatic Is static
+     * @param methodName Method name
+     * @param paramTypes Param types
+     * @param paramNames Param names
+     * @param paramValues Param values
+     * @param body Body
+     * @param subvariables Subvariables
+     * @param retType Return type
+     */
     public MethodAVM2Item(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, boolean isPrivate, List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, boolean isInterface, boolean isNative, String customNamespace, boolean needsActivation, boolean hasRest, int line, boolean override, boolean isFinal, boolean isStatic, String methodName, List<GraphTargetItem> paramTypes, List<String> paramNames, List<GraphTargetItem> paramValues, List<GraphTargetItem> body, List<AssignableAVM2Item> subvariables, GraphTargetItem retType) {
         super(metadata, pkg, isInterface, isNative, needsActivation, hasRest, line, methodName, paramTypes, paramNames, paramValues, body, subvariables, retType);
         this.outsidePackage = outsidePackage;
@@ -57,17 +90,28 @@ public class MethodAVM2Item extends FunctionAVM2Item {
         this.isFinal = isFinal;
         this.isPrivate = isPrivate;
         this.customNamespace = customNamespace;
-        //this.isInterface = this.isInterface;
     }
 
+    /**
+     * Is override.
+     * @return Is override
+     */
     public boolean isOverride() {
         return override;
     }
 
+    /**
+     * Is static.
+     * @return Is static
+     */
     public boolean isStatic() {
         return isStatic;
     }
 
+    /**
+     * Is final.
+     * @return Is final
+     */
     public boolean isFinal() {
         return isFinal;
     }

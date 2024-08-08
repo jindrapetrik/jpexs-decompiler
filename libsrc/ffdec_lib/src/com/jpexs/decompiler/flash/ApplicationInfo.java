@@ -132,6 +132,13 @@ public class ApplicationInfo {
     }
 
     /**
+     * Constructor.
+     */
+    public ApplicationInfo() {
+        
+    }
+    
+    /**
      * Loads library version
      */
     private static void loadLibraryVersion() {

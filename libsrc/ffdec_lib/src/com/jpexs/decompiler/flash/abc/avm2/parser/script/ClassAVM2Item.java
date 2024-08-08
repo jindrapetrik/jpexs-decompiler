@@ -36,36 +36,84 @@ import java.util.Map;
  */
 public class ClassAVM2Item extends AVM2Item implements Block {
 
+    /**
+     * Traits
+     */
     public List<GraphTargetItem> traits;
 
+    /**
+     * Extends
+     */
     public GraphTargetItem extendsOp;
 
+    /**
+     * Implements
+     */
     public List<GraphTargetItem> implementsOp;
 
+    /**
+     * Class base name
+     */
     public String classBaseName;
 
+    /**
+     * Instance initializer
+     */
     public GraphTargetItem iinit;
 
+    /**
+     * Is dynamic
+     */
     public boolean isDynamic;
 
+    /**
+     * Is final
+     */
     public boolean isFinal;
 
+    /**
+     * Opened namespaces
+     */
     public List<NamespaceItem> openedNamespaces;
 
+    /**
+     * Static initializer
+     */
     public List<GraphTargetItem> staticInit;
 
+    /**
+     * Static initializer activation
+     */
     public boolean cinitActivation;
 
+    /**
+     * Instance initializer activation
+     */
     public boolean iinitActivation;
 
+    /**
+     * Static initializer variables
+     */
     public List<AssignableAVM2Item> cinitVariables;
 
+    /**
+     * Imported classes
+     */
     public List<DottedChain> importedClasses;
 
+    /**
+     * Package
+     */
     public NamespaceItem pkg;
 
+    /**
+     * Instance initializer variables
+     */
     public List<AssignableAVM2Item> iinitVariables;
 
+    /**
+     * Metadata
+     */
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
     @Override
@@ -82,6 +130,25 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     }
 
+    /**
+     * Constructor.
+     * @param metadata Metadata
+     * @param importedClasses Imported classes
+     * @param pkg Package
+     * @param openedNamespaces Opened namespaces
+     * @param isFinal Is final
+     * @param isDynamic Is dynamic
+     * @param className Class name
+     * @param extendsOp Extends
+     * @param implementsOp Implements
+     * @param cinit Static initializer
+     * @param staticInitActivation Static initializer activation
+     * @param cinitVariables Static initializer variables
+     * @param iinit Instance initializer
+     * @param iinitVariables Instance initializer variables
+     * @param traits Traits
+     * @param iinitActivation Instance initializer activation
+     */
     public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, boolean isDynamic, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> cinit, boolean staticInitActivation, List<AssignableAVM2Item> cinitVariables, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, List<GraphTargetItem> traits, boolean iinitActivation) {
         super(null, null, NOPRECEDENCE);
         this.metadata = metadata;

@@ -23,10 +23,22 @@ package com.jpexs.decompiler.flash.types.annotations.parser;
  */
 public class ConditionToken {
 
+    /**
+     * Value
+     */
     public String value;
 
+    /**
+     * Type
+     */
     public ConditionTokenType type;
 
+    /**
+     * Constructor.
+     *
+     * @param type Type
+     * @param value Value
+     */
     public ConditionToken(ConditionTokenType type, String value) {
         this.value = value;
         this.type = type;

@@ -28,9 +28,20 @@ import java.util.Map;
  */
 public abstract class SymbolClassTypeTag extends Tag {
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public SymbolClassTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Gets the tag to name map.
+     * @return Tag to name map
+     */
     public abstract Map<Integer, String> getTagToNameMap();
 }

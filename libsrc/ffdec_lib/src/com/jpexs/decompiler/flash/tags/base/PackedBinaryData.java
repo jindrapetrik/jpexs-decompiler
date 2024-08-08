@@ -44,6 +44,12 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     private Packer usedPacker;
     private SWF innerSwf;
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param parent Parent binary data
+     * @param data Data
+     */
     public PackedBinaryData(SWF swf, BinaryDataInterface parent, ByteArrayRange data) {
         this.swf = swf;
         this.parent = parent;
@@ -70,6 +76,10 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
         return sub;
     }
 
+    /**
+     * Gets parent binary data.
+     * @return Parent binary data
+     */
     public BinaryDataInterface getParent() {
         return parent;
     }

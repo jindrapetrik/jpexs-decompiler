@@ -26,6 +26,12 @@ import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
  */
 public class MorphShapeImporter {
 
+    /**
+     * Gets morph shape tag type.
+     *
+     * @param format Format
+     * @return Morph shape tag type
+     */
     public static int getMorphShapeTagType(String format) {
         int res = 0;
         switch (format) {

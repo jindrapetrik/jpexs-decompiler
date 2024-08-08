@@ -74,11 +74,6 @@ public class ClassPath implements Serializable {
         return packageStr.add(className, namespaceSuffix).toRawString();
     }
 
-    /**
-     * Hash code
-     *
-     * @return Hash code
-     */
     @Override
     public int hashCode() {
         int hash = 3;
@@ -88,12 +83,6 @@ public class ClassPath implements Serializable {
         return hash;
     }
 
-    /**
-     * Equals
-     *
-     * @param obj
-     * @return True if equals
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

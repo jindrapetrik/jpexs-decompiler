@@ -23,34 +23,74 @@ package com.jpexs.decompiler.flash.flv;
  */
 public class FLVTAG {
 
+    /**
+     * Tag type
+     */
     public int tagType;
 
+    /**
+     * Timestamp in milliseconds
+     */
     public long timeStamp;
 
+    /**
+     * Data
+     */
     public DATA data;
 
+    /**
+     * Data type: video
+     */
     public static final int DATATYPE_VIDEO = 9;
 
+    /**
+     * Data type: audio
+     */
     public static final int DATATYPE_AUDIO = 8;
 
+    /**
+     * Data type: script data
+     */
     public static final int DATATYPE_SCRIPT_DATA = 18;
 
+    /**
+     * Constructor.
+     * @param timeStamp Timestamp in milliseconds
+     * @param data Data
+     */
     public FLVTAG(long timeStamp, SCRIPTDATA data) {
         tagType = DATATYPE_SCRIPT_DATA;
+        this.timeStamp = timeStamp;
         this.data = data;
     }
 
+    /**
+     * Constructor.
+     * @param timeStamp Timestamp in milliseconds
+     * @param data Data
+     */
     public FLVTAG(long timeStamp, UnparsedDATA data) {
         tagType = data.getDataType();
+        this.timeStamp = timeStamp;
         this.data = data;
     }
 
+    /**
+     * Constructor.
+     * @param timeStamp Timestamp in milliseconds
+     * @param data Data
+     */
     public FLVTAG(long timeStamp, VIDEODATA data) {
         this.tagType = DATATYPE_VIDEO;
         this.timeStamp = timeStamp;
         this.data = data;
     }
 
+    /**
+     * Constructor.
+     * @param timeStamp Timestamp in milliseconds
+     * @param data Data
+     */
     public FLVTAG(long timeStamp, AUDIODATA data) {
         this.tagType = DATATYPE_AUDIO;
         this.timeStamp = timeStamp;

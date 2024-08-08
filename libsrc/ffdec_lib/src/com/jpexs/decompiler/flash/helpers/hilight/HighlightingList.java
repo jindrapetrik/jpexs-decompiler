@@ -30,10 +30,18 @@ public class HighlightingList extends ArrayList<Highlighting> {
 
     private boolean finished = false;
 
+    /**
+     * Marks this list as finished, so no more elements can be added.
+     */
     public void finish() {
         this.finished = true;
     }
 
+    /**
+     * Returns true if this list is finished.
+     *
+     * @return true if this list is finished
+     */
     public boolean isFinished() {
         return finished;
     }

@@ -31,35 +31,35 @@ public interface ILINESTYLE extends NeedsCharacters, Serializable {
     /**
      * Gets version of LINESTYLE.
      *
-     * @return
+     * @return Version of LINESTYLE
      */
     public int getNum();
 
     /**
      * Gets color.
      *
-     * @return
+     * @return Color
      */
     public RGB getColor();
 
     /**
      * Gets width.
      *
-     * @return
+     * @return Width
      */
     public int getWidth();
 
     /**
      * Sets color.
      *
-     * @param color
+     * @param color Color
      */
     public void setColor(RGB color);
 
     /**
      * Sets width.
      *
-     * @param width
+     * @param width Width
      */
     public void setWidth(int width);
 }

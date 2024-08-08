@@ -26,8 +26,14 @@ import java.io.Serializable;
  */
 public class HighlightedText implements Serializable {
 
+    /**
+     * Empty highlighted text
+     */
     public static HighlightedText EMPTY = new HighlightedText();
 
+    /**
+     * Text
+     */
     public String text;
 
     private final HighlightingList traitHighlights;
@@ -40,26 +46,50 @@ public class HighlightedText implements Serializable {
 
     private final HighlightingList specialHighlights;
 
+    /**
+     * Gets trait highlights
+     * @return Trait highlights
+     */
     public HighlightingList getTraitHighlights() {
         return traitHighlights;
     }
 
+    /**
+     * Gets method highlights
+     * @return Method highlights
+     */
     public HighlightingList getMethodHighlights() {
         return methodHighlights;
     }
 
+    /**
+     * Gets class highlights
+     * @return Class highlights
+     */
     public HighlightingList getClassHighlights() {
         return classHighlights;
     }
 
+    /**
+     * Gets instruction highlights
+     * @return Instruction highlights
+     */
     public HighlightingList getInstructionHighlights() {
         return instructionHighlights;
     }
 
+    /**
+     * Gets special highlights
+     * @return Special highlights
+     */
     public HighlightingList getSpecialHighlights() {
         return specialHighlights;
     }
 
+    /**
+     * Constructor.
+     * @param writer Writer
+     */
     public HighlightedText(HighlightedTextWriter writer) {
         this.text = writer.toString();
         this.traitHighlights = writer.traitHilights;
@@ -73,6 +103,10 @@ public class HighlightedText implements Serializable {
         this("");
     }
 
+    /**
+     * Constructor.
+     * @param text Text
+     */
     public HighlightedText(String text) {
         this.text = text;
         this.traitHighlights = new HighlightingList();

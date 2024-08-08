@@ -28,6 +28,13 @@ import java.util.Map;
  */
 public abstract class RemoveTag extends Tag implements DepthTag {
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public RemoveTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }

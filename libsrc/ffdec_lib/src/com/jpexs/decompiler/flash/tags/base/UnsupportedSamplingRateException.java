@@ -26,16 +26,29 @@ public class UnsupportedSamplingRateException extends SoundImportException {
     private final int soundRate;
     private final int[] supportedRates;
 
+    /**
+     * Constructor.
+     * @param soundRate Unsupported sound rate
+     * @param supportedRates Supported sound rates
+     */
     public UnsupportedSamplingRateException(int soundRate, int[] supportedRates) {
         super("Unsupported sound rate: " + soundRate);
         this.soundRate = soundRate;
         this.supportedRates = supportedRates;
     }
 
+    /**
+     * Gets supported sound rates.
+     * @return Supported sound rates
+     */
     public int[] getSupportedRates() {
         return supportedRates;
     }
 
+    /**
+     * Gets unsupported sound rate.
+     * @return Unsupported sound rate
+     */
     public int getSoundRate() {
         return soundRate;
     }

@@ -46,28 +46,66 @@ import java.util.Map;
  */
 public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
+    /**
+     * Shape
+     */
     protected final SHAPE shape;
 
+    /**
+     * Shape end
+     */
     protected final SHAPE shapeEnd;
 
+    /**
+     * Fill styles
+     */
     protected List<FILLSTYLE> _fillStyles;
 
+    /**
+     * Line styles
+     */
     protected List<ILINESTYLE> _lineStyles;
 
+    /**
+     * Fill styles end
+     */
     protected List<FILLSTYLE> _fillStylesEnd;
 
+    /**
+     * Line styles end
+     */
     protected List<ILINESTYLE> _lineStylesEnd;
 
+    /**
+     * Fill edge maps
+     */
     protected List<Map<Integer, List<IMorphEdge>>> _fillEdgeMaps;
 
+    /**
+     * Line edge maps
+     */
     protected List<Map<Integer, List<IMorphEdge>>> _lineEdgeMaps;
 
     private boolean edgeMapsCreated;
 
+    /**
+     * Color transform
+     */
     protected ColorTransform colorTransform;
 
+    /**
+     * Morph shape number (1 = DefineMorphShape, 2 = DefineMorphShape2)
+     */
     protected int morphShapeNum;
 
+    /**
+     * Constructor.
+     *
+     * @param morphShapeNum Morph shape number (1 = DefineMorphShape, 2 = DefineMorphShape2)
+     * @param shape Shape
+     * @param endShape Shape end
+     * @param colorTransform Color transform
+     */
     public MorphShapeExporterBase(int morphShapeNum, SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
         this.shape = shape;
         this.shapeEnd = endShape;
@@ -97,6 +135,9 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         }
     }
 
+    /**
+     * Exports the morph shape.
+     */
     public void export() {
         // Create edge maps
         _fillEdgeMaps = new ArrayList<>();

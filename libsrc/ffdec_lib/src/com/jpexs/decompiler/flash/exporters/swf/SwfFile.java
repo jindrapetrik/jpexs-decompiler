@@ -26,10 +26,20 @@ import java.io.IOException;
  */
 public class SwfFile {
 
+    /**
+     * Gets SWF
+     * @return SWF
+     */
     public SWF getSwf() {
         return null;
     }
 
+    /**
+     * Saves SWF to file
+     *
+     * @param fileName File name
+     * @throws IOException
+     */
     public void saveTo(String fileName) throws IOException {
         /*SWF swf = getSwf();
          try (FileOutputStream fos = new FileOutputStream(fileName)) {

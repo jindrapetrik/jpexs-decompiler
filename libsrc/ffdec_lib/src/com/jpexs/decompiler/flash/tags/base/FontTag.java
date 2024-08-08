@@ -57,78 +57,236 @@ import java.util.Set;
  */
 public abstract class FontTag extends DrawableTag implements AloneTag {
 
+    /**
+     * Preview size for font tags
+     */
     public static final int PREVIEWSIZE = 500;
 
+    /**
+     * Constructor.
+     *
+     * @param swf SWF
+     * @param id Tag ID
+     * @param name Tag name
+     * @param data Tag data
+     */
     public FontTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
+    /**
+     * Gets glyph shape table.
+     * @return Glyph shape table
+     */
     public abstract List<SHAPE> getGlyphShapeTable();
 
+    /**
+     * Adds character to font.
+     * @param character Character
+     * @param font Font
+     * @return True if character was added, false otherwise
+     */
     public abstract boolean addCharacter(char character, Font font);
 
+    /**
+     * Removes character from font.
+     * @param character Character
+     * @return True if character was removed, false otherwise
+     */
     public abstract boolean removeCharacter(char character);
 
+    /**
+     * Sets advance values.
+     * @param font Font
+     */
     public abstract void setAdvanceValues(Font font);
 
+    /**
+     * Converts glyph to character.
+     * @param glyphIndex Glyph index
+     * @return Character
+     */
     public abstract char glyphToChar(int glyphIndex);
 
+    /**
+     * Converts character to glyph.
+     * @param c Character
+     * @return Glyph index
+     */
     public abstract int charToGlyph(char c);
 
+    /**
+     * Gets glyph advance.
+     * @param glyphIndex Glyph index
+     * @return Glyph advance
+     */
     public abstract double getGlyphAdvance(int glyphIndex);
 
+    /**
+     * Gets glyph kerning adjustment.
+     * @param glyphIndex Glyph index
+     * @param nextGlyphIndex Next glyph index
+     * @return Kerning adjustment
+     */
     public abstract int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex);
 
+    /**
+     * Gets character kerning adjustment.
+     * @param c1 Character 1
+     * @param c2 Character 2
+     * @return Kerning adjustment
+     */
     public abstract int getCharKerningAdjustment(char c1, char c2);
 
+    /**
+     * Gets glyph width.
+     * @param glyphIndex Glyph index
+     * @return Glyph width
+     */
     public abstract int getGlyphWidth(int glyphIndex);
 
+    /**
+     * Gets font name in the tag.
+     * @return Font name in the tag
+     */
     public abstract String getFontNameIntag();
 
+    /**
+     * Sets font name in the tag.
+     * @param name Font name
+     */
     public abstract void setFontNameIntag(String name);
 
+    /**
+     * Checks if font is small.
+     * @return True if font is small, false otherwise
+     */
     public abstract boolean isSmall();
 
+    /**
+     * Checks if font is bold.
+     * @return True if font is bold, false otherwise
+     */
     public abstract boolean isBold();
 
+    /**
+     * Checks if font is italic.
+     * @return True if font is italic, false otherwise
+     */
     public abstract boolean isItalic();
 
+    /**
+     * Checks if the font small flag is editable.
+     * @return True if the font small flag is editable, false otherwise
+     */
     public abstract boolean isSmallEditable();
 
+    /**
+     * Checks if the font bold flag is editable.
+     * @return True if the font bold flag is editable, false otherwise
+     */
     public abstract boolean isBoldEditable();
 
+    /**
+     * Checks if the font italic flag is editable.
+     * @return True if the font italic flag is editable, false otherwise
+     */
     public abstract boolean isItalicEditable();
 
+    /**
+     * Checks if the font name in the tag is editable.
+     * @return True if the font name in the tag is editable, false otherwise
+     */
     public abstract boolean isFontNameInTagEditable();
 
+    /**
+     * Checks if ascent is editable.
+     * @return True if ascent is editable, false otherwise
+     */
     public abstract boolean isAscentEditable();
 
+    /**
+     * Checks if descent is editable.
+     * @return True if descent is editable, false otherwise
+     */
     public abstract boolean isDescentEditable();
 
+    /**
+     * Checks if leading is editable.
+     * @return True if leading is editable, false otherwise
+     */
     public abstract boolean isLeadingEditable();
 
+    /**
+     * Sets small flag.
+     * @param value Small flag value
+     */
     public abstract void setSmall(boolean value);
 
+    /**
+     * Sets bold flag.
+     * @param value Bold flag value
+     */
     public abstract void setBold(boolean value);
 
+    /**
+     * Sets italic flag.
+     * @param value Italic flag value
+     */
     public abstract void setItalic(boolean value);
 
+    /**
+     * Gets divider of font units.
+     * @return Divider of font units
+     */
     public abstract double getDivider();
 
+    /**
+     * Gets ascent.
+     * @return Ascent
+     */
     public abstract int getAscent();
 
+    /**
+     * Gets descent.
+     * @return Descent
+     */
     public abstract int getDescent();
 
+    /**
+     * Gets leading.
+     * @return Leading
+     */
     public abstract int getLeading();
 
+    /**
+     * Sets ascent.
+     * @param ascent Ascent
+     */
     public abstract void setAscent(int ascent);
 
+    /**
+     * Sets descent.
+     * @param descent Descent
+     */
     public abstract void setDescent(int descent);
 
+    /**
+     * Sets leading.
+     * @param leading Leading
+     */
     public abstract void setLeading(int leading);
 
+    /**
+     * Sets has layout flag.
+     * @param hasLayout Has layout flag
+     */
     public abstract void setHasLayout(boolean hasLayout);
 
+    /**
+     * Gets font name.
+     * @return Font name
+     */
     public String getFontName() {
         DefineFontNameTag fontNameTag = getFontNameTag();
         if (fontNameTag == null) {
@@ -137,6 +295,10 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return fontNameTag.fontName;
     }
 
+    /**
+     * Gets font copyright.
+     * @return Font copyright
+     */
     public String getFontCopyright() {
         DefineFontNameTag fontNameTag = getFontNameTag();
         if (fontNameTag == null) {
@@ -163,6 +325,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     private static Map<Font, Map<Integer, List<FontHelper.KerningPair>>> customFontKerningPairs;
 
+    /**
+     * Gets font file from font name.
+     * @param fontName Font name
+     * @return Font file
+     */
     public static File fontNameToFile(String fontName) {
         if (installedFontFilesByName.containsKey(fontName)) {
             return installedFontFilesByName.get(fontName);
@@ -177,14 +344,27 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         firstLoaded = true;
     }
 
+    /**
+     * Checks if font has layout.
+     * @return True if font has layout, false otherwise
+     */
     public boolean hasLayout() {
         return false;
     }
 
+    /**
+     * Checks if font contains character.
+     * @param character Character
+     * @return True if font contains character, false otherwise
+     */
     public boolean containsChar(char character) {
         return charToGlyph(character) > -1;
     }
 
+    /**
+     * Gets font style.
+     * @return Font style
+     */
     public int getFontStyle() {
         int fontStyle = 0;
         if (isBold()) {
@@ -196,8 +376,16 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return fontStyle;
     }
 
+    /**
+     * Gets character count.
+     * @return Character count
+     */
     public abstract int getCharacterCount();
 
+    /**
+     * Gets characters as string.
+     * @return Characters as string
+     */
     public abstract String getCharacters();
 
     @Override
@@ -221,6 +409,10 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return result + (fontName != null ? "_" + fontName : "");
     }
 
+    /**
+     * Gets system font name.
+     * @return System font name
+     */
     public String getSystemFontName() {
         int fontId = getCharacterId();
         String selectedFont = swf.sourceFontNamesMap.get(fontId);
@@ -244,10 +436,20 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return FontTag.findInstalledFontName(getFontName());
     }
 
+    /**
+     * Gets system font.
+     * @return System font
+     */
     public Font getSystemFont() {
         return FontTag.installedFontsByName.get(getSystemFontName());
     }
 
+    /**
+     * Shifts glyph indices.
+     * @param fontId Font ID
+     * @param startIndex Start index
+     * @param increment Increment
+     */
     protected void shiftGlyphIndices(int fontId, int startIndex, boolean increment) {
         for (Tag t : swf.getTags()) {
             List<TEXTRECORD> textRecords = null;
@@ -285,10 +487,26 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
     }
 
+    /**
+     * Gets system font advance.
+     * @param fontName Font name
+     * @param fontStyle Font style
+     * @param fontSize Font size
+     * @param character Character
+     * @param nextCharacter Next character
+     * @return System font advance
+     */
     public static float getSystemFontAdvance(String fontName, int fontStyle, int fontSize, Character character, Character nextCharacter) {
         return getSystemFontAdvance(new Font(fontName, fontStyle, fontSize), character, nextCharacter);
     }
 
+    /**
+     * Gets system font advance.
+     * @param aFont Font
+     * @param character Character
+     * @param nextCharacter Next character
+     * @return System font advance
+     */
     public static float getSystemFontAdvance(Font aFont, Character character, Character nextCharacter) {
         String chars = "" + character + (nextCharacter == null ? "" : nextCharacter);
         GlyphVector gv = aFont.layoutGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), chars.toCharArray(), 0, chars.length(), Font.LAYOUT_LEFT_TO_RIGHT);
@@ -296,11 +514,21 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return gm.getAdvanceX();
     }
 
+    /**
+     * Gets default font name.
+     * @return Default font name
+     */
     public static String getDefaultFontName() {
         ensureLoaded();
         return defaultFontName;
     }
 
+    /**
+     * Gets font kerning pairs.
+     * @param font Font
+     * @param size Size
+     * @return Font kerning pairs
+     */
     protected static List<FontHelper.KerningPair> getFontKerningPairs(Font font, int size) {
         if (customFontToFile.containsKey(font)) {
             if (!customFontKerningPairs.containsKey(font) || !customFontKerningPairs.get(font).containsKey(size)) {
@@ -336,10 +564,18 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return new ArrayList<>();
     }
 
+    /**
+     * Adds custom font.
+     * @param font Font
+     * @param file File
+     */
     public static void addCustomFont(Font font, File file) {
         customFontToFile.put(font, file);
     }
 
+    /**
+     * Reloads fonts.
+     */
     public static void reload() {
         installedFontKerningPairsByFamily = new HashMap<>();
         installedFontsByFamily = FontHelper.getInstalledFonts();
@@ -370,6 +606,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         }
     }
 
+    /**
+     * Gets font name with fallback.
+     * @param fontName Font name
+     * @return Font name with fallback
+     */
     public static String getFontNameWithFallback(String fontName) {
         ensureLoaded();
         if (installedFontsByFamily.containsKey(fontName)) {
@@ -385,6 +626,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return installedFontsByFamily.keySet().iterator().next();
     }
 
+    /**
+     * Checks if font family is installed.
+     * @param fontFamily Font family
+     * @return Installed font family
+     */
     public static String isFontFamilyInstalled(String fontFamily) {
         ensureLoaded();
         if (installedFontsByFamily.containsKey(fontFamily)) {
@@ -399,6 +645,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return null;
     }
 
+    /**
+     * Finds installed font name.
+     * @param fontName Font name
+     * @return Installed font name
+     */
     public static String findInstalledFontName(String fontName) {
         ensureLoaded();
         if (installedFontsByName.containsKey(fontName)) {
@@ -486,6 +737,10 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return super.getCharacterExportFileName() + "_" + getFontNameIntag();
     }
 
+    /**
+     * Gets DefineFontName tag.
+     * @return DefineFontNameTag tag
+     */
     public DefineFontNameTag getFontNameTag() {
         if (swf == null) {
             return null;
@@ -501,6 +756,10 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return null;
     }
 
+    /**
+     * Gets copyright.
+     * @return Copyright
+     */
     public String getCopyright() {
         DefineFontNameTag dfn = getFontNameTag();
         if (dfn == null) {
@@ -509,24 +768,45 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return dfn.fontCopyright;
     }
 
+    /**
+     * Gets glyph bounds.
+     * @param glyphIndex Glyph index
+     * @return Glyph bounds
+     */
     public RECT getGlyphBounds(int glyphIndex) {
         return getGlyphShapeTable().get(glyphIndex).getBounds(1);
     }
 
+    /**
+     * Converts font to classic font. (= not GFX and such)
+     * @return
+     */
     public FontTag toClassicFont() {
         return this;
     }
 
+    /**
+     * Gets installed fonts by family.
+     * @return Installed fonts by family
+     */
     public static Map<String, Map<String, Font>> getInstalledFontsByFamily() {
         ensureLoaded();
         return installedFontsByFamily;
     }
 
+    /**
+     * Gets installed fonts by family.
+     * @return Installed fonts by family
+     */
     public static Map<String, Font> getInstalledFontsByName() {
         ensureLoaded();
         return installedFontsByName;
     }
 
+    /**
+     * Gets codes charset.
+     * @return Codes charset
+     */
     public abstract String getCodesCharset();
 
 }

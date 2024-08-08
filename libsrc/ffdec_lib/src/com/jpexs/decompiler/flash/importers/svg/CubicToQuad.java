@@ -307,12 +307,22 @@ public class CubicToQuad {
         return _isApproximationClose(pc[0], pc[1], pc[2], pc[3], fromFlatArray(quads), errorBound);
     }
 
-    /*
+    /**
      * Approximate cubic Bezier curve defined with base points p1, p2 and control points c1, c2 with
      * with a few quadratic Bezier curves.
      * The function uses tangent method to find quadratic approximation of cubic curve segment and
      * simplified Hausdorff distance to determine number of segments that is enough to make error small.
      * In general the method is the same as described here: https://fontforge.github.io/bezier.html.
+     * @param p1x Base point 1 x coordinate
+     * @param p1y Base point 1 y coordinate
+     * @param c1x Control point 1 x coordinate
+     * @param c1y Control point 1 y coordinate
+     * @param c2x Control point 2 x coordinate
+     * @param c2y Control point 2 y coordinate
+     * @param p2x Base point 2 x coordinate
+     * @param p2y Base point 2 y coordinate
+     * @param errorBound Error bound
+     * @return List of quadratic Bezier curve points
      */
     public List<Double> cubicToQuad(double p1x, double p1y, double c1x, double c1y, double c2x, double c2y, double p2x, double p2y, double errorBound) {
         Point p1 = new Point(p1x, p1y);

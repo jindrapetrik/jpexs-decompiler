@@ -24,19 +24,30 @@ public class NoSerializerExistsException extends Exception {
     private final String className;
     private final Object incompleteData;
 
-    /*public NoSerializerExistsException(String className, Object incompleteData) {
-        this(className, incompleteData, null);
-    }*/
+    /**
+     * Constructor.
+     * @param className Class name
+     * @param incompleteData Incomplete data
+     * @param cause Cause
+     */
     public NoSerializerExistsException(String className, Object incompleteData, Throwable cause) {
         super("Cannot read AMF - no deserializer defined for class \"" + className + "\".", cause);
         this.className = className;
         this.incompleteData = incompleteData;
     }
 
+    /**
+     * Gets the class name.
+     * @return Class name
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Gets the incomplete data.
+     * @return Incomplete data
+     */
     public Object getIncompleteData() {
         return incompleteData;
     }

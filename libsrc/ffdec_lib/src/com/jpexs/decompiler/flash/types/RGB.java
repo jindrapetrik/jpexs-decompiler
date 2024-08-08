@@ -46,21 +46,38 @@ public class RGB implements Serializable {
     @SWFType(BasicType.UI8)
     public int blue;
 
+    /**
+     * Constructor.
+     * @param color Color to copy
+     */
     public RGB(RGB color) {
         this.red = color.red;
         this.green = color.green;
         this.blue = color.blue;
     }
 
+    /**
+     * Constructor.
+     * @param red Red color value
+     * @param green Green color value
+     * @param blue Blue color value
+     */
     public RGB(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
 
+    /**
+     * Constructor.
+     */
     public RGB() {
     }
 
+    /**
+     * Converts this RGB to hex string.
+     * @return Hex string
+     */
     public String toHexRGB() {
         String rh = Integer.toHexString(red);
         if (rh.length() < 2) {
@@ -77,14 +94,29 @@ public class RGB implements Serializable {
         return "#" + rh + gh + bh;
     }
 
+    /**
+     * Converts this RGB to Color.
+     * @return Color
+     */
     public Color toColor() {
         return new Color(red, green, blue);
     }
 
+    /**
+     * Converts this RGB to int.
+     * @return int
+     */
     public int toInt() {
         return toInt(red, green, blue);
     }
 
+    /**
+     * Converts RGB to int.
+     * @param red Red color value
+     * @param green Green color value
+     * @param blue Blue color value
+     * @return int
+     */
     public static int toInt(int red, int green, int blue) {
         return (0xFF << 24)
                 | ((red & 0xFF) << 16)
@@ -92,12 +124,20 @@ public class RGB implements Serializable {
                 | (blue & 0xFF);
     }
 
+    /**
+     * Constructor.
+     * @param color Color
+     */
     public RGB(Color color) {
         red = color.getRed();
         green = color.getGreen();
         blue = color.getBlue();
     }
 
+    /**
+     * Constructor.
+     * @param rgb RGB value
+     */
     public RGB(int rgb) {
         red = (rgb >> 16) & 0xFF;
         green = (rgb >> 8) & 0xFF;

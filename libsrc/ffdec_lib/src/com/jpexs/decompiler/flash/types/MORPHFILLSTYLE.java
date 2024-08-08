@@ -33,6 +33,9 @@ import java.util.Set;
  */
 public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
 
+    /**
+     * Fill style type
+     */
     @SWFType(BasicType.UI8)
     @EnumValue(value = SOLID, text = "Solid")
     @EnumValue(value = LINEAR_GRADIENT, text = "Linear gradient")
@@ -44,43 +47,91 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
     @EnumValue(value = NON_SMOOTHED_CLIPPED_BITMAP, text = "Non smoothed clipped bitmap")
     public int fillStyleType;
 
+    /**
+     * Type - solid
+     */
     public static final int SOLID = 0x0;
 
+    /**
+     * Type - linear gradient
+     */
     public static final int LINEAR_GRADIENT = 0x10;
 
+    /**
+     * Type - radial gradient
+     */
     public static final int RADIAL_GRADIENT = 0x12;
 
+    /**
+     * Type - focal radial gradient
+     */
     public static final int FOCAL_RADIAL_GRADIENT = 0x13;
 
+    /**
+     * Type - repeating bitmap
+     */
     public static final int REPEATING_BITMAP = 0x40;
 
+    /**
+     * Type - clipped bitmap
+     */
     public static final int CLIPPED_BITMAP = 0x41;
 
+    /**
+     * Type - non smoothed repeating bitmap
+     */
     public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
 
+    /**
+     * Type - non smoothed clipped bitmap
+     */
     public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
 
+    /**
+     * Start color
+     */
     @Conditional(value = "fillStyleType", options = {SOLID})
     public RGBA startColor;
 
+    /**
+     * End color
+     */
     @Conditional(value = "fillStyleType", options = {SOLID})
     public RGBA endColor;
 
+    /**
+     * Start gradient matrix
+     */
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
     public MATRIX startGradientMatrix;
 
+    /**
+     * End gradient matrix
+     */
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
     public MATRIX endGradientMatrix;
 
+    /**
+     * Gradient
+     */
     @Conditional(value = "fillStyleType", options = {LINEAR_GRADIENT, RADIAL_GRADIENT, FOCAL_RADIAL_GRADIENT})
     public MORPHGRADIENT gradient;
 
+    /**
+     * Bitmap id
+     */
     @Conditional(value = "fillStyleType", options = {REPEATING_BITMAP, CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public int bitmapId;
 
+    /**
+     * Start bitmap matrix
+     */
     @Conditional(value = "fillStyleType", options = {REPEATING_BITMAP, CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public MATRIX startBitmapMatrix;
 
+    /**
+     * End bitmap matrix
+     */
     @Conditional(value = "fillStyleType", options = {REPEATING_BITMAP, CLIPPED_BITMAP, NON_SMOOTHED_REPEATING_BITMAP, NON_SMOOTHED_CLIPPED_BITMAP})
     public MATRIX endBitmapMatrix;
 
@@ -144,6 +195,11 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Gets fill style at given ratio.
+     * @param ratio Ratio
+     * @return Fill style
+     */
     public FILLSTYLE getFillStyleAt(int ratio) {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;
@@ -163,6 +219,10 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Gets start fill style.
+     * @return Start fill style
+     */
     public FILLSTYLE getStartFillStyle() {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;
@@ -176,6 +236,10 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
         return ret;
     }
 
+    /**
+     * Gets end fill style.
+     * @return End fill style
+     */
     public FILLSTYLE getEndFillStyle() {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;

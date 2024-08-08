@@ -59,10 +59,25 @@ public class SwfIntelliJIdeaExporter {
         return ds;
     }
 
+    /**
+     * Exports SWF to IntelliJ IDEA project.
+     * @param swf SWF to export
+     * @param outDir Output directory
+     * @param handler Handler for abort, retry, ignore
+     * @throws IOException On I/O error
+     */
     public void exportIntelliJIdeaProject(SWF swf, File outDir, AbortRetryIgnoreHandler handler) throws IOException {
         exportIntelliJIdeaProject(swf, outDir, handler, null);
     }
 
+    /**
+     * Exports SWF to IntelliJ IDEA project.
+     * @param swf SWF to export
+     * @param outDir Output directory
+     * @param handler Handler for abort, retry, ignore
+     * @param eventListener Event listener
+     * @throws IOException On I/O error
+     */
     public void exportIntelliJIdeaProject(SWF swf, File outDir, AbortRetryIgnoreHandler handler, EventListener eventListener) throws IOException {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");

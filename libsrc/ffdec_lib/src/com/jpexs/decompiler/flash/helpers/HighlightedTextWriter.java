@@ -49,16 +49,34 @@ public class HighlightedTextWriter extends GraphTextWriter {
 
     private final Stack<Highlighting> hilightStack = new Stack<>();
 
+    /**
+     * Trait hilights
+     */
     public HighlightingList traitHilights = new HighlightingList();
 
+    /**
+     * Class hilights
+     */
     public HighlightingList classHilights = new HighlightingList();
 
+    /**
+     * Method hilights
+     */
     public HighlightingList methodHilights = new HighlightingList();
 
+    /**
+     * Instruction hilights
+     */
     public HighlightingList instructionHilights = new HighlightingList();
 
+    /**
+     * Special hilights
+     */
     public HighlightingList specialHilights = new HighlightingList();
 
+    /**
+     * Finish hilights.
+     */
     public void finishHilights() {
         traitHilights.finish();
         classHilights.finish();
@@ -67,11 +85,22 @@ public class HighlightedTextWriter extends GraphTextWriter {
         specialHilights.finish();
     }
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     * @param hilight If true, text will be highlighted
+     */
     public HighlightedTextWriter(CodeFormatting formatting, boolean hilight) {
         super(formatting);
         this.hilight = hilight;
     }
 
+    /**
+     * Constructor.
+     * @param formatting Code formatting
+     * @param hilight If true, text will be highlighted
+     * @param indent Indent
+     */
     public HighlightedTextWriter(CodeFormatting formatting, boolean hilight, int indent) {
         super(formatting);
         this.hilight = hilight;

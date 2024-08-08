@@ -25,10 +25,20 @@ import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
  */
 public class FontExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "fonts";
 
+    /**
+     * Mode
+     */
     public FontExportMode mode;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     */
     public FontExportSettings(FontExportMode mode) {
         this.mode = mode;
     }

@@ -36,6 +36,10 @@ public class MiterClipBasicStroke implements Stroke {
 
     private final BasicStroke stroke;
 
+    /**
+     * Constructor.
+     * @param stroke
+     */
     public MiterClipBasicStroke(BasicStroke stroke) {
         this.stroke = stroke;
     }

@@ -23,5 +23,13 @@ package com.jpexs.decompiler.flash.importers.svg;
  */
 enum SvgGradientUnits {
 
-    USER_SPACE_ON_USE, OBJECT_BOUNDING_BOX
+    /**
+     * User space on use
+     */
+    USER_SPACE_ON_USE,
+
+    /**
+     * Object bounding box
+     */
+    OBJECT_BOUNDING_BOX
 }

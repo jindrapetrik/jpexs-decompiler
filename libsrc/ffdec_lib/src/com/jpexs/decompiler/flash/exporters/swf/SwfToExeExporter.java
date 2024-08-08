@@ -36,8 +36,15 @@ import java.util.logging.Logger;
  */
 public class SwfToExeExporter {
 
-    public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(tmpFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+    /**
+     * Saves SWF to EXE file.
+     * @param swf SWF to save
+     * @param exeExportMode EXE export mode
+     * @param outFile Target file to save to
+     * @throws IOException If an I/O error occurs
+     */
+    public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File outFile) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(outFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {
                 case WRAPPER:
                     InputStream exeStream = SwfToExeExporter.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");

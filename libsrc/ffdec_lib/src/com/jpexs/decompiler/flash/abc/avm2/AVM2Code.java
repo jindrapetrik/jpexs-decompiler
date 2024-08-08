@@ -913,7 +913,7 @@ public class AVM2Code implements Cloneable {
      * @param arguments Local registers values
      * @param constants Constant pool
      * @return Result of the execution
-     * @throws AVM2ExecutionException
+     * @throws AVM2ExecutionException On execution error
      */
     public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants) throws AVM2ExecutionException {
         return execute(arguments, constants, null);
@@ -926,7 +926,7 @@ public class AVM2Code implements Cloneable {
      * @param constants Constant pool
      * @param runtimeInfo Runtime information
      * @return Result of the execution
-     * @throws AVM2ExecutionException
+     * @throws AVM2ExecutionException On execution error
      */
     public Object execute(HashMap<Integer, Object> arguments, AVM2ConstantPool constants, AVM2RuntimeInfo runtimeInfo) throws AVM2ExecutionException {
         int pos = 0;
@@ -1095,7 +1095,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param ais ABC input stream
      * @param body Method body
-     * @throws IOException
+     * @throws IOException On I/O error
      */
     public AVM2Code(ABCInputStream ais, MethodBody body) throws IOException {
         Map<Long, AVM2Instruction> codeMap = new HashMap<>();
@@ -1632,7 +1632,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param address Address
      * @return Instruction or null if not found
-     * @throws ConvertException
+     * @throws ConvertException On convert error
      */
     public AVM2Instruction adr2ins(long address) throws ConvertException {
         int pos = adr2pos(address, false);
@@ -1649,7 +1649,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param address Address
      * @return Position
-     * @throws ConvertException
+     * @throws ConvertException On convert error
      */
     public int adr2pos(long address) throws ConvertException {
         return adr2pos(address, false);
@@ -1661,7 +1661,7 @@ public class AVM2Code implements Cloneable {
      * @param address Address
      * @param nearest Whether to find nearest position
      * @return Position
-     * @throws ConvertException
+     * @throws ConvertException On convert error
      */
     public int adr2pos(long address, boolean nearest) throws ConvertException {
         int ret = adr2posNoEx(address);
@@ -1809,12 +1809,43 @@ public class AVM2Code implements Cloneable {
      *
      * @param addr Current address
      * @return New address
-     * @throws ConvertException
+     * @throws ConvertException On convert error
      */
     public long getAddrThroughJumpAndDebugLine(long addr) throws ConvertException {
         return pos2adr(getIpThroughJumpAndDebugLine(adr2pos(addr, true)));
     }
 
+    /**
+     * Converts to source output.
+     * @param switchParts Switch parts
+     * @param callStack Call stack
+     * @param abcIndex ABC indexing
+     * @param setLocalPosToGetLocalPos Set local position to get local position
+     * @param thisHasDefaultToPrimitive Whether this has default to primitive
+     * @param lineStartItem Line start item
+     * @param path Path
+     * @param part Part
+     * @param processJumps Whether to process jumps
+     * @param isStatic Whether is static
+     * @param scriptIndex Script index
+     * @param classIndex Class index
+     * @param localRegs Local registers
+     * @param stack Stack
+     * @param scopeStack Scope stack
+     * @param localScopeStack Local scope stack
+     * @param abc ABC
+     * @param body Method body
+     * @param start Start
+     * @param end End
+     * @param localRegNames Local register names
+     * @param localRegTypes Local register types
+     * @param fullyQualifiedNames Fully qualified names
+     * @param visited Visited
+     * @param localRegAssigmentIps Local register assignment IPs
+     * @return Convert output
+     * @throws ConvertException On convert error
+     * @throws InterruptedException On interrupt
+     */
     public ConvertOutput toSourceOutput(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
@@ -2474,7 +2505,7 @@ public class AVM2Code implements Cloneable {
      * @param staticOperation Static operation
      * @param localRegAssigmentIps Local register assignment IPs
      * @return List of GraphTargetItems
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public List<GraphTargetItem> toGraphTargetItems(List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, Traits initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps) throws InterruptedException {
         initToSource();
@@ -2755,7 +2786,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param path Path
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void fixJumps(final String path, MethodBody body) throws InterruptedException {
         if (code.isEmpty()) {
@@ -3014,7 +3045,7 @@ public class AVM2Code implements Cloneable {
      * @param isStatic True if static
      * @param path Path
      * @return 1
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeTraps(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
@@ -3243,7 +3274,7 @@ public class AVM2Code implements Cloneable {
      * @param ip Position
      * @param lastIp Last position
      * @param refs Map from position to list of references
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
         Queue<Integer> toVisit = new LinkedList<>();
@@ -3312,7 +3343,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param body Method body
      * @return Map from position to list of references
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
@@ -3334,7 +3365,7 @@ public class AVM2Code implements Cloneable {
      * Remove instructions that are marked as ignored.
      *
      * @param body Method body
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public void removeIgnored(MethodBody body) throws InterruptedException {
         //System.err.println("removing ignored...");
@@ -3352,7 +3383,7 @@ public class AVM2Code implements Cloneable {
      *
      * @param body Method body
      * @return Number of removed instructions
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeDeadCode(MethodBody body) throws InterruptedException {
         return removeDeadCode(body, new Reference<>(-1));
@@ -3365,7 +3396,7 @@ public class AVM2Code implements Cloneable {
      * @param minChangedIpRef Minimum changed instruction position (as
      * reference)
      * @return Number of removed instructions
-     * @throws InterruptedException
+     * @throws InterruptedException On interrupt
      */
     public int removeDeadCode(MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = visitCode(body);

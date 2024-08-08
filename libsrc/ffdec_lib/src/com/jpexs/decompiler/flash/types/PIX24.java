@@ -27,6 +27,9 @@ import java.io.Serializable;
  */
 public class PIX24 implements Serializable {
 
+    /**
+     * Reserved
+     */
     @SWFType(BasicType.UI8)
     @Reserved
     public int reserved;
@@ -52,5 +55,11 @@ public class PIX24 implements Serializable {
     @Override
     public String toString() {
         return "[PIX24 red:" + red + ", green:" + green + ", blue:" + blue + "]";
+    }
+
+    /**
+     * Constructor.
+     */
+    public PIX24() {
     }
 }

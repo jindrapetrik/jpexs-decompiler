@@ -25,5 +25,15 @@ import java.io.Serializable;
  */
 public class ALPHABITMAPDATA implements Serializable {
 
+    /**
+     * Bitmap pixel data
+     */
     public int[] bitmapPixelData = new int[0];
+
+    /**
+     * Constructor.
+     */
+    public ALPHABITMAPDATA() {
+
+    }
 }

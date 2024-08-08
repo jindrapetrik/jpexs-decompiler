@@ -25,10 +25,20 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
  */
 public class MovieExportSettings {
 
+    /**
+     * Export folder name
+     */
     public static final String EXPORT_FOLDER_NAME = "movies";
 
+    /**
+     * Mode
+     */
     public MovieExportMode mode;
 
+    /**
+     * Constructor.
+     * @param mode Mode
+     */
     public MovieExportSettings(MovieExportMode mode) {
         this.mode = mode;
     }

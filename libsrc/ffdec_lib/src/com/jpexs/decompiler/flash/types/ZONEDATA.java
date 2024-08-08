@@ -26,9 +26,15 @@ import java.io.Serializable;
  */
 public class ZONEDATA implements Serializable {
 
+    /**
+     * Alignment coordinate
+     */
     @SWFType(BasicType.FLOAT16)
     public int alignmentCoordinate;
 
+    /**
+     * Range
+     */
     @SWFType(BasicType.FLOAT16)
     public int range;
 

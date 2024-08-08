@@ -21,16 +21,31 @@ package com.jpexs.decompiler.flash.amf.amf3.types;
  */
 public class XmlType implements Amf3ValueType {
 
+    /**
+     * Data
+     */
     private String data;
 
+    /**
+     * Constructor.
+     * @param data Data
+     */
     public XmlType(String data) {
         this.data = data;
     }
 
+    /**
+     * Gets data.
+     * @return Data
+     */
     public String getData() {
         return data;
     }
 
+    /**
+     * Sets data.
+     * @param data Data
+     */
     public void setData(String data) {
         this.data = data;
     }

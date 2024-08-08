@@ -57,21 +57,46 @@ import java.util.logging.Logger;
  */
 public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
+    /**
+     * Shape ID
+     */
     @SWFType(BasicType.UI16)
     public int shapeId;
 
+    /**
+     * Shape bounds
+     */
     public RECT shapeBounds;
 
+    /**
+     * Shapes
+     */
     public SHAPEWITHSTYLE shapes;
 
+    /**
+     * Shape data
+     */
     protected ByteArrayRange shapeData;
 
     private final int markerSize = 10;
 
+    /**
+     * Winding rule - even-odd
+     */
     public static final int WIND_EVEN_ODD = 0;
 
+    /**
+     * Winding rule - nonzero
+     */
     public static final int WIND_NONZERO = 1;
 
+    /**
+     * Constructor.
+     * @param swf SWF
+     * @param id ID
+     * @param name Name
+     * @param data Data
+     */
     public ShapeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
@@ -81,10 +106,23 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
         getShapes();
     }
 
+    /**
+     * Gets the winding rule.
+     * @return Winding rule
+     */
     public abstract int getWindingRule();
 
+    /**
+     * Gets shape number.
+     * DefineShape = 1, DefineShape2 = 2, ...
+     * @return Shape number
+     */
     public abstract int getShapeNum();
 
+    /**
+     * Gets shapes.
+     * @return Shapes
+     */
     public synchronized SHAPEWITHSTYLE getShapes() {
         if (shapes == null && shapeData != null) {
             try {
@@ -271,6 +309,9 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
         this.shapeId = characterId;
     }
 
+    /**
+     * Updates bounds.
+     */
     public void updateBounds() {
         shapes.clearCachedOutline();
         shapeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, shapes.lineStyles, getShapeNum(), false);

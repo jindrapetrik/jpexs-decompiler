@@ -37,4 +37,10 @@ public class DynamicTextGlyphEntry extends GLYPHENTRY {
      * Character.
      */
     public char character;
+
+    /**
+     * Constructor.
+     */
+    public DynamicTextGlyphEntry() {
+    }
 }

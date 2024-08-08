@@ -26,16 +26,32 @@ import java.io.Serializable;
  */
 public class MORPHGRADRECORD implements Serializable {
 
+    /**
+     * Start ratio
+     */
     @SWFType(BasicType.UI8)
     public int startRatio;
 
+    /**
+     * Start color
+     */
     public RGBA startColor;
 
+    /**
+     * End ratio
+     */
     @SWFType(BasicType.UI8)
     public int endRatio;
 
+    /**
+     * End color
+     */
     public RGBA endColor;
 
+    /**
+     * Gets start record.
+     * @return Start record
+     */
     public GRADRECORD getStartRecord() {
         GRADRECORD ret = new GRADRECORD();
         ret.ratio = startRatio;
@@ -43,6 +59,10 @@ public class MORPHGRADRECORD implements Serializable {
         return ret;
     }
 
+    /**
+     * Gets end record.
+     * @return End record
+     */
     public GRADRECORD getEndRecord() {
         GRADRECORD ret = new GRADRECORD();
         ret.ratio = endRatio;

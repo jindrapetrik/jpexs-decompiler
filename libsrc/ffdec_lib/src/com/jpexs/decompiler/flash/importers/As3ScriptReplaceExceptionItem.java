@@ -26,17 +26,41 @@ public class As3ScriptReplaceExceptionItem {
     private int col;
     private String message;
 
+    /**
+     * Column unknown
+     */
     public static final int COL_UNKNOWN = -1;
+    /**
+     * Line unknown
+     */
     public static final int LINE_UNKNOWN = -1;
 
+    /**
+     * Constructor.
+     * @param file File
+     * @param message Message
+     * @param line Line
+     */
     public As3ScriptReplaceExceptionItem(String file, String message, int line) {
         this(file, message, line, COL_UNKNOWN);
     }
 
+    /**
+     * Constructor.
+     * @param file File
+     * @param message Message
+     */
     public As3ScriptReplaceExceptionItem(String file, String message) {
         this(file, message, LINE_UNKNOWN, COL_UNKNOWN);
     }
 
+    /**
+     * Constructor.
+     * @param file File
+     * @param message Message
+     * @param line Line
+     * @param col Column
+     */
     public As3ScriptReplaceExceptionItem(String file, String message, int line, int col) {
         this.file = file;
         this.line = line;
@@ -44,18 +68,34 @@ public class As3ScriptReplaceExceptionItem {
         this.message = message;
     }
 
+    /**
+     * Gets the file.
+     * @return File
+     */
     public String getFile() {
         return file;
     }
 
+    /**
+     * Gets the line.
+     * @return Line
+     */
     public int getLine() {
         return line;
     }
 
+    /**
+     * Gets the message.
+     * @return Message
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Gets the column.
+     * @return Column
+     */
     public int getCol() {
         return col;
     }
