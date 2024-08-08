@@ -2949,6 +2949,14 @@ public class Graph {
                     List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
                     stopPartKind2.add(StopPartKind.OTHER);
                     Set<GraphPart> subVisited = new HashSet<>();
+                    
+                    /*
+                     * Save loop phases to be able to walk precontinue block again.
+                     */
+                    List<Integer> loopPhases = new ArrayList<>();
+                    for (Loop el : loops) {
+                        loopPhases.add(el.phase);
+                    }
                     precontinueCommands = printGraph(foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
@@ -2980,6 +2988,13 @@ public class Graph {
                         }
                         if (currentLoop.loopPreContinue == null) {
                             precontinueCommands.clear();
+                            
+                            /**
+                             * Restore loop phases
+                             */
+                            for (int i = 0; i < loopPhases.size(); i++) {
+                                loops.get(i).phase = loopPhases.get(i);
+                            }
                         }
                     }
                 }

@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#2221] AS3 P-code - add new function button (creates methodinfo, methodbody)
 
+### Fixed
+- [#2267] Script decompilation - Loop detection causing `§§goto` instructions in some cases
+
 ## [21.0.0] - 2024-08-05
 ### Added
 - StartSound and StartSound2 show characterId/class in the tag tree
