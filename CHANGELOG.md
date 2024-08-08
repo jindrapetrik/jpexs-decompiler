@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#2221] AS3 P-code - add new function button (creates methodinfo, methodbody)
+- Javadoc HTML documentation for library (Separate download)
 
 ### Fixed
 - [#2267] Script decompilation - Loop detection causing `§§goto` instructions in some cases
