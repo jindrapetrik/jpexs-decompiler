@@ -107,7 +107,7 @@ public class ABCCleaner {
             }
             if (m.flagHas_optional()) {
                 for (int j = 0; j < m.optional.length; j++) {
-                    m.optional[j].value_index = handleReplaceValueKind(m.optional[j].value_kind, m.optional[j].value_index, replaceMap);
+                    m.optional[j].value_index = handleReplaceValueKind(abc, m.optional[j].value_kind, m.optional[j].value_index, replaceMap);
                 }
             }
 
@@ -194,8 +194,17 @@ public class ABCCleaner {
                         case AVM2Code.DAT_CLASS_INDEX:
                             ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.CLASS, ins.operands[operandIndex], replaceMap);
                             break;
+                        case AVM2Code.DAT_DECIMAL_INDEX:
+                            ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.DECIMAL, ins.operands[operandIndex], replaceMap);
+                            break;
                         case AVM2Code.DAT_DOUBLE_INDEX:
                             ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.DOUBLE, ins.operands[operandIndex], replaceMap);
+                            break;
+                        case AVM2Code.DAT_FLOAT_INDEX:
+                            ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.FLOAT, ins.operands[operandIndex], replaceMap);
+                            break;
+                        case AVM2Code.DAT_FLOAT4_INDEX:
+                            ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.FLOAT4, ins.operands[operandIndex], replaceMap);
                             break;
                         case AVM2Code.DAT_INT_INDEX:
                             ins.operands[operandIndex] = handleReplace(ABCSimpleUsageDetector.ItemKind.INT, ins.operands[operandIndex], replaceMap);
@@ -249,6 +258,31 @@ public class ABCCleaner {
                 continue;
             }
             newCpool.addDouble(abc.constants.getDouble(i));
+        }
+        
+        if (abc.hasDecimalSupport()) {
+            for (int i = 1; i < abc.constants.getDecimalCount(); i++) {
+                if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.DECIMAL).contains(i)) {
+                    continue;
+                }
+                newCpool.addDecimal(abc.constants.getDecimal(i));
+            }
+        }
+        
+        if (abc.hasFloatSupport()) {
+            for (int i = 1; i < abc.constants.getFloatCount(); i++) {
+                if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.FLOAT).contains(i)) {
+                    continue;
+                }
+                newCpool.addFloat(abc.constants.getFloat(i));
+            }
+            
+            for (int i = 1; i < abc.constants.getFloat4Count(); i++) {
+                if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.FLOAT4).contains(i)) {
+                    continue;
+                }
+                newCpool.addFloat4(abc.constants.getFloat4(i));
+            }
         }
 
         for (int i = 1; i < abc.constants.getStringCount(); i++) {
@@ -322,7 +356,7 @@ public class ABCCleaner {
         return replaceMap.get(kind).get(index);
     }
 
-    private int handleReplaceValueKind(int value_kind, int value_index, Map<ABCSimpleUsageDetector.ItemKind, Map<Integer, Integer>> replaceMap) {
+    private int handleReplaceValueKind(ABC abc, int value_kind, int value_index, Map<ABCSimpleUsageDetector.ItemKind, Map<Integer, Integer>> replaceMap) {
         switch (value_kind) {
             case ValueKind.CONSTANT_Int:
                 return handleReplace(ABCSimpleUsageDetector.ItemKind.INT, value_index, replaceMap);
@@ -330,6 +364,16 @@ public class ABCCleaner {
                 return handleReplace(ABCSimpleUsageDetector.ItemKind.UINT, value_index, replaceMap);
             case ValueKind.CONSTANT_Double:
                 return handleReplace(ABCSimpleUsageDetector.ItemKind.DOUBLE, value_index, replaceMap);
+            case ValueKind.CONSTANT_DecimalOrFloat:
+                if (abc.hasFloatSupport()) {
+                    return handleReplace(ABCSimpleUsageDetector.ItemKind.FLOAT, value_index, replaceMap);
+                }
+                if (abc.hasDecimalSupport()) {
+                    return handleReplace(ABCSimpleUsageDetector.ItemKind.DECIMAL, value_index, replaceMap);
+                }
+                break;
+            case ValueKind.CONSTANT_Float4:
+                return handleReplace(ABCSimpleUsageDetector.ItemKind.FLOAT4, value_index, replaceMap);                
             case ValueKind.CONSTANT_Utf8:
                 return handleReplace(ABCSimpleUsageDetector.ItemKind.STRING, value_index, replaceMap);
             case ValueKind.CONSTANT_Namespace:
@@ -363,7 +407,7 @@ public class ABCCleaner {
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
                 tsc.type_index = handleReplace(ABCSimpleUsageDetector.ItemKind.MULTINAME, tsc.type_index, replaceMap);
-                tsc.value_index = handleReplaceValueKind(tsc.value_kind, tsc.value_index, replaceMap);
+                tsc.value_index = handleReplaceValueKind(abc, tsc.value_kind, tsc.value_index, replaceMap);
             }
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;

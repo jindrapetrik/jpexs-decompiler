@@ -63,6 +63,18 @@ public class ABCSimpleUsageDetector {
          */
         DOUBLE(true),
         /**
+         * Decimal - only for ABCs with decimal support
+         */
+        DECIMAL(true),
+        /**
+         * Float - only for ABCs with float support
+         */
+        FLOAT(true),
+        /**
+         * Float4 - only for ABCs with float support
+         */
+        FLOAT4(true),
+        /**
          * String
          */
         STRING(true),
@@ -98,7 +110,7 @@ public class ABCSimpleUsageDetector {
         /**
          * True if has reserved zero index.
          */
-        private boolean reserveZeroIndex;
+        private final boolean reserveZeroIndex;
 
         /**
          * Constructs a new item kind.
