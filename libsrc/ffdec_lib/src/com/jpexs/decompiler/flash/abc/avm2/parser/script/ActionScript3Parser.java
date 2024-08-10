@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.NumberContext;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -939,14 +940,14 @@ public class ActionScript3Parser {
         }
     }
 
-    private void scriptTraits(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    private void scriptTraits(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits, Reference<Integer> numberUsageRef, Reference<Integer> numberRoundingRef, Reference<Integer> numberPrecisionRef) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
 
-        while (scriptTraitsBlock(allOpenedNamespaces, scriptIndex, scriptName, traits)) {
+        while (scriptTraitsBlock(allOpenedNamespaces, scriptIndex, scriptName, traits, numberUsageRef, numberRoundingRef, numberPrecisionRef)) {
             //empty
         }
     }
 
-    private boolean scriptTraitsBlock(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    private boolean scriptTraitsBlock(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits, Reference<Integer> numberUsageRef, Reference<Integer> numberRoundingRef, Reference<Integer> numberPrecisionRef) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         ParsedSymbol s;
         boolean inPackage = false;
         s = lex();
@@ -995,7 +996,7 @@ public class ActionScript3Parser {
             }
         }
 
-        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces);
+        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef);
 
         boolean isEmpty = true;
 
@@ -2567,54 +2568,145 @@ public class ActionScript3Parser {
 
     private List<String> constantPool;
 
-    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces) throws IOException, AVM2ParseException, InterruptedException {
+    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef) throws IOException, AVM2ParseException, InterruptedException {
 
         ParsedSymbol s;
         List<DottedChain> importedClasses = new ArrayList<>();
 
         s = lex();
         while (s.isType(SymbolType.IMPORT, SymbolType.USE)) {
-            boolean all = false;
-            boolean isUse = s.type == SymbolType.USE;
-            if (isUse) {
-                expectedType(SymbolType.NAMESPACE);
-            }
-            s = lex();
-            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
-            DottedChain fullName = new DottedChain(new String[]{});
-            fullName = fullName.add(s.value.toString(), "");
-            s = lex();
-            boolean isStar = false;
-            while (s.type == SymbolType.DOT) {
-
+            
+            if (s.isType(SymbolType.IMPORT)) {
                 s = lex();
-                if (s.type == SymbolType.MULTIPLY && !isUse) {
-                    isStar = true;
-                    s = lex();
-                    break;
-                }
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                DottedChain fullName = new DottedChain(new String[]{});
                 fullName = fullName.add(s.value.toString(), "");
                 s = lex();
-            }
+                boolean isStar = false;
+                while (s.type == SymbolType.DOT) {
+                    s = lex();
+                    if (s.type == SymbolType.MULTIPLY) {
+                        isStar = true;
+                        s = lex();
+                        break;
+                    }
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                    fullName = fullName.add(s.value.toString(), "");
+                    s = lex();
+                }
 
-            if (isStar) {
-                openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
-            } else if (isUse) {
-                //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
-                openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
-            } else {
-                importedClasses.add(fullName);
+                /*else if (isUse) {
+                    //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
+                    openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
+                } else */
+                if (isStar) {
+                    openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_PACKAGE));
+                } else {
+                    importedClasses.add(fullName);
+                }
+                expected(s, lexer.yyline(), SymbolType.SEMICOLON);
+            } else if (s.isType(SymbolType.USE)) {
+                do {
+                    s = lex();
+                    if (s.isType(SymbolType.NAMESPACE)) {
+                        s = lex();
+                        expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                        DottedChain fullName = new DottedChain(new String[]{});
+                        fullName = fullName.add(s.value.toString(), "");
+                        s = lex();
+                        boolean isStar = false;
+                        while (s.type == SymbolType.DOT) {
+                            s = lex();
+                            if (s.type == SymbolType.MULTIPLY) {
+                                isStar = true;
+                                s = lex();
+                                break;
+                            }
+                            expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
+                            fullName = fullName.add(s.value.toString(), "");
+                            s = lex();
+                        }
+                    } else {
+                        expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                        String pragmaItemName = (String) s.value;
+                        switch (pragmaItemName) {
+                            case "Number":
+                                numberUsageRef.setVal(NumberContext.USE_NUMBER);
+                                break;
+                            case "decimal":
+                                numberUsageRef.setVal(NumberContext.USE_DECIMAL);
+                                break;
+                            case "double":
+                                numberUsageRef.setVal(NumberContext.USE_DOUBLE);
+                                break;
+                            case "int":
+                                numberUsageRef.setVal(NumberContext.USE_INT);
+                                break;
+                            case "uint":
+                                numberUsageRef.setVal(NumberContext.USE_UINT);
+                                break;
+                            case "rounding":
+                                s = lex();
+                                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                                String roundingIdentifier = (String) s.value;
+                                int rounding;
+                                switch (roundingIdentifier) {
+                                    case "CEILING":
+                                        rounding = NumberContext.ROUND_CEILING;
+                                        break;
+                                    case "UP":
+                                        rounding = NumberContext.ROUND_UP;
+                                        break;
+                                    case "HALF_UP":
+                                        rounding = NumberContext.ROUND_HALF_UP;
+                                        break;
+                                    case "HALF_EVEN":
+                                        rounding = NumberContext.ROUND_HALF_EVEN;
+                                        break;
+                                    case "HALF_DOWN":
+                                        rounding = NumberContext.ROUND_HALF_DOWN;
+                                        break;
+                                    case "DOWN":
+                                        rounding = NumberContext.ROUND_DOWN;
+                                        break;
+                                    case "FLOOR":
+                                        rounding = NumberContext.ROUND_FLOOR;
+                                        break;
+                                    default:
+                                        throw new AVM2ParseException("Rounding expected - one of: CEILING, UP, HALF_UP, HALF_EVEN, HALF_DOWN, DOWN, FLOOR", lexer.yyline());
+                                }
+                                numberRoundingRef.setVal(rounding);
+                                break;
+                            case "precision":
+                                s = lex();
+                                expected(s, lexer.yyline(), SymbolType.INTEGER);
+                                int precision = (Integer) s.value;
+                                if (precision < 1 || precision > 34) {
+                                    throw new AVM2ParseException("Invalid precision - must be between 1 and 34", lexer.yyline());
+                                }
+                                numberPrecisionRef.setVal(precision);
+                                break;
+                            default:
+                                throw new AVM2ParseException("Invalid use kind", lexer.yyline());
+                        }
+                    }                    
+                    s = lex();
+                }while(s.isType(SymbolType.COMMA));
+                expected(s, lexer.yyline(), SymbolType.SEMICOLON);
             }
-
-            expected(s, lexer.yyline(), SymbolType.SEMICOLON);
+            /*boolean isUse = s.type == SymbolType.USE;
+            if (isUse) {
+                
+                expectedType(SymbolType.NAMESPACE);
+            }*/
+            
             s = lex();
         }
         lexer.pushback(s);
         return importedClasses;
     }
 
-    private List<GraphTargetItem> parseScript(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String fileName) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
+    private List<GraphTargetItem> parseScript(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String fileName, Reference<Integer> numberContextRef) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
 
         //int scriptPrivateNs;
         if (fileName.contains("/")) {
@@ -2624,7 +2716,15 @@ public class ActionScript3Parser {
             fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
         }
         List<GraphTargetItem> items = new ArrayList<>();
-        scriptTraits(allOpenedNamespaces, scriptIndex, fileName, items);
+        Reference<Integer> numberUsageRef = new Reference<>(NumberContext.USE_NUMBER);
+        Reference<Integer> numberRoundingRef = new Reference<>(NumberContext.ROUND_HALF_EVEN);
+        Reference<Integer> numberPrecisionRef = new Reference<>(34);
+        scriptTraits(allOpenedNamespaces, scriptIndex, fileName, items, numberUsageRef, numberRoundingRef, numberPrecisionRef);
+        
+        NumberContext nc = new NumberContext(numberUsageRef.getVal(), numberPrecisionRef.getVal(), numberRoundingRef.getVal());
+        if (!nc.isDefault()) {
+            numberContextRef.setVal(nc.toParam());
+        }
         return items;
     }
 
@@ -2634,16 +2734,17 @@ public class ActionScript3Parser {
      * @param str String to parse
      * @param fileName File name
      * @param scriptIndex Script index
+     * @param numberContextRef Number context reference
      * @return List of script traits
      * @throws AVM2ParseException On parsing error
      * @throws IOException On I/O error
      * @throws CompilationException On compilation error
      * @throws InterruptedException On interrupt
      */
-    public List<GraphTargetItem> scriptTraitsFromString(List<List<NamespaceItem>> allOpenedNamespaces, String str, String fileName, int scriptIndex) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    public List<GraphTargetItem> scriptTraitsFromString(List<List<NamespaceItem>> allOpenedNamespaces, String str, String fileName, int scriptIndex, Reference<Integer> numberContextRef) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         lexer = new ActionScriptLexer(str);
 
-        List<GraphTargetItem> ret = parseScript(allOpenedNamespaces, scriptIndex, fileName);
+        List<GraphTargetItem> ret = parseScript(allOpenedNamespaces, scriptIndex, fileName, numberContextRef);
         if (lexer.lex().type != SymbolType.EOF) {
             throw new AVM2ParseException("Parsing finisned before end of the file", lexer.yyline());
         }
@@ -2659,11 +2760,12 @@ public class ActionScript3Parser {
      * @throws AVM2ParseException On parsing error
      * @throws CompilationException On compilation error
      */
-    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass, Integer numberContext) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
         localData.documentClass = documentClass;
+        localData.numberContext = numberContext;
         ScriptInfo si = new ScriptInfo();
         int scriptIndex = abcIndex.getSelectedAbc().script_info.size();
         abcIndex.getSelectedAbc().script_info.add(si);
@@ -2691,8 +2793,9 @@ public class ActionScript3Parser {
      */
     public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
-        List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex);
-        addScriptFromTree(allOpenedNamespaces, traits, classPos, documentClass);
+        Reference<Integer> numberContextRef = new Reference<>(null);
+        List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex, numberContextRef);
+        addScriptFromTree(allOpenedNamespaces, traits, classPos, documentClass, numberContextRef.getVal());
     }
 
     /**

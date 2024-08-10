@@ -159,6 +159,11 @@ public class NumberContext {
         return ret;
     }
     
+    /**
+     * Converts usage to name.
+     * @param usage Usage
+     * @return Name
+     */
     public static String usageToName(int usage) {
         if (usage > usageNames.length || usage < 0) {
             throw new IllegalArgumentException("Invalid usage value :" + usage);
@@ -166,6 +171,11 @@ public class NumberContext {
         return usageNames[usage];
     }
     
+    /**
+     * Converts rounding to name.
+     * @param rounding Rounding
+     * @return Name
+     */
     public static String roundingToName(int rounding) {
         if (rounding > roundingNames.length || rounding < 0) {
             throw new IllegalArgumentException("Invalid rounding value :" + rounding);
@@ -173,6 +183,14 @@ public class NumberContext {
         return roundingNames[rounding];
     }
 
+    /**
+     * Checks whether this is default NumberContext.
+     * @return 
+     */
+    public boolean isDefault() {
+        return usage == USE_NUMBER && precision == 34;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

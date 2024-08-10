@@ -174,6 +174,11 @@ public class SourceGeneratorLocalData implements Serializable {
      * Is second run
      */
     public boolean secondRun = false;
+    
+    /**
+     * Number context
+     */
+    public Integer numberContext = null;
 
     /**
      * Gets full class name.

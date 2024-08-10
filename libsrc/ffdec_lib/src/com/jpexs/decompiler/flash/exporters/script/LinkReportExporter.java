@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -173,7 +174,7 @@ public class LinkReportExporter {
             List<Dependency> dependencies = new ArrayList<>();
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>(), new ArrayList<>());
+            tc.getDependencies(swf.getAbcIndex(), scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {

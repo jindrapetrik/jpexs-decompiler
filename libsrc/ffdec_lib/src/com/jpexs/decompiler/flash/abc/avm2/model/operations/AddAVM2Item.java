@@ -94,7 +94,12 @@ public class AddAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
                         new AVM2Instruction(0, AVM2Instructions.Increment, null)
                 );
             }
-        }*/
+        }*/        
+        if (localData.numberContext != null) {
+            return toSourceMerge(localData, generator, leftSide, rightSide,
+                new AVM2Instruction(0, AVM2Instructions.AddP, new int[] {localData.numberContext})
+            );
+        }
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, AVM2Instructions.Add, null)
         );

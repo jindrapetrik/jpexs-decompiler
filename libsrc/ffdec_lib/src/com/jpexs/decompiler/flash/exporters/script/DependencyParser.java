@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,9 +157,10 @@ public class DependencyParser {
      * @param fullyQualifiedNames Fully qualified names
      * @param visitedMethods Visited methods
      * @param uses Uses
+     * @param numberContextRef Number context reference
      * @throws InterruptedException On interrupt
      */
-    public static void parseDependenciesFromMethodInfo(AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods, List<String> uses) throws InterruptedException {
+    public static void parseDependenciesFromMethodInfo(AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -174,7 +176,7 @@ public class DependencyParser {
         MethodBody body = abc.findBody(method_index);
         if (body != null && body.convertException == null) {
             body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
-            body.traits.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
+            body.traits.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
             for (ABCException ex : body.exceptions) {
                 parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
@@ -189,7 +191,7 @@ public class DependencyParser {
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ins.operands[0] != method_index) {
                         if (!visitedMethods.contains(ins.operands[0])) {
-                            parseDependenciesFromMethodInfo(abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses);
+                            parseDependenciesFromMethodInfo(abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
                         }
                     }
                 }
@@ -225,6 +227,9 @@ public class DependencyParser {
                         if (m < abc.constants.getMultinameCount()) {
                             parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION, uses);
                         }
+                    }
+                    if (ins.definition.operands[k] == AVM2Code.DAT_NUMBER_CONTEXT) {
+                        numberContextRef.setVal(ins.operands[k]);
                     }
                 }
             }

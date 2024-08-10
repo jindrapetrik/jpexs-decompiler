@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
+import com.jpexs.decompiler.flash.abc.avm2.NumberContext;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
@@ -42,6 +43,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -278,7 +280,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param uses Uses
      * @throws InterruptedException On interrupt
      */
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (customNamespace == null) {
             Multiname m = getName(abc);
             int nskind = m.getSimpleNamespaceKind(abc.constants);
@@ -395,7 +397,8 @@ public abstract class Trait implements Cloneable, Serializable {
             customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
         }
         List<String> uses = new ArrayList<>();
-        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses);
+        Reference<Integer> numberContextRef = new Reference<>(null);
+        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
 
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
@@ -486,6 +489,17 @@ public abstract class Trait implements Cloneable, Serializable {
             for (String u : uses) {
                 writer.appendNoHilight("use namespace " + u + ";").newLine();
             }
+            writer.newLine();
+        }
+        if (numberContextRef.getVal() != null) {
+            writer.appendNoHilight("use ");
+            NumberContext nc = new NumberContext(numberContextRef.getVal());
+            writer.appendNoHilight(NumberContext.usageToName(nc.getUsage()));
+            writer.appendNoHilight(", rounding ");
+            writer.appendNoHilight(NumberContext.roundingToName(nc.getRounding()));
+            writer.appendNoHilight(", precision ");
+            writer.appendNoHilight(nc.getPrecision());
+            writer.appendNoHilight(";");
             writer.newLine();
         }
     }

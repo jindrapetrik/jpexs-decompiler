@@ -98,7 +98,7 @@ Label = {Identifier}:
 
 
 /* integer literals */
-NumberLiteral = (0 | -?[1-9][0-9]*) [ui]
+NumberLiteral = (0 | -?[1-9][0-9]*) [ui]?
 
 PositiveNumberLiteral = 0 | [1-9][0-9]*
    

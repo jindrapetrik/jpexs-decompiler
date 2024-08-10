@@ -123,13 +123,22 @@ public class ImportedSlotConstItem extends AssignableAVM2Item {
         Reference<Integer> obj_temp = new Reference<>(-1);
 
         boolean isInteger = false;
+        
+        AVM2Instruction changeIns;
+        if (isInteger) {
+            changeIns = ins(decrement ? AVM2Instructions.DecrementI : AVM2Instructions.IncrementI);
+        } else if (localData.numberContext != null) {
+            changeIns = ins(decrement ? AVM2Instructions.DecrementP : AVM2Instructions.IncrementP, localData.numberContext);
+        } else {
+            changeIns = ins(decrement ? AVM2Instructions.Decrement : AVM2Instructions.Increment);
+        }
 
         List<GraphSourceItem> ret = toSourceMerge(localData, generator, obj, dupSetTemp(localData, generator, obj_temp),
                 ins(AVM2Instructions.GetProperty, propertyId),
                 (!isInteger && post) ? ins(AVM2Instructions.ConvertD) : null,
-                (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                (!post) ? changeIns : null,
                 needsReturn ? ins(AVM2Instructions.Dup) : null,
-                (post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                (post) ? changeIns : null,
                 setTemp(localData, generator, ret_temp),
                 getTemp(localData, generator, obj_temp),
                 getTemp(localData, generator, ret_temp),

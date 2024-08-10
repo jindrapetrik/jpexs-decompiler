@@ -204,7 +204,7 @@ XmlSQuoteStringChar = [^\r\n\']
 
 
 /* integer literals */
-DecIntegerLiteral = (0 | [1-9][0-9]*) [ui]
+DecIntegerLiteral = (0 | [1-9][0-9]*) [ui]?
 
 HexIntegerLiteral = 0 [xX] 0* {HexDigit}+
 HexDigit          = [0-9a-fA-F]

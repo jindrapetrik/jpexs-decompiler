@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -135,6 +136,16 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
          */
         ABC abc = g.abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
+        
+        AVM2Instruction changeIns;
+        if (isInteger) {
+            changeIns = ins(decrement ? AVM2Instructions.DecrementI : AVM2Instructions.IncrementI);
+        } else if (localData.numberContext != null) {
+            changeIns = ins(decrement ? AVM2Instructions.DecrementP : AVM2Instructions.IncrementP, localData.numberContext);
+        } else {
+            changeIns = ins(decrement ? AVM2Instructions.Decrement : AVM2Instructions.Increment);
+        }
+        
         if (name != null) {
             return toSourceMerge(localData, generator,
                     ns, NameAVM2Item.generateCoerce(localData, generator, new TypeItem(DottedChain.NAMESPACE)),
@@ -148,9 +159,9 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
                     ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultinameL(false, allNsSet(g.abcIndex)), true)),
                     !isInteger ? ins(AVM2Instructions.ConvertD) : null,
                     //End get original
-                    (!post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                    (!post) ? changeIns : null,
                     needsReturn ? ins(AVM2Instructions.Dup) : null,
-                    (post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
+                    (post) ? changeIns : null,
                     setTemp(localData, generator, ret_temp),
                     getTemp(localData, generator, name_temp),
                     getTemp(localData, generator, ns_temp),
