@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
+import macromedia.asc.util.Decimal128;
 
 /**
  * Missing symbol handler.
@@ -37,5 +37,5 @@ public interface MissingSymbolHandler {
 
     public boolean missingFloat4(Float4 value);
 
-    public boolean missingDecimal(Decimal value);
+    public boolean missingDecimal(Decimal128 value);
 }

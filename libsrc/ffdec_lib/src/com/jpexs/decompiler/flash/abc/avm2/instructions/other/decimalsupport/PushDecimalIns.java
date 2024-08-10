@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
@@ -25,6 +26,10 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecimalValueAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  * pushdecimal instruction - push a decimal.
@@ -40,6 +45,12 @@ public class PushDecimalIns extends InstructionDefinition {
         super(0x33, "pushdecimal", new int[]{AVM2Code.DAT_DECIMAL_INDEX}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.ES4_NUMERICS_MINOR);
     }
 
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.operandStack.push(ins.getParam(constants, 0));
+        return true;
+    }
+    
     @Override
     public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
         if (lda.getRuntime() == AVM2Runtime.ADOBE_FLASH) {
@@ -57,5 +68,10 @@ public class PushDecimalIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
+    }
+    
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.push(new DecimalValueAVM2Item(ins, localData.lineStartInstruction, localData.getConstants().getDecimal(ins.operands[0])));
     }
 }

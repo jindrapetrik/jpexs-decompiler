@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -50,7 +50,7 @@ public class PushDoubleIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new FloatValueAVM2Item(ins, localData.lineStartInstruction, localData.getConstants().getDouble(ins.operands[0])));
+        stack.push(new DoubleValueAVM2Item(ins, localData.lineStartInstruction, localData.getConstants().getDouble(ins.operands[0])));
     }
 
     @Override

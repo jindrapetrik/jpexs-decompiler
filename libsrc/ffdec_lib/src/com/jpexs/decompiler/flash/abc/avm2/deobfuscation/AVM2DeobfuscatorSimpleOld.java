@@ -81,7 +81,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.SwapIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.TypeOfIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
@@ -147,8 +147,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         if (graphTargetItem instanceof IntegerValueAVM2Item) {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) graphTargetItem;
             return cpool.makePush(iv.value);
-        } else if (graphTargetItem instanceof FloatValueAVM2Item) {
-            FloatValueAVM2Item fv = (FloatValueAVM2Item) graphTargetItem;
+        } else if (graphTargetItem instanceof DoubleValueAVM2Item) {
+            DoubleValueAVM2Item fv = (DoubleValueAVM2Item) graphTargetItem;
             return cpool.makePush(fv.value);
         } else if (graphTargetItem instanceof StringAVM2Item) {
             StringAVM2Item fv = (StringAVM2Item) graphTargetItem;

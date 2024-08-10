@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2;
 import com.jpexs.decompiler.flash.abc.ABCVersionRequirements;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
@@ -37,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import macromedia.asc.util.Decimal128;
 
 /**
  * AVM2 constant pool.
@@ -73,7 +73,7 @@ public class AVM2ConstantPool implements Cloneable {
      */
     @SWFField
     @ABCVersionRequirements(exactMinor = 17)
-    private HashArrayList<Decimal> constant_decimal = new HashArrayList<>();
+    private HashArrayList<Decimal128> constant_decimal = new HashArrayList<>();
 
     /**
      * Constant pool of floats
@@ -389,7 +389,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param value Value
      * @return Index
      */
-    public synchronized int addDecimal(Decimal value) {
+    public synchronized int addDecimal(Decimal128 value) {
         ensureDefault(constant_decimal);
         constant_decimal.add(value);
         return constant_decimal.size() - 1;
@@ -510,7 +510,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param value Value
      * @return Value
      */
-    public Decimal setDecimal(int index, Decimal value) {
+    public Decimal128 setDecimal(int index, Decimal128 value) {
         constant_decimal.set(index, value);
         return value;
     }
@@ -650,7 +650,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param index Index
      * @return Value
      */
-    public Decimal getDecimal(int index) {
+    public Decimal128 getDecimal(int index) {
         return constant_decimal.get(index);
     }
 
@@ -878,7 +878,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param add Whether to add the decimal if it does not exist
      * @return Decimal id
      */
-    public int getDecimalId(Decimal val, boolean add) {
+    public int getDecimalId(Decimal128 val, boolean add) {
         int id = getDecimalId(val);
         if (add && id == -1) {
             id = addDecimal(val);
@@ -892,7 +892,7 @@ public class AVM2ConstantPool implements Cloneable {
      * @param value Value
      * @return Decimal id
      */
-    private int getDecimalId(Decimal value) {
+    private int getDecimalId(Decimal128 value) {
         return constant_decimal.indexOf(value);
     }
 
@@ -1375,7 +1375,7 @@ public class AVM2ConstantPool implements Cloneable {
         }
         decimalMap.put(0, 0);
         for (int i = 1; i < secondPool.constant_decimal.size(); i++) {
-            Decimal val = secondPool.constant_decimal.get(i);
+            Decimal128 val = secondPool.constant_decimal.get(i);
             decimalMap.put(i, getDecimalId(val, true));
         }
         namespaceMap.put(0, 0);

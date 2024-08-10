@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
@@ -24,6 +25,11 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.DNanAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
+import macromedia.asc.util.Decimal128;
 
 /**
  * pushdnan instruction - push a decimal NaN.
@@ -37,6 +43,12 @@ public class PushDNanIns extends InstructionDefinition {
      */
     public PushDNanIns() {
         super(0x34, "pushdnan", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.ES4_NUMERICS_MINOR);
+    }
+    
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.operandStack.push(Decimal128.NaN);
+        return true;
     }
 
     @Override
@@ -56,5 +68,10 @@ public class PushDNanIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
+    }
+    
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.push(new DNanAVM2Item(ins, localData.lineStartInstruction));
     }
 }

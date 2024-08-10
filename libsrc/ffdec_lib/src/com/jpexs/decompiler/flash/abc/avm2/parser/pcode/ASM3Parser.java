@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
+import macromedia.asc.util.Decimal128;
 
 /**
  * Parses AVM2 P-code.
@@ -1093,6 +1094,7 @@ public class ASM3Parser {
                                 case AVM2Code.DAT_INT_INDEX:
                                 case AVM2Code.DAT_UINT_INDEX:
                                 case AVM2Code.DAT_DOUBLE_INDEX:
+                                case AVM2Code.DAT_DECIMAL_INDEX:
                                 case AVM2Code.DAT_FLOAT_INDEX:
                                 case AVM2Code.DAT_FLOAT4_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_UNKNOWN) {
@@ -1191,6 +1193,31 @@ public class ASM3Parser {
                                         operandsList.add(did);
                                     } else {
                                         throw new AVM2ParseException("Double or null expected", lexer.yyline());
+                                    }
+                                    break;
+                                case AVM2Code.DAT_DECIMAL_INDEX:
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                                        operandsList.add(0);
+                                    } else if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
+
+                                        Decimal128 decimalVal = Decimal128.ZERO;
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
+                                            decimalVal = new Decimal128((Integer) parsedOperand.value);
+                                        }
+                                        if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
+                                            decimalVal = new Decimal128((Double) parsedOperand.value);
+                                        }
+                                        int did = constants.getDecimalId(decimalVal, false);
+                                        if (did == -1) {
+                                            if ((missingHandler != null) && (missingHandler.missingDecimal(decimalVal))) {
+                                                did = constants.addDecimal(decimalVal);
+                                            } else {
+                                                throw new AVM2ParseException("Unknown decimal", lexer.yyline());
+                                            }
+                                        }
+                                        operandsList.add(did);
+                                    } else {
+                                        throw new AVM2ParseException("Float or null expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.DAT_FLOAT_INDEX:

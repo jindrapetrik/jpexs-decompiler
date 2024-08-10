@@ -1,0 +1,12 @@
+const int abcclass_Object = 0;
+const int abcclass_Number = 1;
+const int abcclass_int = 2;
+const int abcclass_decimal = 3;
+const int abcclass___AS3___vec_Vector = 4;
+const int abcclass_mypkg_MyClass = 5;
+const int abcpackage_stubs_as = 0;
+extern const int decimal_abc_length;
+extern const int decimal_abc_method_count;
+extern const int decimal_abc_class_count;
+extern const int decimal_abc_script_count;
+extern const unsigned char decimal_abc_data[];
