@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.NumberContext;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -466,6 +467,77 @@ public class ASM3Parser {
         return parseSlotConst(abc, lexer, constants, tsc);
     }
 
+    
+    private static int parseNumberContext(Flasm3Lexer lexer) throws AVM2ParseException, IOException {
+        ParsedSymbol s = lexer.lex();
+        expected(s, ParsedSymbol.TYPE_KEYWORD_NUMBERCONTEXT, "NumberContext", lexer.yyline());
+        expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+        s = lexer.lex();
+        int usage;
+        switch (s.type) {
+            case ParsedSymbol.TYPE_KEYWORD_NUMBER:
+                usage = NumberContext.USE_NUMBER;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_DECIMAL:
+                usage = NumberContext.USE_DECIMAL;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_DOUBLE:
+                usage = NumberContext.USE_DOUBLE;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_INT:
+                usage = NumberContext.USE_INT;
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_UINT:
+                usage = NumberContext.USE_UINT;
+                break;
+            default:
+                throw new AVM2ParseException("Usage expected - one of: Number, decimal, double, int or uint", lexer.yyline());
+        }
+        int rounding = NumberContext.ROUND_HALF_UP;   
+        int precision = 34;
+        if (usage == NumberContext.USE_NUMBER || usage == NumberContext.USE_DECIMAL) {
+            expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+            s = lexer.lex();
+            switch (s.type) {
+                case ParsedSymbol.TYPE_KEYWORD_CEILING:
+                    rounding = NumberContext.ROUND_CEILING;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_UP:
+                    rounding = NumberContext.ROUND_UP;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_HALF_UP:
+                    rounding = NumberContext.ROUND_HALF_UP;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_HALF_EVEN:
+                    rounding = NumberContext.ROUND_HALF_EVEN;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_HALF_DOWN:
+                    rounding = NumberContext.ROUND_HALF_DOWN;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_DOWN:
+                    rounding = NumberContext.ROUND_DOWN;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_FLOOR:
+                    rounding = NumberContext.ROUND_FLOOR;
+                    break;
+                default:
+                    throw new AVM2ParseException("Rounding expected - one of: CEILING, UP, HALF_UP, HALF_EVEN, HALF_DOWN, DOWN, FLOOR", lexer.yyline());        
+            }
+            s = lexer.lex();
+            if (s.type == ParsedSymbol.TYPE_COMMA) {
+                s = lexer.lex();
+                precision = (int) getUInteger(s, lexer.yyline(), false);
+                if (precision > 34) {
+                    throw new AVM2ParseException("Precision must not exceed 34", lexer.yyline());
+                }
+            } else {
+                lexer.pushback(s);
+            }
+        }
+        expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+        return new NumberContext(usage, precision, rounding).toParam();
+    }
+    
     private static int parseNamespaceSet(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
         List<Integer> namespaceList = new ArrayList<>();
         ParsedSymbol s = lexer.lex();
@@ -1309,6 +1381,10 @@ public class ASM3Parser {
                                         }
                                         operandsList.add(did);
                                     }
+                                    break;
+                                case AVM2Code.DAT_NUMBER_CONTEXT:
+                                    lexer.pushback(parsedOperand);
+                                    operandsList.add(parseNumberContext(lexer));
                                     break;
                                 case AVM2Code.DAT_FLOAT_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {

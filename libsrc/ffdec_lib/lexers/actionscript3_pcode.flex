@@ -284,6 +284,18 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "PROTECTEDNS"                {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS, yytext());}
   "NON_NULLABLE"               {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE, yytext());}
   
+  "Number"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NUMBER, yytext());}
+  "int"                        {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_INT, yytext());}
+  "uint"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UINT, yytext());}
+  "NumberContext"              {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_NUMBERCONTEXT, yytext());}
+  "CEILING"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_CEILING, yytext());}
+  "UP"                         {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UP, yytext());}
+  "HALF_UP"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_HALF_UP, yytext());}
+  "HALF_EVEN"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_HALF_EVEN, yytext());}
+  "HALF_DOWN"                  {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_HALF_DOWN, yytext());}
+  "DOWN"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DOWN, yytext());}
+  "FLOOR"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FLOOR, yytext());}  
+
   /* numeric literals */
 
   {NumberLiteral}            {                                 

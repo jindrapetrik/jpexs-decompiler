@@ -223,6 +223,19 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "class"                       |
   "function"                    {  return token(TokenType.KEYWORD2);}
 
+
+  "Number"                      |
+  "int"                         |
+  "uint"                        |
+  "NumberContext"               |
+  "CEILING"                     |
+  "UP"                          |
+  "HALF_UP"                     |
+  "HALF_EVEN"                   |
+  "HALF_DOWN"                   |
+  "DOWN"                        |
+  "FLOOR"                       {  return token(TokenType.KEYWORD2);  }
+
   /* string literal */
   \"                             {
                                     yybegin(STRING);

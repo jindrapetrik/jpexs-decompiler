@@ -36,6 +36,10 @@ public class NumberContext {
     public static final int USE_DOUBLE = 2;
     public static final int USE_INT = 3;
     public static final int USE_UINT = 4;
+        
+    private static String[] usageNames = new String[]{"Number", "decimal", "double", "int", "uint"};
+    
+    private static String[] roundingNames = new String[] {"CEILING", "UP", "HALF_UP", "HALF_EVEN", "HALF_DOWN", "DOWN", "FLOOR"};
 
     /**
      * Usage of the number.
@@ -72,6 +76,9 @@ public class NumberContext {
         this.usage = param & 7;
         this.rounding = (param >> 3) & 7;
         this.precision = param >> 6;
+        if ((usage == USE_NUMBER || usage == USE_DECIMAL) && precision == 0) {
+            precision = 34;
+        }
     }
 
     /**
@@ -80,7 +87,7 @@ public class NumberContext {
      * @param usage Usage
      */
     public void setUsage(int usage) {
-        if (usage > 6 || usage < 0) {
+        if (usage > usageNames.length || usage < 0) {
             throw new IllegalArgumentException("Invalid usage value :" + usage);
         }
         this.usage = usage;
@@ -117,6 +124,26 @@ public class NumberContext {
     }
 
     /**
+     * Sets the rounding of the number.
+     * 
+     * @param rounding Rounding
+     */
+    public void setRounding(int rounding) {
+        if (rounding > roundingNames.length || rounding < 0) {
+            throw new IllegalArgumentException("Invalid rounding value :" + rounding);
+        }
+        this.rounding = rounding;
+    }
+
+    /**
+     * Gets the rounding of the number
+     * @return Rounding
+     */
+    public int getRounding() {
+        return rounding;
+    }        
+    
+    /**
      * Converts the number context to a parameter.
      *
      * @return Parameter.
@@ -131,4 +158,36 @@ public class NumberContext {
         }
         return ret;
     }
+    
+    public static String usageToName(int usage) {
+        if (usage > usageNames.length || usage < 0) {
+            throw new IllegalArgumentException("Invalid usage value :" + usage);
+        }
+        return usageNames[usage];
+    }
+    
+    public static String roundingToName(int rounding) {
+        if (rounding > roundingNames.length || rounding < 0) {
+            throw new IllegalArgumentException("Invalid rounding value :" + rounding);
+        }
+        return roundingNames[rounding];
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("NumberContext");
+        sb.append("(");
+        sb.append(usageToName(usage));        
+        if (usage == USE_NUMBER || usage == USE_DECIMAL) {
+            sb.append(",");
+            sb.append(roundingToName(rounding));
+            if (precision < 34) {
+                sb.append(",");
+                sb.append(precision);
+            }
+        }
+        sb.append(")");
+        return sb.toString();
+    }            
 }
