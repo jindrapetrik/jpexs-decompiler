@@ -1059,6 +1059,16 @@ public class ActionScript3Parser {
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     subNameStr = s.value.toString();
                     s = lex();
+                    
+                    boolean nullable = true;
+                    
+                    if (s.type == SymbolType.NOT) {
+                        s = lex();
+                        nullable = false;
+                    } else if (s.type == SymbolType.TERNAR) {
+                        s = lex();
+                    }
+                    
                     if (!isInterface) {
 
                         if (s.type == SymbolType.EXTENDS) {
@@ -1112,9 +1122,9 @@ public class ActionScript3Parser {
                     classTraits(allOpenedNamespaces, !inPackage, cinitVariables, cinitNeedsActivation, cinit, importedClasses, subOpenedNamespaces, ns, subNameStr, isInterface, subTraits, iinitVariables, iinitNeedsActivation, iinit);
 
                     if (isInterface) {
-                        traits.add(new InterfaceAVM2Item(metadata, importedClasses, ns, subOpenedNamespaces, isFinal, subNameStr, interfaces, subTraits));
+                        traits.add(new InterfaceAVM2Item(metadata, importedClasses, ns, subOpenedNamespaces, isFinal, subNameStr, interfaces, subTraits, nullable));
                     } else {
-                        traits.add(new ClassAVM2Item(metadata, importedClasses, ns, subOpenedNamespaces, isFinal, isDynamic, subNameStr, extendsTypeStr, interfaces, cinit, cinitNeedsActivation.getVal(), cinitVariables, iinit.getVal(), iinitVariables, subTraits, iinitNeedsActivation.getVal()));
+                        traits.add(new ClassAVM2Item(metadata, importedClasses, ns, subOpenedNamespaces, isFinal, isDynamic, subNameStr, extendsTypeStr, interfaces, cinit, cinitNeedsActivation.getVal(), cinitVariables, iinit.getVal(), iinitVariables, subTraits, iinitNeedsActivation.getVal(), nullable));
                     }
 
                     expectedType(SymbolType.CURLY_CLOSE);

@@ -874,6 +874,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (cai.isFinal) {
                 ii.flags |= InstanceInfo.CLASS_FINAL;
             }
+            if (!cai.isNullable) {
+                ii.flags |= InstanceInfo.CLASS_NON_NULLABLE;
+            }
             ii.flags |= InstanceInfo.CLASS_PROTECTEDNS;
             ii.protectedNS = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString().isEmpty() ? cai.classBaseName : pkg.toRawString() + ":" + cai.classBaseName, 0, true);
         }
@@ -881,6 +884,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
             ii.flags |= InstanceInfo.CLASS_INTERFACE;
             ii.flags |= InstanceInfo.CLASS_SEALED;
+            if (!iai.isNullable) {
+                ii.flags |= InstanceInfo.CLASS_NON_NULLABLE;
+            }
             generateClass(iai.importedClasses, new ArrayList<>(), false, new ArrayList<>(),
                     iai.openedNamespaces, namespace, initScope, pkg, ci, ii, localData, true, iai.baseName, null, null, iai.superInterfaces, null, null, false, iai.methods,
                     class_index
