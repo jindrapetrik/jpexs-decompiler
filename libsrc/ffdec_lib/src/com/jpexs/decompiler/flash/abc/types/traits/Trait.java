@@ -495,10 +495,14 @@ public abstract class Trait implements Cloneable, Serializable {
             writer.appendNoHilight("use ");
             NumberContext nc = new NumberContext(numberContextRef.getVal());
             writer.appendNoHilight(NumberContext.usageToName(nc.getUsage()));
-            writer.appendNoHilight(", rounding ");
-            writer.appendNoHilight(NumberContext.roundingToName(nc.getRounding()));
-            writer.appendNoHilight(", precision ");
-            writer.appendNoHilight(nc.getPrecision());
+            if (nc.getUsage() == NumberContext.USE_NUMBER || nc.getUsage() == NumberContext.USE_DECIMAL) {
+                writer.appendNoHilight(", rounding ");
+                writer.appendNoHilight(NumberContext.roundingToName(nc.getRounding()));
+                if (nc.getPrecision() != 34) {
+                    writer.appendNoHilight(", precision ");
+                    writer.appendNoHilight(nc.getPrecision());
+                }
+            }
             writer.appendNoHilight(";");
             writer.newLine();
         }

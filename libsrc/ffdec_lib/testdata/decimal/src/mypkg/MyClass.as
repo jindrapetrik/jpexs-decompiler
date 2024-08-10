@@ -22,13 +22,7 @@ package mypkg
             ++c;
             --c;
             c = -a;
-         }                    
-         
-         private function testd(arg_d:decimal) {
-            var a:* = 1;
-            var b:* = 2;
-            var c = a + b;
-         }                     
+         }                                 
     }
 
 }
