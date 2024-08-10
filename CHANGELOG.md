@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Hex view for unknown tags was not scrollable
 
 ## [21.0.1] - 2024-08-08
 ### Added

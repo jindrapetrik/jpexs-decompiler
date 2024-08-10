@@ -757,7 +757,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createUnknownCard() {
         JPanel unknownCard = new JPanel(new BorderLayout());
         unknownHexView = new HexView();
-        unknownCard.add(unknownHexView, BorderLayout.CENTER);
+        unknownCard.add(new FasterScrollPane(unknownHexView), BorderLayout.CENTER);
         unknownCard.add(createUnknownButtonsPanel(), BorderLayout.SOUTH);
         return unknownCard;
     }
