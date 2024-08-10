@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Hex view for unknown tags was not scrollable
 - [#2269] Nullpointer on importing (ImportAssets) a character that does not exists
+- Asking more than once for the same imported (ImportAssets) URL
 
 ## [21.0.1] - 2024-08-08
 ### Added

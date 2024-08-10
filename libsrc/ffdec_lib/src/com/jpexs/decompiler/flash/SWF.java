@@ -2304,12 +2304,21 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param resolver URL resolver
      */
     private synchronized void resolveImported(UrlResolver resolver) {
+        Map<String, SWF> importedSwfs = new HashMap<>();
         for (int p = 0; p < tags.size(); p++) {
             Tag t = tags.get(p);
             if (t instanceof ImportTag) {
                 ImportTag importTag = (ImportTag) t;
 
-                SWF iSwf = resolver.resolveUrl(importTag.getUrl());
+                String url = importTag.getUrl();
+                
+                SWF iSwf;
+                if (importedSwfs.containsKey(url)) {
+                    iSwf = importedSwfs.get(url);
+                } else {
+                    iSwf = resolver.resolveUrl(url);
+                    importedSwfs.put(url, iSwf);
+                }
                 if (iSwf != null) {
 
                     Map<Integer, String> importedIdToNameMap = importTag.getAssets();
@@ -2327,7 +2336,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                             SymbolClassTag sc = (SymbolClassTag) t2;
                             for (int i = 0; i < sc.names.size(); i++) {
                                 importedClassToCharacter.put(sc.names.get(i), iSwf.getCharacter(sc.tags.get(i)));
-                                importedClassSourceUrls.put(sc.names.get(i), importTag.getUrl());
+                                importedClassSourceUrls.put(sc.names.get(i), url);
                             }
                         }
                     }
@@ -2337,12 +2346,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         if (exportedNameToIdsMap.containsKey(importedName)) {
                             int exportedId = exportedNameToIdsMap.get(importedName);
                             if (iSwf.getCharacter(exportedId) == null) {
-                                logger.log(Level.WARNING, "Imported character from URL {0} not found: exported id = {1}, exported name = {2}, imported id = {3}", new Object[]{importTag.getUrl(), exportedId, importedName, importedId});
+                                logger.log(Level.WARNING, "Imported character from URL {0} not found: exported id = {1}, exported name = {2}, imported id = {3}", new Object[]{url, exportedId, importedName, importedId});
                                 continue;
                             }
                             importedCharacterSourceSwfs.put(importedId, iSwf);
                             importedCharacterIds.put(importedId, exportedId);
                             importedNameToCharacter.put(importedName, importedId);
+                        } else {
+                            logger.log(Level.WARNING, "Imported character from URL {0} not found: imported name = {1}, imported id = {2}", new Object[]{url, importedName, importedId});
                         }
                     }
                 }
