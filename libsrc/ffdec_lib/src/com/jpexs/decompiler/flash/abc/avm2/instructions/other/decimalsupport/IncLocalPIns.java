@@ -71,7 +71,7 @@ public class IncLocalPIns extends InstructionDefinition {
     //same for inclocal and inclocalp (decimal)
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        int regId = ins.operands[0];
+        int regId = ins.operands[1];
         boolean isPostInc = false;
         if (!stack.isEmpty()) {
             GraphTargetItem stackTop = stack.peek();

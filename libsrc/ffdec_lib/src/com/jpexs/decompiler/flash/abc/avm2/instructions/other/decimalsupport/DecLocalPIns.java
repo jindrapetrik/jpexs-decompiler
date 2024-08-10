@@ -71,7 +71,7 @@ public class DecLocalPIns extends InstructionDefinition {
     //same for declocal and declocalp (decimal)
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        int regId = ins.operands[0];
+        int regId = ins.operands[1];
         boolean isPostDec = false;
         if (!stack.isEmpty()) {
             GraphTargetItem stackTop = stack.peek();
