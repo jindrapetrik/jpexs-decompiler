@@ -105,3 +105,6 @@ exported1.all.bin
 /libsrc/ffdec_cli/coverage.ec
 /out/
 /.idea/
+/libsrc/decimal/nbproject/private/
+/libsrc/decimal/dist/
+/libsrc/decimal/build/

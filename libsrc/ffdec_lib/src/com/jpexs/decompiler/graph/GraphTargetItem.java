@@ -18,7 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
@@ -157,14 +157,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             return new StringAVM2Item(null, null, (String) r);
         }
         if (r instanceof Long) {
-            return new FloatValueAVM2Item(null, null, (double) (Long) r);
+            return new DoubleValueAVM2Item(null, null, (double) (Long) r);
         }
         if (r instanceof Integer) {
             return new IntegerValueAVM2Item(null, null, (Integer) r);
         }
 
         if (r instanceof Double) {
-            return new FloatValueAVM2Item(null, null, (Double) r);
+            return new DoubleValueAVM2Item(null, null, (Double) r);
         }
         if (r instanceof Null) {
             return new NullAVM2Item(null, null);

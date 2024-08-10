@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.Flasm3Lexer;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ParsedSymbol;
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -65,6 +64,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Utilities;
+import macromedia.asc.util.Decimal128;
 
 /**
  * @author JPEXS
@@ -319,7 +319,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                     }
 
                     @Override
-                    public boolean missingDecimal(Decimal value) {
+                    public boolean missingDecimal(Decimal128 value) {
                         return true;
                     }
 

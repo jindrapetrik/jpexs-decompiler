@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.ABCVersion;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -132,6 +131,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import macromedia.asc.util.Decimal128;
 
 /**
  * SWF XML importer.
@@ -180,7 +180,7 @@ public class SwfXmlImporter {
             CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
             BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
             DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
-            AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
+            AVM2ConstantPool.class, Decimal128.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
             ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
             TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
             ABCException.class, ABCVersion.class, Amf3Value.class,

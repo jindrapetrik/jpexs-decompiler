@@ -38,7 +38,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -241,6 +240,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import macromedia.asc.util.Decimal128;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -4003,7 +4003,7 @@ public class CommandLineArgumentParser {
                     }
 
                     @Override
-                    public boolean missingDecimal(Decimal value) {
+                    public boolean missingDecimal(Decimal128 value) {
                         return true;
                     }
 

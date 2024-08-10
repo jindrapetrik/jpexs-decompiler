@@ -46,6 +46,8 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     public static final DottedChain ARRAY = new DottedChain(new String[]{"Array"});
 
     public static final DottedChain NUMBER = new DottedChain(new String[]{"Number"});
+    
+    public static final DottedChain DECIMAL = new DottedChain(new String[]{"decimal"});
 
     public static final DottedChain OBJECT = new DottedChain(new String[]{"Object"});
 

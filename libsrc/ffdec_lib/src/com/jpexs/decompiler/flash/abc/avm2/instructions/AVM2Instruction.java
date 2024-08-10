@@ -292,6 +292,12 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                 return constants.getUInt(operands[idx]);
             case AVM2Code.DAT_DOUBLE_INDEX:
                 return constants.getDouble(operands[idx]);
+            case AVM2Code.DAT_DECIMAL_INDEX:
+                return constants.getDecimal(operands[idx]);
+            case AVM2Code.DAT_FLOAT_INDEX:
+                return constants.getFloat(operands[idx]);
+            case AVM2Code.DAT_FLOAT4_INDEX:
+                return constants.getFloat4(operands[idx]);
             case AVM2Code.DAT_OFFSET:
                 return address + operands[idx] + getBytesLength();
             case AVM2Code.DAT_CASE_BASEOFFSET:
@@ -447,7 +453,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     } else {
                         s.append(" ");
                         try {
-                            s.append(constants.getDecimal(operands[i]));
+                            s.append(constants.getDecimal(operands[i]).toActionScriptString());
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
                         }

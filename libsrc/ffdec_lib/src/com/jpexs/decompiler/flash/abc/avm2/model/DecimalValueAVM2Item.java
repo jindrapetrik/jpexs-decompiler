@@ -31,18 +31,19 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import macromedia.asc.util.Decimal128;
 
 /**
- * Float value.
+ * Decimal value.
  *
  * @author JPEXS
  */
-public class FloatValueAVM2Item extends NumberValueAVM2Item {
+public class DecimalValueAVM2Item extends NumberValueAVM2Item {
 
     /**
      * Value
      */
-    public Double value;
+    public Decimal128 value;
 
     /**
      * Constructor.
@@ -51,14 +52,14 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
      * @param lineStartIns Line start instruction
      * @param value Value
      */
-    public FloatValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Double value) {
+    public DecimalValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Decimal128 value) {
         super(instruction, lineStartIns);
         this.value = value;
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        return writer.append(EcmaScript.toString(value));
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {       
+        return writer.append(value.toActionScriptString());
     }
 
     @Override
@@ -74,7 +75,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, AVM2Instructions.PushDouble, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getDoubleId(value, true)})
+                new AVM2Instruction(0, AVM2Instructions.PushDecimal, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getDecimalId(value, true)})
         );
     }
 
@@ -106,7 +107,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final FloatValueAVM2Item other = (FloatValueAVM2Item) obj;
+        final DecimalValueAVM2Item other = (DecimalValueAVM2Item) obj;
         if (!Objects.equals(this.value, other.value)) {
             return false;
         }

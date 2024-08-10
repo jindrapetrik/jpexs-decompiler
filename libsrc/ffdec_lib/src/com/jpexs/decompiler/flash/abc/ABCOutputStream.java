@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -31,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.OutputStream;
+import macromedia.asc.util.Decimal128;
 
 /**
  * ABC output stream.
@@ -456,8 +456,8 @@ public class ABCOutputStream extends OutputStream {
      * @param value Decimal to write
      * @throws IOException On I/O error
      */
-    public void writeDecimal(Decimal value) throws IOException {
-        write(value.data);
+    public void writeDecimal(Decimal128 value) throws IOException {
+        write(value.toIEEE());
     }
 
     /**

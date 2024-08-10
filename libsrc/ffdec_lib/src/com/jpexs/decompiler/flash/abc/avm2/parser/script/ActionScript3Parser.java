@@ -26,7 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DefaultXMLNamespace;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
@@ -2336,7 +2336,7 @@ public class ActionScript3Parser {
             case MINUS:
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
-                    ret = new FloatValueAVM2Item(null, null, -(Double) s.value);
+                    ret = new DoubleValueAVM2Item(null, null, -(Double) s.value);
 
                 } else if (s.isType(SymbolType.INTEGER)) {
                     ret = new IntegerValueAVM2Item(null, null, -(Integer) s.value);
@@ -2348,12 +2348,12 @@ public class ActionScript3Parser {
                         ((IntegerValueAVM2Item) num).value = -((IntegerValueAVM2Item) num).value;
                         ((IntegerValueAVM2Item) num).detectFormat();
                         ret = num;
-                    } else if (num instanceof FloatValueAVM2Item) {
-                        Double d = ((FloatValueAVM2Item) num).value;
+                    } else if (num instanceof DoubleValueAVM2Item) {
+                        Double d = ((DoubleValueAVM2Item) num).value;
                         if (d.isInfinite()) {
-                            ((FloatValueAVM2Item) num).value = Double.NEGATIVE_INFINITY;
+                            ((DoubleValueAVM2Item) num).value = Double.NEGATIVE_INFINITY;
                         } else {
-                            ((FloatValueAVM2Item) num).value = -d;
+                            ((DoubleValueAVM2Item) num).value = -d;
                         }
                         ret = (num);
                     } else {
@@ -2435,7 +2435,7 @@ public class ActionScript3Parser {
 
                 break;
             case INFINITY:
-                ret = new FloatValueAVM2Item(null, null, Double.POSITIVE_INFINITY);
+                ret = new DoubleValueAVM2Item(null, null, Double.POSITIVE_INFINITY);
 
                 break;
             case INTEGER:
@@ -2443,7 +2443,7 @@ public class ActionScript3Parser {
 
                 break;
             case DOUBLE:
-                ret = new FloatValueAVM2Item(null, null, (Double) s.value);
+                ret = new DoubleValueAVM2Item(null, null, (Double) s.value);
                 allowMemberOrCall = true; // 5.2.toString();
                 break;
             case DELETE:

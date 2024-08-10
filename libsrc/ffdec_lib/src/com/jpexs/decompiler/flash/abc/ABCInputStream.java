@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -38,6 +37,7 @@ import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import macromedia.asc.util.Decimal128;
 
 /**
  * ABC input stream.
@@ -684,11 +684,11 @@ public class ABCInputStream implements AutoCloseable {
      * @return Decimal
      * @throws IOException On I/O error
      */
-    public Decimal readDecimal(String name) throws IOException {
+    public Decimal128 readDecimal(String name) throws IOException {
         newDumpLevel(name, "Decimal");
         byte[] data = readBytesInternal(16);
         endDumpLevel();
-        return new Decimal(data);
+        return new Decimal128(data);
     }
 
     /**
