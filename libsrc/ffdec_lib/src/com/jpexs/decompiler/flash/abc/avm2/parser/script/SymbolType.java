@@ -468,6 +468,14 @@ public enum SymbolType {
      */
     DOUBLE(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     /**
+     * Other: Decimal
+     */
+    DECIMAL(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    /**
+     * Other: Float
+     */
+    FLOAT(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    /**
      * Other: Type name
      */
     TYPENAME(GraphTargetItem.PRECEDENCE_PRIMARY, false),

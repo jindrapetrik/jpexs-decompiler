@@ -58,6 +58,7 @@ public class DecLocalIns extends InstructionDefinition {
         return true;
     }
 
+    //same for declocal and declocalp (decimal)
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int regId = ins.operands[0];
@@ -77,8 +78,6 @@ public class DecLocalIns extends InstructionDefinition {
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new SubtractAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));
-        } else {
-            //localRegs.put(regIndex, new SubtractAVM2Item(ins, localData.lineStartInstruction, new IntegerValueAVM2Item(ins, localData.lineStartInstruction, new Long(0)), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, new Long(1))));
         }
         if (!localData.localRegAssignmentIps.containsKey(regId)) {
             localData.localRegAssignmentIps.put(regId, 0);

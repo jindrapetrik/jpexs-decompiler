@@ -9,9 +9,19 @@ package mypkg
          {
             //Presision values: HALF_EVEN, DOWN, FLOOR, UP, CEILING, HALF_UP, HALF_DOWN
             
-            //use precision 10, rounding FLOOR;                        
+            use decimal, precision 20, rounding FLOOR;
             
-            var a:decimal = 10000000010000000002000000000300000000040000000005m;            
+            var a:decimal = 10000000010000000002000000000300000000040000000005m;
+            var b:int = 10;
+            var c:*;
+            c = a + b;
+            c = a - b;
+            c = a / b;
+            c = a % b;
+            c = a * b;
+            ++c;
+            --c;
+            c = -a;
          }                    
          
          private function testd(arg_d:decimal) {

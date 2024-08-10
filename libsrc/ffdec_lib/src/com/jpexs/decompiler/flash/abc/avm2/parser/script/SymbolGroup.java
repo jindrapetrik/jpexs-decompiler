@@ -56,6 +56,14 @@ public enum SymbolGroup {
      */
     DOUBLE,
     /**
+     * Decimal
+     */
+    DECIMAL,
+    /**
+     * Float
+     */
+    FLOAT,
+    /**
      * Type name
      */
     TYPENAME,

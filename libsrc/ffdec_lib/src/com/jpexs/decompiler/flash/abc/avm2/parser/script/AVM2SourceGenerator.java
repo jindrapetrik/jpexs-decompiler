@@ -32,7 +32,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecimalValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
@@ -1548,6 +1550,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         if (val instanceof DoubleValueAVM2Item) {
             return new ValueKind(abcIndex.getSelectedAbc().constants.getDoubleId(((DoubleValueAVM2Item) val).value, true), ValueKind.CONSTANT_Double);
+        }
+        if (val instanceof DecimalValueAVM2Item) {
+            return new ValueKind(abcIndex.getSelectedAbc().constants.getDecimalId(((DecimalValueAVM2Item) val).value, true), ValueKind.CONSTANT_DecimalOrFloat);
+        }
+        if (val instanceof FloatValueAVM2Item) {
+            return new ValueKind(abcIndex.getSelectedAbc().constants.getFloatId(((FloatValueAVM2Item) val).value, true), ValueKind.CONSTANT_DecimalOrFloat);
         }
         if (val instanceof NanAVM2Item) {
             return new ValueKind(abcIndex.getSelectedAbc().constants.getDoubleId(Double.NaN, true), ValueKind.CONSTANT_Double);
