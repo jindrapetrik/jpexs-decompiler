@@ -959,7 +959,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             for (int importedCharacterId : importedCharacterIds.keySet()) {
                 int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
                 SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
-                charsWithImported.put(importedCharacterId, importedSwf.getCharacter(exportedCharacterId));
+                CharacterTag exportedCharacter = importedSwf.getCharacter(exportedCharacterId);
+                charsWithImported.put(importedCharacterId, exportedCharacter);
                 charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
                 //FIXME? eimages
 
@@ -1617,7 +1618,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 if (characterId != -1) {
                     if (t instanceof CharacterTag) {
                         if (characters.containsKey(characterId)) {
-                            logger.log(Level.SEVERE, "SWF already contains characterId={0}", characterId);
+                            CharacterTag ct = (CharacterTag) t;
+                            CharacterTag oldCt = characters.get(characterId);
+                            logger.log(Level.SEVERE, "SWF already contains characterId={0} of type {1}, tried to add type {2}", new Object[]{characterId, oldCt.getTagName(), ct.getTagName()});
                         }
 
                         characters.put(characterId, (CharacterTag) t);
@@ -2333,6 +2336,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         String importedName = importedIdToNameMap.get(importedId);
                         if (exportedNameToIdsMap.containsKey(importedName)) {
                             int exportedId = exportedNameToIdsMap.get(importedName);
+                            if (iSwf.getCharacter(exportedId) == null) {
+                                logger.log(Level.WARNING, "Imported character from URL {0} not found: exported id = {1}, exported name = {2}, imported id = {3}", new Object[]{importTag.getUrl(), exportedId, importedName, importedId});
+                                continue;
+                            }
                             importedCharacterSourceSwfs.put(importedId, iSwf);
                             importedCharacterIds.put(importedId, exportedId);
                             importedNameToCharacter.put(importedName, importedId);
@@ -5137,7 +5144,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         return readOnlyTags;
-    }  
+    }
 
     /**
      * Adds a tag to the SWF.
