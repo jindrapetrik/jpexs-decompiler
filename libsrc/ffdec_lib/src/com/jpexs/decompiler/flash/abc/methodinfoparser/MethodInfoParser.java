@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import macromedia.asc.util.Decimal128;
 
 /**
  * ABC Method info P-code parser.
@@ -33,8 +34,33 @@ import java.util.List;
  */
 public class MethodInfoParser {
 
+    private static ValueKind numberToValueKind(ABC abc, String nval) {
+        if (nval.endsWith("m")) {
+            nval = nval.substring(0, nval.length() - 1);
+            return new ValueKind(abc.constants.getDecimalId(new Decimal128(nval), true), ValueKind.CONSTANT_DecimalOrFloat);
+
+        }
+        if (nval.endsWith("f")) {
+            nval = nval.substring(0, nval.length() - 1);
+            return new ValueKind(abc.constants.getFloatId(Float.parseFloat(nval), true), ValueKind.CONSTANT_DecimalOrFloat);
+        }
+        if (nval.endsWith("d") || nval.contains("e") || nval.contains("E") | nval.contains(".")) {
+            if (nval.endsWith("d")) {
+                nval = nval.substring(0, nval.length() - 1);
+            }
+            return new ValueKind(abc.constants.getDoubleId(Double.parseDouble(nval), true), ValueKind.CONSTANT_Double);
+        }
+
+        if (nval.endsWith("i") || nval.endsWith("u")) {
+            nval = nval.substring(0, nval.length() - 1);
+        }
+        return new ValueKind(abc.constants.getIntId(Integer.parseInt(nval), true), ValueKind.CONSTANT_Int);
+
+    }
+
     /**
      * Parses slot const.
+     *
      * @param text Text to parse
      * @param trait Trait to update
      * @param abc ABC file
@@ -70,11 +96,8 @@ public class MethodInfoParser {
                 }
                 int id = 0;
                 switch (symbValue.type) {
-                    case ParsedSymbol.TYPE_INTEGER:
-                        value = new ValueKind(abc.constants.getIntId((Integer) symbValue.value, true), ValueKind.CONSTANT_Int);
-                        break;
-                    case ParsedSymbol.TYPE_FLOAT:
-                        value = new ValueKind(abc.constants.getDoubleId((Double) symbValue.value, true), ValueKind.CONSTANT_Double);
+                    case ParsedSymbol.TYPE_NUMBER:
+                        value = numberToValueKind(abc, (String) symbValue.value);
                         break;
                     case ParsedSymbol.TYPE_STRING:
                         value = new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8);
@@ -133,6 +156,7 @@ public class MethodInfoParser {
 
     /**
      * Parses return type.
+     *
      * @param text Text to parse
      * @param update Method info to update
      * @return True if successful
@@ -165,6 +189,7 @@ public class MethodInfoParser {
 
     /**
      * Parses parameters.
+     *
      * @param text Text to parse
      * @param update Method info to update
      * @param abc ABC file
@@ -225,12 +250,8 @@ public class MethodInfoParser {
                         }
                         int id = 0;
                         switch (symbValue.type) {
-                            case ParsedSymbol.TYPE_INTEGER:
-                                optionalValues.add(new ValueKind(abc.constants.getIntId((Integer) symbValue.value, true), ValueKind.CONSTANT_Int));
-                                break;
-                            case ParsedSymbol.TYPE_FLOAT:
-                                optionalValues.add(new ValueKind(abc.constants.getDoubleId((Double) symbValue.value, true), ValueKind.CONSTANT_Double));
-                                break;
+                            case ParsedSymbol.TYPE_NUMBER:
+                                optionalValues.add(numberToValueKind(abc, (String) symbValue.value));
                             case ParsedSymbol.TYPE_STRING:
                                 optionalValues.add(new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8));
                                 break;

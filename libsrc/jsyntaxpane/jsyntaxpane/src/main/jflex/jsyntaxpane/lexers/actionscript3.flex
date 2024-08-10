@@ -119,7 +119,7 @@ XMLBeginTag = "<" {XMLIdentifier} " " | "<{" {XMLIdentifier} "} "
 XMLEndTag = "</" {XMLIdentifier} " "* ">" | "</{" {XMLIdentifier} "}" " "* ">"
 
 /* integer literals */
-DecIntegerLiteral = 0 | [1-9][0-9]*
+DecIntegerLiteral = (0 | -?[1-9][0-9]*) [ui]?
 
 HexIntegerLiteral = 0 [xX] 0* {HexDigit} {1,8}
 HexDigit          = [0-9a-fA-F]
@@ -128,7 +128,7 @@ OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
 OctDigit          = [0-7]
 
 /* floating point literals */
-DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [mdf]?
 
 FLit1    = [0-9]+ \. [0-9]*
 FLit2    = \. [0-9]+

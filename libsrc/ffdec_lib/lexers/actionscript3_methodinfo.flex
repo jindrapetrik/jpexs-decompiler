@@ -65,7 +65,7 @@ WhiteSpace = [ \t\f]+
 Identifier = [:jletter:][:jletterdigit:]*
 
 /* integer literals */
-NumberLiteral = 0 | -?[1-9][0-9]*
+NumberLiteral = (0 | -?[1-9][0-9]*) [ui]?
 
 PositiveNumberLiteral = 0 | [1-9][0-9]*
 
@@ -74,7 +74,7 @@ Multiname = m\[{PositiveNumberLiteral}\]
 Namespace = ns\{PositiveNumberLiteral}\]
    
 /* floating point literals */        
-FloatLiteral =  -?({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+FloatLiteral =  -?({FLit1}|{FLit2}|{FLit3}) {Exponent}? [mdf]?
 
 FLit1    = [0-9]+ \. [0-9]* 
 FLit2    = \. [0-9]+ 
@@ -110,8 +110,8 @@ StringCharacter = [^\r\n\"\\]
 
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
+  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_NUMBER, yytext());  }
+  {FloatLiteral}             { return new ParsedSymbol(ParsedSymbol.TYPE_NUMBER, yytext());  }
 
   ":"                     {return new ParsedSymbol(ParsedSymbol.TYPE_COLON);}
   ","                     {return new ParsedSymbol(ParsedSymbol.TYPE_COMMA);}

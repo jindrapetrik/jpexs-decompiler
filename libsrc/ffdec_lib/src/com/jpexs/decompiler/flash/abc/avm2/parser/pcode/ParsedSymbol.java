@@ -54,15 +54,10 @@ public class ParsedSymbol {
     public static final int TYPE_INSTRUCTION_NAME = 3;
 
     /**
-     * Type: Integer
+     * Type: Number
      */
-    public static final int TYPE_INTEGER = 4;
-
-    /**
-     * Type: Float
-     */
-    public static final int TYPE_FLOAT = 5;
-
+    public static final int TYPE_NUMBER = 4;
+    
     /**
      * Type: Identifier
      */
