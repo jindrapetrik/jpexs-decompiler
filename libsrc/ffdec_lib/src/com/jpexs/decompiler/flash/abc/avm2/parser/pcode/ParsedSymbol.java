@@ -520,6 +520,61 @@ public class ParsedSymbol {
     public static final int TYPE_KEYWORD_PROTECTEDNS_BLOCK = 97;
 
     /**
+     * Type: Keyword Number
+     */
+    public static final int TYPE_KEYWORD_NUMBER = 98;
+    
+    /**
+     * Type: Keyword int
+     */
+    public static final int TYPE_KEYWORD_INT = 99;
+    
+    /**
+     * Type: Keyword uint
+     */
+    public static final int TYPE_KEYWORD_UINT = 100;
+    
+    /**
+     * Type: Keyword NumberContext
+     */
+    public static final int TYPE_KEYWORD_NUMBERCONTEXT = 101;
+    
+    /**
+     * Type: Keyword CEILING
+     */
+    public static final int TYPE_KEYWORD_CEILING = 102;
+    
+    /**
+     * Type: Keyword UP
+     */
+    public static final int TYPE_KEYWORD_UP = 103;
+    
+    /**
+     * Type: Keyword HALF_UP
+     */
+    public static final int TYPE_KEYWORD_HALF_UP = 104;
+    
+    /**
+     * Type: Keyword HALF_EVEN
+     */
+    public static final int TYPE_KEYWORD_HALF_EVEN = 105;
+    
+    /**
+     * Type: Keyword HALF_DOWN 
+     */
+    public static final int TYPE_KEYWORD_HALF_DOWN = 106;
+    
+    /**
+     * Type: Keyword DOWN
+     */
+    public static final int TYPE_KEYWORD_DOWN = 107;
+    
+    /**
+     * Type: Keyword FLOOR
+     */
+    public static final int TYPE_KEYWORD_FLOOR = 108;
+    
+    /**
      * Constructor.
      * @param pos Position
      * @param type Type

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.NumberContext;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
@@ -458,6 +459,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                             s.append("Unknown(").append(operands[i]).append(")");
                         }
                     }
+                    break;
+                case AVM2Code.DAT_NUMBER_CONTEXT:
+                    NumberContext nc = new NumberContext(operands[i]);
+                    s.append(" ");
+                    s.append(nc.toString());
                     break;
                 case AVM2Code.DAT_OFFSET:
                     s.append(" ");

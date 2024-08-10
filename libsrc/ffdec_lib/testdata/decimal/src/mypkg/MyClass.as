@@ -9,7 +9,9 @@ package mypkg
          {
             //Presision values: HALF_EVEN, DOWN, FLOOR, UP, CEILING, HALF_UP, HALF_DOWN
             
-            use decimal, precision 20, rounding FLOOR;
+            //use decimal, precision 20, rounding FLOOR;
+            
+            use Number, precision 10;
             
             var a:decimal = 10000000010000000002000000000300000000040000000005m;
             var b:int = 10;
