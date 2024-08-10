@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -260,12 +261,12 @@ public class TraitFunction extends Trait implements TraitWithSlot {
      * @throws InterruptedException On interrupt
      */
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
 
     /**

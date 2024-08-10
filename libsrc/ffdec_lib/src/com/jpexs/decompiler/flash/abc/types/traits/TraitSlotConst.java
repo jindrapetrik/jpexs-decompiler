@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -369,11 +370,11 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @throws InterruptedException On interrupt
      */
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
         DependencyParser.parseDependenciesFromMultiname(abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
     }
 

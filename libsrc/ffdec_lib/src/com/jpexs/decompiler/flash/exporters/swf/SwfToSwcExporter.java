@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -166,7 +167,7 @@ public class SwfToSwcExporter {
                 sb.append("        <dep id=\"AS3\" type=\"").append(DEPENDENCY_NAMESPACE).append("\" />\n");
                 if (!skipDependencies) {
                     List<Dependency> dependencies = new ArrayList<>();
-                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(swf.getAbcIndex(), pack.scriptIndex, -1, false, null, pack.abc, dependencies, new DottedChain(new String[]{"NO:PACKAGE"}), new ArrayList<>(), new ArrayList<>());
+                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(swf.getAbcIndex(), pack.scriptIndex, -1, false, null, pack.abc, dependencies, new DottedChain(new String[]{"NO:PACKAGE"}), new ArrayList<>(), new ArrayList<>(), new Reference<>(null));
 
                     for (Dependency d : dependencies) {
                         if ("*".equals(d.getId().getLast())) {

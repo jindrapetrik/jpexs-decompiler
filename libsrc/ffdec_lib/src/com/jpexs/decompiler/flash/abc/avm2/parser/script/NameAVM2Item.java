@@ -448,15 +448,32 @@ public class NameAVM2Item extends AssignableAVM2Item {
          */
         if (!needsReturn) {
             if (slotNumber > -1) {
+                AVM2Instruction changeIns;
+                if (isInteger) {
+                    changeIns = ins(decrement ? AVM2Instructions.DecrementI : AVM2Instructions.IncrementI);
+                } else if (localData.numberContext != null) {
+                    changeIns = ins(decrement ? AVM2Instructions.DecrementP : AVM2Instructions.IncrementP, localData.numberContext);
+                } else {
+                    changeIns = ins(decrement ? AVM2Instructions.Decrement : AVM2Instructions.Increment);
+                }
                 return toSourceMerge(localData, generator,
                         ins(AVM2Instructions.GetScopeObject, slotScope),
                         generateGetSlot(slotScope, slotNumber),
-                        (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)),
+                        changeIns,
                         ins(AVM2Instructions.SetSlot, slotNumber)
                 );
             } else {
+                AVM2Instruction changeIns;
+                if (isInteger) {
+                    changeIns = ins(decrement ? AVM2Instructions.DecLocalI : AVM2Instructions.IncLocalI, regNumber);
+                } else if (localData.numberContext != null) {
+                    changeIns = ins(decrement ? AVM2Instructions.DecLocalP : AVM2Instructions.IncLocalP, localData.numberContext, regNumber);
+                } else {
+                    changeIns = ins(decrement ? AVM2Instructions.DecLocal : AVM2Instructions.IncLocal, regNumber);
+                }
+                
                 return toSourceMerge(localData, generator,
-                        (decrement ? ins(isInteger ? AVM2Instructions.DecLocalI : AVM2Instructions.DecLocal, regNumber) : ins(isInteger ? AVM2Instructions.IncLocalI : AVM2Instructions.IncLocal, regNumber)));
+                        changeIns);
             }
         }
         return toSourceMerge(localData, generator,

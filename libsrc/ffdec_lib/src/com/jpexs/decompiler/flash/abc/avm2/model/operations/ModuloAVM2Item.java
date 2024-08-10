@@ -82,6 +82,13 @@ public class ModuloAVM2Item extends BinaryOpItem implements CompoundableBinaryOp
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        if (localData.numberContext != null) {
+            return toSourceMerge(localData, generator, leftSide, rightSide,
+                new AVM2Instruction(0, AVM2Instructions.ModuloP, new int[] {localData.numberContext})
+            );
+        }
+        
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, AVM2Instructions.Modulo, null)
         );

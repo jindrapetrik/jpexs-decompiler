@@ -1055,6 +1055,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.protectedNs = localData.protectedNs;
         newlocalData.isStatic = isStatic;
         newlocalData.subMethod = subMethod;
+        newlocalData.numberContext = localData.numberContext;
         localData = newlocalData;
 
         localData.activationReg = 0;

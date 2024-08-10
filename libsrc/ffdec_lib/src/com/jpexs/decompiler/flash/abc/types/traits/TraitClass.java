@@ -48,6 +48,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -118,8 +119,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
      * @throws InterruptedException On interrupt
      */
     @Override
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
-        super.getDependencies(abcIndex, scriptIndex, -1, false, customNamespace, abc, dependencies, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames, uses);
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        super.getDependencies(abcIndex, scriptIndex, -1, false, customNamespace, abc, dependencies, ignorePackage == null ? getPackage(abc) : ignorePackage, fullyQualifiedNames, uses, numberContextRef);
         ClassInfo classInfo = abc.class_info.get(class_info);
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         DottedChain packageName = instanceInfo.getName(abc.constants).getNamespace(abc.constants).getName(abc.constants); //assume not null name
@@ -133,16 +134,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static
-        classInfo.static_traits.getDependencies(abcIndex, scriptIndex, class_info, true, customNamespace, abc, dependencies, packageName, fullyQualifiedNames, uses);
+        classInfo.static_traits.getDependencies(abcIndex, scriptIndex, class_info, true, customNamespace, abc, dependencies, packageName, fullyQualifiedNames, uses, numberContextRef);
 
         //static initializer
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, true, customNamespace, abc, classInfo.cinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses);
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, true, customNamespace, abc, classInfo.cinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
 
         //instance
-        instanceInfo.instance_traits.getDependencies(abcIndex, scriptIndex, class_info, false, customNamespace, abc, dependencies, packageName, fullyQualifiedNames, uses);
+        instanceInfo.instance_traits.getDependencies(abcIndex, scriptIndex, class_info, false, customNamespace, abc, dependencies, packageName, fullyQualifiedNames, uses, numberContextRef);
 
         //instance initializer
-        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNamespace, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses);
+        DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNamespace, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
 
     /**

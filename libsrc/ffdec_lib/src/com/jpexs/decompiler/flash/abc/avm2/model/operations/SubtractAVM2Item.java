@@ -86,6 +86,13 @@ public class SubtractAVM2Item extends BinaryOpItem implements CompoundableBinary
                 );
             }
         }*/
+        
+        if (localData.numberContext != null) {
+            return toSourceMerge(localData, generator, leftSide, rightSide,
+                new AVM2Instruction(0, AVM2Instructions.SubtractP, new int[] {localData.numberContext})
+            );
+        }
+        
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, AVM2Instructions.Subtract, null)
         );

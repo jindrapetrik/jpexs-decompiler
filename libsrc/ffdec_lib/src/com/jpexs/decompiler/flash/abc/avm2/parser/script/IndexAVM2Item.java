@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -112,14 +114,21 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         int indexPropIndex = g.abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createMultinameL(attr, allNsSet(g.abcIndex)), true);
 
+        AVM2Instruction changeIns;
+        if (localData.numberContext != null) {
+            changeIns = ins(decrement ? AVM2Instructions.DecrementP : AVM2Instructions.IncrementP, localData.numberContext);
+        } else {
+            changeIns = ins(decrement ? AVM2Instructions.Decrement : AVM2Instructions.Increment);
+        }
+        
         return toSourceMerge(localData, generator,
                 object, dupSetTemp(localData, generator, obj_temp),
                 index, dupSetTemp(localData, generator, index_temp),
                 ins(AVM2Instructions.GetProperty, indexPropIndex),
                 post ? ins(AVM2Instructions.ConvertD) : null,
-                (!post) ? (decrement ? ins(AVM2Instructions.Decrement) : ins(AVM2Instructions.Increment)) : null,
+                (!post) ? changeIns : null,
                 needsReturn ? ins(AVM2Instructions.Dup) : null,
-                post ? (decrement ? ins(AVM2Instructions.Decrement) : ins(AVM2Instructions.Increment)) : null,
+                post ? changeIns : null,
                 setTemp(localData, generator, val_temp),
                 getTemp(localData, generator, obj_temp),
                 getTemp(localData, generator, index_temp),

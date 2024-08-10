@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -478,9 +479,9 @@ public class Traits implements Cloneable, Serializable {
      * @param uses Uses
      * @throws InterruptedException On interrupt
      */
-    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
         for (Trait t : traits) {
-            t.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses);
+            t.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
         }
     }
 

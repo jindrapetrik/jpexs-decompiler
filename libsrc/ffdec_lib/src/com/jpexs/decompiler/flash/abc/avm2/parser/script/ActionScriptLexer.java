@@ -246,33 +246,33 @@ public final class ActionScriptLexer {
     "\1\44\1\1\1\42\2\45\1\46\2\47\1\42\2\1"+
     "\1\50\1\51\1\42\1\52\1\1\1\53\3\42\2\54"+
     "\2\42\1\55\1\56\1\1\1\57\2\42\1\0\1\60"+
-    "\1\0\1\61\1\0\1\62\1\63\1\64\1\15\1\65"+
-    "\1\66\1\67\1\0\1\70\1\71\1\72\1\73\1\74"+
-    "\1\75\1\76\1\77\1\100\1\15\1\0\1\101\1\15"+
-    "\1\102\1\0\14\6\1\103\1\104\3\0\2\6\1\105"+
-    "\14\6\1\106\1\107\1\110\1\6\1\111\13\6\1\112"+
+    "\1\0\1\61\1\0\1\62\1\63\1\64\1\65\1\66"+
+    "\1\67\1\70\1\0\1\71\1\72\1\73\1\74\1\75"+
+    "\1\76\1\77\1\100\1\15\1\65\1\0\1\101\1\65"+
+    "\1\102\1\0\14\6\1\103\1\104\1\0\2\105\2\6"+
+    "\1\106\14\6\1\107\1\110\1\111\1\6\1\112\13\6"+
     "\1\113\1\114\1\115\1\116\1\117\1\120\1\121\1\122"+
-    "\2\120\1\123\1\124\1\125\1\126\1\127\1\130\1\131"+
-    "\1\0\1\132\1\0\1\133\1\134\3\0\1\135\2\0"+
-    "\1\136\3\137\1\140\1\141\1\142\1\143\1\144\1\145"+
-    "\1\146\1\137\2\0\1\147\2\60\2\0\1\147\2\0"+
-    "\1\147\1\150\1\151\2\0\1\152\1\153\1\154\1\0"+
-    "\1\15\1\155\1\156\1\157\7\6\1\160\4\6\1\161"+
-    "\1\162\3\6\1\163\4\6\1\164\3\6\1\165\17\6"+
-    "\1\166\1\6\1\167\1\6\1\170\1\171\1\172\2\0"+
-    "\1\173\1\174\1\0\1\175\2\0\1\176\4\0\1\177"+
-    "\1\200\2\0\1\60\1\147\1\201\1\0\1\202\1\6"+
-    "\1\203\10\6\1\204\1\205\6\6\1\206\2\6\1\207"+
-    "\1\6\1\210\10\6\1\211\5\6\1\212\1\6\1\0"+
-    "\1\213\1\0\1\214\1\215\2\0\1\216\2\0\1\6"+
-    "\1\217\1\220\1\6\1\221\1\6\1\222\1\223\1\6"+
-    "\1\224\1\6\1\225\5\6\1\226\10\6\1\227\5\6"+
-    "\1\0\1\230\1\0\5\6\1\231\1\232\1\233\2\6"+
-    "\1\234\1\235\1\236\5\6\1\237\1\6\1\240\4\6"+
-    "\2\0\3\6\1\241\1\242\6\6\1\243\1\244\1\6"+
-    "\1\245\1\246\1\6\2\0\1\6\1\247\1\250\1\251"+
-    "\4\6\1\252\1\6\1\253\1\0\1\254\1\255\1\256"+
-    "\2\6\1\257\1\260\1\261\1\262\1\263";
+    "\1\123\2\121\1\124\1\125\1\126\1\127\1\130\1\131"+
+    "\1\132\1\0\1\133\1\0\1\134\1\135\3\0\1\136"+
+    "\2\0\1\137\3\140\1\141\1\142\1\143\1\144\1\145"+
+    "\1\146\1\147\1\140\2\0\1\150\2\60\2\0\1\150"+
+    "\2\0\1\150\1\151\1\152\2\0\1\153\1\154\1\155"+
+    "\1\0\1\65\1\156\1\157\1\160\7\6\1\161\4\6"+
+    "\1\162\1\105\3\6\1\163\4\6\1\164\3\6\1\165"+
+    "\17\6\1\166\1\6\1\167\1\6\1\170\1\171\1\172"+
+    "\2\0\1\173\1\174\1\0\1\175\2\0\1\176\4\0"+
+    "\1\177\1\200\2\0\1\60\1\150\1\201\1\0\1\202"+
+    "\1\6\1\203\10\6\1\204\1\205\6\6\1\206\2\6"+
+    "\1\207\1\6\1\210\10\6\1\211\5\6\1\212\1\6"+
+    "\1\0\1\213\1\0\1\214\1\215\2\0\1\216\1\0"+
+    "\1\217\1\0\1\6\1\220\1\221\1\6\1\222\1\6"+
+    "\1\223\1\224\1\6\1\225\1\6\1\226\5\6\1\227"+
+    "\10\6\1\230\5\6\2\0\5\6\1\231\1\232\1\233"+
+    "\2\6\1\234\1\235\1\236\5\6\1\237\1\6\1\240"+
+    "\4\6\2\0\3\6\1\241\1\242\6\6\1\243\1\244"+
+    "\1\6\1\245\1\246\1\6\2\0\1\6\1\247\1\250"+
+    "\1\251\4\6\1\252\1\6\1\253\1\0\1\254\1\255"+
+    "\1\256\2\6\1\257\1\260\1\261\1\262\1\263";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[465];
@@ -345,11 +345,11 @@ public final class ActionScriptLexer {
     "\0\u4448\0\u4494\0\u44e0\0\u452c\0\u4578\0\u45c4\0\u4610\0\u465c"+
     "\0\u0558\0\u46a8\0\u46f4\0\u4740\0\u478c\0\u47d8\0\u0558\0\u4824"+
     "\0\u27c8\0\u03dc\0\u4870\0\u03dc\0\u03dc\0\u48bc\0\u2a28\0\u03dc"+
-    "\0\u4908\0\u4954\0\u49a0\0\u0558\0\u0558\0\u49ec\0\u0558\0\u4a38"+
-    "\0\u0558\0\u4a84\0\u4ad0\0\u0558\0\u4b1c\0\u0558\0\u4b68\0\u4bb4"+
-    "\0\u4c00\0\u4c4c\0\u4c98\0\u0558\0\u4ce4\0\u4d30\0\u4d7c\0\u4dc8"+
-    "\0\u4e14\0\u4e60\0\u4eac\0\u4ef8\0\u0558\0\u4f44\0\u4f90\0\u4fdc"+
-    "\0\u5028\0\u5074\0\u50c0\0\u03dc\0\u510c\0\u5158\0\u51a4\0\u51f0"+
+    "\0\u4908\0\u03dc\0\u4954\0\u49a0\0\u0558\0\u0558\0\u49ec\0\u0558"+
+    "\0\u4a38\0\u0558\0\u4a84\0\u4ad0\0\u0558\0\u4b1c\0\u0558\0\u4b68"+
+    "\0\u4bb4\0\u4c00\0\u4c4c\0\u4c98\0\u0558\0\u4ce4\0\u4d30\0\u4d7c"+
+    "\0\u4dc8\0\u4e14\0\u4e60\0\u4eac\0\u4ef8\0\u0558\0\u4f44\0\u4f90"+
+    "\0\u4fdc\0\u5028\0\u5074\0\u50c0\0\u510c\0\u5158\0\u51a4\0\u51f0"+
     "\0\u523c\0\u5288\0\u0558\0\u0558\0\u0558\0\u52d4\0\u5320\0\u0558"+
     "\0\u0558\0\u0558\0\u536c\0\u53b8\0\u5404\0\u5450\0\u549c\0\u0558"+
     "\0\u54e8\0\u0558\0\u5534\0\u5580\0\u55cc\0\u5618\0\u5664\0\u56b0"+
@@ -646,152 +646,152 @@ public final class ActionScriptLexer {
     "\1\u0167\6\0\1\u0167\46\0\1\u0168\1\0\1\u0168\3\0"+
     "\3\u0168\5\0\1\u0168\3\0\2\u0168\1\0\3\u0168\4\0"+
     "\1\u0168\1\0\1\u0168\6\0\1\u0168\50\0\1\u012e\13\0"+
-    "\1\u012e\1\u0169\3\0\1\u012e\20\0\1\u0169\66\0\1\u0169"+
-    "\24\0\1\u0169\27\0\1\340\2\341\1\340\1\u0134\1\u0132"+
-    "\43\340\1\344\42\340\4\341\1\337\1\u0133\106\341\1\340"+
-    "\2\341\1\340\1\342\1\u0132\13\340\1\u0135\15\340\2\u0135"+
-    "\1\340\1\u0135\1\340\2\u0135\1\340\1\u0135\1\340\1\344"+
-    "\2\340\21\u0135\17\340\27\0\1\u016a\72\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\7\24\1\u016b\2\24\4\0"+
-    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\14\24\1\u016c\6\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\7\24\1\u016d"+
+    "\1\u012e\1\u0169\3\0\1\u012e\20\0\1\u0169\15\0\1\u016a"+
+    "\50\0\1\u0169\24\0\1\u0169\15\0\1\u016a\11\0\1\340"+
+    "\2\341\1\340\1\u0134\1\u0132\43\340\1\344\42\340\4\341"+
+    "\1\337\1\u0133\106\341\1\340\2\341\1\340\1\342\1\u0132"+
+    "\13\340\1\u0135\15\340\2\u0135\1\340\1\u0135\1\340\2\u0135"+
+    "\1\340\1\u0135\1\340\1\344\2\340\21\u0135\17\340\27\0"+
+    "\1\u016b\72\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\7\24\1\u016c\2\24\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\14\24\1\u016d"+
+    "\6\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\7\24\1\u016e\13\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u016f"+
+    "\12\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\4\24\1\u0170\16\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\7\24\1\u0171"+
     "\13\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\10\24\1\u016e\12\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\4\24\1\u016f"+
-    "\16\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\7\24\1\u0170\13\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\11\24\1\u0171\4\0\23\24"+
+    "\11\24\1\u0172\4\0\23\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\12\24\1\u0173\10\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\12\24\1\u0172\10\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\6\24\1\u0173\14\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\3\24\1\u0174\17\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\1\24\1\u0175\21\24"+
+    "\4\0\6\24\1\u0174\14\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\3\24\1\u0175\17\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
     "\4\0\1\24\1\u0176\21\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\10\24\1\u0177\12\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\4\24"+
-    "\1\u0178\5\24\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\1\24\1\u0179\21\24"+
+    "\3\0\4\24\4\0\12\24\4\0\1\24\1\u0177\21\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\4\24\1\u017a\16\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\17\24\1\u017b\3\24"+
+    "\4\0\10\24\1\u0178\12\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\4\24\1\u0179\5\24\4\0\23\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\13\24\1\u017c\7\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\5\24\1\u017d\15\24"+
+    "\4\0\1\24\1\u017a\21\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\4\24\1\u017b\16\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\1\24\1\u017e\21\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\11\24\1\u017f\4\0\23\24\23\0"+
-    "\3\24\7\0\3\24\3\0\4\24\4\0\12\24\4\0"+
-    "\2\24\1\u0180\20\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\12\24\4\0\1\24\1\u0181\21\24\23\0"+
-    "\3\24\7\0\3\24\3\0\4\24\4\0\1\24\1\u0182"+
-    "\10\24\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\12\24\4\0\7\24\1\u0183\13\24\23\0"+
-    "\3\24\7\0\3\24\3\0\4\24\4\0\6\24\1\u0184"+
-    "\3\24\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\11\24\1\u0185\4\0\23\24\23\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\12\24\4\0\10\24"+
-    "\1\u0186\12\24\23\0\3\24\7\0\3\24\3\0\4\24"+
-    "\4\0\11\24\1\u0187\4\0\23\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\2\24\1\u0188"+
-    "\20\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\2\24\1\u0189\20\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\6\24\1\u018a"+
-    "\14\24\16\0\2\u0163\10\0\1\u0163\2\0\1\u0164\124\0"+
-    "\1\u018b\166\0\1\u018c\41\0\1\u018d\71\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u018e"+
-    "\12\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\6\24\1\u018f\14\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u0190"+
-    "\12\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\12\24\1\u0191\10\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\11\24\1\u0192"+
-    "\11\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\6\24\1\u0193\14\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\4\24\1\u0194\5\24\4\0"+
-    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\14\24\1\u0195\6\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u0196"+
-    "\12\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\15\24\1\u0197\5\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\11\24\1\u0198\4\0\23\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\7\24"+
-    "\1\u0199\2\24\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\7\24\1\u019a\13\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\6\24"+
-    "\1\u019b\3\24\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\6\24\1\u019c\14\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\7\24"+
-    "\1\u019d\2\24\4\0\6\24\1\u019e\14\24\23\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\12\24\4\0\12\24"+
-    "\1\u019f\10\24\23\0\3\24\7\0\3\24\3\0\4\24"+
-    "\4\0\11\24\1\u01a0\4\0\23\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u01a1"+
-    "\12\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\4\24\1\u01a2\5\24\4\0\23\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\4\24\1\u01a3\5\24\4\0"+
-    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\7\24\1\u01a4\13\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\20\24\1\u01a5"+
-    "\2\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\10\24\1\u01a6\12\24\45\0\1\u01a7\114\0"+
-    "\1\u01a8\70\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\6\24\1\u01a9\14\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\1\24\1\u01aa\10\24\4\0"+
-    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\5\24\1\u01ab\15\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\16\24\1\u01ac"+
-    "\4\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\4\24\1\u01ad\16\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\12\24\4\0\11\24\1\u01ae"+
-    "\11\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\2\24\1\u01af\20\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\11\24\1\u01b0\4\0\23\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\4\24"+
-    "\1\u01b1\5\24\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\2\24\1\u01b2\20\24"+
+    "\4\0\17\24\1\u017c\3\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\13\24\1\u017d\7\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\2\24\1\u01b3\20\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\7\24\1\u01b4\13\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\4\24"+
-    "\1\u01b5\5\24\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\7\24\1\u01b6\13\24"+
+    "\4\0\5\24\1\u017e\15\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\1\24\1\u017f\21\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\11\24"+
-    "\1\u01b7\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\11\24\1\u01b8\4\0\23\24\23\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\12\24\4\0\7\24"+
-    "\1\u01b9\13\24\46\0\1\u01ba\112\0\1\u01bb\71\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\11\24\1\u01bc\4\0"+
-    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\11\24\1\u01bd\4\0\23\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\6\24\1\u01be\14\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\11\24"+
-    "\1\u01bf\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\4\24\1\u01c0\5\24\4\0\23\24\23\0"+
+    "\1\u0180\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
+    "\4\24\4\0\12\24\4\0\2\24\1\u0181\20\24\23\0"+
     "\3\24\7\0\3\24\3\0\4\24\4\0\12\24\4\0"+
-    "\6\24\1\u01c1\14\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\11\24\1\u01c2\4\0\23\24\23\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\4\24\1\u01c3\5\24"+
+    "\1\24\1\u0182\21\24\23\0\3\24\7\0\3\24\3\0"+
+    "\4\24\4\0\1\24\1\u0183\10\24\4\0\23\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\12\24\4\0"+
+    "\7\24\1\u0184\13\24\23\0\3\24\7\0\3\24\3\0"+
+    "\4\24\4\0\6\24\1\u0185\3\24\4\0\23\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\11\24\1\u0186"+
     "\4\0\23\24\23\0\3\24\7\0\3\24\3\0\4\24"+
-    "\4\0\12\24\4\0\12\24\1\u01c4\10\24\23\0\3\24"+
-    "\7\0\3\24\3\0\4\24\4\0\11\24\1\u01c5\4\0"+
+    "\4\0\12\24\4\0\10\24\1\u0187\12\24\23\0\3\24"+
+    "\7\0\3\24\3\0\4\24\4\0\11\24\1\u0188\4\0"+
     "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\16\24\1\u01c6\4\24\45\0\1\u01c7\110\0"+
-    "\1\u01c8\74\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\11\24\1\u01c9\11\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\11\24\1\u01ca\4\0\23\24"+
+    "\12\24\4\0\2\24\1\u0189\20\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\2\24\1\u018a"+
+    "\20\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\6\24\1\u018b\14\24\16\0\2\u0163\10\0"+
+    "\1\u0163\2\0\1\u0164\124\0\1\u018c\166\0\1\u016a\41\0"+
+    "\1\u018d\71\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\10\24\1\u018e\12\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\6\24\1\u018f"+
+    "\14\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\10\24\1\u0190\12\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\12\24\1\u0191"+
+    "\10\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\11\24\1\u0192\11\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\6\24\1\u0193"+
+    "\14\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\4\24\1\u0194\5\24\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\14\24\1\u0195"+
+    "\6\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\10\24\1\u0196\12\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\15\24\1\u0197"+
+    "\5\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\11\24\1\u0198\4\0\23\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\7\24\1\u0199\2\24\4\0\23\24"+
     "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
-    "\4\0\7\24\1\u01cb\13\24\23\0\3\24\7\0\3\24"+
-    "\3\0\4\24\4\0\12\24\4\0\5\24\1\u01cc\15\24"+
-    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\11\24"+
-    "\1\u01cd\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
-    "\4\24\4\0\12\24\4\0\11\24\1\u01ce\11\24\42\0"+
-    "\1\u01cf\74\0\3\24\7\0\3\24\3\0\4\24\4\0"+
-    "\12\24\4\0\4\24\1\u01d0\16\24\23\0\3\24\7\0"+
-    "\3\24\3\0\4\24\4\0\7\24\1\u01d1\2\24\4\0"+
-    "\23\24\15\0";
+    "\4\0\7\24\1\u019a\13\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\6\24\1\u019b\3\24\4\0\23\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\6\24\1\u019c\14\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\7\24\1\u019d\2\24\4\0\6\24"+
+    "\1\u019e\14\24\23\0\3\24\7\0\3\24\3\0\4\24"+
+    "\4\0\12\24\4\0\12\24\1\u019f\10\24\23\0\3\24"+
+    "\7\0\3\24\3\0\4\24\4\0\11\24\1\u01a0\4\0"+
+    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\10\24\1\u01a1\12\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\4\24\1\u01a2\5\24\4\0"+
+    "\23\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\4\24\1\u01a3\5\24\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\7\24\1\u01a4"+
+    "\13\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\20\24\1\u01a5\2\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\10\24\1\u01a6"+
+    "\12\24\45\0\1\u01a7\114\0\1\u01a8\70\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\6\24\1\u01a9"+
+    "\14\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\1\24\1\u01aa\10\24\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\5\24\1\u01ab"+
+    "\15\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\16\24\1\u01ac\4\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\4\24\1\u01ad"+
+    "\16\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\12\24\4\0\11\24\1\u01ae\11\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\2\24\1\u01af"+
+    "\20\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\11\24\1\u01b0\4\0\23\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\4\24\1\u01b1\5\24\4\0\23\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\2\24\1\u01b2\20\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\2\24\1\u01b3\20\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\7\24\1\u01b4\13\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\4\24\1\u01b5\5\24\4\0\23\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\7\24\1\u01b6\13\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\11\24\1\u01b7\4\0\23\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\11\24\1\u01b8"+
+    "\4\0\23\24\23\0\3\24\7\0\3\24\3\0\4\24"+
+    "\4\0\12\24\4\0\7\24\1\u01b9\13\24\46\0\1\u01ba"+
+    "\112\0\1\u01bb\71\0\3\24\7\0\3\24\3\0\4\24"+
+    "\4\0\11\24\1\u01bc\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\11\24\1\u01bd\4\0\23\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\6\24\1\u01be\14\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\11\24\1\u01bf\4\0\23\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\4\24\1\u01c0"+
+    "\5\24\4\0\23\24\23\0\3\24\7\0\3\24\3\0"+
+    "\4\24\4\0\12\24\4\0\6\24\1\u01c1\14\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\11\24\1\u01c2"+
+    "\4\0\23\24\23\0\3\24\7\0\3\24\3\0\4\24"+
+    "\4\0\4\24\1\u01c3\5\24\4\0\23\24\23\0\3\24"+
+    "\7\0\3\24\3\0\4\24\4\0\12\24\4\0\12\24"+
+    "\1\u01c4\10\24\23\0\3\24\7\0\3\24\3\0\4\24"+
+    "\4\0\11\24\1\u01c5\4\0\23\24\23\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\16\24\1\u01c6"+
+    "\4\24\45\0\1\u01c7\110\0\1\u01c8\74\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\11\24\1\u01c9"+
+    "\11\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\11\24\1\u01ca\4\0\23\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\12\24\4\0\7\24\1\u01cb\13\24"+
+    "\23\0\3\24\7\0\3\24\3\0\4\24\4\0\12\24"+
+    "\4\0\5\24\1\u01cc\15\24\23\0\3\24\7\0\3\24"+
+    "\3\0\4\24\4\0\11\24\1\u01cd\4\0\23\24\23\0"+
+    "\3\24\7\0\3\24\3\0\4\24\4\0\12\24\4\0"+
+    "\11\24\1\u01ce\11\24\42\0\1\u01cf\74\0\3\24\7\0"+
+    "\3\24\3\0\4\24\4\0\12\24\4\0\4\24\1\u01d0"+
+    "\16\24\23\0\3\24\7\0\3\24\3\0\4\24\4\0"+
+    "\7\24\1\u01d1\2\24\4\0\23\24\15\0";
 
   private static int [] zzUnpackTrans() {
     int [] result = new int[23940];
@@ -838,7 +838,7 @@ public final class ActionScriptLexer {
     "\3\1\1\11\2\1\2\11\1\1\1\11\2\1\1\0"+
     "\1\1\1\0\1\1\1\0\1\11\1\1\1\11\1\1"+
     "\1\11\2\1\1\0\2\11\1\1\2\11\1\1\4\11"+
-    "\1\0\3\1\1\0\14\1\2\11\3\0\37\1\1\11"+
+    "\1\0\3\1\1\0\14\1\2\11\1\0\41\1\1\11"+
     "\1\1\1\11\1\1\5\11\2\1\7\11\1\0\1\11"+
     "\1\0\2\11\3\0\1\1\2\0\2\11\2\1\7\11"+
     "\1\1\2\0\2\1\1\11\2\0\1\1\2\0\1\1"+
@@ -846,7 +846,7 @@ public final class ActionScriptLexer {
     "\17\1\1\11\41\1\2\11\2\0\2\11\1\0\1\11"+
     "\2\0\1\1\4\0\2\11\2\0\2\1\1\11\1\0"+
     "\1\11\50\1\1\0\1\11\1\0\2\11\2\0\1\11"+
-    "\2\0\40\1\1\0\1\11\1\0\31\1\2\0\21\1"+
+    "\1\0\1\11\1\0\40\1\2\0\31\1\2\0\21\1"+
     "\2\0\13\1\1\0\1\11\6\1\1\11\2\1";
 
   private static int [] zzUnpackAttribute() {
@@ -1383,19 +1383,16 @@ public final class ActionScriptLexer {
           }
         case 191: break;
         case 13: 
-          { String dval = yytext();
-                                    if (dval.endsWith("m")) {
-                                        dval = dval.substring(0, dval.length() - 1);
-                                        return new ParsedSymbol(SymbolGroup.DECIMAL, SymbolType.DECIMAL, new Decimal128(dval));
+          { String ival = yytext();
+                                    if (ival.endsWith("i") || ival.endsWith("u")) {
+                                        ival = ival.substring(0, ival.length() - 1);
                                     }
-                                    if (dval.endsWith("f")) {
-                                        dval = dval.substring(0, dval.length() - 1);
-                                        return new ParsedSymbol(SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(dval));
+                                    try{
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(ival)); 
+                                    } catch(NumberFormatException nfe){
+                                        //its too long for an Integer var
+                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(ival)); 
                                     }
-                                    if (dval.endsWith("d")) {
-                                        dval = dval.substring(0, dval.length() - 1);
-                                    }
-                                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(dval));
           }
         case 192: break;
         case 14: 
@@ -1592,62 +1589,65 @@ public final class ActionScriptLexer {
           }
         case 231: break;
         case 53: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.FILTER, yytext());
+          { String dval = yytext();
+                                    if (dval.endsWith("m")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                        return new ParsedSymbol(SymbolGroup.DECIMAL, SymbolType.DECIMAL, new Decimal128(dval));
+                                    }
+                                    if (dval.endsWith("f")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                        return new ParsedSymbol(SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(dval));
+                                    }
+                                    if (dval.endsWith("d")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                    }
+                                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(dval));
           }
         case 232: break;
         case 54: 
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.FILTER, yytext());
+          }
+        case 233: break;
+        case 55: 
           { yybegin(XMLOPENTAG);
                                     string.setLength(0);
                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext());
           }
-        case 233: break;
-        case 55: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_LEFT, yytext());
-          }
         case 234: break;
         case 56: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_EQUAL, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_LEFT, yytext());
           }
         case 235: break;
         case 57: 
-          { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_EQUAL, yytext());
           }
         case 236: break;
         case 58: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT_EQUAL, yytext());
+          { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext());
           }
         case 237: break;
         case 59: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DECREMENT, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT_EQUAL, yytext());
           }
         case 238: break;
         case 60: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MINUS, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DECREMENT, yytext());
           }
         case 239: break;
         case 61: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_RIGHT, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MINUS, yytext());
           }
         case 240: break;
         case 62: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_EQUAL, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.SHIFT_RIGHT, yytext());
           }
         case 241: break;
         case 63: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NAMESPACE_OP, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_EQUAL, yytext());
           }
         case 242: break;
         case 64: 
-          { String ival = yytext();
-                                    if (ival.endsWith("i") || ival.endsWith("u")) {
-                                        ival = ival.substring(0, ival.length() - 1);
-                                    }
-                                    try{
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(ival)); 
-                                    } catch(NumberFormatException nfe){
-                                        //its too long for an Integer var
-                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(ival)); 
-                                    }
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NAMESPACE_OP, yytext());
           }
         case 243: break;
         case 65: 
@@ -1672,86 +1672,90 @@ public final class ActionScriptLexer {
           }
         case 247: break;
         case 69: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AS, yytext());
+          { return new ParsedSymbol(SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1)));
           }
         case 248: break;
         case 70: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IF, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AS, yytext());
           }
         case 249: break;
         case 71: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.IS, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IF, yytext());
           }
         case 250: break;
         case 72: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IN, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.IS, yytext());
           }
         case 251: break;
         case 73: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DO, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IN, yytext());
           }
         case 252: break;
         case 74: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITAND, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DO, yytext());
           }
         case 253: break;
         case 75: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AND, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITAND, yytext());
           }
         case 254: break;
         case 76: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITOR, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AND, yytext());
           }
         case 255: break;
         case 77: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.OR, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_BITOR, yytext());
           }
         case 256: break;
         case 78: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_XOR, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.OR, yytext());
           }
         case 257: break;
         case 79: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MODULO, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_XOR, yytext());
           }
         case 258: break;
         case 80: 
-          { /* ignore illegal character escape */
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_MODULO, yytext());
           }
         case 259: break;
         case 81: 
-          { string.append('\"');
+          { /* ignore illegal character escape */
           }
         case 260: break;
         case 82: 
-          { string.append('\'');
+          { string.append('\"');
           }
         case 261: break;
         case 83: 
-          { string.append('\f');
+          { string.append('\'');
           }
         case 262: break;
         case 84: 
-          { string.append('\\');
+          { string.append('\f');
           }
         case 263: break;
         case 85: 
-          { string.append('\b');
+          { string.append('\\');
           }
         case 264: break;
         case 86: 
-          { string.append('\r');
+          { string.append('\b');
           }
         case 265: break;
         case 87: 
-          { string.append('\n');
+          { string.append('\r');
           }
         case 266: break;
         case 88: 
-          { string.append('\t');
+          { string.append('\n');
           }
         case 267: break;
         case 89: 
+          { string.append('\t');
+          }
+        case 268: break;
+        case 90: 
           { yybegin(XML);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTFINISHTAG_END, yytext()));
                                     if (string.length() > 0){
@@ -1760,8 +1764,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 268: break;
-        case 90: 
+        case 269: break;
+        case 91: 
           { yybegin(XMLOPENTAGATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
                                     if (string.length() > 0){
@@ -1770,21 +1774,21 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 269: break;
-        case 91: 
+        case 270: break;
+        case 92: 
           { yybegin(XMLOPENTAG);
                                         return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
           }
-        case 270: break;
-        case 92: 
+        case 271: break;
+        case 93: 
           { yybegin(XML);
                                     string.append(yytext());
                                     String tos = string.toString();
                                     string.setLength(0);
                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR, tos);
           }
-        case 271: break;
-        case 93: 
+        case 272: break;
+        case 94: 
           { yybegin(XMLOPENTAG);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext()));
                                     if (string.length() > 0){
@@ -1793,8 +1797,8 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 272: break;
-        case 94: 
+        case 273: break;
+        case 95: 
           { yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
                                     if (string.length() > 0){
@@ -1803,68 +1807,68 @@ public final class ActionScriptLexer {
                                     }
                                     return lex();
           }
-        case 273: break;
-        case 95: 
-          { throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
-          }
         case 274: break;
         case 96: 
-          { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;
+          { throw new AVM2ParseException("Illegal escape sequence \"" + yytext() + "\"", yyline + 1);
           }
         case 275: break;
         case 97: 
-          { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;
           }
         case 276: break;
         case 98: 
-          { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;
           }
         case 277: break;
         case 99: 
-          { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;
           }
         case 278: break;
         case 100: 
-          { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;
           }
         case 279: break;
         case 101: 
-          { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;
           }
         case 280: break;
         case 102: 
-          { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;
+          { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;
           }
         case 281: break;
         case 103: 
-          { return new ParsedSymbol(SymbolGroup.REGEXP, SymbolType.REGEXP, yytext());
+          { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;
           }
         case 282: break;
         case 104: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.REST, yytext());
+          { return new ParsedSymbol(SymbolGroup.REGEXP, SymbolType.REGEXP, yytext());
           }
         case 283: break;
         case 105: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_LEFT, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.REST, yytext());
           }
         case 284: break;
         case 106: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_NOT_EQUAL, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_LEFT, yytext());
           }
         case 285: break;
         case 107: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.USHIFT_RIGHT, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_NOT_EQUAL, yytext());
           }
         case 286: break;
         case 108: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_RIGHT, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.USHIFT_RIGHT, yytext());
           }
         case 287: break;
         case 109: 
-          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_EQUALS, yytext());
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_SHIFT_RIGHT, yytext());
           }
         case 288: break;
         case 110: 
+          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_EQUALS, yytext());
+          }
+        case 289: break;
+        case 111: 
           { try {
                                         return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext().substring(2), 16));
                                     } catch (NumberFormatException nfe) {
@@ -1872,21 +1876,17 @@ public final class ActionScriptLexer {
                                         return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext().substring(2), 16).doubleValue()); 
                                     }
           }
-        case 289: break;
-        case 111: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.USE, yytext());
-          }
         case 290: break;
         case 112: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FOR, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.USE, yytext());
           }
         case 291: break;
         case 113: 
-          { return new ParsedSymbol(SymbolGroup.PREPROCESSOR, SymbolType.PREPROCESSOR, yytext().substring(2));
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FOR, yytext());
           }
         case 292: break;
         case 114: 
-          { return new ParsedSymbol(SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1)));
+          { return new ParsedSymbol(SymbolGroup.PREPROCESSOR, SymbolType.PREPROCESSOR, yytext().substring(2));
           }
         case 293: break;
         case 115: 
@@ -2039,43 +2039,43 @@ public final class ActionScriptLexer {
           }
         case 321: break;
         case 143: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CATCH, yytext());
+          { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1));
           }
         case 322: break;
         case 144: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CONST, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CATCH, yytext());
           }
         case 323: break;
         case 145: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CLASS, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CONST, yytext());
           }
         case 324: break;
         case 146: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FALSE, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CLASS, yytext());
           }
         case 325: break;
         case 147: 
-          { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FALSE, yytext());
           }
         case 326: break;
         case 148: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.BREAK, yytext());
+          { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext());
           }
         case 327: break;
         case 149: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SUPER, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.BREAK, yytext());
           }
         case 328: break;
         case 150: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THROW, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SUPER, yytext());
           }
         case 329: break;
         case 151: 
-          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WHILE, yytext());
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THROW, yytext());
           }
         case 330: break;
         case 152: 
-          { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1));
+          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WHILE, yytext());
           }
         case 331: break;
         case 153: 
