@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - Hex view for unknown tags was not scrollable
+- [#2269] Nullpointer on importing (ImportAssets) a character that does not exists
 
 ## [21.0.1] - 2024-08-08
 ### Added
@@ -3476,6 +3477,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2269]: https://www.free-decompiler.com/flash/issues/2269
 [#2221]: https://www.free-decompiler.com/flash/issues/2221
 [#2267]: https://www.free-decompiler.com/flash/issues/2267
 [#2268]: https://www.free-decompiler.com/flash/issues/2268
