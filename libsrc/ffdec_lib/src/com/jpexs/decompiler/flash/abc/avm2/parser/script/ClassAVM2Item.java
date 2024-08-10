@@ -115,6 +115,11 @@ public class ClassAVM2Item extends AVM2Item implements Block {
      * Metadata
      */
     public List<Map.Entry<String, Map<String, String>>> metadata;
+    
+    /**
+     * Is nullable
+     */
+    public boolean isNullable;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -148,8 +153,9 @@ public class ClassAVM2Item extends AVM2Item implements Block {
      * @param iinitVariables Instance initializer variables
      * @param traits Traits
      * @param iinitActivation Instance initializer activation
+     * @param isNullable Nullable
      */
-    public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, boolean isDynamic, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> cinit, boolean staticInitActivation, List<AssignableAVM2Item> cinitVariables, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, List<GraphTargetItem> traits, boolean iinitActivation) {
+    public ClassAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, boolean isDynamic, String className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> cinit, boolean staticInitActivation, List<AssignableAVM2Item> cinitVariables, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, List<GraphTargetItem> traits, boolean iinitActivation, boolean isNullable) {
         super(null, null, NOPRECEDENCE);
         this.metadata = metadata;
         this.importedClasses = importedClasses;
@@ -167,6 +173,7 @@ public class ClassAVM2Item extends AVM2Item implements Block {
         this.cinitActivation = staticInitActivation;
         this.cinitVariables = cinitVariables;
         this.iinitVariables = iinitVariables;
+        this.isNullable = isNullable;
     }
 
     @Override

@@ -102,8 +102,7 @@ public class InstanceInfo {
     public static final int CLASS_PROTECTEDNS = 8;
 
     /**
-     * Unknown. This is somehow used in Flex, probably through annotations or
-     * something with Vector datatype (?) TODO: Investigate this
+     * Non nullable class
      */
     public static final int CLASS_NON_NULLABLE = 16;
 
@@ -293,6 +292,10 @@ public class InstanceInfo {
         String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(abc.constants, true).toRawString();
 
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
+        
+        if (!isNullable()) {
+            writer.appendNoHilight("!");
+        }
 
         if (super_index > 0) {
             String typeName = abc.constants.getMultiname(super_index).getNameWithNamespace(abc.constants, true).toRawString();

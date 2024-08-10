@@ -2,7 +2,7 @@ package mypkg
 {    
     use decimal, rounding CEILING, precision 10;
     
-    public class MyClass
+    public class MyClass!
     {        
          private var attr_dec:decimal;
          private var attr_int:int;

@@ -73,6 +73,11 @@ public class InterfaceAVM2Item extends AVM2Item {
     public List<Map.Entry<String, Map<String, String>>> metadata;
 
     /**
+     * Is nullable
+     */
+    public boolean isNullable;
+    
+    /**
      * Constructor.
      * @param metadata Metadata
      * @param importedClasses Imported classes
@@ -82,8 +87,9 @@ public class InterfaceAVM2Item extends AVM2Item {
      * @param name Name
      * @param superInterfaces Super interfaces
      * @param traits Traits
+     * @param isNullable Nullable
      */
-    public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits) {
+    public InterfaceAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, List<DottedChain> importedClasses, NamespaceItem pkg, List<NamespaceItem> openedNamespaces, boolean isFinal, String name, List<GraphTargetItem> superInterfaces, List<GraphTargetItem> traits, boolean isNullable) {
         super(null, null, NOPRECEDENCE);
         this.metadata = metadata;
         this.importedClasses = importedClasses;
@@ -93,6 +99,7 @@ public class InterfaceAVM2Item extends AVM2Item {
         this.methods = traits;
         this.isFinal = isFinal;
         this.openedNamespaces = openedNamespaces;
+        this.isNullable = isNullable;
     }
 
     @Override
