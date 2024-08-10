@@ -34,14 +34,9 @@ public class ParsedSymbol {
     public Object value;
 
     /**
-     * Type: Integer
+     * Type: Number
      */
-    public static final int TYPE_INTEGER = 1;
-
-    /**
-     * Type: Float
-     */
-    public static final int TYPE_FLOAT = 2;
+    public static final int TYPE_NUMBER = 1;
 
     /**
      * Type: True

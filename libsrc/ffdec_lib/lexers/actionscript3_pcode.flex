@@ -98,12 +98,12 @@ Label = {Identifier}:
 
 
 /* integer literals */
-NumberLiteral = 0 | -?[1-9][0-9]*
+NumberLiteral = (0 | -?[1-9][0-9]*) [ui]
 
 PositiveNumberLiteral = 0 | [1-9][0-9]*
    
 /* floating point literals */        
-FloatLiteral =  -?({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+FloatLiteral =  -?({FLit1}|{FLit2}|{FLit3}) {Exponent}? [mdf]?
 
 FLit1    = [0-9]+ \. [0-9]* 
 FLit2    = \. [0-9]+ 
@@ -286,14 +286,10 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   
   /* numeric literals */
 
-  {NumberLiteral}            { 
-                                try {
-                                    return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_INTEGER, Integer.parseInt((yytext())));  
-                                } catch(NumberFormatException nfe) {
-                                    return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
-                                }
+  {NumberLiteral}            {                                 
+                                return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_NUMBER, yytext());                                  
                              }
-  {FloatLiteral}                 { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));  }
+  {FloatLiteral}             { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_NUMBER, yytext());  }
   {Identifier}            { return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_IDENTIFIER, yytext());  }
   {LineTerminator}      {yybegin(YYINITIAL);}
   {Comment}             {return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_COMMENT, yytext().substring(1));}

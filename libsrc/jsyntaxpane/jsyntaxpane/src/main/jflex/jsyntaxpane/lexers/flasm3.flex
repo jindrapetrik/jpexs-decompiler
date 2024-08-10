@@ -59,11 +59,11 @@ Label = {Identifier}:
 
 
 /* integer literals */
-NumberLiteral = 0 | -?[1-9][0-9]*
+NumberLiteral = (0 | -?[1-9][0-9]*) [ui]?
 PositiveNumberLiteral = 0 | [1-9][0-9]*
 
 /* floating point literals */        
-FloatLiteral = -?({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+FloatLiteral = -?({FLit1}|{FLit2}|{FLit3}) {Exponent}? [mdf]?
 
 FLit1    = [0-9]+ \. [0-9]* 
 FLit2    = \. [0-9]+ 
