@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -30,19 +31,18 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import macromedia.asc.util.Decimal128;
 
 /**
- * Decimal value.
+ * Float value.
  *
  * @author JPEXS
  */
-public class DecimalValueAVM2Item extends NumberValueAVM2Item {
+public class FloatValueAVM2Item extends NumberValueAVM2Item {
 
     /**
      * Value
      */
-    public Decimal128 value;
+    public Float value;
 
     /**
      * Constructor.
@@ -51,14 +51,14 @@ public class DecimalValueAVM2Item extends NumberValueAVM2Item {
      * @param lineStartIns Line start instruction
      * @param value Value
      */
-    public DecimalValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Decimal128 value) {
+    public FloatValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Float value) {
         super(instruction, lineStartIns);
         this.value = value;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {       
-        return writer.append(value.toActionScriptString());
+        return writer.append(EcmaScript.toString(value)).append("f");
     }
 
     @Override
@@ -74,7 +74,7 @@ public class DecimalValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, AVM2Instructions.PushDecimal, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getDecimalId(value, true)})
+                new AVM2Instruction(0, AVM2Instructions.PushFloat, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getFloatId(value, true)})
         );
     }
 
@@ -106,7 +106,7 @@ public class DecimalValueAVM2Item extends NumberValueAVM2Item {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final DecimalValueAVM2Item other = (DecimalValueAVM2Item) obj;
+        final FloatValueAVM2Item other = (FloatValueAVM2Item) obj;
         if (!Objects.equals(this.value, other.value)) {
             return false;
         }

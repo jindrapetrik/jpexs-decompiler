@@ -23,10 +23,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecimalValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DefaultXMLNamespace;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
@@ -129,6 +131,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import macromedia.asc.util.Decimal128;
 
 /**
  * ActionScript 3 parser.
@@ -2337,10 +2340,12 @@ public class ActionScript3Parser {
                 s = lex();
                 if (s.isType(SymbolType.DOUBLE)) {
                     ret = new DoubleValueAVM2Item(null, null, -(Double) s.value);
-
                 } else if (s.isType(SymbolType.INTEGER)) {
                     ret = new IntegerValueAVM2Item(null, null, -(Integer) s.value);
-
+                } else if (s.isType(SymbolType.DECIMAL)) {
+                    ret = new DecimalValueAVM2Item(null, null, ((Decimal128) s.value).multiply(Decimal128.NEG1));
+                } else if (s.isType(SymbolType.FLOAT)) {
+                    ret = new FloatValueAVM2Item(null, null, -(Float) s.value);
                 } else {
                     lexer.pushback(s);
                     GraphTargetItem num = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);
@@ -2445,6 +2450,14 @@ public class ActionScript3Parser {
             case DOUBLE:
                 ret = new DoubleValueAVM2Item(null, null, (Double) s.value);
                 allowMemberOrCall = true; // 5.2.toString();
+                break;
+            case DECIMAL:
+                ret = new DecimalValueAVM2Item(null, null, (Decimal128) s.value);
+                allowMemberOrCall = true;
+                break;
+            case FLOAT:
+                ret = new FloatValueAVM2Item(null, null, (Float) s.value);
+                allowMemberOrCall = true;
                 break;
             case DELETE:
                 GraphTargetItem varDel = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);

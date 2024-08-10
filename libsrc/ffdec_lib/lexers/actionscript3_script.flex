@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.math.BigInteger;
+import macromedia.asc.util.Decimal128;
 
 %%
 
@@ -203,7 +204,7 @@ XmlSQuoteStringChar = [^\r\n\']
 
 
 /* integer literals */
-DecIntegerLiteral = 0 | [1-9][0-9]*
+DecIntegerLiteral = (0 | [1-9][0-9]*) [ui]
 
 HexIntegerLiteral = 0 [xX] 0* {HexDigit}+
 HexDigit          = [0-9a-fA-F]
@@ -212,7 +213,7 @@ OctIntegerLiteral = 0+ [1-3]? {OctDigit}+
 OctDigit          = [0-7]
 
 /* floating point literals */
-DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [mdf]?
 
 FLit1    = [0-9]+ \. [0-9]*
 FLit2    = \. [0-9]+
@@ -373,15 +374,19 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   /* numeric literals */
 
   {DecIntegerLiteral}            { 
+                                    String ival = yytext();
+                                    if (ival.endsWith("i") || ival.endsWith("u")) {
+                                        ival = ival.substring(0, ival.length() - 1);
+                                    }
                                     try{
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext())); 
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(ival)); 
                                     } catch(NumberFormatException nfe){
                                         //its too long for an Integer var
-                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext())); 
+                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(ival)); 
                                     }
                                  }
 
-  {HexIntegerLiteral}            { 
+  {HexIntegerLiteral}            {                                    
                                     try {
                                         return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext().substring(2), 16));
                                     } catch (NumberFormatException nfe) {
@@ -397,7 +402,21 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                         return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext(), 8).doubleValue()); 
                                    }
                                  }  
-  {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext())); }
+  {DoubleLiteral}                { 
+                                    String dval = yytext();
+                                    if (dval.endsWith("m")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                        return new ParsedSymbol(SymbolGroup.DECIMAL, SymbolType.DECIMAL, new Decimal128(dval));
+                                    }
+                                    if (dval.endsWith("f")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                        return new ParsedSymbol(SymbolGroup.FLOAT, SymbolType.FLOAT, Float.parseFloat(dval));
+                                    }
+                                    if (dval.endsWith("d")) {
+                                        dval = dval.substring(0, dval.length() - 1);
+                                    }
+                                    return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(dval));
+                                 }
 
   /* comments */
   {Comment}                      { yyline += count(yytext(),"\n"); }

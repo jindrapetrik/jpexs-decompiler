@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport;
 
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
@@ -24,6 +25,10 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  * add_p instruction - add two numbers with number context.
@@ -46,5 +51,12 @@ public class AddPIns extends InstructionDefinition {
         }
 
         super.verify(lda, constants, ins);
+    }
+    
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        GraphTargetItem v2 = stack.pop();
+        GraphTargetItem v1 = stack.pop();
+        stack.push(new AddAVM2Item(ins, localData.lineStartInstruction, v1, v2));
     }
 }

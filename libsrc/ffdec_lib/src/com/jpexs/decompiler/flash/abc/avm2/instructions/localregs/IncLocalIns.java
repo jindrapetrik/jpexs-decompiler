@@ -58,6 +58,7 @@ public class IncLocalIns extends InstructionDefinition {
         return true;
     }
 
+    //same for inclocal and inclocalp (decimal)
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int regId = ins.operands[0];
@@ -77,8 +78,6 @@ public class IncLocalIns extends InstructionDefinition {
         }
         if (localData.localRegs.containsKey(regId)) {
             localData.localRegs.put(regId, new AddAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));
-        } else {
-            //localRegs.put(regIndex, new AddAVM2Item(ins, localData.lineStartInstruction, null, new IntegerValueAVM2Item(ins, localData.lineStartInstruction, new Long(1))));
         }
         if (!localData.localRegAssignmentIps.containsKey(regId)) {
             localData.localRegAssignmentIps.put(regId, 0);

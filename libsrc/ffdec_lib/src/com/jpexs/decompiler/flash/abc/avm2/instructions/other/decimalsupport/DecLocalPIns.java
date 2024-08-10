@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
@@ -25,6 +26,14 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  * declocal_p instruction - decrement local register with number context.
@@ -57,5 +66,32 @@ public class DecLocalPIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 0;
+    }
+    
+    //same for declocal and declocalp (decimal)
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        int regId = ins.operands[0];
+        boolean isPostDec = false;
+        if (!stack.isEmpty()) {
+            GraphTargetItem stackTop = stack.peek();
+            if (stackTop instanceof LocalRegAVM2Item) {
+                if (regId == ((LocalRegAVM2Item) stackTop).regIndex) {
+                    stack.pop();
+                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, stackTop));
+                    isPostDec = true;
+                }
+            }
+        }
+        if (!isPostDec) {
+            output.add(new DecLocalAVM2Item(ins, localData.lineStartInstruction, regId));
+        }
+        if (localData.localRegs.containsKey(regId)) {
+            localData.localRegs.put(regId, new SubtractAVM2Item(ins, localData.lineStartInstruction, localData.localRegs.get(regId), new IntegerValueAVM2Item(ins, localData.lineStartInstruction, 1)));
+        }
+        if (!localData.localRegAssignmentIps.containsKey(regId)) {
+            localData.localRegAssignmentIps.put(regId, 0);
+        }
+        localData.localRegAssignmentIps.put(regId, localData.localRegAssignmentIps.get(regId) + 1);
     }
 }
