@@ -2665,6 +2665,7 @@ public class ActionScript3Parser {
                             fullName = fullName.add(s.value.toString(), "");
                             s = lex();
                         }
+                        lexer.pushback(s);
                     } else {
                         if (!abc.hasDecimalSupport()) {
                             throw new AVM2ParseException("Invalid use kind", lexer.yyline());
