@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2269] Nullpointer on importing (ImportAssets) a character that does not exists
 - Asking more than once for the same imported (ImportAssets) URL
 - ABC Explorer problems when index out of bounds (Usually in obfuscated code)
+- Go to document class for classes with obfuscated name
 
 ## [21.0.1] - 2024-08-08
 ### Added
