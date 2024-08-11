@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simple usage detector for ABC.
@@ -518,7 +520,10 @@ public class ABCSimpleUsageDetector {
      * @return True if it is new
      */
     private boolean handleUsage(ItemKind kind, int index, String usageDescription) {
-
+        if (index < 0 || index > usages.get(kind).size() - 1) {
+            Logger.getLogger(ABCSimpleUsageDetector.class.getName()).log(Level.WARNING, "{0} with index {1} not found for usage {2}", new Object[]{kind, index, usageDescription});
+            return false;
+        }
         List<String> kindList = usages.get(kind).get(index);
         kindList.add(usageDescription);
 
