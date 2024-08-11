@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Better decimal values support (for ABCs minor 17, not standard FP)
 - Better float values support (for ABCs major 47, minor 16 +, not standard FP)
 - Non-nullable classes support (not standard FP)
+- AS3 direct editation - unary plus support
 
 ### Fixed
 - Hex view for unknown tags was not scrollable

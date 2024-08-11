@@ -2906,7 +2906,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + (parentClassName.isEmpty() ? "" : " extends " + parentClassName) + " {"
                             + " }"
                             + "}";
-                    parser.addScript(script, fileName, 0, 0, swf.getDocumentClass());
+                    parser.addScript(script, fileName, 0, 0, swf.getDocumentClass(), selectedAbcContainer.getABC());
                 } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
                     Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
                 }
@@ -3106,7 +3106,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + " {"
                         + " }"
                         + "}";
-                parser.addScript(script, fileName, 0, 0, swf.getDocumentClass());
+                parser.addScript(script, fileName, 0, 0, swf.getDocumentClass(), doAbc.getABC());
             } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
             }
