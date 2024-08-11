@@ -1000,7 +1000,7 @@ public class ActionScript3Parser {
             }
         }
 
-        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef);
+        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc);
 
         boolean isEmpty = true;
 
@@ -2607,7 +2607,7 @@ public class ActionScript3Parser {
 
     private List<String> constantPool;
 
-    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef) throws IOException, AVM2ParseException, InterruptedException {
+    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
 
         ParsedSymbol s;
         List<DottedChain> importedClasses = new ArrayList<>();
@@ -2666,6 +2666,10 @@ public class ActionScript3Parser {
                             s = lex();
                         }
                     } else {
+                        if (!abc.hasDecimalSupport()) {
+                            throw new AVM2ParseException("Invalid use kind", lexer.yyline());
+                        }
+                        
                         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                         String pragmaItemName = (String) s.value;
                         switch (pragmaItemName) {
