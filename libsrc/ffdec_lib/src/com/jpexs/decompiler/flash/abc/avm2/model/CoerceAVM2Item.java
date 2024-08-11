@@ -146,6 +146,8 @@ public class CoerceAVM2Item extends AVM2Item {
             case "int":
             case "uint":
             case "Number":
+            case "float":
+            case "float4":
                 return value.isConvertedCompileTime(dependencies);
         }
         return false;
@@ -214,6 +216,19 @@ public class CoerceAVM2Item extends AVM2Item {
                 break;
             case "Number":
                 ins = new AVM2Instruction(0, AVM2Instructions.ConvertD, null);
+                break;
+            case "float":
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertF, null);
+                break;
+            case "float4":
+                ins = new AVM2Instruction(0, AVM2Instructions.ConvertF4, null);
+                break;
+            case "decimal":
+                if (localData.numberContext != null) {
+                    ins = new AVM2Instruction(0, AVM2Instructions.ConvertMP, new int[] {localData.numberContext});
+                } else {
+                    ins = new AVM2Instruction(0, AVM2Instructions.ConvertM, null);
+                }
                 break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, typeObj, ((AVM2SourceGenerator) generator).abcIndex);
