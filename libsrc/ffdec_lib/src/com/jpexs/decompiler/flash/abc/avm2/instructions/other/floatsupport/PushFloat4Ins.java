@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
@@ -25,6 +26,10 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.Float4ValueAVM2Item;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  * pushfloat4 - Push a float4 constant onto the stack.
@@ -50,6 +55,12 @@ public class PushFloat4Ins extends InstructionDefinition {
     }
 
     @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        lda.operandStack.push(constants.getFloat4(ins.operands[0]));
+        return true;
+    }
+    
+    @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;
     }
@@ -59,4 +70,8 @@ public class PushFloat4Ins extends InstructionDefinition {
         return 1;
     }
 
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.push(new Float4ValueAVM2Item(ins, localData.lineStartInstruction, localData.getConstants().getFloat4(ins.operands[0])));
+    }
 }

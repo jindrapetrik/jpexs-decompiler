@@ -241,7 +241,7 @@ public class ASM3Parser {
             nval = nval.substring(0, nval.length() - 1);
         }
         return Double.parseDouble(nval);
-    }
+    }        
     
     private static void expected(ParsedSymbol s, int type, String expStr, int line) throws IOException, AVM2ParseException {
         if (s.type != type) {
@@ -830,11 +830,44 @@ public class ASM3Parser {
                 value = lexer.lex();
                 if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     value_index = 0;
-                } else if (value.type == ParsedSymbol.TYPE_NUMBER) {
+                } else {
                     value_index = constants.getDoubleId(getDouble(value, lexer.yyline(), true), true);
                 }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
-                break;           
+                break;       
+            case ParsedSymbol.TYPE_KEYWORD_FLOAT:
+                value_kind = ValueKind.CONSTANT_DecimalOrFloat;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    value_index = constants.getFloatId(getFloat(value, lexer.yyline(), true), true);
+                }
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;
+            case ParsedSymbol.TYPE_KEYWORD_FLOAT4:
+                value_kind = ValueKind.CONSTANT_Float4;
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                value = lexer.lex();
+                if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
+                    value_index = 0;
+                } else {
+                    float f1 = getFloat(value, lexer.yyline(), true);
+                    expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+                    value = lexer.lex();
+                    float f2 = getFloat(value, lexer.yyline(), true);
+                    expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+                    value = lexer.lex();                    
+                    float f3 = getFloat(value, lexer.yyline(), true);
+                    expected(ParsedSymbol.TYPE_COMMA, ",", lexer);
+                    value = lexer.lex();                    
+                    float f4 = getFloat(value, lexer.yyline(), true);
+                    Float4 fval = new Float4(f1, f2, f3, f4);
+                    value_index = constants.getFloat4Id(fval, true);
+                }
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                break;  
             case ParsedSymbol.TYPE_NUMBER:
                 String nval = (String) type.value;
                 if (nval.endsWith("m")) {

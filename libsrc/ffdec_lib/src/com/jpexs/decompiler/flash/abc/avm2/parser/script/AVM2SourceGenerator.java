@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecimalValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.Float4ValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
@@ -1563,6 +1564,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         if (val instanceof FloatValueAVM2Item) {
             return new ValueKind(abcIndex.getSelectedAbc().constants.getFloatId(((FloatValueAVM2Item) val).value, true), ValueKind.CONSTANT_DecimalOrFloat);
+        }
+        if (val instanceof Float4ValueAVM2Item) {
+            return new ValueKind(abcIndex.getSelectedAbc().constants.getFloat4Id(((Float4ValueAVM2Item) val).value, true), ValueKind.CONSTANT_Float4);
         }
         if (val instanceof NanAVM2Item) {
             return new ValueKind(abcIndex.getSelectedAbc().constants.getDoubleId(Double.NaN, true), ValueKind.CONSTANT_Double);

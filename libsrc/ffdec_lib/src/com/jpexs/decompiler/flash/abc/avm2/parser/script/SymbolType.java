@@ -476,6 +476,10 @@ public enum SymbolType {
      */
     FLOAT(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     /**
+     * Other: Float 4
+     */
+    FLOAT4(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    /**
      * Other: Type name
      */
     TYPENAME(GraphTargetItem.PRECEDENCE_PRIMARY, false),

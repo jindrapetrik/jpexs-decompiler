@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -33,16 +34,16 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Float value.
+ * Float4 value.
  *
  * @author JPEXS
  */
-public class FloatValueAVM2Item extends NumberValueAVM2Item {
+public class Float4ValueAVM2Item extends NumberValueAVM2Item {
 
     /**
      * Value
      */
-    public Float value;
+    public Float4 value;
 
     /**
      * Constructor.
@@ -51,17 +52,36 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
      * @param lineStartIns Line start instruction
      * @param value Value
      */
-    public FloatValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Float value) {
+    public Float4ValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Float4 value) {
         super(instruction, lineStartIns);
         this.value = value;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {       
-        writer.append(EcmaScript.toString(value));
-        if (Float.isFinite(value)) {
+        writer.append("float4");
+        writer.spaceBeforeCallParenthesies(precedence);
+        writer.append("(");
+        writer.append(EcmaScript.toString(value.values[0]));
+        if (Float.isFinite(value.values[0])) {
+            writer.append("f");
+        } 
+        writer.append(",");
+        writer.append(EcmaScript.toString(value.values[1]));
+        if (Float.isFinite(value.values[1])) {
             writer.append("f");
         }         
+        writer.append(",");
+        writer.append(EcmaScript.toString(value.values[2]));
+        if (Float.isFinite(value.values[2])) {
+            writer.append("f");
+        }         
+        writer.append(",");
+        writer.append(EcmaScript.toString(value.values[3]));
+        if (Float.isFinite(value.values[3])) {
+            writer.append("f");
+        }         
+        writer.append(")");
         return writer;
     }
 
@@ -78,7 +98,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator,
-                new AVM2Instruction(0, AVM2Instructions.PushFloat, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getFloatId(value, true)})
+                new AVM2Instruction(0, AVM2Instructions.PushFloat4, new int[]{((AVM2SourceGenerator) generator).abcIndex.getSelectedAbc().constants.getFloat4Id(value, true)})
         );
     }
 
@@ -110,7 +130,7 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final FloatValueAVM2Item other = (FloatValueAVM2Item) obj;
+        final Float4ValueAVM2Item other = (Float4ValueAVM2Item) obj;
         if (!Objects.equals(this.value, other.value)) {
             return false;
         }

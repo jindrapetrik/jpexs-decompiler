@@ -269,6 +269,8 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "UInteger"                   {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UINTEGER, yytext());}
   "Double"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DOUBLE, yytext());}
   "Decimal"                    {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_DECIMAL, yytext());}
+  "Float"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FLOAT, yytext());}
+  "Float4"                     {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FLOAT4, yytext());}
   "Utf8"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_UTF8, yytext());}
   "True"                       {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_TRUE, yytext());}
   "False"                      {  return new ParsedSymbol(yychar(), ParsedSymbol.TYPE_KEYWORD_FALSE, yytext());}
