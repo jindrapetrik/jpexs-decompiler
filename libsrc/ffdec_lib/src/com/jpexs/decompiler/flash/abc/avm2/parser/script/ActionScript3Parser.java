@@ -2475,15 +2475,28 @@ public class ActionScript3Parser {
                 allowMemberOrCall = true; // 5.2.toString();
                 break;           
             case DECIMAL:
+                if (!abc.hasDecimalSupport()) {
+                    throw new AVM2ParseException("The ABC has no decimal support", lexer.yyline());
+                }
                 ret = new DecimalValueAVM2Item(null, null, (Decimal128) s.value);
                 allowMemberOrCall = true;
                 break;
             case FLOAT:
+                if (!abc.hasFloatSupport()) {
+                    throw new AVM2ParseException("The ABC has no float support", lexer.yyline());
+                }
                 ret = new FloatValueAVM2Item(null, null, (Float) s.value);
                 allowMemberOrCall = true;
                 break;
             case FLOAT4:
-                ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);
+                if (!abc.hasFloatSupport()) {
+                    //parse again as method call
+                    lexer.yypushbackstr(lexer.yytext().substring("float4".length()));                                        
+                    lexer.pushback(new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));
+                    ret = name(allOpenedNamespaces, thisType, pkg, needsActivation, false, openedNamespaces, registerVars, inFunction, inMethod, variables, importedClasses, abc);                    
+                } else {
+                    ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);                    
+                }
                 allowMemberOrCall = true;
                 break;
             case DELETE:
