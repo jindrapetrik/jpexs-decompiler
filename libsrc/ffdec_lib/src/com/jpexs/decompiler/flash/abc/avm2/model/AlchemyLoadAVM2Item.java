@@ -65,14 +65,17 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("l").append(type).append(size).append("(");
+        String ts = "" + type + size;
+        if (type.equals("f4")) {
+            ts = "f32x4";
+        }
+        writer.append("l").append(ts).append("(");
         ofs.toString(writer, localData);
         return writer.append(")");
     }
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-
         String ts = "" + type + size;
         if (type.equals("f4")) {
             ts = "f32x4";
@@ -88,15 +91,15 @@ public class AlchemyLoadAVM2Item extends AVM2Item {
             case "i32":
                 code = AVM2Instructions.Li32;
                 break;
-            case "f":
-                code = AVM2Instructions.Lf32;
-                break;
             case "f32":
-                code = AVM2Instructions.Lf64;
+                code = AVM2Instructions.Lf32;
                 break;
             case "f32x4":
                 code = AVM2Instructions.Lf32x4;
                 break;
+            case "f64":
+                code = AVM2Instructions.Lf64;
+                break;            
         }
         return toSourceMerge(localData, generator, ofs, ins(code));
     }

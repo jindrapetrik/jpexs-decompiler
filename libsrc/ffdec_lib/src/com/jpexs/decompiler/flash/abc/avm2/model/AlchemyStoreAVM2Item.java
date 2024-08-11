@@ -68,7 +68,11 @@ public class AlchemyStoreAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("s").append(type).append(size).append("(");
+        String ts = "" + type + size;
+        if (type.equals("f4")) {
+            ts = "f32x4";
+        }
+        writer.append("s").append(ts).append("(");
         value.toString(writer, localData);
         writer.append(",");
         ofs.toString(writer, localData);
