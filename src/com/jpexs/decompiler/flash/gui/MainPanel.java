@@ -2753,7 +2753,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!abcList.isEmpty()) {
                 ABCPanel abcPanel = getABCPanel();
                 for (ABCContainerTag c : abcList) {
-                    if (c.getABC().findClassByName(documentClassPrintable) > -1) {
+                    if (c.getABC().findClassByName(documentClass) > -1) {
                         abcPanel.setAbc(c.getABC());
                         abcPanel.hilightScript(swf, documentClassPrintable);
                         break;
