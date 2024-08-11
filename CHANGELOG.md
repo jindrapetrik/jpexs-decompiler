@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Better decimal values support (for ABCs minor 17, not standard FP)
+- Better float values support (for ABCs major 47, minor 16 +, not standard FP)
+- Non-nullable classes support (not standard FP)
+
 ### Fixed
 - Hex view for unknown tags was not scrollable
 - [#2269] Nullpointer on importing (ImportAssets) a character that does not exists
