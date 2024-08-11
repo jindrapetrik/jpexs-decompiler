@@ -192,6 +192,8 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "UInteger"                   |
   "Double"                     |
   "Decimal"                    |
+  "Float"                      |
+  "Float4"                     |
   "Utf8"                       |
   "True"                       |
   "False"                      |

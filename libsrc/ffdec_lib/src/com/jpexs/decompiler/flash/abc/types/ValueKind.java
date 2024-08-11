@@ -237,17 +237,38 @@ public class ValueKind {
                 break;
             case CONSTANT_DecimalOrFloat:
                 if (abc.hasDecimalSupport()) {
-                    ret = "" + abc.constants.getDecimal(value_index);
+                    ret = abc.constants.getDecimal(value_index).toActionScriptString();
                 } else {
-                    ret = "" + EcmaScript.toString(abc.constants.getFloat(value_index));
+                    float fval = abc.constants.getFloat(value_index);
+                    ret = EcmaScript.toString(fval) + (Float.isFinite(fval) ? "f" : "");
                 }
                 break;
             case CONSTANT_Float4:
                 Float4 f4 = abc.constants.getFloat4(value_index);
-                ret = "[" + EcmaScript.toString(f4.values[0]) + ", "
-                        + EcmaScript.toString(f4.values[1]) + ", "
-                        + EcmaScript.toString(f4.values[2]) + ", "
-                        + EcmaScript.toString(f4.values[3]) + "]";
+                StringBuilder fsb = new StringBuilder();
+                fsb.append("float4");
+                fsb.append("(");
+                fsb.append(EcmaScript.toString(f4.values[0]));
+                if (Float.isFinite(f4.values[0])) {
+                    fsb.append("f");
+                }
+                fsb.append(",");
+                fsb.append(EcmaScript.toString(f4.values[1]));
+                if (Float.isFinite(f4.values[1])) {
+                    fsb.append("f");
+                }
+                fsb.append(",");
+                fsb.append(EcmaScript.toString(f4.values[2]));
+                if (Float.isFinite(f4.values[2])) {
+                    fsb.append("f");
+                }
+                fsb.append(",");
+                fsb.append(EcmaScript.toString(f4.values[3]));
+                if (Float.isFinite(f4.values[3])) {
+                    fsb.append("f");
+                }
+                fsb.append(")");
+                ret = fsb.toString();
                 break;
             case CONSTANT_Utf8:
                 ret = "\"" + Helper.escapeActionScriptString(abc.constants.getString(value_index)) + "\"";

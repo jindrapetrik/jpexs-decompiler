@@ -575,6 +575,16 @@ public class ParsedSymbol {
     public static final int TYPE_KEYWORD_FLOOR = 108;
     
     /**
+     * Type: Keyword Float
+     */
+    public static final int TYPE_KEYWORD_FLOAT = 109;
+    
+    /**
+     * Type: Keyword Float4
+     */
+    public static final int TYPE_KEYWORD_FLOAT4 = 110;
+    
+    /**
      * Constructor.
      * @param pos Position
      * @param type Type

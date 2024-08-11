@@ -64,6 +64,10 @@ public enum SymbolGroup {
      */
     FLOAT,
     /**
+     * Float 4
+     */
+    FLOAT4,
+    /**
      * Type name
      */
     TYPENAME,

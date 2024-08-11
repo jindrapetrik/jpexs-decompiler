@@ -46,8 +46,16 @@ public enum EcmaType {
     /**
      * Boolean
      */
-    BOOLEAN("Boolean");
-
+    BOOLEAN("Boolean"),
+    /**
+     * Float
+     */
+    FLOAT("float"),
+    /**
+     * Float 4
+     */
+    FLOAT4("float4");
+    
     private final String clsName;
 
     private EcmaType(String clsName) {

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.DefaultXMLNamespace;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DoubleValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.Float4ValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FloatValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetDescendantsAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
@@ -86,6 +87,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.TypeOfAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -2461,13 +2463,17 @@ public class ActionScript3Parser {
             case DOUBLE:
                 ret = new DoubleValueAVM2Item(null, null, (Double) s.value);
                 allowMemberOrCall = true; // 5.2.toString();
-                break;
+                break;           
             case DECIMAL:
                 ret = new DecimalValueAVM2Item(null, null, (Decimal128) s.value);
                 allowMemberOrCall = true;
                 break;
             case FLOAT:
                 ret = new FloatValueAVM2Item(null, null, (Float) s.value);
+                allowMemberOrCall = true;
+                break;
+            case FLOAT4:
+                ret = new Float4ValueAVM2Item(null, null, (Float4) s.value);
                 allowMemberOrCall = true;
                 break;
             case DELETE:

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.ecma;
 
+import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
@@ -52,6 +53,9 @@ public class EcmaScript {
         if (o instanceof Float) {
             o = (double) (float) (Float) o;
         }
+        if (o instanceof Float4) {
+            return Double.NaN;
+        }        
         if (o instanceof Double) {
             return (Double) o;
         }
@@ -69,7 +73,7 @@ public class EcmaScript {
             }
 
             try {
-                return Double.parseDouble(str);
+                return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
                 return Double.NaN;
             }
@@ -204,6 +208,12 @@ public class EcmaScript {
         if (o.getClass() == Undefined.class) {
             return EcmaType.UNDEFINED;
         }
+        if (o.getClass() == Float.class) {
+            return EcmaType.FLOAT;
+        }
+        if (o.getClass() == Float4.class) {
+            return EcmaType.FLOAT4;
+        }
         return EcmaType.OBJECT;
     }
 
@@ -225,6 +235,12 @@ public class EcmaScript {
             case NUMBER:
                 typeStr = "number";
                 break;
+            case FLOAT:
+                typeStr = "float";
+                break;
+            case FLOAT4:
+                typeStr = "float4";
+                break;
             case OBJECT:
                 typeStr = "object";
                 break;
@@ -236,7 +252,7 @@ public class EcmaScript {
                 typeStr = "object";
                 break;
             default:
-                // todo: function,movieclip
+                // todo: function,movieclip,xml
                 typeStr = "object";
                 break;
         }

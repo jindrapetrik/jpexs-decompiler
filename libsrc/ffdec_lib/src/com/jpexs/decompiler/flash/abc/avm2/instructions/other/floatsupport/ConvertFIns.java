@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other.floatsupport;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
@@ -24,13 +25,20 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceOrConvertTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
+import java.util.List;
 
 /**
  * convert_f - Convert a value to a float.
  *
  * @author JPEXS
  */
-public class ConvertFIns extends InstructionDefinition {
+public class ConvertFIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     /**
      * Constructor
@@ -47,6 +55,15 @@ public class ConvertFIns extends InstructionDefinition {
 
         super.verify(lda, constants, ins);
     }
+    
+    @Override
+    public boolean execute(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) {
+        Object value = lda.operandStack.pop();
+        double d = EcmaScript.toNumber(value);
+        float f = (float) d;
+        lda.operandStack.push(f);
+        return true;
+    }
 
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
@@ -56,5 +73,15 @@ public class ConvertFIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
+    }
+    
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        stack.push(new ConvertAVM2Item(ins, localData.lineStartInstruction, stack.pop(), getTargetType(localData.getConstants(), ins)));
+    }
+    
+    @Override
+    public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
+        return new TypeItem("float");
     }
 }
