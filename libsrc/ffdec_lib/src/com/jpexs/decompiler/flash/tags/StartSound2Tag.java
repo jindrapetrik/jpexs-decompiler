@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * StartSound2 tag - starts a sound playing. Extends functionality of StartSound
@@ -89,4 +90,10 @@ public class StartSound2Tag extends Tag {
         ret.put("cls", "" + soundClassName);
         return ret;
     }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+        int characterId = swf.getCharacterId(swf.getCharacterByClass(soundClassName));
+        needed.add(characterId);
+    }        
 }

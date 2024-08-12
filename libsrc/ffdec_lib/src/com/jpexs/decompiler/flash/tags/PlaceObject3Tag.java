@@ -482,6 +482,12 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         if (placeFlagHasCharacter) {
             needed.add(characterId);
         }
+        if (placeFlagHasClassName) {
+            int chId = swf.getCharacterId(swf.getCharacterByClass(className));
+            if (chId != -1) {
+                needed.add(chId);
+            }
+        }
     }
 
     @Override
