@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [21.0.2] - 2024-08-12
 ### Added
 - Better decimal values support (for ABCs minor 17, not standard FP)
 - Better float values support (for ABCs major 47, minor 16 +, not standard FP)
@@ -3335,7 +3335,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.1...dev
+[21.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.1...version21.0.2
 [21.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.0...version21.0.1
 [21.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.1.0...version21.0.0
 [20.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.0.0...version20.1.0

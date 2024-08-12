@@ -65,6 +65,29 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.0.2" date="2024-08-12">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Better decimal values support (for ABCs minor 17, not standard FP)</li>
+					<li>Better float values support (for ABCs major 47, minor 16 +, not standard FP)</li>
+					<li>Non-nullable classes support (not standard FP)</li>
+					<li>AS3 direct editation - unary plus support</li>
+					<li>Go to document class context menu item</li>
+					<li>Updated go to document class icon</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Hex view for unknown tags was not scrollable</li>
+					<li>#2269 Nullpointer on importing (ImportAssets) a character that does not exists</li>
+					<li>Asking more than once for the same imported (ImportAssets) URL</li>
+					<li>ABC Explorer problems when index out of bounds (Usually in obfuscated code)</li>
+					<li>Go to document class for classes with obfuscated name</li>
+					<li>#2270 AS3 decompilation - unnnecessary local registers assignments as part of expressions when using optimization like `dup, setlocal N` instead of `setlocal N, getlocal N`</li>
+					<li>Movies (DefineVideoStream) preview not working</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.1" date="2024-08-08">
 			<description>
 				<p>Added</p>
