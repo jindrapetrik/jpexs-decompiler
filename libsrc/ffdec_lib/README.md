@@ -102,43 +102,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 ...
 ```
 
-## Usefull packages and classes
-### `com.jpexs.decompiler.flash` - SWF reading and writing
-* `SWF` - Basic class for SWF manipulation
-* `SWFInputStream` - Reading of SWF data
-* `SWFOuputStream` - Writing of SWF data
-
-### `com.jpexs.decompiler.flash.abc` - AS3 bytecode (ABC format)
-* `ABC` - AS3 bytecode structure
-* `ABCInputStream` - Reading AS3 bytecode structure
-* `ABCOutputStream` - Writing AS3 bytecode structure
-* `ScriptPack` - **important** - for purposes of easily displaying of flashCC/alchemy long scripts, ABC scripts can be splitted into so called `script packs` which is script index and list of trait indices. FFDec always displays a scriptpack, not a whole script.
-
-### `com.jpexs.decompiler.flash.abc.avm2` - AS3 AVM2 code
-* `AVM2Code` - code handling
-### `com.jpexs.decompiler.flash.abc.avm2.deobfuscation` - Some AS3 AVM2 code deobfuscation classes
-### `com.jpexs.decompiler.flash.abc.avm2.graph` - Generates high-level code from instructions of AVM2 code
-### `com.jpexs.decompiler.flash.abc.avm2.instructions.*` - Instructions for AS3 AVM2 code
-### `com.jpexs.decompiler.flash.abc.avm2.model.*` - Model representing generated high-level code of AS3
-### `com.jpexs.decompiler.flash.abc.avm2.parser.*` - Compilers of AS3 and its p-code
-### `com.jpexs.decompiler.flash.abc.types` - ABC format related types
-### `com.jpexs.decompiler.flash.abc.types.traits` - ABC traits
-### `com.jpexs.decompiler.flash.abc.usages` - Get usages feature
-### `com.jpexs.decompiler.flash.action` - AS1/2 related
-### `com.jpexs.decompiler.flash.action.swf*` - AS1/2 Actions
-### `com.jpexs.decompiler.flash.action.model` - Model representing generated high-level code of AS1/2
-### `com.jpexs.decompiler.flash.action.parser.*` - Compilers of A1/2 and its p-code
-### `com.jpexs.decompiler.flash.configuration` - Configuration of the decompilation
-### `com.jpexs.decompiler.flash.exporters` - Exporters of resources/scripts to various formats
-### `com.jpexs.decompiler.flash.iggy` - Iggy format related
-### `com.jpexs.decompiler.flash.importers` - Importers of resources/scripts from various formats
-### `com.jpexs.decompiler.flash.tags` - Definitions of SWF tags
-### `com.jpexs.decompiler.flash.timeline` - Browsing SWF in a timeline
-### `com.jpexs.decompiler.flash.types` - Structures used in SWF file
-### `com.jpexs.decompiler.flash.xfl` - Export to FLA and XFL
-### `com.jpexs.decompiler.flash.graph` - Generates high-level code from instructions of AS1/2/3 code
-### `com.jpexs.decompiler.flash.graph.model.*` - Shared model representing generated high-level code
-
+## HTML documentation
+You can download HTML documentation for Java classes generated from Javadoc
+as separate download from main project website.
 
 ## Authors and contact
 The decompiler was originally written by **Jindra Petřík** also known as **JPEXS**.
