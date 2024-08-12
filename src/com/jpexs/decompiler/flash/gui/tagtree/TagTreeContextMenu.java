@@ -174,6 +174,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private final MainPanel mainPanel;
 
+    private JMenuItem gotoDocumentClassMenuItem;
+    
     private JMenuItem configurePathResolvingMenuItem;
 
     private JMenuItem setAsLinkageMenuItem;
@@ -388,7 +390,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         configurePathResolvingMenuItem.setIcon(View.getIcon("settings16"));
         add(configurePathResolvingMenuItem);
 
-        addSeparator();
+        addSeparator();                        
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
         jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
@@ -524,6 +526,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(replaceRefsWithTagMenuItem);
 
         addSeparator();
+        
+        gotoDocumentClassMenuItem = new JMenuItem(mainPanel.translate("menu.tools.gotoDocumentClass"));
+        gotoDocumentClassMenuItem.addActionListener(this::gotoDocumentClassActionPerformed);
+        gotoDocumentClassMenuItem.setIcon(View.getIcon("gotomainclass16"));
+        add(gotoDocumentClassMenuItem);
 
         setAsLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAsLinkage"));
         setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
@@ -1175,6 +1182,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
+        gotoDocumentClassMenuItem.setVisible(false);
         setAsLinkageMenuItem.setVisible(false);
         setAs3ClassLinkageMenuItem.setVisible(false);
         expandRecursiveMenuItem.setVisible(false);
@@ -1337,19 +1345,41 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (firstItem instanceof ClassesListTreeModel) {
                 addAs3ClassMenuItem.setVisible(true);
+                if (firstItem.getOpenable() instanceof SWF) {
+                    gotoDocumentClassMenuItem.setVisible(true);
+                }
             }
             if (firstItem instanceof AS3Package) {
                 AS3Package pkg = (AS3Package) firstItem;
                 if (!pkg.isPartOfCompoundScript()) {
                     addAs3ClassMenuItem.setVisible(true);
                 }
+                if (firstItem.getOpenable() instanceof SWF) {
+                    gotoDocumentClassMenuItem.setVisible(true);
+                }
             }
             if (firstItem instanceof ABC) {
                 addAs3ClassMenuItem.setVisible(true);
+                if (firstItem.getOpenable() instanceof SWF) {
+                    gotoDocumentClassMenuItem.setVisible(true);
+                }
             }
             if (firstItem instanceof ABCContainerTag) {
                 addAs3ClassMenuItem.setVisible(true);
                 exportABCMenuItem.setVisible(true);
+                gotoDocumentClassMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof ScriptPack) {
+                if (firstItem.getOpenable() instanceof SWF) {
+                    gotoDocumentClassMenuItem.setVisible(true);
+                }
+            }
+            
+            if (firstItem instanceof SWF) {
+                if (((SWF) firstItem).isAS3()) {
+                    gotoDocumentClassMenuItem.setVisible(true);
+                }
             }
 
             if (mainPanel.isPinned(firstItem)) {
@@ -2627,6 +2657,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.showGenericTag((Tag) itemr);
     }
 
+    private void gotoDocumentClassActionPerformed(ActionEvent evt) {
+        TreeItem item = getCurrentItem();
+        item.getOpenable();
+        mainPanel.gotoDocumentClass((SWF) item.getOpenable());
+    }
+    
     private void jumpToCharacterActionPerformed(ActionEvent evt) {
         TreeItem itemj = getCurrentItem();
         if (itemj == null || !(itemj instanceof HasCharacterId)) {
