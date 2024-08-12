@@ -30,6 +30,7 @@ These include:
 * Flashdebugger library - `flashdebugger.jar` - Flash debugging
 * Open Imaging GIF Decoder - `gifreader.jar` - Importing GIFs
 * Miter clip - modified openjdk8 Stroker - `miterclip.jar` - Support for miter clip join style in shapes
+* FlexSDK Decimal128 class - `decimal.jar` - Working with decimal type in AS3
 
 ## Basic library usage
 ```java
@@ -156,6 +157,7 @@ It uses modified code of these libraries:
 * [Animated GIF Encoder] (Frames to GIF export)
 * [gnujpdf] (PDF export) - LGPL License
 * [openjdk8 Stroker] (Shapes - Miter clip drawing) - GPL License
+* [Apache Flex SDK] (Decimal numbers support - Decimal128 class) - Apache Licence 2.0
 
 And also links to these libraries:
 
@@ -188,3 +190,4 @@ And also links to these libraries:
 [Java Native Access - JNA]: https://github.com/twall/jna
 [Open Imaging GIF Decoder]: https://github.com/DhyanB/Open-Imaging
 [openjdk8 Stroker]: https://github.com/JetBrains/jdk8u_jdk
+[Apache Flex SDK]: https://github.com/apache/flex-sdk
