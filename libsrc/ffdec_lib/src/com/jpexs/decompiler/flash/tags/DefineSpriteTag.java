@@ -373,13 +373,15 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
-        for (Tag t : getTags()) {
-            if (t instanceof PlaceObjectTypeTag) {
-                int chId = ((PlaceObjectTypeTag) t).getCharacterId();
-                if (chId != -1) {
-                    needed.add(chId);
-                }
-            }
+        for (Tag t : getTags()) {           
+            if (
+                    (t instanceof PlaceObjectTypeTag)
+                    || (t instanceof StartSoundTag)
+                    || (t instanceof StartSound2Tag)
+                    || (t instanceof VideoFrameTag)
+                ) {
+                t.getNeededCharacters(needed, swf);
+            }            
         }
     }
 
