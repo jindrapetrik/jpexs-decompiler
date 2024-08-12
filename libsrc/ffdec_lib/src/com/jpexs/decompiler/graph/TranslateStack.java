@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.PopItem;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +42,27 @@ public class TranslateStack extends Stack<GraphTargetItem> {
      */
     private final String path;
 
+    private Map<String, GraphTargetItem> marks = new HashMap<>();
+
+    
+    /**
+     * Sets mark.
+     * @param name Name
+     * @param value Value
+     */
+    public void setMark(String name, GraphTargetItem value) {
+        marks.put(name, value);
+    }
+    
+    /**
+     * Gets mark.
+     * @param name Name
+     * @return Value
+     */
+    public GraphTargetItem getMark(String name) {
+        return marks.get(name);
+    }
+    
     /**
      * Simplifies all items in the stack.
      */

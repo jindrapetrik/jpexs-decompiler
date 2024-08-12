@@ -34,5 +34,6 @@ program
  #include "tests/TestMutatingSwitch.script.asasm"
  #include "tests/TestSwitchMostCommon.script.asasm"
  #include "tests/TestXmlStar.script.asasm"
+ #include "tests/TestLocalRegIf.script.asasm"
  ; place to add next
 end ; program

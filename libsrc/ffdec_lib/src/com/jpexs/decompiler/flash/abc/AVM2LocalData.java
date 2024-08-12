@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -221,6 +223,12 @@ public class AVM2LocalData extends BaseLocalData {
      */
     public Set<Integer> seenMethods = new HashSet<>();
 
+    
+    /**
+     * Bottom set locals
+     */
+    public LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals = new LinkedIdentityHashSet<>();    
+    
     /**
      * Constructs a new AVM2LocalData
      */
@@ -287,6 +295,7 @@ public class AVM2LocalData extends BaseLocalData {
         pushDefaultPart = localData.pushDefaultPart;
         finallyKinds = localData.finallyKinds;
         seenMethods = localData.seenMethods;
+        bottomSetLocals = localData.bottomSetLocals;
     }
 
     /**

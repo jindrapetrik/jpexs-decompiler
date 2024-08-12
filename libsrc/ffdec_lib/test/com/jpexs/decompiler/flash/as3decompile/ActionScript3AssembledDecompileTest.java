@@ -100,7 +100,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     public void testDupAssignment() {
         decompileMethod("assembled", "testDupAssignment", "var _loc1_:int = 0;\r\n"
                 + "var _loc2_:int = 10;\r\n"
-                + "if(_loc1_ = _loc2_)\r\n"
+                + "_loc1_ = _loc2_;\r\n"
+                + "if(_loc1_)\r\n"
                 + "{\r\n"
                 + "trace(_loc2_);\r\n"
                 + "}\r\n",
@@ -151,6 +152,16 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     @Test
     public void testIncrement3() {
         decompileMethod("assembled", "testIncrement3", "_loc1_.length--;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testLocalRegIf() {
+        decompileMethod("assembled", "testLocalRegIf", "var _loc1_:int = 8;\r\n"
+                + "if(_loc1_ > 5 && _loc1_ < 10)\r\n"
+                + "{\r\n"
+                + "trace(\"I\");\r\n"
+                + "}\r\n",
                  false);
     }
 

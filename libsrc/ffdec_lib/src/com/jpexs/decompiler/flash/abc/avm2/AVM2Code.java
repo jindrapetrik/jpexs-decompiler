@@ -289,6 +289,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.graph.AbstractGraphTargetRecursiveVisitor;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -302,6 +303,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.stat.Statistics;
@@ -320,6 +322,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1842,11 +1845,12 @@ public class AVM2Code implements Cloneable {
      * @param fullyQualifiedNames Fully qualified names
      * @param visited Visited
      * @param localRegAssigmentIps Local register assignment IPs
+     * @param bottomStackSetLocals Set locals on bottom of the stack
      * @return Convert output
      * @throws ConvertException On convert error
      * @throws InterruptedException On interrupt
      */
-    public ConvertOutput toSourceOutput(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps) throws ConvertException, InterruptedException {
+    public ConvertOutput toSourceOutput(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, LinkedIdentityHashSet<SetLocalAVM2Item> bottomStackSetLocals) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.err.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1901,26 +1905,13 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
-            /*if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
-
-                AVM2Instruction insAfter = code.get(ip + 1);
-                Set<Integer> usages = setLocalPosToGetLocalPos.containsKey(ip) ? setLocalPosToGetLocalPos.get(ip) : new HashSet<>();
-
-                if (!(stack.peek().getNotCoercedNoDup() instanceof DuplicateItem) && !AVM2Item.mustStayIntact2(stack.peek()) && usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
-                    ip += 2;
-                    continue iploop;
-                } else {
-                    ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
-                    ip++;
-                    continue iploop;
-                }
-            } else*/
+            /*
             if (ins.definition instanceof DupIns) {
                 int nextPos;
                 do {
                     AVM2Instruction insAfter = ip + 1 < code.size() ? code.get(ip + 1) : null;
                     if (insAfter == null) {
-                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
+                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                         ip++;
                         break;
                     }
@@ -1942,14 +1933,16 @@ public class AVM2Code implements Cloneable {
                         //stack.add("(" + stack.pop() + ")||");
                         isAnd = false;
                     } else {
-                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
+                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                         ip++;
                         break;
                         //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                     }
                 } while (ins.definition instanceof DupIns);
-            } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
+            } else
+            */    
+            if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
+                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 //ip = end + 1;
                 break;
             } else if (ins.definition instanceof NewFunctionIns) {
@@ -1985,13 +1978,18 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 // What to do when hasDup is false?
-                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
+                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                 nft.functionName = functionName;
                 ip++;
             } else {
-                try {
-                    ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
+                try {                    
+                    ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
+                    
+                    
+                    if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
+                       bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
+                    }
                 } catch (RuntimeException re) {
                     /*String last="";
                      int len=5;
@@ -2281,9 +2279,9 @@ public class AVM2Code implements Cloneable {
                     break;
                 }*/
                 Reference<Boolean> hasPrevReference = new Reference<>(false);
-                value.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+                value.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                     @Override
-                    public void visit(GraphTargetItem subItem) {
+                    public void visit(GraphTargetItem subItem, Stack<GraphTargetItem> parentStack) {
                         Multiname propertyMultiName;
                         String propertyName;
                         if (subItem instanceof GetPropertyAVM2Item) {
@@ -2343,9 +2341,9 @@ public class AVM2Code implements Cloneable {
             GraphTargetItem currentItem = items.get(i);
             List<GraphTargetItem> itemsOnLine = new ArrayList<>();
             itemsOnLine.add(currentItem);
-            currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+            currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                 @Override
-                public void visit(GraphTargetItem item) {
+                public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
                     itemsOnLine.add(item);
                 }
             });

@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +42,11 @@ public class AVM2FinalProcessLocalData extends FinalProcessLocalData {
      * Set local position to get local position mapping.
      */
     public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new HashMap<>();
+    
+    /**
+     * Bottom set locals
+     */
+    public LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals = new LinkedIdentityHashSet<>();
 
     /**
      * Constructs AVM2 final process local data.
@@ -49,11 +56,13 @@ public class AVM2FinalProcessLocalData extends FinalProcessLocalData {
      * mapping
      * @param setLocalPosToGetLocalPos Set local position to get local position
      * mapping
+     * @param bottomSetLocals Bottom set locals
      */
-    public AVM2FinalProcessLocalData(List<Loop> loops, HashMap<Integer, String> localRegNames, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos) {
+    public AVM2FinalProcessLocalData(List<Loop> loops, HashMap<Integer, String> localRegNames, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals) {
         super(loops);
         this.localRegNames = localRegNames;
         this.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
+        this.bottomSetLocals = bottomSetLocals;
     }
 
     /**

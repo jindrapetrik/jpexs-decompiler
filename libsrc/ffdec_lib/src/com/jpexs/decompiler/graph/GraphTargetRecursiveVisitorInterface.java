@@ -17,25 +17,28 @@
 package com.jpexs.decompiler.graph;
 
 import java.util.Collection;
+import java.util.Stack;
 
 /**
- * Graph target visitor interface.
+ * Recursive graph target visitor interface.
  *
  * @author JPEXS
  */
-public interface GraphTargetVisitorInterface {
+public interface GraphTargetRecursiveVisitorInterface {
 
     /**
      * Visits a graph target item.
      *
      * @param item Graph target item
+     * @param parentStack Stack of parents
      */
-    public void visit(GraphTargetItem item);
+    public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack);
 
     /**
      * Visits all graph target items.
      *
      * @param items Collection of graph target items
+     * @param parentStack Stack of parents
      */
-    public void visitAll(Collection<GraphTargetItem> items);
+    public void visitAll(Collection<GraphTargetItem> items, Stack<GraphTargetItem> parentStack);
 }

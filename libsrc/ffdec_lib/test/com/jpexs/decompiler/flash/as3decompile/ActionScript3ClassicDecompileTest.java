@@ -539,7 +539,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
         decompileMethod("classic", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
                 + "var j:int = 5;\r\n"
-                + "if((i = i = i / 2) == 1 || i == 2)\r\n"
+                + "i = i = i / 2;\r\n"
+                + "if(i == 1 || i == 2)\r\n"
                 + "{\r\n"
                 + "arguments.concat(i);\r\n"
                 + "}\r\n"
@@ -1651,6 +1652,20 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "\"test\" + this.f();\r\n"
                 + "v = undefined;\r\n"
                 + "sr = typeof c;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testOptimization() {
+        decompileMethod("classic", "testOptimization", "var f:int = 0;\r\n"
+                + "var g:int = 0;\r\n"
+                + "var h:int = 0;\r\n"
+                + "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "var c:int = 3;\r\n"
+                + "var d:int = 4;\r\n"
+                + "var e:int = d + 5;\r\n"
+                + "var i:int = h = g = f;\r\n",
                  false);
     }
 

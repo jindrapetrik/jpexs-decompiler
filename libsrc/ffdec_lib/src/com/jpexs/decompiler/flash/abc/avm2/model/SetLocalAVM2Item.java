@@ -72,6 +72,11 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
      * Caused by duplicate
      */
     public boolean causedByDup = false;
+    
+    /**
+     * Directly caused by duplicate
+     */
+    public boolean directlyCausedByDup = false;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {

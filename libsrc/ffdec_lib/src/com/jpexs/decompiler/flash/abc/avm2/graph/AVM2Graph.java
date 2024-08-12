@@ -48,7 +48,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
@@ -81,6 +83,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.graph.AbstractGraphTargetRecursiveVisitor;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
@@ -122,6 +125,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -2641,6 +2645,51 @@ public class AVM2Graph extends Graph {
             }
         }
 
+        
+        AVM2FinalProcessLocalData adata = (AVM2FinalProcessLocalData) localData;
+        //if(false)
+        if (!adata.bottomSetLocals.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                
+                if (list.get(i) instanceof LoopItem) {
+                    continue;
+                }
+                if (list.get(i) instanceof WithEndAVM2Item) {
+                    continue;
+                }
+                
+                Reference<SetLocalAVM2Item> foundSetLoc = new Reference<>(null);
+                list.get(i).visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                    @Override
+                    public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                        
+                        if (item instanceof SetLocalAVM2Item) {
+                            if (adata.bottomSetLocals.contains((SetLocalAVM2Item) item)) {
+                                int s = parentStack.size() - 1;
+                                if (parentStack.get(s) instanceof CoerceAVM2Item) {
+                                    s--;
+                                } else if (parentStack.get(s) instanceof ConvertAVM2Item) {
+                                    s--;
+                                }
+                                if (s >= 0) {
+                                    GraphTargetItem parent = parentStack.get(s);
+                                    if (!(parent instanceof SetTypeAVM2Item)) { //not a chained assignment
+                                        foundSetLoc.setVal((SetLocalAVM2Item) item);
+                                    }
+                                }                                
+                            }
+                        }
+                    }                
+                });
+                if (foundSetLoc.getVal() != null) {
+                    SetLocalAVM2Item setLoc = foundSetLoc.getVal();
+                    list.add(i, setLoc.clone());
+                    setLoc.hideValue = true;                
+                    i++;
+                }
+            }
+        }
+        
         /*
         convert this situation:
         
@@ -2656,13 +2705,13 @@ public class AVM2Graph extends Graph {
         It's TestSwapAssignment assembled test case.
         
          */
-        for (int i = 0; i < list.size(); i++) {
+        /*for (int i = 0; i < list.size(); i++) {
 
             GraphTargetItem item = list.get(i);
             Map<Integer, List<SetLocalAVM2Item>> setRegisters = new HashMap<>();
-            item.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+            item.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                 @Override
-                public void visit(GraphTargetItem item) {
+                public void visit(GraphTargetItem item, GraphTargetItem parent) {
                     if (item instanceof SetLocalAVM2Item) {
                         SetLocalAVM2Item setLoc = (SetLocalAVM2Item) item;
                         if (setLoc.causedByDup) {
@@ -2770,15 +2819,15 @@ public class AVM2Graph extends Graph {
             });
             i = newI.getVal();
         }
-
+        */
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);
     }
 
     @Override
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
-        FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames, ((AVM2LocalData) localData).setLocalPosToGetLocalPos);
-        finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;
+        FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).bottomSetLocals);
+        finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;        
         return finalProcess;
     }
 
@@ -3080,5 +3129,38 @@ public class AVM2Graph extends Graph {
     @Override
     protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         return new SecondPassData();
+    }
+    
+    @Override
+    protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
+        GraphTargetItem result = stack.pop();
+        
+        /*
+        Fixes this case:
+        
+        var i:int;
+        if ((i = 5) > 2 && i < 10) {
+            ...
+        }
+        
+        when instead
+        setlocal x
+        getlocal x
+        
+        there is:
+        dup
+        setlocal x
+        
+        */
+        
+        if (stack.getMark("firstSetLocal") != null) {
+            SetLocalAVM2Item setLocal = (SetLocalAVM2Item) stack.getMark("firstSetLocal");
+            if (setLocal.directlyCausedByDup) {
+                output.add(setLocal.clone());
+                setLocal.hideValue = true;
+            }
+        }
+        
+        return result;
     }
 }

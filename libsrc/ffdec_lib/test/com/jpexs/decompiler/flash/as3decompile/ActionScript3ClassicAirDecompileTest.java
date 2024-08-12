@@ -280,8 +280,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var dict:Dictionary = new Dictionary();\r\n"
                 + "s = \"a\";\r\n"
                 + "i = int(s);\r\n"
-                + "var j:int;\r\n"
-                + "s = String(j = n);\r\n"
+                + "var j:int = n;\r\n"
+                + "s = String(j);\r\n"
                 + "s = ns;\r\n"
                 + "s = String(i == 4 ? \"\" : i);\r\n"
                 + "s = i == 4 ? \"\" : String(i);\r\n"
@@ -296,8 +296,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "2:\"C\"\r\n"
                 + "};\r\n"
                 + "i = int(s.charAt(10));\r\n"
-                + "var v:Vector.<String>;\r\n"
-                + "(v = new Vector.<String>()).push(\"A\");\r\n"
+                + "var v:Vector.<String> = new Vector.<String>();\r\n"
+                + "v.push(\"A\");\r\n"
                 + "v.push(\"B\");\r\n"
                 + "i = int(v[0]);\r\n"
                 + "s = v[1];\r\n"
@@ -321,11 +321,11 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"c\");\r\n"
                 + "i = int(x.item[i].@id);\r\n"
                 + "dict[String(x.item[i].@id)] = \"Hello\";\r\n"
-                + "var lc:LocalClass;\r\n"
-                + "i = (lc = new LocalClass()).attr;\r\n"
+                + "var lc:LocalClass = new LocalClass();\r\n"
+                + "i = lc.attr;\r\n"
                 + "s = String(lc.attr);\r\n"
-                + "var f:Function;\r\n"
-                + "if(Boolean(f = this.f))\r\n"
+                + "var f:Function = this.f;\r\n"
+                + "if(Boolean(f))\r\n"
                 + "{\r\n"
                 + "trace(\"OK\");\r\n"
                 + "}\r\n"
@@ -537,7 +537,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
                 + "var j:int = 5;\r\n"
-                + "if((i = i /= 2) == 1 || i == 2)\r\n"
+                + "i = i /= 2;\r\n"
+                + "if(i == 1 || i == 2)\r\n"
                 + "{\r\n"
                 + "arguments.concat(i);\r\n"
                 + "}\r\n"
@@ -920,7 +921,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var b:int = 6;\r\n"
                 + "for(i = 0; i < len; k = myXML.book.(@isbn == \"12345\"))\r\n"
                 + "{\r\n"
-                + "if((c = 1) == 2)\r\n"
+                + "c = 1;\r\n"
+                + "if(c == 2)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
                 + "}\r\n"
@@ -1668,6 +1670,20 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testOptimization() {
+        decompileMethod("classic_air", "testOptimization", "var f:int = 0;\r\n"
+                + "var g:* = 0;\r\n"
+                + "var h:int = 0;\r\n"
+                + "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "var c:int = 3;\r\n"
+                + "var d:int = 4;\r\n"
+                + "var e:int = d + 5;\r\n"
+                + "var i:int = h = g = f;\r\n",
+                 false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic_air", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                  false);
@@ -2327,12 +2343,12 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testXml() {
         decompileMethod("classic_air", "testXml", "var name:String = \"ahoj\";\r\n"
-                + "var myXML:XML;\r\n"
-                + "var k:* = (myXML = <order id=\"604\">\r\n"
+                + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
                 + "<title>{name}</title>\r\n"
                 + "</book>\r\n"
-                + "</order>).@id;\r\n"
+                + "</order>;\r\n"
+                + "var k:* = myXML.@id;\r\n"
                 + "var all:String = myXML.@*.toXMLString();\r\n"
                 + "k = myXML.book;\r\n"
                 + "k = myXML.book.(@isbn == \"12345\");\r\n"

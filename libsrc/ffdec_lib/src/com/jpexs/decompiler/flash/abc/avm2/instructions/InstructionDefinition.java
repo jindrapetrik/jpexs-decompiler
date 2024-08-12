@@ -62,6 +62,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -290,9 +291,10 @@ public abstract class InstructionDefinition implements Serializable {
      * @param ip IP
      * @param code AVM2 code
      * @param thisHasDefaultToPrimitive This has default to primitive
+     * @param bottomSetLocals Bottom set locals
      * @throws InterruptedException On interrupt
      */
-    public void translate(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public void translate(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ScopeStack localScopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, AVM2Code code, boolean thisHasDefaultToPrimitive, LinkedIdentityHashSet<SetLocalAVM2Item> bottomSetLocals) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.allSwitchParts = switchParts;
         localData.isStatic = isStatic;
@@ -314,6 +316,7 @@ public abstract class InstructionDefinition implements Serializable {
         localData.code = code;
         localData.thisHasDefaultToPrimitive = thisHasDefaultToPrimitive;
         localData.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
+        localData.bottomSetLocals = bottomSetLocals;
         translate(localData, stack, ins, output, path);
         lineStartItem.setVal(localData.lineStartInstruction);
     }

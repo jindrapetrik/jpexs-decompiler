@@ -97,6 +97,7 @@ package
         TestNegate;
         TestNumberCall;
         TestOperations;
+        TestOptimization;
         TestOptionalParameters;
         TestParamNames;
         TestParamsCount;
