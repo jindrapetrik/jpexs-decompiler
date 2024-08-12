@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * Graph target item - an item in high level representation of the code.
@@ -963,15 +964,19 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      *
      * @param visitor Visitor
      */
-    public final void visitRecursivelyNoBlock(GraphTargetVisitorInterface visitor) {
+    public final void visitRecursivelyNoBlock(GraphTargetRecursiveVisitorInterface visitor) {
         Set<GraphTargetItem> visitedItems = new HashSet<>();
+        Stack<GraphTargetItem> parentStack = new Stack<>();
+        parentStack.add(this);
         visitNoBlock(new AbstractGraphTargetVisitor() {
             @Override
             public void visit(GraphTargetItem item) {
                 if (item != null && !visitedItems.contains(item)) {
                     visitedItems.add(item);
-                    visitor.visit(item);
+                    visitor.visit(item, parentStack);
+                    parentStack.push(item);
                     item.visitNoBlock(this);
+                    parentStack.pop();
                 }
             }
         });

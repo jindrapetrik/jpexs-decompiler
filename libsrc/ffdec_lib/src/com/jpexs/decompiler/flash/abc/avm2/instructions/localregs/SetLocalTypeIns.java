@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.List;
 
@@ -144,6 +145,10 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                     result.setCompoundOperator(binaryOp.getOperator());
                 }
             }
+        }
+        
+        if (value instanceof DuplicateItem) {
+            result.directlyCausedByDup = true;
         }
 
         SetTypeIns.handleResult(value, stack, output, localData, result, regId, value.returnType());

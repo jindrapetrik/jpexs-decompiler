@@ -2716,6 +2716,18 @@ public class Graph {
     }
 
     /**
+     * Gets if expression from stack.
+     * Can be overriden for custom handling
+     * @param localData Local data
+     * @param stack Stack
+     * @param output Output
+     * @return Expression
+     */
+    protected GraphTargetItem getIfExpression(BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output) {
+        return stack.pop();
+    }
+    
+    /**
      * Walks graph parts and converts them to target items.
      *
      * @param foundGotos Found gotos
@@ -3254,7 +3266,7 @@ public class Graph {
                 } //else
                 GraphPart nextOnePart = null;
                 if (getNextParts(localData, part).size() == 2 && !partIsSwitch(part)) {
-                    GraphTargetItem expr = stack.pop();
+                    GraphTargetItem expr = getIfExpression(localData, stack, currentRet);
 
                     if (nextOnePart == null) {
 

@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file.
 - Asking more than once for the same imported (ImportAssets) URL
 - ABC Explorer problems when index out of bounds (Usually in obfuscated code)
 - Go to document class for classes with obfuscated name
+- [#2270] AS3 decompilation - unnnecessary local registers assignments as part
+  of expressions when using optimization like `dup, setlocal N`
+  instead of `setlocal N, getlocal N`
 
 ## [21.0.1] - 2024-08-08
 ### Added
@@ -3487,6 +3490,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2269]: https://www.free-decompiler.com/flash/issues/2269
+[#2270]: https://www.free-decompiler.com/flash/issues/2270
 [#2221]: https://www.free-decompiler.com/flash/issues/2221
 [#2267]: https://www.free-decompiler.com/flash/issues/2267
 [#2268]: https://www.free-decompiler.com/flash/issues/2268

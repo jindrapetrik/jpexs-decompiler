@@ -5,7 +5,7 @@ package tests
 	{
 		public function run():*
 		{
-			trace("hello");         
+			trace("hello");              
 		}
 	}
 }
