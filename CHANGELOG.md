@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2270] AS3 decompilation - unnnecessary local registers assignments as part
   of expressions when using optimization like `dup, setlocal N`
   instead of `setlocal N, getlocal N`
+- Movies (DefineVideoStream) preview not working
 
 ## [21.0.1] - 2024-08-08
 ### Added

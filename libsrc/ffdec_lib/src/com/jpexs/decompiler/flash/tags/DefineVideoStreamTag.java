@@ -467,7 +467,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             if (frames.containsKey(f)) {
                 tags.add(frames.get(f));
             }
-            tags.add(new PlaceObject2Tag(swf, f == 0 ? false : true, 1, f == 0 ? -1 : characterID, new MATRIX(), null, f, null, -1, null));
+            tags.add(new PlaceObject2Tag(swf, f == 0 ? false : true, 1, f == 0 ? characterID : -1, new MATRIX(), null, f, null, -1, null));
             tags.add(new ShowFrameTag(swf));
         }
         this.tags = new ReadOnlyTagList(tags);
