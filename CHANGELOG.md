@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2266] StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)
-- [#2275] - Export to FlashDevelop - framerate setting
+- [#2275] Export to FlashDevelop - framerate setting
+- [#2276] Protected namespaces do not use fully qualified names
 
 ## [21.0.2] - 2024-08-12
 ### Added
@@ -3500,6 +3501,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2266]: https://www.free-decompiler.com/flash/issues/2266
 [#2275]: https://www.free-decompiler.com/flash/issues/2275
+[#2276]: https://www.free-decompiler.com/flash/issues/2276
 [#2269]: https://www.free-decompiler.com/flash/issues/2269
 [#2270]: https://www.free-decompiler.com/flash/issues/2270
 [#2221]: https://www.free-decompiler.com/flash/issues/2221

@@ -684,12 +684,10 @@ public class Multiname {
                     if (identifier != null && !identifier.isEmpty()) {
                         return nsname + "::" + name;
                     }
-                } else {
-                    //???
                 }
             }
 
-            if (fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+            if (nskind == Namespace.KIND_PACKAGE && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
                 DottedChain dc = getNameWithNamespace(abc.constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }
