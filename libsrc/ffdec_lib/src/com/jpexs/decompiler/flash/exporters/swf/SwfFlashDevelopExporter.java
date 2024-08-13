@@ -86,7 +86,7 @@ public class SwfFlashDevelopExporter {
                 + "    <movie outputType=\"Application\" />\n"
                 + "    <movie input=\"\" />\n"
                 + "    <movie path=\"" + simpleName + ".swf\" />\n"
-                + "    <movie fps=\"30\" />\n"
+                + "    <movie fps=\"" + doubleToString(swf.frameRate) + "\" />\n"
                 + "    <movie width=\"" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor) + "\" />\n"
                 + "    <movie height=\"" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor) + "\" />\n"
                 + "    <movie version=\"" + swf.version + "\" />\n"
