@@ -61,6 +61,7 @@ package
         TestForInReturn;
         TestForInSwitch;
         TestForXml;
+        TestGetProtected;
         TestGotos;
         TestGotos2;
         TestGotos3;

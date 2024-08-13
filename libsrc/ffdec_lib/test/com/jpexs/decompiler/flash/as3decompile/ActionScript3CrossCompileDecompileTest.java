@@ -54,7 +54,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -69,7 +69,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"catched exception: \" + e.message);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -90,7 +90,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -107,7 +107,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "}\r\n"
                 + "return 2;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -137,7 +137,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -160,7 +160,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "{\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -197,7 +197,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "a++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -218,7 +218,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "a++;\r\n"
                 + "}\r\n"
                 + "return \"OK\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -244,7 +244,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -269,7 +269,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "i++;\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -299,7 +299,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "i++;\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -322,7 +322,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -344,7 +344,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -370,7 +370,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -412,7 +412,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -441,7 +441,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in catch1c\");\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -478,7 +478,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "a++;\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -501,7 +501,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return -1;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -524,7 +524,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -546,7 +546,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"after try\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -565,7 +565,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in finally\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -587,7 +587,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "return \"hu\" + str;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -617,7 +617,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"after\");\r\n"
                 + "i++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -647,7 +647,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"after\");\r\n"
                 + "i++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -670,7 +670,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in finally\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -685,7 +685,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in finally\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -717,7 +717,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -753,7 +753,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"RETEXIT\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -785,7 +785,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in finally1\");\r\n"
                 + "}\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -837,7 +837,7 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "trace(\"after0\");\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "swfNamesProvider")
@@ -862,6 +862,6 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in finally\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 }
