@@ -351,8 +351,7 @@ public class ASM3Parser {
         expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
         ParsedSymbol symb;
         symb = lexer.lex();
-        expected(symb, ParsedSymbol.TYPE_NUMBER, "Integer", lexer.yyline());
-        int slotid = (int) (Integer) symb.value;
+        int slotid = (int) getUInteger(symb, lexer.yyline(), false);
 
         expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
         expected(ParsedSymbol.TYPE_KEYWORD_INSTANCE, "instance", lexer);
