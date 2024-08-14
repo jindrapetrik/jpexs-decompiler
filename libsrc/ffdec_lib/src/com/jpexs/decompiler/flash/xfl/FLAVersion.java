@@ -16,9 +16,6 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * FLA version enumeration.
  *
@@ -42,33 +39,7 @@ public enum FLAVersion {
 
     private final String applicationName;
 
-    private final int maxSwfVersion;
-
-    private static final Map<Integer, String> versionToPlayerMap = new HashMap<>();
-
-    static {
-        versionToPlayerMap.put(9, "FlashPlayer9.0"); // 9.0.115.0
-        versionToPlayerMap.put(10, "FlashPlayer10.0"); //10 & 10.1
-        versionToPlayerMap.put(11, "FlashPlayer10.2");
-        versionToPlayerMap.put(12, "FlashPlayer10.3");
-        versionToPlayerMap.put(13, "FlashPlayer11.0");
-        versionToPlayerMap.put(14, "FlashPlayer11.1");
-        versionToPlayerMap.put(15, "FlashPlayer11.2");
-        versionToPlayerMap.put(16, "FlashPlayer11.3");
-        versionToPlayerMap.put(17, "FlashPlayer11.4");
-        versionToPlayerMap.put(18, "FlashPlayer11.5");
-        versionToPlayerMap.put(19, "FlashPlayer11.6");
-        versionToPlayerMap.put(20, "FlashPlayer11.7");
-        versionToPlayerMap.put(21, "FlashPlayer11.8");
-        versionToPlayerMap.put(22, "FlashPlayer11.9");
-        versionToPlayerMap.put(23, "FlashPlayer12.0");
-        versionToPlayerMap.put(24, "FlashPlayer13.0");
-        versionToPlayerMap.put(25, "FlashPlayer14.0");
-        versionToPlayerMap.put(26, "FlashPlayer15.0");
-        versionToPlayerMap.put(27, "FlashPlayer16.0");
-        versionToPlayerMap.put(28, "FlashPlayer17.0");
-        versionToPlayerMap.put(29, "FlashPlayer18.0");
-    }
+    private final int maxSwfVersion;   
 
     private FLAVersion(String shortName, String applicationName, String xflVersion, int maxSwfVersion) {
         this.xflVersion = xflVersion;
@@ -100,13 +71,6 @@ public enum FLAVersion {
     @Override
     public String toString() {
         return shortName;
-    }
-
-    public static String swfVersionToPlayer(int version) {
-        if (versionToPlayerMap.containsKey(version)) {
-            return versionToPlayerMap.get(version);
-        }
-        return "";
     }
 
     public static FLAVersion fromString(String s) {

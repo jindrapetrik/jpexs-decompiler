@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.FlashPlayerVersion;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
@@ -4988,7 +4989,7 @@ public class XFLConverter {
             publishSettings.writeElementValue("EventCompress", 7);
             publishSettings.writeElementValue("OverrideSounds", 0);
             publishSettings.writeElementValue("Version", flaSwfVersion);
-            publishSettings.writeElementValue("ExternalPlayer", FLAVersion.swfVersionToPlayer(flaSwfVersion));
+            publishSettings.writeElementValue("ExternalPlayer", "FlashPlayer" + FlashPlayerVersion.getFlashPlayerBySwfVersion(flaSwfVersion));
             publishSettings.writeElementValue("ActionScriptVersion", useAS3 ? 3 : 2);
             publishSettings.writeElementValue("PackageExportFrame", 1);
             publishSettings.writeElementValue("PackagePaths", "");
