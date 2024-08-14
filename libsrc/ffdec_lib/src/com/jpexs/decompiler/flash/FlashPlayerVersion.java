@@ -81,6 +81,9 @@ public class FlashPlayerVersion {
      * @return Flash player version or null if not found
      */
     public static String getFlashPlayerBySwfVersion(int swfVersion) {
+        if (swfVersion > 50) {
+            return "50.0"; //??
+        }
         return swfVersionToFlashPlayer.get(swfVersion);
     }
     

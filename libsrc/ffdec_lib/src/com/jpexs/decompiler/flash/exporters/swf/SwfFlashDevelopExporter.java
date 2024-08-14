@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters.swf;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.FlashPlayerVersion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -77,6 +78,9 @@ public class SwfFlashDevelopExporter {
 
         String documentClass = swf.getDocumentClass();
 
+        String flashPlayerVersion = FlashPlayerVersion.getFlashPlayerBySwfVersion(swf.version);
+        String[] flashPlayerVersions = flashPlayerVersion.split("\\.");
+        
         String srcPath = "src";
         String project = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<project version=\"2\">\n"
@@ -89,8 +93,8 @@ public class SwfFlashDevelopExporter {
                 + "    <movie fps=\"" + doubleToString(swf.frameRate) + "\" />\n"
                 + "    <movie width=\"" + doubleToString(swf.displayRect.getWidth() / SWF.unitDivisor) + "\" />\n"
                 + "    <movie height=\"" + doubleToString(swf.displayRect.getHeight() / SWF.unitDivisor) + "\" />\n"
-                + "    <movie version=\"" + swf.version + "\" />\n"
-                + "    <movie minorVersion=\"0\" />\n"
+                + "    <movie version=\"" + flashPlayerVersions[0] + "\" />\n"
+                + "    <movie minorVersion=\"" + flashPlayerVersions[1] + "\" />\n"
                 + "    <movie platform=\"Flash Player\" />\n"
                 + "    <movie background=\"" + (bgColorTag == null ? "#FFFFFF" : bgColorTag.backgroundColor.toHexRGB()) + "\" />\n"
                 + "  </output>\n"

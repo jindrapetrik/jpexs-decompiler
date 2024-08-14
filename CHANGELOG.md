@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#2266] StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)
 - [#2275] Export to FlashDevelop - framerate setting
 - [#2276] Protected namespaces do not use fully qualified names
+- Target flash player version in FlashDevelop and IDEA projects
 
 ## [21.0.2] - 2024-08-12
 ### Added

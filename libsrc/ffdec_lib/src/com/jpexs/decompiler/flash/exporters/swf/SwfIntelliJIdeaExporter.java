@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.swf;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.FlashPlayerVersion;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -112,12 +113,15 @@ public class SwfIntelliJIdeaExporter {
             additionalOptions.add("-default-background-color " + swf.getBackgroundColor().backgroundColor.toHexRGB());
         }
 
+        String flashPlayerVersion = FlashPlayerVersion.getFlashPlayerBySwfVersion(swf.version);
+        
+        
         String imlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<module type=\"Flex\" version=\"4\">\n"
                 + "  <component name=\"FlexBuildConfigurationManager\" active=\"" + simpleName + "\">\n"
                 + "    <configurations>\n"
                 + "      <configuration name=\"" + simpleName + "\" pure-as=\"true\" main-class=\"" + documentClass + "\" output-file=\"" + simpleName + ".swf\" output-folder=\"$MODULE_DIR$/out/production/" + simpleName + "\">\n"
-                + "        <dependencies target-player=\"25.0\">\n"
+                + "        <dependencies target-player=\"" + flashPlayerVersion +"\">\n"
                 + "          <sdk name=\"flex\" />\n"
                 + "        </dependencies>\n"
                 + "        <compiler-options>\n"
