@@ -2489,7 +2489,7 @@ public class ActionScript3Parser {
                 allowMemberOrCall = true;
                 break;
             case FLOAT4:
-                if (!abc.hasFloatSupport()) {
+                if (!abc.hasFloat4Support()) {
                     //parse again as method call
                     lexer.yypushbackstr(lexer.yytext().substring("float4".length()));                                        
                     lexer.pushback(new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, "float4"));

@@ -87,6 +87,12 @@ public class CoerceAVM2Item extends AVM2Item {
                         && !valueReturnType.equals(TypeItem.UINT)
                         && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
+            case "float":
+                displayCoerce = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(new TypeItem("float"))
+                        && !valueReturnType.equals(TypeItem.UINT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "int":
                 displayCoerce = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(TypeItem.UNBOUNDED);

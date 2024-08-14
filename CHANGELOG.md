@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Updated Flash player to SWF version map
+- Harman AIR 51 float support compatibility
 
 ### Fixed
 - [#2266] StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)

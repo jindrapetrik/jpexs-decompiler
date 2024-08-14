@@ -700,7 +700,7 @@ public class ABCInputStream implements AutoCloseable {
      */
     public Float readFloat(String name) throws IOException {
         newDumpLevel(name, "Float");
-        int intBits = (readInternal()) + (readInternal() << 8);
+        int intBits = (readInternal()) + (readInternal() << 8) + (readInternal() << 16) + (readInternal() << 24);
         float ret = Float.intBitsToFloat(intBits);
         endDumpLevel(ret);
         return ret;

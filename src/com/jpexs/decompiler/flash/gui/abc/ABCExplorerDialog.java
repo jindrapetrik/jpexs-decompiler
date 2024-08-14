@@ -404,6 +404,8 @@ public class ABCExplorerDialog extends AppDialog {
         }
         if (abc.hasFloatSupport()) {
             cpTabbedPane.addTab("fl (" + Math.max(0, abc.constants.getFloatCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_FLOAT.getIcon().getFile()), makeTreePanel(abc, TreeType.CONSTANT_FLOAT));
+        }
+        if (abc.hasFloat4Support()) {
             cpTabbedPane.addTab("fl4 (" + Math.max(0, abc.constants.getFloat4Count() - 1) + ")", View.getIcon(TreeType.CONSTANT_FLOAT_4.getIcon().getFile()), makeTreePanel(abc, TreeType.CONSTANT_FLOAT_4));
         }
         cpTabbedPane.addTab("str (" + Math.max(0, abc.constants.getStringCount() - 1) + ")", View.getIcon(TreeType.CONSTANT_STRING.getIcon().getFile()), makeTreePanel(abc, TreeType.CONSTANT_STRING));
@@ -424,7 +426,8 @@ public class ABCExplorerDialog extends AppDialog {
                 + Math.max(0, abc.constants.getNamespaceSetCount() - 1)
                 + Math.max(0, abc.constants.getMultinameCount() - 1)
                 + (abc.hasDecimalSupport() ? Math.max(0, abc.constants.getDecimalCount() - 1) : 0)
-                + (abc.hasFloatSupport() ? (Math.max(0, abc.constants.getFloatCount() - 1) + Math.max(0, abc.constants.getFloat4Count() - 1)) : 0);
+                + (abc.hasFloatSupport() ? Math.max(0, abc.constants.getFloatCount() - 1) : 0)
+                + (abc.hasFloat4Support() ? Math.max(0, abc.constants.getFloat4Count() - 1) : 0);
         mainTabbedPane.addTab("cp (" + cpCount + ")", View.getIcon("abcconstantpool16"), cpPanel);
         mainTabbedPane.addTab("mi (" + abc.method_info.size() + ")", View.getIcon(TreeType.METHOD_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.METHOD_INFO));
         mainTabbedPane.addTab("md (" + abc.metadata_info.size() + ")", View.getIcon(TreeType.METADATA_INFO.getIcon().getFile()), makeTreePanel(abc, TreeType.METADATA_INFO));
@@ -558,7 +561,10 @@ public class ABCExplorerDialog extends AppDialog {
             stringOffset = 1;
         }
         if (getSelectedAbc().hasFloatSupport()) {
-            stringOffset = 2;
+            stringOffset++;
+        }
+        if (getSelectedAbc().hasFloat4Support()) {
+            stringOffset++;
         }
         switch (selectedType) {
             case CONSTANT_INT:
@@ -588,7 +594,7 @@ public class ABCExplorerDialog extends AppDialog {
                 cpTabbedPane.setSelectedIndex(3);
                 break;
             case CONSTANT_FLOAT_4:
-                if (!getSelectedAbc().hasFloatSupport()) {
+                if (!getSelectedAbc().hasFloat4Support()) {
                     return;
                 }
                 mainTabbedPane.setSelectedIndex(0);

@@ -580,7 +580,7 @@ public class AVM2Code implements Cloneable {
         /*0x20*/ new PushNullIns(),
         /*0x21*/ new PushUndefinedIns(),
         /*0x22*/ new PushFloatIns(), //major 47+
-        /*0x22*/ new PushConstantIns(), //before major 47
+        /*0x22*/ //new PushConstantIns(), //before major 47
         /*0x23*/ new NextValueIns(),
         /*0x24*/ new PushByteIns(),
         /*0x25*/ new PushShortIns(),

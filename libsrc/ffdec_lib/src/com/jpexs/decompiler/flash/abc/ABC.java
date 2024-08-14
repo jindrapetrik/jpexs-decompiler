@@ -784,6 +784,14 @@ public class ABC implements Openable {
     public boolean hasFloatSupport() {
         return minVersionCheck(47, 16);
     }
+    
+    /**
+     * Checks whether the ABC has float4 support
+     * @return Whether the ABC has float4 support
+     */
+    public boolean hasFloat4Support() {
+        return false;
+    }
 
     /**
      * Sets float support.
@@ -927,6 +935,8 @@ public class ABC implements Openable {
                 }
                 ais.endDumpLevel();
             }
+        }
+        if (hasFloat4Support()) {
             // constant float4
             int constant_float4_pool_count = ais.readU30("float4_count");
             if (constant_float4_pool_count > 1) {
@@ -1125,6 +1135,8 @@ public class ABC implements Openable {
             for (int i = 1; i < constants.getFloatCount(); i++) {
                 aos.writeFloat(constants.getFloat(i));
             }
+        }
+        if (hasFloat4Support()) {
             aos.writeU30(constants.getFloat4Count());
             for (int i = 1; i < constants.getFloat4Count(); i++) {
                 aos.writeFloat4(constants.getFloat4(i));
@@ -2400,7 +2412,7 @@ public class ABC implements Openable {
                         }
                         break;
                     case ValueKind.CONSTANT_Float4:
-                        if (hasFloatSupport()) {
+                        if (hasFloat4Support()) {
                             valueMergeMap = mergeFloat4Map;
                         }
                         break;
@@ -2675,7 +2687,7 @@ public class ABC implements Openable {
                 }
                 break;
             case ValueKind.CONSTANT_Float4:
-                if (hasFloatSupport()) {
+                if (hasFloat4Support()) {
                     valueMergeMap = mergeFloat4Map;
                 }
                 break;
