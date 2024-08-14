@@ -276,7 +276,8 @@ public class ABCCleaner {
                 }
                 newCpool.addFloat(abc.constants.getFloat(i));
             }
-            
+        }
+        if (abc.hasFloat4Support()) {
             for (int i = 1; i < abc.constants.getFloat4Count(); i++) {
                 if (notReferencedIndices.get(ABCSimpleUsageDetector.ItemKind.FLOAT4).contains(i)) {
                     continue;

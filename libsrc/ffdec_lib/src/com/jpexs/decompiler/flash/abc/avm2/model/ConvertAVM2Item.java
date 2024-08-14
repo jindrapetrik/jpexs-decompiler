@@ -75,6 +75,12 @@ public class ConvertAVM2Item extends AVM2Item {
                         && !valueReturnType.equals(TypeItem.UINT)
                         && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
+            case "float":
+                displayConvert = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(new TypeItem("float"))
+                        && !valueReturnType.equals(TypeItem.UINT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "int":
                 displayConvert = !valueReturnType.equals(TypeItem.INT)
                         && !valueReturnType.equals(TypeItem.UNBOUNDED);
