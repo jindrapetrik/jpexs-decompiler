@@ -26,6 +26,11 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 public class AssignedValue {
 
     /**
+     * Command
+     */
+    public GraphTargetItem command;
+    
+    /**
      * Value
      */
     public GraphTargetItem value;
@@ -43,11 +48,13 @@ public class AssignedValue {
     /**
      * Constructs a new assigned value.
      *
+     * @param command Command
      * @param value Value
      * @param initializer Initializer type
      * @param method Method index
      */
-    public AssignedValue(GraphTargetItem value, int initializer, int method) {
+    public AssignedValue(GraphTargetItem command, GraphTargetItem value, int initializer, int method) {
+        this.command = command;
         this.value = value;
         this.initializer = initializer;
         this.method = method;

@@ -316,7 +316,7 @@ public class Traits implements Cloneable, Serializable {
      */
     public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
 
-        List<Trait> ordered = new ArrayList<>(traits);
+        /*List<Trait> ordered = new ArrayList<>(traits);
         loopi:
         for (int i = 0; i < ordered.size(); i++) {
             for (int j = i + 1; j < ordered.size(); j++) {
@@ -356,7 +356,9 @@ public class Traits implements Cloneable, Serializable {
                 }
             }
         }
-
+*/
+        List<Trait> ordered = traits;
+        
         for (Trait trait : ordered) {
             int t = traits.indexOf(trait);
             if (traitTypes != null) {
@@ -377,8 +379,13 @@ public class Traits implements Cloneable, Serializable {
             if (ignoredTraitNames.contains(trait.getName(abc).getName(abc.constants, new ArrayList<>(), false, false))) {
                 continue;
             }
-            writer.newLine();
-            int h = abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t);
+            
+            if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
+                continue;
+            }
+            
+            writer.newLine();            
+            int h = abc.getGlobalTraitId(TraitType.METHOD , isStatic, classIndex, t);
             writer.startTrait(h);
             if (makePackages) {
                 trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);

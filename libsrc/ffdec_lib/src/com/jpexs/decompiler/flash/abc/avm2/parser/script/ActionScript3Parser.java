@@ -561,14 +561,14 @@ public class ActionScript3Parser {
         }
         List<GraphTargetItem> body = null;
         List<AssignableAVM2Item> subvariables = new ArrayList<>();
-        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "this", "", null, true, openedNamespaces, abcIndex));
+        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "this", "", null, true, openedNamespaces, abcIndex, false));
         for (int i = 0; i < paramNames.size() - (hasRest ? 1 : 0); i++) {
-            subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), false, paramNames.get(i), "", null, true, openedNamespaces, abcIndex));
+            subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), false, paramNames.get(i), "", null, true, openedNamespaces, abcIndex, false));
         }
         if (hasRest) {
-            subvariables.add(new NameAVM2Item(TypeItem.UNBOUNDED, lexer.yyline(), false, paramNames.get(paramNames.size() - 1), "", null, true, openedNamespaces, abcIndex));
+            subvariables.add(new NameAVM2Item(TypeItem.UNBOUNDED, lexer.yyline(), false, paramNames.get(paramNames.size() - 1), "", null, true, openedNamespaces, abcIndex, false));
         }
-        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "arguments", "", null, true, openedNamespaces, abcIndex));
+        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "arguments", "", null, true, openedNamespaces, abcIndex, false));
         int parCnt = subvariables.size();
         Reference<Boolean> needsActivation2 = new Reference<>(false);
         if (!isInterface && !isNative) {
@@ -650,6 +650,10 @@ public class ActionScript3Parser {
         openedNamespaces.add(privateNs);
         openedNamespaces.add(protectedNs);
         openedNamespaces.add(staticProtectedNs);
+        
+        Stack<Loop> cinitLoops = new Stack<>();
+        Map<Loop, String> cinitLoopLabels = new HashMap<>();
+        HashMap<String, Integer> cinitRegisterVars = new HashMap<>();
 
         looptraits:
         while (true) {
@@ -667,14 +671,14 @@ public class ActionScript3Parser {
             NamespaceItem namespace = null;
             ParsedSymbol s = lex();
             //static class initializer
-            if (s.type == SymbolType.CURLY_OPEN) {
+            /*if (s.type == SymbolType.CURLY_OPEN) {
                 cinit.addAll(commands(allOpenedNamespaces, thisType, pkg, cinitNeedsActivation, importedClasses, openedNamespaces, new Stack<>(), new HashMap<>(), new HashMap<>(), true, false, 0, cinitVariables, abc));
                 expectedType(SymbolType.CURLY_CLOSE);
             } else {
                 lexer.pushback(s);
-            }
+            }*/
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
-            s = lex();
+            //s = lex();
 
             while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
@@ -939,23 +943,77 @@ public class ActionScript3Parser {
                     break;
                 default:
                     lexer.pushback(s);
-                    break looptraits;
+                    
+                    GraphTargetItem cmd = command(allOpenedNamespaces, null, publicNs, cinitNeedsActivation, importedClasses, openedNamespaces, cinitLoops, cinitLoopLabels, cinitRegisterVars, true, false, 0, false, cinitVariables, abc);
+                    if (cmd != null) {
+                        traits.add(cmd);
+                    } else {
+                        break looptraits;
+                    }
             }
         }
     }
 
-    private void scriptTraits(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits, Reference<Integer> numberUsageRef, Reference<Integer> numberRoundingRef, Reference<Integer> numberPrecisionRef, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    private void scriptTraits(
+            List<DottedChain> importedClasses,
+            List<NamespaceItem> openedNamespaces,
+            List<List<NamespaceItem>> allOpenedNamespaces,
+            int scriptIndex,
+            String scriptName,
+            List<GraphTargetItem> traits, 
+            Reference<Integer> numberUsageRef, 
+            Reference<Integer> numberRoundingRef, 
+            Reference<Integer> numberPrecisionRef,
+            ABC abc,
+            Reference<Boolean> sinitNeedsActivation,
+            List<AssignableAVM2Item> sinitVariables            
+            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
 
-        while (scriptTraitsBlock(allOpenedNamespaces, scriptIndex, scriptName, traits, numberUsageRef, numberRoundingRef, numberPrecisionRef, abc)) {
+        Stack<Loop> sinitLoops = new Stack<>();
+        Map<Loop, String> sinitLoopLabels = new HashMap<>();
+            
+        HashMap<String, Integer> sinitRegisterVars = new HashMap<>();
+        while (scriptTraitsBlock(
+                importedClasses,
+                openedNamespaces,
+                allOpenedNamespaces, 
+                scriptIndex,
+                scriptName, 
+                traits, 
+                numberUsageRef,
+                numberRoundingRef, 
+                numberPrecisionRef,
+                abc,
+                sinitNeedsActivation,
+                sinitLoops,
+                sinitLoopLabels,
+                sinitRegisterVars,
+                sinitVariables
+                )) {
             //empty
         }
     }
 
-    private boolean scriptTraitsBlock(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String scriptName, List<GraphTargetItem> traits, Reference<Integer> numberUsageRef, Reference<Integer> numberRoundingRef, Reference<Integer> numberPrecisionRef, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    private boolean scriptTraitsBlock(
+            List<DottedChain> importedClasses,
+            List<NamespaceItem> openedNamespaces,
+            List<List<NamespaceItem>> allOpenedNamespaces,
+            int scriptIndex,
+            String scriptName,
+            List<GraphTargetItem> traits,
+            Reference<Integer> numberUsageRef, 
+            Reference<Integer> numberRoundingRef,
+            Reference<Integer> numberPrecisionRef,
+            ABC abc,
+            Reference<Boolean> sinitNeedsActivation,
+            Stack<Loop> sinitLoops,
+            Map<Loop, String> sinitLoopLabels,
+            HashMap<String, Integer> sinitRegisterVars,
+            List<AssignableAVM2Item> sinitVariables        
+            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         ParsedSymbol s;
         boolean inPackage = false;
         s = lex();
-        List<AssignableAVM2Item> sinitVariables = new ArrayList<>();
         NamespaceItem publicNs;
         NamespaceItem packageInternalNs;
         DottedChain pkgName = DottedChain.TOPLEVEL;
@@ -983,7 +1041,6 @@ public class ActionScript3Parser {
         }
         lexer.pushback(s);
 
-        List<NamespaceItem> openedNamespaces = new ArrayList<>();
         allOpenedNamespaces.add(openedNamespaces);
         NamespaceItem emptyNs = new NamespaceItem("", Namespace.KIND_PACKAGE);
         openedNamespaces.add(emptyNs);
@@ -1000,7 +1057,7 @@ public class ActionScript3Parser {
             }
         }
 
-        List<DottedChain> importedClasses = parseImportsUsages(openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc);
+        parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc);
 
         boolean isEmpty = true;
 
@@ -1206,7 +1263,13 @@ public class ActionScript3Parser {
                     traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs));
                     break;
                 default:
-                    lexer.pushback(s);
+                    lexer.pushback(s);     
+                    parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc);
+                    GraphTargetItem cmd = command(allOpenedNamespaces, null, publicNs, sinitNeedsActivation, importedClasses, openedNamespaces, sinitLoops, sinitLoopLabels, sinitRegisterVars, true, false, 0, false, sinitVariables, abc);
+                    if (cmd != null) {
+                        traits.add(cmd);
+                        isEmpty = false;
+                    } 
                     break looptrait;
             }
 
@@ -1532,6 +1595,8 @@ public class ActionScript3Parser {
                     ret = (function(allOpenedNamespaces, new ArrayList<>(), pkg, false, false, needsActivation, importedClasses, thisType, openedNamespaces, s.value.toString(), false, variables, abc));
                     break;
                 case VAR:
+                case CONST:
+                    boolean isConst = s.type == SymbolType.CONST;
                     s = lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String varIdentifier = s.value.toString();
@@ -1546,10 +1611,10 @@ public class ActionScript3Parser {
 
                     if (s.type == SymbolType.ASSIGN) {
                         GraphTargetItem varval = (expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false, abc));
-                        ret = new NameAVM2Item(type, lexer.yyline(), false, varIdentifier, "", varval, true, openedNamespaces, abcIndex);
+                        ret = new NameAVM2Item(type, lexer.yyline(), false, varIdentifier, "", varval, true, openedNamespaces, abcIndex, isConst);
                         variables.add((NameAVM2Item) ret);
                     } else {
-                        ret = new NameAVM2Item(type, lexer.yyline(), false, varIdentifier, "", null, true, openedNamespaces, abcIndex);
+                        ret = new NameAVM2Item(type, lexer.yyline(), false, varIdentifier, "", null, true, openedNamespaces, abcIndex, isConst);
                         variables.add((NameAVM2Item) ret);
                         lexer.pushback(s);
                     }
@@ -1817,7 +1882,7 @@ public class ActionScript3Parser {
                         String enamestr = s.value.toString();
                         expectedType(SymbolType.COLON);
                         GraphTargetItem etype = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables, abc);
-                        NameAVM2Item e = new NameAVM2Item(etype, lexer.yyline(), false, enamestr, "", new ExceptionAVM2Item(null)/*?*/, true/*?*/, openedNamespaces, abcIndex);
+                        NameAVM2Item e = new NameAVM2Item(etype, lexer.yyline(), false, enamestr, "", new ExceptionAVM2Item(null)/*?*/, true/*?*/, openedNamespaces, abcIndex, false);
                         //variables.add(e);
                         catchExceptions.add(e);
                         e.setSlotNumber(1);
@@ -2607,10 +2672,9 @@ public class ActionScript3Parser {
 
     private List<String> constantPool;
 
-    private List<DottedChain> parseImportsUsages(List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
+    private void parseImportsUsages(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
 
-        ParsedSymbol s;
-        List<DottedChain> importedClasses = new ArrayList<>();
+        ParsedSymbol s;        
 
         s = lex();
         while (s.isType(SymbolType.IMPORT, SymbolType.USE)) {
@@ -2747,10 +2811,19 @@ public class ActionScript3Parser {
             s = lex();
         }
         lexer.pushback(s);
-        return importedClasses;
     }
 
-    private List<GraphTargetItem> parseScript(List<List<NamespaceItem>> allOpenedNamespaces, int scriptIndex, String fileName, Reference<Integer> numberContextRef, ABC abc) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
+    private List<GraphTargetItem> parseScript(
+            List<DottedChain> importedClasses,
+            List<NamespaceItem> openedNamespaces,
+            List<List<NamespaceItem>> allOpenedNamespaces,
+            int scriptIndex, 
+            String fileName, 
+            Reference<Integer> numberContextRef,
+            ABC abc,
+            Reference<Boolean> sinitNeedsActivation,
+            List<AssignableAVM2Item> sinitVariables
+            ) throws IOException, AVM2ParseException, CompilationException, InterruptedException {
 
         //int scriptPrivateNs;
         if (fileName.contains("/")) {
@@ -2763,7 +2836,7 @@ public class ActionScript3Parser {
         Reference<Integer> numberUsageRef = new Reference<>(NumberContext.USE_NUMBER);
         Reference<Integer> numberRoundingRef = new Reference<>(NumberContext.ROUND_HALF_EVEN);
         Reference<Integer> numberPrecisionRef = new Reference<>(34);
-        scriptTraits(allOpenedNamespaces, scriptIndex, fileName, items, numberUsageRef, numberRoundingRef, numberPrecisionRef, abc);
+        scriptTraits(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, items, numberUsageRef, numberRoundingRef, numberPrecisionRef, abc, sinitNeedsActivation, sinitVariables);
         
         NumberContext nc = new NumberContext(numberUsageRef.getVal(), numberPrecisionRef.getVal(), numberRoundingRef.getVal());
         if (!nc.isDefault()) {
@@ -2774,22 +2847,37 @@ public class ActionScript3Parser {
 
     /**
      * Converts string to script traits.
+     * @param importedClasses Imported classes
+     * @param openedNamespaces Opened namespaces
      * @param allOpenedNamespaces All opened namespaces
      * @param str String to parse
      * @param fileName File name
      * @param scriptIndex Script index
      * @param numberContextRef Number context reference
      * @param abc ABC
+     * @param sinitNeedsActivation Script initializer needs activation
+     * @param sinitVariables Script initializer variables
      * @return List of script traits
      * @throws AVM2ParseException On parsing error
      * @throws IOException On I/O error
      * @throws CompilationException On compilation error
      * @throws InterruptedException On interrupt
      */
-    public List<GraphTargetItem> scriptTraitsFromString(List<List<NamespaceItem>> allOpenedNamespaces, String str, String fileName, int scriptIndex, Reference<Integer> numberContextRef, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+    public List<GraphTargetItem> scriptTraitsFromString(
+            List<DottedChain> importedClasses,
+            List<NamespaceItem> openedNamespaces,
+            List<List<NamespaceItem>> allOpenedNamespaces, 
+            String str, 
+            String fileName, 
+            int scriptIndex, 
+            Reference<Integer> numberContextRef, 
+            ABC abc,
+            Reference<Boolean> sinitNeedsActivation,
+            List<AssignableAVM2Item> sinitVariables
+            ) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         lexer = new ActionScriptLexer(str);
 
-        List<GraphTargetItem> ret = parseScript(allOpenedNamespaces, scriptIndex, fileName, numberContextRef, abc);
+        List<GraphTargetItem> ret = parseScript(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, numberContextRef, abc, sinitNeedsActivation, sinitVariables);
         if (lexer.lex().type != SymbolType.EOF) {
             throw new AVM2ParseException("Parsing finisned before end of the file", lexer.yyline());
         }
@@ -2798,14 +2886,19 @@ public class ActionScript3Parser {
 
     /**
      * Adds script from tree.
+     * @param sinitVariables Script initializer variables
+     * @param sinitNeedsActivation Script initializer needs activation
+     * @param importedClasses Imported classes
+     * @param openedNamespaces Opened namespaces
      * @param allOpenedNamespaces All opened namespaces
      * @param items Items
      * @param classPos Class position
      * @param documentClass Document class
+     * @param numberContext Number context
      * @throws AVM2ParseException On parsing error
      * @throws CompilationException On compilation error
      */
-    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass, Integer numberContext) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<AssignableAVM2Item> sinitVariables, boolean sinitNeedsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos, String documentClass, Integer numberContext) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
@@ -2815,8 +2908,9 @@ public class ActionScript3Parser {
         int scriptIndex = abcIndex.getSelectedAbc().script_info.size();
         abcIndex.getSelectedAbc().script_info.add(si);
         try {
-            gen.generateScriptInfo(scriptIndex, si, allOpenedNamespaces, localData, items, classPos);
+            gen.generateScriptInfo(sinitVariables, sinitNeedsActivation, importedClasses, openedNamespaces, scriptIndex, si, allOpenedNamespaces, localData, items, classPos);
         } catch (Exception ex) {
+            ex.printStackTrace(); // FIXME
             abcIndex.getSelectedAbc().script_info.remove(si);
             throw ex;
         }
@@ -2840,8 +2934,12 @@ public class ActionScript3Parser {
     public void addScript(String s, String fileName, int classPos, int scriptIndex, String documentClass, ABC abc) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);
-        List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex, numberContextRef, abc);
-        addScriptFromTree(allOpenedNamespaces, traits, classPos, documentClass, numberContextRef.getVal());
+        Reference<Boolean> sinitNeedsActivation = new Reference<>(false);
+        List<AssignableAVM2Item> sinitVariables = new ArrayList<>();
+        List<DottedChain> importedClasses = new ArrayList<>();
+        List<NamespaceItem> openedNamespaces = new ArrayList<>();
+        List<GraphTargetItem> traits = scriptTraitsFromString(importedClasses, openedNamespaces, allOpenedNamespaces, s, fileName, scriptIndex, numberContextRef, abc, sinitNeedsActivation, sinitVariables);
+        addScriptFromTree(sinitVariables, sinitNeedsActivation.getVal(), importedClasses, openedNamespaces, allOpenedNamespaces, traits, classPos, documentClass, numberContextRef.getVal());
     }
 
     /**

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +79,11 @@ public class LocalData {
      * ABC
      */
     public ABC abc;
+    
+    /**
+     * Script export mode
+     */
+    public ScriptExportMode exportMode;
 
     /**
      * Creates a new local data
@@ -99,9 +105,10 @@ public class LocalData {
      * @param localRegNames Local register names
      * @param fullyQualifiedNames Fully qualified names
      * @param seenMethods Seen methods
+     * @param exportMode
      * @return Local data
      */
-    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) {
+    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
@@ -110,6 +117,7 @@ public class LocalData {
         localData.seenMethods = seenMethods;
         localData.abcIndex = abcIndex;
         localData.callStack = callStack;
+        localData.exportMode = exportMode;                
         return localData;
     }
 }
