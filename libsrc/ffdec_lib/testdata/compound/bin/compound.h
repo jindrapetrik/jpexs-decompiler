@@ -1,0 +1,13 @@
+const int abcclass_Object = 0;
+const int abcclass_Number = 1;
+const int abcclass_int = 2;
+const int abcclass___AS3___vec_Vector = 3;
+const int abcclass_mypkg_MyClass = 4;
+const int abcclass_mypkg_MyClass2 = 5;
+const int abcpackage_compound_as = 0;
+const int abcpackage_stubs_as = 1;
+extern const int compound_abc_length;
+extern const int compound_abc_method_count;
+extern const int compound_abc_class_count;
+extern const int compound_abc_script_count;
+extern const unsigned char compound_abc_data[];

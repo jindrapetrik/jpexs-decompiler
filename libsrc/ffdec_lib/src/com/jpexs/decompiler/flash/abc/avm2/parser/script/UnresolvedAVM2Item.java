@@ -411,7 +411,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 if (a instanceof NameAVM2Item) {
                     NameAVM2Item n = (NameAVM2Item) a;
                     if (n.isDefinition() && name.get(0).equals(n.getVariableName())) {
-                        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex);
+                        NameAVM2Item ret = new NameAVM2Item(n.type, n.line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, n.isConst());
                         ret.setSlotScope(n.getSlotScope());
                         ret.setSlotNumber(n.getSlotNumber());
                         ret.setRegNumber(n.getRegNumber());
@@ -441,7 +441,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 t = paramTypes.get(ind);
             } //else rest parameter
 
-            GraphTargetItem ret = new NameAVM2Item(t, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex);
+            GraphTargetItem ret = new NameAVM2Item(t, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
             resolved = ret;
             for (int i = 1; i < name.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>());
@@ -627,7 +627,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
             }
 
-            NameAVM2Item ret = new NameAVM2Item(ntype, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex);
+            NameAVM2Item ret = new NameAVM2Item(ntype, line, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), null, false, openedNamespaces, abcIndex, false);
             resolved = ret;
             for (int i = 1; i < name.size(); i++) {
                 resolved = new PropertyAVM2Item(resolved, name.isAttribute(i), name.get(i), name.getNamespaceSuffix(i), abc, openedNamespaces, new ArrayList<>());

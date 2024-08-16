@@ -11,6 +11,11 @@ All notable changes to this project will be documented in this file.
 - [#2275] Export to FlashDevelop - framerate setting
 - [#2276] Protected namespaces do not use fully qualified names
 - Target flash player version in FlashDevelop and IDEA projects
+- Script/Class initializers order of assignment
+
+
+### Changed
+- Compound script has slot/const traits inside main script initializer
 
 ## [21.0.2] - 2024-08-12
 ### Added

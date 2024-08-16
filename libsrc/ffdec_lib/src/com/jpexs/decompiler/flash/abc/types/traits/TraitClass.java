@@ -234,7 +234,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
-        getMetaData(parent, convertData, abc, writer);
+        getMetaData(this, convertData, abc, writer);
 
         boolean allowEmbed = true;
 
@@ -284,11 +284,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.startMethod(classInfo.cinit_index, "cinit");
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!classInitializerIsEmpty) {
-                    writer.startBlock();
+                    //writer.startBlock();
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
                     abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
-                    writer.endBlock();
+                    //writer.endBlock();
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
                     //TODO: handle this better in GUI(?)
@@ -297,9 +297,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
             writer.endMethod();
             writer.endTrait();
-            if (!classInitializerIsEmpty) {
+            /*if (!classInitializerIsEmpty) {
                 writer.newLine();
-            }
+            }*/
         } else {
             //"/*classInitializer*/";
         }

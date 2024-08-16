@@ -93,15 +93,25 @@ public class NameAVM2Item extends AssignableAVM2Item {
     private AbcIndexing abcIndex;
 
     private String namespaceSuffix;
+    
+    private final boolean isConst;
 
     @Override
     public AssignableAVM2Item copy() {
-        NameAVM2Item c = new NameAVM2Item(type, line, attribute, variableName, namespaceSuffix, assignedValue, definition, openedNamespaces, abcIndex);
+        NameAVM2Item c = new NameAVM2Item(type, line, attribute, variableName, namespaceSuffix, assignedValue, definition, openedNamespaces, abcIndex, isConst);
         c.setNs(ns);
         c.regNumber = regNumber;
         c.unresolved = unresolved;
         c.nsKind = nsKind;
         return c;
+    }
+    
+    /**
+     * Checks whether this name is const.
+     * @return Whether this name is const
+     */
+    public boolean isConst() {
+        return isConst;
     }
 
     /**
@@ -235,8 +245,9 @@ public class NameAVM2Item extends AssignableAVM2Item {
      * @param definition Is definition
      * @param openedNamespaces Opened namespaces
      * @param abcIndex ABC index
+     * @param isConst Is const
      */
-    public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
+    public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex, boolean isConst) {
         super(storeValue);
         this.attribute = attribute;
         this.variableName = variableName;
@@ -247,6 +258,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
         this.type = type;
         this.openedNamespaces = openedNamespaces;
         this.abcIndex = abcIndex;
+        this.isConst = isConst;
     }
 
     /**

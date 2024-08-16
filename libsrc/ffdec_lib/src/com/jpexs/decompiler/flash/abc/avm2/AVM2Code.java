@@ -261,12 +261,15 @@ import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PackageAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StoreNewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.TraitSlotConstAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
@@ -278,6 +281,7 @@ import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -296,6 +300,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
@@ -312,8 +317,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -1905,6 +1912,34 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
+            
+            if (ins.definition instanceof KillIns) {
+                int killedReg = ins.operands[0];
+                if (output.size() >= 2 && !stack.isEmpty()) {
+                    if ((stack.peek() instanceof LocalRegAVM2Item) && (((LocalRegAVM2Item) stack.peek()).regIndex == killedReg)) {
+                        if (output.get(output.size() - 1) instanceof SetPropertyAVM2Item) {
+                            SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) output.get(output.size() - 1);
+                            if ((output.get(output.size() - 2) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 2)).regIndex == killedReg)) {
+                                SetLocalAVM2Item setLoc = (SetLocalAVM2Item) output.get(output.size() - 2);
+                                AVM2Instruction insAfter = ip + 1 < code.size() ? code.get(ip + 1) : null;
+                                if (insAfter != null && (insAfter.definition instanceof PopIns)) {
+                                    if (setProp.value instanceof LocalRegAVM2Item) {
+                                        LocalRegAVM2Item locReg = (LocalRegAVM2Item) setProp.value;
+                                        if  (locReg.regIndex == killedReg) {
+                                            setProp.value = setLoc.value;
+                                            output.remove(output.size() - 2);
+                                            stack.pop();
+                                            ip += 2;
+                                            continue;
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             /*
             if (ins.definition instanceof DupIns) {
                 int nextPos;
@@ -2480,6 +2515,10 @@ public class AVM2Code implements Cloneable {
             }
         }*/
     }
+    
+    private static interface BlockVisitor {
+        public void visitBlock(List<GraphTargetItem> items);
+    }
 
     /**
      * Converts code to source - list of GraphTargetItems.
@@ -2541,10 +2580,10 @@ public class AVM2Code implements Cloneable {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
                                             f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                                         }
-                                        AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
+                                        AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
-                                        list.remove(i);
-                                        i--;
+                                        //list.remove(i);
+                                        //i--;
                                         continue loopi;
                                     }
                                 }
@@ -2609,10 +2648,10 @@ public class AVM2Code implements Cloneable {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
                                             f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                                         }
-                                        AssignedValue av = new AssignedValue(value, initializerType, methodIndex);
+                                        AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
-                                        list.remove(i);
-                                        i--;
+                                        //list.remove(i);
+                                        //i--;
                                         continue loopi;
                                     }
                                 }
@@ -2626,7 +2665,153 @@ public class AVM2Code implements Cloneable {
                 }
             }
         }
+        
+        
+        int lastPos = list.size() - 1;
+        if (lastPos < 0) {
+            lastPos = 0;
+        }
+        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ScriptEndItem)) {
+            lastPos--;
+        }
+        if (lastPos < 0) {
+            lastPos = 0;
+        }
+        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnVoidAVM2Item)) {
+            list.remove(lastPos);
+        }
+        if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+            if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnValueAVM2Item)) {
+                ReturnValueAVM2Item rv = (ReturnValueAVM2Item) list.get(lastPos);
+                if (rv.value instanceof LocalRegAVM2Item) {
+                    list.remove(lastPos);
+                } else {
+                    list.set(lastPos, rv.value);
+                }
+                
+            }
+        }
+        
         if (initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+            Map<GraphTargetItem, AssignedValue> commandToAssigned = new IdentityHashMap<>();
+            Map<GraphTargetItem, TraitSlotConst> commandToTrait = new IdentityHashMap<>();
+            for (TraitSlotConst tsc : convertData.assignedValues.keySet()) {
+                AssignedValue asv = convertData.assignedValues.get(tsc);
+                commandToAssigned.put(asv.command, asv);
+                commandToTrait.put(asv.command, tsc);
+            }
+                        
+            for (int i = 0; i < list.size(); i++) {
+                GraphTargetItem ti = list.get(i);                                
+                if (commandToAssigned.containsKey(ti)) {
+                    AssignedValue asv = commandToAssigned.get(ti);
+                    TraitSlotConst tsc = commandToTrait.get(ti);
+                    TraitSlotConstAVM2Item item = new TraitSlotConstAVM2Item(
+                            ti.getSrc(), 
+                            ti.getLineStartItem(),
+                            tsc, 
+                            asv.value, 
+                            isStatic,
+                            scriptIndex,
+                            classIndex,
+                            initializerType,
+                            methodIndex,
+                            initTraits.traits.indexOf(tsc)
+                    );
+                    list.set(i, item);
+                }
+            }
+            
+            if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+                                
+                //Eliminate all setlocals, can sometimes happen
+                BlockVisitor bv = new BlockVisitor() {
+                    @Override
+                    public void visitBlock(List<GraphTargetItem> items) {
+                                                
+                        for (int i = 0; i < items.size(); i++) {
+                            GraphTargetItem item = items.get(i);
+                            if (item instanceof SetLocalAVM2Item) {
+                                items.set(i, item.value);
+                            }
+                            
+                            if (item instanceof Block) {
+                                Block b = (Block) item;
+                                for (List<GraphTargetItem> list : b.getSubs()) {
+                                    visitBlock(list);
+                                }
+                            }
+                        }
+                    }
+                };
+                bv.visitBlock(list);
+                
+                PackageAVM2Item currentPkg = null;
+                for (int i = 0; i < list.size(); i++) {
+                    GraphTargetItem ti = list.get(i);
+                    if (ti instanceof TraitSlotConstAVM2Item) {
+                        TraitSlotConstAVM2Item tsci = (TraitSlotConstAVM2Item) ti;
+                        Namespace ns = tsci.getTrait().getName(abc).getNamespace(abc.constants);
+                        if (ns.kind == Namespace.KIND_PACKAGE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL) {
+                            String newPkgName = ns.getName(abc.constants).toRawString();
+                            if (currentPkg == null) {
+                                currentPkg = new PackageAVM2Item(new ArrayList<>(), newPkgName);
+                                currentPkg.addItem(tsci);
+                                list.set(i, currentPkg);
+                            } else if (currentPkg.getPackageName().equals(newPkgName)){
+                                currentPkg.addItem(tsci);
+                                list.remove(i);
+                                i--;
+                            } else {
+                                currentPkg = new PackageAVM2Item(new ArrayList<>(), newPkgName);
+                                currentPkg.addItem(tsci);
+                                list.set(i, currentPkg);
+                            }
+                        }
+                    } else if (currentPkg != null) {
+                        final String currentPkgName = currentPkg.getPackageName();
+                        Reference<Boolean> insidePackage = new Reference<>(true);
+
+                        //Check whether the command references internal traits of other package
+                        ti.visitRecursively(new AbstractGraphTargetVisitor() {
+                            @Override
+                            public void visit(GraphTargetItem item) {
+                                if (item instanceof GetSlotAVM2Item) {
+                                    GetSlotAVM2Item gs = (GetSlotAVM2Item) item;
+                                    if ((gs.slotObject instanceof GlobalAVM2Item) && (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
+                                        for (Trait t : initTraits.traits) {
+                                            if (t instanceof TraitSlotConst) {
+                                                TraitSlotConst tsc = (TraitSlotConst) t;
+                                                if (tsc.slot_id == gs.slotIndex) {
+                                                    int nsKind = tsc.getName(abc).getNamespace(abc.constants).kind;
+                                                    if (
+                                                            (
+                                                            nsKind == Namespace.KIND_PACKAGE_INTERNAL
+                                                            && !currentPkgName.equals(tsc.getName(abc).getNamespace(abc.constants).getRawName(abc.constants))
+                                                            )
+                                                            || (nsKind == Namespace.KIND_PRIVATE)
+                                                        ) {
+                                                            insidePackage.setVal(false);                                                    
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        if (insidePackage.getVal()) {
+                            currentPkg.addItem(ti);
+                            list.remove(i);
+                            i--;
+                        } else {
+                            currentPkg = null;
+                        }
+                    }
+                }
+            }
+            
             List<GraphTargetItem> newList = new ArrayList<>();
             for (GraphTargetItem ti : list) {
                 if (!(ti instanceof ReturnVoidAVM2Item)) {
@@ -2678,21 +2863,7 @@ public class AVM2Code implements Cloneable {
         for (int ir = 0; ir < r; ir++) {
             paramNamesList.add(AVM2Item.localRegName(localRegNames, ir));
         }
-        injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
-
-        int lastPos = list.size() - 1;
-        if (lastPos < 0) {
-            lastPos = 0;
-        }
-        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ScriptEndItem)) {
-            lastPos--;
-        }
-        if (lastPos < 0) {
-            lastPos = 0;
-        }
-        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnVoidAVM2Item)) {
-            list.remove(lastPos);
-        }
+        injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);       
 
         return list;
     }

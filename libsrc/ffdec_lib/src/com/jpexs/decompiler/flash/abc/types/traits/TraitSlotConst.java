@@ -166,14 +166,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      *
      * @param abcIndex ABC indexing
      * @param exportMode Export mode
-     * @param parent Parent
      * @param convertData Convert data
      * @param writer Writer
      * @param abc ABC
      * @param fullyQualifiedNames Fully qualified names
      * @throws InterruptedException On interrupt
      */
-    public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -189,7 +188,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode));
             }
             writer.endMethod();
             writer.endTrait();
@@ -252,7 +251,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        getMetaData(parent, convertData, abc, writer);
+        getMetaData(this, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
         if ((classIndex == -1) && (n != null)) {
@@ -272,13 +271,13 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 List<MethodBody> callStack = new ArrayList<>();
                 AssignedValue assignment = convertData.assignedValues.get(this);
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
         if (hasValueStr(abc, convertData)) {
             writer.appendNoHilight(" = ");
-            getValueStr(abcIndex, exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";").newLine();
     }
@@ -305,7 +304,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (hasValueStr(abc, convertData)) {
-            getValueStr(abcIndex, exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 

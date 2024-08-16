@@ -147,6 +147,7 @@ package
         TestImports2;
         TestInitializer;
         TestRegexpHilight;
+        TestScriptInitializer;
         
         TestPropertyCoerce;
         TestUnaryMinus;
@@ -170,6 +171,8 @@ package
         {
             removeEventListener(Event.ADDED_TO_STAGE, init);
             // entry point
+            
+            new TestScriptInitializer();
         }    
     
     }

@@ -644,13 +644,16 @@ public abstract class Trait implements Cloneable, Serializable {
                         }
                     }
                 }
-                String nsPrefix = Namespace.getPrefix(nskind);
-                if (nsPrefix != null && !nsPrefix.isEmpty()) {
-                    writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
+                
+                if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {                                    
+                    String nsPrefix = Namespace.getPrefix(nskind);
+                    if (nsPrefix != null && !nsPrefix.isEmpty()) {
+                        writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
+                    }
                 }
             }
         }
-        if (isStatic) {
+        if (isStatic && classIndex > -1) {
             if ((this instanceof TraitSlotConst) && ((TraitSlotConst) this).isNamespace()) {
                 //static is automatic
             } else {

@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
@@ -258,7 +259,7 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
         int sinit_bodyIndex = abc.findBodyIndex(sinit_index);
-        if (sinit_bodyIndex != -1) {
+        if (sinit_bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //initialize all classes traits
             /*for (Trait t : traits) {
                 if (t instanceof TraitClass) {
@@ -306,42 +307,28 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         if (!isSimple && traitIndices.isEmpty()) {
             for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
+                
+                if (t instanceof TraitSlotConst) {
+                    continue;
+                }
+                
                 String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
                 writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
-        }
-
-        if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
-            //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
-            writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
-            writer.startMethod(script_init, null);
-            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                if (!scriptInitializerIsEmpty) {
-                    writer.startBlock();
-                    List<MethodBody> callStack = new ArrayList<>();
-                    callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
-                    writer.endBlock();
-                } else {
-                    writer.append("");
-                }
-            }
-            writer.endMethod();
-            writer.endTrait();
-            if (!scriptInitializerIsEmpty) {
-                writer.newLine();
-                first = false;
-            }
-        }
-
+        }       
+                       
         for (int t : traitIndices) {
+            
+            Trait trait = traits.get(t);
+            
+            if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
+                continue;
+            }
+
             if (!first) {
                 writer.newLine();
             }
-
-            Trait trait = traits.get(t);
-
             //if (!(trait instanceof TraitClass)) {
             writer.startTrait(t);
             //}
@@ -356,6 +343,29 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.endTrait();
             }
             first = false;
+        }
+        
+        if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
+            //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
+            writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
+            writer.startMethod(script_init, null);
+            if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
+                if (!scriptInitializerIsEmpty) {
+                    //writer.startBlock();
+                    List<MethodBody> callStack = new ArrayList<>();
+                    callStack.add(abc.bodies.get(bodyIndex));
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
+                    //writer.endBlock();
+                } else {
+                    writer.append("");
+                }
+            }
+            writer.endMethod();
+            writer.endTrait();
+            if (!scriptInitializerIsEmpty) {
+                writer.newLine();
+                first = false;
+            }
         }
     }
 

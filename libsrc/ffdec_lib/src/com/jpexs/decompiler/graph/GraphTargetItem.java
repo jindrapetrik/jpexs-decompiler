@@ -767,6 +767,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public boolean handlesNewLine() {
         return false;
     }
+    
+    /**
+     * Checks whether this item needs single newline before and after.
+     * @return True if needs
+     */
+    public boolean hasSingleNewLineAround() {
+        return false;
+    }
 
     /**
      * Converts this to string with new line.
