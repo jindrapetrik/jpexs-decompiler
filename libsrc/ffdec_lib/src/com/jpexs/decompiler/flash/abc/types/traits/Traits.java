@@ -295,6 +295,7 @@ public class Traits implements Cloneable, Serializable {
     /**
      * To string.
      *
+     * @param first Whether to add newline
      * @param abcIndex ABC indexing
      * @param traitTypes Trait types
      * @param parent Parent trait
@@ -314,7 +315,7 @@ public class Traits implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(Reference<Boolean> first, AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
 
         /*List<Trait> ordered = new ArrayList<>(traits);
         loopi:
@@ -384,7 +385,10 @@ public class Traits implements Cloneable, Serializable {
                 continue;
             }
             
-            writer.newLine();            
+            if (!first.getVal()) {
+                writer.newLine();     
+            }
+            first.setVal(false);
             int h = abc.getGlobalTraitId(TraitType.METHOD , isStatic, classIndex, t);
             writer.startTrait(h);
             if (makePackages) {
@@ -392,7 +396,7 @@ public class Traits implements Cloneable, Serializable {
             } else {
                 trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
-            writer.endTrait();
+            writer.endTrait();            
         }
         return writer;
     }

@@ -783,7 +783,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         //Class initializer
-        int cinit_index = method(true, str(""), false, false, false, new ArrayList<>(), pkg, cinitNeedsActivation, cinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : baseClassName, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), cinit, TypeItem.UNBOUNDED);
+        int cinit_index = method(true, str(""), false, false, false, new ArrayList<>(), pkg, cinitNeedsActivation, cinitVariables, initScope + (implementsStr.isEmpty() ? 0 : 1), false, 0, isInterface ? null : baseClassName, superName, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), commands, TypeItem.UNBOUNDED);
         MethodBody cinitBody = abcIndex.getSelectedAbc().findBody(cinit_index);
 
         
@@ -806,9 +806,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
         
-        List<AVM2Instruction> cinitcode = new ArrayList<>();
+        //List<AVM2Instruction> cinitcode = new ArrayList<>();
         List<AVM2Instruction> initcode = new ArrayList<>();
-        for (GraphTargetItem ti : commands) {
+        /*for (GraphTargetItem ti : commands) {
             if ((ti instanceof SlotAVM2Item) || (ti instanceof ConstAVM2Item)) {
                 GraphTargetItem val = null;
                 boolean isStatic = false;
@@ -855,15 +855,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     cinitcode.add((AVM2Instruction)src);
                 }
             }
-        }
+        }*/
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abcIndex.getSelectedAbc().findBody(init);
             initBody.getCode().code.addAll(iinit == null ? 0 : 2, initcode); //after getlocal0,pushscope
 
-            if (cinitBody.getCode().code.get(cinitBody.getCode().code.size() - 1).definition instanceof ReturnVoidIns) {
+            /*if (cinitBody.getCode().code.get(cinitBody.getCode().code.size() - 1).definition instanceof ReturnVoidIns) {
                 cinitBody.getCode().code.addAll(2, cinitcode); //after getlocal0,pushscope
-            }
+            }*/
         }
         cinitBody.markOffsets();
         cinitBody.autoFillStats(abcIndex.getSelectedAbc(), initScope + (implementsStr.isEmpty() ? 0 : 1), true);
@@ -1626,7 +1626,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return null;
     }
 
-    private int genNs(List<DottedChain> importedClasses, DottedChain pkg, NamespaceItem ns, List<NamespaceItem> openedNamespaces, SourceGeneratorLocalData localData, int line) throws CompilationException {
+    public int genNs(List<DottedChain> importedClasses, DottedChain pkg, NamespaceItem ns, List<NamespaceItem> openedNamespaces, SourceGeneratorLocalData localData, int line) throws CompilationException {
         ns.resolveCustomNs(abcIndex, importedClasses, pkg, openedNamespaces, localData);
         return ns.getCpoolIndex(abcIndex);
     }
@@ -2180,13 +2180,21 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ABC abc = abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
         MethodInfo mi = new MethodInfo(new int[0], 0, constants.getStringId("", true), 0, new ValueKind[0], new int[0]);
-        MethodBody mb = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
-        mb.method_info = abc.addMethodInfo(mi);
-        mb.setCode(new AVM2Code());
-        List<AVM2Instruction> mbCode = mb.getCode().code;
-        mbCode.add(ins(AVM2Instructions.GetLocal0));
-        mbCode.add(ins(AVM2Instructions.PushScope));
+        MethodBody mb;
+        //= new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
+        //mb.method_info = abc.addMethodInfo(mi);
+  //      mb.setCode(new AVM2Code());
+        
+        localData.importedClasses = importedClasses;
+        localData.openedNamespaces = openedNamespaces;
+        int sinit_index = method(true, str(""), false, false, false, new ArrayList<>(), null, sinitNeedsActivation, sinitVariables, 0, false, 0, null, null, false, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), commands, TypeItem.UNBOUNDED);
+        mb = abcIndex.getSelectedAbc().findBody(sinit_index);
 
+        
+        List<AVM2Instruction> mbCode = mb.getCode().code;
+        /*mbCode.add(ins(AVM2Instructions.GetLocal0));
+        mbCode.add(ins(AVM2Instructions.PushScope));
+*/
         int traitScope = 1;
 
         String documentClassStr = localData.documentClass;
@@ -2197,6 +2205,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         Map<Trait, Integer> initScopes = new HashMap<>();
 
+        List<AVM2Instruction> sinitcode = new ArrayList<>();
         for (Trait t : scriptInfo.traits.traits) {
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
@@ -2204,14 +2213,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                 List<Integer> parents = new ArrayList<>();
                 if (documentClass != null && documentClass.equals(className)) {
-                    mbCode.add(ins(AVM2Instructions.GetScopeObject, 0));
+                    sinitcode.add(ins(AVM2Instructions.GetScopeObject, 0));
                 } else {
                     int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};
-                    mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
+                    sinitcode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
                 }
                 traitScope++;
                 if (abc.instance_info.get(tc.class_info).isInterface()) {
-                    mbCode.add(ins(AVM2Instructions.PushNull));
+                    sinitcode.add(ins(AVM2Instructions.PushNull));
                 } else {
 
                     AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, constants), null, null/*FIXME?*/);
@@ -2230,52 +2239,36 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                     //add all parent objects to scopestack
                     for (int i = parents.size() - 1; i >= 0; i--) {
-                        mbCode.add(ins(AVM2Instructions.GetLex, parents.get(i)));
-                        mbCode.add(ins(AVM2Instructions.PushScope));
+                        sinitcode.add(ins(AVM2Instructions.GetLex, parents.get(i)));
+                        sinitcode.add(ins(AVM2Instructions.PushScope));
                         traitScope++;
                     }
                     //direct parent class to new_class instruction
                     if (!parents.isEmpty()) { //NON EXISTING PARENT CLASS - TODO: handle as error!
-                        mbCode.add(ins(AVM2Instructions.GetLex, parents.get(0)));
+                        sinitcode.add(ins(AVM2Instructions.GetLex, parents.get(0)));
                     }
                 }
-                mbCode.add(ins(AVM2Instructions.NewClass, tc.class_info));
+                sinitcode.add(ins(AVM2Instructions.NewClass, tc.class_info));
                 for (int i = 0; i < parents.size(); i++) {
-                    mbCode.add(ins(AVM2Instructions.PopScope));
+                    sinitcode.add(ins(AVM2Instructions.PopScope));
                 }
 
-                mbCode.add(ins(AVM2Instructions.InitProperty, tc.name_index));
+                sinitcode.add(ins(AVM2Instructions.InitProperty, tc.name_index));
                 initScopes.put(t, traitScope);
                 traitScope = 1;
             }
         }
 
-        abc.addMethodBody(mb);
+        mbCode.addAll(2, sinitcode); //after getlocal0 pushscope
+        
+        //abc.addMethodBody(mb);
         scriptInfo.init_index = mb.method_info;
         localData.pkg = DottedChain.EMPTY;
-        localData.registerVars.put("this", 0);
+        //localData.registerVars.put("this", 0);
         generateTraitsPhase4(new ArrayList<>(), new ArrayList<>(), 1/*??*/, false, null, null, true, localData, traitsList, scriptInfo.traits, traitArr, initScopes, class_index, true);
-
-        List<AVM2Instruction> sinitcode = new ArrayList<>();
-        for (int i = 0; i < sinitVariables.size(); i++) {
-            AssignableAVM2Item an = sinitVariables.get(i);
-            if (an instanceof UnresolvedAVM2Item) {
-                UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
-                if (n.resolved == null) {
-                    String fullClass = localData.getFullClass();
-                    List<MethodBody> callStack = new ArrayList<>();
-                    callStack.add(mb);
-                    GraphTargetItem res = n.resolve(localData, fullClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, callStack, sinitVariables);
-                    if (res instanceof AssignableAVM2Item) {
-                        sinitVariables.set(i, (AssignableAVM2Item) res);
-                    } else {
-                        sinitVariables.remove(i);
-                        i--;
-                    }
-                }
-            }
-        }
-        for (GraphTargetItem ti : commands) {
+        
+               
+        /*for (GraphTargetItem ti : commands) {
             if ((ti instanceof SlotAVM2Item) || (ti instanceof ConstAVM2Item)) {
                 GraphTargetItem val = null;
                 int ns = -1;
@@ -2310,8 +2303,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     sinitcode.add((AVM2Instruction)src);
                 }
             }            
-        }
-        mbCode.addAll(sinitcode);
+        }*/
+        //mbCode.addAll(sinitcode);
         
         /*int maxSlotId = 0;
         for (int k = 0; k < scriptInfo.traits.traits.size(); k++) {

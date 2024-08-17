@@ -322,16 +322,44 @@ public class ScriptPack extends AS3ClassTreeItem {
             
             Trait trait = traits.get(t);
             
-            if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
+            if (trait instanceof TraitSlotConst) {
                 continue;
             }
 
             if (!first) {
                 writer.newLine();
             }
-            //if (!(trait instanceof TraitClass)) {
             writer.startTrait(t);
-            //}
+            Multiname name = trait.getName(abc);
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+            } else {
+                trait.toString(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+            }
+            if (!(trait instanceof TraitClass)) {
+                writer.endTrait();
+            }
+            first = false;
+        }
+        
+        //Slot const last
+        for (int t : traitIndices) {
+            
+            Trait trait = traits.get(t);
+            
+            if (!(trait instanceof TraitSlotConst)) {
+                continue;
+            }
+            
+            if (convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
+                continue;
+            }
+
+            if (!first) {
+                writer.newLine();
+            }
+            writer.startTrait(t);
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -351,11 +379,16 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.startMethod(script_init, null);
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!scriptInitializerIsEmpty) {
-                    //writer.startBlock();
+                    DottedChain ignorePackage = null;
+                    if (isSimple) {
+                        ignorePackage = getPathPackage();
+                    }
+                    List<DottedChain> fullyQualifiedNames = new ArrayList<>();
+                    writer.newLine();
+                    Trait.writeImports(null, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, new ArrayList<>(), new HashSet<>());
-                    //writer.endBlock();
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());                    
                 } else {
                     writer.append("");
                 }

@@ -3872,7 +3872,7 @@ public class Graph {
      * @throws InterruptedException On interrupt
      */
     public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        boolean lastNewLine = false;
+        boolean lastNewLine = true;
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 if (ti.hasSingleNewLineAround() && !lastNewLine) {

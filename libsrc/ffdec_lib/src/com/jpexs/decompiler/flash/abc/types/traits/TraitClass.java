@@ -230,7 +230,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         fullyQualifiedNames = new ArrayList<>();
-        writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames);
+        
+        if (getName(abc).getNamespace(abc.constants).kind != Namespace.KIND_PACKAGE_INTERNAL) {
+            writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames);
+        }
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
@@ -273,9 +276,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.startBlock();
         writer.startClass(class_info);
 
+        Reference<Boolean> first = new Reference<>(true);
+        
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.static_traits.toString(abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
@@ -285,6 +290,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!classInitializerIsEmpty) {
                     //writer.startBlock();
+                    if (!first.getVal()) {
+                        writer.newLine();     
+                    }
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
                     abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
@@ -292,7 +300,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
                     //TODO: handle this better in GUI(?)
-                    writer.append(" ").newLine();
+                    writer.append("");
                 }
             }
             writer.endMethod();
@@ -305,14 +313,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
-        instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
             String modifier = "public ";
             Multiname m = abc.constants.getMultiname(instanceInfo.name_index);
 
-            writer.newLine();
+            if (!first.getVal()) {
+                writer.newLine();     
+            }
+            first.setVal(false);
             writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
             writer.startMethod(instanceInfo.iinit_index, "iinit");
             writer.appendNoHilight(modifier);
@@ -337,10 +348,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static methods
-        classInfo.static_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //instance methods
-        instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
 
         writer.endClass();
         writer.endBlock(); // class
