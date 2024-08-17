@@ -21,8 +21,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.AlchemyTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewClassIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -180,7 +184,30 @@ public class DependencyParser {
             for (ABCException ex : body.exceptions) {
                 parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
-            for (AVM2Instruction ins : body.getCode().code) {
+            for (int i = 0; i < body.getCode().code.size(); i++) {
+                AVM2Instruction ins = body.getCode().code.get(i);
+                
+                //Ignore class parents in script initializer
+                if (ins.definition instanceof GetLexIns) {
+                    boolean foundNewClass = false;
+                    for (int j = i + 1; j < body.getCode().code.size(); j++) {
+                        AVM2Instruction insJ = body.getCode().code.get(j);
+                        if (insJ.definition instanceof NewClassIns) {
+                            foundNewClass = true;
+                            break;
+                        } else if (ins.definition instanceof GetLexIns) {
+                            //continue
+                        } else if (ins.definition instanceof PushScopeIns) {
+                            //continue
+                        } else {
+                            break;
+                        }
+                    }
+                    if (foundNewClass) {
+                        continue;
+                    }
+                }
+                
                 if (ins.definition instanceof AlchemyTypeIns) {
                     DottedChain nimport = AlchemyTypeIns.ALCHEMY_PACKAGE.addWithSuffix(ins.definition.instructionName);
                     Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
