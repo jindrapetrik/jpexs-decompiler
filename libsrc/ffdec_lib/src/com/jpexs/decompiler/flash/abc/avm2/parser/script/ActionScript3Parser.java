@@ -2917,7 +2917,7 @@ public class ActionScript3Parser {
         try {
             gen.generateScriptInfo(sinitVariables, sinitNeedsActivation, importedClasses, openedNamespaces, scriptIndex, si, allOpenedNamespaces, localData, items, classPos);
         } catch (Exception ex) {
-            ex.printStackTrace(); // FIXME
+            Logger.getLogger(ActionScript3Parser.class.getName()).log(Level.FINE, "Script generation exception", ex);
             abcIndex.getSelectedAbc().script_info.remove(si);
             throw ex;
         }
