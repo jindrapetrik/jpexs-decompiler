@@ -3328,7 +3328,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             fileName = swfShortName + ".as3proj";
         }
 
-        FileFilter f = new FileFilter() {
+        FileFilter as3Filter = new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".as3proj"));
@@ -3339,7 +3339,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return translate("filter.as3proj");
             }
         };
-        fc.setFileFilter(f);
+        FileFilter airAs3Filter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".as3proj"));
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.air.as3proj");
+            }
+        };
+        fc.setFileFilter(as3Filter);
+        fc.addChoosableFileFilter(airAs3Filter);
         fc.setAcceptAllFileFilterUsed(false);
         fc.setSelectedFile(new File(selDir + fileName));
 
@@ -3380,7 +3392,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 EventListener evl = swf.getExportEventListener();
                 try {
                     AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
-                    exporter.exportFlashDevelopProject(swf, new File(fpath), errorHandler, evl);
+                    exporter.exportFlashDevelopProject(swf, new File(fpath), fc.getFileFilter() == airAs3Filter, errorHandler, evl);
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "FlashDevelop export error", ex);
                     ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
