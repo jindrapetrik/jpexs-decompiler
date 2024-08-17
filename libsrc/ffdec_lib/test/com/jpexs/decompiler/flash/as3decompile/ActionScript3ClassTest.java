@@ -678,9 +678,9 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}\n"
                 + "\n"
-                + "var v:int;\n"
-                + "\n"
                 + "import tests.TestHello;\n"
+                + "\n"
+                + "var v:int;\n"
                 + "\n"
                 + "var x:int = Math.random() * 100;\n"
                 + "\n"
@@ -711,7 +711,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "{\n"
                 + "   trace(v);\n"
                 + "}\n"
-                + "TestHello;\n"
+                + "TestHello;\n"                
         );
     }
 }
