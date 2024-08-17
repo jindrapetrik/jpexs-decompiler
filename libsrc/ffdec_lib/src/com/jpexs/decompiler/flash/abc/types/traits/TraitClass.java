@@ -230,15 +230,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
         DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         fullyQualifiedNames = new ArrayList<>();
+
+        Reference<Boolean> first = new Reference<>(true);        
         
         if (getName(abc).getNamespace(abc.constants).kind != Namespace.KIND_PACKAGE_INTERNAL) {
-            writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames);
+            first.setVal(!writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames));
         }
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
         getMetaData(this, convertData, abc, writer);
-
+        
         boolean allowEmbed = true;
 
         if (convertData.exportEmbedFlaMode) {
@@ -275,9 +277,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.endTrait();
         writer.startBlock();
         writer.startClass(class_info);
-
-        Reference<Boolean> first = new Reference<>(true);
-        
+       
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
         classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);

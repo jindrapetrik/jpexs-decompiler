@@ -501,9 +501,11 @@ public abstract class Trait implements Cloneable, Serializable {
             for (String u : uses) {
                 writer.appendNoHilight("use namespace " + u + ";").newLine();
             }
-            writer.newLine();
         }
         if (numberContextRef.getVal() != null) {
+            if (uses.isEmpty() && hasImport) {
+                writer.newLine();
+            }
             writer.appendNoHilight("use ");
             NumberContext nc = new NumberContext(numberContextRef.getVal());
             writer.appendNoHilight(NumberContext.usageToName(nc.getUsage()));
