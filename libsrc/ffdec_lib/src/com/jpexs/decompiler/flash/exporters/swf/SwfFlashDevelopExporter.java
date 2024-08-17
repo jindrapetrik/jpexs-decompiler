@@ -24,7 +24,14 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import static com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter.canExportSwf;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +44,25 @@ import java.io.IOException;
  */
 public class SwfFlashDevelopExporter {
 
+    public static boolean canExportSwf(SWF swf) {
+        if (!swf.isAS3()) {
+            return false;
+        }
+        //Cannot export if it has something on main timeline
+        for (Tag t : swf.getTags()) {
+            if (
+                    (t instanceof PlaceObjectTypeTag)
+                    || (t instanceof SoundStreamBlockTag)
+                    || (t instanceof VideoFrameTag)
+                    || (t instanceof StartSoundTag)
+                    || (t instanceof StartSound2Tag)
+                ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private static String doubleToString(double d) {
         String ds = "" + d;
         if (ds.endsWith(".0")) {
@@ -67,6 +93,10 @@ public class SwfFlashDevelopExporter {
     public void exportFlashDevelopProject(SWF swf, File outFile, AbortRetryIgnoreHandler handler, EventListener eventListener) throws IOException {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");
+        }
+        
+        if (!canExportSwf(swf)) {
+            throw new IllegalArgumentException("SWF must not contain main timeline");
         }
 
         String simpleName = outFile.getName();

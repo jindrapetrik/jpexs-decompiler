@@ -23,6 +23,12 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,14 +58,26 @@ public class SwfIntelliJIdeaExporter {
         return sb.toString();
     }
 
-    private static String doubleToString(double d) {
-        String ds = "" + d;
-        if (ds.endsWith(".0")) {
-            ds = ds.substring(0, ds.length() - 2);
+    public static boolean canExportSwf(SWF swf) {
+        if (!swf.isAS3()) {
+            return false;
         }
-        return ds;
+        
+        //Cannot export if it has something on main timeline
+        for (Tag t : swf.getTags()) {
+            if (
+                    (t instanceof PlaceObjectTypeTag)
+                    || (t instanceof SoundStreamBlockTag)
+                    || (t instanceof VideoFrameTag)
+                    || (t instanceof StartSoundTag)
+                    || (t instanceof StartSound2Tag)
+                ) {
+                return false;
+            }
+        }
+        return true;
     }
-
+    
     /**
      * Exports SWF to IntelliJ IDEA project.
      * @param swf SWF to export
@@ -82,6 +100,10 @@ public class SwfIntelliJIdeaExporter {
     public void exportIntelliJIdeaProject(SWF swf, File outDir, AbortRetryIgnoreHandler handler, EventListener eventListener) throws IOException {
         if (!swf.isAS3()) {
             throw new IllegalArgumentException("SWF must be AS3");
+        }
+        
+        if (!canExportSwf(swf)) {
+            throw new IllegalArgumentException("SWF must not contain main timeline");
         }
 
         if (!outDir.exists()) {
