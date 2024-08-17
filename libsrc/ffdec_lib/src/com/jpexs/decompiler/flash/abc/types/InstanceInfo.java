@@ -175,24 +175,43 @@ public class InstanceInfo {
                     String fileName = ct.getCharacterExportFileName();
                     if (Configuration.as3ExportNamesUseClassNamesOnly.get()) {
                         fileName = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
-                    }
-                    fileName = Helper.makeFileName(fileName);
+                    }                    
 
+                    String ext = "";
                     if (ct instanceof DefineBinaryDataTag) {
                         DefineBinaryDataTag db = (DefineBinaryDataTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + (db.innerSwf != null ? ".swf" : ".bin") + "\", mimeType=\"application/octet-stream\")]").newLine();
+                        ext = db.innerSwf != null ? ".swf" : ".bin";
                     }
                     if (ct instanceof ImageTag) {
                         ImageTag it = (ImageTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
+                        ext = it.getImageFormat().getExtension();
+                    }
+                    if (ct instanceof DefineSoundTag) {
+                        DefineSoundTag st = (DefineSoundTag) ct;
+                        ext = st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? ".mp3" : ".wav";
+                    }
+                    if (ct instanceof FontTag) {
+                        ext = ".ttf";
+                    }
+                    if (ct instanceof DefineFont4Tag) {
+                        ext = ".cff";
+                    }
+                    
+                    fileName = Helper.makeFileName(fileName + ext);
+                    
+                    if (ct instanceof DefineBinaryDataTag) {
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\", mimeType=\"application/octet-stream\")]").newLine();
+                    }
+                    if (ct instanceof ImageTag) {
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\")]").newLine();
                     }
                     if (ct instanceof DefineSpriteTag) {
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + "symbol" + ct.getCharacterId() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSoundTag) {
                         //should be mp3, otherwise it won't work. Should we convert this?
-                        DefineSoundTag st = (DefineSoundTag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "." + (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? "mp3" : "wav") + "\")]").newLine();
+                        
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\")]").newLine();
                     }
                     if (ct instanceof FontTag) {
                         FontTag ft = (FontTag) ct;
@@ -206,7 +225,7 @@ public class InstanceInfo {
                             }
                         }
 
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ".ttf\",").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft.getFontNameIntag()) + "\",").newLine();
                         writer.appendNoHilight("fontFamily=\"" + Helper.escapeActionScriptString(ft.getFontName()) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
@@ -255,7 +274,7 @@ public class InstanceInfo {
 
                     if (ct instanceof DefineFont4Tag) {
                         DefineFont4Tag ft4 = (DefineFont4Tag) ct;
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + ".cff\",").newLine();
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\",").newLine();
                         writer.appendNoHilight("fontName=\"" + Helper.escapeActionScriptString(ft4.fontName) + "\",").newLine();
                         writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
                         writer.appendNoHilight("fontWeight=\"" + (ft4.fontFlagsBold ? "bold" : "normal") + "\",").newLine();
