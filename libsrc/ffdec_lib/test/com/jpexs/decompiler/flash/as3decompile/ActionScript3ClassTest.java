@@ -711,7 +711,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "{\n"
                 + "   trace(v);\n"
                 + "}\n"
-                + "TestHello;\n"                
+                + "TestHello;\n"
         );
     }
 }

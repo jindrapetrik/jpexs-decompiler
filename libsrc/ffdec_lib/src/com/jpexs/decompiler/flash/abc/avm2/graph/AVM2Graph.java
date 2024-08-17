@@ -93,6 +93,7 @@ import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetRecursiveVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.SecondPassData;
@@ -100,7 +101,9 @@ import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.AnyItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
@@ -110,6 +113,7 @@ import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
@@ -2659,12 +2663,37 @@ public class AVM2Graph extends Graph {
                 }
                 
                 Reference<SetLocalAVM2Item> foundSetLoc = new Reference<>(null);
+                List<SetLocalAVM2Item> ignoredItems = new ArrayList<>();
+                
+                //We need to ignore everything on the right side of && and ||,                
+                list.get(i).visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                    @Override
+                    public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                        if ((item instanceof AndItem) || (item instanceof OrItem)) {
+                            BinaryOpItem bo = (BinaryOpItem) item;
+                            bo.getRightSide().visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
+                                @Override
+                                public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
+                                    if (item instanceof SetLocalAVM2Item) {
+                                        if (adata.bottomSetLocals.contains((SetLocalAVM2Item) item)) {
+                                            ignoredItems.add((SetLocalAVM2Item) item);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+                
                 list.get(i).visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
                     @Override
                     public void visit(GraphTargetItem item, Stack<GraphTargetItem> parentStack) {
                         
                         if (item instanceof SetLocalAVM2Item) {
-                            if (adata.bottomSetLocals.contains((SetLocalAVM2Item) item)) {
+                            if (
+                                    adata.bottomSetLocals.contains((SetLocalAVM2Item) item)
+                                    && !ignoredItems.contains((SetLocalAVM2Item) item)
+                                ) {
                                 int s = parentStack.size() - 1;
                                 if (parentStack.get(s) instanceof CoerceAVM2Item) {
                                     s--;

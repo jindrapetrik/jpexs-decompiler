@@ -944,7 +944,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testGetProtected() {
         decompileMethod("classic", "testGetProtected", "var c:InnerClass = new InnerClass();\r\n"
                 + "c.attr = 2;\r\n"
-                + "var a:* = this.attr;\r\n"
+                + "var a:int = this.attr;\r\n"
                 + "trace(a);\r\n",
                  false);
     }
@@ -1675,6 +1675,22 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var d:int = 4;\r\n"
                 + "var e:int = d + 5;\r\n"
                 + "var i:int = h = g = f;\r\n",
+                 false);
+    }
+
+    @Test
+    public void testOptimizationAndOr() {
+        decompileMethod("classic", "testOptimizationAndOr", "var plugin:Object = null;\r\n"
+                + "var o:Object = {\r\n"
+                + "\"a\":\"Object\",\r\n"
+                + "\"b\":\"Object\",\r\n"
+                + "\"c\":\"Object\"\r\n"
+                + "};\r\n"
+                + "var a:String = \"d\";\r\n"
+                + "if(a in o && (plugin = new o[a]()).toString().length > 2)\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
+                + "}\r\n",
                  false);
     }
 

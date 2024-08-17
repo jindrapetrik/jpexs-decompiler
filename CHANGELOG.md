@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Script/Class initializers order of assignment
 - [#2277] Return statement in initializer
 - Imports in script initializer
+- [#2279] AS3 Decompilation - assignments on the right side of `&&` and `||` operators
 
 
 ### Changed
@@ -3515,6 +3516,7 @@ Major version of SWF to XML export changed to 2.
 [#2275]: https://www.free-decompiler.com/flash/issues/2275
 [#2276]: https://www.free-decompiler.com/flash/issues/2276
 [#2277]: https://www.free-decompiler.com/flash/issues/2277
+[#2279]: https://www.free-decompiler.com/flash/issues/2279
 [#2269]: https://www.free-decompiler.com/flash/issues/2269
 [#2270]: https://www.free-decompiler.com/flash/issues/2270
 [#2221]: https://www.free-decompiler.com/flash/issues/2221

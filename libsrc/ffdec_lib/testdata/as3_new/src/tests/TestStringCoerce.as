@@ -3,7 +3,7 @@ package tests
 	
 	public class TestStringCoerce
 	{
-        var a:Object = null;
+        private var a:Object = null;
     
 		public function run():*
 		{

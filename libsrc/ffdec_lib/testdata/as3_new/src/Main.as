@@ -99,6 +99,7 @@ package
         TestNumberCall;
         TestOperations;
         TestOptimization;
+        TestOptimizationAndOr;
         TestOptionalParameters;
         TestParamNames;
         TestParamsCount;

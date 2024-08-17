@@ -1693,6 +1693,22 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testOptimizationAndOr() {
+        decompileMethod("classic_air", "testOptimizationAndOr", "var plugin:Object = null;\r\n"
+                + "var o:Object = {\r\n"
+                + "\"a\":\"Object\",\r\n"
+                + "\"b\":\"Object\",\r\n"
+                + "\"c\":\"Object\"\r\n"
+                + "};\r\n"
+                + "var a:String = \"d\";\r\n"
+                + "if(a in o && (plugin = new o[a]()).toString().length > 2)\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic_air", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                  false);

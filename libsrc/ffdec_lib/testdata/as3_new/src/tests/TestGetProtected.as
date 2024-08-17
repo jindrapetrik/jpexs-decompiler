@@ -9,7 +9,7 @@ package tests
 		{
             var c:InnerClass = new InnerClass();
             c.attr = 2;
-			var a = attr;
+			var a:int = attr;
             trace(a);       
 		}
 	}
