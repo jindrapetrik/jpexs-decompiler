@@ -343,6 +343,18 @@ public class ScriptPack extends AS3ClassTreeItem {
             first = false;
         }
         
+        List<DottedChain> fullyQualifiedNames = new ArrayList<>();
+        if (!first) {
+            writer.newLine();
+        }
+        DottedChain ignorePackage = null;
+        if (isSimple) {
+            ignorePackage = getPathPackage();
+        }
+        Trait.writeImports(null, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+        first = true;
+
+        
         //Slot const last
         for (int t : traitIndices) {
             
@@ -378,16 +390,12 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
             writer.startMethod(script_init, null);
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                if (!scriptInitializerIsEmpty) {
-                    DottedChain ignorePackage = null;
-                    if (isSimple) {
-                        ignorePackage = getPathPackage();
-                    }
-                    List<DottedChain> fullyQualifiedNames = new ArrayList<>();
-                    writer.newLine();
-                    Trait.writeImports(null, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+                if (!scriptInitializerIsEmpty) {                    
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
+                    if (!first) {
+                        writer.newLine();                        
+                    }
                     abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());                    
                 } else {
                     writer.append("");
