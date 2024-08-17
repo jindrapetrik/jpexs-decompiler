@@ -1263,14 +1263,17 @@ public class ActionScript3Parser {
                     traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs));
                     break;
                 default:
-                    lexer.pushback(s);     
-                    parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc);
+                    lexer.pushback(s);
+                    if (parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc)) {
+                        break;
+                    }
                     GraphTargetItem cmd = command(allOpenedNamespaces, null, publicNs, sinitNeedsActivation, importedClasses, openedNamespaces, sinitLoops, sinitLoopLabels, sinitRegisterVars, true, false, 0, false, sinitVariables, abc);
                     if (cmd != null) {
                         traits.add(cmd);
                         isEmpty = false;
-                    } 
-                    break looptrait;
+                    } else {                        
+                        break looptrait;
+                    }
             }
 
         }
@@ -2672,14 +2675,16 @@ public class ActionScript3Parser {
 
     private List<String> constantPool;
 
-    private void parseImportsUsages(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
+    private boolean parseImportsUsages(List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Reference<Integer> numberUsageRef, Reference<Integer> numberPrecisionRef, Reference<Integer> numberRoundingRef, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
 
+        boolean isEmpty = true;
         ParsedSymbol s;        
 
         s = lex();
         while (s.isType(SymbolType.IMPORT, SymbolType.USE)) {
             
             if (s.isType(SymbolType.IMPORT)) {
+                isEmpty = false;
                 s = lex();
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                 DottedChain fullName = new DottedChain(new String[]{});
@@ -2707,8 +2712,9 @@ public class ActionScript3Parser {
                 } else {
                     importedClasses.add(fullName);
                 }
-                expected(s, lexer.yyline(), SymbolType.SEMICOLON);
+                expected(s, lexer.yyline(), SymbolType.SEMICOLON);                
             } else if (s.isType(SymbolType.USE)) {
+                isEmpty = false;
                 do {
                     s = lex();
                     if (s.isType(SymbolType.NAMESPACE)) {
@@ -2811,6 +2817,7 @@ public class ActionScript3Parser {
             s = lex();
         }
         lexer.pushback(s);
+        return !isEmpty;
     }
 
     private List<GraphTargetItem> parseScript(
