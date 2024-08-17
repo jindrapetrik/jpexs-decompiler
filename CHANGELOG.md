@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#2277] Return statement in initializer
 - Imports in script initializer
 - [#2279] AS3 Decompilation - assignments on the right side of `&&` and `||` operators
+- [#2279] Embed assets with file base name ending with a space
 
 
 ### Changed
