@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Compound script has slot/const traits inside main script initializer
+- Export to FlashDevelop and IntelliJ IDEA is available only for SWFs without main timeline
 
 ## [21.0.2] - 2024-08-12
 ### Added

@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -1001,8 +1003,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean swfSelected = openable instanceof SWF;
         boolean abcSelected = openable instanceof ABC;
         boolean isAs3 = false;
+        boolean canExportFlashDevelop = false;
+        boolean canExportIdea = false;
         if (swf != null) {
             isAs3 = swf.isAS3();
+            canExportFlashDevelop = SwfFlashDevelopExporter.canExportSwf(swf);
+            canExportIdea = SwfIntelliJIdeaExporter.canExportSwf(swf);
         }
         if (abcSelected) {
             isAs3 = true;
@@ -1075,10 +1081,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportAll", openableSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
-        setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking);
-        setMenuEnabled("_/exportIdea", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking);
+        setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking && canExportFlashDevelop);
+        setMenuEnabled("/file/export/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking && canExportFlashDevelop);
+        setMenuEnabled("_/exportIdea", swfSelected && !isWorking && canExportIdea);
+        setMenuEnabled("/file/export/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking && canExportIdea);
         setMenuEnabled("_/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
