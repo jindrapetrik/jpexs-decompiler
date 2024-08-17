@@ -324,15 +324,15 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}\n"
                 + "\n"
-                + "var globalVar1:String = \"glb1\";\n"
-                + "\n"
-                + "var globalVar2:String = \"glb2\";\n"
-                + "\n"
                 + "function globalFunction():void\n"
                 + "{\n"
                 + "   trace(globalVar1);\n"
                 + "   trace(globalVar2);\n"
-                + "}");
+                + "}\n"
+                + "var globalVar1:String = \"glb1\";\n"
+                + "\n"
+                + "var globalVar2:String = \"glb2\";\n"
+                );
     }
 
     @Test
