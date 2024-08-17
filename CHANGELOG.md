@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Target flash player version in FlashDevelop and IDEA projects
 - Script/Class initializers order of assignment
 - [#2277] Return statement in initializer
+- Imports in script initializer
 
 
 ### Changed

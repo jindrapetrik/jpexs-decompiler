@@ -332,7 +332,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "var globalVar1:String = \"glb1\";\n"
                 + "\n"
                 + "var globalVar2:String = \"glb2\";\n"
-                );
+        );
     }
 
     @Test
@@ -632,9 +632,10 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testScriptInitializer() {
         decompileScriptPack("standard", "tests_classes.TestScriptInitializer", "package tests_classes\n"
                 + "{\n"
+                + "   import tests.TestHello;\n"
+                + "   \n"
                 + "   public class TestScriptInitializer\n"
                 + "   {\n"
-                + "      \n"
                 + "      private static var sv:int;\n"
                 + "      \n"
                 + "      private static var sa:int = 5;\n"
@@ -672,11 +673,14 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "      public function test() : void\n"
                 + "      {\n"
                 + "         var x:int = 5;\n"
+                + "         var th:TestHello = new TestHello();\n"
                 + "      }\n"
                 + "   }\n"
                 + "}\n"
                 + "\n"
                 + "var v:int;\n"
+                + "\n"
+                + "import tests.TestHello;\n"
                 + "\n"
                 + "var x:int = Math.random() * 100;\n"
                 + "\n"
@@ -707,6 +711,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "{\n"
                 + "   trace(v);\n"
                 + "}\n"
-                + "");
+                + "TestHello;\n"
+        );
     }
 }

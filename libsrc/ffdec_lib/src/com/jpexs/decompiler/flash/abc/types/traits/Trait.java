@@ -322,7 +322,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scriptIndex Script index
      * @param isParent Is parent
      */
-    private void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
+    private static void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
         boolean publicProtectedOnly = isParent;
         for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {
             if (publicProtectedOnly) {
@@ -355,6 +355,8 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Writes imports.
      *
+     * @param trait Trait
+     * @param methodIndex Method index
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param classIndex Class index
@@ -363,9 +365,10 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param writer Writer
      * @param ignorePackage Ignore package
      * @param fullyQualifiedNames Fully qualified names
+     * @return True if its not empty
      * @throws InterruptedException On interrupt
      */
-    public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public static boolean writeImports(Trait trait, int methodIndex, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
@@ -391,15 +394,21 @@ public abstract class Trait implements Cloneable, Serializable {
         //imports
         List<Dependency> dependencies = new ArrayList<>();
         String customNs = null;
-        Multiname multiname = getName(abc);
-        int nskind = multiname.getSimpleNamespaceKind(abc.constants);
-        if (nskind == Namespace.KIND_NAMESPACE) {
-            customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
-        }
         List<String> uses = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);
-        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
-
+        
+        
+        if (trait != null) {
+            Multiname multiname = trait.getName(abc);
+            int nskind = multiname.getSimpleNamespaceKind(abc.constants);
+            if (nskind == Namespace.KIND_NAMESPACE) {
+                customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
+            }
+            trait.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
+        }
+        if (methodIndex != -1) {
+            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, trait, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+        }
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
             if (!imports.contains(d.getId())) {
@@ -481,11 +490,14 @@ public abstract class Trait implements Cloneable, Serializable {
                 hasImport = true;
             }
         }
-        if (hasImport) {
-            writer.newLine();
-        }
+        
 
+        boolean hasUse = false;
         if (!uses.isEmpty()) {
+            hasUse = true;
+            if (hasImport) {
+                writer.newLine();
+            }
             for (String u : uses) {
                 writer.appendNoHilight("use namespace " + u + ";").newLine();
             }
@@ -505,7 +517,12 @@ public abstract class Trait implements Cloneable, Serializable {
             }
             writer.appendNoHilight(";");
             writer.newLine();
+            hasUse = true;
         }
+        if (hasImport || hasUse) {
+            writer.newLine();
+        }
+        return hasImport || hasUse;
     }
 
     /**

@@ -1,6 +1,8 @@
 
 package tests_classes 
 {
+    import tests.TestHello;
+
     public class TestScriptInitializer 
 	{                             	        
          	private static var sa:int = 5;
@@ -29,10 +31,13 @@ package tests_classes
                       
             public function test() : void {
                 const x:int = 5;
+                
+                var th:TestHello = new TestHello();
             }
-	}
-    //TestImports;
+	}    
 }
+
+import tests.TestHello;
 
 var x:int = Math.random() * 100;
 
@@ -59,3 +64,4 @@ for each (v in [1,3,5])
     trace(v);
 }       
 
+TestHello;

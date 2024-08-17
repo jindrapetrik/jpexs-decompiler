@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.NamespaceItem;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
@@ -179,6 +180,16 @@ public class SourceGeneratorLocalData implements Serializable {
      * Number context
      */
     public Integer numberContext = null;
+    
+    /**
+     * Imported classes
+     */
+    public List<DottedChain> importedClasses = new ArrayList<>();
+    
+    /**
+     * Opened namespaces
+     */
+    public List<NamespaceItem> openedNamespaces = new ArrayList<>();
 
     /**
      * Gets full class name.

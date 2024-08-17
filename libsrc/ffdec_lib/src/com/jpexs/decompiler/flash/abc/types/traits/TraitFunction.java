@@ -161,7 +161,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
      */
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
+        writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         getMetaData(this, convertData, abc, writer);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
@@ -202,7 +202,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
-        writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
+        writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);

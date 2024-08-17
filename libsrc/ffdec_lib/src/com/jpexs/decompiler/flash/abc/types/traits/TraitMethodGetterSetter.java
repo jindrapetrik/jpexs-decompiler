@@ -185,7 +185,7 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         if (classIndex < 0) {
-            writeImports(abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
+            writeImports(this, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
@@ -238,7 +238,7 @@ public class TraitMethodGetterSetter extends Trait {
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 
         if (classIndex < 0) {
-            writeImports(abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
+            //writeImports(this, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         getMetaData(this, convertData, abc, writer);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
