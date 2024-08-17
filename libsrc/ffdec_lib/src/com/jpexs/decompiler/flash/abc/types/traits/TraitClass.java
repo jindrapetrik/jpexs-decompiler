@@ -271,13 +271,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 }
             }
         }
-
+        
         //class header
         instanceInfo.getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, allowEmbed);
         writer.endTrait();
         writer.startBlock();
         writer.startClass(class_info);
-       
+
+        first.setVal(true);
+        
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
         classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
@@ -293,9 +295,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     if (!first.getVal()) {
                         writer.newLine();     
                     }
+                    first.setVal(false);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
                     abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    //first.setVal(true);
                     //writer.endBlock();
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly

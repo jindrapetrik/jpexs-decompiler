@@ -3873,7 +3873,12 @@ public class Graph {
      */
     public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean lastNewLine = true;
-        for (GraphTargetItem ti : tree) {
+        int tsize = tree.size();
+        if (!tree.isEmpty() && (tree.get(tree.size() - 1) instanceof ScriptEndItem)) {
+            tsize--;
+        }
+        for (int i = 0; i < tsize; i++) {
+            GraphTargetItem ti = tree.get(i);
             if (!ti.isEmpty()) {
                 if (ti.hasSingleNewLineAround() && !lastNewLine) {
                     writer.newLine();
@@ -3882,8 +3887,8 @@ public class Graph {
                 if (!ti.handlesNewLine()) {
                     writer.newLine();
                 }
-                lastNewLine = false;                
-                if (ti.hasSingleNewLineAround()) {
+                lastNewLine = false;
+                if (ti.hasSingleNewLineAround() && (i < tsize - 1)) {
                     writer.newLine();
                     lastNewLine = true;
                 }
