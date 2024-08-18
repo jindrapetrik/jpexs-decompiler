@@ -18,15 +18,13 @@ package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Script export settings.
  *
  * @author JPEXS
  */
-public class ScriptExportSettings {
+public class ScriptExportSettings implements Cloneable {
 
     /**
      * Export folder name
@@ -136,14 +134,14 @@ public class ScriptExportSettings {
                 throw new Error("Unsupported script export mode: " + mode);
         }
     }
-
+    
     @Override
     public ScriptExportSettings clone() {
         try {
             return (ScriptExportSettings) super.clone();
-        } catch (CloneNotSupportedException ex) {
+        } catch (CloneNotSupportedException ex) {            
             //ignored
         }
         return null;
-    }        
+    }       
 }
