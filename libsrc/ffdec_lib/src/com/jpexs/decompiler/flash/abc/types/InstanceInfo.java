@@ -188,7 +188,9 @@ public class InstanceInfo {
                     }
                     if (ct instanceof DefineSoundTag) {
                         DefineSoundTag st = (DefineSoundTag) ct;
-                        ext = st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? ".mp3" : ".wav";
+                        if (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3) {
+                            ext = ".mp3";
+                        }
                     }
                     if (ct instanceof FontTag) {
                         ext = ".ttf";
@@ -209,9 +211,12 @@ public class InstanceInfo {
                         writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + "symbol" + ct.getCharacterId() + "\")]").newLine();
                     }
                     if (ct instanceof DefineSoundTag) {
-                        //should be mp3, otherwise it won't work. Should we convert this?
-                        
-                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\")]").newLine();
+                        DefineSoundTag st = (DefineSoundTag) ct;
+                        if (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3) {
+                            writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + fileName + "\")]").newLine();
+                        } else {
+                            writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + "symbol" + ct.getCharacterId() + "\")]").newLine();
+                        }                               
                     }
                     if (ct instanceof FontTag) {
                         FontTag ft = (FontTag) ct;

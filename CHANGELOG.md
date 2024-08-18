@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Imports in script initializer
 - [#2279] AS3 Decompilation - assignments on the right side of `&&` and `||` operators
 - [#2279] Embed assets with file base name ending with a space
+- Embed tag - Wav files need to be embedded in assets.swf
 
 
 ### Changed

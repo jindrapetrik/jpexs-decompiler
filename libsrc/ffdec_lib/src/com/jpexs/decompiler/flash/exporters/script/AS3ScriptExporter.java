@@ -82,6 +82,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -590,7 +591,7 @@ public class AS3ScriptExporter {
 
             final String ASSETS_DIR = outdir + exportSettings.assetsDir;
             List<Tag> exportTagList = new ArrayList<>();
-            List<DefineSpriteTag> spriteTagList = new ArrayList<>();
+            List<CharacterTag> assetsTagList = new ArrayList<>();
 
             for (ScriptPack item : packs) {
                 if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
@@ -613,14 +614,19 @@ public class AS3ScriptExporter {
                 }
                 if (!exportSettings.exportEmbedFlaMode) {
                     if (ct instanceof DefineSpriteTag) {
-                        spriteTagList.add((DefineSpriteTag) ct);
+                        assetsTagList.add((DefineSpriteTag) ct);
                     }
                     if (ct instanceof DefineSoundTag) {
-                        exportTagList.add(ct);
+                        DefineSoundTag st = (DefineSoundTag) ct;
+                        if (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3) {
+                            exportTagList.add(ct);
+                        } else {
+                            assetsTagList.add(st);
+                        }
                     }
                     if (ct instanceof FontTag) {
                         exportTagList.add(ct);
-                    }
+                    }                    
                 }
                 if (ct instanceof DefineFont4Tag) {
                     exportTagList.add(ct);
@@ -653,7 +659,7 @@ public class AS3ScriptExporter {
                 if (Thread.currentThread().isInterrupted()) {
                     return ret;
                 }
-                if (!spriteTagList.isEmpty()) {
+                if (!assetsTagList.isEmpty()) {
                     new RetryTask(() -> {
                         Path.createDirectorySafe(new File(ASSETS_DIR));
                         try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
@@ -674,9 +680,9 @@ public class AS3ScriptExporter {
                             Set<Integer> neededCharacters = new LinkedHashSet<>();
                             List<Integer> symbolClassIds = new ArrayList<>();
                             List<String> symbolClassNames = new ArrayList<>();
-                            for (DefineSpriteTag st : spriteTagList) {
+                            for (CharacterTag st : assetsTagList) {
                                 st.getNeededCharactersDeep(neededCharacters);
-                                neededCharacters.add(st.spriteId);
+                                neededCharacters.add(swf.getCharacterId(st));
                             }
                             for (int n : neededCharacters) {
                                 CharacterTag ct = (CharacterTag) swf.getCharacter(n);
