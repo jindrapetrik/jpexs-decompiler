@@ -74,6 +74,7 @@ import com.jpexs.helpers.ReReadableInputStream;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
@@ -2490,7 +2491,15 @@ public class Main {
 
                 @Override
                 public void onLoaderModifyBytes(String clientId, byte[] inputData, String url, DebugLoaderDataModified modifiedListener) {
-
+                    if (inputData.length < 3) {
+                        modifiedListener.dataModified(inputData);
+                        return;
+                    }
+                    String signature = new String(inputData, 0, 3, Utf8Helper.charset);
+                    if (!SWF.swfSignatures.contains(signature)) {
+                        modifiedListener.dataModified(inputData);
+                        return;
+                    }
                     final String hash = md5(inputData);
                     OpenableOpened afterLoad = new OpenableOpened() {
                         @Override

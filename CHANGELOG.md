@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#2279] Embed assets with file base name ending with a space
 - Embed tag - Wav files need to be embedded in assets.swf
 - [#2282] FLA export - visible flag
+- Opening loaded files while playing even if not a valid SWF file - like images
 
 ### Changed
 - Compound script has slot/const traits inside main script initializer
