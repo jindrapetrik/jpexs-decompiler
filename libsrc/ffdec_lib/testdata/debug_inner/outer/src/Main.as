@@ -13,7 +13,10 @@ package
 	public class Main extends Sprite 
 	{
 		[Embed(source="../../inner.swf", mimeType="application/octet-stream")] 
-        public var binaryDataClass:Class;		
+        public var binaryDataClass:Class;
+        
+        [Embed(source="../image.png", mimeType="application/octet-stream")] 
+        public var imageDataClass:Class;		
 		
 		public function Main() 
 		{
@@ -28,17 +31,23 @@ package
 			var byteArray:ByteArray = new binaryDataClass() as ByteArray;
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
-			//trace("loading innerSwf 1");
 			loader.loadBytes(byteArray);
+            
+            var imageByteArray:ByteArray = new imageDataClass() as ByteArray;
+            var loader2:Loader = new Loader();
+			loader2.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageLoaderComplete);
+			loader2.loadBytes(imageByteArray);
 		}
-		
+		        
+        private function onImageLoaderComplete(event:Event):void {
+            var loader:Loader = LoaderInfo(event.currentTarget).loader;
+            addChild(loader);
+        }
 		private function onLoaderComplete(event:Event):void {
 			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
 			var className:String = "MyInnerClass";
-			//trace("getting definition of " + className);		
 			var LoadedClass:Class = loaderInfo.applicationDomain.getDefinition(className) as Class;
 			var instance:* = new LoadedClass();
-			//trace("calling innerSwf 1 instance");
 			instance.run(this);
 		}
 		
