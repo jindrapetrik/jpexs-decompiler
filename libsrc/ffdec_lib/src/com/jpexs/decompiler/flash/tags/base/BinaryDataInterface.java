@@ -43,9 +43,10 @@ public interface BinaryDataInterface extends Exportable {
     /**
      * Unpacks the data.
      * @param packer Packer
+     * @param key Key
      * @return True if the data was unpacked
      */
-    public boolean unpack(Packer packer);
+    public boolean unpack(Packer packer, String key);
 
     /**
      * Detects the packer.
@@ -57,6 +58,12 @@ public interface BinaryDataInterface extends Exportable {
      * @return Used packer
      */
     public Packer getUsedPacker();
+    
+    /**
+     * Gets the used packer key.
+     * @return Packer key
+     */
+    public String getPackerKey();
 
     /**
      * Sets the data bytes.

@@ -53,21 +53,23 @@ public interface Packer {
      *
      * @param is Data to unpack
      * @param os Stream to write unpacked data to
+     * @param key Key
      * @return True if it was unpacked correctly, False if it is not suitable
      * for unpacking or an error happened.
      * @throws IOException On I/O error
      */
-    public boolean decrypt(InputStream is, OutputStream os) throws IOException;
+    public boolean decrypt(InputStream is, OutputStream os, String key) throws IOException;
 
     /**
      * Pack the data
      *
      * @param is Data to pack
      * @param os Stream to write packed data to
+     * @param key Key
      * @return True if packed successfully, False if error happened.
      * @throws IOException On I/O error
      */
-    public boolean encrypt(InputStream is, OutputStream os) throws IOException;
+    public boolean encrypt(InputStream is, OutputStream os, String key) throws IOException;
 
     /**
      * Human readable name of this packer
@@ -82,4 +84,10 @@ public interface Packer {
      * @return Identifier of this packer
      */
     public String getIdentifier();
+    
+    /**
+     * Checks whether the packer uses encryption key.
+     * @return True if key is used
+     */
+    public boolean usesKey();
 }

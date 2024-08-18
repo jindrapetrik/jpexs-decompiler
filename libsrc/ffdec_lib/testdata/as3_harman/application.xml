@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<application xmlns="http://ns.adobe.com/air/application/50.0">
+<application xmlns="http://ns.adobe.com/air/application/51.0">
 	
-	<id>com.jpexs.Harman</id> 
+	<id>harmanencrypted</id> 
 	<versionNumber>1.0</versionNumber> 
-	<filename>Harman</filename> 
+	<filename>harman_encrypted</filename> 
 	
-	<name>Harman</name> 
+	<name>harman_encrypted</name> 
 	<description></description> 
-	<copyright>JPEXS</copyright> 
+	<copyright></copyright> 
 	
 	<initialWindow> 
-		<title>Harman</title> 
-		<content>harman_encrypted.swf</content> 
+		<title>harman_encrypted</title> 
+		<content>bin/harman_encrypted.swf</content> 
 		<systemChrome>standard</systemChrome> 
 		<transparent>false</transparent> 
 		<visible>true</visible> 
 		<minimizable>true</minimizable> 
 		<maximizable>true</maximizable> 
 		<resizable>true</resizable> 
-        <width>800</width>
-        <height>600</height>
 	</initialWindow> 
 	
 	<!-- 

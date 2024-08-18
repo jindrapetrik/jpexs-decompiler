@@ -78,7 +78,7 @@ public final class BinaryPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (binaryData.getUsedPacker() != null) {
-                    binaryData.unpack(binaryData.getUsedPacker());
+                    binaryData.unpack(binaryData.getUsedPacker(), binaryData.getPackerKey());
                 }
                 mainPanel.loadFromBinaryTag(binaryData);
                 swfOrPackedDataInsidePanel.setVisible(false);

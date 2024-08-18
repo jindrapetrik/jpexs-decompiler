@@ -43,6 +43,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     private PackedBinaryData sub;
     private Packer usedPacker;
     private SWF innerSwf;
+    private String packerKey;
 
     /**
      * Constructor.
@@ -57,10 +58,10 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
     }
 
     @Override
-    public boolean unpack(Packer packer) {
+    public boolean unpack(Packer packer, String key) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            if (!packer.decrypt(new ByteArrayInputStream(data.getRangeData()), baos)) {
+            if (!packer.decrypt(new ByteArrayInputStream(data.getRangeData()), baos, key)) {
                 return false;
             }
         } catch (IOException ex) {
@@ -68,6 +69,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
         }
         sub = new PackedBinaryData(swf, this, new ByteArrayRange(baos.toByteArray()));
         usedPacker = packer;
+        packerKey = key;
         return true;
     }
 
@@ -159,7 +161,7 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            if (!usedPacker.encrypt(new ByteArrayInputStream(sub.getDataBytes().getRangeData()), baos)) {
+            if (!usedPacker.encrypt(new ByteArrayInputStream(sub.getDataBytes().getRangeData()), baos, packerKey)) {
                 return false;
             }
         } catch (IOException ex) {
@@ -253,5 +255,10 @@ public class PackedBinaryData implements TreeItem, BinaryDataInterface {
 
         parts.add(0, binaryData.getClassExportFileName(className));
         return String.join("_", parts);
+    }
+    
+    @Override
+    public String getPackerKey() {
+        return packerKey;
     }
 }

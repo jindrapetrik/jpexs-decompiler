@@ -28,7 +28,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class HarmanAirPacker implements Packer {
+public class HarmanAirPackerWithKey implements Packer {
 
     @Override
     public Boolean suitableForBinaryData(DefineBinaryDataTag dataTag) {
@@ -49,7 +49,7 @@ public class HarmanAirPacker implements Packer {
     @Override
     public boolean decrypt(InputStream is, OutputStream os, String key) throws IOException {
         byte[] encryptedData = Helper.readStream(is);
-        byte[] decryptedData = HarmanBinaryDataEncrypt.decrypt(encryptedData, null);
+        byte[] decryptedData = HarmanBinaryDataEncrypt.decrypt(encryptedData, key);
         if (decryptedData == null) {
             return false;
         }
@@ -60,7 +60,7 @@ public class HarmanAirPacker implements Packer {
     @Override
     public boolean encrypt(InputStream is, OutputStream os, String key) throws IOException {
         byte[] data = Helper.readStream(is);
-        byte[] encryptedData = HarmanBinaryDataEncrypt.encrypt(data, null);
+        byte[] encryptedData = HarmanBinaryDataEncrypt.encrypt(data, key);
         if (encryptedData == null) {
             return false;
         }
@@ -70,16 +70,16 @@ public class HarmanAirPacker implements Packer {
 
     @Override
     public String getName() {
-        return "Harman AIR SDK";
+        return "Harman AIR SDK with custom key";
     }
 
     @Override
     public String getIdentifier() {
-        return "harmanair";
+        return "harmanair_key";
     }
 
     @Override
     public boolean usesKey() {
-        return false;
+        return true;
     }        
 }

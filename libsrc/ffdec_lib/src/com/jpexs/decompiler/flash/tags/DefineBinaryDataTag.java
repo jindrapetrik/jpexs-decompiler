@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.packers.HarmanAirPacker;
+import com.jpexs.decompiler.flash.packers.HarmanAirPackerWithKey;
 import com.jpexs.decompiler.flash.packers.MochiCryptPacker16Bit;
 import com.jpexs.decompiler.flash.packers.MochiCryptPacker32Bit;
 import com.jpexs.decompiler.flash.packers.Packer;
@@ -68,6 +69,9 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
 
     @Internal
     public Packer usedPacker;
+    
+    @Internal
+    public String packerKey;
 
     @Internal
     private PackedBinaryData sub;
@@ -75,7 +79,8 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     private static final Packer[] PACKERS = {
         new MochiCryptPacker16Bit(),
         new MochiCryptPacker32Bit(),
-        new HarmanAirPacker()
+        new HarmanAirPacker(),
+        new HarmanAirPackerWithKey()
     };
 
     public static Packer[] getAvailablePackers() {
@@ -103,10 +108,10 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     }
 
     @Override
-    public boolean unpack(Packer packer) {
+    public boolean unpack(Packer packer, String key) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            if (!packer.decrypt(new ByteArrayInputStream(binaryData.getRangeData()), baos)) {
+            if (!packer.decrypt(new ByteArrayInputStream(binaryData.getRangeData()), baos, key)) {
                 return false;
             }
         } catch (IOException ex) {
@@ -114,6 +119,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
         }
         sub = new PackedBinaryData(swf, this, new ByteArrayRange(baos.toByteArray()));
         usedPacker = packer;
+        packerKey = key;
         return true;
     }
 
@@ -135,7 +141,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
             String packerAdd = "";
             BinaryDataInterface binaryData = this;
             if (usedPacker != null) {
-                unpack(usedPacker);
+                unpack(usedPacker, packerKey);
                 if (sub != null) {
                     is = new ByteArrayInputStream(sub.getDataBytes().getRangeData());
                     binaryData = sub;
@@ -233,7 +239,7 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
         sub.pack();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            if (!usedPacker.encrypt(new ByteArrayInputStream(sub.getDataBytes().getRangeData()), baos)) {
+            if (!usedPacker.encrypt(new ByteArrayInputStream(sub.getDataBytes().getRangeData()), baos, packerKey)) {
                 return false;
             }
         } catch (IOException ex) {
@@ -281,5 +287,10 @@ public class DefineBinaryDataTag extends CharacterTag implements BinaryDataInter
     @Override
     public String getClassExportFileName(String className) {
         return className;
+    }
+    
+    @Override
+    public String getPackerKey() {
+        return packerKey;
     }
 }

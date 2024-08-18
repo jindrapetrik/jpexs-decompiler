@@ -28,7 +28,7 @@ package
         {
             removeEventListener(Event.ADDED_TO_STAGE, init);
             
-            var decrypted:ByteArray = System.decryptBlob(EncryptedByteArray);
+            var decrypted:ByteArray = System.decryptBlob(EncryptedCustomKeyByteArray, "secret_key");
             
             this.swfLoader = new Loader();
             var lc:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain);
@@ -55,3 +55,6 @@ package
     }
 
 }
+
+//Include also this class
+EncryptedByteArray;
