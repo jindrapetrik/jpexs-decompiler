@@ -133,7 +133,7 @@ public class DecompilerPool {
                 }
                 boolean parallel = Configuration.parallelSpeedUp.get();
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                pack.toSource(abcIndex, writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false);
+                pack.toSource(abcIndex, writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false, false);
 
                 writer.finishHilights();
                 HighlightedText result = new HighlightedText(writer);

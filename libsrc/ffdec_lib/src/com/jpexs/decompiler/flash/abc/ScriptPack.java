@@ -297,9 +297,11 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param convertData Convert data
      * @param exportMode Export mode
      * @param parallel Parallel
+     * @param exportAllClasses Export all classes - reference it in document
+     * class
      * @throws InterruptedException On interrupt
      */
-    private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel) throws InterruptedException {
+    private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel, boolean exportAllClasses) throws InterruptedException {
         boolean first = true;
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
@@ -307,21 +309,21 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         if (!isSimple && traitIndices.isEmpty()) {
             for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
-                
+
                 if (t instanceof TraitSlotConst) {
                     continue;
                 }
-                
+
                 String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
                 writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
-        }       
-                       
+        }
+
         for (int t : traitIndices) {
-            
+
             Trait trait = traits.get(t);
-            
+
             if (trait instanceof TraitSlotConst) {
                 continue;
             }
@@ -342,7 +344,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             first = false;
         }
-        
+
         List<DottedChain> fullyQualifiedNames = new ArrayList<>();
         if (!first) {
             writer.newLine();
@@ -354,16 +356,15 @@ public class ScriptPack extends AS3ClassTreeItem {
         Trait.writeImports(null, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
         first = true;
 
-        
         //Slot const last
         for (int t : traitIndices) {
-            
+
             Trait trait = traits.get(t);
-            
+
             if (!(trait instanceof TraitSlotConst)) {
                 continue;
             }
-            
+
             if (convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
                 continue;
             }
@@ -384,19 +385,19 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             first = false;
         }
-        
+
         if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
             writer.startMethod(script_init, null);
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                if (!scriptInitializerIsEmpty) {                    
+                if (!scriptInitializerIsEmpty) {
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
                     if (!first) {
-                        writer.newLine();                        
+                        writer.newLine();
                     }
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());                    
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
                 } else {
                     writer.append("");
                 }
@@ -406,6 +407,16 @@ public class ScriptPack extends AS3ClassTreeItem {
             if (!scriptInitializerIsEmpty) {
                 writer.newLine();
                 first = false;
+            }
+        }
+
+        if (exportAllClasses) {
+            String documentClass = abc.getSwf().getDocumentClass();
+            if (documentClass != null) {
+                if (path.toRawString().equals(documentClass)) {
+                    writer.append("//Include all classes in the build").append("\r\n");
+                    writer.append("function __ffdec_include_classes() { FFDecIncludeClasses; }");
+                }
             }
         }
     }
@@ -420,9 +431,10 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @param exportMode Export mode
      * @param parallel Parallel
      * @param ignoreFrameScripts Whether to ignore frame scripts
+     * @param exportAllClasses Export all classes
      * @throws InterruptedException On interrupt
      */
-    public void toSource(AbcIndexing abcIndex, GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts) throws InterruptedException {
+    public void toSource(AbcIndexing abcIndex, GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts, boolean exportAllClasses) throws InterruptedException {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {
@@ -460,7 +472,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         writer.continueMeasure();
 
-        appendTo(abcIndex, writer, traits, convertData, exportMode, parallel);
+        appendTo(abcIndex, writer, traits, convertData, exportMode, parallel, exportAllClasses);
     }
 
     /**
@@ -492,7 +504,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             convertData.exportEmbed = exportSettings.exportEmbed;
             convertData.exportEmbedFlaMode = exportSettings.exportEmbedFlaMode;
             convertData.assetsDir = exportSettings.assetsDir;
-            toSource(abcIndex, writer2, abc.script_info.get(scriptIndex).traits.traits, convertData, exportSettings.mode, parallel, exportSettings.ignoreFrameScripts);
+            toSource(abcIndex, writer2, abc.script_info.get(scriptIndex).traits.traits, convertData, exportSettings.mode, parallel, exportSettings.ignoreFrameScripts, exportSettings.includeAllClasses);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);
         }
