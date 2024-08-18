@@ -1019,6 +1019,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningAddFunction = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> linkAllClasses = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX

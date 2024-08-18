@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Script export settings.
@@ -72,6 +74,11 @@ public class ScriptExportSettings {
     public String assetsDir;
 
     /**
+     * Modify main class to reference all classes
+     */
+    public boolean includeAllClasses = true;
+        
+    /**
      * Constructor.
      * @param mode Mode
      * @param singleFile Single file
@@ -88,7 +95,7 @@ public class ScriptExportSettings {
             boolean exportEmbedFlaMode,
             boolean resampleWav
     ) {
-        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/");
+        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/", false);
     }
 
     public ScriptExportSettings(
@@ -98,7 +105,8 @@ public class ScriptExportSettings {
             boolean exportEmbed,
             boolean exportEmbedFlaMode,
             boolean resampleWav,
-            String assetsDir
+            String assetsDir,
+            boolean includeAllClasses
     ) {
         this.mode = mode;
         this.singleFile = singleFile;
@@ -107,6 +115,7 @@ public class ScriptExportSettings {
         this.exportEmbedFlaMode = exportEmbedFlaMode;
         this.resampleWav = resampleWav;
         this.assetsDir = assetsDir;
+        this.includeAllClasses = includeAllClasses;
     }
 
     public String getFileExtension() {
@@ -127,4 +136,14 @@ public class ScriptExportSettings {
                 throw new Error("Unsupported script export mode: " + mode);
         }
     }
+
+    @Override
+    public ScriptExportSettings clone() {
+        try {
+            return (ScriptExportSettings) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            //ignored
+        }
+        return null;
+    }        
 }

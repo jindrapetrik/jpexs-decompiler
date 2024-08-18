@@ -81,6 +81,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -92,6 +93,7 @@ import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -381,6 +383,7 @@ public class AS3ScriptExporter {
 
     /**
      * Export ActionScript 3 scripts.
+     *
      * @param swf SWF
      * @param handler AbortRetryIgnoreHandler
      * @param outdir Output directory
@@ -405,6 +408,56 @@ public class AS3ScriptExporter {
         int cnt = 1;
         List<ExportPackTask> tasks = new ArrayList<>();
         Set<String> files = new HashSet<>();
+        String documentClass = swf.getDocumentClass();
+        StringBuffer includeClassesBuilder = new StringBuffer();
+        String documentPkg = DottedChain.parseNoSuffix(documentClass).getWithoutLast().toPrintableString(true);
+
+        StringBuilder importsBuilder = new StringBuilder();
+
+        for (ScriptPack item : packs) {
+            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                continue;
+            }
+            if (ignoredClasses.contains(item.getClassPath().toRawString())) {
+                continue;
+            }
+            if (flexClass != null && item.getClassPath().toRawString().equals(flexClass)) {
+                continue;
+            }
+
+            String rawClassName = item.getClassPath().toRawString();
+            CharacterTag character = swf.getCharacterByClass(rawClassName);
+
+            //For some reasons Sprites do not work...
+            boolean allowedType = (character instanceof SoundTag)
+                    || (character instanceof ImageTag)
+                    || (character instanceof FontTag);
+
+            if (allowedType) {
+                if (!item.getClassPath().packageStr.isTopLevel()) {
+                    importsBuilder.append("   import ").append(item.getClassPath().toString()).append(";\r\n");
+                }
+                includeClassesBuilder.append("      ").append(item.getClassPath().toString()).append(";\r\n");
+            }
+        }
+
+        if (documentClass != null && !includeClassesBuilder.isEmpty()) {
+            StringBuilder prep = new StringBuilder();
+            prep.append("   /**\r\n");
+            prep.append("    * This class contains references to all decompiled sound/image/font classes.\r\n");
+            prep.append("    * It is needed for compilation otherwise some classes will be missed.\r\n");
+            prep.append("    */\r\n");
+            prep.append("   public class FFDecIncludeClasses\r\n");
+            prep.append("   {\r\n");
+            includeClassesBuilder.insert(0, prep);
+        }
+
+        //If no sound/image classes found, then do not include FFDecIncludeClasses at all
+        if (includeClassesBuilder.isEmpty()) {
+            exportSettings = exportSettings.clone();
+            exportSettings.includeAllClasses = false;
+        }
+
         for (ScriptPack item : packs) {
             if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
                 continue;
@@ -444,6 +497,35 @@ public class AS3ScriptExporter {
             }
 
             tasks.add(new ExportPackTask(swf.getAbcIndex(), handler, cnt++, packs.size(), item.getClassPath(), item, file, exportSettings, parallel, evl));
+        }
+
+        if (!includeClassesBuilder.isEmpty()) {
+            includeClassesBuilder.append("   }\r\n");
+            includeClassesBuilder.append("}\r\n");
+
+            StringBuilder prepend = new StringBuilder();
+            prepend.append("package ").append(documentPkg).append("\r\n");
+            prepend.append("{\r\n");
+            prepend.append(importsBuilder.toString());
+            prepend.append("\r\n");
+
+            includeClassesBuilder.insert(0, prepend.toString());
+
+            if (exportSettings.includeAllClasses) {
+                java.nio.file.Path outPath = new File(outdir).toPath();
+                if (!documentPkg.isEmpty()) {
+                    outPath = outPath.resolve(documentPkg);
+                }
+                File ffdecIncludeFilePath = outPath.resolve("FFDecIncludeClasses.as").toFile();
+
+                try (FileOutputStream fos = new FileOutputStream(ffdecIncludeFilePath)) {
+                    fos.write(Utf8Helper.getBytes(includeClassesBuilder.toString()));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
 
         if (!parallel || tasks.size() < 2) {
