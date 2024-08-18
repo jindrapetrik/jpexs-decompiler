@@ -1336,10 +1336,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (characterToId == null) {
             getCharacters(true);
         }
-        if (!characterToId.containsKey(tag)) {
+        Map<CharacterIdTag, Integer> characterToId2 = characterToId;
+        if (characterToId2 == null) {
             return -1;
         }
-        return characterToId.get(tag);
+        if (!characterToId2.containsKey(tag)) {
+            return -1;
+        }
+        return characterToId2.get(tag);
     }
 
     /**
