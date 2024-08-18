@@ -42,7 +42,7 @@ public class MochiCryptPacker32Bit implements Packer {
     }
 
     @Override
-    public boolean decrypt(InputStream is, OutputStream os) throws IOException {
+    public boolean decrypt(InputStream is, OutputStream os, String key) throws IOException {
         byte[] payload = Helper.readStream(is);
         if (!handleXor(payload)) {
             return false;
@@ -103,7 +103,7 @@ public class MochiCryptPacker32Bit implements Packer {
     }
 
     @Override
-    public boolean encrypt(InputStream is, OutputStream os) throws IOException {
+    public boolean encrypt(InputStream is, OutputStream os, String key) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DeflaterOutputStream def = new DeflaterOutputStream(baos);
         Helper.copyStreamEx(is, def);
@@ -133,4 +133,9 @@ public class MochiCryptPacker32Bit implements Packer {
     public String getIdentifier() {
         return "mochicrypt32";
     }
+
+    @Override
+    public boolean usesKey() {
+        return false;
+    }        
 }

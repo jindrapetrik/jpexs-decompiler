@@ -47,9 +47,22 @@ public class HarmanBinaryDataEncrypt {
     /**
      * Encrypts data.
      * @param data Data to encrypt
+     * @param key Key
      * @return Encrypted data
      */
-    public static byte[] encrypt(byte[] data) {
+    public static byte[] encrypt(byte[] data, String key) {
+        
+        byte[] customKey = null;
+        
+        if (key != null) {
+            customKey = new byte[16];
+            int keyLen = key.length();
+
+            for(int i = 0; i < 16; ++i) {
+               customKey[i] = (byte)key.charAt(i % keyLen);
+            }
+        }
+        
         byte[] result;
         try {
             SecureRandom random = new SecureRandom();
@@ -69,7 +82,7 @@ public class HarmanBinaryDataEncrypt {
 
             byte[] ivBytes = getIv(hashBytes, random1, random2);
             IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+            SecretKeySpec keySpec = new SecretKeySpec(customKey != null ? customKey : keyBytes, "AES");
             byte[] dataPadded = new byte[(int) encryptedDataLen];
             random.nextBytes(dataPadded);
             System.arraycopy(data, 0, dataPadded, 0, data.length);
@@ -153,12 +166,25 @@ public class HarmanBinaryDataEncrypt {
     /**
      * Decrypts data.
      * @param data Encrypted data
+     * @param key
      * @return Decrypted data
      */
-    public static byte[] decrypt(byte[] data) {
+    public static byte[] decrypt(byte[] data, String key) {
         if (data.length < 32) {
             return null;
         }
+        
+        byte[] customKey = null;
+        
+        if (key != null) {
+            customKey = new byte[16];
+            int keyLen = key.length();
+
+            for(int i = 0; i < 16; ++i) {
+               customKey[i] = (byte)key.charAt(i % keyLen);
+            }
+        }
+        
         long encryptedLen = data.length;
         long encryptedLenXorHash = unpack(data, 0);
         long decryptedLenXorRandom1 = unpack(data, 4);
@@ -181,7 +207,7 @@ public class HarmanBinaryDataEncrypt {
             byte[] ivBytes = getIv(hashBytes, random1, random2);
             IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
 
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+            SecretKeySpec keySpec = new SecretKeySpec(customKey != null ? customKey : keyBytes, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
@@ -203,8 +229,8 @@ public class HarmanBinaryDataEncrypt {
      */
     public static void main(String[] args) throws IOException {
         byte[] data = new byte[]{'A', 'B', 'C'};
-        byte[] encrypted = encrypt(data);
-        byte[] decrypted = decrypt(encrypted);
+        byte[] encrypted = encrypt(data, null);
+        byte[] decrypted = decrypt(encrypted, null);
         if (!Arrays.equals(data, decrypted)) {
             throw new RuntimeException("Cannot encrypt/decrypt");
         }

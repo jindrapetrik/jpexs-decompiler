@@ -2483,9 +2483,16 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void applyUnpackerActionPerformed(Packer packer) {
         List<TreeItem> sel = getSelectedItems();
+        String key = null;
+        if (packer.usesKey()) {
+            key = ViewMessages.showInputDialog(mainPanel, AppStrings.translate("packer.key").replace("%packer%", packer.getName()), AppStrings.translate("packer.key.title").replace("%packer%", packer.getName()), "");
+            if (key == null || key.isEmpty()) {
+                return;
+            }
+        }
         for (TreeItem item : sel) {
             BinaryDataInterface binaryData = (BinaryDataInterface) item;
-            if (!binaryData.unpack(packer)) {
+            if (!binaryData.unpack(packer, key)) {
                 ViewMessages.showMessageDialog(mainPanel, AppStrings.translate("error.wrong.packer").replace("%item%", item.toString()).replace("%packer%", packer.getName()), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             }
         }
