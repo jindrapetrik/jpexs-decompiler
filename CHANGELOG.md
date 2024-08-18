@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - Updated Flash player to SWF version map
 - Harman AIR 51 float support compatibility
 - FlashDevelop project export - option to export AIR project (select correct type in the file save dialog)
-- FLA/FlashDevelop/IDEA export - A link to all classes (sound, font, images) is added so no class is missed during compilation
+- FLA/FlashDevelop/IDEA export - option to add link to all classes (sound, font, images) so no class is missed during compilation
 
 ### Fixed
 - [#2266] StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)

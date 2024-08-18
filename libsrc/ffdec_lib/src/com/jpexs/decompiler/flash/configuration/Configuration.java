@@ -1020,7 +1020,7 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningAddFunction = null;
     
-    @ConfigurationDefaultBoolean(true)
+    @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> linkAllClasses = null;
 

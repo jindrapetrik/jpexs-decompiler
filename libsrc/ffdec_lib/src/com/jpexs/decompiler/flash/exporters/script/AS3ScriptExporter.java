@@ -455,7 +455,7 @@ public class AS3ScriptExporter {
 
         //If no sound/image classes found, then do not include FFDecIncludeClasses at all
         if (includeClassesBuilder.isEmpty()) {
-            exportSettings = exportSettings.clone();
+            exportSettings = (ScriptExportSettings) exportSettings.clone();
             exportSettings.includeAllClasses = false;
         }
 
