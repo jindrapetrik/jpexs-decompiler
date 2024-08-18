@@ -512,9 +512,11 @@ public class AS3ScriptExporter {
             includeClassesBuilder.insert(0, prepend.toString());
 
             if (exportSettings.includeAllClasses) {
+                new File(outdir).mkdirs();
                 java.nio.file.Path outPath = new File(outdir).toPath();
                 if (!documentPkg.isEmpty()) {
                     outPath = outPath.resolve(documentPkg);
+                    outPath.toFile().mkdirs();
                 }
                 File ffdecIncludeFilePath = outPath.resolve("FFDecIncludeClasses.as").toFile();
 
