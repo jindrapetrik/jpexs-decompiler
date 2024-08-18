@@ -108,7 +108,7 @@ public class SwfFlashDevelopExporter {
             simpleName = simpleName.substring(0, simpleName.lastIndexOf("."));
         }
 
-        String simpleNameNoSpaces = simpleName.replace(" ", "");
+        String simpleNameNoSpaces = simpleName.replace(" ", "").replace("_", "");
 
         SetBackgroundColorTag bgColorTag = swf.getBackgroundColor();
 
