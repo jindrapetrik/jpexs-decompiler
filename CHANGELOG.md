@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2279] AS3 Decompilation - assignments on the right side of `&&` and `||` operators
 - [#2279] Embed assets with file base name ending with a space
 - Embed tag - Wav files need to be embedded in assets.swf
-
+- [#2282] FLA export - visible flag
 
 ### Changed
 - Compound script has slot/const traits inside main script initializer
@@ -3522,6 +3522,7 @@ Major version of SWF to XML export changed to 2.
 [#2276]: https://www.free-decompiler.com/flash/issues/2276
 [#2277]: https://www.free-decompiler.com/flash/issues/2277
 [#2279]: https://www.free-decompiler.com/flash/issues/2279
+[#2282]: https://www.free-decompiler.com/flash/issues/2282
 [#2269]: https://www.free-decompiler.com/flash/issues/2269
 [#2270]: https://www.free-decompiler.com/flash/issues/2270
 [#2221]: https://www.free-decompiler.com/flash/issues/2221

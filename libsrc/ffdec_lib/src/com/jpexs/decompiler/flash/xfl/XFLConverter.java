@@ -2511,6 +2511,13 @@ public class XFLConverter {
                             if (ratio2 > -1) {
                                 ratio = ratio2;
                             }
+                            if (po.getPlaceObjectNum() >= 3) {
+                                if (po.getVisible() != null) {
+                                    isVisible = po.isVisible();
+                                }
+                            } else {
+                                isVisible = true;
+                            }
                         } else {
                             metadata = po.getAmfData();
                             matrix = po.getMatrix();
@@ -2521,6 +2528,7 @@ public class XFLConverter {
                             filters = po.getFilters();
                             ratio = po.getRatio();
                             clipActions = po.getClipActions();
+                            isVisible = po.isVisible();
                         }
                     }
                 }
