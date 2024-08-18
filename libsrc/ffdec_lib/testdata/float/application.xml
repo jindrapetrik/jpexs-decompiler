@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<application xmlns="http://ns.adobe.com/air/application/51.0">
+	
+	<id>floatair.harman</id> 
+	<versionNumber>1.0</versionNumber> 
+	<filename>float.air_harman</filename> 
+	
+	<name>float.air_harman</name> 
+	<description></description> 
+	<copyright></copyright> 
+	
+	<initialWindow> 
+		<title>float.air_harman</title> 
+		<content>bin/float.air_harman.swf</content> 
+		<systemChrome>standard</systemChrome> 
+		<transparent>false</transparent> 
+		<visible>true</visible> 
+		<minimizable>true</minimizable> 
+		<maximizable>true</maximizable> 
+		<resizable>true</resizable> 
+	</initialWindow> 
+	
+	<!-- 
+	More options:
+	http://livedocs.adobe.com/flex/3/html/File_formats_1.html#1043413
+	-->
+</application>
