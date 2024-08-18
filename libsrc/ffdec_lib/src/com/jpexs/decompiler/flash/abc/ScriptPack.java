@@ -415,7 +415,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             if (documentClass != null) {
                 if (path.toRawString().equals(documentClass)) {
                     writer.append("//Include all classes in the build").append("\r\n");
-                    writer.append("function __ffdec_include_classes() { FFDecIncludeClasses; }");
+                    writer.append("function __ffdec_include_classes():void { FFDecIncludeClasses; }");
                 }
             }
         }
