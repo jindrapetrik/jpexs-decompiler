@@ -34,6 +34,8 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.AsLinkageDialog;
@@ -1472,8 +1474,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 SWF swf = (SWF) firstItem;
                 exportFlaMenuItem.setVisible(true);
                 if (swf.isAS3()) {
-                    exportFlashDevelopMenuItem.setVisible(true);
-                    exportIdeaMenuItem.setVisible(true);
+                    if (SwfFlashDevelopExporter.canExportSwf(swf)) {
+                        exportFlashDevelopMenuItem.setVisible(true);
+                    }
+                    if (SwfIntelliJIdeaExporter.canExportSwf(swf)) {
+                        exportIdeaMenuItem.setVisible(true);
+                    }
                 }
             }
 
