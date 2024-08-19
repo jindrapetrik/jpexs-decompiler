@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Embed tag - Wav files need to be embedded in assets.swf
 - [#2282] FLA export - visible flag
 - Opening loaded files while playing even if not a valid SWF file - like images
+- [#2284] FLA export - sounds should be WAV or MP3, not FLV
 
 ### Changed
 - Compound script has slot/const traits inside main script initializer
@@ -3525,6 +3526,7 @@ Major version of SWF to XML export changed to 2.
 [#2277]: https://www.free-decompiler.com/flash/issues/2277
 [#2279]: https://www.free-decompiler.com/flash/issues/2279
 [#2282]: https://www.free-decompiler.com/flash/issues/2282
+[#2284]: https://www.free-decompiler.com/flash/issues/2284
 [#2269]: https://www.free-decompiler.com/flash/issues/2269
 [#2270]: https://www.free-decompiler.com/flash/issues/2270
 [#2221]: https://www.free-decompiler.com/flash/issues/2221

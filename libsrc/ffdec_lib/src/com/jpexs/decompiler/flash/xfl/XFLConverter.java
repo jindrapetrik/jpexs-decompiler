@@ -1770,7 +1770,7 @@ public class XFLConverter {
         long soundSampleCount = 0;
         byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
         int[] rateMap = {5, 11, 22, 44};
-        String exportFormat = "flv";
+        String exportFormat = "wav";
         if (symbol instanceof SoundStreamFrameRange) {
             SoundStreamHeadTypeTag head = ((SoundStreamFrameRange) symbol).getHead();
             soundFormat = head.getSoundFormatId();
