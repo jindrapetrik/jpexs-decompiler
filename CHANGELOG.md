@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Java 8 compatibility
 
 ## [21.0.3] - 2024-08-27
 ### Added
