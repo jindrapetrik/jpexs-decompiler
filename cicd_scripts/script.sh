@@ -94,8 +94,13 @@ else
       echo "revision=$CICD_COMMIT">>$VERSION_PROP_FILE
       echo "debug=true">>$VERSION_PROP_FILE
       
+      JAVA_HOME=$JDK_8
       #compile, build, create files
       ant new-version
+
+      # Javadoc generation is buggy with Java 8, lets generate it with Java 21
+      JAVA_HOME=$JDK_21
+      ant release_lib_javadoc
                         
       CURRENT_DATE=`date +%Y-%m-%dT%H:%M:%SZ`
 
