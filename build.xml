@@ -599,7 +599,7 @@
         <property name="lib.file" value="${lib.releases.dir}/${lib.prefix.filename}_${version}${version.suffix}.zip" />        
     </target>
     
-    <target name="release_lib_javadoc" depends="git-tag,-loadversion,-save-version-info,-suffix">
+    <target name="release_lib_javadoc" depends="-new-version-set,git-tag,-loadversion,-save-version-info,-suffix">
         <ant antfile="${core.lib.script}" target="release_javadoc" inheritAll="false" usenativebasedir="true"/>
         <property name="lib.javadoc.file" value="${lib.releases.dir}/${lib.prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip" />
         <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
