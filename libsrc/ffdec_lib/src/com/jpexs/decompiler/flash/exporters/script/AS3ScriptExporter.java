@@ -442,7 +442,7 @@ public class AS3ScriptExporter {
             }
         }
 
-        if (documentClass != null && !includeClassesBuilder.isEmpty()) {
+        if (documentClass != null && includeClassesBuilder.length() > 0) {
             StringBuilder prep = new StringBuilder();
             prep.append("   /**\r\n");
             prep.append("    * This class contains references to all decompiled sound/image/font classes.\r\n");
@@ -454,7 +454,7 @@ public class AS3ScriptExporter {
         }
 
         //If no sound/image classes found, then do not include FFDecIncludeClasses at all
-        if (includeClassesBuilder.isEmpty()) {
+        if (includeClassesBuilder.length() == 0) {
             exportSettings = (ScriptExportSettings) exportSettings.clone();
             exportSettings.includeAllClasses = false;
         }
@@ -500,7 +500,7 @@ public class AS3ScriptExporter {
             tasks.add(new ExportPackTask(swf.getAbcIndex(), handler, cnt++, packs.size(), item.getClassPath(), item, file, exportSettings, parallel, evl));
         }
 
-        if (!includeClassesBuilder.isEmpty()) {
+        if (includeClassesBuilder.length() > 0) {
             includeClassesBuilder.append("   }\r\n");
             includeClassesBuilder.append("}\r\n");
 
