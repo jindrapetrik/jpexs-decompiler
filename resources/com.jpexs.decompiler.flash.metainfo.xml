@@ -65,6 +65,14 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.0.4" date="2024-08-27">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Java 8 compatibility</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.3" date="2024-08-27">
 			<description>
 				<p>Added</p>
