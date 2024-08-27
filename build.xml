@@ -215,8 +215,7 @@
     
     <target name="library" depends="-loadversion,release_lib,-copy-lib">
         <mkdir dir="${releases.dir}"/>
-        <copy file="${lib.file}" todir="${releases.dir}" />
-        <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
+        <copy file="${lib.file}" todir="${releases.dir}" />        
     </target>
     
     <target name="archive" depends="-loadversion,dist">
@@ -602,7 +601,8 @@
     
     <target name="release_lib_javadoc" depends="git-tag,-loadversion,-save-version-info,-suffix">
         <ant antfile="${core.lib.script}" target="release_javadoc" inheritAll="false" usenativebasedir="true"/>
-        <property name="lib.javadoc.file" value="${lib.releases.dir}/${lib.prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip" />               
+        <property name="lib.javadoc.file" value="${lib.releases.dir}/${lib.prefix.filename}_${javadoc.release.filename}_${version}${version.suffix}.zip" />
+        <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
     </target>
     
     <target name="build_lib" depends="-loadversion,-save-version-info">
