@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [21.0.3] - 2024-08-27
 ### Added
 - Updated Flash player to SWF version map
 - Harman AIR 51 float support compatibility
@@ -3362,7 +3362,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.2...dev
+[21.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.2...version21.0.3
 [21.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.1...version21.0.2
 [21.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.0...version21.0.1
 [21.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version20.1.0...version21.0.0

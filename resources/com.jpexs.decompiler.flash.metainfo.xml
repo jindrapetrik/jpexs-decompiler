@@ -65,6 +65,39 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.0.3" date="2024-08-27">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Updated Flash player to SWF version map</li>
+					<li>Harman AIR 51 float support compatibility</li>
+					<li>FlashDevelop project export - option to export AIR project (select correct type in the file save dialog)</li>
+					<li>FLA/FlashDevelop/IDEA export - option to add link to all classes (sound, font, images) so no class is missed during compilation</li>
+					<li>Harman AIR 51 unpacker for binarydata with custom key</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2266 StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)</li>
+					<li>#2275 Export to FlashDevelop - framerate setting</li>
+					<li>#2276 Protected namespaces do not use fully qualified names</li>
+					<li>Target flash player version in FlashDevelop and IDEA projects</li>
+					<li>Script/Class initializers order of assignment</li>
+					<li>#2277 Return statement in initializer</li>
+					<li>Imports in script initializer</li>
+					<li>#2279 AS3 Decompilation - assignments on the right side of `&&` and `||` operators</li>
+					<li>#2279 Embed assets with file base name ending with a space</li>
+					<li>Embed tag - Wav files need to be embedded in assets.swf</li>
+					<li>#2282 FLA export - visible flag</li>
+					<li>Opening loaded files while playing even if not a valid SWF file - like images</li>
+					<li>#2284 FLA export - sounds should be WAV or MP3, not FLV</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Compound script has slot/const traits inside main script initializer</li>
+					<li>Export to FlashDevelop and IntelliJ IDEA is available only for SWFs without main timeline</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.2" date="2024-08-12">
 			<description>
 				<p>Added</p>
