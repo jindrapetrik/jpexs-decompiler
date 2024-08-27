@@ -213,7 +213,7 @@
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
-    <target name="library" depends="-loadversion,release_lib,release_lib_javadoc,-copy-lib">
+    <target name="library" depends="-loadversion,release_lib,-copy-lib">
         <mkdir dir="${releases.dir}"/>
         <copy file="${lib.file}" todir="${releases.dir}" />
         <copy file="${lib.javadoc.file}" todir="${releases.dir}" />
