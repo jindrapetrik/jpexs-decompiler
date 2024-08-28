@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Fixed
-- [#2293] FLA export - stackoverflow on multilevel clips extraction
+- [#2293] FLA export - stackoverflow on multilevel clips extraction, clipping
 
 ## [21.0.4] - 2024-08-27
 ### Fixed

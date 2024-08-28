@@ -169,6 +169,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,7 +225,7 @@ public class XFLConverter {
     /**
      * Adds "(depth xxx)" to layer name
      */
-    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
+    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = true;
 
     private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
@@ -1709,7 +1710,7 @@ public class XFLConverter {
 
                     extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, sprite.getTags(), swf.getCharacterId(sprite), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
-                    convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), sprite, characterVariables.get(sprite), nonLibraryShapes, tags, sprite.getTags(), getSymbolName(lastImportedId, characterNameMap, swf, symbol), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+                    convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), sprite, swf.getCharacterId(sprite), characterVariables.get(sprite), nonLibraryShapes, tags, sprite.getTags(), getSymbolName(lastImportedId, characterNameMap, swf, symbol), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
                 } else if (symbol instanceof ShapeTag) {
                     symbolStr.writeStartElement("timeline");
@@ -3210,7 +3211,7 @@ public class XFLConverter {
             "lastModified", Long.toString(getTimestamp(swf))});
         symbolStr.writeAttribute("symbolType", "graphic");
 
-        convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, "", nonLibraryShapes, timelineTags, timelineTags, getMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+        convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, timelineTags, timelineTags, getMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
         symbolStr.writeEndElement(); // DOMSymbolItem
         String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3324,7 +3325,7 @@ public class XFLConverter {
                 }
             }
 
-            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, "", nonLibraryShapes, swf.getTags(), new ReadOnlyTagList(timelineTags), getSymbolName(lastImportedId, characterNameMap, swf, swf.getCharacter(objectId)), flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>(), statusStack);
+            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, swf.getTags(), new ReadOnlyTagList(timelineTags), getSymbolName(lastImportedId, characterNameMap, swf, swf.getCharacter(objectId)), flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>(), statusStack);
 
             symbolStr.writeEndElement(); // DOMSymbolItem
             String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3368,12 +3369,29 @@ public class XFLConverter {
         Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
         Map<PlaceObjectTypeTag, Integer> clipStartFrames = new HashMap<>();
 
+        
+        
         Set<Integer> occupiedDepths = new HashSet<>();
 
+        List<PlaceObjectTypeTag> clipPlacesInCurrentFrame = new ArrayList<>();
+        Comparator<PlaceObjectTypeTag> placeComparator = new Comparator<PlaceObjectTypeTag>() {
+                        @Override
+                        public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
+                            int ret = o2.getClipDepth() - o1.getClipDepth();
+                            if (ret != 0) {
+                                return ret;
+                            }
+                            return o1.getDepth() - o1.getDepth();
+                        }                        
+                    };
+        
         int maxDepth = getMaxDepth(timelineTags);
         Tag lastTag = null;
         for (Tag t : timelineTags) {
             if (t instanceof ShowFrameTag) {
+                clipPlacesInCurrentFrame.sort(placeComparator);
+                clipPlaces.addAll(clipPlacesInCurrentFrame);
+                clipPlacesInCurrentFrame.clear();
                 f++;
             }
             if (t instanceof PlaceObjectTypeTag) {
@@ -3391,7 +3409,7 @@ public class XFLConverter {
 
                     if (po.getClipDepth() > -1) {
                         clipStartFrames.put(po, f);
-                        clipPlaces.add(po);
+                        clipPlacesInCurrentFrame.add(po);
                         if (depthToClipPlace.containsKey(po.getDepth())) {
                             clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
                         }
@@ -3415,6 +3433,10 @@ public class XFLConverter {
             }
             lastTag = t;
         }
+        
+        clipPlacesInCurrentFrame.sort(placeComparator);
+        clipPlaces.addAll(clipPlacesInCurrentFrame);
+        clipPlacesInCurrentFrame.clear();
 
         if (clipPlaces.isEmpty()) {
             return;
@@ -3469,8 +3491,10 @@ public class XFLConverter {
         for (int fr : frameToDepthToClips.keySet()) {
             for (int d : frameToDepthToClips.get(fr).keySet()) {
                 List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
+                
                 if (places.size() > 1) {
                     depthToFramesList.get(d).remove((Integer) fr);
+                    PlaceObjectTypeTag firstPlace = places.get(0);
                     PlaceObjectTypeTag secondPlace = places.get(1);
                     if (delegatedPlaces.contains(secondPlace)) {
                         continue;
@@ -3517,7 +3541,10 @@ public class XFLConverter {
                                             removed = true;
                                         }
                                     }
-                                    if (!removed && place.getDepth() >= secondPlace.getDepth() && place.getDepth() <= secondPlace.getClipDepth()) {
+                                    if (!removed 
+                                            && place != firstPlace
+                                            && place.getDepth() >= secondPlace.getDepth() 
+                                            && place.getDepth() <= secondPlace.getClipDepth()) {
                                         delegatedTimeline.add(place);
                                     }
                                 }
@@ -3548,11 +3575,6 @@ public class XFLConverter {
                         //set timelined?
                         delegatedTimeline.add(showFrame);
                     }
-                    if (delegatedTimeline.size() == timelineTags.size()) { 
-                        //avoid recursion
-                        //FIXME: this is wrong, needs to be fixed somehow
-                        return;
-                    }
                     addExtractedClip(lastItemIdNumber, lastImportedId, characterNameMap, new ReadOnlyTagList(delegatedTimeline), spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
                     placeToMaskedSymbol.put(secondPlace, new MultiLevelClip(secondPlace, nextClipId.getVal(), numFrames));
                 }
@@ -3574,7 +3596,8 @@ public class XFLConverter {
         }
     }
 
-    private void convertTimelines(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
+    //Note: symbolId argument might be a virtual symbol like MaskedSymbol
+    private void convertTimelines(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack) throws XMLStreamException {
 
         String symbolName = getSymbolName(lastImportedId, characterNameMap, swf, sprite);
         List<String> classNames = new ArrayList<>();
@@ -3647,7 +3670,7 @@ public class XFLConverter {
         if (classNames.size() == 1) {
             writer.writeAttribute("linkageClassName", classNames.get(0));
         }
-        if (sprite == null) {
+        if (symbolId == -1) {
             writer.writeStartElement("timelines");
         } else {
             writer.writeStartElement("timeline");
@@ -3673,7 +3696,7 @@ public class XFLConverter {
         if (!lastShowFrame) {
             fc++;
         }
-        if (sprite == null) {
+        if (symbolId == -1) {
             if (sceneLabelTag != null) {
                 for (int i = 0; i < sceneLabelTag.sceneOffsets.length; i++) {
                     scenes.add(new Scene(
@@ -3759,8 +3782,24 @@ public class XFLConverter {
             Set<Integer> occupiedDepths = new HashSet<>();
             Tag lastTag = null;
             int tpos = 0;
+            
+            List<PlaceObjectTypeTag> clipPlacesInCurrentFrame = new ArrayList<>();
+            Comparator<PlaceObjectTypeTag> placeComparator = new Comparator<PlaceObjectTypeTag>() {
+                        @Override
+                        public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
+                            int ret = o2.getClipDepth() - o1.getClipDepth();
+                            if (ret != 0) {
+                                return ret;
+                            }
+                            return o1.getDepth() - o1.getDepth();
+                        }                        
+                    };
+            
             for (Tag t : sceneTimelineTags) {
                 if (t instanceof ShowFrameTag) {
+                    clipPlacesInCurrentFrame.sort(placeComparator);
+                    clipPlaces.addAll(clipPlacesInCurrentFrame);
+                    clipPlacesInCurrentFrame.clear();
                     f++;
                 }
                 if (t instanceof PlaceObjectTypeTag) {
@@ -3777,7 +3816,7 @@ public class XFLConverter {
                         if (po.getClipDepth() > -1) {
                             clipFrameSplitters.add(f);
                             clipStartFrames.put(po, f);
-                            clipPlaces.add(po);
+                            clipPlacesInCurrentFrame.add(po);
 
                             if (depthToClipPlace.containsKey(po.getDepth())) {
                                 clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
@@ -3817,7 +3856,11 @@ public class XFLConverter {
                 lastTag = t;
                 tpos++;
             }
-
+            
+            clipPlacesInCurrentFrame.sort(placeComparator);
+            clipPlaces.addAll(clipPlacesInCurrentFrame);
+            clipPlacesInCurrentFrame.clear();
+                    
             //Some sprites do not end with ShowFrame:
             if (lastTag != null && !(lastTag instanceof ShowFrameTag)) {
                 f++;
@@ -3851,7 +3894,7 @@ public class XFLConverter {
 
             for (f = 0; f < frameCount; f++) {
                 for (int d = 0; d < maxDepth; d++) {
-                    for (int p = 0; p < clipPlaces.size() - 1; p++) {
+                    for (int p = 0; p < clipPlaces.size() - 1; p++) {                       
                         PlaceObjectTypeTag po = clipPlaces.get(p);
                         if (po == null) {
                             continue;
@@ -3891,17 +3934,10 @@ public class XFLConverter {
             for (int d = maxDepth; d >= 0; d--) {
                 loopp:
                 for (int p = 0; p < clipPlaces.size() - 1; p++) {
-                    PlaceObjectTypeTag po = clipPlaces.get(p);
-                    /* if (po != null && po.getClipDepth() == d && secondLevelPlaces.contains(po)) {
-                        int clipFrame = clipFrameSplitters.get(p);
-                        int nextFrame = clipFinishFrames.get(po);    
-
-
+                    PlaceObjectTypeTag po = clipPlaces.get(p);                   
+                    /*if (po != null && multiLevelsPlaces.contains(po)) {
                         continue;
                     }*/
-                    if (po != null && multiLevelsPlaces.contains(po)) {
-                        continue;
-                    }
                     if (po != null && handledClips.contains(po)) {
                         continue;
                     }
@@ -4765,7 +4801,7 @@ public class XFLConverter {
             }
 
             statusStack.pushStatus("main timeline");
-            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, null, nonLibraryShapes, swf.getTags(), swf.getTags(), null, flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, -1, null, nonLibraryShapes, swf.getTags(), swf.getTags(), null, flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
             statusStack.popStatus();
             //domDocument.writeEndElement();
 
