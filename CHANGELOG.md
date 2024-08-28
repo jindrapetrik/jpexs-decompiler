@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2293] FLA export - stackoverflow on multilevel clips extraction, clipping
+- [#2294] FLA export - Nullpointer on AS3 SWFs without document class
 
 ## [21.0.4] - 2024-08-27
 ### Fixed
@@ -3531,6 +3532,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
+[#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2266]: https://www.free-decompiler.com/flash/issues/2266
 [#2275]: https://www.free-decompiler.com/flash/issues/2275
 [#2276]: https://www.free-decompiler.com/flash/issues/2276

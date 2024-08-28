@@ -411,46 +411,48 @@ public class AS3ScriptExporter {
         Set<String> files = new HashSet<>();
         String documentClass = swf.getDocumentClass();
         StringBuffer includeClassesBuilder = new StringBuffer();
-        String documentPkg = DottedChain.parseNoSuffix(documentClass).getWithoutLast().toPrintableString(true);
+        String documentPkg = documentClass != null ? DottedChain.parseNoSuffix(documentClass).getWithoutLast().toPrintableString(true) : null;
 
         StringBuilder importsBuilder = new StringBuilder();
 
-        for (ScriptPack item : packs) {
-            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
-                continue;
-            }
-            if (ignoredClasses.contains(item.getClassPath().toRawString())) {
-                continue;
-            }
-            if (flexClass != null && item.getClassPath().toRawString().equals(flexClass)) {
-                continue;
-            }
-
-            String rawClassName = item.getClassPath().toRawString();
-            CharacterTag character = swf.getCharacterByClass(rawClassName);
-
-            //For some reasons Sprites do not work...
-            boolean allowedType = (character instanceof SoundTag)
-                    || (character instanceof ImageTag)
-                    || (character instanceof FontTag);
-
-            if (allowedType) {
-                if (!item.getClassPath().packageStr.isTopLevel()) {
-                    importsBuilder.append("   import ").append(item.getClassPath().toString()).append(";\r\n");
+        if (documentClass != null) {
+            for (ScriptPack item : packs) {
+                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                    continue;
                 }
-                includeClassesBuilder.append("      ").append(item.getClassPath().toString()).append(";\r\n");
-            }
-        }
+                if (ignoredClasses.contains(item.getClassPath().toRawString())) {
+                    continue;
+                }
+                if (flexClass != null && item.getClassPath().toRawString().equals(flexClass)) {
+                    continue;
+                }
 
-        if (documentClass != null && includeClassesBuilder.length() > 0) {
-            StringBuilder prep = new StringBuilder();
-            prep.append("   /**\r\n");
-            prep.append("    * This class contains references to all decompiled sound/image/font classes.\r\n");
-            prep.append("    * It is needed for compilation otherwise some classes will be missed.\r\n");
-            prep.append("    */\r\n");
-            prep.append("   public class FFDecIncludeClasses\r\n");
-            prep.append("   {\r\n");
-            includeClassesBuilder.insert(0, prep);
+                String rawClassName = item.getClassPath().toRawString();
+                CharacterTag character = swf.getCharacterByClass(rawClassName);
+
+                //For some reasons Sprites do not work...
+                boolean allowedType = (character instanceof SoundTag)
+                        || (character instanceof ImageTag)
+                        || (character instanceof FontTag);
+
+                if (allowedType) {
+                    if (!item.getClassPath().packageStr.isTopLevel()) {
+                        importsBuilder.append("   import ").append(item.getClassPath().toString()).append(";\r\n");
+                    }
+                    includeClassesBuilder.append("      ").append(item.getClassPath().toString()).append(";\r\n");
+                }
+            }
+
+            if (includeClassesBuilder.length() > 0) {
+                StringBuilder prep = new StringBuilder();
+                prep.append("   /**\r\n");
+                prep.append("    * This class contains references to all decompiled sound/image/font classes.\r\n");
+                prep.append("    * It is needed for compilation otherwise some classes will be missed.\r\n");
+                prep.append("    */\r\n");
+                prep.append("   public class FFDecIncludeClasses\r\n");
+                prep.append("   {\r\n");
+                includeClassesBuilder.insert(0, prep);
+            }
         }
 
         //If no sound/image classes found, then do not include FFDecIncludeClasses at all
@@ -500,7 +502,7 @@ public class AS3ScriptExporter {
             tasks.add(new ExportPackTask(swf.getAbcIndex(), handler, cnt++, packs.size(), item.getClassPath(), item, file, exportSettings, parallel, evl));
         }
 
-        if (includeClassesBuilder.length() > 0) {
+        if (documentClass != null && includeClassesBuilder.length() > 0) {
             includeClassesBuilder.append("   }\r\n");
             includeClassesBuilder.append("}\r\n");
 
@@ -626,7 +628,7 @@ public class AS3ScriptExporter {
                     }
                     if (ct instanceof FontTag) {
                         exportTagList.add(ct);
-                    }                    
+                    }
                 }
                 if (ct instanceof DefineFont4Tag) {
                     exportTagList.add(ct);
