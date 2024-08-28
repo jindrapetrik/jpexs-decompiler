@@ -214,11 +214,13 @@ public class SoundFormat {
         byte[] decodedData = baos.toByteArray();
         if (skipSamples > 0) {
             byte[] data = decodedData;
-            data = Arrays.copyOfRange(
-                    data,
-                    skipSamples * 2 * (stereo ? 2 : 1),
-                    data.length
-            );
+            if (data.length > 0) {
+                data = Arrays.copyOfRange(
+                        data,
+                        skipSamples * 2 * (stereo ? 2 : 1),
+                        data.length
+                );
+            }
             return data;
         }
 
