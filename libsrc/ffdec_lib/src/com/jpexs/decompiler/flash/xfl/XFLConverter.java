@@ -1707,7 +1707,7 @@ public class XFLConverter {
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite) ? characterScriptPacks.get(sprite) : null;
 
-                    extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, sprite.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+                    extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, sprite.getTags(), swf.getCharacterId(sprite), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
                     convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), sprite, characterVariables.get(sprite), nonLibraryShapes, tags, sprite.getTags(), getSymbolName(lastImportedId, characterNameMap, swf, symbol), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
@@ -1750,7 +1750,7 @@ public class XFLConverter {
         }
 
         statusStack.pushStatus("extracting multilevel clips");
-        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, swf.getTags(), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, swf.getTags(), -1, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
         statusStack.popStatus();
 
         statusStack.pushStatus("converting multiusage morphshapes");
@@ -3178,6 +3178,7 @@ public class XFLConverter {
             Reference<Integer> lastImportedId, 
             Map<CharacterTag, String> characterNameMap,
             ReadOnlyTagList timelineTags,
+            int spriteId,
             XFLXmlWriter writer,
             SWF swf,
             Reference<Integer> nextClipId,
@@ -3191,7 +3192,7 @@ public class XFLConverter {
     ) throws XMLStreamException {
         XFLXmlWriter symbolStr = new XFLXmlWriter();
 
-        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, timelineTags, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, timelineTags, spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
         if (nextClipId.getVal() < 0) {
             nextClipId.setVal(swf.getNextCharacterId());
@@ -3348,6 +3349,7 @@ public class XFLConverter {
             Reference<Integer> lastImportedId,
             Map<CharacterTag, String> characterNameMap,
             ReadOnlyTagList timelineTags,
+            int spriteId,
             XFLXmlWriter writer,
             SWF swf,
             Reference<Integer> nextClipId,
@@ -3358,7 +3360,7 @@ public class XFLConverter {
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol,
             List<Integer> multiUsageMorphShapes,
             StatusStack statusStack
-    ) throws XMLStreamException {
+    ) throws XMLStreamException {      
         int f = 0;
 
         List<PlaceObjectTypeTag> clipPlaces = new ArrayList<>();
@@ -3474,7 +3476,7 @@ public class XFLConverter {
                         continue;
                     }
                     delegatedPlaces.add(secondPlace);
-
+                                        
                     List<Tag> delegatedTimeline = new ArrayList<>();
                     f = 0;
                     boolean removed = false;
@@ -3482,7 +3484,7 @@ public class XFLConverter {
                     lastTag = null;
                     //Map<Integer, Integer> depthStates = new HashMap<>();
                     occupiedDepths.clear();
-
+                    
                     for (Tag t : timelineTags) {
                         if (f < fr) {
                             if (t instanceof PlaceObjectTypeTag) {
@@ -3546,7 +3548,12 @@ public class XFLConverter {
                         //set timelined?
                         delegatedTimeline.add(showFrame);
                     }
-                    addExtractedClip(lastItemIdNumber, lastImportedId, characterNameMap, new ReadOnlyTagList(delegatedTimeline), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
+                    if (delegatedTimeline.size() == timelineTags.size()) { 
+                        //avoid recursion
+                        //FIXME: this is wrong, needs to be fixed somehow
+                        return;
+                    }
+                    addExtractedClip(lastItemIdNumber, lastImportedId, characterNameMap, new ReadOnlyTagList(delegatedTimeline), spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
                     placeToMaskedSymbol.put(secondPlace, new MultiLevelClip(secondPlace, nextClipId.getVal(), numFrames));
                 }
             }
@@ -3957,65 +3964,67 @@ public class XFLConverter {
                                         }
 
                                         MultiLevelClip mlc = placeToMaskedSymbol.get(po2);
+                                        
+                                        if (mlc != null) {
+                                            writer.writeStartElement("DOMLayer", new String[]{
+                                                "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + po2.getDepth() + " clipdepth:" + po2.getClipDepth() + " maskedid:" + mlc.symbol + ")" : ""),
+                                                "color", randomOutlineColor(),
+                                                "parentLayerIndex", "" + parentIndex,
+                                                "locked", "true"
+                                            });
+                                            writer.writeStartElement("frames");
 
-                                        writer.writeStartElement("DOMLayer", new String[]{
-                                            "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + po2.getDepth() + " clipdepth:" + po2.getClipDepth() + " maskedid:" + mlc.symbol + ")" : ""),
-                                            "color", randomOutlineColor(),
-                                            "parentLayerIndex", "" + parentIndex,
-                                            "locked", "true"
-                                        });
-                                        writer.writeStartElement("frames");
-
-                                        int clipFrame2 = 0;
-                                        for (int p2 = 0; p2 < clipPlaces.size() - 1; p2++) {
-                                            if (clipPlaces.get(p2) == po2) {
-                                                clipFrame2 = clipFrameSplitters.get(p2);
+                                            int clipFrame2 = 0;
+                                            for (int p2 = 0; p2 < clipPlaces.size() - 1; p2++) {
+                                                if (clipPlaces.get(p2) == po2) {
+                                                    clipFrame2 = clipFrameSplitters.get(p2);
+                                                }
                                             }
-                                        }
-                                        //int nextFrame2 = clipFinishFrames.get(po2);
+                                            //int nextFrame2 = clipFinishFrames.get(po2);
 
-                                        if (clipFrame2 > 0) {
+                                            if (clipFrame2 > 0) {
+                                                writer.writeStartElement("DOMFrame", new String[]{
+                                                    "index", "0",
+                                                    "duration", "" + clipFrame2,
+                                                    "keyMode", "" + KEY_MODE_NORMAL
+                                                });
+                                                writer.writeEmptyElement("elements");
+                                                writer.writeEndElement();
+                                            }
+
                                             writer.writeStartElement("DOMFrame", new String[]{
-                                                "index", "0",
-                                                "duration", "" + clipFrame2,
+                                                "index", "" + clipFrame2,
+                                                "duration", "" + mlc.numFrames,
                                                 "keyMode", "" + KEY_MODE_NORMAL
                                             });
-                                            writer.writeEmptyElement("elements");
+                                            writer.writeStartElement("elements");
+                                            writer.writeStartElement("DOMSymbolInstance", new String[]{
+                                                "libraryItemName", getMaskedSymbolName(mlc.symbol),
+                                                "symbolType", "graphic",
+                                                "loop", "loop"
+                                            });
+
+                                            writer.writeStartElement("matrix");
+                                            convertMatrix(new MATRIX(), writer);
+                                            writer.writeEndElement(); //matrix                                                                
+
+                                            writer.writeStartElement("transformationPoint");
+                                            writer.writeEmptyElement("Point");
+                                            writer.writeEndElement(); //transformationPoint
+
+                                            writer.writeEndElement(); //DOMSymbolInstance
+                                            writer.writeEndElement(); //elements
+                                            writer.writeEndElement(); //DOMFrame                                    
+
+                                            writer.writeEndElement(); //frames
+
                                             writer.writeEndElement();
-                                        }
+                                            index++;
 
-                                        writer.writeStartElement("DOMFrame", new String[]{
-                                            "index", "" + clipFrame2,
-                                            "duration", "" + mlc.numFrames,
-                                            "keyMode", "" + KEY_MODE_NORMAL
-                                        });
-                                        writer.writeStartElement("elements");
-                                        writer.writeStartElement("DOMSymbolInstance", new String[]{
-                                            "libraryItemName", getMaskedSymbolName(mlc.symbol),
-                                            "symbolType", "graphic",
-                                            "loop", "loop"
-                                        });
-
-                                        writer.writeStartElement("matrix");
-                                        convertMatrix(new MATRIX(), writer);
-                                        writer.writeEndElement(); //matrix                                                                
-
-                                        writer.writeStartElement("transformationPoint");
-                                        writer.writeEmptyElement("Point");
-                                        writer.writeEndElement(); //transformationPoint
-
-                                        writer.writeEndElement(); //DOMSymbolInstance
-                                        writer.writeEndElement(); //elements
-                                        writer.writeEndElement(); //DOMFrame                                    
-
-                                        writer.writeEndElement(); //frames
-
-                                        writer.writeEndElement();
-                                        index++;
-
-                                        for (int nd2 = po2.getDepth(); nd2 <= po2.getClipDepth(); nd2++) {
-                                            for (int i = clipFrame2; i < clipFrame2 + mlc.numFrames; i++) {
-                                                depthToFramesList.get(nd2).remove((Integer) i);
+                                            for (int nd2 = po2.getDepth(); nd2 <= po2.getClipDepth(); nd2++) {
+                                                for (int i = clipFrame2; i < clipFrame2 + mlc.numFrames; i++) {
+                                                    depthToFramesList.get(nd2).remove((Integer) i);
+                                                }
                                             }
                                         }
                                     }
