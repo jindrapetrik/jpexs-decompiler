@@ -225,7 +225,7 @@ public class XFLConverter {
     /**
      * Adds "(depth xxx)" to layer name
      */
-    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = true;
+    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 
     private static final DecimalFormat EDGE_DECIMAL_FORMAT = new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
