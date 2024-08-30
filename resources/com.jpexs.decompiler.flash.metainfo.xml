@@ -92,7 +92,7 @@
 					<li>Script/Class initializers order of assignment</li>
 					<li>#2277 Return statement in initializer</li>
 					<li>Imports in script initializer</li>
-					<li>#2279 AS3 Decompilation - assignments on the right side of `&&` and `||` operators</li>
+					<li>#2279 AS3 Decompilation - assignments on the right side of `&amp;&amp;` and `||` operators</li>
 					<li>#2279 Embed assets with file base name ending with a space</li>
 					<li>Embed tag - Wav files need to be embedded in assets.swf</li>
 					<li>#2282 FLA export - visible flag</li>
