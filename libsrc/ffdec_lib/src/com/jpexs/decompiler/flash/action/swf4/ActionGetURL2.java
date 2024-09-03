@@ -209,7 +209,7 @@ public class ActionGetURL2 extends Action {
                 output.add(new LoadVariablesActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else if (loadTargetFlag) {
-            if ((urlString instanceof DirectValueActionItem) && (urlString.getResult().equals(""))) {
+            if ((urlString instanceof DirectValueActionItem) && ("".equals(urlString.getResult()))) {
                 output.add(new UnLoadMovieActionItem(this, lineStartAction, targetString));
             } else {
                 output.add(new LoadMovieActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
