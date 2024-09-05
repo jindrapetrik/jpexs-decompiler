@@ -65,6 +65,17 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.0.5" date="2024-09-05">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2293 FLA export - stackoverflow on multilevel clips extraction, clipping</li>
+					<li>#2294, #2300 AS3 export - Nullpointer on SWFs without document class</li>
+					<li>#2299 AS1/2 - Nullpointer on loadMovie with register as parameter</li>
+					<li>#2301 AS3 direct editing - instance variables assignments producing additional static assignments</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.4" date="2024-08-27">
 			<description>
 				<p>Fixed</p>
