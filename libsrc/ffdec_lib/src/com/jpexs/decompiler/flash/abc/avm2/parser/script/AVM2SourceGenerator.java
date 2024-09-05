@@ -808,7 +808,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         
         //List<AVM2Instruction> cinitcode = new ArrayList<>();
         List<AVM2Instruction> initcode = new ArrayList<>();
-        /*for (GraphTargetItem ti : commands) {
+        for (GraphTargetItem ti : commands) {
             if ((ti instanceof SlotAVM2Item) || (ti instanceof ConstAVM2Item)) {
                 GraphTargetItem val = null;
                 boolean isStatic = false;
@@ -831,12 +831,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         continue;
                     }
                 }
-                if (isStatic && val != null) {
+                /*if (isStatic && val != null) {
                     cinitcode.add(ins(AVM2Instructions.FindProperty, traitName(ns, tname)));
                     localData.isStatic = true;
                     cinitcode.addAll(toInsList(val.toSource(localData, this)));
                     cinitcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
                 }
+                */
                 if (!isStatic && val != null) {
                     //do not init basic values, that can be stored in trait
                     if (!(val instanceof IntegerValueAVM2Item) && !(val instanceof StringAVM2Item) && !(val instanceof BooleanAVM2Item) && !(val instanceof NullAVM2Item) && !(val instanceof UndefinedAVM2Item)) {
@@ -846,16 +847,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         initcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
                     }
                 }
-            } else if (ti instanceof MethodAVM2Item) {
-                //ignore
-            } else {
-                localData.isStatic = true;
-                List<GraphSourceItem> srcs = ti.toSourceIgnoreReturnValue(localData, this);
-                for (GraphSourceItem src : srcs) {
-                    cinitcode.add((AVM2Instruction)src);
-                }
             }
-        }*/
+        }
         MethodBody initBody = null;
         if (!isInterface) {
             initBody = abcIndex.getSelectedAbc().findBody(init);

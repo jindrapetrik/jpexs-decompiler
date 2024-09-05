@@ -120,9 +120,14 @@ public class SlotAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        if (localData.isStatic != isStatic) {
+            return new ArrayList<>();
+        }
+        
         AVM2SourceGenerator agen = (AVM2SourceGenerator) generator;
-        int ns = agen.genNs(localData.importedClasses, pkg.name, pkg, localData.openedNamespaces, localData, line);
-
+        int ns = agen.genNs(localData.importedClasses, pkg.name, pkg, localData.openedNamespaces, localData, line);       
+        
         List<GraphSourceItem> ret = new ArrayList<>();
         if (value != null) {
             ret.add(ins(AVM2Instructions.FindProperty, agen.traitName(ns, var)));
