@@ -128,11 +128,17 @@ public class ConstAVM2Item extends AVM2Item {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        if (localData.isStatic != isStatic) {
+            return new ArrayList<>();
+        }
+        
         AVM2SourceGenerator agen = (AVM2SourceGenerator) generator;
         int ns = agen.genNs(localData.importedClasses, pkg.name, pkg, localData.openedNamespaces, localData, line);
         if (type.toString().equals("Namespace")) {
             return new ArrayList<>();
         }
+                
 
         List<GraphSourceItem> ret = new ArrayList<>();
         if (value != null) {
