@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [21.0.5] - 2024-09-05
 ### Fixed
 - [#2293] FLA export - stackoverflow on multilevel clips extraction, clipping
@@ -3373,6 +3375,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.5...dev
 [21.0.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.4...version21.0.5
 [21.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.3...version21.0.4
 [21.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.2...version21.0.3
