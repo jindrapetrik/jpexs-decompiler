@@ -60,4 +60,9 @@ public class SCRIPTDATAVALUE {
         this.value = (Double) d;
         type = 0;
     }
+
+    @Override
+    public String toString() {
+        return "" + value;
+    }        
 }
