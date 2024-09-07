@@ -161,6 +161,8 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -2063,7 +2065,15 @@ public class XFLConverter {
                 writer.writeAttribute("frameRight", image.getWidth());
                 writer.writeAttribute("frameBottom", image.getHeight());
                 writer.writeEndElement();
-                datfiles.put(datFileName, new byte[0]); //empty byte arrays are not written
+                
+                ImageBinDataGenerator ibg = new ImageBinDataGenerator();
+                ByteArrayOutputStream iba = new ByteArrayOutputStream();
+                try {
+                    ibg.generateBinData(new ByteArrayInputStream(imageBytes), iba, format);
+                } catch (IOException ex) {
+                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during bin/dat file generation for image", ex);
+                }
+                datfiles.put(datFileName, iba.toByteArray());
                 statusStack.popStatus();
             } else if (symbol instanceof DefineSoundTag) {
                 statusStack.pushStatus(symbol.toString());
@@ -2134,22 +2144,9 @@ public class XFLConverter {
                         writer.writeAttribute("linkageURL", characterImportLinkageURL.get(symbol));
                     }
                     writer.writeEndElement();
-                    //Use the dat file, otherwise it does not work
-                    datfiles.put(datFileName, new byte[]{ //Magic numbers, if anybody knows why, please tell me
-                        (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xA0, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x78, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x59, (byte) 0x40, (byte) 0x18, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF,
-                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
-                    });
+                    
+                    MovieBinDataGenerator mbd = new MovieBinDataGenerator();
+                    datfiles.put(datFileName, mbd.generateEmptyBinData());
                 } else {
                     files.put(symbolFile, data);
                     writer.writeStartElement("DOMVideoItem", new String[]{
@@ -2184,6 +2181,19 @@ public class XFLConverter {
 
                         writer.writeAttribute("linkageExportForAS", true);
                     }
+                    
+                    long ts = getTimestamp(swf);
+                    String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";                    
+                    writer.writeAttribute("videoDataHRef", datFileName);
+                    MovieBinDataGenerator mbg = new MovieBinDataGenerator();
+                    ByteArrayOutputStream bba = new ByteArrayOutputStream();
+                    try {                    
+                        mbg.generateBinData(new ByteArrayInputStream(data), bba, swf.frameRate);
+                    } catch (IOException ex) {
+                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during bin/dat file generation for movie", ex);
+                    }
+                    datfiles.put(datFileName, bba.toByteArray());
+                    
                     writer.writeEndElement();
                 }
                 statusStack.popStatus();

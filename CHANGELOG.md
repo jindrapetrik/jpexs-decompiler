@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- FLA export - generating bin/*.dat files for movies and images
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
