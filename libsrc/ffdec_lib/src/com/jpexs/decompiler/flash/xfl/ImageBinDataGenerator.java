@@ -21,8 +21,6 @@ import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,11 +29,18 @@ import java.util.zip.DeflaterOutputStream;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Generates bin/*.dat file for images.
  * @author JPEXS
  */
 public class ImageBinDataGenerator {
 
+    /**
+     * Generates data
+     * @param is Input stream
+     * @param os Output stream
+     * @param format Image format
+     * @throws IOException On I/O error
+     */
     public void generateBinData(InputStream is, OutputStream os, ImageFormat format) throws IOException {
         byte[] inputData = Helper.readStream(is);
         BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(inputData));
@@ -59,8 +64,8 @@ public class ImageBinDataGenerator {
             w.writeUI16(bimg.getHeight());
 
             w.writeUI32(0);
-            w.writeUI32(0);
             w.writeUI32(20 * bimg.getWidth());
+            w.writeUI32(0);            
             w.writeUI32(20 * bimg.getHeight());
 
             w.write(0x01); //has transparency
@@ -72,10 +77,27 @@ public class ImageBinDataGenerator {
             for (int y = 0; y < bimg.getHeight(); y++) {
                 for (int x = 0; x < bimg.getWidth(); x++) {
                     int rgba = bimg.getRGB(x, y);
-                    def.write((rgba >> 24) & 0xFF); //a 
-                    def.write((rgba >> 16) & 0xFF); //b
-                    def.write((rgba >> 8) & 0xFF); //g
-                    def.write(rgba & 0xFF); //r                                                       
+                    int a = (rgba >> 24) & 0xFF;
+                    int b = (rgba >> 16) & 0xFF;
+                    int g = (rgba >> 8) & 0xFF;
+                    int r = rgba & 0xFF;
+                                   
+                    //some weird premultiplication
+                    if (a != 255) {
+                        r = (int)Math.floor(r * a / 256f);
+                        g = (int)Math.floor(g * a / 256f);
+                        b = (int)Math.floor(b * a / 256f);
+                    }
+                    
+                    //also weird, but this way it works...
+                    if (a != 0 && a != 255) {
+                        a = a + 1;
+                    }                                        
+                    
+                    def.write(a);
+                    def.write(b);
+                    def.write(g);
+                    def.write(r);
                 }
             }
             def.flush();

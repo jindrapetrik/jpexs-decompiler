@@ -33,11 +33,15 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- *
+ * Generates bin/*.dat file for movies.
  * @author JPEXS
  */
 public class MovieBinDataGenerator {
 
+    /**
+     * Generates empty bin data.
+     * @return Byte array
+     */
     public byte[] generateEmptyBinData() {
         return new byte[]{
             (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
@@ -56,6 +60,13 @@ public class MovieBinDataGenerator {
         };
     }
 
+    /**
+     * Generates data
+     * @param is Input stream
+     * @param os Output stream
+     * @param fps SWF fps
+     * @throws IOException On I/O error
+     */
     public void generateBinData(InputStream is, OutputStream os, float fps) throws IOException {
         BinDataOutputStream df = new BinDataOutputStream(os);
         FLVInputStream flvIs = new FLVInputStream(is);
