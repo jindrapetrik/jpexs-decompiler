@@ -16,7 +16,7 @@ if "%FFDEC_MEMORY%"=="" set FFDEC_MEMORY=1024m
 
 set STACK_SIZE_PARAM=
 set MEMORY_PARAM=
-if not "%FFDEC_STACK_SiZE%"=="" set STACK_SIZE_PARAM= -Xss%FFDEC_STACK_SiZE% 
-if not "%FFDEC_MEMORY%"=="" set MEMORY_PARAM=-Xmx%FFDEC_MEMORY% 
+if not "%FFDEC_STACK_SIZE%"=="" set STACK_SIZE_PARAM="-Xss%FFDEC_STACK_SIZE%" 
+if not "%FFDEC_MEMORY%"=="" set MEMORY_PARAM="-Xmx%FFDEC_MEMORY%" 
 
-java %MEMORY_PARAM%%STACK_SIZE_PARAM%-Djna.nosys=true -jar "%~dp0\ffdec.jar" %*
+java %MEMORY_PARAM% %STACK_SIZE_PARAM% -Djava.net.preferIPv4Stack=true -Djna.nosys=true -Djava.util.Arrays.useLegacyMergeSort=true -jar "%~dp0\ffdec.jar" %*
