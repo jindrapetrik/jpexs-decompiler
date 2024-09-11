@@ -2062,8 +2062,8 @@ public class XFLConverter {
                 writer.writeAttribute("href", symbolFile);
                 String datFileName = "M " + (datfiles.size() + 1) + " " + getTimestamp(swf) + ".dat";
                 writer.writeAttribute("bitmapDataHRef", datFileName);
-                writer.writeAttribute("frameRight", image.getWidth());
-                writer.writeAttribute("frameBottom", image.getHeight());
+                writer.writeAttribute("frameRight", (int) (image.getWidth() * SWF.unitDivisor));
+                writer.writeAttribute("frameBottom", (int) (image.getHeight() * SWF.unitDivisor));
                 writer.writeEndElement();
                 
                 ImageBinDataGenerator ibg = new ImageBinDataGenerator();

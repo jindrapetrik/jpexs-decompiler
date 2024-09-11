@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,17 +37,14 @@ import javax.imageio.ImageIO;
 public class ImageBinDataGenerator {
 
     public void generateBinData(InputStream is, OutputStream os, ImageFormat format) throws IOException {
-        BufferedImage bimg = ImageIO.read(is);
+        byte[] inputData = Helper.readStream(is);
+        BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(inputData));
         if (format == ImageFormat.JPEG) {
-            byte[] buf = new byte[4096];
-            int cnt;
-            while ((cnt = is.read(buf)) > 0) {
-                os.write(buf, 0, cnt);
-            }
+            os.write(inputData);
             BinDataOutputStream dw2 = new BinDataOutputStream(os);
             dw2.writeUI32(0);
-            dw2.writeUI32(0);
             dw2.writeUI32(20 * bimg.getWidth());
+            dw2.writeUI32(0);
             dw2.writeUI32(20 * bimg.getHeight());
         } else {
             //https://stackoverflow.com/questions/4082812/xfl-what-are-the-bin-dat-files/4082907#4082907
