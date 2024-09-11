@@ -180,7 +180,7 @@ public class SwfXmlImporter {
             CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
             BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
             DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
-            AVM2ConstantPool.class, Decimal128.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
+            AVM2ConstantPool.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
             ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
             TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
             ABCException.class, ABCVersion.class, Amf3Value.class,
@@ -195,7 +195,7 @@ public class SwfXmlImporter {
             }
             objects.put(cls2.getSimpleName(), cls2);
         }
-
+        
         swfObjects = objects;
 
         Map<String, Class> objectsParam = new HashMap<>();
@@ -526,6 +526,12 @@ public class SwfXmlImporter {
             return Float.parseFloat(stringValue);
         } else if (cls == Double.class || cls == double.class) {
             return Double.parseDouble(stringValue);
+        } else if (cls == Decimal128.class) {
+            String sdec = stringValue;
+            if (sdec.endsWith("m")) {
+                sdec = sdec.substring(0, sdec.length() - 1);                
+            }
+            return new Decimal128(sdec);
         } else if (cls == Boolean.class || cls == boolean.class) {
             return Boolean.parseBoolean(stringValue);
         } else if (cls == Character.class || cls == char.class) {

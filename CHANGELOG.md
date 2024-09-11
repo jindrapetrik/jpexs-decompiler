@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - FLA export - generating bin/*.dat files for movies and images
 
+### Fixed
+- [#2309] XML export/import - Decimal support
+
 ## [21.0.5] - 2024-09-05
 ### Fixed
 - [#2293] FLA export - stackoverflow on multilevel clips extraction, clipping
@@ -3538,6 +3541,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2309]: https://www.free-decompiler.com/flash/issues/2309
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2300]: https://www.free-decompiler.com/flash/issues/2300

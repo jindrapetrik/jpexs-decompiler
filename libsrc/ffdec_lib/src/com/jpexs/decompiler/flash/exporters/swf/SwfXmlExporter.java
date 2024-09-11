@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import macromedia.asc.util.Decimal128;
 
 /**
  * Exports SWF to XML.
@@ -178,6 +179,16 @@ public class SwfXmlExporter {
             Object value = obj;
             String stringValue = Helper.escapeXmlExportString(value.toString());
 
+            if (isListItem) {
+                writer.writeStartElement(name);
+                writer.writeCharacters(stringValue);
+                writer.writeEndElement();
+            } else {
+                writer.writeAttribute(name, stringValue);
+            }
+        } else if (cls == Decimal128.class) {
+            Decimal128 value = (Decimal128) obj;
+            String stringValue = value.toActionScriptString();
             if (isListItem) {
                 writer.writeStartElement(name);
                 writer.writeCharacters(stringValue);
