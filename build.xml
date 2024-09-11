@@ -717,6 +717,7 @@
             <jvmarg value="-Xmx${max.heap.size.run}m" />
             <!-- <jvmarg value="-Xss${max.stack.size}m"/> -->
             <jvmarg value="-Djava.net.preferIPv4Stack=true" />
+            <jvmarg value="-Djava.util.Arrays.useLegacyMergeSort=true" />
             <arg line="${run.params}" />
         </java>
     </target>
