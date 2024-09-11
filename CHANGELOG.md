@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2309] XML export/import - Decimal support
-- [#2300], [#2303] ShellFolder Comparaor Windows Java error
+- [#2300], [#2303] ShellFolder Comparator Windows Java error
 - [#2302] AS3 Class linkage - changes did not save
 
 ## [21.0.5] - 2024-09-05
