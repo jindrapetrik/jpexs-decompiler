@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2309] XML export/import - Decimal support
 - [#2300], [#2303] ShellFolder Comparaor Windows Java error
+- [#2302] AS3 Class linkage - changes did not save
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3545,6 +3546,7 @@ Major version of SWF to XML export changed to 2.
 [#2309]: https://www.free-decompiler.com/flash/issues/2309
 [#2300]: https://www.free-decompiler.com/flash/issues/2300
 [#2303]: https://www.free-decompiler.com/flash/issues/2303
+[#2302]: https://www.free-decompiler.com/flash/issues/2302
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299

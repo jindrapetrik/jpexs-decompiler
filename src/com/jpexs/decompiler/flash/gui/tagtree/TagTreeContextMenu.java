@@ -2835,7 +2835,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         if (!identifier.isEmpty() && !found) {
             ea.tags.add(ch.getCharacterId());
-            ea.names.add(identifier);
+            ea.names.add(identifier);           
         }
         ea.setModified(true);
         if (ea.names.isEmpty()) {
@@ -3002,6 +3002,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (sct.tags.get(i) == ch.getCharacterId()) {
                         sct.names.remove(i);
                         sct.tags.remove(i);
+                        sct.setModified(true);
                     }
                 }
                 if (sct.names.isEmpty() && sct != selectedSymbolClass) {
@@ -3012,6 +3013,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         selectedSymbolClass.tags.add(ch.getCharacterId());
         selectedSymbolClass.names.add(className);
+        selectedSymbolClass.setModified(true);
 
         swf.clearAllCache();
         swf.assignClassesToSymbols();
