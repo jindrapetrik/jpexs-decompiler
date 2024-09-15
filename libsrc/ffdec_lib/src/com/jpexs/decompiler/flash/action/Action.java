@@ -83,6 +83,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -182,13 +183,17 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Property names list in lower case
      */
-    public static final List<String> propertyNamesListLowerCase = new ArrayList<>();
-
-    {
-        for (String s : propertyNamesList) {
-            propertyNamesListLowerCase.add(s.toLowerCase());
+    public static final List<String> propertyNamesListLowerCase = new AbstractList<String>() {
+        @Override
+        public String get(int index) {
+            return propertyNamesList.get(index).toLowerCase();
         }
-    }
+
+        @Override
+        public int size() {
+            return propertyNamesList.size();
+        }
+    };
 
     /**
      * Logger
