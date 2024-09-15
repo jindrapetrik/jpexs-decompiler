@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#2309] XML export/import - Decimal support
 - [#2300], [#2303] ShellFolder Comparator Windows Java error
 - [#2302] AS3 Class linkage - changes did not save
+- [PR203] AS1/2 lagging on saving
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -4624,6 +4625,7 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR203]: https://github.com/jindrapetrik/jpexs-decompiler/pull/203
 [PR190]: https://github.com/jindrapetrik/jpexs-decompiler/pull/190
 [PR194]: https://github.com/jindrapetrik/jpexs-decompiler/pull/194
 [PR191]: https://github.com/jindrapetrik/jpexs-decompiler/pull/191
