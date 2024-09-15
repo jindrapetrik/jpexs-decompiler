@@ -183,17 +183,13 @@ public abstract class Action implements GraphSourceItem {
     /**
      * Property names list in lower case
      */
-    public static final List<String> propertyNamesListLowerCase = new AbstractList<String>() {
-        @Override
-        public String get(int index) {
-            return propertyNamesList.get(index).toLowerCase();
-        }
+    public static final List<String> propertyNamesListLowerCase = new ArrayList<>();
 
-        @Override
-        public int size() {
-            return propertyNamesList.size();
+    static {
+        for (String s : propertyNamesList) {
+            propertyNamesListLowerCase.add(s.toLowerCase());
         }
-    };
+    }
 
     /**
      * Logger
