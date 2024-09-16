@@ -147,6 +147,14 @@ public class AbstractDocs {
             while (true) {
                 startPos = lexer.yychar();
                 symb = lexer.lex();
+                if (symb.type == ParsedSymbol.TYPE_DOTS) {
+                    endPos = lexer.yychar() + 3;
+                    break;
+                }
+                if (symb.type == ParsedSymbol.TYPE_EOF) {
+                    endPos = lexer.yychar();
+                    break;
+                }
                 if (symb.type == ParsedSymbol.TYPE_BRACKET_OPEN) {
                     while (symb.type != ParsedSymbol.TYPE_BRACKET_CLOSE && symb.type != ParsedSymbol.TYPE_EOF) {
                         symb = lexer.lex();

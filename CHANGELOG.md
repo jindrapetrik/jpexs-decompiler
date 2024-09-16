@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2302] AS3 Class linkage - changes did not save
 - [PR203] AS1/2 extreme lagging
 - [#2310] Text search history showing as null
+- [#2311] AS1/2 p-code freezing on highlighting ConstantPool
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3550,6 +3551,7 @@ Major version of SWF to XML export changed to 2.
 [#2303]: https://www.free-decompiler.com/flash/issues/2303
 [#2302]: https://www.free-decompiler.com/flash/issues/2302
 [#2310]: https://www.free-decompiler.com/flash/issues/2310
+[#2311]: https://www.free-decompiler.com/flash/issues/2311
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299
