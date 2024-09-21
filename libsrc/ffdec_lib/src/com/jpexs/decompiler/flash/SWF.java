@@ -2945,7 +2945,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     if (allowUncompressed) {
                         //In old versions of GFX format (I saw it in 1.02), the fileSize field 
                         // does not contain size of header (signature + version + filesize = 8 bytes)
-                        if (header.gfx && is.available() >= fileSize) {
+                        if (header.gfx && is.available() + 8 > fileSize) {
                             final InputStream fis = is;
 
                             //pass to outputstream all we read
@@ -2972,6 +2972,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 int exporterVersion = sis.readUI16("exporterInfo");
                                 if (exporterVersion < 0x200) { //assuming version 2 corrected this
                                     Helper.copyStream(is, os, fileSize - sis.getPos());
+                                } else {
+                                    Helper.copyStream(is, os, fileSize - 8 - sis.getPos());
                                 }
                             } else {
                                 Helper.copyStream(is, os, fileSize - 8 - sis.getPos());
