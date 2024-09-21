@@ -150,6 +150,12 @@ import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.flash.fla.converter.FlaConverter;
+import com.jpexs.flash.fla.converter.FlaFormatVersion;
+import com.jpexs.flash.fla.converter.streams.CfbOutputStorage;
+import com.jpexs.flash.fla.converter.streams.InputStorageInterface;
+import com.jpexs.flash.fla.converter.streams.OutputStorageInterface;
+import com.jpexs.flash.fla.converter.streams.ZippedInputStorage;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Path;
@@ -2010,7 +2016,7 @@ public class XFLConverter {
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = getSymbolName(lastImportedId, characterNameMap, swf, symbol, "Bitmap") + imageTag.getImageFormat().getExtension();
                 files.put(symbolFile, imageBytes);
-                writer.writeStartElement("DOMBitmapItem", new String[]{                    
+                writer.writeStartElement("DOMBitmapItem", new String[]{
                     "name", symbolFile,
                     "itemID", generateItemId(lastItemIdNumber),
                     "sourceLastImported", Long.toString(getTimestamp(swf)),
@@ -2065,7 +2071,7 @@ public class XFLConverter {
                 writer.writeAttribute("frameRight", (int) (image.getWidth() * SWF.unitDivisor));
                 writer.writeAttribute("frameBottom", (int) (image.getHeight() * SWF.unitDivisor));
                 writer.writeEndElement();
-                
+
                 ImageBinDataGenerator ibg = new ImageBinDataGenerator();
                 ByteArrayOutputStream iba = new ByteArrayOutputStream();
                 try {
@@ -2144,7 +2150,7 @@ public class XFLConverter {
                         writer.writeAttribute("linkageURL", characterImportLinkageURL.get(symbol));
                     }
                     writer.writeEndElement();
-                    
+
                     MovieBinDataGenerator mbd = new MovieBinDataGenerator();
                     datfiles.put(datFileName, mbd.generateEmptyBinData());
                 } else {
@@ -2181,19 +2187,19 @@ public class XFLConverter {
 
                         writer.writeAttribute("linkageExportForAS", true);
                     }
-                    
+
                     long ts = getTimestamp(swf);
-                    String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";                    
+                    String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
                     writer.writeAttribute("videoDataHRef", datFileName);
                     MovieBinDataGenerator mbg = new MovieBinDataGenerator();
                     ByteArrayOutputStream bba = new ByteArrayOutputStream();
-                    try {                    
+                    try {
                         mbg.generateBinData(new ByteArrayInputStream(data), bba, swf.frameRate);
                     } catch (IOException ex) {
                         Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during bin/dat file generation for movie", ex);
                     }
                     datfiles.put(datFileName, bba.toByteArray());
-                    
+
                     writer.writeEndElement();
                 }
                 statusStack.popStatus();
@@ -2725,17 +2731,19 @@ public class XFLConverter {
                 FontTag font = (FontTag) ct;
                 DefineFontNameTag fontNameTag = (DefineFontNameTag) font.getSwf().getCharacterIdTag(font.getCharacterId(), DefineFontNameTag.ID);
                 String fontName = fontNameTag == null ? null : fontNameTag.fontName;
+                int fontStyle = font.getFontStyle();
                 if (fontName == null) {
                     fontName = font.getFontNameIntag();
+
+                    fontName = FontTag.isFontFamilyInstalled(fontName);
+                    if (fontName == null) {
+                        fontName = FontTag.getDefaultFontName();
+                    }
                 }
-                if (fontName == null) {
-                    fontName = FontTag.getDefaultFontName();
+                if (FontTag.isFontNameInstalled(fontName)) {
+                    fontName = new Font(fontName, fontStyle, 10).getPSName();
                 }
-                int fontStyle = font.getFontStyle();
-                String installedFont;
-                if ((installedFont = FontTag.isFontFamilyInstalled(fontName)) != null) {
-                    fontName = new Font(installedFont, fontStyle, 10).getPSName();
-                }
+
                 String embedRanges = "";
 
                 String fontChars = font.getCharacters();
@@ -3186,7 +3194,7 @@ public class XFLConverter {
 
     private void addExtractedClip(
             Reference<Integer> lastItemIdNumber,
-            Reference<Integer> lastImportedId, 
+            Reference<Integer> lastImportedId,
             Map<CharacterTag, String> characterNameMap,
             ReadOnlyTagList timelineTags,
             int spriteId,
@@ -3371,7 +3379,7 @@ public class XFLConverter {
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol,
             List<Integer> multiUsageMorphShapes,
             StatusStack statusStack
-    ) throws XMLStreamException {      
+    ) throws XMLStreamException {
         int f = 0;
 
         List<PlaceObjectTypeTag> clipPlaces = new ArrayList<>();
@@ -3379,22 +3387,20 @@ public class XFLConverter {
         Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
         Map<PlaceObjectTypeTag, Integer> clipStartFrames = new HashMap<>();
 
-        
-        
         Set<Integer> occupiedDepths = new HashSet<>();
 
         List<PlaceObjectTypeTag> clipPlacesInCurrentFrame = new ArrayList<>();
         Comparator<PlaceObjectTypeTag> placeComparator = new Comparator<PlaceObjectTypeTag>() {
-                        @Override
-                        public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
-                            int ret = o2.getClipDepth() - o1.getClipDepth();
-                            if (ret != 0) {
-                                return ret;
-                            }
-                            return o1.getDepth() - o1.getDepth();
-                        }                        
-                    };
-        
+            @Override
+            public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
+                int ret = o2.getClipDepth() - o1.getClipDepth();
+                if (ret != 0) {
+                    return ret;
+                }
+                return o1.getDepth() - o1.getDepth();
+            }
+        };
+
         int maxDepth = getMaxDepth(timelineTags);
         Tag lastTag = null;
         for (Tag t : timelineTags) {
@@ -3443,7 +3449,7 @@ public class XFLConverter {
             }
             lastTag = t;
         }
-        
+
         clipPlacesInCurrentFrame.sort(placeComparator);
         clipPlaces.addAll(clipPlacesInCurrentFrame);
         clipPlacesInCurrentFrame.clear();
@@ -3501,7 +3507,7 @@ public class XFLConverter {
         for (int fr : frameToDepthToClips.keySet()) {
             for (int d : frameToDepthToClips.get(fr).keySet()) {
                 List<PlaceObjectTypeTag> places = frameToDepthToClips.get(fr).get(d);
-                
+
                 if (places.size() > 1) {
                     depthToFramesList.get(d).remove((Integer) fr);
                     PlaceObjectTypeTag firstPlace = places.get(0);
@@ -3510,7 +3516,7 @@ public class XFLConverter {
                         continue;
                     }
                     delegatedPlaces.add(secondPlace);
-                                        
+
                     List<Tag> delegatedTimeline = new ArrayList<>();
                     f = 0;
                     boolean removed = false;
@@ -3518,7 +3524,7 @@ public class XFLConverter {
                     lastTag = null;
                     //Map<Integer, Integer> depthStates = new HashMap<>();
                     occupiedDepths.clear();
-                    
+
                     for (Tag t : timelineTags) {
                         if (f < fr) {
                             if (t instanceof PlaceObjectTypeTag) {
@@ -3551,9 +3557,9 @@ public class XFLConverter {
                                             removed = true;
                                         }
                                     }
-                                    if (!removed 
+                                    if (!removed
                                             && place != firstPlace
-                                            && place.getDepth() >= secondPlace.getDepth() 
+                                            && place.getDepth() >= secondPlace.getDepth()
                                             && place.getDepth() <= secondPlace.getClipDepth()) {
                                         delegatedTimeline.add(place);
                                     }
@@ -3792,19 +3798,19 @@ public class XFLConverter {
             Set<Integer> occupiedDepths = new HashSet<>();
             Tag lastTag = null;
             int tpos = 0;
-            
+
             List<PlaceObjectTypeTag> clipPlacesInCurrentFrame = new ArrayList<>();
             Comparator<PlaceObjectTypeTag> placeComparator = new Comparator<PlaceObjectTypeTag>() {
-                        @Override
-                        public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
-                            int ret = o2.getClipDepth() - o1.getClipDepth();
-                            if (ret != 0) {
-                                return ret;
-                            }
-                            return o1.getDepth() - o1.getDepth();
-                        }                        
-                    };
-            
+                @Override
+                public int compare(PlaceObjectTypeTag o1, PlaceObjectTypeTag o2) {
+                    int ret = o2.getClipDepth() - o1.getClipDepth();
+                    if (ret != 0) {
+                        return ret;
+                    }
+                    return o1.getDepth() - o1.getDepth();
+                }
+            };
+
             for (Tag t : sceneTimelineTags) {
                 if (t instanceof ShowFrameTag) {
                     clipPlacesInCurrentFrame.sort(placeComparator);
@@ -3866,11 +3872,11 @@ public class XFLConverter {
                 lastTag = t;
                 tpos++;
             }
-            
+
             clipPlacesInCurrentFrame.sort(placeComparator);
             clipPlaces.addAll(clipPlacesInCurrentFrame);
             clipPlacesInCurrentFrame.clear();
-                    
+
             //Some sprites do not end with ShowFrame:
             if (lastTag != null && !(lastTag instanceof ShowFrameTag)) {
                 f++;
@@ -3904,7 +3910,7 @@ public class XFLConverter {
 
             for (f = 0; f < frameCount; f++) {
                 for (int d = 0; d < maxDepth; d++) {
-                    for (int p = 0; p < clipPlaces.size() - 1; p++) {                       
+                    for (int p = 0; p < clipPlaces.size() - 1; p++) {
                         PlaceObjectTypeTag po = clipPlaces.get(p);
                         if (po == null) {
                             continue;
@@ -3944,7 +3950,7 @@ public class XFLConverter {
             for (int d = maxDepth; d >= 0; d--) {
                 loopp:
                 for (int p = 0; p < clipPlaces.size() - 1; p++) {
-                    PlaceObjectTypeTag po = clipPlaces.get(p);                   
+                    PlaceObjectTypeTag po = clipPlaces.get(p);
                     /*if (po != null && multiLevelsPlaces.contains(po)) {
                         continue;
                     }*/
@@ -4010,7 +4016,7 @@ public class XFLConverter {
                                         }
 
                                         MultiLevelClip mlc = placeToMaskedSymbol.get(po2);
-                                        
+
                                         if (mlc != null) {
                                             writer.writeStartElement("DOMLayer", new String[]{
                                                 "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + po2.getDepth() + " clipdepth:" + po2.getClipDepth() + " maskedid:" + mlc.symbol + ")" : ""),
@@ -4661,6 +4667,14 @@ public class XFLConverter {
      * @throws InterruptedException On interrupt
      */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
+        FlaFormatVersion cbfFlaVersion = null;
+        
+        String xflVersion = flaVersion.xflVersion();
+
+        if (flaVersion.getCfbFlaVersion() != null) {
+            cbfFlaVersion = flaVersion.getCfbFlaVersion();
+            xflVersion = FLAVersion.CS5.xflVersion();
+        }
 
         FileAttributesTag fa = swf.getFileAttributes();
 
@@ -4680,13 +4694,13 @@ public class XFLConverter {
             baseName = baseName.substring(0, baseName.lastIndexOf('.')); //myfile
         }
 
-        File scriptsDir = flaFile.getParentFile(); //c:/mydir
+        File scriptsDir = flaFile.getParentFile(); //c:/mydir                
 
         Path.createDirectorySafe(scriptsDir);
 
         File xflDataDir = null;
         String xflFile = null;
-        if (!settings.compressed) {
+        if (!settings.compressed && cbfFlaVersion == null) {
             xflDataDir = new File(Path.combine(flaFile.getParentFile().getAbsolutePath(), baseName)); //c:/mydir/myfile/
             xflFile = Path.combine(xflDataDir.getAbsolutePath(), baseName + ".xfl"); // c:/mydir/myfile.xfl
             Path.createDirectorySafe(xflDataDir);
@@ -4719,7 +4733,7 @@ public class XFLConverter {
                 "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
                 "xmlns", "http://ns.adobe.com/xfl/2008/",
                 "currentTimeline", "1",
-                "xflVersion", flaVersion.xflVersion(),
+                "xflVersion", xflVersion,
                 "creatorInfo", generator,
                 "platform", "Windows",
                 "versionInfo", "Saved by " + generatorVerName,
@@ -5238,10 +5252,17 @@ public class XFLConverter {
 
         String publishSettingsStr = publishSettings.toString();
 
-        if (settings.compressed) {
+        String zipfile = outfile;
+
+        if (settings.compressed || cbfFlaVersion != null) {
             final String domDocumentF = domDocumentStr;
             final String publishSettingsF = publishSettingsStr;
-            final String outfileF = outfile;
+
+            if (cbfFlaVersion != null) {
+                zipfile = File.createTempFile("ffdec_fla_export", ".fla").getAbsolutePath();
+            }
+
+            final String outfileF = zipfile;
             new RetryTask(() -> {
                 try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
                     out.putNextEntry(new ZipEntry("DOMDocument.xml"));
@@ -5289,6 +5310,23 @@ public class XFLConverter {
                 swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
+            }
+        }
+
+        if (cbfFlaVersion != null) {
+            progressListener.status("Converting to " + cbfFlaVersion + " ...");
+            try {
+                InputStorageInterface inputStorage = new ZippedInputStorage(new File(zipfile));
+                OutputStorageInterface outputStorage = new CfbOutputStorage(new File(outfile));
+
+                FlaConverter contentsGenerator = new FlaConverter(cbfFlaVersion);
+                contentsGenerator.convert(inputStorage, outputStorage);
+                inputStorage.close();
+                outputStorage.close();
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Error while converting to old format", ex);
+            } finally {
+                new File(zipfile).delete();
             }
         }
 
@@ -5447,14 +5485,14 @@ public class XFLConverter {
     private static double twipToPixel(double tw) {
         return tw / SWF.unitDivisor;
     }
-    
+
     private static String generateItemId(Reference<Integer> lastItemIdNumber) {
         lastItemIdNumber.setVal(lastItemIdNumber.getVal() + 1);
         String epochHex = String.format("%1$08x", Math.round(System.currentTimeMillis() / 1000));
         String numberHex = String.format("%1$08x", lastItemIdNumber.getVal());
         return epochHex + "-" + numberHex;
     }
-    
+
     private static class HTMLTextParser extends DefaultHandler {
 
         public XFLXmlWriter result = new XFLXmlWriter();
@@ -5749,7 +5787,7 @@ public class XFLConverter {
                 if (fontFace != null) {
                     result.writeAttribute("face", fontFace);
                 }
-                if (color != null) {
+                if (color != null && !color.isEmpty()) {
                     result.writeAttribute("fillColor", color);
                 }
                 if (url != null) {

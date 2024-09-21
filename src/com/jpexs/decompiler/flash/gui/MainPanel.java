@@ -3529,6 +3529,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         boolean isAS3 = swf.isAS3();
         Map<FileFilter, String> filterToVersion = new HashMap<>();
         Map<FileFilter, Boolean> filterToCompressed = new HashMap<>();
+        
+        Map<FileFilter, FLAVersion> filterToFlaVersion = new HashMap<>();
 
         FLAVersion lastVersion = FLAVersion.fromString(Configuration.lastFlaExportVersion.get("CS6"));
         boolean lastCompressed = Configuration.lastFlaExportCompressed.get(true);
@@ -3555,29 +3557,34 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 } else {
                     fc.addChoosableFileFilter(f);
                 }
+                filterToFlaVersion.put(f, v);                    
                 filterToVersion.put(f, "" + v);
                 filterToCompressed.put(f, true);
                 flaFilters.add(f);
-                f = new FileFilter() {
-                    @Override
-                    public boolean accept(File f) {
-                        return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".xfl"));
-                    }
+                
+                if (v.xflVersion() != null)  {
+                    f = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return f.isDirectory() || (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".xfl"));
+                        }
 
-                    @Override
-                    public String getDescription() {
-                        return translate("filter.xfl").replace("%version%", v.applicationName());
-                    }
-                };
-                filterToVersion.put(f, "" + v);
-                filterToCompressed.put(f, false);
+                        @Override
+                        public String getDescription() {
+                            return translate("filter.xfl").replace("%version%", v.applicationName());
+                        }
+                    };
+                    filterToFlaVersion.put(f, v);
+                    filterToVersion.put(f, "" + v);
+                    filterToCompressed.put(f, false);
 
-                if (v == lastVersion && !lastCompressed) {
-                    fc.setFileFilter(f);
-                } else {
-                    fc.addChoosableFileFilter(f);
+                    if (v == lastVersion && !lastCompressed) {
+                        fc.setFileFilter(f);
+                    } else {
+                        fc.addChoosableFileFilter(f);
+                    }
+                    xflFilters.add(f);
                 }
-                xflFilters.add(f);
             }
         }
 
@@ -3595,7 +3602,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 path = path.substring(0, path.length() - 4);
             }
             path += compressed ? ".fla" : ".xfl";
-            final FLAVersion selectedVersion = versions.get(compressed ? flaFilters.indexOf(selectedFilter) : xflFilters.indexOf(selectedFilter));
+            final FLAVersion selectedVersion = filterToFlaVersion.get(selectedFilter);
             final File selfile = new File(path);
             long timeBefore = System.currentTimeMillis();
             new CancellableWorker() {

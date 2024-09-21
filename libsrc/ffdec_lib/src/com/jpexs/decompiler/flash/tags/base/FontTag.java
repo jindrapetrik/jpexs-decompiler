@@ -626,6 +626,10 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return installedFontsByFamily.keySet().iterator().next();
     }
 
+    public static boolean isFontNameInstalled(String fontName) {
+        return installedFontsByName.containsKey(fontName);
+    }
+    
     /**
      * Checks if font family is installed.
      * @param fontFamily Font family
