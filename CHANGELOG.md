@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - FLA export - generating bin/*.dat files for movies and images
+- [#943], [#1812], [#2287] Export to older binary FLA formats (CS4, CS3, Flash 8, MX 2004, MX, Flash 5)
 
 ### Fixed
 - [#2309] XML export/import - Decimal support
@@ -11,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2302] AS3 Class linkage - changes did not save
 - [PR203] AS1/2 extreme lagging
 - [#2310] Text search history showing as null
-- [#2311] AS1/2 p-code freezing on highlighting ConstantPool
+- [#2295], [#2311] AS1/2 p-code freezing on highlighting ConstantPool
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3546,11 +3547,15 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#943]: https://www.free-decompiler.com/flash/issues/943
+[#1812]: https://www.free-decompiler.com/flash/issues/1812
+[#2287]: https://www.free-decompiler.com/flash/issues/2287
 [#2309]: https://www.free-decompiler.com/flash/issues/2309
 [#2300]: https://www.free-decompiler.com/flash/issues/2300
 [#2303]: https://www.free-decompiler.com/flash/issues/2303
 [#2302]: https://www.free-decompiler.com/flash/issues/2302
 [#2310]: https://www.free-decompiler.com/flash/issues/2310
+[#2295]: https://www.free-decompiler.com/flash/issues/2295
 [#2311]: https://www.free-decompiler.com/flash/issues/2311
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294

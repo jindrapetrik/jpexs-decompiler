@@ -16,22 +16,30 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.flash.fla.converter.FlaFormatVersion;
+
 /**
  * FLA version enumeration.
  *
  * @author JPEXS
  */
 public enum FLAVersion {
-
-    CS5("CS5", "Flash CS 5", "2.0", 10),
-    CS5_5("CS5.5", "Flash CS 5.5", "2.1", 11),
-    CS6("CS6", "Flash CS 6", "2.2", 17),
-    CC("CC", "Flash CC", "2.4", Integer.MAX_VALUE) {
+    F5("F5", "Flash 5", FlaFormatVersion.F5, null, 5),
+    MX("MX", "Flash MX", FlaFormatVersion.MX, null, 6),
+    MX2004("MX2004", "Flash MX 2004", FlaFormatVersion.MX2004, null, 7),
+    F8("F8", "Flash 8", FlaFormatVersion.F8, null, 8),
+    CS3("CS3", "Flash CS 3", FlaFormatVersion.CS3, null, 9),
+    CS4("CS4", "Flash CS 4", FlaFormatVersion.CS4, null, 10),
+    CS5("CS5", "Flash CS 5", null, "2.0", 10),
+    CS5_5("CS5.5", "Flash CS 5.5", null, "2.1", 11),
+    CS6("CS6", "Flash CS 6", null, "2.2", 17),
+    CC("CC", "Flash CC", null, "2.4", Integer.MAX_VALUE) {
         @Override
         public int minASVersion() {
             return 3; //AS 1/2 not supported anymore
         }
     };
+    private final FlaFormatVersion cfbFlaVersion;
 
     private final String xflVersion;
 
@@ -39,15 +47,20 @@ public enum FLAVersion {
 
     private final String applicationName;
 
-    private final int maxSwfVersion;   
+    private final int maxSwfVersion;
 
-    private FLAVersion(String shortName, String applicationName, String xflVersion, int maxSwfVersion) {
+    private FLAVersion(String shortName, String applicationName, FlaFormatVersion cfbFlaVersion, String xflVersion, int maxSwfVersion) {
+        this.cfbFlaVersion = cfbFlaVersion;
         this.xflVersion = xflVersion;
         this.shortName = shortName;
         this.applicationName = applicationName;
         this.maxSwfVersion = maxSwfVersion;
     }
 
+    public FlaFormatVersion getCfbFlaVersion() {
+        return cfbFlaVersion;
+    }   
+    
     public String xflVersion() {
         return xflVersion;
     }
@@ -81,7 +94,7 @@ public enum FLAVersion {
             if (v.shortName.toLowerCase().equals(s.toLowerCase())) {
                 return v;
             }
-            if (v.xflVersion.equals(s)) {
+            if (v.xflVersion != null && v.xflVersion.equals(s)) {
                 return v;
             }
         }
