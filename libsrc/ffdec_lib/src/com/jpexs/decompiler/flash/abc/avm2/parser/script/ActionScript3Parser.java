@@ -1226,9 +1226,9 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, ns, null, false, vcname, type, value, lexer.yyline(), false);
+                        tar = new ConstAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline(), false);
                     } else {
-                        tar = new SlotAVM2Item(metadata, ns, null, false, vcname, type, value, lexer.yyline());
+                        tar = new SlotAVM2Item(metadata, ns, null, true, vcname, type, value, lexer.yyline());
                     }
                     traits.add(tar);
                     if (s.type != SymbolType.SEMICOLON) {
