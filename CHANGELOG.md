@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 - FLA export - generating bin/*.dat files for movies and images
 - [#943], [#1812], [#2287] Export to older binary FLA formats (CS4, CS3, Flash 8, MX 2004, MX, Flash 5)
 
+### Changed
+- [#1644] Swapped Save all and Save buttons - Save is bigger
+
 ### Fixed
 - [#2309] XML export/import - Decimal support
 - [#2300], [#2303] ShellFolder Comparator Windows Java error
@@ -3555,6 +3558,7 @@ Major version of SWF to XML export changed to 2.
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
+[#1644]: https://www.free-decompiler.com/flash/issues/1644
 [#2309]: https://www.free-decompiler.com/flash/issues/2309
 [#2300]: https://www.free-decompiler.com/flash/issues/2300
 [#2303]: https://www.free-decompiler.com/flash/issues/2303
@@ -3603,7 +3607,6 @@ Major version of SWF to XML export changed to 2.
 [#1290]: https://www.free-decompiler.com/flash/issues/1290
 [#1809]: https://www.free-decompiler.com/flash/issues/1809
 [#873]: https://www.free-decompiler.com/flash/issues/873
-[#1644]: https://www.free-decompiler.com/flash/issues/1644
 [#1383]: https://www.free-decompiler.com/flash/issues/1383
 [#2149]: https://www.free-decompiler.com/flash/issues/2149
 [#2172]: https://www.free-decompiler.com/flash/issues/2172
