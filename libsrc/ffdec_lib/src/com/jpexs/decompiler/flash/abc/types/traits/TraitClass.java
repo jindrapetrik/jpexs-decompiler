@@ -359,6 +359,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance methods
         instanceInfo.instance_traits.toString(first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
 
+        if (first.getVal()) {
+            writer.newLine();
+        }
         writer.endClass();
         writer.endBlock(); // class
         writer.newLine();
