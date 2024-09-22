@@ -2867,8 +2867,8 @@ public class Graph {
 
             if (stopPart.contains(part)) {
 
-                boolean hasBlockClosesAfter = false;
-                //this weird stuff handles some goto problems:            
+                /*boolean hasBlockClosesAfter = false;
+                //this weird stuff handles some goto problems:
                 loopi:
                 for (int i = 0; i < stopPartKind.size(); i++) {
                     if (stopPart.get(i) == part) {
@@ -2883,15 +2883,15 @@ public class Graph {
                     }
                 }
 
-                if (!hasBlockClosesAfter) {
-                    if (currentLoop != null) {
-                        currentLoop.phase = 0;
-                    }
-                    if (debugPrintGraph) {
-                        System.err.println("Stopped on part " + part);
-                    }
-                    return ret;
+                if (!hasBlockClosesAfter) {*/
+                if (currentLoop != null) {
+                    currentLoop.phase = 0;
                 }
+                if (debugPrintGraph) {
+                    System.err.println("Stopped on part " + part);
+                }
+                return ret;
+                //}
             }
 
             if (code.size() <= part.start) {
