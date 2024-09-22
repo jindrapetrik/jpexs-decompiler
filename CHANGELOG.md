@@ -24,7 +24,8 @@ All notable changes to this project will be documented in this file.
 - [#2290] FLA export - not generating sound bin files causing sound compression setting to be ignored
 - [#2296] AS decompilation - goto problems
 - AS3 - displaying imports of class parent chain
-- AS3 - imports for script traits
+- AS3 - imports for script slot/const traits
+- AS3 direct editation - script slot/const traits assignments
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
