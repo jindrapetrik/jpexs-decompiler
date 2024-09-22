@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - displaying imports of class parent chain
 - AS3 - imports for script slot/const traits
 - AS3 direct editation - script slot/const traits assignments
+- AS3 direct editation - double returnvoid on script initializer
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
