@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - FLA export - generating bin/*.dat files for movies and images
 - [#943], [#1812], [#2287] Export to older binary FLA formats (CS4, CS3, Flash 8, MX 2004, MX, Flash 5)
 - [#2286] Set SWF version in FlashDevelop project
+- [#2306] Export to VS Code project
 
 ### Changed
 - [#1644] Swapped Save all and Save buttons - Save is bigger
@@ -3560,6 +3561,7 @@ Major version of SWF to XML export changed to 2.
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
 [#2286]: https://www.free-decompiler.com/flash/issues/2286
+[#2306]: https://www.free-decompiler.com/flash/issues/2306
 [#1644]: https://www.free-decompiler.com/flash/issues/1644
 [#2309]: https://www.free-decompiler.com/flash/issues/2309
 [#2300]: https://www.free-decompiler.com/flash/issues/2300

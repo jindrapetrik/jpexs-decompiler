@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
@@ -3477,6 +3478,79 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             protected void onStart() {
                 Main.startWork(translate("work.exporting.idea") + "...", this);
+            }
+
+            @Override
+            protected void done() {
+                Main.stopWork();
+                long timeAfter = System.currentTimeMillis();
+                final long timeMs = timeAfter - timeBefore;
+
+                View.execInEventDispatch(() -> {
+                    setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                });
+
+                if (Configuration.openFolderAfterFlaExport.get()) {
+                    try {
+                        Desktop.getDesktop().open(new File(fpath).getAbsoluteFile().getParentFile());
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.execute();
+    }
+    
+    public void exportVsCode(final SWF swf) {
+        if (swf == null) {
+            return;
+        }
+
+        JFileChooser chooser = View.getFileChooserWithIcon("exportvscode");
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("export.project.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        final String fpath = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+        Configuration.lastExportDir.set(Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
+        SwfVsCodeExporter exporter = new SwfVsCodeExporter();
+
+        long timeBefore = System.currentTimeMillis();
+        new CancellableWorker() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Helper.freeMem();
+
+                CancellableWorker w = this;
+
+                ProgressListener prog = new ProgressListener() {
+                    @Override
+                    public void progress(int p) {
+                    }
+
+                    @Override
+                    public void status(String status) {
+                        Main.startWork(translate("work.exporting.vsCode") + "..." + status, w);
+                    }
+                };
+                EventListener evl = swf.getExportEventListener();
+                try {
+                    AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
+                    exporter.exportVsCodeProject(swf, new File(fpath), false, errorHandler, evl);
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "VsCode export error", ex);
+                    ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                Helper.freeMem();
+                return null;
+            }
+
+            @Override
+            protected void onStart() {
+                Main.startWork(translate("work.exporting.vsCode") + "...", this);
             }
 
             @Override
