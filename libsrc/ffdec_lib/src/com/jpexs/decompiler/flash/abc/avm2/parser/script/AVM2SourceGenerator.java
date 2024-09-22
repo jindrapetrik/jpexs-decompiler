@@ -359,9 +359,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         AVM2Instruction ajmp = null;
         if (onFalse != null) {
-            if (!((!nonempty(onTrue).isEmpty())
-                    && ((onTrue.get(onTrue.size() - 1).definition instanceof ContinueJumpIns)
-                    || ((onTrue.get(onTrue.size() - 1).definition instanceof BreakJumpIns))))) {
+            if (onTrueCmds.isEmpty() || 
+                    !((onTrueCmds.get(onTrueCmds.size() - 1) instanceof ContinueItem)
+                    || (onTrueCmds.get(onTrueCmds.size() - 1) instanceof BreakItem))
+                    ) {
                 ajmp = ins(AVM2Instructions.Jump, 0);
                 onTrue.add(ajmp);
             }

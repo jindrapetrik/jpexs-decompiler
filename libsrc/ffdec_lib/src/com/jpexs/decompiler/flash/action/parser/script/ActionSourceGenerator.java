@@ -183,10 +183,10 @@ public class ActionSourceGenerator implements SourceGenerator {
         ifaif.setJumpOffset(onTrueLen);
         ActionJump ajmp = null;
         if (onFalse != null) {
-            if (!((!nonempty(onTrue).isEmpty())
-                    && (onTrue.get(onTrue.size() - 1) instanceof ActionJump)
-                    && ((((ActionJump) onTrue.get(onTrue.size() - 1)).isContinue)
-                    || (((ActionJump) onTrue.get(onTrue.size() - 1)).isBreak)))) {
+            if (onTrueCmds.isEmpty() || 
+                    !((onTrueCmds.get(onTrueCmds.size() - 1) instanceof ContinueItem)
+                    || (onTrueCmds.get(onTrueCmds.size() - 1) instanceof BreakItem))
+                    ) {
                 ajmp = new ActionJump(0, charset);
                 ret.add(ajmp);
                 onTrueLen += ajmp.getTotalActionLength();
