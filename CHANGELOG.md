@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - imports for script slot/const traits
 - AS3 direct editation - script slot/const traits assignments
 - AS3 direct editation - double returnvoid on script initializer
+- AS3 empty interface indentation
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
