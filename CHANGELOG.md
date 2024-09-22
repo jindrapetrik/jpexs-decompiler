@@ -14,9 +14,10 @@ All notable changes to this project will be documented in this file.
 - [#2310] Text search history showing as null
 - [#2295], [#2311] AS1/2 p-code freezing on highlighting ConstantPool
 - [#2304] GFX files truncated
-- [#2297] AS1/2/3 direct editation - if..else clause broken when using continue/break
+- [#2297] AS direct editation - if..else clause broken when using continue/break
 - [#2291] AS1/2 Incorrect var keyword placement causing registers to compile wrong
 - [#2290] FLA export - not generating sound bin files causing sound compression setting to be ignored
+- [#2296] AS decompilation - goto problems
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3565,6 +3566,7 @@ Major version of SWF to XML export changed to 2.
 [#2297]: https://www.free-decompiler.com/flash/issues/2297
 [#2291]: https://www.free-decompiler.com/flash/issues/2291
 [#2290]: https://www.free-decompiler.com/flash/issues/2290
+[#2296]: https://www.free-decompiler.com/flash/issues/2296
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299
