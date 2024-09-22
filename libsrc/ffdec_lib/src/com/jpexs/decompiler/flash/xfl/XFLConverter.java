@@ -1915,7 +1915,7 @@ public class XFLConverter {
         SoundTag st = (SoundTag) symbol;
         byte[] data = SWFInputStream.BYTE_ARRAY_EMPTY;
         try {
-            data = new SoundExporter().exportSound(st, convertMp3ToWav ? SoundExportMode.WAV : SoundExportMode.MP3_WAV, true);
+            data = new SoundExporter().exportSound(st, convertMp3ToWav ? SoundExportMode.WAV : SoundExportMode.MP3_WAV, false);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -1931,7 +1931,7 @@ public class XFLConverter {
         }
 
         String datFileName = null;
-        if (convertMp3ToWav && decodedData != null) {
+        if (decodedData != null) {
             long ts = getTimestamp(swf);
             datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
             datfiles.put(datFileName, decodedData);
