@@ -2775,7 +2775,7 @@ public class AVM2Code implements Cloneable {
                         //Check whether the command references internal traits of other package
                         ti.visitRecursively(new AbstractGraphTargetVisitor() {
                             @Override
-                            public void visit(GraphTargetItem item) {
+                            public boolean visit(GraphTargetItem item) {
                                 if (item instanceof GetSlotAVM2Item) {
                                     GetSlotAVM2Item gs = (GetSlotAVM2Item) item;
                                     if ((gs.slotObject instanceof GlobalAVM2Item) && (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)) {
@@ -2798,6 +2798,7 @@ public class AVM2Code implements Cloneable {
                                         }
                                     }
                                 }
+                                return true;
                             }
                         });
 

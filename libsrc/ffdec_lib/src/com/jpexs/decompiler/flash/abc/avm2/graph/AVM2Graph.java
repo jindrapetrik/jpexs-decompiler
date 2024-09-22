@@ -2277,9 +2277,9 @@ public class AVM2Graph extends Graph {
                                 private boolean handled = false;
 
                                 @Override
-                                public void visit(GraphTargetItem item) {
+                                public boolean visit(GraphTargetItem item) {
                                     if (handled) {
-                                        return;
+                                        return false;
                                     }
                                     if ((item instanceof NextNameAVM2Item) || (item instanceof NextValueAVM2Item)) {
                                         handled = true;
@@ -2293,7 +2293,9 @@ public class AVM2Graph extends Graph {
                                             nn.localReg = hn.index;
                                             kindRef.setVal(2);
                                         }
+                                        return false;
                                     }
+                                    return true;
                                 }
                             });
 

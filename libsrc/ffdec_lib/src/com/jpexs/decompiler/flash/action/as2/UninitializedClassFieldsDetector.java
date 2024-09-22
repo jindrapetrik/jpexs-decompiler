@@ -301,7 +301,7 @@ public class UninitializedClassFieldsDetector {
                                 if (value instanceof GraphTargetItem) {
                                     AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                                         @Override
-                                        public void visit(GraphTargetItem item) {
+                                        public boolean visit(GraphTargetItem item) {
                                             List<String> path = getFullPath(item);
                                             if (path != null) {
                                                 List<String> parent = new ArrayList<>(path);
@@ -319,6 +319,7 @@ public class UninitializedClassFieldsDetector {
                                                     }
                                                 }
                                             }
+                                            return true;
                                         }
                                     };
                                     visitor.visit(value);
@@ -339,7 +340,7 @@ public class UninitializedClassFieldsDetector {
             for (GraphTargetItem item : tree) {
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                     @Override
-                    public void visit(GraphTargetItem item) {
+                    public boolean visit(GraphTargetItem item) {
                         if ((item instanceof SetMemberActionItem)
                                 || (item instanceof CallMethodActionItem)
                                 || (item instanceof NewMethodActionItem)
@@ -364,6 +365,7 @@ public class UninitializedClassFieldsDetector {
                                 }
                             }
                         }
+                        return true;
                     }
                 };
                 visitor.visit(item);
