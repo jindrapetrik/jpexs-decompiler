@@ -353,7 +353,16 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (isSimple) {
             ignorePackage = getPathPackage();
         }
-        Trait.writeImports(null, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+        List<Trait> importTraits = new ArrayList<>();
+        for (int t : traitIndices) {
+            Trait trait = traits.get(t);
+
+            if (!(trait instanceof TraitSlotConst)) {
+                continue;
+            }
+            importTraits.add(trait);                        
+        }
+        Trait.writeImports(importTraits, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
         first = true;
 
         //Slot const last

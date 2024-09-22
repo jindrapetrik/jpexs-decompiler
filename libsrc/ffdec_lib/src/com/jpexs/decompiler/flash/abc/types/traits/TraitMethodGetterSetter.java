@@ -185,7 +185,9 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         if (classIndex < 0) {
-            writeImports(this, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
+            List<Trait> traits = new ArrayList<>();
+            traits.add(this);
+            writeImports(traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);

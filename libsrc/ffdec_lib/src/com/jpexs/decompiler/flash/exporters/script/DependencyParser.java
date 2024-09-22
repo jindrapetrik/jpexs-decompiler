@@ -184,8 +184,32 @@ public class DependencyParser {
             for (ABCException ex : body.exceptions) {
                 parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
+            
+            boolean hasNewClass = false;
+            
+            if (classIndex == -1) {
+                for (int i = 0; i < body.getCode().code.size(); i++) {
+                    AVM2Instruction ins = body.getCode().code.get(i);
+                    if (ins.definition instanceof NewClassIns) {
+                        hasNewClass = true;
+                        break;
+                    }                
+                }
+            }
+            boolean wasNewClass = false;
             for (int i = 0; i < body.getCode().code.size(); i++) {
                 AVM2Instruction ins = body.getCode().code.get(i);
+                
+                
+                //Do not parse dependencies from class parent chain
+                if (classIndex == -1 && hasNewClass && !wasNewClass) {
+                    
+                    if (ins.definition instanceof NewClassIns) {
+                        wasNewClass = true;
+                    }
+                    
+                    continue;
+                }
                 
                 //Ignore class parents in script initializer
                 if (ins.definition instanceof GetLexIns) {
