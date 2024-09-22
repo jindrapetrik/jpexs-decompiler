@@ -2259,79 +2259,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         scriptInfo.init_index = mb.method_info;
         localData.pkg = DottedChain.EMPTY;
         //localData.registerVars.put("this", 0);
-        generateTraitsPhase4(new ArrayList<>(), new ArrayList<>(), 1/*??*/, false, null, null, true, localData, traitsList, scriptInfo.traits, traitArr, initScopes, class_index, true);
+        generateTraitsPhase4(new ArrayList<>(), new ArrayList<>(), 1/*??*/, false, null, null, true, localData, traitsList, scriptInfo.traits, traitArr, initScopes, class_index, true);              
         
-               
-        /*for (GraphTargetItem ti : commands) {
-            if ((ti instanceof SlotAVM2Item) || (ti instanceof ConstAVM2Item)) {
-                GraphTargetItem val = null;
-                int ns = -1;
-                String tname = null;
-                boolean isConst = false;
-                NamespaceItem pkg = null;
-                if (ti instanceof SlotAVM2Item) {
-                    val = ((SlotAVM2Item) ti).value;
-                    pkg = ((SlotAVM2Item) ti).pkg;
-                    ns = genNs(importedClasses, pkg.name, ((SlotAVM2Item) ti).pkg, openedNamespaces, localData, ((SlotAVM2Item) ti).line);
-                    tname = ((SlotAVM2Item) ti).var;
-                }
-                if (ti instanceof ConstAVM2Item) {
-                    val = ((ConstAVM2Item) ti).value;
-                    pkg = ((ConstAVM2Item) ti).pkg;
-                    ns = genNs(importedClasses, pkg.name, ((ConstAVM2Item) ti).pkg, openedNamespaces, localData, ((ConstAVM2Item) ti).line);
-                    tname = ((ConstAVM2Item) ti).var;
-                    isConst = true;
-                    if (((ConstAVM2Item) ti).type.toString().equals("Namespace")) {
-                        continue;
-                    }
-                }
-                if (val != null) {
-                    sinitcode.add(ins(AVM2Instructions.FindProperty, traitName(ns, tname)));
-                    localData.isStatic = true;
-                    sinitcode.addAll(toInsList(val.toSource(localData, this)));
-                    sinitcode.add(ins(isConst ? AVM2Instructions.InitProperty : AVM2Instructions.SetProperty, traitName(ns, tname)));
-                }                
-            } else {
-                List<GraphSourceItem> srcs = ti.toSourceIgnoreReturnValue(localData, this);
-                for (GraphSourceItem src : srcs) {
-                    sinitcode.add((AVM2Instruction)src);
-                }
-            }            
-        }*/
-        //mbCode.addAll(sinitcode);
-        
-        /*int maxSlotId = 0;
-        for (int k = 0; k < scriptInfo.traits.traits.size(); k++) {
-            if (scriptInfo.traits.traits.get(k) instanceof TraitSlotConst) {
-                TraitSlotConst ti = (TraitSlotConst) scriptInfo.traits.traits.get(k);
-                if (ti.slot_id > maxSlotId) {
-                    maxSlotId = ti.slot_id;
-                }
-            }
-        }
-        for (int k = 0; k < scriptInfo.traits.traits.size(); k++) {
-            if ((scriptInfo.traits.traits.get(k) instanceof TraitMethodGetterSetter) && (commands.get(k) instanceof MethodAVM2Item)) {
-                MethodAVM2Item mai = (MethodAVM2Item) commands.get(k);
-                if (mai.outsidePackage) {
-                    TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) scriptInfo.traits.traits.get(k);
-                    TraitSlotConst nts = new TraitSlotConst();
-                    nts.name_index = scriptInfo.traits.traits.get(k).name_index;
-                    nts.metadata = scriptInfo.traits.traits.get(k).metadata;
-
-                    nts.slot_id = maxSlotId + 1;
-                    maxSlotId++;
-                    nts.type_index = abcIndex.getSelectedAbc().constants.getQnameId("Function", Namespace.KIND_PACKAGE, "", true);
-                    nts.value_index = 0;
-                    nts.value_kind = 0;
-                    int methodinfo = tmgs.method_info;
-                    scriptInfo.traits.traits.set(k, nts);
-                    mbCode.add(ins(AVM2Instructions.NewFunction, methodinfo));
-                    mbCode.add(ins(AVM2Instructions.InitProperty, nts.name_index));
-                }
-            }
-        }*/        
-
-        mbCode.add(ins(AVM2Instructions.ReturnVoid));
         mb.markOffsets();
         mb.autoFillStats(abc, 1, false);
 
