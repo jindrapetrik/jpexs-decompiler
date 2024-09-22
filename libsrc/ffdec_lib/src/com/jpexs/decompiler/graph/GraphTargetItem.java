@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -624,10 +625,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         Reference<Boolean> ref = new Reference<>(false);
         visitRecursively(new AbstractGraphTargetVisitor() {
             @Override
-            public void visit(GraphTargetItem item) {
+            public boolean visit(GraphTargetItem item) {
                 if (item.hasSideEffect()) {
                     ref.setVal(Boolean.TRUE);
                 }
+                return true;
             }
         });
         return ref.getVal();
@@ -923,10 +925,11 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         List<GraphTargetItem> ret = new ArrayList<>();
         visit(new AbstractGraphTargetVisitor() {
             @Override
-            public void visit(GraphTargetItem item) {
+            public boolean visit(GraphTargetItem item) {
                 if (item != null) {
                     ret.add(item);
                 }
+                return true;
             }
         });
         return ret;
@@ -941,8 +944,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         Set<GraphTargetItem> ret = new HashSet<>();
         visitRecursively(new AbstractGraphTargetVisitor() {
             @Override
-            public void visit(GraphTargetItem item) {
+            public boolean visit(GraphTargetItem item) {
                 ret.add(item);
+                return true;
             }
         });
         return ret;
@@ -954,15 +958,17 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param visitor Visitor
      */
     public final void visitRecursively(GraphTargetVisitorInterface visitor) {
-        Set<GraphTargetItem> visitedItems = new HashSet<>();
+        Set<GraphTargetItem> visitedItems = new LinkedIdentityHashSet<>();
         visit(new AbstractGraphTargetVisitor() {
             @Override
-            public void visit(GraphTargetItem item) {
+            public boolean visit(GraphTargetItem item) {
                 if (item != null && !visitedItems.contains(item)) {
                     visitedItems.add(item);
-                    visitor.visit(item);
-                    item.visit(this);
+                    if (visitor.visit(item)) {
+                        item.visit(this);
+                    }
                 }
+                return true;
             }
         });
     }
@@ -978,7 +984,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         parentStack.add(this);
         visitNoBlock(new AbstractGraphTargetVisitor() {
             @Override
-            public void visit(GraphTargetItem item) {
+            public boolean visit(GraphTargetItem item) {
                 if (item != null && !visitedItems.contains(item)) {
                     visitedItems.add(item);
                     visitor.visit(item, parentStack);
@@ -986,6 +992,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                     item.visitNoBlock(this);
                     parentStack.pop();
                 }
+                return true;
             }
         });
     }

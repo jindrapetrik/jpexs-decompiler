@@ -29,8 +29,9 @@ public interface GraphTargetVisitorInterface {
      * Visits a graph target item.
      *
      * @param item Graph target item
+     * @return True if continue
      */
-    public void visit(GraphTargetItem item);
+    public boolean visit(GraphTargetItem item);
 
     /**
      * Visits all graph target items.

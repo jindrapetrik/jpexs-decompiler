@@ -678,7 +678,7 @@ public class ActionScript2ClassDetector {
 
                                                     AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                                                         @Override
-                                                        public void visit(GraphTargetItem item) {
+                                                        public boolean visit(GraphTargetItem item) {
                                                             if (item instanceof ReturnActionItem) {
                                                                 ReturnActionItem ret = (ReturnActionItem) item;
                                                                 if (ret.value instanceof DirectValueActionItem) {
@@ -688,6 +688,7 @@ public class ActionScript2ClassDetector {
                                                                     }
                                                                 }
                                                             }
+                                                            return true;
                                                         }
                                                     };
                                                     for (GraphTargetItem ti : func.actions) {
@@ -790,7 +791,7 @@ public class ActionScript2ClassDetector {
 
                 AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
                     @Override
-                    public void visit(GraphTargetItem item) {
+                    public boolean visit(GraphTargetItem item) {
                         if (item instanceof ReturnActionItem) {
                             ReturnActionItem ret = (ReturnActionItem) item;
                             if (ret.value instanceof DirectValueActionItem) {
@@ -800,6 +801,7 @@ public class ActionScript2ClassDetector {
                                 }
                             }
                         }
+                        return true;
                     }
                 };
                 for (GraphTargetItem ti : ((FunctionActionItem) constructor).actions) {

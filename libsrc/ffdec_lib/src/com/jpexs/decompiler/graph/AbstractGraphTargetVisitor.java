@@ -35,9 +35,10 @@ public abstract class AbstractGraphTargetVisitor implements GraphTargetVisitorIn
      * Visits a graph target item.
      *
      * @param item Graph target item
+     * @return True if continue
      */
     @Override
-    public abstract void visit(GraphTargetItem item);
+    public abstract boolean visit(GraphTargetItem item);
 
     /**
      * Visits all graph target items.

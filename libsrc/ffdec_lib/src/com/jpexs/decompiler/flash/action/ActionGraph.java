@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
+import com.jpexs.decompiler.flash.action.model.TraceActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
@@ -58,6 +59,7 @@ import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.StopPartKind;
@@ -74,10 +76,12 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,13 +219,13 @@ public class ActionGraph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {        
         ActionGraph g = new ActionGraph(uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
-
+    
     /**
      * Final process stack. Override this method to provide custom behavior.
      *
@@ -621,7 +625,7 @@ public class ActionGraph extends Graph {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
         }
-        makeDefineRegistersUp(ret);
+        makeDefineRegistersUp(ret, new HashSet<>());
         return ret;
     }
 
@@ -640,52 +644,73 @@ public class ActionGraph extends Graph {
             trace("x");
         }
      
+        It also makes sure that var keyword is on the first occurrence of that register.
      
      */
     /**
      * Makes define registers up.
      *
      * @param list List of GraphTargetItems
+     * @param definedRegisters Defined registers
      */
-    private void makeDefineRegistersUp(List<GraphTargetItem> list) {
+    private void makeDefineRegistersUp(List<GraphTargetItem> list, Set<Integer> definedRegisters) {
         for (int i = 0; i < list.size(); i++) {
-            final int fi = i;
             GraphTargetItem ti = list.get(i);
+            Reference<Integer> ri = new Reference<>(i);
 
             if (ti instanceof TemporaryRegister) {
                 continue;
             }
 
-            Set<GraphTargetItem> visitedItems = new HashSet<>();
-            ti.visitNoBlock(new AbstractGraphTargetVisitor() {
+            Set<GraphTargetItem> visitedItems = new LinkedIdentityHashSet<>();
+            GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
                 @Override
-                public void visit(GraphTargetItem item) {
+                public boolean visit(GraphTargetItem item) {
                     if (item != null && !visitedItems.contains(item)) {
                         visitedItems.add(item);
 
                         if (item instanceof TemporaryRegister) {
-                            return;
+                            return true;
                         }
                         //can has definition in for in...
                         if ((ti instanceof ForInActionItem) && (item == ((ForInActionItem) ti).variableName)) {
-                            return;
+                            return true;
                         }
                         if (item instanceof StoreRegisterActionItem) {
                             StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
-                            if (sr.define) {
-                                list.add(fi, new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Null.INSTANCE), true));
-                                sr.define = false;
+                            sr.define = !definedRegisters.contains(sr.register.number);
+                            definedRegisters.add(sr.register.number);                            
+                            if (sr.define && sr != ti) {
+                                list.add(ri.getVal(), new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Null.INSTANCE), true));
+                                sr.define = false;  
+                                ri.setVal(ri.getVal() + 1);
                             }
+                        }
+                        
+                        if (item instanceof FunctionActionItem) {
+                            return false;
                         }
 
                         item.visitNoBlock(this);
                     }
+                    return true;
                 }
-            });
+            };
+            
+            if (ti instanceof StoreRegisterActionItem) {
+                StoreRegisterActionItem sr = (StoreRegisterActionItem) ti;
+                sr.define = !definedRegisters.contains(sr.register.number);
+                definedRegisters.add(sr.register.number);
+            }
+            
+            ti.visitNoBlock(visitor);
+            //visitor.visit(ti);
+            //ti.visitRecursively(visitor);
+            i = ri.getVal();
             if (ti instanceof Block) {
                 Block b = (Block) ti;
                 for (List<GraphTargetItem> items : b.getSubs()) {
-                    makeDefineRegistersUp(items);
+                    makeDefineRegistersUp(items, definedRegisters);
                 }
             }
         }
