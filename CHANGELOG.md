@@ -23,6 +23,8 @@ All notable changes to this project will be documented in this file.
 - [#2291] AS1/2 Incorrect var keyword placement causing registers to compile wrong
 - [#2290] FLA export - not generating sound bin files causing sound compression setting to be ignored
 - [#2296] AS decompilation - goto problems
+- AS3 - displaying imports of class parent chain
+- AS3 - imports for script traits
 
 ## [21.0.5] - 2024-09-05
 ### Fixed

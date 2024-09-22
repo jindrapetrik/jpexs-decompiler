@@ -234,7 +234,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         Reference<Boolean> first = new Reference<>(true);        
         
         if (getName(abc).getNamespace(abc.constants).kind != Namespace.KIND_PACKAGE_INTERNAL) {
-            first.setVal(!writeImports(this, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames));
+            List<Trait> traits = new ArrayList<>();
+            traits.add(this);
+            first.setVal(!writeImports(traits, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames));
         }
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);

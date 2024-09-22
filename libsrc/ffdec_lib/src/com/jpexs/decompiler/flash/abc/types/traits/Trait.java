@@ -368,7 +368,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return True if its not empty
      * @throws InterruptedException On interrupt
      */
-    public static boolean writeImports(Trait trait, int methodIndex, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public static boolean writeImports(List<Trait> traits, int methodIndex, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
@@ -398,7 +398,7 @@ public abstract class Trait implements Cloneable, Serializable {
         Reference<Integer> numberContextRef = new Reference<>(null);
         
         
-        if (trait != null) {
+        for (Trait trait : traits) {
             Multiname multiname = trait.getName(abc);
             int nskind = multiname.getSimpleNamespaceKind(abc.constants);
             if (nskind == Namespace.KIND_NAMESPACE) {
@@ -407,7 +407,7 @@ public abstract class Trait implements Cloneable, Serializable {
             trait.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>(), uses, numberContextRef);
         }
         if (methodIndex != -1) {
-            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, trait, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, classIndex, isStatic, customNs, abc, methodIndex, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
         }
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
