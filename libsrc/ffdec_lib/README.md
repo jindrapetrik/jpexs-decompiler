@@ -31,6 +31,7 @@ These include:
 * Open Imaging GIF Decoder - `gifreader.jar` - Importing GIFs
 * Miter clip - modified openjdk8 Stroker - `miterclip.jar` - Support for miter clip join style in shapes
 * FlexSDK Decimal128 class - `decimal.jar` - Working with decimal type in AS3
+* FLA Compound Document Tools - `flacomdoc.jar` - Exporting FLA to CS4 or lower
 
 ## Basic library usage
 ```java
@@ -138,6 +139,7 @@ And also links to these libraries:
 * [flashdebugger library] (Debugging ActionScript) - LGPLv3
 * [Java Native Access - JNA] (Registry association, Process memory reading) - LGPL
 * [Open Imaging GIF Decoder] (GIF file importing) - Apache License 2.0
+* [FLA Compound Document Tools] (Exporting to FLA CS4 and below) - LGPLv2.1
 
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
@@ -157,3 +159,4 @@ And also links to these libraries:
 [Open Imaging GIF Decoder]: https://github.com/DhyanB/Open-Imaging
 [openjdk8 Stroker]: https://github.com/JetBrains/jdk8u_jdk
 [Apache Flex SDK]: https://github.com/apache/flex-sdk
+[FLA Compound Document Tools]: https://github.com/jindrapetrik/flacomdoc

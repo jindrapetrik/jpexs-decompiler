@@ -155,7 +155,6 @@ And links also these libraries:
 * [Insubstantial] (Substance Look and Feel, Flamingo Ribbon component) - Revised BSD
 * [javactivex] (Flash Player ActiveX embedding) - LGPLv3
 * [flashdebugger library] (Debugging ActionScript) - LGPLv3
-* [FLA Compound Document Tools] (Exporting to FLA CS4 and below) - LGPLv2.1
 * FFDec Library (LGPLv3) - see below
 
 Application uses also some icons of the [Silk icons pack], [Silk companion 1], [FatCow icons pack] and [Aha-Soft icons pack].
@@ -173,7 +172,6 @@ See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec libra
 [Insubstantial]: http://shemnon.com/speling/2011/04/insubstantial-62-release.html
 [javactivex]:https://github.com/jindrapetrik/javactivex
 [flashdebugger library]: https://github.com/jindrapetrik/flashdebugger
-[FLA Compound Document Tools]: https://github.com/jindrapetrik/flacomdoc
 [Silk icons pack]: http://www.famfamfam.com/lab/icons/silk/
 [Silk companion 1]: http://damieng.com/creative/icons/silk-companion-1-icons
 [FatCow icons pack]: http://www.fatcow.com/free-icons
