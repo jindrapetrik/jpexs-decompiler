@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - [#2314] AS3 direct editation - cannot save class initializer in some cases
 - [#2315] AS3 direct editation - switching scripts during editation causing missing scripts
 - [#2316] AS3 direct editation - private classes
+- [#2317] AS3 direct editation - local register names colliding with parameter names
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3588,6 +3589,7 @@ Major version of SWF to XML export changed to 2.
 [#2314]: https://www.free-decompiler.com/flash/issues/2314
 [#2315]: https://www.free-decompiler.com/flash/issues/2315
 [#2316]: https://www.free-decompiler.com/flash/issues/2316
+[#2317]: https://www.free-decompiler.com/flash/issues/2317
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299

@@ -1209,21 +1209,32 @@ public class AVM2SourceGenerator implements SourceGenerator {
                         String varName = n.getVariableName();
                         if (!needsActivation) {
                             Matcher m = pat.matcher(varName);
-                            //In first round, make all register that match standard loc_xx register
+                            boolean addNew = false;
+                            //In first round, make all register that match standard loc_xx register                            
                             if ((round == 1) && (m.matches())) {
                                 String regIndexStr = m.group(1);
                                 int regIndex = Integer.parseInt(regIndexStr);
-                                while (registerNames.size() <= regIndex) {
-                                    registerNames.add(UNUSED);
-                                    registerTypes.add(TypeItem.UNBOUNDED);
-                                    registerLines.add(paramLine);
+                                
+                                boolean alreadyExistsWithDifferentName = regIndex < registerNames.size() 
+                                        && !registerNames.get(regIndex).equals(UNUSED)
+                                        && !registerNames.get(regIndex).equals(varName);
+                                
+                                if (alreadyExistsWithDifferentName) {
+                                    addNew = true;
+                                } else {
+                                    while (registerNames.size() <= regIndex) {
+                                        registerNames.add(UNUSED);
+                                        registerTypes.add(TypeItem.UNBOUNDED);
+                                        registerLines.add(paramLine);
+                                    }
+                                    registerNames.set(regIndex, varName);
+                                    registerTypes.set(regIndex, n.type);
+                                    registerLines.set(regIndex, n.line);
                                 }
-                                registerNames.set(regIndex, varName);
-                                registerTypes.set(regIndex, n.type);
-                                registerLines.set(regIndex, n.line);
-
                             } else if (round == 2 && !m.matches()) { //in second round the rest
-
+                                addNew = true;
+                            }
+                            if (addNew) {                                
                                 //search for some unused indices first:
                                 int newRegIndex = -1;
                                 for (int j = 0; j < registerNames.size(); j++) {
