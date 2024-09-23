@@ -18,11 +18,6 @@ alias /?
 <infile> [<infile2> <infile3> ...]
     Open SWF file(s) with the decompiler GUI.
 
--proxy [-P<port>]
-    Auto start proxy in the tray.
-    Start proxy in the system tray.
-    Optional parameter -P specifies port for proxy. Defaults to 55555. 
-
 -export <itemtypes> <outdirectory> <infile_or_directory>
     Export sources.
     Export <infile_or_directory> sources to <outdirectory>.
