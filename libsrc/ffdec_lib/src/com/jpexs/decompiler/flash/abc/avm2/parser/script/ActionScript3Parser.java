@@ -669,7 +669,6 @@ public class ActionScript3Parser {
             String customNs = null;
             String rawCustomNs = null;
             NamespaceItem namespace = null;
-            ParsedSymbol s = lex();
             //static class initializer
             /*if (s.type == SymbolType.CURLY_OPEN) {
                 cinit.addAll(commands(allOpenedNamespaces, thisType, pkg, cinitNeedsActivation, importedClasses, openedNamespaces, new Stack<>(), new HashMap<>(), new HashMap<>(), true, false, 0, cinitVariables, abc));
@@ -679,7 +678,8 @@ public class ActionScript3Parser {
             }*/
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
             //s = lex();
-
+            
+            ParsedSymbol s = lex();            
             while (s.isType(SymbolType.NATIVE, SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
