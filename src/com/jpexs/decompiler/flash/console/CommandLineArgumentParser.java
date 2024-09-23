@@ -358,13 +358,7 @@ public class CommandLineArgumentParser {
         if (filter == null) {
             out.println(PREFIX + "myfile.swf");
             exampleFound = true;
-        }
-
-        if (filter == null || filter.equals("proxy")) {
-            out.println(PREFIX + "proxy");
-            out.println(PREFIX + "proxy -P1234");
-            exampleFound = true;
-        }
+        }      
 
         if (filter == null || filter.equals("export") || filter.equals("format") || filter.equals("selectclass") || filter.equals("onerror")) {
             out.println(PREFIX + "-export script \"C:\\decompiled\" myfile.swf");
@@ -1913,7 +1907,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseProxy(Stack<String> args) {
-        System.err.println("Proxy functionalit was REMOVED");
+        System.err.println("Proxy functionality was REMOVED");
         System.exit(1);
     }
 
