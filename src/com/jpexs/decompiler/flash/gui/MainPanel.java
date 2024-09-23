@@ -5387,6 +5387,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             updateUi();
         }
 
+        clearEditingStatus();        
         reload(false, false);
 
         if (source == dumpTree) {
@@ -6083,10 +6084,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final ScriptPack scriptLeaf = ((AS3Package) treeItem).getCompoundInitializerPack();
             if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {
                 ABCPanel abcPanel = getABCPanel();
-                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
-                abcPanel.setAbc(scriptLeaf.abc);
-                abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
-                abcPanel.decompiledTextArea.setNoTrait();
+                abcPanel.setScript(scriptLeaf);
                 abcPanel.setCompound(true);
             }
 
@@ -6100,10 +6098,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
             if (Main.isInited() && (!Main.isWorking() || Main.isDebugging())) {
                 ABCPanel abcPanel = getABCPanel();
-                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
-                abcPanel.setAbc(scriptLeaf.abc);
-                abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
-                abcPanel.decompiledTextArea.setNoTrait();
+                abcPanel.setScript(scriptLeaf);
                 abcPanel.setCompound(!scriptLeaf.isSimple);
             }
 
