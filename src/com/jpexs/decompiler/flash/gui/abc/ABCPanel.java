@@ -2102,4 +2102,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         flexLabel.setVisible(useFlex && !value);
         editDecompiledButton.setEnabled(!value);
     }
+    
+    public void setScript(ScriptPack scriptPack) {
+        setDecompiledEditMode(false);
+        detailPanel.setEditMode(false);        
+        detailPanel.methodTraitPanel.methodCodePanel.clear();
+        setAbc(scriptPack.abc);
+        decompiledTextArea.setScript(scriptPack, true);
+        decompiledTextArea.setNoTrait();
+        
+    }
 }
