@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -390,7 +391,10 @@ public abstract class Trait implements Cloneable, Serializable {
                 traitNamesInThisScript.add(st.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
             }
         }
-
+        
+        Set<String> traitNamesInThisScriptSet = new LinkedHashSet<>(traitNamesInThisScript);
+        traitNamesInThisScript = new ArrayList<>(traitNamesInThisScriptSet);
+       
         //imports
         List<Dependency> dependencies = new ArrayList<>();
         String customNs = null;
@@ -416,24 +420,21 @@ public abstract class Trait implements Cloneable, Serializable {
             }
         }
 
-        List<String> importnames = new ArrayList<>();
-        importnames.addAll(namesInThisPackage);
-        importnames.addAll(traitNamesInThisScript);
-        importnames.addAll(Arrays.asList(builtInClasses));
-
+        
+        List<String> importedNames = new ArrayList<>();
+        
+        importedNames.addAll(Arrays.asList(builtInClasses));       
+        importedNames.addAll(namesInThisPackage);
+        importedNames.addAll(traitNamesInThisScript);
+        
+        
+        
         for (DottedChain imp : imports) {
             if (imp.getLast().equals("*")) {
                 if (imp.getWithoutLast().equals(ignorePackage)) {
                     continue;
                 }
-                Set<String> objectsInPkg = abcIndex.getPackageObjects(imp.getWithoutLast());
-                for (String objectName : objectsInPkg) {
-                    if (importnames.contains(objectName)) {
-                        fullyQualifiedNames.add(DottedChain.parseWithSuffix(objectName));
-                    } else {
-                        importnames.add(objectName);
-                    }
-                }
+                importedNames.addAll(abcIndex.getPackageObjects(imp.getWithoutLast()));
             }
         }
 
@@ -450,24 +451,30 @@ public abstract class Trait implements Cloneable, Serializable {
                 i--;
             }
         }
+        
+        for (int i = 0; i < imports.size(); i++) {
+            DottedChain ipath = imports.get(i);
+            DottedChain pkg = ipath.getWithoutLast();
+
+            if (pkg.equals(ignorePackage)) {
+                imports.remove(i);
+                i--;
+            }
+        }
 
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
             String name = ipath.getLast();
-            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically                
-                if (traitNamesInThisScript.contains(name)) {
-                    fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
-                }
-
-                imports.remove(i);
-                i--;
-                continue;
-            }
-
-            if (importnames.contains(name)) {
+            importedNames.add(name);           
+        }
+        
+        List<String> uniqueImportedNames = new ArrayList<>();
+        for (int i = 0; i < importedNames.size(); i++) {
+            String name = importedNames.get(i);
+            if (uniqueImportedNames.contains(name)) {
                 fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
             } else {
-                importnames.add(name);
+                uniqueImportedNames.add(name);
             }
         }
 
@@ -707,6 +714,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * To string.
      *
      * @param abcIndex ABC indexing
+     * @param packageName Package name
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -722,7 +730,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
@@ -868,7 +876,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight(" " + nsname); //assume not null name
             }
             writer.startBlock();
-            toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+            toString(abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
         }
@@ -906,6 +914,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * ToString of header.
      *
      * @param parent Parent trait
+     * @param packageName Package name
      * @param convertData Convert data
      * @param path Path
      * @param abc ABC
@@ -920,8 +929,8 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        toString(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+    public GraphTextWriter toStringHeader(Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        toString(null, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         return writer;
     }
 

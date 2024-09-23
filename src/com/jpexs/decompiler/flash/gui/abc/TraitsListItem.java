@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -110,7 +111,7 @@ public class TraitsListItem {
                 if (classIndex > -1) {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
-                trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                trait.toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 writer.finishHilights();
                 s = writer.toString();
             } else {
@@ -126,7 +127,7 @@ public class TraitsListItem {
                 if (classIndex > -1) {
                     insideInterface = abc.instance_info.get(classIndex).isInterface();
                 }
-                trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                trait.toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 writer.finishHilights();
                 s = writer.toString();
             }

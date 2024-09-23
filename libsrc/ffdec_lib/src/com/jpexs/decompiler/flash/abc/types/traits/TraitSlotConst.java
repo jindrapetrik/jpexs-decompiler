@@ -230,27 +230,8 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc) + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    /**
-     * To string.
-     *
-     * @param abcIndex ABC indexing
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param insideInterface Inside interface
-     * @return Writer
-     * @throws InterruptedException On interrupt
-     */
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(this, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
