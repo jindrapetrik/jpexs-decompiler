@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - double returnvoid on script initializer
 - AS3 empty interface indentation
 - [#2313] AS3 direct editation - parsing class traits metadata
+- [#2314] AS3 direct editation - cannot save class initializer in some cases
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
@@ -3582,6 +3583,7 @@ Major version of SWF to XML export changed to 2.
 [#2290]: https://www.free-decompiler.com/flash/issues/2290
 [#2296]: https://www.free-decompiler.com/flash/issues/2296
 [#2313]: https://www.free-decompiler.com/flash/issues/2313
+[#2314]: https://www.free-decompiler.com/flash/issues/2314
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299

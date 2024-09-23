@@ -667,6 +667,7 @@ public class ActionScript3Parser {
             boolean isNative = false;
 
             String customNs = null;
+            List<ParsedSymbol> preSymbols = new ArrayList<>();
             String rawCustomNs = null;
             NamespaceItem namespace = null;
             //static class initializer
@@ -685,11 +686,13 @@ public class ActionScript3Parser {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
                     }
-                    isFinal = true;
+                    preSymbols.add(s);
+                    isFinal = true;                    
                 } else if (s.type == SymbolType.OVERRIDE) {
                     if (isOverride) {
                         throw new AVM2ParseException("Only one override keyword allowed", lexer.yyline());
                     }
+                    preSymbols.add(s);
                     isOverride = true;
                 } else if (s.type == SymbolType.STATIC) {
                     if (isInterface) {
@@ -701,19 +704,23 @@ public class ActionScript3Parser {
                     if (isStatic) {
                         throw new AVM2ParseException("Only one static keyword allowed", lexer.yyline());
                     }
+                    preSymbols.add(s);
                     isStatic = true;
                 } else if (s.type == SymbolType.NAMESPACE) {
+                    preSymbols.add(s);
                     break;
                 } else if (s.type == SymbolType.NATIVE) {
                     if (isNative) {
                         throw new AVM2ParseException("Only one native keyword allowed", lexer.yyline());
                     }
+                    preSymbols.add(s);
                     isNative = true;
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
-                    customNs = s.value.toString();
+                    customNs = s.value.toString();                    
                     if (isInterface) {
                         throw new AVM2ParseException("Namespace attributes are not permitted on interface methods", lexer.yyline());
                     }
+                    preSymbols.add(s);
                 } else if (namespace != null) {
                     throw new AVM2ParseException("Only one access identifier allowed", lexer.yyline());
                 }
@@ -723,6 +730,7 @@ public class ActionScript3Parser {
                         if (isInterface) {
                             throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
+                        preSymbols.add(s);
                         break;
                     case PRIVATE:
                         isPrivate = true;
@@ -730,26 +738,36 @@ public class ActionScript3Parser {
                         if (isInterface) {
                             throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
+                        preSymbols.add(s);
                         break;
                     case PROTECTED:
                         namespace = protectedNs;
                         if (isInterface) {
                             throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
+                        preSymbols.add(s);
                         break;
                     case INTERNAL:
                         namespace = packageInternalNs;
                         if (isInterface) {
                             throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
+                        preSymbols.add(s);
                         break;
                     case PREPROCESSOR:
                         if (((String) s.value).toLowerCase().equals("namespace")) {
-                            expectedType(SymbolType.PARENT_OPEN);
+                            preSymbols.add(s);
                             s = lex();
+                            expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
+                            preSymbols.add(s);
+                            s = lex();                            
                             expected(s, lexer.yyline(), SymbolType.STRING);
+                            preSymbols.add(s);                            
                             namespace = new NamespaceItem((String) s.value, Namespace.KIND_NAMESPACE);
-                            expectedType(SymbolType.PARENT_CLOSE);
+                            s = lex();
+                            expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
+                            preSymbols.add(s);                            
+                            
                         } else {
                             lexer.pushback(s);
                         }
@@ -943,6 +961,9 @@ public class ActionScript3Parser {
                     break;
                 default:
                     lexer.pushback(s);
+                    for (int i = preSymbols.size() - 1; i >= 0; i--) {
+                        lexer.pushback(preSymbols.get(i));
+                    }
                     
                     GraphTargetItem cmd = command(allOpenedNamespaces, null, publicNs, cinitNeedsActivation, importedClasses, openedNamespaces, cinitLoops, cinitLoopLabels, cinitRegisterVars, true, false, 0, false, cinitVariables, abc);
                     if (cmd != null) {
@@ -1070,12 +1091,14 @@ public class ActionScript3Parser {
             boolean isPublic = false;
             boolean isNative = false;
             NamespaceItem ns = packageInternalNs;
+            List<ParsedSymbol> preSymbols = new ArrayList<>();
             while (s.isType(SymbolType.FINAL, SymbolType.DYNAMIC, SymbolType.PUBLIC)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
                     }
                     isFinal = true;
+                    preSymbols.add(s);                    
                 }
                 if (s.type == SymbolType.PUBLIC) {
                     if (!inPackage) {
@@ -1087,18 +1110,21 @@ public class ActionScript3Parser {
                     }
                     isPublic = true;
                     ns = publicNs;
+                    preSymbols.add(s);
                 }
                 if (s.type == SymbolType.DYNAMIC) {
                     if (isDynamic) {
                         throw new AVM2ParseException("Only one dynamic keyword allowed", lexer.yyline());
                     }
                     isDynamic = true;
+                    preSymbols.add(s);
                 }
                 if (s.type == SymbolType.NATIVE) {
                     if (isNative) {
                         throw new AVM2ParseException("Only one native keyword allowed", lexer.yyline());
                     }
                     isNative = true;
+                    preSymbols.add(s);
                 }
                 s = lex();
             }
@@ -1264,6 +1290,11 @@ public class ActionScript3Parser {
                     break;
                 default:
                     lexer.pushback(s);
+                    
+                    for (int i = preSymbols.size() - 1; i >= 0; i--) {
+                        lexer.pushback(preSymbols.get(i));
+                    }
+                    
                     if (parseImportsUsages(importedClasses, openedNamespaces, numberUsageRef, numberPrecisionRef, numberRoundingRef, abc)) {
                         break;
                     }
