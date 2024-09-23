@@ -78,6 +78,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             abc.script_info.get(oldIndex).delete(abc, true);
             AbcIndexing abcIndex = swf.getAbcIndex();
             abcIndex.selectAbc(abc);
+            abcIndex.refreshAbc(abc);
 
             ActionScript3Parser.compile(text, abc, abcIndex, scriptName, newClassIndex, oldIndex, air, swf.getDocumentClass());
             if (pack.isSimple) {

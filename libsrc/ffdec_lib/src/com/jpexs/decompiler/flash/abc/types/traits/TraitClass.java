@@ -145,26 +145,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance initializer
         DependencyParser.parseDependenciesFromMethodInfo(abcIndex, null, scriptIndex, class_info, false, customNamespace, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
-
-    /**
-     * ToString of header.
-     *
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param insideInterface Inside interface
-     * @return Writer
-     */
+    
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
+    public GraphTextWriter toStringHeader(Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         abc.instance_info.get(class_info).getClassHeaderStr(convertData.assetsDir, writer, abc, fullyQualifiedNames, false, false /*??*/);
         return writer;
     }
@@ -220,19 +203,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
      * @throws InterruptedException On interrupt
      */
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
 
         boolean isInterface = instanceInfo.isInterface();
 
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
-        DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
+        //DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
         fullyQualifiedNames = new ArrayList<>();
 
         Reference<Boolean> first = new Reference<>(true);        
-        
+              
         if (getName(abc).getNamespace(abc.constants).kind != Namespace.KIND_PACKAGE_INTERNAL) {
             List<Trait> traits = new ArrayList<>();
             traits.add(this);
@@ -284,7 +267,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        classInfo.static_traits.toString(packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
@@ -319,7 +302,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
-        instanceInfo.instance_traits.toString(first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
@@ -354,10 +337,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static methods
-        classInfo.static_traits.toString(first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
+        classInfo.static_traits.toString(packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         //instance methods
-        instanceInfo.instance_traits.toString(first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
 
         if (first.getVal()) {
             writer.newLine();

@@ -715,7 +715,20 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            if (fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+            Namespace ns = getNamespace(constants);
+            boolean isPublic = false;
+            if (ns == null) {
+                NamespaceSet nss = getNamespaceSet(constants);
+                if (nss != null) {
+                    if (nss.namespaces.length > 0) {
+                        ns = constants.getNamespace(nss.namespaces[0]);                        
+                    }
+                }
+            }            
+            if (ns != null && (ns.kind == Namespace.KIND_PACKAGE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                isPublic = true;
+            } 
+            if (isPublic && fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
                 DottedChain dc = getNameWithNamespace(constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }

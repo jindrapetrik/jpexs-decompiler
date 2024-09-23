@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 
 /**
@@ -75,13 +76,13 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
         if (parentTraitIndex > -1) {
             if (traitsType == TRAITS_TYPE_CLASS) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             } else if (traitsType == TRAITS_TYPE_INSTANCE) {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             }
         }
         try {
-            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
         } catch (InterruptedException ex) {
             // ignore
         }

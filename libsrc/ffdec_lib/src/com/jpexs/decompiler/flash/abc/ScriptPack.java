@@ -320,6 +320,8 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.newLine();
         }
 
+        DottedChain pkg = getPathPackage();
+        
         for (int t : traitIndices) {
 
             Trait trait = traits.get(t);
@@ -337,7 +339,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             } else {
-                trait.toString(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
@@ -387,7 +389,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             } else {
-                trait.toString(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toString(abcIndex, pkg,  null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();

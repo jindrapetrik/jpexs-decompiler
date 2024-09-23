@@ -120,26 +120,9 @@ public class TraitMethodGetterSetter extends Trait {
         }
         DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, isStatic, customNamespace, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
     }
-
-    /**
-     * ToString of header.
-     *
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param insideInterface Inside interface
-     * @return Writer
-     */
+    
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
+    public GraphTextWriter toStringHeader(Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         String addKind = "";
         if (kindType == TRAIT_GETTER) {
             addKind = "get ";
@@ -217,27 +200,8 @@ public class TraitMethodGetterSetter extends Trait {
         return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    /**
-     * To string.
-     *
-     * @param abcIndex ABC indexing
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param insideInterface Inside interface
-     * @return Writer
-     * @throws InterruptedException On interrupt
-     */
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 
         if (classIndex < 0) {
             //writeImports(this, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
@@ -245,7 +209,7 @@ public class TraitMethodGetterSetter extends Trait {
         getMetaData(this, convertData, abc, writer);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
-        toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+        toStringHeader(parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");

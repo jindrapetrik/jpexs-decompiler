@@ -218,9 +218,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
          }
          }
          }*/
+                
         ABC abc = abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
-        AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(dname), null, null/*FIXME?*/);
+        AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(dname), abc, localData != null ? localData.scriptIndex : null);
         if (ci != null) {
             Multiname m = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants);
             if (m != null) {
@@ -234,16 +235,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
-        String pkgRaw = pkg.toRawString();
+        /*String pkgRaw = pkg.toRawString();
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             Multiname mname = constants.getMultiname(i);
-            if (mname != null && name.equals(mname.getName(constants, null, true, true /*FIXME!!*/))) {
+            if (mname != null && name.equals(mname.getName(constants, null, true, true FIXME!!))) {
                 if (mname.getNamespace(constants) != null && Objects.equals(pkgRaw, mname.getNamespace(constants).getRawName(constants))) {
                     name_index = i;
                     break;
                 }
             }
-        }
+        }*/
         if (name_index == 0) {
             if (pkg.isEmpty() && localData.currentScript != null /*FIXME!*/) {
                 for (Trait t : localData.currentScript.traits.traits) {
@@ -688,7 +689,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     parent = ((UnresolvedAVM2Item) parent).resolved;
                 }
                 if (parent instanceof TypeItem) {
-                    ClassIndex ci = abcIndex.findClass(parent, null, null/*FIXME?*/);
+                    ClassIndex ci = abcIndex.findClass(parent, abcIndex.getSelectedAbc(), localData != null ? localData.scriptIndex : null);
                     if (ci != null) {
                         int mi = ci.abc.class_info.get(ci.index).cinit_index;
                         MethodBody pcinit = ci.abc.findBody(mi);
@@ -1464,7 +1465,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                  */
                 int parentConstMinAC = 0;
 
-                AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(superType), null, null/*FIXME?*/);
+                AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(superType), abcIndex.getSelectedAbc(), localData.scriptIndex);
 
                 if (ci != null) {
                     MethodInfo pmi = ci.abc.method_info.get(ci.abc.instance_info.get(ci.index).iinit_index);
@@ -2217,7 +2218,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     sinitcode.add(ins(AVM2Instructions.PushNull));
                 } else {
 
-                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, constants), null, null/*FIXME?*/);
+                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, constants), abc, scriptIndex);
                     while (ci != null && ci.parent != null) {
                         ci = ci.parent;
                         Multiname origM = ci.abc.constants.getMultiname(ci.abc.instance_info.get(ci.index).name_index);
@@ -2274,11 +2275,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param names Names
      * @param namespaces Namespaces
      */
-    public static void parentNamesAddNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
+    public static void parentNamesAddNames(AbcIndexing abc, int scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
         List<Integer> cindices = new ArrayList<>();
 
         List<ABC> outABCs = new ArrayList<>();
-        parentNames(abc, name_index, cindices, names, namespaces, outABCs);
+        parentNames(abc, scriptIndex, name_index, cindices, names, namespaces, outABCs);
         for (int i = 0; i < cindices.size(); i++) {
             ABC a = outABCs.get(i);
             int m = cindices.get(i);
@@ -2411,8 +2412,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
      * @param namespaces Namespaces
      * @param outABCs Out ABCs
      */
-    public static void parentNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
-        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc().constants, true /*FIXME!!*/)), null, null/*FIXME?*/);
+    public static void parentNames(AbcIndexing abc, int scriptIndex, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
+        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc().constants, true /*FIXME!!*/)), abc.getSelectedAbc(), scriptIndex);
         while (ci != null) {
             int ni = ci.abc.instance_info.get(ci.index).name_index;
             indices.add(ni);

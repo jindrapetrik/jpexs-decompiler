@@ -295,6 +295,7 @@ public class Traits implements Cloneable, Serializable {
     /**
      * To string.
      *
+     * @param packageName Package name
      * @param first Whether to add newline
      * @param abcIndex ABC indexing
      * @param traitTypes Trait types
@@ -315,49 +316,7 @@ public class Traits implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(Reference<Boolean> first, AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
-
-        /*List<Trait> ordered = new ArrayList<>(traits);
-        loopi:
-        for (int i = 0; i < ordered.size(); i++) {
-            for (int j = i + 1; j < ordered.size(); j++) {
-                if (i == j) {
-                    continue;
-                }
-                Trait o1 = ordered.get(i);
-                Trait o2 = ordered.get(j);
-                Multiname m2 = abc.constants.getMultiname(o2.name_index);
-                if (!convertData.assignedValues.containsKey(o1)) {
-                    continue;
-                }
-                GraphTargetItem v1 = convertData.assignedValues.get(o1).value;
-
-                Set<GraphTargetItem> subitems1 = v1.getAllSubItemsRecursively();
-                subitems1.add(v1);
-                for (GraphTargetItem si : subitems1) {
-                    if (si instanceof GetPropertyAVM2Item) {
-                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) si;
-                        Multiname sm1 = abc.constants.getMultiname(((FullMultinameAVM2Item) getProp.propertyName).multinameIndex);
-                        if (getProp.object instanceof FindPropertyAVM2Item && sm1.equals(m2)) {
-                            ordered.add(j + 1, o1);
-                            ordered.remove(i);
-                            i--;
-                            continue loopi;
-                        }
-                    }
-                    if (si instanceof GetLexAVM2Item) {
-                        GetLexAVM2Item lex = (GetLexAVM2Item) si;
-                        if (lex.propertyName.equals(m2)) {
-                            ordered.add(j + 1, o1);
-                            ordered.remove(i);
-                            i--;
-                            continue loopi;
-                        }
-                    }
-                }
-            }
-        }
-*/
+    public GraphTextWriter toString(DottedChain packageName, Reference<Boolean> first, AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<String> ignoredTraitNames, boolean insideInterface) throws InterruptedException {     
         List<Trait> ordered = traits;
         
         for (Trait trait : ordered) {
@@ -394,7 +353,7 @@ public class Traits implements Cloneable, Serializable {
             if (makePackages) {
                 trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             } else {
-                trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+                trait.toString(abcIndex, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
             writer.endTrait();            
         }
