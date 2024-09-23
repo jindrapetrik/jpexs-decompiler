@@ -720,7 +720,7 @@ public class Multiname {
             if (ns == null) {
                 NamespaceSet nss = getNamespaceSet(constants);
                 if (nss != null) {
-                    if (nss.namespaces.length > 0) {
+                    if (nss.namespaces.length == 1) {
                         ns = constants.getNamespace(nss.namespaces[0]);                        
                     }
                 }
