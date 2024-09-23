@@ -65,6 +65,45 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.1.0" date="2024-09-23">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>FLA export - generating bin/*.dat files for movies and images</li>
+					<li>#943, #1812, #2287 Export to older binary FLA formats (CS4, CS3, Flash 8, MX 2004, MX, Flash 5)</li>
+					<li>#2286 Set SWF version in FlashDevelop project</li>
+					<li>#2306 Export to VS Code project</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1644 Swapped Save all and Save buttons - Save is bigger</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2309 XML export/import - Decimal support</li>
+					<li>#2300, #2303 ShellFolder Comparator Windows Java error</li>
+					<li>#2302 AS3 Class linkage - changes did not save</li>
+					<li>PR203 AS1/2 extreme lagging</li>
+					<li>#2310 Text search history showing as null</li>
+					<li>#2295, #2311 AS1/2 p-code freezing on highlighting ConstantPool</li>
+					<li>#2304 GFX files truncated</li>
+					<li>#2297 AS direct editation - if..else clause broken when using continue/break</li>
+					<li>#2291 AS1/2 Incorrect var keyword placement causing registers to compile wrong</li>
+					<li>#2290 FLA export - not generating sound bin files causing sound compression setting to be ignored</li>
+					<li>#2296 AS decompilation - goto problems</li>
+					<li>AS3 - displaying imports of class parent chain</li>
+					<li>AS3 - imports for script slot/const traits</li>
+					<li>AS3 direct editation - script slot/const traits assignments</li>
+					<li>AS3 direct editation - double returnvoid on script initializer</li>
+					<li>AS3 empty interface indentation</li>
+					<li>#2313 AS3 direct editation - parsing class traits metadata</li>
+					<li>#2314 AS3 direct editation - cannot save class initializer in some cases</li>
+					<li>#2315 AS3 direct editation - switching scripts during editation causing missing scripts</li>
+					<li>#2316 AS3 direct editation - private classes</li>
+					<li>#2317 AS3 direct editation - local register names colliding with parameter names</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.0.5" date="2024-09-05">
 			<description>
 				<p>Fixed</p>
