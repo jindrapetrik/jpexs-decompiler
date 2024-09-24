@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
+import static com.jpexs.decompiler.flash.docs.As3PCodeDocs.NEWLINE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.InputStream;
@@ -297,6 +298,8 @@ public class As12PCodeDocs extends AbstractDocs {
         jsData += "var txt_filter_order_name = \"" + getProperty("ui.filter.order.name") + "\";" + NEWLINE;
 
         jsData += "var order_set = \"name\";";
+        jsData += "var flags_set = {};" + NEWLINE;
+        jsData += "var flags = null;" + NEWLINE;
         StringBuilder sb = new StringBuilder();
         sb.append(htmlHeader(jsData + getJs(), getStyle(), nightMode));
         sb.append("<body");

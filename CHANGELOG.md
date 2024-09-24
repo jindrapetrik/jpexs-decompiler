@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added 
+- [#2321] Commandline option to generate HTML docs for AS1/2 Actions
+
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
 - [#2319] AS3 direct editation - class gets removed after pressing cancel
@@ -3574,6 +3577,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2319]: https://www.free-decompiler.com/flash/issues/2319
 [#2320]: https://www.free-decompiler.com/flash/issues/2320
 [#943]: https://www.free-decompiler.com/flash/issues/943
