@@ -122,12 +122,17 @@ function init() {
     t += "<input onkeydown=\"applyFilter();\" onkeyup=\"applyFilter();\" onkeypress=\"applyFilter();\" type=\"text\" id=\"filter-byname\" size=\"15\" />";
     t += "</div>";
 
-    t += "<div class=\"filter-item\">";
-    t += "<strong class=\"filter-hide-title\">" + txt_filter_hide + "</strong><br />";
-    for (var flag in flags) {
-        var flagDesc = flags[flag];
-        var flagSet = flags_set[flag];
-        t += '<input class="filter" data-flag="' + flag + '" onchange="applyFilter();" type="checkbox"' + (flagSet ? ' checked="checked"' : '') + ' id="flag-' + flag + '-switch"/><label for="flag-' + flag + '-switch">' + flagDesc + '</label><br />';
+    if (flags !== null) {
+        t += "<div class=\"filter-item\">";
+
+        t += "<strong class=\"filter-hide-title\">" + txt_filter_hide + "</strong><br />";        
+    
+        for (var flag in flags) {
+            var flagDesc = flags[flag];
+            var flagSet = flags_set[flag];
+            t += '<input class="filter" data-flag="' + flag + '" onchange="applyFilter();" type="checkbox"' + (flagSet ? ' checked="checked"' : '') + ' id="flag-' + flag + '-switch"/><label for="flag-' + flag + '-switch">' + flagDesc + '</label><br />';
+        }
+        t += "</div>";
     }
 
     t += "<div class=\"filter-item\">";
@@ -136,7 +141,6 @@ function init() {
     t += "<option value=\"code\"" + (order_set == "code" ? ' selected="selected"' : '') + ">" + txt_filter_order_code + "</option>";
     t += "<option value=\"name\"" + (order_set == "name" ? ' selected="selected"' : '') + ">" + txt_filter_order_name + "</option>";
     t += "</select>";
-    t += "</div>";
     t += "</div>";
 
     t += "</div>"; //.filter

@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.docs.As12PCodeDocs;
 import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
@@ -409,6 +410,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("doc")) {
             out.println(PREFIX + "-doc -type as3.pcode.instructions -format html");
+            out.println(PREFIX + "-doc -type as12.pcode.instructions -format html");
             out.println(PREFIX + "-doc -type as3.pcode.instructions -format html -locale en -out as3_docs_en.html");
             exampleFound = true;
         }
@@ -3467,12 +3469,7 @@ public class CommandLineArgumentParser {
         if (format == null) {
             format = "html";
         }
-        if (type == null) {
-            badArguments("doc");
-        } else if (!type.equals("as3.pcode.instructions")) {
-            badArguments("doc");
-        }
-
+        
         if (!format.equals("html")) {
             badArguments("doc");
         }
@@ -3480,8 +3477,16 @@ public class CommandLineArgumentParser {
             Locale.setDefault(Locale.forLanguageTag(locale));
         }
 
-        String doc = As3PCodeDocs.getAllInstructionDocs(nightMode);
-
+        String doc = "";
+        if (type == null) {
+            badArguments("doc");
+        } else if (type.equals("as3.pcode.instructions")) {
+            doc = As3PCodeDocs.getAllInstructionDocs(nightMode);
+        } else if (type.equals("as12.pcode.instructions")) {
+            doc = As12PCodeDocs.getAllInstructionDocs(nightMode);
+        } else {
+            badArguments("doc");
+        }
         PrintStream outStream;
 
         if (out == null) {

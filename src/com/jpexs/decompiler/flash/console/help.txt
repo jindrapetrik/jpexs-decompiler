@@ -197,8 +197,9 @@ alias /?
 -doc -type <type> [-out <outfile>] [-format <format>] [-locale <locale>]
     Generate documentation.
     -type <type> Selects documentation type
-    <type> can be currently only: as3.pcode.instructions for list 
-           of ActionScript3 AVM2 instructions
+    <type> can be: 
+           as3.pcode.instructions - AVM2 instruction list
+           as12.pcode.instructions - AVM1 action list
     -out <outfile> (optional) If specified, output is written 
                               to <outfile> instead of stdout
     -format <format> (optional, html is default) Selects output format
