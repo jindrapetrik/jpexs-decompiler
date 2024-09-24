@@ -109,7 +109,7 @@ public class ConstructPropIns extends InstructionDefinition {
         if (obj instanceof FindPropertyAVM2Item) {
             multiname.property = false;  //can be type
         }
-        stack.push(new ConstructPropAVM2Item(ins, localData.lineStartInstruction, obj, multiname, args, type.getVal()));
+        stack.push(new ConstructPropAVM2Item(ins, localData.lineStartInstruction, obj, multiname, args, type.getVal(), isStatic.getVal()));
     }
 
     @Override
