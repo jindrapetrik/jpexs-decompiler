@@ -107,15 +107,15 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         String localName = localRegName(localData.localRegNames, regIndex);
         getSrcData().localName = localName;
         writer.append(localName);
+        if (hideValue) {
+            return writer;
+        }
         if (compoundOperator != null) {
             writer.append(" ");
             writer.append(compoundOperator);
             writer.append("= ");
             return compoundValue.toString(writer, localData);
-        }
-        if (hideValue) {
-            return writer;
-        }
+        }        
         writer.append(" = ");
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
