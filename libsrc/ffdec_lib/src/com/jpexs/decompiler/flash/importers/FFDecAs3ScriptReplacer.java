@@ -54,15 +54,10 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
         String scriptName = pack.getPathScriptName() + ".as";
         int oldIndex = pack.scriptIndex;
         int newIndex = abc.script_info.size();
+        AbcIndexing abcIndex = swf.getAbcIndex();
         try {
             ScriptInfo si = abc.script_info.get(oldIndex);
-            if (pack.isSimple) {
-                si.delete(abc, true);
-            } else {
-                for (int t : pack.traitIndices) {
-                    si.traits.traits.get(t).delete(abc, true);
-                }
-            }
+            pack.delete(abc, true);
 
             int newClassIndex = abc.instance_info.size();
             for (int t : pack.traitIndices) {
@@ -74,9 +69,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             }
             List<ABC> otherAbcs = new ArrayList<>(pack.allABCs);
 
-            otherAbcs.remove(abc);
-            abc.script_info.get(oldIndex).delete(abc, true);
-            AbcIndexing abcIndex = swf.getAbcIndex();
+            otherAbcs.remove(abc);            
             abcIndex.selectAbc(abc);
             abcIndex.refreshAbc(abc);
 
@@ -92,9 +85,13 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             abc.pack(); //remove old deleted items
             ((Tag) abc.parentTag).setModified(true);
         } catch (AVM2ParseException ex) {
+            pack.delete(abc, false);
+            abcIndex.refreshAbc(abc);
             //ex.printStackTrace();
             throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, (int) ex.line));
         } catch (CompilationException ex) {
+            pack.delete(abc, false);
+            abcIndex.refreshAbc(abc);
             //ex.printStackTrace();
             throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, (int) ex.line));
         }
