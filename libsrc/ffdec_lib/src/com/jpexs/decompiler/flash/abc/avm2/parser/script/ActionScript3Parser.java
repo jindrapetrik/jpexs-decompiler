@@ -131,8 +131,10 @@ import java.io.OutputStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -3013,6 +3015,12 @@ public class ActionScript3Parser {
         ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
+        Set<Integer> modifiedScripts = new HashSet<>();        
+        for (int i = 0; i < abc.script_info.size(); i++) {
+            if (abc.script_info.get(i).isModified()) {
+                modifiedScripts.add(i);
+            }
+        }
         try {
             parser.addScript(src, fileName, classPos, scriptIndex, documentClass, abc);
             success = true;
@@ -3027,6 +3035,12 @@ public class ActionScript3Parser {
                 abc.script_info = originalAbc.script_info;
                 abc.bodies = originalAbc.bodies;
                 abc.resetMethodIndexing();
+                
+                for (int i = 0; i < abc.script_info.size(); i++) {
+                    if (modifiedScripts.contains(i)) {
+                        abc.script_info.get(i).setModified(true);
+                    }
+                }
             }
         }
     }
