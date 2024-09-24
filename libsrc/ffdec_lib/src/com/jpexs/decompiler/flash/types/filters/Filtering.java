@@ -367,8 +367,7 @@ public class Filtering {
             if (inner) {
                 alpha = 255 - alpha;
             }
-            Color shadowColor;
-            shadowColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255 * strength));
+            Color shadowColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), cut(color.getAlpha() * alpha / 255f));
             shadow[i] = shadowColor.getRGB();
         }
 
@@ -382,6 +381,14 @@ public class Filtering {
             blur(shadow, width, height, blurX, blurY, iterations, null);
         }
 
+        if (strength != 1f) {
+            for (int i = 0; i < shadow.length; i++) {
+                int alpha = (shadow[i] >> 24) & 0xff;
+                alpha = cut(alpha * strength);
+                shadow[i] = (shadow[i] & 0xffffff) | (alpha << 24);
+            }
+        }
+        
         if (knockout || inner) {
             for (int i = 0; i < shadow.length; i++) {
                 int mask = (srcPixels[i] >> 24) & 0xff;
