@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#2272] Filters strength attribute caps at 100%
 - [#2322] AS3 Construct property name formatting
 - [#2322] AS3 Assigment position when using dup
+- [#2323] AS3 direct editation - Number class traits are duplicated in constructor
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3585,6 +3586,7 @@ Major version of SWF to XML export changed to 2.
 [#2320]: https://www.free-decompiler.com/flash/issues/2320
 [#2272]: https://www.free-decompiler.com/flash/issues/2272
 [#2322]: https://www.free-decompiler.com/flash/issues/2322
+[#2323]: https://www.free-decompiler.com/flash/issues/2323
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287

@@ -842,7 +842,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 */
                 if (!isStatic && val != null) {
                     //do not init basic values, that can be stored in trait
-                    if (!(val instanceof IntegerValueAVM2Item) && !(val instanceof StringAVM2Item) && !(val instanceof BooleanAVM2Item) && !(val instanceof NullAVM2Item) && !(val instanceof UndefinedAVM2Item)) {
+                    if (!(val instanceof IntegerValueAVM2Item) 
+                            && !(val instanceof DoubleValueAVM2Item)
+                            && !(val instanceof StringAVM2Item) 
+                            && !(val instanceof BooleanAVM2Item) 
+                            && !(val instanceof NullAVM2Item) 
+                            && !(val instanceof UndefinedAVM2Item)
+                            ) {
                         initcode.add(ins(AVM2Instructions.GetLocal0));
                         localData.isStatic = false;
                         initcode.addAll(toInsList(val.toSource(localData, this)));
