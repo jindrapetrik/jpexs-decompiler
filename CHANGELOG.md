@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
+- [#2319] AS3 direct editation - class gets removed after pressing cancel
 
 ## [21.1.0] - 2024-09-23
 ### Added
