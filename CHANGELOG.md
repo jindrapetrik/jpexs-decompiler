@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#2319] AS3 Compound assignments problems in some cases
 - [#2319] AS3 direct editation - class gets removed after pressing cancel
 - [#2320] AS3 direct editation - modified flag of scripts vanishes after editing other script with and having error
+- [#2272] Filters strength attribute caps at 100%
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3580,6 +3581,7 @@ Major version of SWF to XML export changed to 2.
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2319]: https://www.free-decompiler.com/flash/issues/2319
 [#2320]: https://www.free-decompiler.com/flash/issues/2320
+[#2272]: https://www.free-decompiler.com/flash/issues/2272
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
