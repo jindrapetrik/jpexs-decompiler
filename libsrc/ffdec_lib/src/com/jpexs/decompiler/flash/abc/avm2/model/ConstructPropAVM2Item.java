@@ -50,6 +50,11 @@ public class ConstructPropAVM2Item extends AVM2Item {
      * Type
      */
     public GraphTargetItem type;
+    
+    /**
+     * Is static
+     */
+    public boolean isStatic;
 
     /**
      * Constructor.
@@ -60,13 +65,15 @@ public class ConstructPropAVM2Item extends AVM2Item {
      * @param propertyName Property name
      * @param args Arguments
      * @param type Type
+     * @param isStatic Is static
      */
-    public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args, GraphTargetItem type) {
+    public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args, GraphTargetItem type, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
         this.args = args;
         this.type = type;
+        this.isStatic = isStatic;
     }
 
     @Override
@@ -79,11 +86,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        if (!(object.getThroughDuplicate() instanceof FindPropertyAVM2Item)) {
-            object.toString(writer, localData);
-            writer.append(".");
-        }
-        propertyName.toString(writer, localData);
+        formatProperty(writer, object, propertyName, localData, isStatic);
         writer.spaceBeforeCallParenthesies(args.size());
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {
