@@ -2704,7 +2704,14 @@ public class AVM2Graph extends Graph {
                                 }
                                 if (s >= 0) {
                                     GraphTargetItem parent = parentStack.get(s);
-                                    if (!(parent instanceof SetTypeAVM2Item)) { //not a chained assignment
+                                    boolean move = true;
+                                    if (parent instanceof SetTypeAVM2Item) {
+                                        SetTypeAVM2Item setType = (SetTypeAVM2Item) parent;
+                                        if (setType.getValue() == item) { //chained assignment
+                                            move = false;
+                                        }
+                                    }
+                                    if (move) { 
                                         foundSetLoc.setVal((SetLocalAVM2Item) item);
                                     }
                                 }                                
