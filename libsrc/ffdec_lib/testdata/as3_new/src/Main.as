@@ -100,6 +100,7 @@ package
         TestOperations;
         TestOptimization;
         TestOptimizationAndOr;
+        TestOptimizationWhile;
         TestOptionalParameters;
         TestParamNames;
         TestParamsCount;

@@ -1001,7 +1001,7 @@ public class Graph {
         processIfs(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
-        finalProcessAll(ret, 0, getFinalData(localData, loops, throwStates), path);
+        finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         return ret;
     }
 
@@ -1332,22 +1332,23 @@ public class Graph {
     /**
      * Final process all.
      *
+     * @param parent Parent item
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
      * @param path Path
      * @throws InterruptedException On interrupt
      */
-    private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+    private void finalProcessAll(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
         if (debugDoNotProcess) {
             return;
         }
-        finalProcess(list, level, localData, path);
+        finalProcess(parent, list, level, localData, path);
         for (GraphTargetItem item : list) {
             if (item instanceof Block) {
                 List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
                 for (List<GraphTargetItem> sub : subs) {
-                    finalProcessAll(sub, level + 1, localData, path);
+                    finalProcessAll(item, sub, level + 1, localData, path);
                 }
             }
         }
@@ -1428,13 +1429,14 @@ public class Graph {
     /**
      * Final process. Override this method to provide custom behavior.
      *
+     * @param parent Paren item
      * @param list List of GraphTargetItems
      * @param level Level
      * @param localData Local data
      * @param path Path
      * @throws InterruptedException On interrupt
      */
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+    protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
         //For detection based on debug line information
         boolean[] toDelete = new boolean[list.size()];

@@ -1709,6 +1709,20 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testOptimizationWhile() {
+        decompileMethod("classic_air", "testOptimizationWhile", "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "var c:int = 3;\r\n"
+                + "var d:int = 4;\r\n"
+                + "while(d = Math.round(Math.random() * 10), d < 10)\r\n"
+                + "{\r\n"
+                + "trace(\"xxx\");\r\n"
+                + "d++;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic_air", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                  false);
