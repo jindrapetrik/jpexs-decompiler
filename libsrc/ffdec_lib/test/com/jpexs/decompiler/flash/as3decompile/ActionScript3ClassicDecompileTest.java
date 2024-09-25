@@ -1695,6 +1695,25 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testOptimizationWhile() {
+        decompileMethod("classic", "testOptimizationWhile", "var a:int = 1;\r\n"
+                + "var b:int = 2;\r\n"
+                + "var c:int = 3;\r\n"
+                + "var d:int = 4;\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "d = Math.round(Math.random() * 10);\r\n"
+                + "if(d >= 10)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"xxx\");\r\n"
+                + "d++;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                  false);

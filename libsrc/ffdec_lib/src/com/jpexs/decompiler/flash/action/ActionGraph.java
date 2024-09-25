@@ -274,17 +274,8 @@ public class ActionGraph extends Graph {
         return !isSwitch;
     }
 
-    /**
-     * Final process.
-     *
-     * @param list List of GraphTargetItems
-     * @param level Level
-     * @param localData Local data
-     * @param path Path
-     * @throws InterruptedException On interrupt
-     */
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+    protected void finalProcess(GraphTargetItem parent, List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
         if (level == 0) {
             List<GraphTargetItem> removed = new ArrayList<>();
@@ -553,7 +544,7 @@ public class ActionGraph extends Graph {
             }
         }
         //Handle for loops at the end:
-        super.finalProcess(list, level, localData, path);
+        super.finalProcess(parent, list, level, localData, path);
 
     }
 
