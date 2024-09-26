@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added 
 - [#2321] Commandline option to generate HTML docs for AS1/2 Actions
+- Chinese translation update
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
