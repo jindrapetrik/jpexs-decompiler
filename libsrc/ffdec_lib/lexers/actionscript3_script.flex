@@ -539,6 +539,10 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                         yybegin(XMLOPENTAG);
                                         return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
                                     }
+    \'{XmlSQuoteStringChar}*\'      {
+                                        yybegin(XMLOPENTAG);
+                                        return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE_SINGLEQUOTED, yytext());
+                                    }
     "{"                             {
                                       yybegin(YYINITIAL);
                                       return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRVALVAR_BEGIN, yytext());

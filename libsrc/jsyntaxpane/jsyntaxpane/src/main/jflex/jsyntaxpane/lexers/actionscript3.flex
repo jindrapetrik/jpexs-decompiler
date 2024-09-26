@@ -113,7 +113,7 @@ TypeNameSpec = ".<" {Identifier} ">"
 /* XML */
 LetterColon = [:jletter] | ":"
 XMLIdentifier = {Identifier} | {IdentifierNs}
-XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
+XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* (\" {InputCharacter}* \" | "'" {InputCharacter}* "'") " "*
 XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">" | "<{" {XMLIdentifier} "}" {XMLAttribute}* " "* ">"
 XMLBeginTag = "<" {XMLIdentifier} " " | "<{" {XMLIdentifier} "} "
 XMLEndTag = "</" {XMLIdentifier} " "* ">" | "</{" {XMLIdentifier} "}" " "* ">"
