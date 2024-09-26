@@ -397,14 +397,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
             pos += ins.getBytesLength();
             if (ins.definition instanceof JumpIns) {
                 if (ins.definition instanceof ContinueJumpIns) {
-                    if (continueOffset != Integer.MAX_VALUE) {
-                        ins.operands[0] = (-pos + continueOffset);
-                        ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
+                    ContinueJumpIns cji = (ContinueJumpIns) ins.definition;
+                    if (cji.getLoopId() == loopId) {
+                        if (continueOffset != Integer.MAX_VALUE) {
+                            ins.operands[0] = (-pos + continueOffset);
+                            ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
+                        }
                     }
                 }
                 if (ins.definition instanceof BreakJumpIns) {
-                    ins.operands[0] = (-pos + breakOffset);
-                    ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
+                    BreakJumpIns bji = (BreakJumpIns) ins.definition;
+                    if (bji.getLoopId() == loopId) {
+                        ins.operands[0] = (-pos + breakOffset);
+                        ins.definition = AVM2Code.instructionSet[AVM2Instructions.Jump];
+                    }
                 }
             }
         }

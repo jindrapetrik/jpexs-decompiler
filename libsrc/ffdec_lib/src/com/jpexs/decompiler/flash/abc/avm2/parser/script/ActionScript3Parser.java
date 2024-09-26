@@ -1711,6 +1711,7 @@ public class ActionScript3Parser {
                     loops.push(wloop);
                     whileBody.add(command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables, abc));
                     ret = new WhileItem(null, null, wloop, whileExpr, whileBody);
+                    loops.pop();
                     break;
                 case DO:
                     List<GraphTargetItem> doBody = new ArrayList<>();
@@ -1726,6 +1727,7 @@ public class ActionScript3Parser {
                     doExpr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true, abc));
                     expectedType(SymbolType.PARENT_CLOSE);
                     ret = new DoWhileItem(null, null, dloop, doBody, doExpr);
+                    loops.pop();
                     break;
                 case FOR:
                     s = lex();
@@ -1791,6 +1793,7 @@ public class ActionScript3Parser {
                     } else {
                         ret = new ForItem(null, null, floop, forFirstCommands, forExpr, forFinalCommands, forBody);
                     }
+                    loops.pop();
                     break;
                 case SWITCH:
                     Loop sloop = new Loop(-uniqId(), null, null); //negative id marks switch = no continue
@@ -1833,6 +1836,7 @@ public class ActionScript3Parser {
                     }
                     expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
                     ret = new SwitchItem(null, null, sloop, switchExpr, caseExprsAll, caseCmds, valueMapping);
+                    loops.pop();
                     break;
                 case BREAK:
                     s = lex();
