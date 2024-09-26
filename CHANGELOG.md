@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#2322] AS3 Assigment position when using dup
 - [#2323] AS3 direct editation - Number class traits are duplicated in constructor
 - [#2324] AS3 direct editation - nested loop continue/break (with labels)
+- [#2325] AS3 direct editation - allow single quoted attributes in XML
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3590,6 +3591,7 @@ Major version of SWF to XML export changed to 2.
 [#2322]: https://www.free-decompiler.com/flash/issues/2322
 [#2323]: https://www.free-decompiler.com/flash/issues/2323
 [#2324]: https://www.free-decompiler.com/flash/issues/2324
+[#2325]: https://www.free-decompiler.com/flash/issues/2325
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287

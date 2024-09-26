@@ -556,9 +556,13 @@ public enum SymbolType {
      */
     XML_ATTRIBUTENAME(GraphTargetItem.PRECEDENCE_PRIMARY, false), // aaa=
     /**
-     * XML: attribute value
+     * XML: attribute value, double quoted
      */
     XML_ATTRIBUTEVALUE(GraphTargetItem.PRECEDENCE_PRIMARY, false), // "vvv"
+    /**
+     * XML: attribute value, single quoted
+     */
+    XML_ATTRIBUTEVALUE_SINGLEQUOTED(GraphTargetItem.PRECEDENCE_PRIMARY, false), // 'vvv'
     /**
      * XML: text
      */
