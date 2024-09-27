@@ -211,17 +211,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
         //DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
-
-        fullyQualifiedNames = new ArrayList<>();
-
-        Reference<Boolean> first = new Reference<>(true);        
-              
-        if (getName(abc).getNamespace(abc.constants).kind != Namespace.KIND_PACKAGE_INTERNAL) {
-            List<Trait> traits = new ArrayList<>();
-            traits.add(this);
-            first.setVal(!writeImports(traits, -1, abcIndex, scriptIndex, classIndex, false, abc, writer, packageName, fullyQualifiedNames));
-        }
-
+        
+        Reference<Boolean> first = new Reference<>(true);                              
+        
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
         getMetaData(this, convertData, abc, writer);
