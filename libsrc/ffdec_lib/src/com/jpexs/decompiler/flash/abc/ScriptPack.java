@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -321,33 +322,41 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
 
         DottedChain pkg = getPathPackage();
-        
+
+        List<Trait> traitList = new ArrayList<>();
+        List<Integer> traitIndicesList = new ArrayList<>(traitIndices);
         for (int t : traitIndices) {
-
             Trait trait = traits.get(t);
+            traitList.add(trait);
+        }
+        
+        List<DottedChain> fullyQualifiedNames = new ArrayList<>();
 
-            if (trait instanceof TraitSlotConst) {
+        for (int t = 0; t < traitList.size(); t++) {
+
+            Trait trait = traitList.get(t);
+
+            int nskind = trait.getName(abc).getSimpleNamespaceKind(abc.constants);
+            if ((nskind != Namespace.KIND_PACKAGE) && (nskind != Namespace.KIND_PACKAGE_INTERNAL)) {
                 continue;
             }
 
             if (!first) {
                 writer.newLine();
             }
-            writer.startTrait(t);
-            Multiname name = trait.getName(abc);
-            int nskind = name.getSimpleNamespaceKind(abc.constants);
-            if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
-            } else {
-                trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
-            }
+            writer.startTrait(traitIndicesList.get(t));
+            trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, fullyQualifiedNames, parallel, false);
+
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
             }
             first = false;
+            traitList.remove(t);
+            traitIndicesList.remove(t);
+            t--;
         }
 
-        List<DottedChain> fullyQualifiedNames = new ArrayList<>();
+        
         if (!first) {
             writer.newLine();
         }
@@ -355,22 +364,33 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (isSimple) {
             ignorePackage = getPathPackage();
         }
-        List<Trait> importTraits = new ArrayList<>();
-        for (int t : traitIndices) {
-            Trait trait = traits.get(t);
-
-            if (!(trait instanceof TraitSlotConst)) {
-                continue;
-            }
-            importTraits.add(trait);                        
-        }
-        Trait.writeImports(importTraits, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
+        Trait.writeImports(traitList, script_init, abcIndex, scriptIndex, -1, true, abc, writer, ignorePackage, fullyQualifiedNames);
         first = true;
 
-        //Slot const last
-        for (int t : traitIndices) {
+        for (int t = 0; t < traitList.size(); t++) {
+            Trait trait = traitList.get(t);
+            if (trait instanceof TraitSlotConst) {
+                continue;
+            }
+            if (!first) {
+                writer.newLine();
+            }
+            writer.startTrait(traitIndicesList.get(t));
+            trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
 
-            Trait trait = traits.get(t);
+            if (!(trait instanceof TraitClass)) {
+                writer.endTrait();
+            }
+            first = false;
+            traitList.remove(t);
+            traitIndicesList.remove(t);
+            t--;
+        }
+
+        //Slot const last
+        for (int t = 0; t < traitList.size(); t++) {
+
+            Trait trait = traitList.get(t);
 
             if (!(trait instanceof TraitSlotConst)) {
                 continue;
@@ -383,17 +403,15 @@ public class ScriptPack extends AS3ClassTreeItem {
             if (!first) {
                 writer.newLine();
             }
-            writer.startTrait(t);
+            writer.startTrait(traitIndicesList.get(t));
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             } else {
-                trait.toString(abcIndex, pkg,  null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
-            if (!(trait instanceof TraitClass)) {
-                writer.endTrait();
-            }
+            writer.endTrait();
             first = false;
         }
 

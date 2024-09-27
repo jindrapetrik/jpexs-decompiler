@@ -2706,6 +2706,15 @@ public class AVM2Code implements Cloneable {
                 if (commandToAssigned.containsKey(ti)) {
                     AssignedValue asv = commandToAssigned.get(ti);
                     TraitSlotConst tsc = commandToTrait.get(ti);
+                    
+                    int nsKind = tsc.getName(abc).getSimpleNamespaceKind(abc.constants);
+                    if (classIndex == -1 && (nsKind == Namespace.KIND_PACKAGE || nsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                        list.remove(i);
+                        i--;
+                        continue;
+                    }
+                
+                    
                     TraitSlotConstAVM2Item item = new TraitSlotConstAVM2Item(
                             ti.getSrc(), 
                             ti.getLineStartItem(),

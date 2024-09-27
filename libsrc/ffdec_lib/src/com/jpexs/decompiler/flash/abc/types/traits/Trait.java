@@ -391,17 +391,16 @@ public abstract class Trait implements Cloneable, Serializable {
                 traitNamesInThisScript.add(st.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
             }
         }
-        
+
         Set<String> traitNamesInThisScriptSet = new LinkedHashSet<>(traitNamesInThisScript);
         traitNamesInThisScript = new ArrayList<>(traitNamesInThisScriptSet);
-       
+
         //imports
         List<Dependency> dependencies = new ArrayList<>();
         String customNs = null;
         List<String> uses = new ArrayList<>();
         Reference<Integer> numberContextRef = new Reference<>(null);
-        
-        
+
         for (Trait trait : traits) {
             Multiname multiname = trait.getName(abc);
             int nskind = multiname.getSimpleNamespaceKind(abc.constants);
@@ -419,16 +418,13 @@ public abstract class Trait implements Cloneable, Serializable {
                 imports.add(d.getId());
             }
         }
-
         
         List<String> importedNames = new ArrayList<>();
-        
-        importedNames.addAll(Arrays.asList(builtInClasses));       
+
+        importedNames.addAll(Arrays.asList(builtInClasses));
         importedNames.addAll(namesInThisPackage);
         importedNames.addAll(traitNamesInThisScript);
-        
-        
-        
+
         for (DottedChain imp : imports) {
             if (imp.getLast().equals("*")) {
                 if (imp.getWithoutLast().equals(ignorePackage)) {
@@ -451,7 +447,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 i--;
             }
         }
-        
+
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
             DottedChain pkg = ipath.getWithoutLast();
@@ -465,9 +461,9 @@ public abstract class Trait implements Cloneable, Serializable {
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
             String name = ipath.getLast();
-            importedNames.add(name);           
+            importedNames.add(name);
         }
-        
+
         List<String> uniqueImportedNames = new ArrayList<>();
         for (int i = 0; i < importedNames.size(); i++) {
             String name = importedNames.get(i);
@@ -497,7 +493,6 @@ public abstract class Trait implements Cloneable, Serializable {
                 hasImport = true;
             }
         }
-        
 
         boolean hasUse = false;
         if (!uses.isEmpty()) {
@@ -653,24 +648,28 @@ public abstract class Trait implements Cloneable, Serializable {
                     }
                     Set<Integer> namespaceIdsClass = new HashSet<>();
 
-                    Multiname mc = abc.instance_info.get(classIndex).getName(abc.constants);
-                    if (mc.isApiVersioned(abc.constants)) {
-                        NamespaceSet nss = mc.getNamespaceSet(abc.constants);
-                        for (int n : nss.namespaces) {
-                            namespaceIdsClass.add(n);
-                        }
+                    if (classIndex == -1) {
+                        nskind = Namespace.KIND_PACKAGE_INTERNAL;
                     } else {
-                        namespaceIdsClass.add(mc.namespace_index);
-                    }
+                        Multiname mc = abc.instance_info.get(classIndex).getName(abc.constants);
+                        if (mc.isApiVersioned(abc.constants)) {
+                            NamespaceSet nss = mc.getNamespaceSet(abc.constants);
+                            for (int n : nss.namespaces) {
+                                namespaceIdsClass.add(n);
+                            }
+                        } else {
+                            namespaceIdsClass.add(mc.namespace_index);
+                        }
 
-                    for (int ns : namespaceIdsThis) {
-                        if (namespaceIdsClass.contains(ns)) {
-                            nskind = Namespace.KIND_PACKAGE_INTERNAL;
-                            break;
+                        for (int ns : namespaceIdsThis) {
+                            if (namespaceIdsClass.contains(ns)) {
+                                nskind = Namespace.KIND_PACKAGE_INTERNAL;
+                                break;
+                            }
                         }
                     }
                 }
-                
+
                 if (!(classIndex == -1 && nskind == Namespace.KIND_PACKAGE_INTERNAL)) {                                    
                     String nsPrefix = Namespace.getPrefix(nskind);
                     if (nsPrefix != null && !nsPrefix.isEmpty()) {
@@ -876,6 +875,9 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight(" " + nsname); //assume not null name
             }
             writer.startBlock();
+            List<Trait> traits = new ArrayList<>();
+            traits.add(this);           
+            writeImports(traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);        
             toString(abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
