@@ -44,15 +44,9 @@ public class FSCommand2ActionItem extends ActionItem {
      */
     public List<GraphTargetItem> arguments;
 
-    /**
-     * Command
-     */
-    public GraphTargetItem command;
-
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visitAll(arguments);
-        visitor.visit(command);
     }
 
     /**
@@ -63,20 +57,20 @@ public class FSCommand2ActionItem extends ActionItem {
      * @param command Command
      * @param arguments Arguments
      */
-    public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem command, List<GraphTargetItem> arguments) {
+    public FSCommand2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, List<GraphTargetItem> arguments) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
-        this.command = command;
         this.arguments = arguments;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("FSCommand2");
+        writer.append("fscommand2");
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
-        command.toString(writer, localData);
         for (int t = 0; t < arguments.size(); t++) {
-            writer.append(",");
+            if (t > 0) {
+                writer.append(",");
+            }
             arguments.get(t).toString(writer, localData);
         }
         return writer.append(")");
@@ -85,7 +79,6 @@ public class FSCommand2ActionItem extends ActionItem {
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(command.getNeededSources());
         for (GraphTargetItem ti : arguments) {
             ret.addAll(ti.getNeededSources());
         }
@@ -102,7 +95,6 @@ public class FSCommand2ActionItem extends ActionItem {
         for (GraphTargetItem a : arguments) {
             ret.addAll(a.toSource(localData, generator));
         }
-        ret.addAll(command.toSource(localData, generator));
         ret.add(new ActionPush((Long) (long) arguments.size(), charset));
         ret.add(new ActionFSCommand2(charset));
         return ret;
@@ -117,7 +109,6 @@ public class FSCommand2ActionItem extends ActionItem {
     public int hashCode() {
         int hash = 3;
         hash = 71 * hash + Objects.hashCode(this.arguments);
-        hash = 71 * hash + Objects.hashCode(this.command);
         return hash;
     }
 
@@ -134,9 +125,6 @@ public class FSCommand2ActionItem extends ActionItem {
         }
         final FSCommand2ActionItem other = (FSCommand2ActionItem) obj;
         if (!Objects.equals(this.arguments, other.arguments)) {
-            return false;
-        }
-        if (!Objects.equals(this.command, other.command)) {
             return false;
         }
         return true;
@@ -157,9 +145,7 @@ public class FSCommand2ActionItem extends ActionItem {
         if (!GraphTargetItem.objectsValueEquals(this.arguments, other.arguments)) {
             return false;
         }
-        if (!GraphTargetItem.objectsValueEquals(this.command, other.command)) {
-            return false;
-        }
+
         return true;
     }
 

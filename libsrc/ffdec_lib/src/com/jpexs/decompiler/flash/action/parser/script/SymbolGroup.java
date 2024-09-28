@@ -35,5 +35,6 @@ public enum SymbolGroup {
     GLOBALFUNC,
     GLOBALCONST,
     PREPROCESSOR,
-    PATH
+    PATH,
+    DIRECTIVE
 }

@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.List;
 
 /**
  * Strict mode.
@@ -46,15 +51,24 @@ public class StrictModeActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        writer.append("StrictMode");
-        writer.spaceBeforeCallParenthesies(0);
-        // I still don't know how AS source of Strict Mode instruction looks like, assuming this...
-        return writer.append("(").append(mode).append(");");
+        if (mode == 1) {
+            writer.append("#strict");
+        } else {
+            writer.append("§§strict");
+            writer.spaceBeforeCallParenthesies(0);
+            writer.append("(").append(mode).append(")");            
+        }
+        return writer;
     }
 
     @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSourceMerge(localData, generator, new ActionStrictMode(mode));
+    }
+        
+    @Override
     public boolean hasReturnValue() {
-        return false; //FIXME ?
+        return false;
     }
 
     @Override
@@ -81,4 +95,9 @@ public class StrictModeActionItem extends ActionItem {
     public boolean hasSideEffect() {
         return true;
     }
+
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }        
 }

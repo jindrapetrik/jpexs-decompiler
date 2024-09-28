@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,15 @@ public class ActionStrictMode extends Action {
      */
     public int mode;
 
+    /**
+     * Constructor
+     * @param mode Mode
+     */
+    public ActionStrictMode(int mode) {
+        super(0x89, 1, Utf8Helper.charsetName);
+        this.mode = mode;
+    }       
+    
     /**
      * Constructor
      * @param sis SWF input stream

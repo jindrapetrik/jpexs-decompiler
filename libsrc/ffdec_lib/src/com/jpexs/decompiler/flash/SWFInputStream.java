@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
+import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
@@ -1935,6 +1937,11 @@ public class SWFInputStream implements AutoCloseable {
                 actionLength = readUI16("actionLength");
             }
             switch (actionCode) {
+                // Flash lite Actions:
+                case 0x2D:
+                    return new ActionFSCommand2(getCharset());
+                case 0x89:
+                    return new ActionStrictMode(this);
                 // SWF3 Actions
                 case 0x81:
                     return new ActionGotoFrame(actionLength, this);

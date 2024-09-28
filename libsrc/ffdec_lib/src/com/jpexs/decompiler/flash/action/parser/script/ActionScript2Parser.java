@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EvalActionItem;
+import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
 import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
@@ -72,6 +73,7 @@ import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
 import com.jpexs.decompiler.flash.action.model.StopActionItem;
 import com.jpexs.decompiler.flash.action.model.StopAllSoundsActionItem;
 import com.jpexs.decompiler.flash.action.model.StopDragActionItem;
+import com.jpexs.decompiler.flash.action.model.StrictModeActionItem;
 import com.jpexs.decompiler.flash.action.model.StringExtractActionItem;
 import com.jpexs.decompiler.flash.action.model.StringLengthActionItem;
 import com.jpexs.decompiler.flash.action.model.TargetPathActionItem;
@@ -124,6 +126,7 @@ import com.jpexs.decompiler.flash.action.model.operations.StringNeActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.URShiftActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.FSCOMMAND;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
@@ -590,8 +593,29 @@ public class ActionScript2Parser {
                 break;
             case FSCOMMAND:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new FSCommandActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                GraphTargetItem command = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                s = lex();
+                GraphTargetItem parameter = null;
+                if (s.isType(SymbolType.COMMA)) {
+                    parameter = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);                
+                } else {
+                    lexer.pushback(s);
+                }
+                ret = new FSCommandActionItem(null, null, command, parameter);
                 expectedType(SymbolType.PARENT_CLOSE);
+                break;
+            case FSCOMMAND2:
+                expectedType(SymbolType.PARENT_OPEN);
+                GraphTargetItem arg0 = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                List<GraphTargetItem> args = new ArrayList<>();
+                args.add(arg0);
+                s = lex();
+                while (s.isType(SymbolType.COMMA)) {
+                    args.add(0, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                    s = lex();
+                }
+                expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
+                ret = new FSCommand2ActionItem(null, null, args);
                 break;
             case SET:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1382,6 +1406,15 @@ public class ActionScript2Parser {
                     System.out.println("/command");
                 }
                 return new EmptyCommand();
+            case DIRECTIVE:
+                switch((String)s.value) {
+                    case "strict":
+                        ret = new StrictModeActionItem(null, null, 1);
+                        break;
+                    default:
+                        throw new ActionParseException("Unknown directive: #" + s.value, lexer.yyline());
+                }
+                break;
             default:
                 lexer.pushback(s);
                 ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
@@ -1769,6 +1802,11 @@ public class ActionScript2Parser {
                         break;
                     case "pop":
                         ret = new PopItem(null, null);
+                        break;
+                    case "strict":
+                        s = lexer.lex();
+                        expected(s, lexer.yyline(), SymbolType.INTEGER);
+                        ret = new StrictModeActionItem(null, null, (int) (long) (Long) s.value);
                         break;
                     case "goto": //TODO
                         throw new ActionParseException("Compiling §§" + s.value + " is not available, sorry", lexer.yyline());
