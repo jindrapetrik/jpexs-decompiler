@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.gui.colordialog.MyColorChooserDialog;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
@@ -133,5 +135,11 @@ public class ViewMessages {
             ret[0] = (String) JOptionPane.showInputDialog(parentComponent, message, title, JOptionPane.QUESTION_MESSAGE, null, null, initialSelection);
         });
         return ret[0];
+    }
+    
+    public static Color showColorDialog(Component parentComponent, Color initialColor, boolean withTransparency) {
+        MyColorChooserDialog colorDialog = new MyColorChooserDialog(parentComponent, initialColor, withTransparency);
+        colorDialog.setVisible(true);
+        return colorDialog.getColor();
     }
 }

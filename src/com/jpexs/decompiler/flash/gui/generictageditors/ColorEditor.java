@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.gui.generictageditors;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -34,17 +36,24 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.border.BevelBorder;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
+import com.jpexs.decompiler.flash.gui.colordialog.MySwatchChooserPanel;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 
 /**
  * @author JPEXS
@@ -254,11 +263,22 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         return col[0];
     }
 
+    JDialog chooserDialog = null;
+    
+    private void colorCancelPerformed(ActionEvent e) {
+        chooserDialog.setVisible(false);
+    }
+    
+    private void colorOkPerformed(ActionEvent e) {
+        chooserDialog.setVisible(false);
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        Color newColor;
-        if (colorType == COLOR_TYPE_RGB) {
+        Color newColor = ViewMessages.showColorDialog(this, color, colorType == COLOR_TYPE_RGBA);
+
+        /*if (colorType == COLOR_TYPE_RGB) {
             try {
                 newColor = noTransparencyColorChooser(null, AppStrings.translate("dialog.selectcolor.title"), color);
             } catch (Exception ex) {
@@ -266,7 +286,7 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
             }
         } else {
             newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), color);
-        }
+        }*/
         if (newColor != null) {
             color = newColor;
             buttonChange.setBackground(color);
