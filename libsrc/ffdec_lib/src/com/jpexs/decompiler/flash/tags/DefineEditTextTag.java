@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.dynamictext.AdvancedTextRecord;
 import com.jpexs.decompiler.flash.tags.dynamictext.CharacterWithStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.DynamicTextModel;
 import com.jpexs.decompiler.flash.tags.dynamictext.GlyphCharacter;
@@ -1281,13 +1282,10 @@ public class DefineEditTextTag extends TextTag {
                 tr.xOffset += currentIndent;
             }
             for (SameStyleTextRecord tr : line) {
-                TEXTRECORD tr2 = new TEXTRECORD();
+                AdvancedTextRecord tr2 = new AdvancedTextRecord();
                 int fid = fontId;
                 if (fontClass != null) {
-                    FontTag ft = swf.getFontByClass(fontClass);
-                    if (ft != null) {
-                        fid = swf.getCharacterId(ft);
-                    }
+                    tr2.fontClass = fontClass;
                 }
                 if (tr.style.font != null) {
                     fid = swf.getCharacterId(tr.style.font);

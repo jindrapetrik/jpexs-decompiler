@@ -1270,13 +1270,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (fontClass == null) {
             return null;
         }
-        for (Tag t : getTags()) {
-            if (t instanceof FontTag) {
-                if (((FontTag) t).getClassNames().contains(fontClass)) {
-                    return (FontTag) t;
-                }
-            }
+        CharacterTag t = getCharacterByClass(fontClass);        
+        if (t instanceof FontTag) {
+            return (FontTag) t;
         }
+        
         return null;
     }
 
@@ -1290,7 +1288,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (fontName == null) {
             return null;
         }
-        for (Tag t : getTags()) {
+        for (Tag t : getCharacters(true).values()) {
             if (t instanceof FontTag) {
                 if (fontName.equals(((FontTag) t).getFontName())) {
                     return (FontTag) t;
@@ -1313,7 +1311,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (fontName == null) {
             return null;
         }
-        for (Tag t : getTags()) {
+        for (Tag t : getCharacters(true).values()) {
             if (t instanceof FontTag) {
                 FontTag ft = (FontTag) t;
                 if (fontName.equals(ft.getFontNameIntag()) && ft.isBold() == bold && ft.isItalic() == italic) {

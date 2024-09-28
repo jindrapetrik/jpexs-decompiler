@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -121,5 +122,12 @@ public class TEXTRECORD implements Serializable {
             width += ge.glyphAdvance;
         }
         return width;
+    }
+    
+    public FontTag getFont(SWF swf) {
+        if (fontId == -1) {
+            return null;
+        }
+        return swf.getFont(fontId);
     }
 }

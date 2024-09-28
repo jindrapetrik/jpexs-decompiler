@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#2325] AS3 direct editation - allow single quoted attributes in XML
 - [#2329] AS3 - imports for standalone functions
 - [#2331] AS1/2 lite - support for fscommand2, `#strict` directive
+- [#2332] Imported fonts by class name not available in texts
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3598,6 +3599,7 @@ Major version of SWF to XML export changed to 2.
 [#2325]: https://www.free-decompiler.com/flash/issues/2325
 [#2329]: https://www.free-decompiler.com/flash/issues/2329
 [#2331]: https://www.free-decompiler.com/flash/issues/2331
+[#2332]: https://www.free-decompiler.com/flash/issues/2332
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
