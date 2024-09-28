@@ -1023,6 +1023,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> linkAllClasses = null;
+    
+    @ConfigurationDefaultString("")
+    @ConfigurationInternal
+    public static ConfigurationItem<String> recentColors = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
