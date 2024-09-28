@@ -146,6 +146,9 @@ public class DumpTree extends JTree {
                         nodeType = TreeNodeType.FLASH;
                     } else if ("TAG".equals(di.type)) {
                         String name = di.name;
+                        if (name == null) {
+                            name = "null";
+                        }
                         if (name.contains(" ")) {
                             name = name.substring(0, name.indexOf(' ')).trim();
                         }
