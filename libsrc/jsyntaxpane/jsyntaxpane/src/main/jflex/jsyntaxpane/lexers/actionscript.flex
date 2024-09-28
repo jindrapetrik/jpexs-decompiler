@@ -294,6 +294,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   /* whitespace */
   {WhiteSpace}                   { }  
   /* identifiers */
+  "#" {Identifier}               { return token(TokenType.KEYWORD); }
   {SlashVariable}                { return token(TokenType.IDENTIFIER); }
   {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }

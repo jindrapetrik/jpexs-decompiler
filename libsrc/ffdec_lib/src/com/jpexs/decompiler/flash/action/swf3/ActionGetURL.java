@@ -131,9 +131,9 @@ public class ActionGetURL extends Action {
     @Override
     public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         String fsCommandPrefix = "FSCommand:";
-        if (urlString.startsWith(fsCommandPrefix) && targetString.isEmpty()) {
+        if (urlString.startsWith(fsCommandPrefix)) {
             String command = urlString.substring(fsCommandPrefix.length());
-            output.add(new FSCommandActionItem(this, lineStartAction, new DirectValueActionItem(command)));
+            output.add(new FSCommandActionItem(this, lineStartAction, new DirectValueActionItem(command), targetString.isEmpty() ? null : new DirectValueActionItem(targetString)));
             return;
         }
         String levelPrefix = "_level";
