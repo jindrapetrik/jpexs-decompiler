@@ -1440,7 +1440,7 @@ public class SWFInputStream implements AutoCloseable {
 
             boolean doParse = true;
 
-            if (((parseTags && !parallel1 && doParse) || (tag.getId() == ExporterInfo.ID)) && (tag instanceof TagStub)) {
+            if (((parseTags && !parallel1 && doParse) || (tag != null && tag.getId() == ExporterInfo.ID)) && (tag instanceof TagStub)) {
                 tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, lazy, true);
             }
             if (tag instanceof ExporterInfo) {
