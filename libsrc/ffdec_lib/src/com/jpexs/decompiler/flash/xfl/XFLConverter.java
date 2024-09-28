@@ -4311,7 +4311,7 @@ public class XFLConverter {
 
             for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {
-                    FontTag ft = swf.getFont(rec.fontId);
+                    FontTag ft = rec.getFont(swf);
                     if (ft != null && ft.isSmall()) {
                         fontRenderingMode = "bitmap";
                         break;

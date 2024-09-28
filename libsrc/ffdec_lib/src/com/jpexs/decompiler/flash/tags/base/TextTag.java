@@ -218,7 +218,7 @@ public abstract class TextTag extends DrawableTag {
 
         for (TEXTRECORD tr : textRecords) {
             if (tr.styleFlagsHasFont) {
-                FontTag font2 = swf.getFont(tr.fontId);
+                FontTag font2 = tr.getFont(swf);
                 if (font2 != null) {
                     font = font2;
                 }
@@ -329,7 +329,7 @@ public abstract class TextTag extends DrawableTag {
         for (int r = 0; r < list.size(); r++) {
             TEXTRECORD rec = list.get(r);
             if (rec.styleFlagsHasFont) {
-                FontTag font2 = swf.getFont(rec.fontId);
+                FontTag font2 = rec.getFont(swf);
                 if (font2 != null) {
                     font = font2;
                 }
@@ -603,7 +603,7 @@ public abstract class TextTag extends DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                FontTag font2 = swf.getFont(rec.fontId);
+                FontTag font2 = rec.getFont(swf);
                 if (font2 != null) {
                     font = font2;
                 }
@@ -681,7 +681,7 @@ public abstract class TextTag extends DrawableTag {
         ExportRectangle result = null;
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasFont) {
-                font = swf.getFont(rec.fontId);
+                font = rec.getFont(swf);
                 glyphs = font == null ? null : font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }
@@ -795,7 +795,7 @@ public abstract class TextTag extends DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = swf.getFont(rec.fontId);
+                font = rec.getFont(swf);
                 fontId = rec.fontId;
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
@@ -855,7 +855,7 @@ public abstract class TextTag extends DrawableTag {
                 }
             }
             if (rec.styleFlagsHasFont) {
-                font = swf.getFont(rec.fontId);
+                font = rec.getFont(swf);
                 glyphs = font.getGlyphShapeTable();
                 textHeight = rec.textHeight;
             }

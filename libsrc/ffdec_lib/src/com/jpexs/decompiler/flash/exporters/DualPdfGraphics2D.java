@@ -582,7 +582,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
             }
 
             if (rec.styleFlagsHasFont) {
-                font = swf.getFont(rec.fontId);
+                font = rec.getFont(swf);
                 textHeight = rec.textHeight;
             }
             if (rec.styleFlagsHasXOffset) {
