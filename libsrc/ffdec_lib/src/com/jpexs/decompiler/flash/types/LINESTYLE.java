@@ -122,5 +122,21 @@ public class LINESTYLE implements NeedsCharacters, Serializable, ILINESTYLE {
         }
         return Objects.equals(this.color, other.color);
     }
+    
+    public LINESTYLE2 toLineStyle2() {
+        LINESTYLE2 result = new LINESTYLE2();
+        result.color = new RGBA(color);
+        result.width = width;
+        return result;
+    }
 
+    public int getMinShapeNum() {
+        if (color instanceof RGBA) {
+            RGBA acolor = (RGBA) color;
+            if (acolor.alpha != 255) {
+                return 3;
+            }
+        }
+        return 1;
+    }
 }

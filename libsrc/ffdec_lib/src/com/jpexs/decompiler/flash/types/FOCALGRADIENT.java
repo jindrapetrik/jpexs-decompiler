@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Focal gradient. Gradient with focal point. Used in radial gradients.
@@ -80,5 +82,19 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
             morphGradient.endFocalPoint = 0;
         }
         return morphGradient;
+    }
+    
+    public GRADIENT toShapeNum(int shapeNum) {                        
+        if (shapeNum < 4) {
+            GRADIENT result = new GRADIENT();
+            result.gradientRecords = Helper.deepCopy(gradientRecords);
+            result.spreadMode = 0;
+            result.interpolationMode = 0;
+            if (result.gradientRecords.length > 8) {
+                result.gradientRecords = Arrays.copyOfRange(result.gradientRecords, 0, 8);
+            }
+            return result;
+        }
+        return Helper.deepCopy(this);
     }
 }

@@ -35,6 +35,26 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
     @SWFArray(value = "fillStyle")
     public FILLSTYLE[] fillStyles;
 
+    public int getMinShapeNum() {
+        int result = 1;
+        for (FILLSTYLE fs : fillStyles) {
+            int sn = fs.getMinShapeNum();
+            if (sn > result) {
+                result = sn;
+            }
+        }
+        return result;
+    }
+    
+    public FILLSTYLEARRAY toShapeNum(int targetShapeNum) {
+        FILLSTYLEARRAY result = new FILLSTYLEARRAY();
+        result.fillStyles = new FILLSTYLE[fillStyles.length];
+        for (int i = 0; i < fillStyles.length; i++) {
+            result.fillStyles[i] = fillStyles[i].toShapeNum(targetShapeNum);
+        }
+        return result;
+    }
+    
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (FILLSTYLE fs : fillStyles) {

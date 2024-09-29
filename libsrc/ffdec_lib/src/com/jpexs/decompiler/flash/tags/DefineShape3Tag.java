@@ -28,7 +28,7 @@ import java.io.IOException;
 
 /**
  * DefineShape3 tag - defines shape. Extends functionality of DefineShape2.
- *
+ * Adds transparency in colors.
  * @author JPEXS
  */
 @SWFVersion(from = 3)

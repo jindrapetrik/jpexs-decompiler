@@ -28,6 +28,7 @@ import java.io.IOException;
 
 /**
  * DefineShape2 tag - defines shape. Extends functionality of DefineShape.
+ * Adds more than 255 styles in style list, multiple style lists.
  *
  * @author JPEXS
  */

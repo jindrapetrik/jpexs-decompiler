@@ -249,4 +249,46 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
         }
     }
 
+    public int getMinShapeNum(int sourceShapeNum) {
+        int result = 1;
+        int sn;
+        
+        if (fillStyles.fillStyles.length > 255) {
+            result = 2;
+        }
+        if (sourceShapeNum >= 4 && lineStyles.lineStyles2.length > 255) {
+            result = 2;
+        }
+        if (sourceShapeNum < 4 && lineStyles.lineStyles.length > 255) {
+            result = 2;
+        }
+        
+        sn = fillStyles.getMinShapeNum();
+        if (sn > result) {
+            result = sn;
+        }
+        sn = lineStyles.getMinShapeNum(sourceShapeNum);
+        if (sn > result) {
+            result = sn;
+        }
+        for (SHAPERECORD sr : shapeRecords) {
+            if (sr instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) sr;
+                if (scr.stateNewStyles) {
+                    if (2 > result) {
+                        result = 2;
+                    }
+                    sn = scr.fillStyles.getMinShapeNum();
+                    if (sn > result) {
+                        result = sn;
+                    }
+                    sn = scr.lineStyles.getMinShapeNum(sourceShapeNum);
+                    if (sn > result) {
+                        result = sn;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Texts spacing is now separated where possible - does not use `[space xx]`,
   but new `spacing "x" NN` and `spacingpair "x" "y" NN` prefix so now
   texts are more readable and searchable
+- [#2333] Changing Shape tag type (DefineShape, DefineShape2, ...)
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
@@ -3596,6 +3597,7 @@ Major version of SWF to XML export changed to 2.
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
 [#2328]: https://www.free-decompiler.com/flash/issues/2328
+[#2333]: https://www.free-decompiler.com/flash/issues/2333
 [#2319]: https://www.free-decompiler.com/flash/issues/2319
 [#2320]: https://www.free-decompiler.com/flash/issues/2320
 [#2272]: https://www.free-decompiler.com/flash/issues/2272
@@ -3606,6 +3608,7 @@ Major version of SWF to XML export changed to 2.
 [#2329]: https://www.free-decompiler.com/flash/issues/2329
 [#2331]: https://www.free-decompiler.com/flash/issues/2331
 [#2332]: https://www.free-decompiler.com/flash/issues/2332
+[#2330]: https://www.free-decompiler.com/flash/issues/2330
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
@@ -3629,7 +3632,6 @@ Major version of SWF to XML export changed to 2.
 [#2315]: https://www.free-decompiler.com/flash/issues/2315
 [#2316]: https://www.free-decompiler.com/flash/issues/2316
 [#2317]: https://www.free-decompiler.com/flash/issues/2317
-[#2330]: https://www.free-decompiler.com/flash/issues/2330
 [#2293]: https://www.free-decompiler.com/flash/issues/2293
 [#2294]: https://www.free-decompiler.com/flash/issues/2294
 [#2299]: https://www.free-decompiler.com/flash/issues/2299

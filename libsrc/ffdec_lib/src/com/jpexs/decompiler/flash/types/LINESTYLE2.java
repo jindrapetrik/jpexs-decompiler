@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -376,6 +377,49 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
             return false;
         }
         return Objects.equals(this.fillType, other.fillType);
+    }
+    
+    public LINESTYLE toLineStyle1(int shapeNum) {
+        LINESTYLE result = new LINESTYLE();
+        if (hasFillFlag) {
+            result.color = shapeNum >= 3 ? new RGBA(Color.black) : new RGB(Color.black);
+        } else {
+            result.color = color;
+        }
+        result.width = width;
+        return result;
+    }
+    
+    public int getMinShapeNum() {
+        int shapeNum = 1;
+        if (hasFillFlag) {
+            return 4;
+        }
+        if (startCapStyle != ROUND_CAP) {
+            return 4;
+        }
+        if (endCapStyle != ROUND_CAP) {
+            return 4;            
+        }
+        if (joinStyle != ROUND_JOIN) {
+            return 4;
+        }
+        if (noClose) {
+            return 4;
+        }
+        if (noHScaleFlag) {
+            return 4;
+        }
+        if (noVScaleFlag) {
+            return 4;
+        }
+        if (pixelHintingFlag) {
+            return 4;
+        }
+        if (color.alpha != 255) {
+            return 3;
+        }
+        return 1;
     }
 
 }
