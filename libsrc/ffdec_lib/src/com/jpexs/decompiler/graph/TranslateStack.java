@@ -17,9 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.PopItem;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.colordialog;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
