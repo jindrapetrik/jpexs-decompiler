@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - [#2329] AS3 - imports for standalone functions
 - [#2331] AS1/2 lite - support for fscommand2, `#strict` directive
 - [#2332] Imported fonts by class name not available in texts
+- [#2330] Windows EXE launcher (+ CLI) does not respect current working directory
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -57,7 +58,6 @@ All notable changes to this project will be documented in this file.
 - [#2315] AS3 direct editation - switching scripts during editation causing missing scripts
 - [#2316] AS3 direct editation - private classes
 - [#2317] AS3 direct editation - local register names colliding with parameter names
-- [#2330] Windows EXE launcher (+ CLI) does not respect current working directory
 
 ## [21.0.5] - 2024-09-05
 ### Fixed
