@@ -120,13 +120,6 @@ public class SearchDialog extends AppDialog {
             scopeComboBox.setSelectedIndex(1);
         }
 
-        if (replace) {
-            if (selection != null) {
-                scopeComboBox.setSelectedIndex(1);
-            }
-            scopeComboBox.setEnabled(false);
-        }
-
         cnt.add(panField);
 
         JPanel checkPanel = new JPanel(new FlowLayout());
@@ -152,10 +145,6 @@ public class SearchDialog extends AppDialog {
             rbPanel.add(searchInPCodeRadioButton);
             rbPanel.add(searchInTextsRadioButton);
             cnt.add(rbPanel);
-
-            searchInASRadioButton.addActionListener(this::searchTypeActionPerformed);
-            searchInPCodeRadioButton.addActionListener(this::searchTypeActionPerformed);
-            searchInTextsRadioButton.addActionListener(this::searchTypeActionPerformed);
         }
 
         cnt.add(panButtons);
@@ -170,20 +159,7 @@ public class SearchDialog extends AppDialog {
         images.add(View.loadImage(replace ? "replace32" : "search32"));
         setIconImages(images);
     }
-
-    private void searchTypeActionPerformed(ActionEvent e) {
-        if (searchInTextsRadioButton.isSelected()) {
-            if (scopeComboBox.getModel().getSize() == 3) {
-                scopeComboBox.setSelectedIndex(1);
-            } else {
-                scopeComboBox.setSelectedIndex(0);
-            }
-            scopeComboBox.setEnabled(false);
-        } else {
-            scopeComboBox.setEnabled(true);
-        }
-    }
-
+   
     @Override
     public void setVisible(boolean b) {
         if (b) {

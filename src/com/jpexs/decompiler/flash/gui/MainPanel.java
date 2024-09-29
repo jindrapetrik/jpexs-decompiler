@@ -221,6 +221,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
@@ -2847,11 +2848,30 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Map<Openable, List<ScriptPack>> scopeAs3 = new LinkedHashMap<>();
         Map<SWF, Map<String, ASMSource>> swfToAllASMSourceMap = new HashMap<>();
         Map<SWF, Map<String, ASMSource>> scopeAs12 = new LinkedHashMap<>();
+        Set<TextTag> scopeTextTags = new LinkedIdentityHashSet<>();
 
         Set<Openable> openablesUsed = new LinkedHashSet<>();
 
         List<TreeItem> allItems = getAllSelected();
         for (TreeItem t : allItems) {
+            if (t instanceof SWF) {
+                for (Tag g : ((SWF) t).getTags()) {
+                    if (g instanceof TextTag) {
+                        scopeTextTags.add((TextTag) g);
+                    }
+                }
+            }
+            if (t instanceof FolderItem) {
+                FolderItem f = (FolderItem) t;
+                for (TreeItem t2 : f.subItems) {
+                    if (t2 instanceof TextTag) {
+                        scopeTextTags.add((TextTag) t2);
+                    }
+                }
+            }
+            if (t instanceof TextTag) {
+                scopeTextTags.add((TextTag) t);
+            }
             if (t instanceof ScriptPack) {
                 ScriptPack sp = (ScriptPack) t;
                 Openable s = sp.getOpenable(); //Fixme for ABCs
@@ -2897,7 +2917,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> items = getSelected();
         String selected;
 
-        if (scopeAs12.isEmpty() && scopeAs3.isEmpty()) {
+        if (scopeAs12.isEmpty() && scopeAs3.isEmpty() && scopeTextTags.isEmpty()) {
             selected = null;
         } else if (items.size() == 1) {
             selected = items.get(0).toString();
@@ -3037,7 +3057,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             List<TextTag> textResult;
                             SearchPanel<TextTag> textSearchPanel = previewPanel.getTextPanel().getSearchPanel();
                             textSearchPanel.setOptions(ignoreCase, regexp);
-                            textResult = searchText(txt, ignoreCase, regexp, swf);
+                            List<TextTag> scope = new ArrayList<>();
+                            if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_CURRENT_FILE) {
+                                for (Tag t : swf.getTags()) {
+                                    if (t instanceof TextTag) {
+                                        scope.add((TextTag) t);
+                                    }
+                                }
+                            } else if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
+                                for (SWF s : getAllSwfs()) {
+                                    for (Tag t : s.getTags()) {
+                                        if (t instanceof TextTag) {
+                                            scope.add((TextTag) t);
+                                        }
+                                    }
+                                }
+                            } else if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_SELECTION) {
+                                scope.addAll(scopeTextTags);
+                            }
+                            textResult = searchText(txt, ignoreCase, regexp, scope);
 
                             List<TextTag> fTextResult = textResult;
                             View.execInEventDispatch(() -> {
@@ -3067,7 +3105,42 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceText() {
-        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, null, false, false);
+        Set<TextTag> scopeTextTags = new LinkedIdentityHashSet<>();
+
+        List<TreeItem> allItems = getAllSelected();
+        for (TreeItem t : allItems) {
+            if (t instanceof SWF) {
+                for (Tag g : ((SWF) t).getTags()) {
+                    if (g instanceof TextTag) {
+                        scopeTextTags.add((TextTag) g);
+                    }
+                }
+            }
+            if (t instanceof FolderItem) {
+                FolderItem f = (FolderItem) t;
+                for (TreeItem t2 : f.subItems) {
+                    if (t2 instanceof TextTag) {
+                        scopeTextTags.add((TextTag) t2);
+                    }
+                }
+            }
+            if (t instanceof TextTag) {
+                scopeTextTags.add((TextTag) t);
+            }
+        }
+        List<TreeItem> items = getSelected();
+        
+        String selected;
+        if (scopeTextTags.isEmpty()) {
+            selected = null;
+        } else if (items.size() == 1) {
+            selected = items.get(0).toString();
+        } else if (items.isEmpty()) {
+            selected = null;
+        } else {
+            selected = AppDialog.translateForDialog("scope.selection.items", SearchDialog.class).replace("%count%", "" + items.size());
+        }
+        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, selected, false, false);
         if (replaceDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {
@@ -3089,13 +3162,26 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } else {
                             pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
                         }
-                        List<TextTag> textTags = new ArrayList<>();
-                        for (Tag tag : swf.getTags()) {
-                            if (tag instanceof TextTag) {
-                                textTags.add((TextTag) tag);
+
+                        List<TextTag> scope = new ArrayList<>();
+                        if (replaceDialog.getCurrentScope() == SearchDialog.SCOPE_CURRENT_FILE) {
+                            for (Tag t : swf.getTags()) {
+                                if (t instanceof TextTag) {
+                                    scope.add((TextTag) t);
+                                }
                             }
+                        } else if (replaceDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
+                            for (SWF s : getAllSwfs()) {
+                                for (Tag t : s.getTags()) {
+                                    if (t instanceof TextTag) {
+                                        scope.add((TextTag) t);
+                                    }
+                                }
+                            }
+                        } else if (replaceDialog.getCurrentScope() == SearchDialog.SCOPE_SELECTION) {
+                            scope.addAll(scopeTextTags);
                         }
-                        for (TextTag textTag : textTags) {
+                        for (TextTag textTag : scope) {
                             if (!replaceDialog.replaceInParametersCheckBox.isSelected()) {
                                 List<String> texts = textTag.getTexts();
                                 boolean found = false;
@@ -3132,7 +3218,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    private List<TextTag> searchText(String txt, boolean ignoreCase, boolean regexp, SWF swf) {
+    private List<TextTag> searchText(String txt, boolean ignoreCase, boolean regexp, List<TextTag> scope) {
         if (txt != null && !txt.isEmpty()) {
             List<TextTag> found = new ArrayList<>();
             Pattern pat;
@@ -3141,12 +3227,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0);
             }
-            for (Tag tag : swf.getTags()) {
-                if (tag instanceof TextTag) {
-                    TextTag textTag = (TextTag) tag;
-                    if (pat.matcher(textTag.getFormattedText(true).text).find()) {
-                        found.add(textTag);
-                    }
+            for (TextTag textTag : scope) {
+                if (pat.matcher(textTag.getFormattedText(true).text).find()) {
+                    found.add(textTag);
                 }
             }
 
@@ -3500,7 +3583,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }.execute();
     }
-    
+
     public void exportVsCode(final SWF swf) {
         if (swf == null) {
             return;
@@ -3603,7 +3686,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         boolean isAS3 = swf.isAS3();
         Map<FileFilter, String> filterToVersion = new HashMap<>();
         Map<FileFilter, Boolean> filterToCompressed = new HashMap<>();
-        
+
         Map<FileFilter, FLAVersion> filterToFlaVersion = new HashMap<>();
 
         FLAVersion lastVersion = FLAVersion.fromString(Configuration.lastFlaExportVersion.get("CS6"));
@@ -3631,12 +3714,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 } else {
                     fc.addChoosableFileFilter(f);
                 }
-                filterToFlaVersion.put(f, v);                    
+                filterToFlaVersion.put(f, v);
                 filterToVersion.put(f, "" + v);
                 filterToCompressed.put(f, true);
                 flaFilters.add(f);
-                
-                if (v.xflVersion() != null)  {
+
+                if (v.xflVersion() != null) {
                     f = new FileFilter() {
                         @Override
                         public boolean accept(File f) {
@@ -5387,7 +5470,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             updateUi();
         }
 
-        clearEditingStatus();        
+        clearEditingStatus();
         reload(false, false);
 
         if (source == dumpTree) {
