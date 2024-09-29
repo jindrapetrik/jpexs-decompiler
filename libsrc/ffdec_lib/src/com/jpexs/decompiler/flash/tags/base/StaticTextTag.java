@@ -41,11 +41,15 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,8 +93,7 @@ public abstract class StaticTextTag extends TextTag {
     public List<TEXTRECORD> textRecords;
 
     /**
-     * Gets text number.
-     * DefineText = 1, DefineText2 = 2
+     * Gets text number. DefineText = 1, DefineText2 = 2
      *
      * @return Text num
      */
@@ -98,6 +101,7 @@ public abstract class StaticTextTag extends TextTag {
 
     /**
      * Constructor.
+     *
      * @param swf SWF
      * @param id ID
      * @param name Name
@@ -282,6 +286,7 @@ public abstract class StaticTextTag extends TextTag {
         }
         writer.append("]");
         int textHeight = 12;
+        int prevLetterSpacing = 0;
         for (TEXTRECORD rec : textRecords) {
             int letterSpacing = 0;
             if (rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
@@ -297,9 +302,10 @@ public abstract class StaticTextTag extends TextTag {
                 }
                 if (fnt != null && !ignoreLetterSpacing) {
                     letterSpacing = detectLetterSpacing(rec, fnt, textHeight);
-                    if (letterSpacing != 0) {
+                    if (letterSpacing != prevLetterSpacing) {
                         writer.append("letterspacing ").append(letterSpacing).newLine();
                     }
+                    prevLetterSpacing = letterSpacing;
                 }
                 if (rec.styleFlagsHasColor) {
                     if (getTextNum() == 1) {
@@ -314,12 +320,114 @@ public abstract class StaticTextTag extends TextTag {
                 if (rec.styleFlagsHasYOffset) {
                     writer.append("y ").append(rec.yOffset).newLine();
                 }
-                writer.append("]");
             }
 
             if (fnt == null) {
                 writer.append(AppResources.translate("fontNotFound").replace("%fontId%", Integer.toString(rec.fontId)));
             } else {
+
+                boolean first = true;
+                Map<String, Integer> spacing = new LinkedHashMap<>();
+                Map<String, Integer> spacingCount = new LinkedHashMap<>();
+                Set<String> ignoredSpacings = new LinkedHashSet<>();
+                Map<Character, Set<Integer>> charToSpacing = new LinkedHashMap<>();
+                Set<Character> noSpacing = new LinkedHashSet<>();
+                Map<Character, Integer> charCount = new LinkedHashMap<>();
+                if (rec.glyphEntries.size() > 1) {
+                    for (int i = 0; i < rec.glyphEntries.size(); i++) {
+                        GLYPHENTRY ge = rec.glyphEntries.get(i);
+                        char c = fnt.glyphToChar(ge.glyphIndex);
+                        Character nextChar = null;
+                        if (i + 1 < rec.glyphEntries.size()) {
+                            GLYPHENTRY nge = rec.glyphEntries.get(i + 1);
+                            nextChar = fnt.glyphToChar(nge.glyphIndex);
+                        }
+                        int advance = getAdvance(fnt, ge.glyphIndex, textHeight, c, nextChar);
+                        int delta = ge.glyphAdvance - advance;
+                        String spacingKey = "" + c + (nextChar == null ? "" : nextChar);
+                        int spacingVal = delta - letterSpacing;
+
+                        if (!charToSpacing.containsKey(c)) {
+                            charToSpacing.put(c, new LinkedHashSet<>());
+                        }
+                        charToSpacing.get(c).add(spacingVal);
+
+                        if (!charCount.containsKey(c)) {
+                            charCount.put(c, 0);
+                        }
+                        charCount.put(c, charCount.get(c) + 1);
+
+                        
+                        if (delta != letterSpacing && !ignoreLetterSpacing) {
+                            if (ignoredSpacings.contains(spacingKey)) {
+                                continue;
+                            }
+                            if (spacing.containsKey(spacingKey) && spacing.get(spacingKey) != spacingVal) {
+                                spacing.remove(spacingKey);
+                                spacingCount.remove(spacingKey);
+                                ignoredSpacings.add(spacingKey);
+                                continue;
+                            }
+                            spacing.put(spacingKey, spacingVal);
+                            if (!spacingCount.containsKey(spacingKey)) {
+                                spacingCount.put(spacingKey, 0);
+                            }
+                            spacingCount.put(spacingKey, spacingCount.get(spacingKey) + 1);
+                        } else {
+                            noSpacing.add(c);
+                        }
+                    }
+                }
+                List<String> spacingKeys = new ArrayList<>(spacing.keySet());
+                Map<Character, Integer> simpleSpacing = new LinkedHashMap<>();
+                for (String spacingKey : spacingKeys) {
+                    Character c = spacingKey.charAt(0);
+                    if (charToSpacing.get(c).size() == 1 && charCount.get(c) > 1) {
+                        spacing.remove(spacingKey);
+                        simpleSpacing.put(c, charToSpacing.get(c).iterator().next());
+                    }
+                }
+
+                if (!(rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset)
+                        && (!simpleSpacing.isEmpty() || !spacing.isEmpty())) {
+                    writer.append("[").newLine().append("resetspacing").newLine();
+                }
+
+                if (!simpleSpacing.isEmpty()) {
+                    //writer.append("[").newLine();
+                    for (Character c : simpleSpacing.keySet()) {
+                        writer.append("spacing \"").append(Helper.escapeString("" + c)).append("\"");
+                        writer.append(" ");
+                        writer.append(simpleSpacing.get(c));
+                        writer.newLine();
+                    }
+                    //writer.append("]");
+                }
+
+                if (!spacing.isEmpty()) {
+                    //writer.append("[").newLine();
+
+                    for (String spacingKey : spacing.keySet()) {
+                        writer.append("spacingpair \"").append(Helper.escapeString("" + spacingKey.charAt(0))).append("\"");
+                        writer.append(" ");
+                        if (spacingKey.length() > 1) {
+                            writer.append("\"").append(spacingKey.charAt(1)).append("\"");
+                        } else {
+                            writer.append("\"\"");
+                        }
+                        writer.append(" ");
+                        writer.append(spacing.get(spacingKey));
+                        writer.newLine();
+                    }
+
+                    //writer.append("]");
+                }
+
+                if (rec.styleFlagsHasFont || rec.styleFlagsHasColor || rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset
+                        || !simpleSpacing.isEmpty() || !spacing.isEmpty()) {
+                    writer.append("]");
+                }
+
                 for (int i = 0; i < rec.glyphEntries.size(); i++) {
                     GLYPHENTRY ge = rec.glyphEntries.get(i);
                     char c = fnt.glyphToChar(ge.glyphIndex);
@@ -329,12 +437,17 @@ public abstract class StaticTextTag extends TextTag {
                     if (!ignoreLetterSpacing) {
                         Character nextChar = null;
                         if (i + 1 < rec.glyphEntries.size()) {
-                            nextChar = fnt.glyphToChar(ge.glyphIndex);
+                            GLYPHENTRY nge = rec.glyphEntries.get(i + 1);
+                            nextChar = fnt.glyphToChar(nge.glyphIndex);
                         }
-                        int advance = getAdvance(fnt, ge.glyphIndex, textHeight, c, nextChar);
-                        int delta = ge.glyphAdvance - advance;
-                        if (delta != letterSpacing && !ignoreLetterSpacing) {
-                            writer.append("[space " + (delta - letterSpacing) + "]");
+
+                        String spacingKey = "" + c + (nextChar == null ? "" : nextChar);
+                        if (!spacing.containsKey(spacingKey) && !simpleSpacing.containsKey(c)) {
+                            int advance = getAdvance(fnt, ge.glyphIndex, textHeight, c, nextChar);
+                            int delta = ge.glyphAdvance - advance;
+                            if (delta != letterSpacing && !ignoreLetterSpacing) {
+                                writer.append("[space " + (delta - letterSpacing) + "]");
+                            }
                         }
                     }
                 }
@@ -367,13 +480,37 @@ public abstract class StaticTextTag extends TextTag {
             textMatrix.hasScale = false;
             RECT textBounds = new RECT();
             int textIdx = 0;
+            Map<Character, Integer> simpleSpacing = new LinkedHashMap<>();
+            Map<String, Integer> pairSpacing = new LinkedHashMap<>();
+            boolean append = false;
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
-                    case PARAMETER:
-                        String paramName = (String) s.values[0];
-                        String paramValue = (String) s.values[1];
+                    case PARAMETER_IDENTIFIER:
+                        String paramName = (String) s.value;
+
                         switch (paramName) {
+                            case "font":
+                            case "height":
+                            case "letterspacing":
                             case "color":
+                            case "x":
+                            case "y":
+                            case "resetspacing":
+                                simpleSpacing.clear();
+                                pairSpacing.clear();
+                        }
+
+                        if (!paramName.equals("space")) {
+                            append = false;
+                        }
+
+                        String paramValue;
+                        switch (paramName) {
+                            case "resetspacing":
+                                break;
+                            case "color":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 if (getTextNum() == 1) {
                                     Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
                                     if (m.matches()) {
@@ -391,6 +528,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "font":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     fontId = Integer.parseInt(paramValue);
 
@@ -405,6 +544,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "height":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textHeight = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -412,6 +553,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "letterspacing":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     letterSpacing = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -419,6 +562,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "x":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     x = Integer.parseInt(paramValue);
                                     currentX = x;
@@ -427,6 +572,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "y":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     y = Integer.parseInt(paramValue);
                                     currentY = y;
@@ -435,6 +582,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "xmin":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textBounds.Xmin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -442,6 +591,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "xmax":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textBounds.Xmax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -449,6 +600,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "ymin":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textBounds.Ymin = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -456,6 +609,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "ymax":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textBounds.Ymax = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -463,6 +618,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "scalex":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.scaleX = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasScale = true;
@@ -471,6 +628,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "scaley":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.scaleY = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasScale = true;
@@ -480,6 +639,8 @@ public abstract class StaticTextTag extends TextTag {
                                 break;
 
                             case "scalexf":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.scaleX = Float.parseFloat(paramValue);
                                     textMatrix.hasScale = true;
@@ -488,6 +649,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "scaleyf":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.scaleY = Float.parseFloat(paramValue);
                                     textMatrix.hasScale = true;
@@ -497,6 +660,8 @@ public abstract class StaticTextTag extends TextTag {
                                 break;
 
                             case "rotateskew0":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.rotateSkew0 = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasRotate = true;
@@ -505,6 +670,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "rotateskew1":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.rotateSkew1 = MATRIX.toFloat(Integer.parseInt(paramValue));
                                     textMatrix.hasRotate = true;
@@ -513,6 +680,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "rotateskew0f":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.rotateSkew0 = Float.parseFloat(paramValue);
                                     textMatrix.hasRotate = true;
@@ -521,6 +690,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "rotateskew1f":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.rotateSkew1 = Float.parseFloat(paramValue);
                                     textMatrix.hasRotate = true;
@@ -529,6 +700,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "translatex":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.translateX = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -536,6 +709,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "translatey":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     textMatrix.translateY = Integer.parseInt(paramValue);
                                 } catch (NumberFormatException nfe) {
@@ -543,6 +718,8 @@ public abstract class StaticTextTag extends TextTag {
                                 }
                                 break;
                             case "space":
+                                s = lexer.yylex();
+                                paramValue = (String) s.value;
                                 try {
                                     int space = Integer.parseInt(paramValue);
                                     if (textRecords.isEmpty()) {
@@ -556,12 +733,45 @@ public abstract class StaticTextTag extends TextTag {
                                     throw new TextParseException("Invalid space value - number expected. Found: " + paramValue, lexer.yyline());
                                 }
                                 break;
+                            case "spacing":
+                                s = lexer.yylex();
+                                String spacingChar = (String) s.value;
+                                if (spacingChar.length() != 1) {
+                                    throw new TextParseException("Invalid spacing character - single character expected. Found: " + (String) s.value, lexer.yyline());
+                                }
+                                s = lexer.yylex();
+                                try {
+                                    int space = Integer.parseInt((String) s.value);
+                                    simpleSpacing.put(spacingChar.charAt(0), space);
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid spacing value - number expected. Found: " + (String) s.value, lexer.yyline());
+                                }
+                                break;
+                            case "spacingpair":
+                                s = lexer.yylex();
+                                String spacingChar1 = (String) s.value;
+                                if (spacingChar1.length() != 1) {
+                                    throw new TextParseException("Invalid spacing character1 - single character expected. Found: " + (String) s.value, lexer.yyline());
+                                }
+                                s = lexer.yylex();
+                                String spacingChar2 = (String) s.value;
+                                if (spacingChar2.length() > 1) {
+                                    throw new TextParseException("Invalid spacing character2 - single character expected. Found: " + (String) s.value, lexer.yyline());
+                                }
+                                s = lexer.yylex();
+                                try {
+                                    int space = Integer.parseInt((String) s.value);
+                                    pairSpacing.put(spacingChar1 + spacingChar2, space);
+                                } catch (NumberFormatException nfe) {
+                                    throw new TextParseException("Invalid spacing value - number expected. Found: " + (String) s.value, lexer.yyline());
+                                }
+                                break;
                             default:
                                 throw new TextParseException("Unrecognized parameter name: " + paramName, lexer.yyline());
                         }
                         break;
                     case TEXT:
-                        String txt = (texts == null || textIdx >= texts.length) ? (String) s.values[0] : texts[textIdx++];
+                        String txt = (texts == null || textIdx >= texts.length) ? (String) s.value : texts[textIdx++];
                         if (txt == null || (font == null && txt.isEmpty())) {
                             continue;
                         }
@@ -597,36 +807,42 @@ public abstract class StaticTextTag extends TextTag {
 
                         txt = txtSb.toString();
 
-                        TEXTRECORD tr = new TEXTRECORD();
-                        textRecords.add(tr);
-                        if (fontId > -1) {
-                            tr.fontId = fontId;
-                            tr.textHeight = textHeight;
-                            fontId = -1;
-                            tr.styleFlagsHasFont = true;
-                        }
-                        if (getTextNum() == 1) {
-                            if (color != null) {
-                                tr.textColor = color;
-                                tr.styleFlagsHasColor = true;
-                                color = null;
+                        TEXTRECORD tr;
+
+                        if (append) {
+                            tr = textRecords.get(textRecords.size() - 1);
+                        } else {
+                            tr = new TEXTRECORD();
+                            textRecords.add(tr);
+                            if (fontId > -1) {
+                                tr.fontId = fontId;
+                                tr.textHeight = textHeight;
+                                fontId = -1;
+                                tr.styleFlagsHasFont = true;
                             }
-                        } else if (colorA != null) {
-                            tr.textColorA = colorA;
-                            tr.styleFlagsHasColor = true;
-                            colorA = null;
+                            if (getTextNum() == 1) {
+                                if (color != null) {
+                                    tr.textColor = color;
+                                    tr.styleFlagsHasColor = true;
+                                    color = null;
+                                }
+                            } else if (colorA != null) {
+                                tr.textColorA = colorA;
+                                tr.styleFlagsHasColor = true;
+                                colorA = null;
+                            }
+                            if (x != null) {
+                                tr.xOffset = x;
+                                tr.styleFlagsHasXOffset = true;
+                                x = null;
+                            }
+                            if (y != null) {
+                                tr.yOffset = y;
+                                tr.styleFlagsHasYOffset = true;
+                                y = null;
+                            }
+                            tr.glyphEntries = new ArrayList<>(txt.length());
                         }
-                        if (x != null) {
-                            tr.xOffset = x;
-                            tr.styleFlagsHasXOffset = true;
-                            x = null;
-                        }
-                        if (y != null) {
-                            tr.yOffset = y;
-                            tr.styleFlagsHasYOffset = true;
-                            y = null;
-                        }
-                        tr.glyphEntries = new ArrayList<>(txt.length());
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
                             Character nextChar = null;
@@ -637,7 +853,16 @@ public abstract class StaticTextTag extends TextTag {
                             GLYPHENTRY ge = new GLYPHENTRY();
                             ge.glyphIndex = font.charToGlyph(c);
 
-                            int advance = getAdvance(font, ge.glyphIndex, textHeight, c, nextChar) + letterSpacing;
+                            int advance = getAdvance(font, ge.glyphIndex, textHeight, c, nextChar);
+
+                            advance += letterSpacing;
+                            if (simpleSpacing.containsKey(c)) {
+                                advance += simpleSpacing.get(c) - letterSpacing;
+                            }
+                            String pairKey = "" + c + (nextChar == null ? "" : nextChar);
+                            if (pairSpacing.containsKey(pairKey)) {
+                                advance += pairSpacing.get(pairKey) - letterSpacing;
+                            }
                             ge.glyphAdvance = advance;
                             tr.glyphEntries.add(ge);
 
@@ -650,6 +875,7 @@ public abstract class StaticTextTag extends TextTag {
                         if (currentX < minX) {
                             minX = currentX;
                         }
+                        append = true;
                         break;
                 }
             }
@@ -670,6 +896,7 @@ public abstract class StaticTextTag extends TextTag {
 
     /**
      * Gets advance.
+     *
      * @param font Font
      * @param glyphIndex Glyph index
      * @param textHeight Text height
@@ -695,6 +922,7 @@ public abstract class StaticTextTag extends TextTag {
 
     /**
      * Detects letter spacing.
+     *
      * @param textRecord Text record
      * @param font Font
      * @param textHeight Text height

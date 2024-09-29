@@ -24,5 +24,6 @@ package com.jpexs.decompiler.flash.tags.text;
 public enum SymbolType {
 
     TEXT,
-    PARAMETER
+    PARAMETER_IDENTIFIER,
+    PARAMETER_VALUE
 }

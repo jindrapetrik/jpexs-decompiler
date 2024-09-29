@@ -37,7 +37,7 @@ import jsyntaxpane.TokenType;
 %}
 
 
-Parameter = [a-z0-9_]+
+Parameter = [a-z_][a-z0-9_]*
 Value = [^ \r\n\]]+
 Divider = [ \r\n]+
 
@@ -76,9 +76,11 @@ Divider = [ \r\n]+
 }
 
 <VALUE> {
-    {Divider}                          {}
-    {Value}                      {  
-                                    yybegin(PARAMETER);                                    
+    {Divider}                    {}
+    {Parameter}                  {
+                                    return token(TokenType.KEYWORD); 
+                                 }
+    {Value}                      {
                                     return token(TokenType.NUMBER);
                                  }
     "]"                          {

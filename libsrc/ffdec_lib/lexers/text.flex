@@ -31,11 +31,11 @@ package com.jpexs.decompiler.flash.tags.text;
 
 %{
 
-    StringBuilder string = null;
     boolean finish = false;
     boolean parameter = false;
-    String parameterName = null;
 
+    StringBuilder string = null;
+    
     /**
      * Create an empty lexer, yyrset will be called later to reset and assign
      * the reader
@@ -54,12 +54,14 @@ package com.jpexs.decompiler.flash.tags.text;
 
 %}
 
-Parameter = [a-z0-9_]+
-Value = [^ \r\n\]]+
+Parameter = [a-z_][a-z0-9_]*
+Value = [^ \r\n\]\"]+
 Divider = [ \r\n]+
 HexDigit          = [0-9a-fA-F]
+StringCharacter = [^\r\n\"\\]
 
-%state PARAMETER,VALUE
+
+%state PARAMETER,VALUE,STRING
 
 %%
 
@@ -96,8 +98,8 @@ HexDigit          = [0-9a-fA-F]
 <PARAMETER> {
     {Divider}                          {}
     {Parameter}                  {
-                                    parameterName = yytext();
                                     yybegin(VALUE);
+                                    return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
                                  }
     "]"                          {
                                     yybegin(YYINITIAL);
@@ -107,14 +109,52 @@ HexDigit          = [0-9a-fA-F]
 
 <VALUE> {
     {Divider}                          {}
-    {Value}                      {  
-                                    yybegin(PARAMETER);                                    
-                                    return new ParsedSymbol(SymbolType.PARAMETER, new Object[] {parameterName, yytext()});
+
+    \"                           {
+                                    string = new StringBuilder();
+                                    yybegin(STRING);
+                                 }
+
+    {Parameter}                  {
+                                    return new ParsedSymbol(SymbolType.PARAMETER_IDENTIFIER, yytext());
+                                 }
+    {Value}                      {
+                                    return new ParsedSymbol(SymbolType.PARAMETER_VALUE, yytext());
                                  }
     "]"                          {
                                     yybegin(YYINITIAL);
                                     parameter = false;
                                  }
+}
+
+<STRING> {
+  \"                             {
+                                     yybegin(VALUE);
+                                     // length also includes the trailing quote
+                                     String tos = string.toString();
+                                     string = null;
+                                     return new ParsedSymbol(SymbolType.PARAMETER_VALUE, tos);
+                                 }
+
+  {StringCharacter}+             { string.append(yytext()); }
+
+  /* escape sequences */
+  "\\b"                          { string.append('\b'); }
+  "\\t"                          { string.append('\t'); }
+  "\\n"                          { string.append('\n'); }
+  "\\f"                          { string.append('\f'); }
+  "\\r"                          { string.append('\r'); }
+  "\\\""                         { string.append('\"'); }
+  "\\'"                          { string.append('\''); }
+  "\\\\"                         { string.append('\\'); }
+  \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+  \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
+                        				   string.append(val); }
+
+  /* escape sequences */
+
+  \\.                            { /* ignore illegal character escape */ } 
 }
 
 /* error fallback */

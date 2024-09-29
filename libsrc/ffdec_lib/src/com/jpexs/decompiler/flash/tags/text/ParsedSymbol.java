@@ -23,32 +23,23 @@ package com.jpexs.decompiler.flash.tags.text;
  */
 public class ParsedSymbol {
 
-    public Object[] values;
+    public Object value;
 
     public SymbolType type;
 
     public ParsedSymbol(SymbolType type) {
         this.type = type;
-        this.values = new Object[0];
+        this.value = "";
     }
 
-    public ParsedSymbol(SymbolType type, Object... values) {
+    public ParsedSymbol(SymbolType type, Object value) {
         this.type = type;
-        this.values = values;
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        String v = "";
-        boolean first = true;
-        for (Object o : values) {
-            if (!first) {
-                v += ", ";
-            }
-            first = false;
-            v += o.toString();
-        }
-        return type.toString() + " " + v;
+        return type.toString() + " " + value.toString();
     }
 
     public boolean isType(SymbolType... types) {
