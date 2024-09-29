@@ -54,14 +54,12 @@ To only build, execute build task:
 ```
 ant build
 ```
-For creating EXE, Installer and ZIP version, there exist Ant tasks "exe","installer","release". These tasks require additional software installed:
-* [launch4j] (3.5 or newer) - creates windows executable
+For creating EXE Installer and ZIP version, there exist Ant tasks "installer","release". These tasks require additional software installed:
 * [NSIS] (Nullsoft Scriptable Install System) (3.0b3 or newer) - creates installer
 
-You must configure installation path of these tools in tools.properties file, which could look like this for windows:
+You must configure installation path of this tool in tools.properties file, which could look like this for windows:
 ```
 nsis.path = c:\\program files (x86)\\NSIS
-launch4j.path = c:\\program files (x86)\\launch4j
 ```
 ### Building libraries
 
@@ -159,13 +157,15 @@ And links also these libraries:
 
 Application uses also some icons of the [Silk icons pack], [Silk companion 1], [FatCow icons pack] and [Aha-Soft icons pack].
 
+For EXE launchers we use [Launch5j] - MIT.
+
 ## Library
 See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec library.
 
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
 [Apache Ant]: http://ant.apache.org/
-[launch4j]: http://launch4j.sourceforge.net/
+[Launch5j]: https://github.com/lordmulder/Launch5j
 [NSIS]: http://nsis.sourceforge.net/
 [JSyntaxPane]: https://code.google.com/p/jsyntaxpane/
 [Java Native Access - JNA]: https://github.com/twall/jna
