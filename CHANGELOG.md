@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#2321] Commandline option to generate HTML docs for AS1/2 Actions
 - Chinese translation update
 - [#2305] Saving recent colors in the color selection dialog
+- [#2328] Searching/replacing in texts now supports selection / all files scope
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
@@ -3590,6 +3591,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
+[#2328]: https://www.free-decompiler.com/flash/issues/2328
 [#2319]: https://www.free-decompiler.com/flash/issues/2319
 [#2320]: https://www.free-decompiler.com/flash/issues/2320
 [#2272]: https://www.free-decompiler.com/flash/issues/2272
