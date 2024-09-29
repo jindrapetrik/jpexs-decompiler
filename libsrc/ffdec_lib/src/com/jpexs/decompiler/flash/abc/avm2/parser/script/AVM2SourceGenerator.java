@@ -2822,8 +2822,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
         forwardJump.operands[0] = insToBytes(bodies).length;
         ret.addAll(bodies);
         ret.addAll(cases);
-        ret.add(lookupOp);
-        fixSwitch(toInsList(ret), insToBytes(toInsList(ret)).length, uniqLast);
+        ret.add(lookupOp);        
+        fixSwitch(toInsList(ret), insToBytes(toInsList(ret)).length, item.loop.id);
         return ret;
     }
 
