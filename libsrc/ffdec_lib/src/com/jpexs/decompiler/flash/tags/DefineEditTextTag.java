@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.tags.dynamictext.TextStyle;
 import com.jpexs.decompiler.flash.tags.dynamictext.Word;
 import com.jpexs.decompiler.flash.tags.enums.TextRenderMode;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
+import com.jpexs.decompiler.flash.tags.text.SymbolType;
 import com.jpexs.decompiler.flash.tags.text.TextAlign;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
@@ -680,9 +681,10 @@ public class DefineEditTextTag extends TextTag {
             int textIdx = 0;
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
-                    case PARAMETER:
-                        String paramName = (String) s.values[0];
-                        String paramValue = (String) s.values[1];
+                    case PARAMETER_IDENTIFIER:
+                        String paramName = (String) s.value;
+                        s = lexer.yylex();                        
+                        String paramValue = (String) s.value;
                         switch (paramName) {
                             case "xmin":
                                 try {
@@ -855,7 +857,7 @@ public class DefineEditTextTag extends TextTag {
                         }
                         break;
                     case TEXT:
-                        String s2 = (String) s.values[0];
+                        String s2 = (String) s.value;
                         if (s2 == null) {
                             s2 = "";
                         }

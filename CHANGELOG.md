@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - Chinese translation update
 - [#2305] Saving recent colors in the color selection dialog
 - [#2328] Searching/replacing in texts now supports selection / all files scope
+- Texts spacing is now separated where possible - does not use `[space xx]`,
+  but new `spacing "x" NN` and `spacingpair "x" "y" NN` prefix so now
+  texts are more readable and searchable
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
