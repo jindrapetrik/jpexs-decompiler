@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.gui.colordialog.MyColorChooserDialog;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.gui.colordialog.MyColorChooserDialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

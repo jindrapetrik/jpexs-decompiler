@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import static com.jpexs.decompiler.flash.docs.As3PCodeDocs.NEWLINE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.InputStream;

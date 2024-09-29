@@ -17,17 +17,13 @@
 package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
-import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
 import com.jpexs.decompiler.graph.SecondPassData;
-import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.HashMap;
