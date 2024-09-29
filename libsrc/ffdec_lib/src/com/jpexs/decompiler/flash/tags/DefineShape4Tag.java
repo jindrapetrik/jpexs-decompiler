@@ -32,7 +32,9 @@ import java.io.IOException;
 
 /**
  * DefineShape4 tag - defines shape. Extends functionality of DefineShape3.
- *
+ * Adds LINESTYLE2 (joins, caps, scaling), filling stroke, edge bounds,
+ * focal gradient, spread mode, interpolation mode, numgradients &gt; 8.
+ * 
  * @author JPEXS
  */
 @SWFVersion(from = 8)
@@ -115,6 +117,10 @@ public class DefineShape4Tag extends ShapeTag {
     @Override
     public void updateBounds() {
         super.updateBounds();
+        updateEdgeBounds();
+    }
+    
+    public void updateEdgeBounds() {
         edgeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, null, 4, true);
     }
 

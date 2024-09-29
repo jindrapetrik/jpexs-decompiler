@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -48,6 +49,58 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
     @Conditional(tags = {DefineShape4Tag.ID})
     public LINESTYLE2[] lineStyles2 = new LINESTYLE2[0];
 
+    public int getMinShapeNum(int sourceShapeNum) {
+        int result = 1;
+        if (sourceShapeNum >= 4) {            
+            for (LINESTYLE2 ls : lineStyles2) {
+                int sn = ls.getMinShapeNum();
+                if (sn > result) {
+                    result = sn;
+                }
+            }
+        } else {
+            for (LINESTYLE ls : lineStyles) {
+                int sn = ls.getMinShapeNum();
+                if (sn > result) {
+                    result = sn;
+                }
+            }
+        }
+        return result;
+    }
+    
+    public LINESTYLEARRAY toShapeNum(int sourceShapeNum, int targetShapeNum) {
+        if (sourceShapeNum == targetShapeNum) {
+            return Helper.deepCopy(this);
+        }
+        LINESTYLEARRAY result = new LINESTYLEARRAY();
+        if (targetShapeNum >= 4) {
+            result.lineStyles2 = new LINESTYLE2[lineStyles.length];
+            for (int i = 0; i < lineStyles.length; i++) {
+                result.lineStyles2[i] = lineStyles[i].toLineStyle2();
+            }
+        } else {
+            result.lineStyles = new LINESTYLE[sourceShapeNum >=4 ? lineStyles2.length : lineStyles.length];
+            if (sourceShapeNum >= 4) {
+                for (int i = 0; i < lineStyles2.length; i++) {
+                    result.lineStyles[i] = lineStyles2[i].toLineStyle1(targetShapeNum);
+                }
+            } else {
+                for (int i = 0; i < lineStyles.length; i++) {
+                    LINESTYLE ls = new LINESTYLE();
+                    if (targetShapeNum < 3) {
+                        ls.color = new RGB(lineStyles[i].color);
+                    } else {
+                        ls.color = new RGBA(lineStyles[i].color);
+                    }
+                    ls.width = lineStyles[i].width;
+                    result.lineStyles[i] = ls;
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (lineStyles != null) {

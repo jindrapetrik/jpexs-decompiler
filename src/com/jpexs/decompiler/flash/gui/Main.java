@@ -2920,6 +2920,9 @@ public class Main {
         decodeLaunch5jArgs(args);
         setSessionLoaded(false);
 
+        
+        System.setProperty("sun.io.serialization.extendedDebugInfo", "true");
+        
         clearTemp();
 
         try {

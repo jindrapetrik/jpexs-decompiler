@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -182,5 +183,37 @@ public class GRADIENT implements Serializable {
         }
         return Arrays.deepEquals(this.gradientRecords, other.gradientRecords);
     }
+    
+    public GRADIENT toShapeNum(int shapeNum) {
+        GRADIENT result = Helper.deepCopy(this);
+        if (shapeNum < 4) {
+            result.spreadMode = 0;
+            result.interpolationMode = 0;
+            if (gradientRecords.length > 8) {
+                result.gradientRecords = Arrays.copyOfRange(result.gradientRecords, 0, 8);
+            }
+        }
+        return result;
+    }
 
+    public int getMinShapeNum() {
+        if (gradientRecords.length > 8) {
+            return 4;
+        }
+        if (spreadMode > 0) {
+            return 4;
+        }
+        if (interpolationMode > 0) {
+            return 4;
+        }
+        for (GRADRECORD rec : gradientRecords) {
+            if (rec.color instanceof RGBA) {
+                RGBA col = (RGBA) rec.color;
+                if (col.alpha != 255) {
+                    return 3;
+                }
+            }
+        }
+        return 1;
+    }
 }

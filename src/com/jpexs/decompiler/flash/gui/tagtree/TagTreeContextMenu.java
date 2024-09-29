@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.AsLinkageDialog;
 import com.jpexs.decompiler.flash.gui.ClipboardType;
 import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
+import com.jpexs.decompiler.flash.gui.ConvertShapeTypeDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PathResolvingDialog;
@@ -103,6 +104,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
@@ -335,7 +337,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem replaceWithGifMenuItem;
 
-    private JMenuItem collectDepthAsSpritesItem;
+    private JMenuItem collectDepthAsSpritesMenuItem;
+    
+    private JMenuItem convertShapeTypeMenuItem;
 
     private List<TreeItem> items = new ArrayList<>();
 
@@ -534,6 +538,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
         replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
+        
+        convertShapeTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertShapeType"));
+        convertShapeTypeMenuItem.addActionListener(this::convertShapeTypeActionPerformed);
+        convertShapeTypeMenuItem.setIcon(View.getIcon("shape16"));
+        add(convertShapeTypeMenuItem);
 
         addSeparator();
         
@@ -761,10 +770,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         pasteInsideMenuItem.addActionListener(this::pasteInsideActionPerformed);
         add(pasteInsideMenuItem);
 
-        collectDepthAsSpritesItem = new JMenuItem(mainPanel.translate("contextmenu.collectDepthAsSprites"));
-        collectDepthAsSpritesItem.setIcon(View.getIcon("sprite16"));
-        collectDepthAsSpritesItem.addActionListener(this::collectDepthAsSprites);
-        add(collectDepthAsSpritesItem);
+        collectDepthAsSpritesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.collectDepthAsSprites"));
+        collectDepthAsSpritesMenuItem.setIcon(View.getIcon("sprite16"));
+        collectDepthAsSpritesMenuItem.addActionListener(this::collectDepthAsSprites);
+        add(collectDepthAsSpritesMenuItem);
 
         addSeparator();
 
@@ -1064,7 +1073,19 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             tim = fr.timeline.timelined;
         }
+        
+        boolean allSelectedIsShape = true;
+        
+        if (items.isEmpty()) {
+            allSelectedIsShape = false;
+        }
+        
         for (TreeItem item : items) {
+            
+            if (!(item instanceof ShapeTag)) {
+                allSelectedIsShape = false;
+            }
+            
             if (item instanceof Tag) {
                 Tag tag = (Tag) item;
                 if (tag.isReadOnly()) {
@@ -1214,6 +1235,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithGifMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
         replaceRefsWithTagMenuItem.setVisible(false);
+        convertShapeTypeMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
@@ -1256,7 +1278,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         pasteAfterMenuItem.setVisible(false);
         pasteBeforeMenuItem.setVisible(false);
         pasteInsideMenuItem.setVisible(false);
-        collectDepthAsSpritesItem.setVisible(allSelectedIsFrame && allSelectedSameParent);
+        collectDepthAsSpritesMenuItem.setVisible(allSelectedIsFrame && allSelectedSameParent);
         applyUnpackerMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
         addAs12ScriptMenuItem.setVisible(false);
@@ -1411,7 +1433,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     replaceRefsWithTagMenuItem.setVisible(true);
                 }
             }
-
+                        
             if (firstItem instanceof DefineSpriteTag) {
                 replaceWithGifMenuItem.setVisible(true);
             }
@@ -1635,6 +1657,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     changeCharsetMenu.setVisible(true);
                 }
             }
+        }
+        
+        if (allSelectedIsShape) {
+            convertShapeTypeMenuItem.setVisible(true);
         }
 
         moveTagToMenu.removeAll();
@@ -2545,6 +2571,53 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.replaceCharacterTags(characterTag, newCharacterId);
             mainPanel.refreshTree(swf);
         }
+    }
+    
+    private void convertShapeTypeActionPerformed(ActionEvent evt) {
+        List<TreeItem> itemr = getSelectedItems();
+        if (itemr.isEmpty()) {
+            return;
+        }
+        int currentShapeNum = 0;
+        int min = 0;
+        int minForced = 0;
+        
+        ShapeTypeConverter converter = new ShapeTypeConverter();
+        
+        
+        if (itemr.size() == 1) {
+            ShapeTag sh = (ShapeTag) itemr.get(0);
+            currentShapeNum = sh.getShapeNum();
+            min = converter.getMinShapeNum(sh);
+            minForced = converter.getForcedMinShapeNum(sh);
+        }                
+        
+        ConvertShapeTypeDialog dialog = new ConvertShapeTypeDialog(Main.getDefaultDialogsOwner(), currentShapeNum, minForced, min);
+        
+        int shapeNum = dialog.showDialog();
+        
+        if (shapeNum == 0) {
+            return;
+        }
+        
+        for (TreeItem item : itemr) {
+            ShapeTag sh = (ShapeTag) item;
+            int newShapeNum = shapeNum;
+            int forcedMin = converter.getForcedMinShapeNum(sh);
+            if (newShapeNum < forcedMin) {
+                newShapeNum = forcedMin;
+            }
+            if (sh.getShapeNum() == newShapeNum) {
+                continue;
+            }
+            converter.convertCharacter(sh.getSwf(), sh.getCharacterId(), newShapeNum);
+        }
+        
+        mainPanel.refreshTree();
+        if (itemr.size() == 1) {
+            ShapeTag sh = (ShapeTag) itemr.get(0);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), sh.getSwf().getCharacter(sh.getCharacterId()));
+        }        
     }
 
     private void replaceRefsWithTagActionPerformed(ActionEvent evt) {

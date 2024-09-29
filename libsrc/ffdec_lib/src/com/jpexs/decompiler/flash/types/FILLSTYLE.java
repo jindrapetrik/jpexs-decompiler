@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -366,4 +367,46 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
         return Objects.equals(this.bitmapMatrix, other.bitmapMatrix);
     }
 
+    public FILLSTYLE toShapeNum(int targetShapeNum) {
+        FILLSTYLE result = Helper.deepCopy(this);
+        if (fillStyleType == SOLID) {
+            if (targetShapeNum < 3) {
+                result.color = new RGB(color);
+            } else {
+                result.color = new RGBA(color);
+            }
+        }
+        if (fillStyleType == LINEAR_GRADIENT 
+                || fillStyleType == RADIAL_GRADIENT
+                || fillStyleType == FOCAL_RADIAL_GRADIENT
+                ) {
+            result.gradient = result.gradient.toShapeNum(targetShapeNum);
+        }
+        if (fillStyleType == FOCAL_RADIAL_GRADIENT && targetShapeNum < 4) {
+            result.fillStyleType = RADIAL_GRADIENT;
+        }
+        return result;
+    }
+    
+    public int getMinShapeNum() {
+        int shapeNum = 1;
+        if (fillStyleType == SOLID) {
+            if (color instanceof RGBA) {
+                RGBA colorA = (RGBA) color;
+                if (colorA.alpha != 255) {
+                    shapeNum = 3;
+                }
+            }
+        }
+        if (fillStyleType == LINEAR_GRADIENT || fillStyleType == RADIAL_GRADIENT) {
+            int gradShapeNum = gradient.getMinShapeNum();
+            if (gradShapeNum > shapeNum) {
+                shapeNum = gradShapeNum;
+            }
+        }
+        if (fillStyleType == FOCAL_RADIAL_GRADIENT) {
+            shapeNum = 4;
+        }
+        return shapeNum;
+    }
 }

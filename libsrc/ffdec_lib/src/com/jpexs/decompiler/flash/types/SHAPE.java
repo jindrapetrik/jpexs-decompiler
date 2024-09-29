@@ -57,8 +57,8 @@ public class SHAPE implements NeedsCharacters, Serializable {
     @SWFArray(value = "record")
     public List<SHAPERECORD> shapeRecords;
 
-    private Shape cachedOutline;
-    private Shape fastCachedOutline;
+    private transient Shape cachedOutline;
+    private transient Shape fastCachedOutline;
 
     /**
      * Constructor.
