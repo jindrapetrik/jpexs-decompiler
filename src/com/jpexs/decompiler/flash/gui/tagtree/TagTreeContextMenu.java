@@ -42,6 +42,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.AsLinkageDialog;
 import com.jpexs.decompiler.flash.gui.ClipboardType;
 import com.jpexs.decompiler.flash.gui.CollectDepthAsSpritesDialog;
+import com.jpexs.decompiler.flash.gui.ConvertPlaceObjectTypeDialog;
 import com.jpexs.decompiler.flash.gui.ConvertShapeTypeDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -104,6 +105,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
@@ -340,6 +342,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem collectDepthAsSpritesMenuItem;
     
     private JMenuItem convertShapeTypeMenuItem;
+    
+    private JMenuItem convertPlaceObjectTypeMenuItem;
 
     private List<TreeItem> items = new ArrayList<>();
 
@@ -543,6 +547,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         convertShapeTypeMenuItem.addActionListener(this::convertShapeTypeActionPerformed);
         convertShapeTypeMenuItem.setIcon(View.getIcon("shape16"));
         add(convertShapeTypeMenuItem);
+        
+        convertPlaceObjectTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertPlaceObjectType"));
+        convertPlaceObjectTypeMenuItem.addActionListener(this::convertPlaceObjectTypeActionPerformed);
+        convertPlaceObjectTypeMenuItem.setIcon(View.getIcon("placeobject16"));
+        add(convertPlaceObjectTypeMenuItem);
 
         addSeparator();
         
@@ -1075,15 +1084,20 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         
         boolean allSelectedIsShape = true;
+        boolean allSelectedIsPlaceObject = true;
         
         if (items.isEmpty()) {
             allSelectedIsShape = false;
+            allSelectedIsPlaceObject = false;
         }
         
         for (TreeItem item : items) {
             
             if (!(item instanceof ShapeTag)) {
                 allSelectedIsShape = false;
+            }
+            if (!(item instanceof PlaceObjectTypeTag)) {
+                allSelectedIsPlaceObject = false;
             }
             
             if (item instanceof Tag) {
@@ -1236,6 +1250,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithTagMenuItem.setVisible(false);
         replaceRefsWithTagMenuItem.setVisible(false);
         convertShapeTypeMenuItem.setVisible(false);
+        convertPlaceObjectTypeMenuItem.setVisible(false);
         abcExplorerMenuItem.setVisible(false);
         cleanAbcMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
@@ -1661,6 +1676,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         
         if (allSelectedIsShape) {
             convertShapeTypeMenuItem.setVisible(true);
+        }
+        
+        if (allSelectedIsPlaceObject) {
+            convertPlaceObjectTypeMenuItem.setVisible(true);
         }
 
         moveTagToMenu.removeAll();
@@ -2617,6 +2636,46 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (itemr.size() == 1) {
             ShapeTag sh = (ShapeTag) itemr.get(0);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), sh.getSwf().getCharacter(sh.getCharacterId()));
+        }        
+    }
+    
+    private void convertPlaceObjectTypeActionPerformed(ActionEvent evt) {
+        List<TreeItem> itemr = getSelectedItems();
+        if (itemr.isEmpty()) {
+            return;
+        }
+        int currentPlaceObjectNum = 0;
+        int min = 0;
+        
+        PlaceObjectTypeConverter converter = new PlaceObjectTypeConverter();
+        
+        
+        if (itemr.size() == 1) {
+            PlaceObjectTypeTag sh = (PlaceObjectTypeTag) itemr.get(0);
+            currentPlaceObjectNum = sh.getPlaceObjectNum();
+            min = converter.getMinPlaceNum(sh);
+        }                
+        
+        ConvertPlaceObjectTypeDialog dialog = new ConvertPlaceObjectTypeDialog(Main.getDefaultDialogsOwner(), currentPlaceObjectNum, min);
+        
+        int placeNum = dialog.showDialog();
+        
+        if (placeNum == 0) {
+            return;
+        }
+        
+        PlaceObjectTypeTag lastConverted = null;
+        for (TreeItem item : itemr) {
+            PlaceObjectTypeTag pl = (PlaceObjectTypeTag) item;
+            if (pl.getPlaceObjectNum()== placeNum) {
+                continue;
+            }
+            lastConverted = converter.convertTagType(pl, placeNum);
+        }
+        
+        mainPanel.refreshTree();
+        if (itemr.size() == 1) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), lastConverted);
         }        
     }
 

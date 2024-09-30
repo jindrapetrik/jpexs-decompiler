@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
   but new `spacing "x" NN` and `spacingpair "x" "y" NN` prefix so now
   texts are more readable and searchable
 - [#2333] Changing Shape tag type (DefineShape, DefineShape2, ...)
+- Changing PlaceObject tag type (PlaceObject, PlaceObject2, ...)
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
