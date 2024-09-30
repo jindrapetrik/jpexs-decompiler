@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - [#2332] Imported fonts by class name not available in texts
 - [#2330] Windows EXE launcher (+ CLI) does not respect current working directory
 - [#2335] AS3 direct editation - Type coercion of `&&` and `||` operators
+- [#2334] AS1/2 P-code export - Do not export on(xxx) header
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3611,6 +3612,7 @@ Major version of SWF to XML export changed to 2.
 [#2332]: https://www.free-decompiler.com/flash/issues/2332
 [#2330]: https://www.free-decompiler.com/flash/issues/2330
 [#2335]: https://www.free-decompiler.com/flash/issues/2335
+[#2334]: https://www.free-decompiler.com/flash/issues/2334
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287
