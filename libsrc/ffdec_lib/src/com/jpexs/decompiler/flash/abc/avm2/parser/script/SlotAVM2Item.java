@@ -130,9 +130,10 @@ public class SlotAVM2Item extends AVM2Item {
         
         List<GraphSourceItem> ret = new ArrayList<>();
         if (value != null) {
+            GraphTargetItem value2 = AVM2SourceGenerator.handleAndOrCoerce(value, type);
             ret.add(ins(AVM2Instructions.FindProperty, agen.traitName(ns, var)));
             localData.isStatic = true;
-            ret.addAll(agen.toInsList(value.toSource(localData, agen)));
+            ret.addAll(agen.toInsList(value2.toSource(localData, agen)));
             ret.add(ins(AVM2Instructions.SetProperty, agen.traitName(ns, var)));
         }
         return ret;

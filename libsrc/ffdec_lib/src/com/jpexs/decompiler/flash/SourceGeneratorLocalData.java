@@ -190,6 +190,11 @@ public class SourceGeneratorLocalData implements Serializable {
      * Opened namespaces
      */
     public List<NamespaceItem> openedNamespaces = new ArrayList<>();
+    
+    /**
+     * Current method return type
+     */
+    public GraphTargetItem returnType = null;
 
     /**
      * Gets full class name.

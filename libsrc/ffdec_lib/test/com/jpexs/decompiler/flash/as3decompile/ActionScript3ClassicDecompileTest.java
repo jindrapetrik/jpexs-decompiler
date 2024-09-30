@@ -46,6 +46,19 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testAndOrCoercion() {
+        decompileMethod("classic", "testAndOrCoercion", "var x:TestInterface = this.ti || (this.ti = new TestClass()) && (this.ti = new TestClass());\r\n"
+                + "var y:TestInterface = this.ti && (this.ti = new TestClass());\r\n"
+                + "var z:TestClass = this.tc || (this.tc = new TestClass());\r\n"
+                + "this.ti = this.ti && (this.ti = new TestClass());\r\n"
+                + "var a:* = this.ti && (this.ti = new TestClass());\r\n"
+                + "var b:int = 1 + (this.i || this.j);\r\n"
+                + "this.test(this.ti && (this.ti = new TestClass()));\r\n"
+                + "return this.ti && (this.ti = new TestClass());\r\n",
+                 false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic", "testArguments", "return arguments[0];\r\n",
                  false);
