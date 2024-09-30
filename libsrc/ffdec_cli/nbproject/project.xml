@@ -68,7 +68,7 @@ auxiliary.show.customizer.message=<message>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">../../dist/ffdec.jar</classpath>
+                <classpath mode="compile">../../src</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>1.8</source-level>
             </compilation-unit>

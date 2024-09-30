@@ -113,10 +113,10 @@ public class ExportScriptTask implements Callable<File> {
                         asm.getActionSourceSuffix(writer2);
                     } else if (exportMode == ScriptExportMode.PCODE_GRAPHVIZ) {
                         new PcodeGraphVizExporter().exportAs12(asm, writer2);
-                    } else if (exportMode != ScriptExportMode.AS) {
-                        asm.getActionSourcePrefix(writer2);
-                        asm.getASMSource(exportMode, writer2, null);
-                        asm.getActionSourceSuffix(writer2);
+                    } else if (exportMode != ScriptExportMode.AS) {                        
+                        //asm.getActionSourcePrefix(writer2);
+                        asm.getASMSource(exportMode, writer2, null);                        
+                        //asm.getActionSourceSuffix(writer2);
                     } else {
                         ActionList as;
                         try (Statistics s = new Statistics("ASMSource.getActions")) {
@@ -126,8 +126,8 @@ public class ExportScriptTask implements Callable<File> {
                         Action.setActionsAddresses(as, 0);
 
                         try (Statistics s = new Statistics("Action.actionsToSource")) {
-                            asm.getActionScriptSource(writer2, as);
-                        }
+                            asm.getActionScriptSource(writer2, as);                            
+                        }                        
                     }
                 }
 
