@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.tags.converters.ShapeTypeConverter;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -35,13 +36,13 @@ import javax.swing.JRadioButton;
  *
  * @author JPEXS
  */
-public class ConvertShapeTypeDialog extends AppDialog {
+public class ConvertPlaceObjectTypeDialog extends AppDialog {
     
     private List<JRadioButton> radios = new ArrayList<>();
     
     private int result = 0;
     
-    public ConvertShapeTypeDialog(Window owner, int currentShapeNum, int minForced, int min) {
+    public ConvertPlaceObjectTypeDialog(Window owner, int currentPlaceObjectNum, int min) {
         super(owner);
         setTitle(translate("dialog.title"));
         JPanel radioPanel = new JPanel();
@@ -51,27 +52,21 @@ public class ConvertShapeTypeDialog extends AppDialog {
         JButton okButton = new JButton(translate("button.ok"));
         
         for (int i = 1; i <= 4; i++) {
-            String text = "DefineShape" + (i > 1 ? "" + i : "");
-            if (i < minForced) {
-                text += " " + translate("unsupported");
-            }
+            String text = "PlaceObject" + (i > 1 ? "" + i : "");
             if (i == min) {
                 text += " " + translate("minimum");
             }
-            text += " - " + translate("shape" + i);
+            text += " - " + translate("place" + i);
             JRadioButton radio = new JRadioButton(text);
             radio.setAlignmentX(Component.LEFT_ALIGNMENT);
-            if (i < minForced) {
-                radio.setEnabled(false);
-            }
-            if (i == currentShapeNum) {
+            if (i == currentPlaceObjectNum) {
                 radio.setSelected(true);
             }
             final int fi = i;
             radio.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    okButton.setEnabled(fi != currentShapeNum);
+                    okButton.setEnabled(fi != currentPlaceObjectNum);
                 }                
             });
             radioPanel.add(radio);            
@@ -97,7 +92,7 @@ public class ConvertShapeTypeDialog extends AppDialog {
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
-        View.setWindowIcon(this, "shape");
+        View.setWindowIcon(this, "placeobject");
         setModal(true);
     }
     
