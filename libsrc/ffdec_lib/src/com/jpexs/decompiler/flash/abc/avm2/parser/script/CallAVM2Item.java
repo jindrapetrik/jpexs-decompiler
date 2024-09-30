@@ -21,7 +21,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -150,6 +153,33 @@ public class CallAVM2Item extends AVM2Item {
 
         if (callable instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
+            
+            Reference<GraphTargetItem> objType = new Reference<>(null);
+            Reference<GraphTargetItem> propType = new Reference<>(null);
+            Reference<Integer> propIndexX = new Reference<>(0);
+            Reference<ValueKind> outPropValue = new Reference<>(null);
+            Reference<ABC> outPropValueAbc = new Reference<>(null);
+            Reference<Boolean> isType = new Reference<>(false);
+            Reference<Trait> outPropTrait = new Reference<>(null);
+
+            prop.resolve(false, localData, isType, objType, propType, propIndexX, outPropValue, outPropValueAbc, outPropTrait);           
+            
+            if (outPropTrait.getVal() != null) {
+                Trait t = (Trait) outPropTrait.getVal();
+                if (t instanceof TraitMethodGetterSetter) {
+                    TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
+                    ABC abc = outPropValueAbc.getVal();
+                    MethodInfo mi = abc.method_info.get(tm.method_info);
+                    for (int i = 0; i < mi.param_types.length; i++) {
+                        if (i >= arguments.size()) {
+                            break;
+                        }
+                        TypeItem type = new TypeItem(abc.constants.getMultiname(mi.param_types[i]).getNameWithNamespace(abc.constants, true /*??*/));
+                        arguments.set(i, AVM2SourceGenerator.handleAndOrCoerce(arguments.get(i), type));
+                    }
+                }
+            }
+            
             obj = prop.object;
             //For using this when appropriate: (Non ASC2 approach)
             /*if (obj == null) {

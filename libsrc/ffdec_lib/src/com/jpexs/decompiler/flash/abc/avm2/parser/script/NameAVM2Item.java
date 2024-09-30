@@ -249,6 +249,10 @@ public class NameAVM2Item extends AssignableAVM2Item {
      */
     public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex, boolean isConst) {
         super(storeValue);
+        
+        if (storeValue != null && type != null) {
+            storeValue = AVM2SourceGenerator.handleAndOrCoerce(storeValue, type);
+        }
         this.attribute = attribute;
         this.variableName = variableName;
         this.namespaceSuffix = namespaceSuffix;

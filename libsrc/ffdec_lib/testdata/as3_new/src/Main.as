@@ -17,6 +17,7 @@ package
     public class Main extends Sprite
     {
         TestActivationArguments;
+        TestAndOrCoercion;
         TestArguments;
         TestBitwiseOperands;
         TestCallCall;

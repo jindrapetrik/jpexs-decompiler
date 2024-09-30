@@ -149,7 +149,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      * @param propertyValueABC Property value ABC
      * @throws CompilationException On compilation error
      */
-    public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<Boolean> isType, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
+    public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<Boolean> isType, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC, Reference<Trait> propertyTrait) throws CompilationException {
         Integer namespaceSuffixInt = null;
         if (!"".equals(namespaceSuffix)) {
             namespaceSuffixInt = Integer.parseInt(namespaceSuffix.substring(1));
@@ -177,6 +177,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             }
         }
         GraphTargetItem propType = null;
+        Trait propTrait = null;
         int propIndex = 0;
         ABC abc = abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
@@ -214,6 +215,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     Reference<GraphTargetItem> outPropType = new Reference<>(null);
                     Reference<ValueKind> outPropValue = new Reference<>(null);
                     Reference<ABC> outPropValueAbc = new Reference<>(null);
+                    Reference<Trait> outPropTrait = new Reference<>(null);
                     List<Integer> otherNs = new ArrayList<>();
                     for (NamespaceItem n : openedNamespaces) {
                         if (n.isResolved()) {
@@ -237,9 +239,10 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             propType = sp.returnType;
                             propValue = sp.value;
                             propValueAbc = sp.abc;
+                            propTrait = sp.trait;
                         }
                     }
-                    if (propType == null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
+                    if (propType == null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
                         objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                         propType = outPropType.getVal();
                         propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -248,6 +251,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         );
                         propValue = outPropValue.getVal();
                         propValueAbc = outPropValueAbc.getVal();
+                        propTrait = outPropTrait.getVal();
                     }
                 }
 
@@ -345,6 +349,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                                 TraitSlotConst tsc = (TraitSlotConst) t;
                                                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
                                                 propValueAbc = abc;
+                                                propTrait = t;
                                             }
                                             break loopobjType;
                                         }
@@ -362,6 +367,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                                 Reference<ValueKind> outPropValue = new Reference<>(null);
                                 Reference<ABC> outPropValueAbc = new Reference<>(null);
+                                Reference<Trait> outPropTrait = new Reference<>(null);
                                 if (p != null && (p.objType instanceof TypeItem)) {
                                     List<Integer> otherns = new ArrayList<>();
                                     for (NamespaceItem n : openedNamespaces) {
@@ -369,7 +375,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             otherns.add(n.getCpoolIndex(abcIndex));
                                         }
                                     }
-                                    if (AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
+                                    if (AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType, outPropTrait)) {
                                         objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                                         propType = p.returnType;
                                         propIndex = constants.getMultinameId(Multiname.createQName(false,
@@ -378,6 +384,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                         );
                                         propValue = p.value;
                                         propValueAbc = outPropValueAbc.getVal();
+                                        propTrait = outPropTrait.getVal();
                                         break loopobjType;
                                     }
                                 }
@@ -410,6 +417,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         propertyIndex.setVal(propIndex);
         propertyType.setVal(propType);
         objectType.setVal(objType);
+        propertyTrait.setVal(propTrait);
     }
 
     /**
@@ -425,7 +433,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
         Reference<Boolean> isType = new Reference<>(false);
-        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        Reference<Trait> outPropTrait = new Reference<>(null);
+        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
         return propIndex.getVal();
     }
 
@@ -438,8 +447,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
         Reference<Boolean> isType = new Reference<>(false);
+        Reference<Trait> outPropTrait = new Reference<>(null);
         try {
-            resolve(false, new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
+            resolve(false, new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0)/*???*/, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
 
             return propType.getVal();
         } catch (CompilationException ex) {
@@ -464,14 +474,18 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
         Reference<Boolean> isType = new Reference<>(false);
-
-        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        Reference<Trait> outPropTrait = new Reference<>(null);
+        
+        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
 
         int propertyId = propIndex.getVal();
         Object obj = resolveObject(localData, generator, assignedValue == null);
         Reference<Integer> ret_temp = new Reference<>(-1);
         boolean isSuper = (obj instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) obj).getVariableName());
         if (assignedValue != null) {
+            
+            assignedValue = AVM2SourceGenerator.handleAndOrCoerce(assignedValue, propType.getVal());
+            
             GraphTargetItem targetType = propType.getVal();
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem coerced = assignedValue;
@@ -571,8 +585,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             Reference<Integer> propIndex = new Reference<>(0);
             Reference<ValueKind> propValue = new Reference<>(null);
             Reference<ABC> propValueAbc = new Reference<>(null);
+            Reference<Trait> propTrait = new Reference<>(null);
 
-            resolve(false, localData, isType, objType, propType, propIndex, outPropValue, propValueAbc);
+            resolve(false, localData, isType, objType, propType, propIndex, propValue, propValueAbc, propTrait);
             obj = ins(mustExist ? AVM2Instructions.FindPropertyStrict : AVM2Instructions.FindProperty, propIndex.getVal());
             //}
         }
@@ -588,8 +603,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         Reference<ValueKind> outPropValue = new Reference<>(null);
         Reference<ABC> outPropValueAbc = new Reference<>(null);
         Reference<Boolean> isType = new Reference<>(false);
+        Reference<Trait> outPropTrait = new Reference<>(null);
 
-        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
+        resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc, outPropTrait);
 
         int propertyId = propIndex.getVal();
         Object obj = resolveObject(localData, generator, false);

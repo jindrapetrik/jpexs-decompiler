@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -139,8 +140,9 @@ public class NamespaceItem {
             Reference<ValueKind> value = new Reference<>(null);
             Reference<ABC> outAbc = new Reference<>(null);
             Reference<Boolean> isType = new Reference<>(false);
+            Reference<Trait> outPropTrait = new Reference<>(null);
 
-            prop.resolve(true, localData, isType, new Reference<>(null), new Reference<>(null), new Reference<>(0), value, outAbc);
+            prop.resolve(true, localData, isType, new Reference<>(null), new Reference<>(null), new Reference<>(0), value, outAbc, outPropTrait);
             boolean resolved = true;
             if (value.getVal() == null) {
                 resolved = false;

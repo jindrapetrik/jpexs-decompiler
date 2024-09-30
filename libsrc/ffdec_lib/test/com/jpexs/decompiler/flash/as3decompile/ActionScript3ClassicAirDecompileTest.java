@@ -46,6 +46,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testAndOrCoercion() {
+        decompileMethod("classic_air", "testAndOrCoercion", "var x:TestInterface = ti || (ti = new TestClass()) && (ti = new TestClass());\r\n"
+                + "var y:TestInterface = ti && (ti = new TestClass());\r\n"
+                + "var z:TestClass = tc || (tc = new TestClass());\r\n"
+                + "this.ti = ti && (ti = new TestClass());\r\n"
+                + "var a:* = ti && (ti = new TestClass());\r\n"
+                + "var b:int = 1 + (i || j);\r\n"
+                + "test(ti && (ti = new TestClass()));\r\n"
+                + "return ti && (ti = new TestClass());\r\n",
+                 false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic_air", "testArguments", "return arguments[0];\r\n",
                  false);

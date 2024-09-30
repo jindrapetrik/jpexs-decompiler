@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -466,8 +467,9 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             Reference<ValueKind> propertyValue = new Reference<>(null);
             Reference<ABC> propertyValueABC = new Reference<>(null);
             Reference<Boolean> isType = new Reference<>(false);
+            Reference<Trait> outPropTrait = new Reference<>(null);
 
-            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC);
+            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC, outPropTrait);
 
             if (objectType.getVal() != null && !isType.getVal()) {
                 isProperty = true;
