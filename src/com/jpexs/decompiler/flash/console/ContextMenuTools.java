@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.console;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
@@ -88,7 +89,7 @@ public class ContextMenuTools {
 
         String appDir = getAppDir();
         String verb = "ffdec";
-        String verbName = "Open with FFDec";
+        String verbName = AppResources.translate("contextMenu");
         boolean exists;
         try {
 
