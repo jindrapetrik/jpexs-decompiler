@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
   texts are more readable and searchable
 - [#2333] Changing Shape tag type (DefineShape, DefineShape2, ...)
 - Changing PlaceObject tag type (PlaceObject, PlaceObject2, ...)
+- AS2 - Information about need of decompiling all scripts to detect uninitialized class fields
 
 ### Fixed
 - [#2319] AS3 Compound assignments problems in some cases
@@ -29,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - [#2330] Windows EXE launcher (+ CLI) does not respect current working directory
 - [#2335] AS3 direct editation - Type coercion of `&&` and `||` operators
 - [#2334] AS1/2 P-code export - Do not export on(xxx) header
+- [#2338] AS decompiling threads got stuck after cancelling / timeout
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3614,6 +3616,7 @@ Major version of SWF to XML export changed to 2.
 [#2330]: https://www.free-decompiler.com/flash/issues/2330
 [#2335]: https://www.free-decompiler.com/flash/issues/2335
 [#2334]: https://www.free-decompiler.com/flash/issues/2334
+[#2338]: https://www.free-decompiler.com/flash/issues/2338
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287

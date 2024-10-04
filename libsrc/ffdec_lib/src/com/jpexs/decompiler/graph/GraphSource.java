@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.helpers.CancellableWorker;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +96,7 @@ public abstract class GraphSource implements Serializable {
      * @throws InterruptedException On interrupt
      */
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
 

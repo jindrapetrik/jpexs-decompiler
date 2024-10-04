@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
@@ -59,7 +60,7 @@ public class MovieExporter {
 
     public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final MovieExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
         if (tags.isEmpty()) {
@@ -109,7 +110,7 @@ public class MovieExporter {
                     ret.add(file);
                 }
 
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
                 if (evl != null) {

@@ -178,7 +178,7 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
             };
 
             // hack: Kernel32.INSTANCE.ConnectNamedPipe never completes in ActiveXControl static constructor
-            flash = CancellableWorker.call(callable, 5, TimeUnit.SECONDS);
+            flash = CancellableWorker.call("flashPlayerPanel", callable, 5, TimeUnit.SECONDS);
 
             flash.setAllowScriptAccess("always");
             try {

@@ -118,11 +118,11 @@ public class AS2ScriptExporter {
 
         if (!parallel || tasks.size() < 2) {
             try {
-                CancellableWorker.call(new Callable<Void>() {
+                CancellableWorker.call("as2scriptexport", new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         for (ExportScriptTask task : tasks) {
-                            if (Thread.currentThread().isInterrupted()) {
+                            if (CancellableWorker.isInterrupted()) {
                                 throw new InterruptedException();
                             }
 
@@ -140,19 +140,23 @@ public class AS2ScriptExporter {
             ExecutorService executor = Executors.newFixedThreadPool(Configuration.getParallelThreadCount());
             List<Future<File>> futureResults = new ArrayList<>();
             for (ExportScriptTask task : tasks) {
-                Future<File> future = executor.submit(task);
+                Future<File> future = executor.submit(task);                
                 futureResults.add(future);
-            }
+            }                       
 
             try {
-                executor.shutdown();
+                executor.shutdown();                
                 if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
                     logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
+                    
+                    for (ExportScriptTask task : tasks) {
+                        CancellableWorker.cancelThread(task.thread);
+                    }
                 }
             } catch (InterruptedException ex) {
                 //ignored
             } finally {
-                executor.shutdownNow();
+                executor.shutdownNow();                
             }
 
             for (int f = 0; f < futureResults.size(); f++) {
@@ -163,9 +167,11 @@ public class AS2ScriptExporter {
                 } catch (InterruptedException ex) {
                     //ignored
                 } catch (ExecutionException ex) {
-                    logger.log(Level.SEVERE, "Error during ABC export", ex);
+                    if (!(ex.getCause() instanceof InterruptedException)) {
+                        logger.log(Level.SEVERE, "Error during ActionScript export", ex);
+                    }
                 }
-            }
+            }            
         }
 
         return ret;

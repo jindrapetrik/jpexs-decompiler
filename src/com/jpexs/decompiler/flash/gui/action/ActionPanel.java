@@ -529,7 +529,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         boolean decompileNeeded = decompiledText == null;
 
         if (disassemblingNeeded || decompileNeeded) {
-            CancellableWorker worker = new CancellableWorker() {
+            CancellableWorker worker = new CancellableWorker("actionPanel") {
                 @Override
                 protected Void doInBackground() throws Exception {
 
@@ -550,10 +550,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         asm.removeDisassemblyListener(listener);
                     }
 
-                    if (decompileNeeded) {
+                    if (decompileNeeded) {                        
                         View.execInEventDispatch(() -> {
                             decompiledEditor.setShowMarkers(false);
-                            setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
+                            if (src.getSwf().needsCalculatingAS2UninitializeClassTraits(src)) {
+                                setEditorText(asm.getScriptName(), asm.getExportedScriptName(), "; ...", "text/flasm");
+                                setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling.allScripts.ucf") + "...");
+                            } else {
+                                setDecompiledText("-", "-", "// " + AppStrings.translate("work.decompiling") + "...");
+                            }
                         });
 
                         HighlightedText htext = SWF.getCached(asm, innerActions);
@@ -584,6 +589,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                         } catch (CancellationException ex) {
                             editor.setShowMarkers(false);
                             setEditorText("-", "-", "; " + AppStrings.translate("work.canceled"), "text/flasm");
+                            setDecompiledText("-", "-", "// " + AppStrings.translate("work.canceled"));
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, "Error", ex);
                             decompiledEditor.setShowMarkers(false);

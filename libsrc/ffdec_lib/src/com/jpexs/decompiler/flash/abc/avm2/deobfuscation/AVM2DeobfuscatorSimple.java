@@ -78,6 +78,7 @@ import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +136,7 @@ public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes 
 
         int localReservedCount = body.getLocalReservedCount();
         for (int i = 0; i < code.code.size(); i++) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 

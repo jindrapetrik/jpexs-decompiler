@@ -350,7 +350,7 @@ public class Main {
         }
         final String ffile = file;
 
-        CancellableWorker runWorker = new CancellableWorker() {
+        CancellableWorker runWorker = new CancellableWorker("runWorker") {
             @Override
             protected Object doInBackground() throws Exception {
                 Process proc;
@@ -672,7 +672,7 @@ public class Main {
         if (tempFile != null) {
             final File fTempFile = tempFile;
             final List<File> tempFiles = new ArrayList<>();
-            CancellableWorker instrumentWorker = new CancellableWorker() {
+            CancellableWorker instrumentWorker = new CancellableWorker("instrumentWorker") {
                 @Override
                 protected Object doInBackground() throws Exception {
 
@@ -974,7 +974,7 @@ public class Main {
                 stream.reset();
                 CancellableWorker<? extends Openable> worker = null;
                 if (streamEntry.getKey().toLowerCase().endsWith(".abc")) {
-                    CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>() {
+                    CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("parseOpenable") {
                         private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
                             SWF dummySwf = new SWF();
                             dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
@@ -1005,7 +1005,7 @@ public class Main {
                     };
                     worker = abcWorker;
                 } else {
-                    CancellableWorker<SWF> swfWorker = new CancellableWorker<SWF>() {
+                    CancellableWorker<SWF> swfWorker = new CancellableWorker<SWF>("bundleSwfWorker") {
                         @Override
                         public SWF doInBackground() throws Exception {
                             final CancellableWorker worker = this;
@@ -1046,7 +1046,7 @@ public class Main {
             CancellableWorker<? extends Openable> worker = null;
 
             if (sourceInfo.getKind() == OpenableSourceKind.ABC) {
-                CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>() {
+                CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("abcWorker") {
                     private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
                         SWF dummySwf = new SWF();
                         dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
@@ -1079,7 +1079,7 @@ public class Main {
             } else if (sourceInfo.getKind() == OpenableSourceKind.SWF) {
                 final String[] yesno = new String[]{AppStrings.translate("button.yes"), AppStrings.translate("button.no"), AppStrings.translate("button.yes.all"), AppStrings.translate("button.no.all")};
 
-                CancellableWorker<SWF> swfWorker = new CancellableWorker<SWF>() {
+                CancellableWorker<SWF> swfWorker = new CancellableWorker<SWF>("swfWorker") {
                     private boolean yestoall = false;
 
                     private boolean notoall = false;

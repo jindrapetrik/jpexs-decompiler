@@ -24,6 +24,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -65,7 +67,7 @@ public class MainFrameStatusPanel extends JPanel {
     public MainFrameStatusPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         createStatusPanel();
-    }
+    }        
 
     private void createStatusPanel() {
         JPanel statusLeftPanel = new JPanel();
@@ -77,10 +79,11 @@ public class MainFrameStatusPanel extends JPanel {
         cancelButton.setBorderPainted(false);
         cancelButton.setOpaque(false);
         cancelButton.addActionListener((ActionEvent e) -> {
-            if (currentWorker != null) {
-                currentWorker.cancel(true);
+            CancellableWorker w = currentWorker;
+            if (w != null) {           
+                w.cancel(true);
             }
-        });
+        });                               
         statusLeftPanel.add(loadingPanel);
         statusLeftPanel.add(cancelButton);
         statusLeftPanel.add(statusLabel);

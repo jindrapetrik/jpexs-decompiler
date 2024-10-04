@@ -64,6 +64,8 @@ public class ExportScriptTask implements Callable<File> {
     long stopTime;
 
     EventListener eventListener;
+    
+    Thread thread;
 
     /**
      * Constructor.
@@ -86,9 +88,10 @@ public class ExportScriptTask implements Callable<File> {
         this.handler = handler;
         this.eventListener = evl;
     }
-
+           
     @Override
     public File call() throws IOException, InterruptedException {
+        thread = Thread.currentThread();
         String f = Path.combine(directory, name) + exportSettings.getFileExtension();
         RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
             @Override

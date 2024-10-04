@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.ImmediateFuture;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,13 +80,18 @@ public class DecompilerPool {
      * @return Future
      */
     public Future<HighlightedText> submitTask(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) {
+        CancellableWorker w = CancellableWorker.getCurrent();
         Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
             public HighlightedText call() throws Exception {
+                if (w != null) {
+                    CancellableWorker.assignThreadToWorker(Thread.currentThread(), w);
+                }                
+
                 if (listener != null) {
                     listener.onStart();
                 }
-
+                
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
                 writer.startFunction("!script");
                 src.getActionScriptSource(writer, actions);
@@ -119,9 +125,13 @@ public class DecompilerPool {
      * @return Future
      */
     public Future<HighlightedText> submitTask(AbcIndexing abcIndex, ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) {
+        CancellableWorker w = CancellableWorker.getCurrent();
         Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
             public HighlightedText call() throws Exception {
+                if (w != null) {
+                    CancellableWorker.assignThreadToWorker(Thread.currentThread(), w);
+                }
                 if (listener != null) {
                     listener.onStart();
                 }
@@ -211,9 +221,25 @@ public class DecompilerPool {
             openableToFutures.put(swf, new ArrayList<>());
         }
         openableToFutures.get(swf).add(future);
+        
+        CancellableWorker w = CancellableWorker.getCurrent();
+                        
+        if (w != null) {
+            if (w.isCancelled()) {
+                throw new InterruptedException();
+            }
+            w.addCancelListener(new Runnable() {
+                @Override
+                public void run() {
+                    w.removeCancelListener(this);
+                    future.cancel(true);
+                }                
+            });
+        }
+        
         try {
             return future.get();
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {            
             future.cancel(true);
             throw ex;
         } catch (ExecutionException ex) {
@@ -243,7 +269,7 @@ public class DecompilerPool {
         if (!openableToFutures.containsKey(openable)) {
             openableToFutures.put(openable, new ArrayList<>());
         }
-        openableToFutures.get(openable).add(future);
+        openableToFutures.get(openable).add(future);              
         try {
             return future.get();
         } catch (InterruptedException ex) {

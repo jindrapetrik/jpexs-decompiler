@@ -57,6 +57,7 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
@@ -200,7 +201,7 @@ public class FrameExporter {
 
         @Override
         public boolean hasNext() {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 return false;
             }
             return fframes.size() > pos;
@@ -226,7 +227,7 @@ public class FrameExporter {
 
             int fframe = fframes.get(pos++);
             BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, backgroundColor == null && !usesTransparency ? Color.white : backgroundColor, settings.zoom, true).getBufferedImage();
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 return null;
             }
             if (evl != null) {
@@ -239,7 +240,7 @@ public class FrameExporter {
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
 
@@ -318,7 +319,7 @@ public class FrameExporter {
                     }, handler).run();
                 }
 
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
 
@@ -614,7 +615,7 @@ public class FrameExporter {
                                 }
                                 g.dispose();
 
-                                if (Thread.currentThread().isInterrupted()) {
+                                if (CancellableWorker.isInterrupted()) {
                                     return;
                                 }
                                 pos++;
@@ -774,7 +775,7 @@ public class FrameExporter {
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
 
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 break;
             }
             result.append("\t\tcase ").append(frame).append(":\r\n");

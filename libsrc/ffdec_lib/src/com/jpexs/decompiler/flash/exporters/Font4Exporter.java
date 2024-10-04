@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
@@ -50,7 +51,7 @@ public class Font4Exporter {
 
     public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final Font4ExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
 
@@ -103,7 +104,7 @@ public class Font4Exporter {
                     ret.add(file);
                 }
 
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
 

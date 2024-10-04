@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayInputStream;
@@ -136,7 +137,7 @@ public class MovieImporter {
                 } catch (IOException ex) {
                     Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import movie " + characterId + " from file " + sourceFile.getName(), ex);
                 }
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
             }

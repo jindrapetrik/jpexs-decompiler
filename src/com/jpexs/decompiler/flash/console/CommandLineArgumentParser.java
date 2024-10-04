@@ -2200,7 +2200,7 @@ public class CommandLineArgumentParser {
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");
                 if (exportAs2Script || exportAs3Script) {
                     System.out.println("Exporting scripts...");
-
+                    
                     String scriptsFolder = Path.combine(outDir, ScriptExportSettings.EXPORT_FOLDER_NAME);
                     Path.createDirectorySafe(new File(scriptsFolder));
                     String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
@@ -4102,7 +4102,7 @@ public class CommandLineArgumentParser {
                             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                                 InputStream stream = streamEntry.getValue();
                                 stream.reset();
-                                CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
+                                CancellableWorker<SWF> worker = new CancellableWorker<SWF>("parseInfoBundle") {
                                     @Override
                                     public SWF doInBackground() throws Exception {
                                         final CancellableWorker worker = this;
@@ -4139,7 +4139,7 @@ public class CommandLineArgumentParser {
                             BufferedInputStream inputStream = new BufferedInputStream(fis);
 
                             InputStream fInputStream = inputStream;
-                            CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
+                            CancellableWorker<SWF> worker = new CancellableWorker<SWF>("parseInfo") {
                                 @Override
                                 public SWF doInBackground() throws Exception {
                                     final CancellableWorker worker = this;

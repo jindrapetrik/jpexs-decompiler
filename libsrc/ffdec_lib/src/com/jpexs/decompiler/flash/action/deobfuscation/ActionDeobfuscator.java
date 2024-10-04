@@ -83,6 +83,7 @@ import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,7 +133,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         }
     }
 
-    private boolean removeGetTimes(FastActionList actions) {
+    private boolean removeGetTimes(FastActionList actions) throws InterruptedException {
         if (actions.isEmpty()) {
             return false;
         }
@@ -215,7 +216,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         FastActionListIterator iterator = actions.iterator();
         boolean first = true;
         while (iterator.hasNext()) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 

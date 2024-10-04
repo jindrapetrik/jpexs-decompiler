@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -231,7 +232,7 @@ public class ActionScriptSearch {
                         Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
                             @Override
                             public void onStart() {
-                                if (Thread.currentThread().isInterrupted()) {
+                                if (CancellableWorker.isInterrupted()) {
                                     return;
                                 }
                                 if (listener != null) {
@@ -242,7 +243,7 @@ public class ActionScriptSearch {
                             @Override
                             public void onComplete(HighlightedText result) {
 
-                                if (!Thread.currentThread().isInterrupted()) {
+                                if (!CancellableWorker.isInterrupted()) {
                                     if (listener != null) {
                                         listener.onSearch(fpos, fscope.size(), pack.getClassPath().toString());
                                     }

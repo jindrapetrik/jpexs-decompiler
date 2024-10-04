@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.Set;
 
@@ -83,7 +84,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
             AVM2Instruction ins = code.code.get(i);
             if (ins.definition instanceof JumpIns) {
                 if (ins.operands[0] == 0) {
-                    if (Thread.currentThread().isInterrupted()) {
+                    if (CancellableWorker.isInterrupted()) {
                         throw new InterruptedException();
                     }
 
@@ -142,7 +143,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
             if (ins2.definition instanceof PopIns
                     && !offsets.contains(ins2.getAddress())
                     && isSimplePush(ins1.definition)) {
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     throw new InterruptedException();
                 }
 
@@ -159,7 +160,7 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
                         && !offsets.contains(ins2.getAddress())
                         && !offsets.contains(ins1.getAddress())
                         && isSimplePush(ins0.definition)) {
-                    if (Thread.currentThread().isInterrupted()) {
+                    if (CancellableWorker.isInterrupted()) {
                         throw new InterruptedException();
                     }
                     code.removeInstruction(i - 2, body);

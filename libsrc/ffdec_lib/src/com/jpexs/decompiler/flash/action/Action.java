@@ -986,12 +986,13 @@ public abstract class Action implements GraphSourceItem {
         final SWF swf = asm == null ? null : asm.getSwf();
         final int version = swf == null ? SWF.DEFAULT_VERSION : swf.version;
         try {
-            tree = CancellableWorker.call(new Callable<List<GraphTargetItem>>() {
+            tree = CancellableWorker.call("script.actionsToSource", new Callable<List<GraphTargetItem>>() {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = 0;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem> tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
+                    List<GraphTargetItem>
+                            tree = actionsToTree(uninitializedClassTraits, insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     for (ActionTreeOperation treeOperation : treeOperations) {
                         treeOperation.run(tree);

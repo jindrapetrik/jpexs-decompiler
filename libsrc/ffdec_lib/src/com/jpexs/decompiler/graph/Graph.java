@@ -53,6 +53,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -1441,7 +1442,7 @@ public class Graph {
         //For detection based on debug line information
         boolean[] toDelete = new boolean[list.size()];
         for (int i = 0; i < list.size(); i++) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 
@@ -2755,7 +2756,7 @@ public class Graph {
     protected final List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         loopPrintGraph:
         while (true) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
             if (stopPart == null) {
@@ -3747,7 +3748,7 @@ public class Graph {
      * @throws InterruptedException On interrupt
      */
     private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startIp, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
 

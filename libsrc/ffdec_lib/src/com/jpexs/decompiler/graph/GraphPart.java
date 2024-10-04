@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
+import com.jpexs.helpers.CancellableWorker;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -144,7 +145,7 @@ public class GraphPart implements Serializable {
      * @throws InterruptedException On interrupt
      */
     private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
 

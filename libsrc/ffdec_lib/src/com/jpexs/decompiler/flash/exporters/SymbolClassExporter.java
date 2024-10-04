@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
@@ -46,7 +47,7 @@ public class SymbolClassExporter {
 
     public List<File> exportNames(AbortRetryIgnoreHandler handler, final String outdir, ReadOnlyTagList tags, SymbolClassExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
 
@@ -79,7 +80,7 @@ public class SymbolClassExporter {
                             writer.append(sct.tags.get(i) + ";" + sct.names.get(i) + Helper.newLine);
                         }
                     }
-                    if (Thread.currentThread().isInterrupted()) {
+                    if (CancellableWorker.isInterrupted()) {
                         break;
                     }
                 }

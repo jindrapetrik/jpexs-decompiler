@@ -2998,7 +2998,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         || searchDialog.searchInPCodeRadioButton.isSelected();
                 if (scriptSearch) {
                     boolean pCodeSearch = searchDialog.searchInPCodeRadioButton.isSelected();
-                    new CancellableWorker<Void>() {
+                    new CancellableWorker<Void>("scriptSearch") {
                         @Override
                         protected Void doInBackground() throws Exception {
 
@@ -3051,7 +3051,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     }.execute();
                 } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
-                    new CancellableWorker<Void>() {
+                    new CancellableWorker<Void>("searchInTexts") {
                         @Override
                         protected Void doInBackground() throws Exception {
                             List<TextTag> textResult;
@@ -3146,7 +3146,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!txt.isEmpty()) {
                 final SWF swf = getCurrentSwf();
 
-                new CancellableWorker() {
+                new CancellableWorker("replace") {
                     @Override
                     protected Void doInBackground() throws Exception {
                         int findCount = 0;
@@ -3290,7 +3290,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         final SWF fswf = swf;
         if (confirmExperimental()) {
-            new CancellableWorker<Integer>() {
+            new CancellableWorker<Integer>("renameColliding") {
                 @Override
                 protected Integer doInBackground() throws Exception {
                     AbcMultiNameCollisionFixer fixer = new AbcMultiNameCollisionFixer();
@@ -3339,7 +3339,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret(new Reference<ABC>(null));
             final List<ABCContainerTag> abcList = swf.getAbcList();
             if (multiName > 0) {
-                new CancellableWorker() {
+                new CancellableWorker("renameOneIdentifierAs3") {
                     @Override
                     public Void doInBackground() throws Exception {
                         renameMultiname(abcList, multiName);
@@ -3363,7 +3363,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             final String identifier = getActionPanel().getStringUnderCursor();
             if (identifier != null) {
-                new CancellableWorker() {
+                new CancellableWorker("renameOneIdentifierAs2") {
                     @Override
                     public Void doInBackground() throws Exception {
                         try {
@@ -3456,7 +3456,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         final String fpath = path;
 
         long timeBefore = System.currentTimeMillis();
-        new CancellableWorker() {
+        new CancellableWorker("exportFlashDevelop") {
             @Override
             protected Void doInBackground() throws Exception {
                 Helper.freeMem();
@@ -3529,7 +3529,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         SwfIntelliJIdeaExporter exporter = new SwfIntelliJIdeaExporter();
 
         long timeBefore = System.currentTimeMillis();
-        new CancellableWorker() {
+        new CancellableWorker("exportIdea") {
             @Override
             protected Void doInBackground() throws Exception {
                 Helper.freeMem();
@@ -3602,7 +3602,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         SwfVsCodeExporter exporter = new SwfVsCodeExporter();
 
         long timeBefore = System.currentTimeMillis();
-        new CancellableWorker() {
+        new CancellableWorker("exportVsCode") {
             @Override
             protected Void doInBackground() throws Exception {
                 Helper.freeMem();
@@ -3762,7 +3762,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             final FLAVersion selectedVersion = filterToFlaVersion.get(selectedFilter);
             final File selfile = new File(path);
             long timeBefore = System.currentTimeMillis();
-            new CancellableWorker() {
+            new CancellableWorker("exportFla") {
                 @Override
                 protected Void doInBackground() throws Exception {
                     Helper.freeMem();
@@ -3842,7 +3842,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             MovieImporter movieImporter = new MovieImporter();
 
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importMovie") {
 
                 private int count = 0;
 
@@ -3902,7 +3902,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             SoundImporter soundImporter = new SoundImporter();
 
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importSound") {
 
                 private int count = 0;
 
@@ -3959,7 +3959,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             SpriteImporter spriteImporter = new SpriteImporter();
 
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importSprite") {
 
                 private int count = 0;
 
@@ -4019,7 +4019,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             SvgImporter svgImporter = new SvgImporter();
 
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importShape") {
 
                 private int count = 0;
 
@@ -4078,7 +4078,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ImageImporter imageImporter = new ImageImporter();
 
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importImage") {
 
                 private int count = 0;
 
@@ -4232,7 +4232,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             final String fScriptsFolder = scriptsFolder;
             final long timeBefore = System.currentTimeMillis();
-            new CancellableWorker<Void>() {
+            new CancellableWorker<Void>("importScript") {
                 private int countAs2 = 0;
                 private int countAs3 = 0;
 
@@ -4359,7 +4359,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (selFile != null) {
                 final long timeBefore = System.currentTimeMillis();
 
-                new CancellableWorker<Void>() {
+                new CancellableWorker<Void>("export") {
                     @Override
                     public Void doInBackground() throws Exception {
                         try {
@@ -4533,7 +4533,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             RenameDialog renameDialog = new RenameDialog(Main.getDefaultDialogsOwner());
             if (renameDialog.showRenameDialog() == AppDialog.OK_OPTION) {
                 final RenameType renameType = renameDialog.getRenameType();
-                new CancellableWorker<Integer>() {
+                new CancellableWorker<Integer>("renameIdentifiers") {
                     @Override
                     protected Integer doInBackground() throws Exception {
                         int cnt = fswf.deobfuscateIdentifiers(renameType);
@@ -4611,7 +4611,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog(Main.getDefaultDialogsOwner());
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
             DeobfuscationLevel level = deobfuscationDialog.getDeobfuscationLevel();
-            new CancellableWorker() {
+            new CancellableWorker("deobfuscate") {
                 @Override
                 protected Void doInBackground() throws Exception {
                     try {
@@ -5792,7 +5792,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void loadFromBinaryTag(final List<BinaryDataInterface> binaryDataTags) {
 
         Main.loadingDialog.setVisible(true);
-        new CancellableWorker<Void>() {
+        new CancellableWorker<Void>("loadFromBinaryTag") {
             @Override
             protected Void doInBackground() throws Exception {
                 try {
