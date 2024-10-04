@@ -360,6 +360,13 @@ public class ActionScript2ClassDetector {
             if (parts.size() > partsPos) {
                 item = parts.get(partsPos);
 
+                if (item instanceof TemporaryRegisterMark) {
+                    if (partsPos + 1 < parts.size()) {
+                        partsPos++;
+                        item = parts.get(partsPos);
+                    }
+                }
+                
                 if (item instanceof SetMemberActionItem) {
                     List<String> memPath = getSetMembersPath((SetMemberActionItem) item);
                     if (memPath != null) {

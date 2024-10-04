@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - [#2335] AS3 direct editation - Type coercion of `&&` and `||` operators
 - [#2334] AS1/2 P-code export - Do not export on(xxx) header
 - [#2338] AS decompiling threads got stuck after cancelling / timeout
+- [#2338] AS2 class detection in some minor cases
 
 ## [21.1.0] - 2024-09-23
 ### Added
