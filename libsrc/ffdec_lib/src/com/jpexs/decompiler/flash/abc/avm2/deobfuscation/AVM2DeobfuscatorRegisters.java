@@ -44,6 +44,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -134,7 +135,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         Reference<AVM2Instruction> assignmentRef = new Reference<>(null);
 
         while (setReg > -1) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 
@@ -200,7 +201,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         AVM2Code code = body.getCode();
 
         for (int i = 0; i < code.code.size(); i++) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 
@@ -271,7 +272,7 @@ public class AVM2DeobfuscatorRegisters extends AVM2DeobfuscatorSimple {
         toVisitStacks.add(stack);
         outer:
         while (!toVisit.isEmpty()) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
 

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -241,7 +242,7 @@ public class SpriteImporter {
                 } catch (IOException ex) {
                     Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sprite " + characterId + " from file " + sourceFile.getName(), ex);
                 }
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
             }

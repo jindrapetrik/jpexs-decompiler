@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -185,8 +186,9 @@ public class UninitializedClassFieldsDetector {
      *
      * @param swf SWF
      * @return Map of class name to map of trait name to trait
+     * @throws java.lang.InterruptedException On interruption
      */
-    public Map<String, Map<String, Trait>> calculateAs2UninitializedClassTraits(SWF swf) {
+    public Map<String, Map<String, Trait>> calculateAs2UninitializedClassTraits(SWF swf) throws InterruptedException {
         if (swf.isAS3()) {
             return new HashMap<>();
         }
@@ -200,6 +202,9 @@ public class UninitializedClassFieldsDetector {
 
         //get all assigned traits and inheritance tree
         for (String key : asms.keySet()) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }      
             ASMSource asm = asms.get(key);
             if (asm instanceof DoInitActionTag) {
                 DoInitActionTag doi = (DoInitActionTag) asm;
@@ -282,6 +287,9 @@ public class UninitializedClassFieldsDetector {
 
         //Detect this.x assigns
         for (String key : asms.keySet()) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
             ASMSource asm = asms.get(key);
             if (asm instanceof DoInitActionTag) {
                 DoInitActionTag doi = (DoInitActionTag) asm;
@@ -335,6 +343,9 @@ public class UninitializedClassFieldsDetector {
 
         //getting static classname.x assigns
         for (String key : asms.keySet()) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
             ASMSource asm = asms.get(key);
             List<GraphTargetItem> tree = asm.getActionsToTree();
             for (GraphTargetItem item : tree) {

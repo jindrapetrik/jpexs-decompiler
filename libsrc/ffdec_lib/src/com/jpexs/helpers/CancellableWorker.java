@@ -31,6 +31,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+    /*private static final Map<Thread, CancellableWorker> threadWorkers = Collections.synchronizedMap(new WeakHashMap<>()); 
+    
+    private static final Map<Thread, CancellableWorker> parentThreadWorkers = Collections.synchronizedMap(new WeakHashMap<>());         
+    
+    private static final Map<Thread, Thread> threadToParentThread = Collections.synchronizedMap(new WeakHashMap<>()); 
+    */
+    
+
 
 /**
  * Cancellable worker.
@@ -46,22 +54,87 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     private FutureTask<T> future;
 
-    private static final Map<Thread, CancellableWorker> threadWorkers = Collections.synchronizedMap(new WeakHashMap<>());
-
     private List<CancellableWorker> subWorkers = Collections.synchronizedList(new ArrayList<>());
-
+    
+    private static final Map<Thread, CancellableWorker> thread2Worker = Collections.synchronizedMap(new WeakHashMap<>());     
+    
+    private Thread parentThread;
+    
     private Thread thread;
+        
+    private String name;
+    
+    private CancellableWorker parentWorker;
+    
+    private boolean canceled = false;
+    
+    private List<Runnable> cancelListeners = new ArrayList<>();
 
+    public Thread getThread() {
+        return thread;
+    }    
+    
+    public static void assignThreadToWorker(Thread t, CancellableWorker w) {
+        if (w == null) {
+            return;
+        }
+        thread2Worker.put(t, w);
+    }
+    
+    public static CancellableWorker getCurrent() {
+        Thread t = Thread.currentThread();
+        
+        CancellableWorker w = thread2Worker.get(t);
+        return w;
+    }
+       
+    public void addCancelListener(Runnable listener) {
+        cancelListeners.add(listener);
+    }
+    
+    public void removeCancelListener(Runnable listener) {
+        cancelListeners.remove(listener);
+    }
+    
+    
+    public static boolean isInterrupted() {
+        Thread t = Thread.currentThread();
+        if (t.isInterrupted()) {
+            return true;
+        }
+        
+        
+        CancellableWorker w = thread2Worker.get(t);        
+        if (w != null) {            
+            while (w != null) {
+                t = w.thread;
+                if (t != null && t.isInterrupted()) {
+                    return true;
+                }
+                if (w.canceled) {
+                    return true;
+                }
+                w = w.parentWorker;
+            }            
+        }
+        return false;
+    }
+    
     /**
      * Constructor.
+     * @param name Identifier of action
      */
-    public CancellableWorker() {
+    public CancellableWorker(String name) {
         super();
+        this.name = name;        
         Callable<T> callable = new Callable<T>() {
             @Override
             public T call() throws Exception {
-                thread = Thread.currentThread();
-                threadWorkers.put(thread, CancellableWorker.this);
+                thread = Thread.currentThread();                                
+                thread2Worker.put(thread, CancellableWorker.this);
+                if (isInterrupted()) {
+                    throw new InterruptedException();
+                }                
                 return doInBackground();
             }
         };
@@ -104,24 +177,36 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
      */
     @SuppressWarnings("unchecked")
     public final void execute() {
-        Thread t = Thread.currentThread();
-        if (threadWorkers.containsKey(t)) {
-            threadWorkers.get(t).subWorkers.add(this);
+        parentThread = Thread.currentThread();
+        if (thread2Worker.containsKey(parentThread)) {
+            CancellableWorker currentWorker = thread2Worker.get(parentThread);
+            currentWorker.subWorkers.add(this);
+            parentWorker = currentWorker;
         }
         onStart();
         THREAD_POOL.execute(this);
     }
 
     @Override
-    public final boolean cancel(boolean mayInterruptIfRunning) {
+    public final boolean cancel(boolean mayInterruptIfRunning) {        
+        canceled = true;
+        boolean r = future.cancel(mayInterruptIfRunning);
         List<CancellableWorker> sw = new ArrayList<>(subWorkers);
         for (CancellableWorker w : sw) {
             w.cancel(mayInterruptIfRunning);
-        }
-        boolean r = future.cancel(mayInterruptIfRunning);
-        if (r) {
+        }        
+        
+        if (r) {            
+            
+            List<Runnable> cls = new ArrayList<>(cancelListeners);                    
+            
+            for (Runnable listener : cls) {
+                listener.run();
+            }
+            
+            
             workerCancelled();
-        }
+        }        
         return r;
     }
 
@@ -149,13 +234,20 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     @Override
     public final T get(long timeout, TimeUnit unit) throws InterruptedException,
-            ExecutionException, TimeoutException {
+            ExecutionException, TimeoutException {        
         return future.get(timeout, unit);
     }
 
+    @Override
+    public String toString() {
+        return  "[CancellableWorker \"" + name + "\" on thread " + thread +", subworkers: " + subWorkers.size() + ", " + (canceled ? " canceled" : "") + ", " + (parentWorker != null ? "HASPARENT" : "NOPARENT");
+    }
+
+    
+    
     private void workerDone() {
-        if (thread != null && threadWorkers.get(thread) == this) {
-            threadWorkers.remove(thread);
+        if (thread != null && thread2Worker.get(thread) == this) {
+            //thread2Worker.remove(thread);
         }
         workers.remove(this);
         done();
@@ -163,6 +255,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     /**
      * Calls a callable with a timeout.
+     * @param name Name
      * @param c Callable
      * @param timeout Timeout
      * @param timeUnit Time unit
@@ -172,12 +265,8 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
      * @throws ExecutionException On execution error
      * @throws TimeoutException On timeout
      */
-    public static <T> T call(final Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-        Thread t = Thread.currentThread();
-        if (t.isInterrupted()) {
-            throw new InterruptedException();
-        }
-        CancellableWorker<T> worker = new CancellableWorker<T>() {
+    public static <T> T call(String name, final Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {        
+        CancellableWorker<T> worker = new CancellableWorker<T>(name) {
 
             @Override
             protected T doInBackground() throws Exception {
@@ -190,7 +279,7 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         } finally {
             worker.cancel(true);
         }
-    }
+    }        
 
     /**
      * Cancels all background threads.
@@ -206,6 +295,17 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
             }
         }
     }
+    
+    public static void cancelThread(Thread t) {
+        List<CancellableWorker> ws = new ArrayList<>(workers);
+        for (CancellableWorker w : ws) {
+            if (w != null) {
+                if (w.parentThread == t) {
+                    w.cancel(true);
+                }
+            }
+        }    
+    }
 
     /**
      * Frees the worker.
@@ -215,5 +315,57 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
         for (CancellableWorker w : subWorkers) {
             w.free();
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void printTree(List<String> out) {
+        out.add("worker " + name + " on thread " + thread);
+        List<CancellableWorker> sws = new ArrayList<>(subWorkers);
+        for (CancellableWorker sw : sws) {
+            List<String> subout = new ArrayList<>();
+            sw.printTree(subout);
+            for (String s:subout) {
+                out.add("-" + s);
+            }
+        }
+    }
+    
+    public static void printAllWorkers() {
+        List<CancellableWorker> aw = new ArrayList<>(workers);
+        
+        System.err.println("====ALL WORKERS ====");
+        for (CancellableWorker w : aw) {
+            System.err.println("" + w);
+        }
+        System.err.println("/====================");
+    }
+    
+    public void printTree() {                
+        System.err.println("=======================");
+        List<String> out = new ArrayList<>();
+        printTree(out);
+        for (String s:out) {
+            System.err.println(s);
+        }
+        System.err.println("/=======================");
+    }  
+    
+    public void startWorkerMonitor() {
+        Thread monit = new Thread() {
+            @Override
+            public void run() {
+                CancellableWorker w = null;
+                while (true) {
+                    CancellableWorker.printAllWorkers();
+                    w.printTree();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        return;
+                    }
+                }
+            }            
+        };
+        monit.start(); 
     }
 }

@@ -909,7 +909,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         boolean decompileNeeded = decompiledText == null;
 
         if (decompileNeeded) {
-            CancellableWorker worker = new CancellableWorker() {
+            CancellableWorker worker = new CancellableWorker("abc.decompiledEditorPane") {
                 @Override
                 protected Void doInBackground() throws Exception {
 

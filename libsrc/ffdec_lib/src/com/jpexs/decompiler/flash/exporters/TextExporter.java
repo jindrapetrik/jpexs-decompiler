@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -52,7 +53,7 @@ public class TextExporter {
 
     public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final TextExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
 
@@ -130,7 +131,7 @@ public class TextExporter {
                             fos.write(Utf8Helper.getBytes(Helper.newLine + Configuration.textExportSingleFileSeparator.get() + Helper.newLine));
                         }, handler).run();
                     }
-                    if (Thread.currentThread().isInterrupted()) {
+                    if (CancellableWorker.isInterrupted()) {
                         break;
                     }
                 }
@@ -159,7 +160,7 @@ public class TextExporter {
                     }, handler).run();
                     ret.add(file);
 
-                    if (Thread.currentThread().isInterrupted()) {
+                    if (CancellableWorker.isInterrupted()) {
                         break;
                     }
                     if (evl != null) {

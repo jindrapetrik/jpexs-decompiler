@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -353,7 +354,7 @@ public class ImageImporter extends TagImporter {
                     }
                 }
 
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
             }

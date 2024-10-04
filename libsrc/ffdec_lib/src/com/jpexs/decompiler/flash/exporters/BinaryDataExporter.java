@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.BufferedOutputStream;
@@ -86,7 +87,7 @@ public class BinaryDataExporter {
      */
     public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<BinaryDataInterface> binaryDatas, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             return ret;
         }
 
@@ -133,7 +134,7 @@ public class BinaryDataExporter {
                 ret.add(file);
             }
 
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 break;
             }
 

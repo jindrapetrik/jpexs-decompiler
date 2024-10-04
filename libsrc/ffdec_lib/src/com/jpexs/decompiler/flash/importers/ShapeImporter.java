@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -315,7 +316,7 @@ public class ShapeImporter {
                 } catch (IOException ex) {
                     Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
                 }
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     break;
                 }
             }

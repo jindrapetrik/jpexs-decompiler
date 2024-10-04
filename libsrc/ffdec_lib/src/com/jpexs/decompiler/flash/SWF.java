@@ -173,6 +173,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
@@ -659,6 +660,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private final HashSet<EventListener> listeners = new HashSet<>();
 
     /**
+     * Lock for characters synchronization
+     */
+    private final Object charactersLock = new Object();
+
+    /**
      * Sets main GFX exporterinfo tag
      *
      * @param exporterInfo ExporterInfo
@@ -945,50 +951,52 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param withImported Include tags imported with importasset/2 tag?
      * @return Character id to character map
      */
-    public synchronized Map<Integer, CharacterTag> getCharacters(boolean withImported) {
-        if (characters == null || charactersWithImported == null) {
-            if (destroyed) {
-                return new HashMap<>();
-            }
-            Map<Integer, CharacterTag> chars = new HashMap<>();
-            Map<Integer, CharacterTag> charsWithImported = new HashMap<>();
-            Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
-            Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
-            parseCharacters(getTags(), eimages, chars, charIdtags);
-            charsWithImported.putAll(chars);
-            for (int importedCharacterId : importedCharacterIds.keySet()) {
-                int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
-                SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
-                CharacterTag exportedCharacter = importedSwf.getCharacter(exportedCharacterId);
-                charsWithImported.put(importedCharacterId, exportedCharacter);
-                charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
-                //FIXME? eimages
+    public Map<Integer, CharacterTag> getCharacters(boolean withImported) {
+        synchronized (charactersLock) {
+            if (characters == null || charactersWithImported == null) {
+                if (destroyed) {
+                    return new HashMap<>();
+                }
+                Map<Integer, CharacterTag> chars = new HashMap<>();
+                Map<Integer, CharacterTag> charsWithImported = new HashMap<>();
+                Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
+                Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
+                parseCharacters(getTags(), eimages, chars, charIdtags);
+                charsWithImported.putAll(chars);
+                for (int importedCharacterId : importedCharacterIds.keySet()) {
+                    int exportedCharacterId = importedCharacterIds.get(importedCharacterId);
+                    SWF importedSwf = importedCharacterSourceSwfs.get(importedCharacterId);
+                    CharacterTag exportedCharacter = importedSwf.getCharacter(exportedCharacterId);
+                    charsWithImported.put(importedCharacterId, exportedCharacter);
+                    charIdtags.put(importedCharacterId, importedSwf.getCharacterIdTags(exportedCharacterId));
+                    //FIXME? eimages
 
-                charsWithImported.get(importedCharacterId).setImported(true, true);
-                for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
-                    if (chi instanceof Tag) {
-                        ((Tag) chi).setImported(true, true);
+                    charsWithImported.get(importedCharacterId).setImported(true, true);
+                    for (CharacterIdTag chi : charIdtags.get(importedCharacterId)) {
+                        if (chi instanceof Tag) {
+                            ((Tag) chi).setImported(true, true);
+                        }
                     }
                 }
-            }
-            Map<CharacterIdTag, Integer> charToId = new IdentityHashMap<>();
-            for (int id : charsWithImported.keySet()) {
-                charToId.put(charsWithImported.get(id), id);
-            }
-            for (int id : charIdtags.keySet()) {
-                for (CharacterIdTag ch : charIdtags.get(id)) {
-                    charToId.put(ch, id);
+                Map<CharacterIdTag, Integer> charToId = new IdentityHashMap<>();
+                for (int id : charsWithImported.keySet()) {
+                    charToId.put(charsWithImported.get(id), id);
                 }
+                for (int id : charIdtags.keySet()) {
+                    for (CharacterIdTag ch : charIdtags.get(id)) {
+                        charToId.put(ch, id);
+                    }
+                }
+
+                characters = Collections.unmodifiableMap(chars);
+                charactersWithImported = Collections.unmodifiableMap(charsWithImported);
+                characterToId = Collections.unmodifiableMap(charToId);
+                characterIdTags = Collections.unmodifiableMap(charIdtags);
+                externalImages2 = Collections.unmodifiableMap(eimages);
             }
 
-            characters = Collections.unmodifiableMap(chars);
-            charactersWithImported = Collections.unmodifiableMap(charsWithImported);
-            characterToId = Collections.unmodifiableMap(charToId);
-            characterIdTags = Collections.unmodifiableMap(charIdtags);
-            externalImages2 = Collections.unmodifiableMap(eimages);
+            return withImported ? charactersWithImported : characters;
         }
-
-        return withImported ? charactersWithImported : characters;
     }
 
     /**
@@ -1270,11 +1278,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (fontClass == null) {
             return null;
         }
-        CharacterTag t = getCharacterByClass(fontClass);        
+        CharacterTag t = getCharacterByClass(fontClass);
         if (t instanceof FontTag) {
             return (FontTag) t;
         }
-        
+
         return null;
     }
 
@@ -2313,7 +2321,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 ImportTag importTag = (ImportTag) t;
 
                 String url = importTag.getUrl();
-                
+
                 SWF iSwf;
                 if (importedSwfs.containsKey(url)) {
                     iSwf = importedSwfs.get(url);
@@ -5386,7 +5394,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
             i++;
@@ -5419,7 +5427,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         List<ScriptPack> packs = getAS3Packs();
         int i = 0;
         for (ScriptPack s : packs) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
             i++;
@@ -5623,7 +5631,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         List<String> names = new ArrayList<>(asms.keySet());
         Collections.sort(names);
         for (String name : names) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
             informListeners("generate_swd", name);
@@ -5720,7 +5728,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             List<String> names = new ArrayList<>(asms.keySet());
             Collections.sort(names);
             for (String name : names) {
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     throw new InterruptedException();
                 }
                 informListeners("generate_swd", name);
@@ -6169,11 +6177,18 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Calculates uninitialized class traits in AS2.
+     *
+     * @throws java.lang.InterruptedException On interruption
      */
-    public void calculateAs2UninitializedClassTraits() {
+    public void calculateAs2UninitializedClassTraits() throws InterruptedException {
         uninitializedAs2ClassTraits = new HashMap<>();
         UninitializedClassFieldsDetector detector = new UninitializedClassFieldsDetector();
-        uninitializedAs2ClassTraits = detector.calculateAs2UninitializedClassTraits(this);
+        try {
+            uninitializedAs2ClassTraits = detector.calculateAs2UninitializedClassTraits(this);
+        } catch (Throwable t) {
+            uninitializedAs2ClassTraits = null;
+            throw t;
+        }
     }
 
     /**
@@ -6181,11 +6196,25 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @return Map of class name to map of trait name to trait
      */
-    public synchronized Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() {
-        if (uninitializedAs2ClassTraits == null) {
+    public synchronized Map<String, Map<String, com.jpexs.decompiler.flash.action.as2.Trait>> getUninitializedAs2ClassTraits() throws InterruptedException {
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        if (uninitializedAs2ClassTraits == null) {            
             calculateAs2UninitializedClassTraits();
         }
         return uninitializedAs2ClassTraits;
+    }
+    
+    public boolean needsCalculatingAS2UninitializeClassTraits(ASMSource src) {
+        if (!isAS3()) {
+            if (src instanceof DoInitActionTag) {
+                if (uninitializedAs2ClassTraits == null) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.helpers.CancellableWorker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -582,7 +583,7 @@ public class FastActionList implements Collection<ActionItem> {
     /**
      * Removes the unreachable actions.
      */
-    public void removeUnreachableActions() {
+    public void removeUnreachableActions() throws InterruptedException {
         ActionItem item = firstItem;
         if (item == null) {
             return;
@@ -629,7 +630,7 @@ public class FastActionList implements Collection<ActionItem> {
      * @param jumpTarget Jump target
      * @return Unreachable action count
      */
-    public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) {
+    public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) throws InterruptedException {
         ActionItem item = firstItem;
         if (item == null) {
             return 0;
@@ -688,7 +689,7 @@ public class FastActionList implements Collection<ActionItem> {
      * @param jump Jump
      * @param jumpTarget Jump target
      */
-    private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) {
+    private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) throws InterruptedException {
         if (firstItem == null) {
             return;
         }
@@ -699,9 +700,12 @@ public class FastActionList implements Collection<ActionItem> {
         ActionItem firstItem2 = firstItem;
         boolean modified = true;
         while (modified) {
+            if (CancellableWorker.isInterrupted()) {
+                throw new InterruptedException();
+            }
             modified = false;
             ActionItem item = firstItem2;
-            do {
+            do {                
                 ActionItem next = item.next;
                 //ActionItem alternativeNext = null;
                 Action action = item.action;

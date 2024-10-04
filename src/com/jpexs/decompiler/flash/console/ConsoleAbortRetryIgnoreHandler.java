@@ -40,6 +40,9 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
 
     @Override
     public int handle(Throwable thrown) {
+        if (thrown instanceof InterruptedException) {
+            return AbortRetryIgnoreHandler.ABORT;
+        }
         if (errorMode != AbortRetryIgnoreHandler.UNDEFINED) {
             int result = errorMode;
 

@@ -466,7 +466,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {
-            CancellableWorker.call(new Callable<Void>() {
+            CancellableWorker.call("script.scriptPack.toSource", new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
                     convert(abcIndex, new NulWriter(), traits, convertData, exportMode, parallel);

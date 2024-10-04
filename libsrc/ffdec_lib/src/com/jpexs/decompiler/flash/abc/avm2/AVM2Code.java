@@ -305,6 +305,7 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
 import com.jpexs.helpers.Reference;
@@ -3458,7 +3459,7 @@ public class AVM2Code implements Cloneable {
         toVisit.add(ip);
         toVisitLast.add(lastIp);
         while (!toVisit.isEmpty()) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
             ip = toVisit.remove();

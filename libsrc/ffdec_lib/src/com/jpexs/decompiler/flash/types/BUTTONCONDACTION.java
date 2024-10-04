@@ -220,7 +220,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
             actions = getActions();
         }
 
-        return Action.actionsToSource(swf.getUninitializedAs2ClassTraits(), this, actions, getScriptName(), writer, actions.getCharset());
+        return Action.actionsToSource(new HashMap<>(), this, actions, getScriptName(), writer, actions.getCharset());
     }
 
     @Override

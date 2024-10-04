@@ -59,6 +59,8 @@ public class ExportPackTask implements Callable<File> {
     EventListener eventListener;
 
     AbcIndexing abcIndex;
+    
+    Thread thread;
 
     /**
      * Constructor.
@@ -73,7 +75,7 @@ public class ExportPackTask implements Callable<File> {
      * @param parallel Parallel
      * @param evl Event listener
      */
-    public ExportPackTask(AbcIndexing abcIndex, AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
+    public ExportPackTask(AbcIndexing abcIndex, AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {        
         this.pack = pack;
         this.file = file;
         this.exportSettings = exportSettings;
@@ -88,6 +90,7 @@ public class ExportPackTask implements Callable<File> {
 
     @Override
     public File call() throws IOException, InterruptedException {
+        this.thread = Thread.currentThread();
         RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
             @Override
             public void run() throws IOException, InterruptedException {

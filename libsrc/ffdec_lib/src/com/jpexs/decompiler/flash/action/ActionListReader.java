@@ -84,7 +84,7 @@ public class ActionListReader {
      */
     public static ActionList readActionListTimeout(final List<DisassemblyListener> listeners, final SWFInputStream sis, final int version, final int ip, final int endIp, final String path, final int deobfuscationMode) throws IOException, InterruptedException, TimeoutException {
         try {
-            ActionList actions = CancellableWorker.call(new Callable<ActionList>() {
+            ActionList actions = CancellableWorker.call("script.readActionList", new Callable<ActionList>() {
 
                 @Override
                 public ActionList call() throws IOException, InterruptedException {

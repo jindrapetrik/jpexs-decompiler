@@ -165,6 +165,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.io.IOException;
 import java.io.StringReader;
@@ -365,7 +366,7 @@ public class ActionScript2Parser {
     }
 
     private ParsedSymbol lex() throws IOException, ActionParseException, InterruptedException {
-        if (Thread.currentThread().isInterrupted()) {
+        if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
         ParsedSymbol ret = lexer.lex();

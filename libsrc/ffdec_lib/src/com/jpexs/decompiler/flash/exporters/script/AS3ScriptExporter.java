@@ -535,11 +535,11 @@ public class AS3ScriptExporter {
 
         if (!parallel || tasks.size() < 2) {
             try {
-                CancellableWorker.call(new Callable<Void>() {
+                CancellableWorker.call("as3scriptexport", new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         for (ExportPackTask task : tasks) {
-                            if (Thread.currentThread().isInterrupted()) {
+                            if (CancellableWorker.isInterrupted()) {
                                 throw new InterruptedException();
                             }
 
@@ -565,6 +565,10 @@ public class AS3ScriptExporter {
                 executor.shutdown();
                 if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
                     logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
+                    
+                    for (ExportPackTask task : tasks) {
+                        CancellableWorker.cancelThread(task.thread);
+                    }
                 }
             } catch (InterruptedException ex) {
                 //ignored
@@ -587,7 +591,7 @@ public class AS3ScriptExporter {
 
         if (exportSettings.exportEmbedFlaMode || exportSettings.exportEmbed) {
 
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 return ret;
             }
 
@@ -638,27 +642,27 @@ public class AS3ScriptExporter {
             try {
                 BinaryDataExporter bde = new BinaryDataExporter();
                 bde.exportBinaryData(handler, ASSETS_DIR, rttl, new BinaryDataExportSettings(BinaryDataExportMode.RAW), evl);
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
                 ImageExporter ie = new ImageExporter();
                 ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
                 SoundExporter se = new SoundExporter();
                 se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV, exportSettings.resampleWav), evl);
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
                 FontExporter fe = new FontExporter();
                 fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
                 Font4Exporter f4e = new Font4Exporter();
                 f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
-                if (Thread.currentThread().isInterrupted()) {
+                if (CancellableWorker.isInterrupted()) {
                     return ret;
                 }
                 if (!assetsTagList.isEmpty()) {

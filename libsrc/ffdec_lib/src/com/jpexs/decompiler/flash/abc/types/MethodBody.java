@@ -482,7 +482,7 @@ public final class MethodBody implements Cloneable {
                     }
                 };
                 if (firstLevel) {
-                    CancellableWorker.call(callable, timeout, TimeUnit.SECONDS);
+                    CancellableWorker.call("script.methodbody.convert", callable, timeout, TimeUnit.SECONDS);
                 } else {
                     callable.call();
                 }

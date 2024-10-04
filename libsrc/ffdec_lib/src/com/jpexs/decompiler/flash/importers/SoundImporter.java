@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -612,7 +613,7 @@ public class SoundImporter {
             } catch (IOException | SoundImportException ex) {
                 Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sound " + characterId + " from file " + sourceFile.getName(), ex);
             }
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 break;
             }
         }

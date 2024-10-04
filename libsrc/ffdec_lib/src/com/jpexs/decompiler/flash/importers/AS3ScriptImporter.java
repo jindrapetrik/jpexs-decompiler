@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class AS3ScriptImporter {
 
         int importCount = 0;
         for (ScriptPack pack : packs) {
-            if (Thread.currentThread().isInterrupted()) {
+            if (CancellableWorker.isInterrupted()) {
                 return importCount;
             }
             if (!pack.isSimple) {
