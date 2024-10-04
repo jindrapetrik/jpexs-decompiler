@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.easygui.EasyGuiMain;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
@@ -2918,6 +2919,10 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         decodeLaunch5jArgs(args);
+        if (args.length > 0 && args[0].equals("-easy")) {
+            EasyGuiMain.main(args);
+            return;
+        }
         setSessionLoaded(false);
 
         
