@@ -136,7 +136,7 @@ public class MainFrame extends JFrame {
             public void frameSelected(int frame, int depth) {
                 stagePanel.selectDepth(depth);
                 stagePanel.pause();
-                stagePanel.gotoFrame(frame);
+                stagePanel.gotoFrame(frame + 1);
             }
         });
     }

@@ -56,7 +56,7 @@ public class LibraryTreeTable extends JTreeTable {
         getTree().setShowsRootHandles(true);
         addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {                
                 int selectedRow = getSelectedRow();
                 JTree tree = getTree();
 
@@ -67,7 +67,7 @@ public class LibraryTreeTable extends JTreeTable {
                         
                         int parentRow = tree.getRowForPath(path);
                         changeSelection(parentRow, 0, false, false);
-                    } else {
+                    } else if (path != null) {
                         TreePath parentPath = path.getParentPath();
                         if (parentPath != null) {
                             int parentRow = tree.getRowForPath(parentPath);
