@@ -69,6 +69,10 @@ public class TimelinePanel extends JPanel {
         timelineBodyPanel.depthSelect(depth);
     }
     
+    public void setFrame(int frame, int depth) {
+        timelineBodyPanel.frameSelect(frame, depth);
+    }
+    
     public void setTimelined(Timelined timelined) {
         this.removeAll();
         if (timelined == null) {
