@@ -231,7 +231,7 @@ public class LibraryTreeTable extends JTreeTable {
             Object o = n.getUserObject();
             switch (column) {
                 case 0:
-                    return node.toString();
+                    return node;
                 case 1:    
                     if (o instanceof CharacterTag) {
                         CharacterTag ct = (CharacterTag) o;

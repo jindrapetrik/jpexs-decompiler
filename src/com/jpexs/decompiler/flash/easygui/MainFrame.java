@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.ImagePanel;
+import com.jpexs.decompiler.flash.gui.TimelinedMaker;
+import com.jpexs.decompiler.flash.gui.player.Zoom;
+import com.jpexs.decompiler.flash.tags.Tag;
 import de.javagl.treetable.JTreeTable;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,11 +29,17 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -40,6 +50,7 @@ public class MainFrame extends JFrame {
     private SWF swf;
     private LibraryTreeTable libraryTreeTable;
     private JSplitPane splitPane;
+    private ImagePanel libraryPreviewPanel;
     public MainFrame() {
         setTitle("JPEXS FFDec Easy GUI");
         setSize(1024, 768);
@@ -49,10 +60,44 @@ public class MainFrame extends JFrame {
         cnt.setLayout(new BorderLayout());
                 
         libraryTreeTable = new LibraryTreeTable();
-        JScrollPane scrollPane = new JScrollPane(libraryTreeTable);
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), scrollPane);        
-        scrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));        
-        cnt.add(splitPane, BorderLayout.CENTER);        
+        JScrollPane libraryScrollPane = new JScrollPane(libraryTreeTable);
+        
+        JPanel libraryPanel = new JPanel(new BorderLayout());
+        libraryPanel.add(libraryScrollPane, BorderLayout.CENTER);
+        
+        libraryPreviewPanel = new ImagePanel();
+        libraryPreviewPanel.setTopPanelVisible(false); 
+        
+        JPanel topLibraryPanel = new JPanel(new BorderLayout());
+        JLabel libraryLabel = new JLabel("Library");
+        libraryLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        topLibraryPanel.add(libraryLabel, BorderLayout.NORTH);
+        topLibraryPanel.add(libraryPreviewPanel, BorderLayout.CENTER);
+        libraryPanel.add(topLibraryPanel, BorderLayout.NORTH);
+        
+        libraryPreviewPanel.setPreferredSize(new Dimension(200,200));
+        
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), libraryPanel);        
+        libraryScrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));        
+        cnt.add(splitPane, BorderLayout.CENTER);    
+        
+        libraryTreeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int row = libraryTreeTable.getSelectedRow();
+                if (row == -1) {
+                    return;
+                }
+                DefaultMutableTreeNode n = (DefaultMutableTreeNode) libraryTreeTable.getModel().getValueAt(row, 0);
+                Object obj = n.getUserObject();
+                if (obj instanceof Tag) {
+                    Tag t = (Tag) obj;
+                    libraryPreviewPanel.setTimelined(TimelinedMaker.makeTimelined(t), t.getSwf(), 
+                            -1, false, true, true, true, true, false, true);
+                    libraryPreviewPanel.zoomFit();
+                }
+            }            
+        });
     }
     
     public void open(File file) throws IOException, InterruptedException {

@@ -41,7 +41,7 @@ public class AppStrings {
         return name;
     }
 
-    public static String translate(String key) {
+    public static String translate(String key) {        
         return resourceBundle.getString(key);
     }
 

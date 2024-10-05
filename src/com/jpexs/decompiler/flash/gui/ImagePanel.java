@@ -303,6 +303,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<java.awt.Point> showPoints2 = new ArrayList<>();
 
     private int displayedFrame = 0;
+    
+    private JPanel topPanel;
+    
+    public void setTopPanelVisible(boolean visible) {
+        topPanel.setVisible(visible);
+    }
 
     public void setShowPoints(List<java.awt.Point> showPoints1, List<java.awt.Point> showPoints2) {
         this.showPoints1 = showPoints1;
@@ -2221,7 +2227,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         //labelPan.add(label, new GridBagConstraints());
         add(iconPanel, BorderLayout.CENTER);
 
-        JPanel topPanel = new JPanel();
+        topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         debugLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         topPanel.add(debugLabel);
@@ -2549,17 +2555,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     @Override
     public synchronized void zoom(Zoom zoom) {
-        zoom(zoom, false);
+        zoom(zoom, false, false);
+    }
+    
+    public void zoomFit() {
+        Zoom z = new Zoom();
+        z.value = 1.0;
+        z.fit = true;
+        zoom(z, false, true);
     }
 
-    private synchronized void zoom(Zoom zoom, boolean useCursor) {
+    private synchronized void zoom(Zoom zoom, boolean useCursor, boolean forced) {
         if (!zoomAvailable) {
             return;
         }
         double zoomDoubleBefore = this.zoom.fit ? getZoomToFit() : this.zoom.value;
 
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
-        if (modified) {
+        if (modified || forced) {
             Point localCursorPosition = this.cursorPosition;
             if (!useCursor || localCursorPosition == null) {
                 localCursorPosition = new Point(iconPanel.getWidth() / 2, iconPanel.getHeight() / 2);
@@ -2613,7 +2626,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 
             double w2 = iconPanel.getWidth();
-            double h2 = iconPanel.getHeight();
+            double h2 = iconPanel.getHeight();            
 
             double w;
             double h;
@@ -3894,14 +3907,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Zoom newZoom = new Zoom();
         newZoom.value = currentRealZoom * ZOOM_MULTIPLIER;
         newZoom.fit = false;
-        zoom(newZoom, true);
+        zoom(newZoom, true, false);
     }
 
     private synchronized void zoomOut() {
         Zoom newZoom = new Zoom();
         newZoom.value = getRealZoom() / ZOOM_MULTIPLIER;
         newZoom.fit = false;
-        zoom(newZoom, true);
+        zoom(newZoom, true, false);
     }
 
     @Override
@@ -4039,5 +4052,5 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.pathPosition = pathPosition;
             this.closestPoint = closestPoint;
         }
-    }
+    }        
 }
