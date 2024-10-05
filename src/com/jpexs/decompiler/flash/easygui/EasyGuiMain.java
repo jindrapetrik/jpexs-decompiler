@@ -16,9 +16,18 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
@@ -71,5 +80,5 @@ public class EasyGuiMain {
         } catch (InterruptedException ex) {
             Logger.getLogger(EasyGuiMain.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }        
+    }      
 }

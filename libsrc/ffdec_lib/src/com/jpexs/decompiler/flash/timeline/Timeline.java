@@ -1028,7 +1028,11 @@ public class Timeline {
         SerializableImage img = null;
         if (cacheAsBitmap && renderContext.displayObjectCache != null) {
             DisplayObjectCacheKey key = new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect);
-            img = renderContext.displayObjectCache.get(key);
+            try {
+                img = renderContext.displayObjectCache.get(key);
+            } catch (NullPointerException npe) {
+                return;
+            }
         }
 
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
@@ -1084,7 +1088,7 @@ public class Timeline {
             if (drawable instanceof ButtonTag) {
                 dtime = time;
                 dframe = ButtonTag.FRAME_UP;
-                if (renderContext.cursorPosition != null) {
+                if (renderContext.cursorPosition != null && renderContext.enableButtons) {
                     int dx = (int) (viewRect.xMin * unzoom);
                     int dy = (int) (viewRect.yMin * unzoom);
                     Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
@@ -1704,7 +1708,7 @@ public class Timeline {
                 int dframe = time % drawableFrameCount;
                 if (character instanceof ButtonTag) {
                     dframe = ButtonTag.FRAME_UP;
-                    if (renderContext.cursorPosition != null) {
+                    if (renderContext.cursorPosition != null && renderContext.enableButtons) {
                         ButtonTag buttonTag = (ButtonTag) character;
                         Shape buttonShape = buttonTag.getOutline(fast, ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                         int dx = (int) Math.round(viewRect.xMin * unzoom);

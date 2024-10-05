@@ -60,6 +60,11 @@ public class RenderContext {
     public Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache;
 
     /**
+     * Enable handling buttons
+     */
+    public boolean enableButtons = true;
+    
+    /**
      * Clear display object cache.
      *
      * @param placeObject Place object
