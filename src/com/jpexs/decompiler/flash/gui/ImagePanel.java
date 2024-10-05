@@ -356,7 +356,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
 
     private List<PointUpdateListener> pointUpdateListeners = new ArrayList<>();
+    
+    private List<Runnable> transformChangeListeners = new ArrayList<>();
 
+    public void addTransformChangeListener(Runnable listener) {
+        transformChangeListeners.add(listener);
+    }
+    
+    public void removeTransformChangeListener(Runnable listener) {
+        transformChangeListeners.remove(listener);
+    }
+    
     public void addPointUpdateListener(PointUpdateListener listener) {
         pointUpdateListeners.add(listener);
     }
@@ -368,6 +378,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private void firePointsUpdated(List<DisplayPoint> points) {
         for (PointUpdateListener listener : pointUpdateListeners) {
             listener.pointsUpdated(points);
+        }
+    }
+    
+    private void fireTransformChanged() {
+        for (Runnable listener : transformChangeListeners) {
+            listener.run();
         }
     }
 
@@ -578,30 +594,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Matrix getNewMatrix() {
-        synchronized (lock) {
-            DepthState ds = null;
-            Timeline timeline = timelined.getTimeline();
-            if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
-                ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
-            }
-            if (freeTransformDepth == -1 && selectionMode && selectedDepth != -1 && timeline.getFrameCount() > frame) {
-                ds = timeline.getFrame(frame).layers.get(selectedDepth);
-            }
-
-            if (ds != null) {
-                CharacterTag cht = ds.getCharacter();
-                if (cht != null) {
-                    if (cht instanceof DrawableTag) {
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                        if (lowQuality) {
-                            zoomDouble /= LQ_FACTOR;
-                        }                      
-                        return transform;
-                    }
-                }
-            }
-            return null;
-        }
+        return transform;
     }
 
     public synchronized void selectDepth(int depth) {
@@ -616,6 +609,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         hideMouseSelection();
         redraw();
     }
+
+    public int getSelectedDepth() {
+        return selectedDepth;
+    }
+
+    public synchronized int getFrame() {
+        return frame;
+    }        
 
     private void calculateFreeOrSelectionTransform() {
         DepthState ds = null;
@@ -1246,15 +1247,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
                             }
                             
-                            if (selectionMode) {
-                                DepthState ds = timelined.getTimeline().getFrame(frame).layers.get(selectedDepth);
-                                PlaceObjectTypeTag pl = ds.placeObjectTag;
-                                MATRIX m = transform.toMATRIX();
-                                ds.setMATRIX(m);                                
-                            }
-                            
                             calcRect(); //do not put this inside synchronized block, it cause deadlock
                             fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
+                            fireTransformChanged();
                             repaint();
                         }
                         if (selectionMode) {

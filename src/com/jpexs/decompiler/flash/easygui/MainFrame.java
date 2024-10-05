@@ -17,19 +17,29 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
+import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,7 +62,10 @@ public class MainFrame extends JFrame {
     private JSplitPane horizontalSplitPane;
     private ImagePanel libraryPreviewPanel;
     private ImagePanel stagePanel;
-    private TimelinePanel timelinePanel;
+    private TimelinePanel timelinePanel;   
+    private JButton undoButton;
+    private JButton redoButton;
+    private UndoManager undoManager;
     
     public MainFrame() {
         setTitle("JPEXS FFDec Easy GUI");
@@ -75,8 +88,101 @@ public class MainFrame extends JFrame {
                 }
             }            
         });
+        
+        stagePanel.addTransformChangeListener(new Runnable() {
+            @Override
+            public void run() {
+                final int depth = stagePanel.getSelectedDepth();
+                final int frame = stagePanel.getFrame();          
+                MATRIX m = stagePanel.getNewMatrix().toMATRIX();
+                undoManager.doOperation(new DoableOperation() {
+                    
+                    private MATRIX previousMatrix;
+                    private MATRIX newMatrix = m;
+                    
+                    @Override
+                    public void doOperation() {
+                        timelinePanel.setFrame(frame, depth);
+                        DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
+                        PlaceObjectTypeTag pl = ds.placeObjectTag;
+                        previousMatrix = ds.matrix;                        
+                        ds.setMATRIX(newMatrix);
+                        stagePanel.repaint();
+                    }
+
+                    @Override
+                    public void undoOperation() {
+                        timelinePanel.setFrame(frame, depth);
+                        DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
+                        ds.setMATRIX(previousMatrix);
+                        stagePanel.repaint();
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Move";
+                    }                    
+                });                
+                
+            }
+            
+        });
+        
+        undoManager = new UndoManager();
+        
+        JPanel topPanel = new JPanel(new BorderLayout());
+        
+        JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        
+        undoButton = new JButton(View.getIcon("rotateanticlockwise16"));
+        undoButton.setToolTipText("Undo");
+        undoButton.setMargin(new Insets(5, 5, 5, 5));
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.undo();
+            }            
+        });
+        
+        redoButton = new JButton(View.getIcon("rotateclockwise16"));
+        redoButton.setToolTipText("Redo");
+        redoButton.setMargin(new Insets(5, 5, 5, 5));
+        redoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.redo();
+            }            
+        });
+        
+        Runnable undoChangeListener = new Runnable() {
+            @Override
+            public void run() {
+                undoButton.setEnabled(undoManager.canUndo());
+                redoButton.setEnabled(undoManager.canRedo());
+                if (undoManager.canUndo()) {
+                    undoButton.setToolTipText("Undo " + undoManager.getUndoName());
+                } else {
+                    undoButton.setToolTipText("Cannot undo");
+                }
+                if (undoManager.canRedo()) {
+                    redoButton.setToolTipText("Redo " + undoManager.getRedoName());
+                } else {
+                    redoButton.setToolTipText("Cannot redo");
+                }
+            }            
+        };
+        
+        undoManager.addChangeListener(undoChangeListener);
+        undoChangeListener.run();
+        
+        toolbarPanel.add(undoButton);
+        toolbarPanel.add(redoButton);
+        
+        topPanel.add(toolbarPanel, BorderLayout.NORTH);
+        topPanel.add(stagePanel, BorderLayout.CENTER);
+        
         timelinePanel = new TimelinePanel();                
-        verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stagePanel, timelinePanel);
+        verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel);
         
         libraryTreeTable = new LibraryTreeTable();
         JScrollPane libraryScrollPane = new JScrollPane(libraryTreeTable);
@@ -146,7 +252,5 @@ public class MainFrame extends JFrame {
         super.setVisible(b);
         verticalSplitPane.setDividerLocation(0.7);
         horizontalSplitPane.setDividerLocation(0.7);
-    }
-    
-    
+    }    
 }
