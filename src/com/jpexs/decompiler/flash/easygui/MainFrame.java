@@ -20,9 +20,12 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,8 +48,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class MainFrame extends JFrame {
     private SWF swf;
     private LibraryTreeTable libraryTreeTable;
-    private JSplitPane splitPane;
+    private JSplitPane verticalSplitPane;
+    private JSplitPane horizontalSplitPane;
     private ImagePanel libraryPreviewPanel;
+    private ImagePanel stagePanel;
+    private TimelinePanel timelinePanel;
+    
     public MainFrame() {
         setTitle("JPEXS FFDec Easy GUI");
         setSize(1024, 768);
@@ -54,7 +61,23 @@ public class MainFrame extends JFrame {
         
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-                
+        
+        stagePanel = new ImagePanel();
+        stagePanel.setTagNameResolver(new EasyTagNameResolver());
+        stagePanel.setShowAllDepthLevelsInfo(false);
+        stagePanel.setSelectionMode(true);
+        stagePanel.addPlaceObjectSelectedListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaceObjectTypeTag pl = stagePanel.getPlaceTagUnderCursor();
+                if (pl != null) {
+                    timelinePanel.setDepth(pl.getDepth());
+                }
+            }            
+        });
+        timelinePanel = new TimelinePanel();                
+        verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, stagePanel, timelinePanel);
+        
         libraryTreeTable = new LibraryTreeTable();
         JScrollPane libraryScrollPane = new JScrollPane(libraryTreeTable);
         
@@ -73,9 +96,9 @@ public class MainFrame extends JFrame {
         
         libraryPreviewPanel.setPreferredSize(new Dimension(200,200));
         
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), libraryPanel);        
+        horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, libraryPanel);        
         libraryScrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));        
-        cnt.add(splitPane, BorderLayout.CENTER);    
+        cnt.add(horizontalSplitPane, BorderLayout.CENTER);    
         
         libraryTreeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -104,13 +127,25 @@ public class MainFrame extends JFrame {
         }
         
         libraryTreeTable.setSwf(swf);
-        
+        stagePanel.setTimelined(swf, swf, 0, true, true, true, true, true, false, true);
+        stagePanel.pause();
+        stagePanel.gotoFrame(0);
+        timelinePanel.setTimelined(swf);
+        timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
+            @Override
+            public void frameSelected(int frame, int depth) {
+                stagePanel.selectDepth(depth);
+                stagePanel.pause();
+                stagePanel.gotoFrame(frame);
+            }
+        });
     }
 
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-        splitPane.setDividerLocation(0.7);
+        verticalSplitPane.setDividerLocation(0.7);
+        horizontalSplitPane.setDividerLocation(0.7);
     }
     
     

@@ -306,6 +306,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     
     private JPanel topPanel;
     
+    private TagNameResolverInterface tagNameResolver = new DefaultTagNameResolver();
+    
+    private boolean showAllDepthLevelsInfo = true;
+    
+    private boolean selectionMode = false;
+
+    public void setSelectionMode(boolean selectionMode) {
+        this.selectionMode = selectionMode;
+    }        
+
+    public void setTagNameResolver(TagNameResolverInterface tagNameResolver) {
+        this.tagNameResolver = tagNameResolver;
+    }        
+
+    public void setShowAllDepthLevelsInfo(boolean showAllDepthLevelsInfo) {
+        this.showAllDepthLevelsInfo = showAllDepthLevelsInfo;
+    }        
+    
     public void setTopPanelVisible(boolean visible) {
         topPanel.setVisible(visible);
     }
@@ -1121,8 +1139,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        if (altDown) {
+                        if (altDown || selectionMode) {
                             if (depthStateUnderCursor != null) {
+                                if (selectionMode) {
+                                    selectDepth(depthStateUnderCursor.depth);
+                                }
                                 firePlaceObjectSelected();
                             }
                             return;
@@ -2335,7 +2356,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (button != null && freeTransformDepth == -1) {
+                    if (button != null && freeTransformDepth == -1 && !frozen) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (!muted && sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             CharacterTag soundCharTag = swf.getCharacter(sounds.buttonSoundChar2);
@@ -2380,7 +2401,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (!muted && button != null && freeTransformDepth == -1) {
+                    if (!muted && button != null && freeTransformDepth == -1 && !frozen) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             CharacterTag soundCharTag = swf.getCharacter(sounds.buttonSoundChar3);
@@ -3264,6 +3285,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         renderContext.mouseButton = mouseButton;
         renderContext.stateUnderCursor = new ArrayList<>();
+        renderContext.enableButtons = !frozen;
 
         SerializableImage img;
         try {
@@ -3431,7 +3453,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed;
+            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozen;
 
             if (showObjectsUnderCursor && autoPlayed) {
 
@@ -3445,12 +3467,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
                     DepthState ds = renderContext.stateUnderCursor.get(i);
                     if (!first) {
+                        if (!showAllDepthLevelsInfo) {
+                            break;
+                        }
                         ret.append(", ");
                     }
 
                     first = false;
                     CharacterTag c = ds.getCharacter();
-                    ret.append(c.toString());
+                    
+                    ret.append(tagNameResolver.getTagName(c));
                     if (ds.depth > -1) {
                         ret.append(" ");
                         ret.append(AppStrings.translate("imagePanel.depth"));
@@ -3500,7 +3526,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             if (freeTransformDepth == -1 && hilightedPoints == null) {
                                 Cursor newCursor;
-                                if (iconPanel.isAltDown()) {
+                                if (iconPanel.isAltDown() && !selectionMode) {
                                     if (depthStateUnderCursor == null) {
                                         newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
                                     } else {

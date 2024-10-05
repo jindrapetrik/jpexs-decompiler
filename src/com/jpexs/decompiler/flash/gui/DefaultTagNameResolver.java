@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.easygui;
+package com.jpexs.decompiler.flash.gui;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
  *
  * @author JPEXS
  */
-public class View {
-    public static Icon getIcon(String name) {
-        return new ImageIcon(com.jpexs.decompiler.flash.gui.View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
-    }       
+public class DefaultTagNameResolver implements TagNameResolverInterface {
+
+    @Override
+    public String getTagName(Tag tag) {
+        return tag.toString();
+    }    
 }

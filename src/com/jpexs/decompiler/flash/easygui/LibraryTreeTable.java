@@ -120,47 +120,42 @@ public class LibraryTreeTable extends JTreeTable {
                 if (object instanceof ImageTag) {
                     ImageTag it = (ImageTag) object;
                     label.setIcon(View.getIcon("image16"));                    
-                    label.setText("image " + it.getCharacterId() + it.getImageFormat().getExtension());
                 }
                 if (object instanceof ShapeTag) {
                     ShapeTag st = (ShapeTag) object;
                     label.setIcon(View.getIcon("shape16"));
-                    label.setText("graphic " + st.getCharacterId());
                 }
                 if (object instanceof MorphShapeTag) {
                     MorphShapeTag mst = (MorphShapeTag) object;
                     label.setIcon(View.getIcon("morphshape16"));
-                    label.setText("shapeTween " + mst.getCharacterId());
                 }
                 if (object instanceof TextTag) {
                     TextTag t = (TextTag) object;
                     label.setIcon(View.getIcon("text16"));
-                    label.setText("text " + t.getCharacterId());
                 }
                 if (object instanceof FontTag) {
                     FontTag f = (FontTag) object;
                     label.setIcon(View.getIcon("font16"));
-                    label.setText("font " + f.getCharacterId());
                 }
                 if (object instanceof DefineSpriteTag) {
                     DefineSpriteTag st = (DefineSpriteTag) object;
                     label.setIcon(View.getIcon("sprite16"));
-                    label.setText("movieClip " + st.getCharacterId());
                 }
                 if (object instanceof ButtonTag) {
                     ButtonTag bt = (ButtonTag) object;
                     label.setIcon(View.getIcon("button16"));
-                    label.setText("button " + bt.getCharacterId());
                 }
                 if (object instanceof SoundTag) {
                     SoundTag st = (SoundTag) object;
                     label.setIcon(View.getIcon("sound16"));
-                    label.setText("sound" + (st.getCharacterId() == -1 ? "" : " " + st.getCharacterId()));
                 }
                 if (object instanceof DefineVideoStreamTag) {
                     DefineVideoStreamTag vt = (DefineVideoStreamTag) object;
                     label.setIcon(View.getIcon("movie16"));
-                    label.setText("video " + vt.getCharacterId());
+                }
+                if (object instanceof Tag) {
+                    EasyTagNameResolver tagNameResolver = new EasyTagNameResolver();
+                    label.setText(tagNameResolver.getTagName((Tag) object));
                 }
             }
             return label;
