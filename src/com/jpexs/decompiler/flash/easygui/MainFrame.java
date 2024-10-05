@@ -17,11 +17,10 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
+import com.jpexs.decompiler.flash.gui.TransformPanel;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -34,19 +33,18 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -66,6 +64,8 @@ public class MainFrame extends JFrame {
     private JButton undoButton;
     private JButton redoButton;
     private UndoManager undoManager;
+    private JTabbedPane rightTabbedPane;
+    private TransformPanel transformPanel;
     
     public MainFrame() {
         setTitle("JPEXS FFDec Easy GUI");
@@ -94,33 +94,50 @@ public class MainFrame extends JFrame {
             public void run() {
                 final int depth = stagePanel.getSelectedDepth();
                 final int frame = stagePanel.getFrame();          
-                MATRIX m = stagePanel.getNewMatrix().toMATRIX();
+                final MATRIX newMatrix = stagePanel.getNewMatrix().toMATRIX();
+                MATRIX previousMatrix = null;
+                synchronized (stagePanel) {
+                    DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
+                    previousMatrix = ds.matrix;
+                }
+                
+                final Point2D regPoint = stagePanel.getRegistrationPoint();
+                final RegistrationPointPosition regPointPos = stagePanel.getRegistrationPointPosition();
+                
+                final MATRIX fpreviousMatrix = previousMatrix;
+                
+                final boolean transformEnabled = transformEnabled();
                 undoManager.doOperation(new DoableOperation() {
-                    
-                    private MATRIX previousMatrix;
-                    private MATRIX newMatrix = m;
-                    
+                                        
                     @Override
                     public void doOperation() {
                         timelinePanel.setFrame(frame, depth);
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                        PlaceObjectTypeTag pl = ds.placeObjectTag;
-                        previousMatrix = ds.matrix;                        
                         ds.setMATRIX(newMatrix);
                         stagePanel.repaint();
+                        if (transformEnabled()) {
+                            stagePanel.freeTransformDepth(depth);
+                            stagePanel.setRegistrationPoint(regPoint);
+                            if (regPointPos != null) {
+                                stagePanel.setRegistrationPointPosition(regPointPos);
+                            }
+                        }                        
                     }
 
                     @Override
                     public void undoOperation() {
                         timelinePanel.setFrame(frame, depth);
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                        ds.setMATRIX(previousMatrix);
+                        ds.setMATRIX(fpreviousMatrix);
                         stagePanel.repaint();
+                        if (transformEnabled()) {
+                            stagePanel.freeTransformDepth(depth);
+                        }
                     }
 
                     @Override
                     public String getDescription() {
-                        return "Move";
+                        return transformEnabled ? "Transform" : "Move";
                     }                    
                 });                
                 
@@ -193,16 +210,35 @@ public class MainFrame extends JFrame {
         libraryPreviewPanel = new ImagePanel();
         libraryPreviewPanel.setTopPanelVisible(false); 
         
-        JPanel topLibraryPanel = new JPanel(new BorderLayout());
-        JLabel libraryLabel = new JLabel("Library");
-        libraryLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        topLibraryPanel.add(libraryLabel, BorderLayout.NORTH);
-        topLibraryPanel.add(libraryPreviewPanel, BorderLayout.CENTER);
-        libraryPanel.add(topLibraryPanel, BorderLayout.NORTH);
+        libraryPanel.add(libraryPreviewPanel, BorderLayout.NORTH);
         
         libraryPreviewPanel.setPreferredSize(new Dimension(200,200));
         
-        horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, libraryPanel);        
+        rightTabbedPane = new JTabbedPane();
+        rightTabbedPane.addTab("Library", libraryPanel);
+        
+        JPanel transformTab = new JPanel(new BorderLayout());
+        transformPanel = new TransformPanel(stagePanel, false);
+        transformTab.add(new JScrollPane(transformPanel), BorderLayout.CENTER);
+        
+        rightTabbedPane.addTab("Transform", transformTab);
+        rightTabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int depth = stagePanel.getSelectedDepth();
+                transformPanel.setVisible(depth != -1);
+                if (transformEnabled()) {
+                    stagePanel.freeTransformDepth(depth);                    
+                    stagePanel.setTransformSelectionMode(true);
+                } else {
+                    stagePanel.freeTransformDepth(-1);
+                    stagePanel.selectDepth(depth);
+                    stagePanel.setTransformSelectionMode(false);
+                }
+            }
+        });
+        
+        horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane);        
         libraryScrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));        
         cnt.add(horizontalSplitPane, BorderLayout.CENTER);    
         
@@ -227,6 +263,10 @@ public class MainFrame extends JFrame {
         });
     }
     
+    private boolean transformEnabled() {
+        return rightTabbedPane.getSelectedIndex() == 1;
+    }
+    
     public void open(File file) throws IOException, InterruptedException {
         try(FileInputStream fis = new FileInputStream(file)) {
             swf = new SWF(fis, true);
@@ -240,9 +280,13 @@ public class MainFrame extends JFrame {
         timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
             @Override
             public void frameSelected(int frame, int depth) {
-                stagePanel.selectDepth(depth);
                 stagePanel.pause();
-                stagePanel.gotoFrame(frame + 1);
+                stagePanel.gotoFrame(frame + 1);                
+                stagePanel.selectDepth(depth);                
+                if (transformEnabled()) {
+                    stagePanel.freeTransformDepth(depth);
+                }              
+                transformPanel.setVisible(depth != -1);
             }
         });
     }
