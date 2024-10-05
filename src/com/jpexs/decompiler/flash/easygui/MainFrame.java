@@ -19,11 +19,8 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
-import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
-import de.javagl.treetable.JTreeTable;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.io.File;
@@ -46,7 +43,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author JPEXS
  */
 public class MainFrame extends JFrame {
-    private File file;
     private SWF swf;
     private LibraryTreeTable libraryTreeTable;
     private JSplitPane splitPane;
@@ -95,13 +91,14 @@ public class MainFrame extends JFrame {
                     libraryPreviewPanel.setTimelined(TimelinedMaker.makeTimelined(t), t.getSwf(), 
                             -1, false, true, true, true, true, false, true);
                     libraryPreviewPanel.zoomFit();
+                } else {
+                    libraryPreviewPanel.clearAll();
                 }
             }            
         });
     }
     
     public void open(File file) throws IOException, InterruptedException {
-        this.file = file;
         try(FileInputStream fis = new FileInputStream(file)) {
             swf = new SWF(fis, true);
         }
