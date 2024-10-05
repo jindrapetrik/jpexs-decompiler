@@ -20,10 +20,13 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
 import java.awt.Component;
@@ -86,6 +89,16 @@ public class LibraryTreeTable extends JTreeTable {
                     label.setIcon(View.getIcon("morphshape16"));
                     label.setText("shapeTween " + mst.getCharacterId());
                 }
+                if (object instanceof TextTag) {
+                    TextTag t = (TextTag) object;
+                    label.setIcon(View.getIcon("text16"));
+                    label.setText("text " + t.getCharacterId());
+                }
+                if (object instanceof FontTag) {
+                    FontTag f = (FontTag) object;
+                    label.setIcon(View.getIcon("font16"));
+                    label.setText("font " + f.getCharacterId());
+                }
                 if (object instanceof DefineSpriteTag) {
                     DefineSpriteTag st = (DefineSpriteTag) object;
                     label.setIcon(View.getIcon("sprite16"));
@@ -116,6 +129,8 @@ public class LibraryTreeTable extends JTreeTable {
             DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode("images");
             DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode("graphics");
             DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode("shapeTweens");
+            DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode("texts");
+            DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode("fonts");
             DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode("movieClips");
             DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode("sounds");
             DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode("videos");
@@ -137,6 +152,12 @@ public class LibraryTreeTable extends JTreeTable {
                 if (t instanceof MorphShapeTag) {
                     shapeTweensNode.add(node);
                 }
+                if (t instanceof TextTag) {
+                    textsNode.add(node);
+                }
+                if (t instanceof FontTag) {
+                    fontsNode.add(node);
+                }
                 if (t instanceof DefineSpriteTag) {
                     movieClipsNode.add(node);
                 }
@@ -156,6 +177,12 @@ public class LibraryTreeTable extends JTreeTable {
             }
             if (!shapeTweensNode.isLeaf()) {
                 root.add(shapeTweensNode);
+            }
+            if (!textsNode.isLeaf()) {
+                root.add(textsNode);
+            }
+            if (!fontsNode.isLeaf()) {
+                root.add(fontsNode);
             }
             if (!movieClipsNode.isLeaf()) {
                 root.add(movieClipsNode);
@@ -200,10 +227,22 @@ public class LibraryTreeTable extends JTreeTable {
 
         @Override
         public Object getValueAt(Object node, int column) {
+            DefaultMutableTreeNode n = (DefaultMutableTreeNode) node;
+            Object o = n.getUserObject();
             switch (column) {
                 case 0:
                     return node.toString();
-                case 1:
+                case 1:    
+                    if (o instanceof CharacterTag) {
+                        CharacterTag ct = (CharacterTag) o;
+                        if (!ct.getClassNames().isEmpty()) {
+                            return String.join(", ", ct.getClassNames());
+                        }
+                        String en = ct.getExportName();
+                        if (en != null) {
+                            return en;
+                        }
+                    }
                     return "";
                 default:
                     return null;
