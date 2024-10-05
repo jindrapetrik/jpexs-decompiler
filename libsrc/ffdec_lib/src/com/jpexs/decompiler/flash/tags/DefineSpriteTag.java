@@ -84,11 +84,11 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     private List<Tag> subTags;
 
     @Internal
-    public ReadOnlyTagList readOnlyTags;
+    public transient ReadOnlyTagList readOnlyTags;
 
     public boolean hasEndTag;
 
-    private Timeline timeline;
+    private transient Timeline timeline;
 
     private boolean isSingleFrameInitialized;
 

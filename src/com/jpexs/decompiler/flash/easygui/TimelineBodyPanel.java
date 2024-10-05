@@ -430,5 +430,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         rect.y = depth * FRAME_HEIGHT;
         return rect;
     }
+    
+    public void refresh() {
+        Dimension dim = new Dimension(FRAME_WIDTH * timeline.getFrameCount() + 1, FRAME_HEIGHT * (timeline.getMaxDepth() + 1));
+        setSize(dim);
+        setPreferredSize(dim);
+    }
 }
 
