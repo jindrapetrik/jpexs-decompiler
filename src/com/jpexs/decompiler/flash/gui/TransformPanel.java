@@ -170,6 +170,9 @@ public class TransformPanel extends JPanel {
     }
 
     public TransformPanel(ImagePanel imagePanel) {
+        this(imagePanel, true);
+    }
+    public TransformPanel(ImagePanel imagePanel, boolean headerLabel) {
 
         imagePanel.addBoundsChangeListener(new BoundsChangeListener() {
             @Override
@@ -181,10 +184,12 @@ public class TransformPanel extends JPanel {
         this.imagePanel = imagePanel;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JLabel transformLabel = new JLabel(AppStrings.translate("transform"));
-        transformLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        transformLabel.setFont(transformLabel.getFont().deriveFont(Font.BOLD));
-        add(transformLabel);
+        if (headerLabel) {
+            JLabel transformLabel = new JLabel(AppStrings.translate("transform"));
+            transformLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            transformLabel.setFont(transformLabel.getFont().deriveFont(Font.BOLD));
+            add(transformLabel);
+        }
 
         JPanel registrationPointPanel = new JPanel(new FlowLayout());
         this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
