@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -104,6 +105,11 @@ public class LibraryTreeTable extends JTreeTable {
                     label.setIcon(View.getIcon("sprite16"));
                     label.setText("movieClip " + st.getCharacterId());
                 }
+                if (object instanceof ButtonTag) {
+                    ButtonTag bt = (ButtonTag) object;
+                    label.setIcon(View.getIcon("button16"));
+                    label.setText("button " + bt.getCharacterId());
+                }
                 if (object instanceof SoundTag) {
                     SoundTag st = (SoundTag) object;
                     label.setIcon(View.getIcon("sound16"));
@@ -132,6 +138,7 @@ public class LibraryTreeTable extends JTreeTable {
             DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode("texts");
             DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode("fonts");
             DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode("movieClips");
+            DefaultMutableTreeNode buttonsNode = new DefaultMutableTreeNode("buttons");
             DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode("sounds");
             DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode("videos");
 
@@ -161,6 +168,9 @@ public class LibraryTreeTable extends JTreeTable {
                 if (t instanceof DefineSpriteTag) {
                     movieClipsNode.add(node);
                 }
+                if (t instanceof ButtonTag) {
+                    buttonsNode.add(node);
+                }                
                 if (t instanceof SoundTag) {
                     soundsNode.add(node);
                 }
@@ -186,6 +196,9 @@ public class LibraryTreeTable extends JTreeTable {
             }
             if (!movieClipsNode.isLeaf()) {
                 root.add(movieClipsNode);
+            }
+            if (!buttonsNode.isLeaf()) {
+                root.add(buttonsNode);
             }
             if (!soundsNode.isLeaf()) {
                 root.add(soundsNode);
