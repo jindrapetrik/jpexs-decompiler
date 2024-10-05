@@ -31,6 +31,8 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
 import java.awt.Component;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
@@ -52,6 +54,46 @@ public class LibraryTreeTable extends JTreeTable {
         getTree().setCellRenderer(new LibraryTreeCellRenderer());
         getTree().setRootVisible(false);
         getTree().setShowsRootHandles(true);
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int selectedRow = getSelectedRow();
+                JTree tree = getTree();
+
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    TreePath path = tree.getPathForRow(selectedRow);
+                    if (path != null && tree.isExpanded(path)) {
+                        tree.collapsePath(path);
+                        
+                        int parentRow = tree.getRowForPath(path);
+                        changeSelection(parentRow, 0, false, false);
+                    } else {
+                        TreePath parentPath = path.getParentPath();
+                        if (parentPath != null) {
+                            int parentRow = tree.getRowForPath(parentPath);
+                            changeSelection(parentRow, 0, false, false);
+                        }
+                    }
+                    e.consume();
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    TreePath path = tree.getPathForRow(selectedRow);
+                    if (path != null && !tree.isExpanded(path)) {
+                        tree.expandPath(path);
+                        int parentRow = tree.getRowForPath(path);
+                        changeSelection(parentRow, 0, false, false);
+                    } else {
+                        TreePath childPath = tree.getPathForRow(selectedRow + 1);
+                        if (childPath != null) {
+                            int childRow = tree.getRowForPath(childPath);
+                            changeSelection(childRow, 0, false, false);
+                        }
+                    }
+                    e.consume();
+                }
+            }
+        });
     }
     
     public void setSwf(SWF swf) {
