@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -68,7 +67,6 @@ public class TimelinePanel extends JPanel {
 
     public void setDepth(int depth) {
         timelineBodyPanel.depthSelect(depth);
-        timelineBodyPanel.scrollRectToVisible(timelineBodyPanel.getDepthBounds(depth));
     }
     
     public void setTimelined(Timelined timelined) {

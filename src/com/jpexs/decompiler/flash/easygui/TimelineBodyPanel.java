@@ -179,12 +179,23 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             g.fillRect(cursor.x * frameWidth + 1, cursor.y * frameHeight + 1, frameWidth - 1, frameHeight - 1);
         }
 
-        g.setColor(A_COLOR);
-        g.setFont(getFont().deriveFont(FONT_SIZE));
         int awidth = g.getFontMetrics().stringWidth("a");
-        for (int f = start_f; f <= end_f; f++) {
+        boolean firstAction = true;        
+        for (int f = start_f; f <= end_f || (firstAction && f <= max_f); f++) {
             if (!timeline.getFrame(f).actions.isEmpty()) {
-                g.drawString("a", f * frameWidth + frameWidth / 2 - awidth / 2, frameHeight / 2 + FONT_SIZE / 2);
+                if (firstAction) {
+                    drawBlock(g, getEmptyFrameColor(), 0, 0, f, BlockType.EMPTY);
+                }                                
+                
+                int f2 = f + 1;
+                while(f2 <= max_f && timeline.getFrame(f2).actions.isEmpty()) {
+                    f2++;
+                }
+                drawBlock(g, getEmptyFrameColor(), 0, f, f2 - f, BlockType.EMPTY);
+                g.setColor(A_COLOR);
+                g.setFont(getFont().deriveFont(FONT_SIZE));        
+                g.drawString("a", f * frameWidth + frameWidth / 2 - awidth / 2, frameHeight / 2);
+                firstAction = false;                
             }
         }
 
@@ -340,6 +351,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         repaint();
         this.frame = frame;
+        scrollRectToVisible(getFrameBounds(frame, depth));
     }
 
     @Override
@@ -355,6 +367,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             p.y = maxDepth;
         }
         frameSelect(p.x, p.y);
+        requestFocusInWindow();
     }
 
     @Override
