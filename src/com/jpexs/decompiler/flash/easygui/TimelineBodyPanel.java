@@ -83,7 +83,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public Point cursor = null;
     
     
-    private int frame = 1;
+    private int frame = 0;
 
     private enum BlockType {
 
