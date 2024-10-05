@@ -35,6 +35,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -94,6 +95,9 @@ public class LibraryTreeTable extends JTreeTable {
                 }
             }
         });
+        setTransferHandler(new TagTransferHandler());
+        setDragEnabled(true);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
     
     public void setSwf(SWF swf) {
