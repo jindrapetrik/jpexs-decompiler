@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PreviewPanel;
+import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -784,7 +785,7 @@ public class AddScriptDialog extends AppDialog {
     private void buttonValueChanged(ListSelectionEvent e) {
         buttonPreviewPanel.showEmpty();
         if (buttonList.getSelectedIndex() >= 0) {
-            buttonPreviewPanel.showImagePanel(MainPanel.makeTimelined(buttonList.getSelectedValue()), swf, -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+            buttonPreviewPanel.showImagePanel(TimelinedMaker.makeTimelined(buttonList.getSelectedValue()), swf, -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
         }
 
         checkEnabled();

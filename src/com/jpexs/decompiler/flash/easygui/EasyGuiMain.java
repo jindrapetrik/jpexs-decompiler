@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
@@ -43,7 +44,7 @@ public class EasyGuiMain {
         System.setProperty("sun.java2d.d3d", "false");
         System.setProperty("sun.java2d.noddraw", "true");
 
-        System.setProperty("sun.java2d.uiScale", "1.0");;
+        System.setProperty("sun.java2d.uiScale", "1.0");
 
         System.setProperty("sun.java2d.opengl", "false");
         
@@ -56,6 +57,9 @@ public class EasyGuiMain {
         
         UIManager.put("Tree.expandedIcon", View.getIcon("expand16"));
         UIManager.put("Tree.collapsedIcon", View.getIcon("collapse16"));
+        
+        AppStrings.setResourceClass(com.jpexs.decompiler.flash.gui.MainFrame.class);
+        
         
         mainFrame = new MainFrame();
         mainFrame.setVisible(true);
