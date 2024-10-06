@@ -1613,7 +1613,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param characters Map of characterId to CharacterTag
      * @param characterIdTags Map of characterId to list of CharacterIdTags
      */
-    private void parseCharacters(Iterable<Tag> list, Map<Integer, DefineExternalImage2> externalImages2, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
+    private synchronized void parseCharacters(Iterable<Tag> list, Map<Integer, DefineExternalImage2> externalImages2, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
         Iterator<Tag> iterator = list.iterator();
         while (iterator.hasNext()) {
             Tag t = iterator.next();
@@ -5068,7 +5068,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param removeDependencies Remove dependencies?
      * @param listener Listener to call after removing each of character.
      */
-    public void removeTags(Collection<Tag> tags, boolean removeDependencies, TagRemoveListener listener) {
+    public synchronized void removeTags(Collection<Tag> tags, boolean removeDependencies, TagRemoveListener listener) {
         Set<Timelined> timelineds = new HashSet<>();
         for (Tag tag : tags) {
             Timelined timelined = tag.getTimelined();
@@ -5091,7 +5091,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param index Index of tag
      */
     @Override
-    public void removeTag(int index) {
+    public synchronized void removeTag(int index) {
         setModified(true);
         tags.remove(index);
         updateCharacters();
@@ -5103,10 +5103,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param tag Tag
      */
     @Override
-    public void removeTag(Tag tag) {
+    public synchronized void removeTag(Tag tag) {
         setModified(true);
         tags.remove(tag);
         updateCharacters();
+        readOnlyTags = null;        
     }
 
     /**
@@ -5116,13 +5117,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param removeDependencies Remove dependencies?
      * @param listener Listener to call after removing each of character.
      */
-    public void removeTag(Tag tag, boolean removeDependencies, TagRemoveListener listener) {
+    public synchronized void removeTag(Tag tag, boolean removeDependencies, TagRemoveListener listener) {
         Timelined timelined = tag.getTimelined();
         removeTagInternal(timelined, tag, removeDependencies, listener);
         resetTimelines(timelined);
         updateCharacters();
         clearImageCache();
         clearShapeCache();
+        readOnlyTags = null;
     }
 
     /**
@@ -5161,7 +5163,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @return Tags
      */
     @Override
-    public ReadOnlyTagList getTags() {
+    public synchronized ReadOnlyTagList getTags() {
         if (readOnlyTags == null) {
             readOnlyTags = new ReadOnlyTagList(tags);
         }
@@ -5175,10 +5177,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param tag Tag
      */
     @Override
-    public void addTag(Tag tag) {
+    public synchronized void addTag(Tag tag) {
         setModified(true);
         tags.add(tag);
         updateCharacters();
+        readOnlyTags = null;
     }
 
     /**
@@ -5188,10 +5191,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param tag Tag
      */
     @Override
-    public void addTag(int index, Tag tag) {
+    public synchronized void addTag(int index, Tag tag) {
         setModified(true);
         tags.add(index, tag);
         updateCharacters();
+        readOnlyTags = null;
     }
 
     /**
@@ -5201,7 +5205,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @return Index or -1 when not found
      */
     @Override
-    public int indexOfTag(Tag tag) {
+    public synchronized int indexOfTag(Tag tag) {
         return tags.indexOf(tag);
     }
 

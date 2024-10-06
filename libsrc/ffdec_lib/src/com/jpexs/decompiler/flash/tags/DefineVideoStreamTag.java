@@ -486,7 +486,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     }
 
     @Override
-    public ReadOnlyTagList getTags() {
+    public synchronized ReadOnlyTagList getTags() {
         initTimeline();
         return tags;
     }

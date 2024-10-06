@@ -326,7 +326,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public ReadOnlyTagList getTags() {
+    public synchronized ReadOnlyTagList getTags() {
         if (readOnlyTags == null) {
             readOnlyTags = new ReadOnlyTagList(subTags);
         }
@@ -335,31 +335,31 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void removeTag(int index) {
+    public synchronized void removeTag(int index) {
         setModified(true);
         subTags.remove(index);
     }
 
     @Override
-    public void removeTag(Tag tag) {
+    public synchronized void removeTag(Tag tag) {
         setModified(true);
         subTags.remove(tag);
     }
 
     @Override
-    public void addTag(Tag tag) {
+    public synchronized void addTag(Tag tag) {
         setModified(true);
         subTags.add(tag);
     }
 
     @Override
-    public void addTag(int index, Tag tag) {
+    public synchronized void addTag(int index, Tag tag) {
         setModified(true);
         subTags.add(index, tag);
     }
 
     @Override
-    public int indexOfTag(Tag tag) {
+    public synchronized int indexOfTag(Tag tag) {
         return subTags.indexOf(tag);
     }
 

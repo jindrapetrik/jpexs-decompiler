@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
@@ -47,6 +49,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -183,14 +186,18 @@ public class MainFrame extends JFrame {
                             
                             private PlaceObject2Tag place;
                             private RemoveObject2Tag remove;
+                            private List<Tag> tags;
+                            private int frame = stagePanel.getFrame();
+                            private int depth = stagePanel.getSelectedDepth();
                             
                             @Override
                             public void doOperation() {
+                                timelinePanel.setFrame(frame, depth);
                                 CharacterTag ch = (CharacterTag) tag;
                                 int maxDepth = stagePanel.getTimelined().getTimeline().getMaxDepth();
                                 int newDepth = maxDepth + 1;
                                 Timelined timelined = stagePanel.getTimelined();
-                                ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(stagePanel.getFrame()).showFrameTag;
+                                ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(frame).showFrameTag;
                                 place = new PlaceObject2Tag(timelined.getSwf());
                                 place.depth = newDepth;
                                 place.placeFlagHasCharacter = true;
@@ -207,6 +214,14 @@ public class MainFrame extends JFrame {
                                     remove.depth = newDepth;
                                     timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);                                    
                                 }
+                                
+                                tags = timelined.getSwf().getTags().toArrayList();
+                                DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
+                                boolean tagOrderChanged = fixer.fixDefineBeforeUsage(timelined.getSwf());
+                                if (!tagOrderChanged) {
+                                    tags = null;
+                                }
+                                
                                 timelined.resetTimeline();
                                 stagePanel.repaint();                                
                                 timelinePanel.refresh();
@@ -221,8 +236,27 @@ public class MainFrame extends JFrame {
                                     timelined.removeTag(remove);
                                 }
                                 timelined.resetTimeline();
+                                
+                                //Tag order changed, put the original tags back
+                                if (tags != null) {
+                                    SWF swf = timelined.getSwf();
+                                    ReadOnlyTagList newTags = swf.getTags();
+                                    int size = newTags.size();
+                                    for (int i = 0; i < size; i++) {
+                                        swf.removeTag(0);
+                                    }
+                                    for (int i = 0; i < tags.size(); i++) {
+                                        if (tags.get(i) == place) {
+                                            continue;
+                                        }
+                                        swf.addTag(tags.get(i));
+                                    }
+                                    swf.resetTimeline();
+                                }
+                                
                                 stagePanel.repaint();
                                 timelinePanel.refresh();
+                                timelinePanel.setFrame(frame, depth);
                             }
 
                             @Override

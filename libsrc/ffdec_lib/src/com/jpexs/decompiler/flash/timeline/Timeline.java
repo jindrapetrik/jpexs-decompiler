@@ -449,7 +449,8 @@ public class Timeline {
         boolean newFrameNeeded = false;
         scenes = new ArrayList<>();
         Scene prevScene = null;
-        for (Tag t : timelined.getTags()) {
+        List<Tag> tagList = timelined.getTags().toArrayList();
+        for (Tag t : tagList) {
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
             if (isNested) {
