@@ -537,13 +537,13 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             }
             emptyDepth = thisEmpty && !somethingBefore && !somethingAfter;
 
-            JMenuItem addKeyFrameMenuItem = new JMenuItem("Add keyframe");
+            JMenuItem addKeyFrameMenuItem = new JMenuItem(EasyStrings.translate("action.addKeyFrame"));
             addKeyFrameMenuItem.addActionListener(this::addKeyFrame);
-            JMenuItem addKeyFrameEmptyBeforeMenuItem = new JMenuItem("Add keyframe with blank frames before");
+            JMenuItem addKeyFrameEmptyBeforeMenuItem = new JMenuItem(EasyStrings.translate("action.addKeyFrameWithBlankFrameBefore"));
             addKeyFrameEmptyBeforeMenuItem.addActionListener(this::addKeyFrameEmptyBefore);
-            JMenuItem addFrameMenuItem = new JMenuItem("Add frame");
+            JMenuItem addFrameMenuItem = new JMenuItem(EasyStrings.translate("action.addFrame"));
             addFrameMenuItem.addActionListener(this::addFrame);
-            JMenuItem removeFrameMenuItem = new JMenuItem("Remove frame");
+            JMenuItem removeFrameMenuItem = new JMenuItem(EasyStrings.translate("action.removeFrame"));
             removeFrameMenuItem.addActionListener(this::removeFrame);
 
             boolean multiSelect = cursor != null && (cursor.width > 1 || cursor.height > 1);
@@ -703,7 +703,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             @Override
             public String getDescription() {
-                return "Remove frame";
+                return EasyStrings.translate("action.removeFrame");
             }
         });
     }
@@ -775,7 +775,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             @Override
             public String getDescription() {
-                return "Add key frame";
+                return EasyStrings.translate("action.addKeyFrame");
             }
         });
     }
@@ -839,7 +839,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             @Override
             public String getDescription() {
-                return "Add key frame";
+                return EasyStrings.translate("action.addKeyFrame"); //Intentionally not "...with blank frames before"
             }
         });
     }
@@ -1006,7 +1006,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             @Override
             public String getDescription() {
-                return "Add frame";
+                return EasyStrings.translate("action.addFrame");
             }
         });
     }

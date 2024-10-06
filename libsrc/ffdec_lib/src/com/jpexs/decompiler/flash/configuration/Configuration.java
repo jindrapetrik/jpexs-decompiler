@@ -1027,6 +1027,17 @@ public final class Configuration {
     @ConfigurationDefaultString("")
     @ConfigurationInternal
     public static ConfigurationItem<String> recentColors = null;
+    
+    
+    @ConfigurationDefaultDouble(0.7)
+    @ConfigurationName("gui.splitPaneEasyVertical.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiSplitPaneEasyVerticaldividerLocationPercent = null;
+    
+    @ConfigurationDefaultDouble(0.7)
+    @ConfigurationName("gui.splitPaneEasyHorizontal.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiSplitPaneEasyHorizontaldividerLocationPercent = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
