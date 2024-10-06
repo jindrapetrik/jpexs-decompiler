@@ -19,12 +19,14 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.TransformPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
@@ -157,7 +159,7 @@ public class EasyPanel extends JPanel {
 
                     @Override
                     public String getDescription() {
-                        return transformEnabled ? "Transform" : "Move";
+                        return EasyStrings.translate(transformEnabled ? "action.transform" : "action.move");
                     }
                 });
 
@@ -268,7 +270,7 @@ public class EasyPanel extends JPanel {
 
                             @Override
                             public String getDescription() {
-                                return "Add to stage";
+                                return EasyStrings.translate("action.addToStage");
                             }
 
                         });
@@ -365,7 +367,7 @@ public class EasyPanel extends JPanel {
             }
         });
         
-        verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel);
+        verticalSplitPane = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel, Configuration.guiSplitPaneEasyVerticaldividerLocationPercent);
 
         libraryTreeTable = new LibraryTreeTable();
         JScrollPane libraryScrollPane = new FasterScrollPane(libraryTreeTable);
@@ -418,7 +420,7 @@ public class EasyPanel extends JPanel {
             }
         });
 
-        horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane);
+        horizontalSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane, Configuration.guiSplitPaneEasyHorizontaldividerLocationPercent);
 
         if (View.isOceanic()) {
             libraryScrollPane.getViewport().setBackground(Color.white);
@@ -461,10 +463,4 @@ public class EasyPanel extends JPanel {
         timelinePanel.setTimelined(swf);  
     }
 
-    @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
-        verticalSplitPane.setDividerLocation(0.7);
-        horizontalSplitPane.setDividerLocation(0.7);
-    }
 }
