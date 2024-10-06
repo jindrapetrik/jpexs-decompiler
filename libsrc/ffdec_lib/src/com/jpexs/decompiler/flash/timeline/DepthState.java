@@ -241,6 +241,7 @@ public class DepthState {
     public void setMATRIX(MATRIX matrix) {
         this.matrix = matrix;
         this.placeObjectTag.setMatrix(matrix);
+        this.placeObjectTag.setPlaceFlagHasMatrix(matrix != null);
     }
 
     /**

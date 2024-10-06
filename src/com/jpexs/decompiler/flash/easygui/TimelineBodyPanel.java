@@ -444,16 +444,22 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             addKeyFrameEmptyBeforeMenuItem.addActionListener(this::addKeyFrameEmptyBefore);
             JMenuItem addFrameMenuItem = new JMenuItem("Add frame");
             addFrameMenuItem.addActionListener(this::addFrame);
+            JMenuItem removeFrameMenuItem = new JMenuItem("Remove frame");
+            removeFrameMenuItem.addActionListener(this::removeFrame);
 
             if (!thisEmpty) {
                 popupMenu.add(addKeyFrameMenuItem);
             }
-
+                        
             if (thisEmpty && previousEmpty && somethingBefore && !somethingAfter) {
                 popupMenu.add(addKeyFrameEmptyBeforeMenuItem);
             }
             if (!emptyDepth) {
                 popupMenu.add(addFrameMenuItem);
+            }
+            
+            if (!thisEmpty || somethingAfter) {
+                popupMenu.add(removeFrameMenuItem);
             }
 
             if (popupMenu.getComponentCount() > 0) {
@@ -462,6 +468,140 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
     }
 
+    private void removeFrame(ActionEvent e) {
+        final int fframe = frame;
+        final int fdepth = depth;
+        undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
+
+            @Override
+            public void doOperation() {
+                super.doOperation();
+                Timelined timelined = timeline.timelined;
+                ReadOnlyTagList tags = timelined.getTags();                                                
+                int f = timelined.getFrameCount();
+                List<Tag> lastFrameDepthTags = new ArrayList<>();
+                DepthState ds = timeline.getFrame(fframe).layers.get(fdepth);
+                if (ds != null && ds.key) {
+                    PlaceObjectTypeTag po = ds.placeObjectTag;
+                    ShowFrameTag sf = timeline.getFrame(fframe).showFrameTag;
+                    int pos = sf == null ? tags.size() : timelined.indexOfTag(sf);
+                    for (int i = pos + 1; i < tags.size(); i++) {
+                        Tag t = tags.get(i);
+                        if (t instanceof RemoveObject2Tag) {
+                            RemoveObject2Tag rt = (RemoveObject2Tag) t;
+                            if (rt.depth == fdepth) {
+                                timelined.removeTag(po);
+                                timelined.removeTag(rt);
+                                i--;
+                                i--;
+                            }
+                        }
+                        if (t instanceof ShowFrameTag) {
+                            break;
+                        }
+                    }
+                }
+                
+                
+
+                boolean endsWithRemove = false;
+                for (int i = tags.size() - 1; i >= 0; i--) {
+                    Tag t = tags.get(i);
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        if (pt.getDepth() == fdepth) {
+                            break;
+                        }
+                    }
+                    if (t instanceof RemoveTag) {
+                        RemoveTag rt = (RemoveTag) t;
+                        if (rt.getDepth() == fdepth) {
+                            endsWithRemove = true;
+                            break;
+                        }
+                    }
+                }
+                
+                for (int i = tags.size() - 1; i >= 0; i--) {
+                    Tag t = tags.get(i);
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        if (pt.getDepth() == fdepth) {
+                            lastFrameDepthTags.add(pt);
+                            timelined.removeTag(i);                            
+                        }
+                    }
+                    if (t instanceof RemoveTag) {
+                        RemoveTag rt = (RemoveTag) t;
+                        if (rt.getDepth() == fdepth) {
+                            lastFrameDepthTags.add(rt);
+                            timelined.removeTag(i);                            
+                        }
+                    }
+                    if (t instanceof ShowFrameTag) {                        
+                        for (Tag lt : lastFrameDepthTags) {
+                            timelined.addTag(i, lt);                            
+                        }
+                        lastFrameDepthTags.clear();
+                        f--;                        
+                        if (f == fframe) {
+                            break;
+                        }
+                    }
+                }
+                
+                if (!endsWithRemove) {
+                    RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
+                    rt.setTimelined(timelined);
+                    rt.setDepth(fdepth);
+                    Tag lt = tags.get(tags.size() - 1);
+                    if (lt instanceof ShowFrameTag) {
+                        timelined.addTag(tags.size() - 1, rt);
+                    } else {
+                        timelined.addTag(lt);
+                    }                    
+                }
+                
+                
+                timelined.resetTimeline();
+                
+                /*System.err.println("=====AFTER=======");
+                f = 0;
+                int i = 0;
+                for (Tag t : timelined.getTags()) {
+                    if (t instanceof ShowFrameTag) {
+                        System.err.println("" + i + ": frame " + f);
+                        f++;
+                    } else {
+                        System.err.println("" + i + ": " + t);                    
+                    }
+                    i++;
+                }*/
+                
+                timeline = timelined.getTimeline();
+
+                refresh();
+                fireChanged();
+                repaint();
+            }
+
+            @Override
+            public void undoOperation() {
+                super.undoOperation();
+                timeline = timeline.timelined.getTimeline();
+
+                refresh();
+                fireChanged();
+                repaint();
+            }                        
+
+            @Override
+            public String getDescription() {
+                return "Remove frame";
+            }
+        });               
+    }
+    
     private void addKeyFrame(ActionEvent e) {
         if (timeline.getFrame(frame).layers.get(depth).key) {
             return;
