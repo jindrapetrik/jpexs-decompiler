@@ -28,7 +28,7 @@ import javax.swing.JPanel;
  */
 public class TimelineDepthPanel extends JPanel {
 
-    private final int maxDepth;
+    private int maxDepth;
 
     public static final int PADDING = 5;
 
@@ -40,8 +40,12 @@ public class TimelineDepthPanel extends JPanel {
 
     public static final Color FONT_COLOR = Color.black;
 
-    public TimelineDepthPanel(Timeline timeline) {
-        maxDepth = timeline.getMaxDepth();
+    public TimelineDepthPanel() {
+        setTimeline(null);
+    }
+    
+    public void setTimeline(Timeline timeline) {
+        maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
         String maxDepthStr = Integer.toString(maxDepth);
         setFont(getFont().deriveFont(FONT_SIZE));
         int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);

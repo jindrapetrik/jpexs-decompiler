@@ -952,8 +952,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @return Character id to character map
      */
     public Map<Integer, CharacterTag> getCharacters(boolean withImported) {
+        Map<Integer, CharacterTag> newCharacters = characters;
+        Map<Integer, CharacterTag> newCharactersWithImported = charactersWithImported;
         synchronized (charactersLock) {
-            if (characters == null || charactersWithImported == null) {
+            if (newCharacters == null || newCharactersWithImported == null) {
                 if (destroyed) {
                     return new HashMap<>();
                 }
@@ -988,14 +990,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     }
                 }
 
-                characters = Collections.unmodifiableMap(chars);
-                charactersWithImported = Collections.unmodifiableMap(charsWithImported);
+                newCharacters = Collections.unmodifiableMap(chars);
+                newCharactersWithImported = Collections.unmodifiableMap(charsWithImported);
+                characters = newCharacters;
+                charactersWithImported = newCharactersWithImported;
                 characterToId = Collections.unmodifiableMap(charToId);
                 characterIdTags = Collections.unmodifiableMap(charIdtags);
                 externalImages2 = Collections.unmodifiableMap(eimages);
             }
 
-            return withImported ? charactersWithImported : characters;
+            return withImported ? newCharactersWithImported : newCharacters;
         }
     }
 

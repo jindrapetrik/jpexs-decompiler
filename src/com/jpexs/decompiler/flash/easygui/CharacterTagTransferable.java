@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -26,30 +27,30 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class TagTransferable implements Transferable {
+public class CharacterTagTransferable implements Transferable {
 
-    public static final DataFlavor TAG_FLAVOR = new DataFlavor(Tag.class, "Tag");
+    public static final DataFlavor CHARACTERTAG_FLAVOR = new DataFlavor(Integer.class, "Tag");
 
-    private Tag tag;
+    private CharacterTag tag;
 
-    public TagTransferable(Tag tag) {
+    public CharacterTagTransferable(CharacterTag tag) {
         this.tag = tag;
     }
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{TAG_FLAVOR};
+        return new DataFlavor[]{CHARACTERTAG_FLAVOR};
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return TAG_FLAVOR.equals(flavor);
+        return CHARACTERTAG_FLAVOR.equals(flavor);
     }
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (TAG_FLAVOR.equals(flavor)) {
-            return tag;
+        if (CHARACTERTAG_FLAVOR.equals(flavor)) {
+            return tag.getCharacterId();
         }
         return null;
     }
