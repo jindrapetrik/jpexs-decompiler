@@ -188,7 +188,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     protected abstract void initTimeline(Timeline timeline);
 
     @Override
-    public ReadOnlyTagList getTags() {
+    public synchronized ReadOnlyTagList getTags() {
         return ReadOnlyTagList.EMPTY;
     }
 

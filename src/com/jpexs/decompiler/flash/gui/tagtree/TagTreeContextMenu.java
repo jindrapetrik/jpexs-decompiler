@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -5281,7 +5282,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             Tag t2 = swf.getTags().get(j);
             if ((t2 instanceof CharacterIdTag)
                     && !(t2 instanceof PlaceObjectTypeTag)
-                    && !(t2 instanceof RemoveTag)) {
+                    && !(t2 instanceof RemoveTag)
+                    && !(t2 instanceof VideoFrameTag)) {
                 CharacterIdTag chit = (CharacterIdTag) t2;
                 if (chit.getCharacterId() == characterId) {
                     swf.removeTag(j);
