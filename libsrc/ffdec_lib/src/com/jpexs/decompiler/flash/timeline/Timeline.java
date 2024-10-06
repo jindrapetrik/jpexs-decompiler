@@ -653,14 +653,23 @@ public class Timeline {
         for (int d = 0; d <= maxDepth; d++) {
             int characterId = -1;
             String charClassName = null;
+            MATRIX matrix = null;
             int len = 0;
             for (int f = 0; f <= frames.size(); f++) {
                 DepthState ds = f >= frames.size() ? null : frames.get(f).layers.get(d);
 
-                if (ds != null && (characterId != -1 || charClassName != null) && (ds.characterId == characterId && Objects.equals(ds.className, charClassName))) {
+                if (ds != null 
+                        && (characterId != -1 || charClassName != null) 
+                        && (ds.characterId == characterId && Objects.equals(ds.className, charClassName))
+                        && (
+                        (ds.getCharacter() instanceof MorphShapeTag)
+                        ||
+                        Objects.equals(ds.matrix, matrix)
+                        )
+                        ) {
                     len++;
                 } else {
-                    if (characterId != -1 || charClassName != null) {
+                    /*if (characterId != -1 || charClassName != null) {
                         int startPos = f - len;
                         List<DepthState> matrices = new ArrayList<>(len);
                         for (int k = 0; k < len; k++) {
@@ -676,14 +685,18 @@ public class Timeline {
                             }
 
                             frames.get(startPos + r.startPosition).layers.get(d).key = true;
-                        }
-                    }
-
+                        }                        
+                    }*/
+                    
                     len = 1;
+                    if (ds != null) {
+                        ds.key = true;
+                    }
                 }
 
                 characterId = ds == null ? -1 : ds.characterId;
                 charClassName = ds == null ? null : ds.className;
+                matrix = ds == null ? null : ds.matrix;                
             }
         }
     }

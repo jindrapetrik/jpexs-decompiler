@@ -31,11 +31,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -96,12 +99,23 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private final List<Runnable> changeListeners = new ArrayList<>();
 
-    public Point cursor = null;
+    public Rectangle cursor = null;
 
     private int frame = 0;
 
+    private int endFrame = 0;
+
     private int depth = 0;
+
+    private int endDepth = 0;
+
     private final UndoManager undoManager;
+
+    private boolean ctrlDown = false;
+
+    private boolean altDown = false;
+
+    private boolean shiftDown = false;
 
     private enum BlockType {
 
@@ -122,6 +136,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     public static Color getSelectedColor() {
         return SystemColor.textHighlight;
+    }
+
+    public static Color getSelectedColorText() {
+        return SystemColor.textHighlightText;
     }
 
     private static Color getControlColor() {
@@ -160,6 +178,19 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         addKeyListener(this);
         setFocusable(true);
         this.undoManager = undoManager;
+
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if ((e.getID() == KeyEvent.KEY_PRESSED) || (e.getID() == KeyEvent.KEY_RELEASED)) {
+                    ctrlDown = ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK);
+                    altDown = ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == InputEvent.ALT_DOWN_MASK);
+                    shiftDown = ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) == InputEvent.SHIFT_DOWN_MASK);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -209,7 +240,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         // draw selected cell
         if (cursor != null) {
             g.setColor(getSelectedColor());
-            g.fillRect(cursor.x * frameWidth + 1, cursor.y * frameHeight + 1, frameWidth - 1, frameHeight - 1);
+            g.fillRect(cursor.x * frameWidth + 1, cursor.y * frameHeight + 1, (frameWidth * cursor.width) - 1, (frameHeight * cursor.height) - 1);
         }
 
         int awidth = g.getFontMetrics().stringWidth("a");
@@ -313,20 +344,35 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         int frameWidth = FRAME_WIDTH;
         int frameHeight = FRAME_HEIGHT;
 
-        g.setColor(backColor);
-        g.fillRect(frame * frameWidth, depth * frameHeight, num_frames * frameWidth, frameHeight);
+        for (int n = frame; n < frame + num_frames; n++) {
+            if (cursor != null && cursor.contains(n, depth)) {
+                g.setColor(getSelectedColor());
+            } else {
+                g.setColor(backColor);
+            }
+            g.fillRect(n * frameWidth, depth * frameHeight, frameWidth, frameHeight);
+        }
+
         g.setColor(BORDER_COLOR);
         g.drawRect(frame * frameWidth, depth * frameHeight, num_frames * frameWidth, frameHeight);
 
-        boolean selected = false;
-        if (cursor != null && frame <= cursor.x && (frame + num_frames) > cursor.x && depth == cursor.y) {
+        boolean selected = cursor != null && cursor.contains(cursor.x, depth);
+        /*if (cursor != null && cursor.contains(frame, depth) && !cursor.contains(frame + num_frames, depth)) {//frame <= cursor.x && (frame + num_frames) > cursor.x && depth == cursor.y) {
             selected = true;
-        }
+        }*/
 
-        if (selected) {
-            g.setColor(getSelectedColor());
-            g.fillRect(cursor.x * frameWidth + 1, depth * frameHeight + 1, frameWidth - 1, frameHeight - 1);
+        if (cursor != null) {
+            for (int n = frame + 1; n < frame + num_frames; n++) {
+                g.setColor(getSelectedColor());
+                if (cursor.contains(n, depth)) {
+                    g.fillRect(n * frameWidth + 1, depth * frameHeight + 1, frameWidth, frameHeight);
+                }
+            }
         }
+        /*if (selected) {
+            g.setColor(getSelectedColor());
+            g.fillRect(cursor.x * frameWidth + 1, depth * frameHeight + 1, (cursor.width * frameWidth) - 1, frameHeight - 1);
+        }*/
 
         boolean isTween = blockType == BlockType.MOTION_TWEEN || blockType == BlockType.SHAPE_TWEEN;
 
@@ -337,6 +383,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             );
         }
 
+        if (cursor != null && cursor.contains(frame, depth)) {
+            g.setBackground(getSelectedColorText());
+        } else {
+            g.setColor(KEY_COLOR);
+        }
         if (blockType == BlockType.EMPTY) {
             g.drawOval(frame * frameWidth + frameWidth / 4, depth * frameHeight + frameHeight * 3 / 4 - frameWidth / 2 / 2, frameWidth / 2, frameWidth / 2);
         } else {
@@ -345,17 +396,35 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         if (num_frames > 1) {
             int endFrame = frame + num_frames - 1;
+            if (cursor != null && cursor.contains(endFrame, depth)) {
+                g.setBackground(getSelectedColorText());
+            } else {
+                g.setColor(KEY_COLOR);
+            }
             if (isTween) {
                 g.fillOval(endFrame * frameWidth + frameWidth / 4, depth * frameHeight + frameHeight * 3 / 4 - frameWidth / 2 / 2, frameWidth / 2, frameWidth / 2);
             } else {
-                g.setColor(STOP_COLOR);
+
+                if (cursor != null && cursor.contains(endFrame, depth)) {
+                    g.setBackground(getSelectedColorText());
+                } else {
+                    g.setColor(STOP_COLOR);
+                }
                 g.fillRect(endFrame * frameWidth + frameWidth / 4, depth * frameHeight + frameHeight / 2 - 2, frameWidth / 2, frameHeight / 2);
-                g.setColor(STOP_BORDER_COLOR);
+                if (cursor != null && cursor.contains(endFrame, depth)) {
+                    g.setBackground(getSelectedColorText());
+                } else {
+                    g.setColor(STOP_BORDER_COLOR);
+                }
                 g.drawRect(endFrame * frameWidth + frameWidth / 4, depth * frameHeight + frameHeight / 2 - 2, frameWidth / 2, frameHeight / 2);
             }
 
-            g.setColor(BORDER_LINES_COLOR);
             for (int n = frame + 1; n < frame + num_frames; n++) {
+                if (cursor != null && cursor.contains(n, depth)) {
+                    g.setBackground(getSelectedColorText());
+                } else {
+                    g.setColor(BORDER_LINES_COLOR);
+                }
                 g.drawLine(n * frameWidth, depth * frameHeight + 1, n * frameWidth, depth * frameHeight + BORDER_LINES_LENGTH);
                 g.drawLine(n * frameWidth, depth * frameHeight + frameHeight - 1, n * frameWidth, depth * frameHeight + frameHeight - BORDER_LINES_LENGTH);
             }
@@ -371,19 +440,33 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         frameSelect(frame, depth);
     }
 
+    public void rectSelect(int frame, int depth, int endFrame, int endDepth) {
+        int x1 = Math.min(frame, endFrame);
+        int x2 = Math.max(frame, endFrame);
+        int y1 = Math.min(depth, endDepth);
+        int y2 = Math.max(depth, endDepth);
+        cursor = new Rectangle(
+                x1,
+                y1,
+                x2 - x1 + 1,
+                y2 - y1 + 1);
+        repaint();
+        this.frame = frame;
+        this.depth = depth;
+        this.endFrame = endFrame;
+        this.endDepth = endDepth;
+        scrollRectToVisible(getFrameBounds(frame, depth));
+        fireFrameSelected(frame, depth);
+    }
+
     public void frameSelect(int frame, int depth) {
-        if (cursor != null && cursor.x == frame && (cursor.y == depth || depth == -1)) {
+        if (cursor != null && cursor.width == 1 && cursor.height == 1 && (cursor.contains(frame, depth) || (depth == -1 && cursor.contains(frame, cursor.y)))) {
             return;
         }
         if (depth == -1 && cursor != null) {
             depth = cursor.y;
         }
-        cursor = new Point(frame, depth);
-        fireFrameSelected(frame, depth);
-        repaint();
-        this.frame = frame;
-        this.depth = depth;
-        scrollRectToVisible(getFrameBounds(frame, depth));
+        rectSelect(frame, depth, frame, depth);
     }
 
     private void fireFrameSelected(int frame, int depth) {
@@ -404,7 +487,25 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         if (p.y > maxDepth) {
             p.y = maxDepth;
         }
-        frameSelect(p.x, p.y);
+        if (shiftDown) {
+            /*int x1 = frame;
+            int x2 = p.x;
+            if (x2 < x1) {
+                x1 = p.x;
+                x2 = frame;
+            }
+            int y1 = depth;
+            int y2 = p.y;
+            if (y2 < y1) {
+                y1 = p.y;
+                y2 = depth;
+            }*/
+            rectSelect(frame, depth, p.x, p.y);
+        } else {
+            if (!(cursor != null && cursor.contains(p) && SwingUtilities.isRightMouseButton(e))) {
+                frameSelect(p.x, p.y);
+            }
+        }
         requestFocusInWindow();
         if (SwingUtilities.isRightMouseButton(e)) {
 
@@ -447,18 +548,20 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             JMenuItem removeFrameMenuItem = new JMenuItem("Remove frame");
             removeFrameMenuItem.addActionListener(this::removeFrame);
 
-            if (!thisEmpty) {
+            boolean multiSelect = cursor != null && (cursor.width > 1 || cursor.height > 1);
+
+            if (!thisEmpty || multiSelect) {
                 popupMenu.add(addKeyFrameMenuItem);
             }
-                        
-            if (thisEmpty && previousEmpty && somethingBefore && !somethingAfter) {
+
+            if (thisEmpty && previousEmpty && somethingBefore && !somethingAfter && !multiSelect) {
                 popupMenu.add(addKeyFrameEmptyBeforeMenuItem);
             }
-            if (!emptyDepth) {
+            if (!emptyDepth || multiSelect) {
                 popupMenu.add(addFrameMenuItem);
             }
-            
-            if (!thisEmpty || somethingAfter) {
+
+            if (!thisEmpty || somethingAfter || multiSelect) {
                 popupMenu.add(removeFrameMenuItem);
             }
 
@@ -469,102 +572,107 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private void removeFrame(ActionEvent e) {
-        final int fframe = frame;
-        final int fdepth = depth;
+        final int fframe = Math.min(frame, endFrame);
+        final int fdepth = Math.min(depth, endDepth);
+        final int fendFrame = Math.max(frame, endFrame);
+        final int fendDepth = Math.max(depth, endDepth);
         undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
 
             @Override
             public void doOperation() {
                 super.doOperation();
                 Timelined timelined = timeline.timelined;
-                ReadOnlyTagList tags = timelined.getTags();                                                
-                int f = timelined.getFrameCount();
-                List<Tag> lastFrameDepthTags = new ArrayList<>();
-                DepthState ds = timeline.getFrame(fframe).layers.get(fdepth);
-                if (ds != null && ds.key) {
-                    PlaceObjectTypeTag po = ds.placeObjectTag;
-                    ShowFrameTag sf = timeline.getFrame(fframe).showFrameTag;
-                    int pos = sf == null ? tags.size() : timelined.indexOfTag(sf);
-                    for (int i = pos + 1; i < tags.size(); i++) {
-                        Tag t = tags.get(i);
-                        if (t instanceof RemoveObject2Tag) {
-                            RemoveObject2Tag rt = (RemoveObject2Tag) t;
-                            if (rt.depth == fdepth) {
-                                timelined.removeTag(po);
-                                timelined.removeTag(rt);
-                                i--;
-                                i--;
+                ReadOnlyTagList tags = timelined.getTags();
+
+                for (int nf = 0; nf < fendFrame - fframe + 1; nf++) {
+                    for (int nd = fdepth; nd <= fendDepth; nd++) {
+
+                        int f = timelined.getFrameCount();
+                        List<Tag> lastFrameDepthTags = new ArrayList<>();
+                        DepthState ds = timeline.getFrame(fframe).layers.get(nd);
+                        if (ds != null && ds.key) {
+                            PlaceObjectTypeTag po = ds.placeObjectTag;
+                            ShowFrameTag sf = timeline.getFrame(fframe).showFrameTag;
+                            int pos = sf == null ? tags.size() : timelined.indexOfTag(sf);
+                            for (int i = pos + 1; i < tags.size(); i++) {
+                                Tag t = tags.get(i);
+                                if (t instanceof RemoveObject2Tag) {
+                                    RemoveObject2Tag rt = (RemoveObject2Tag) t;
+                                    if (rt.depth == nd) {
+                                        timelined.removeTag(po);
+                                        timelined.removeTag(rt);
+                                        i--;
+                                        i--;
+                                    }
+                                }
+                                if (t instanceof ShowFrameTag) {
+                                    break;
+                                }
                             }
                         }
-                        if (t instanceof ShowFrameTag) {
-                            break;
-                        }
-                    }
-                }
-                
-                
 
-                boolean endsWithRemove = false;
-                for (int i = tags.size() - 1; i >= 0; i--) {
-                    Tag t = tags.get(i);
-                    if (t instanceof PlaceObjectTypeTag) {
-                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                        if (pt.getDepth() == fdepth) {
-                            break;
+                        boolean endsWithRemove = false;
+                        for (int i = tags.size() - 1; i >= 0; i--) {
+                            Tag t = tags.get(i);
+                            if (t instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                                if (pt.getDepth() == nd) {
+                                    break;
+                                }
+                            }
+                            if (t instanceof RemoveTag) {
+                                RemoveTag rt = (RemoveTag) t;
+                                if (rt.getDepth() == nd) {
+                                    endsWithRemove = true;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                    if (t instanceof RemoveTag) {
-                        RemoveTag rt = (RemoveTag) t;
-                        if (rt.getDepth() == fdepth) {
-                            endsWithRemove = true;
-                            break;
+
+                        for (int i = tags.size() - 1; i >= 0; i--) {
+                            Tag t = tags.get(i);
+                            if (t instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                                if (pt.getDepth() == nd) {
+                                    lastFrameDepthTags.add(pt);
+                                    timelined.removeTag(i);
+                                }
+                            }
+                            if (t instanceof RemoveTag) {
+                                RemoveTag rt = (RemoveTag) t;
+                                if (rt.getDepth() == nd) {
+                                    lastFrameDepthTags.add(rt);
+                                    timelined.removeTag(i);
+                                }
+                            }
+                            if (t instanceof ShowFrameTag) {
+                                for (Tag lt : lastFrameDepthTags) {
+                                    timelined.addTag(i, lt);
+                                }
+                                lastFrameDepthTags.clear();
+                                f--;
+                                if (f == fframe) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!endsWithRemove) {
+                            RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
+                            rt.setTimelined(timelined);
+                            rt.setDepth(nd);
+                            Tag lt = tags.get(tags.size() - 1);
+                            if (lt instanceof ShowFrameTag) {
+                                timelined.addTag(tags.size() - 1, rt);
+                            } else {
+                                timelined.addTag(lt);
+                            }
                         }
                     }
                 }
-                
-                for (int i = tags.size() - 1; i >= 0; i--) {
-                    Tag t = tags.get(i);
-                    if (t instanceof PlaceObjectTypeTag) {
-                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                        if (pt.getDepth() == fdepth) {
-                            lastFrameDepthTags.add(pt);
-                            timelined.removeTag(i);                            
-                        }
-                    }
-                    if (t instanceof RemoveTag) {
-                        RemoveTag rt = (RemoveTag) t;
-                        if (rt.getDepth() == fdepth) {
-                            lastFrameDepthTags.add(rt);
-                            timelined.removeTag(i);                            
-                        }
-                    }
-                    if (t instanceof ShowFrameTag) {                        
-                        for (Tag lt : lastFrameDepthTags) {
-                            timelined.addTag(i, lt);                            
-                        }
-                        lastFrameDepthTags.clear();
-                        f--;                        
-                        if (f == fframe) {
-                            break;
-                        }
-                    }
-                }
-                
-                if (!endsWithRemove) {
-                    RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
-                    rt.setTimelined(timelined);
-                    rt.setDepth(fdepth);
-                    Tag lt = tags.get(tags.size() - 1);
-                    if (lt instanceof ShowFrameTag) {
-                        timelined.addTag(tags.size() - 1, rt);
-                    } else {
-                        timelined.addTag(lt);
-                    }                    
-                }
-                
-                
+
                 timelined.resetTimeline();
-                
+
                 /*System.err.println("=====AFTER=======");
                 f = 0;
                 int i = 0;
@@ -577,7 +685,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     }
                     i++;
                 }*/
-                
+                frameSelect(fframe, fdepth);
                 timeline = timelined.getTimeline();
 
                 refresh();
@@ -593,47 +701,62 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 refresh();
                 fireChanged();
                 repaint();
-            }                        
+            }
 
             @Override
             public String getDescription() {
                 return "Remove frame";
             }
-        });               
+        });
     }
-    
+
     private void addKeyFrame(ActionEvent e) {
-        if (timeline.getFrame(frame).layers.get(depth).key) {
+        if (frame == endFrame && depth == endDepth && timeline.getFrame(frame).layers.get(depth).key) {
             return;
         }
+        final int fframe = Math.min(frame, endFrame);
+        final int fdepth = Math.min(depth, endDepth);
+        final int fendFrame = Math.max(frame, endFrame);
+        final int fendDepth = Math.max(depth, endDepth);
+        
         undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
 
             @Override
             public void doOperation() {
                 super.doOperation();
                 Timelined timelined = timeline.timelined;
-                DepthState ds = timeline.getFrame(frame).layers.get(depth);
-                /*RemoveTag rm = new RemoveObject2Tag(timelined.getSwf());
-                rm.setDepth(depth);
-                rm.setTimelined(timelined);*/
-                PlaceObjectTypeTag place;
-                try {
-                    place = (PlaceObjectTypeTag) ds.placeObjectTag.cloneTag();
-                } catch (InterruptedException | IOException ex) {
-                    //should not happen
-                    return;
+                
+                for (int nf = frame; nf <= fendFrame; nf++) {
+                    for (int nd = fdepth; nd <= fendDepth; nd++) {
+                        DepthState ds = timeline.getFrame(nf).layers.get(nd);
+                        if (ds.key) {
+                            continue;
+                        }
+                        ds.key = true;
+                        /*RemoveTag rm = new RemoveObject2Tag(timelined.getSwf());
+                        rm.setDepth(depth);
+                        rm.setTimelined(timelined);*/
+                        PlaceObjectTypeTag place;
+                        try {
+                            place = (PlaceObjectTypeTag) ds.placeObjectTag.cloneTag();
+                        } catch (InterruptedException | IOException ex) {
+                            //should not happen
+                            return;
+                        }
+                        place.setTimelined(timelined);
+                        place.setPlaceFlagMove(true);
+                        ShowFrameTag sf = timeline.getFrame(nf).showFrameTag;
+                        int pos;
+                        if (sf != null) {
+                            pos = timelined.indexOfTag(sf);
+                        } else {
+                            pos = timelined.getTags().size();
+                        }
+                        //timelined.addTag(pos++, rm);
+
+                        timelined.addTag(pos++, place);
+                    }
                 }
-                place.setTimelined(timelined);
-                place.setPlaceFlagMove(true);
-                ShowFrameTag sf = timeline.getFrame(frame).showFrameTag;
-                int pos;
-                if (sf != null) {
-                    pos = timelined.indexOfTag(sf);
-                } else {
-                    pos = timelined.getTags().size();
-                }
-                //timelined.addTag(pos++, rm);
-                timelined.addTag(pos++, place);
 
                 timelined.resetTimeline();
                 timeline = timelined.getTimeline();
@@ -673,7 +796,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         break;
                     }
                 }
-                
+
                 PlaceObjectTypeTag place;
                 try {
                     place = (PlaceObjectTypeTag) ds.placeObjectTag.cloneTag();
@@ -686,8 +809,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 ShowFrameTag sf = timeline.getFrame(frame).showFrameTag;
                 int pos;
                 if (sf != null) {
-                    pos = timelined.indexOfTag(sf);    
-                    
+                    pos = timelined.indexOfTag(sf);
+
                     if (frame < timelined.getFrameCount() - 1) {
                         RemoveTag rm = new RemoveObject2Tag(timelined.getSwf());
                         rm.setTimelined(timelined);
@@ -698,7 +821,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     pos = timelined.getTags().size();
                 }
                 timelined.addTag(pos++, place);
-                                
 
                 timelined.resetTimeline();
                 timeline = timelined.getTimeline();
@@ -725,138 +847,145 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private void addFrame(ActionEvent e) {
-        final int fframe = frame;
-        final int fdepth = depth;
-        
+        final int fframe = Math.min(frame, endFrame);
+        final int fdepth = Math.min(depth, endDepth);
+        final int fendFrame = Math.max(frame, endFrame);
+        final int fendDepth = Math.max(depth, endDepth);
+
         undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
             @Override
             public void doOperation() {
                 super.doOperation();
                 DepthState ds;
-
-                boolean somethingAfter = false;
-                for (int f = fframe + 1; f < timeline.getFrameCount(); f++) {
-                    ds = timeline.getFrame(f).layers.get(fdepth);
-                    boolean empty = ds == null || ds.getCharacter() == null;
-                    if (!empty) {
-                        somethingAfter = true;
-                        break;
-                    }
-                }
-
                 Timelined timelined = timeline.timelined;
-                for (int f = fframe; f >= 0; f--) {
-                    ds = timeline.getFrame(f).layers.get(fdepth);
-                    boolean empty = ds == null || ds.getCharacter() == null;
-                    if (!empty || somethingAfter) {
-                        int moveFrameCount = fframe - f;
-                        if (moveFrameCount == 0) {
-                            moveFrameCount = 1;
+
+                for (int nf = 0; nf < fendFrame - fframe + 1; nf++) {
+                    for (int nd = fdepth; nd <= fendDepth; nd++) {
+
+                        boolean somethingAfter = false;
+                        for (int f = fframe + 1; f < timeline.getFrameCount(); f++) {
+                            ds = timeline.getFrame(f).layers.get(nd);
+                            boolean empty = ds == null || ds.getCharacter() == null;
+                            if (!empty) {
+                                somethingAfter = true;
+                                break;
+                            }
                         }
-                        boolean frameAdded = false;
-                        for (int mf = 0; mf < moveFrameCount; mf++) {
-                            int pos = timelined.indexOfTag(timeline.getFrame(f).showFrameTag);
-                            ReadOnlyTagList tags = timelined.getTags();
-                            List<Tag> lastFrameDepthTags = new ArrayList<>();
-                            int f2 = f + 1;
-                            boolean endsWithRemove = false;
-                            for (int i = pos + 1; i < tags.size(); i++) {
-                                Tag t = tags.get(i);
-                                if (t instanceof PlaceObjectTypeTag) {
-                                    PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                                    if (po.getDepth() == fdepth) {
-                                        lastFrameDepthTags.add(po);
-                                        timelined.removeTag(po);
-                                        endsWithRemove = false;
-                                        i--;
-                                    }
-                                }
-                                if (t instanceof RemoveTag) {
-                                    RemoveTag ro = (RemoveTag) t;
-                                    if (ro.getDepth() == fdepth) {
-                                        lastFrameDepthTags.add(ro);
-                                        timelined.removeTag(ro);
-                                        endsWithRemove = true;
-                                        i--;
-                                    }
-                                }
-                                if ((t instanceof ShowFrameTag) || (i == tags.size() - 1)) {
-                                    if (!(t instanceof ShowFrameTag) && !lastFrameDepthTags.isEmpty()) {
-                                        ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
-                                        sf.setTimelined(timelined);
-                                        timelined.addTag(sf);
-                                        i++;
-                                    }
 
-                                    boolean removeOnly = true;
-                                    for (Tag lt : lastFrameDepthTags) {
-                                        if (!(lt instanceof RemoveTag)) {
-                                            removeOnly = false;
-                                            break;
+                        for (int f = fframe; f >= 0; f--) {
+                            ds = timeline.getFrame(f).layers.get(nd);
+                            boolean empty = ds == null || ds.getCharacter() == null;
+                            if (!empty || somethingAfter) {
+                                int moveFrameCount = fframe - f;
+                                if (moveFrameCount == 0) {
+                                    moveFrameCount = 1;
+                                }
+                                boolean frameAdded = false;
+                                for (int mf = 0; mf < moveFrameCount; mf++) {
+                                    int pos = timelined.indexOfTag(timeline.getFrame(f).showFrameTag);
+                                    ReadOnlyTagList tags = timelined.getTags();
+                                    List<Tag> lastFrameDepthTags = new ArrayList<>();
+                                    int f2 = f + 1;
+                                    boolean endsWithRemove = false;
+                                    for (int i = pos + 1; i < tags.size(); i++) {
+                                        Tag t = tags.get(i);
+                                        if (t instanceof PlaceObjectTypeTag) {
+                                            PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                                            if (po.getDepth() == nd) {
+                                                lastFrameDepthTags.add(po);
+                                                timelined.removeTag(po);
+                                                endsWithRemove = false;
+                                                i--;
+                                            }
                                         }
-                                    }
-                                    
-                                    boolean onLastFrame = f2 == timelined.getFrameCount() - 1;
-                                    
-                                    if (!(removeOnly && onLastFrame)) {
-                                        for (Tag lt : lastFrameDepthTags) {
-                                            i++;
-                                            timelined.addTag(i, lt);
+                                        if (t instanceof RemoveTag) {
+                                            RemoveTag ro = (RemoveTag) t;
+                                            if (ro.getDepth() == nd) {
+                                                lastFrameDepthTags.add(ro);
+                                                timelined.removeTag(ro);
+                                                endsWithRemove = true;
+                                                i--;
+                                            }
                                         }
-                                    }
+                                        if ((t instanceof ShowFrameTag) || (i == tags.size() - 1)) {
+                                            if (!(t instanceof ShowFrameTag) && !lastFrameDepthTags.isEmpty()) {
+                                                ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
+                                                sf.setTimelined(timelined);
+                                                timelined.addTag(sf);
+                                                i++;
+                                            }
 
-                                    //Add beyond current total frameCount
-                                    if (onLastFrame) {                                        
-                                        if ((!removeOnly && !lastFrameDepthTags.isEmpty()) || !endsWithRemove) { 
-                                            //Add removeTag to other layers
-                                            for (int d = 1; d <= timeline.maxDepth; d++) {
-                                                if (d == fdepth) {
-                                                    continue;
-                                                }
-                                                ds = timeline.getFrame(f2).layers.get(d);
-                                                if (ds != null && ds.getCharacter() != null) {
-                                                    RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
-                                                    rt.setTimelined(timelined);
-                                                    rt.setDepth(d);
-                                                    timelined.addTag(i, rt);
-                                                    i++;
+                                            boolean removeOnly = true;
+                                            for (Tag lt : lastFrameDepthTags) {
+                                                if (!(lt instanceof RemoveTag)) {
+                                                    removeOnly = false;
+                                                    break;
                                                 }
                                             }
 
-                                            frameAdded = true;
-                                            ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
-                                            sf.setTimelined(timelined);
-                                            timelined.addTag(sf);
-                                            i++;
-                                            timelined.setFrameCount(timelined.getFrameCount() + 1);                                            
+                                            boolean onLastFrame = f2 == timelined.getFrameCount() - 1;
+
+                                            if (!(removeOnly && onLastFrame)) {
+                                                for (Tag lt : lastFrameDepthTags) {
+                                                    i++;
+                                                    timelined.addTag(i, lt);
+                                                }
+                                            }
+
+                                            //Add beyond current total frameCount
+                                            if (onLastFrame) {
+                                                if ((!removeOnly && !lastFrameDepthTags.isEmpty()) || !endsWithRemove) {
+                                                    //Add removeTag to other layers
+                                                    for (int d = 1; d <= timeline.maxDepth; d++) {
+                                                        if (d == nd) {
+                                                            continue;
+                                                        }
+                                                        ds = timeline.getFrame(f2).layers.get(d);
+                                                        if (ds != null && ds.getCharacter() != null) {
+                                                            RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
+                                                            rt.setTimelined(timelined);
+                                                            rt.setDepth(d);
+                                                            timelined.addTag(i, rt);
+                                                            i++;
+                                                        }
+                                                    }
+
+                                                    frameAdded = true;
+                                                    ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
+                                                    sf.setTimelined(timelined);
+                                                    timelined.addTag(sf);
+                                                    i++;
+                                                    timelined.setFrameCount(timelined.getFrameCount() + 1);
+                                                }
+                                            }
+                                            lastFrameDepthTags.clear();
+                                            f2++;
                                         }
                                     }
-                                    lastFrameDepthTags.clear();
-                                    f2++;
                                 }
-                            }                                                        
-                        }
-                        if (!frameAdded && fframe == timelined.getFrameCount() - 1) {
-                            //Add removeTag to other layers
-                            for (int d = 1; d <= timeline.maxDepth; d++) {
-                                if (d == fdepth) {
-                                    continue;
+                                if (!frameAdded && fframe == timelined.getFrameCount() - 1) {
+                                    //Add removeTag to other layers
+                                    for (int d = 1; d <= timeline.maxDepth; d++) {
+                                        if (d == nd) {
+                                            continue;
+                                        }
+                                        ds = timeline.getFrame(fframe).layers.get(d);
+                                        if (ds != null && ds.getCharacter() != null) {
+                                            RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
+                                            rt.setTimelined(timelined);
+                                            rt.setDepth(d);
+                                            timelined.addTag(rt);
+                                        }
+                                    }
+                                    for (int mf = 0; mf < moveFrameCount; mf++) {
+                                        ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
+                                        sf.setTimelined(timelined);
+                                        timelined.addTag(sf);
+                                    }
                                 }
-                                ds = timeline.getFrame(fframe).layers.get(d);
-                                if (ds != null && ds.getCharacter() != null) {
-                                    RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
-                                    rt.setTimelined(timelined);
-                                    rt.setDepth(d);
-                                    timelined.addTag(rt);
-                                }
-                            }                            
-                            for (int mf = 0; mf < moveFrameCount; mf++) {
-                                ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
-                                sf.setTimelined(timelined);
-                                timelined.addTag(sf);
+                                break;
                             }
                         }
-                        break;
                     }
                 }
 

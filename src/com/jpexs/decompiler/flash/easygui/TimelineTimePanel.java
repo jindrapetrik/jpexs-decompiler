@@ -78,10 +78,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     public void frameSelect(int frame) {
         if (selectedFrame == frame) {
             return;
-        }
-        for (FrameSelectionListener l : listeners) {
-            l.frameSelected(frame, -1);
-        }
+        }        
         selectedFrame = frame;
         repaint();
     }
@@ -127,7 +124,11 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        frameSelect((scrollOffset + e.getX()) / TimelineBodyPanel.FRAME_WIDTH);
+        int frame = (scrollOffset + e.getX()) / TimelineBodyPanel.FRAME_WIDTH;
+        frameSelect(frame);
+        for (FrameSelectionListener l : listeners) {
+            l.frameSelected(frame, -1);
+        }
     }
 
     @Override
