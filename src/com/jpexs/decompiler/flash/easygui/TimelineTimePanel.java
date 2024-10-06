@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import static com.jpexs.decompiler.flash.easygui.TimelineDepthPanel.FONT_SIZE;
+import static com.jpexs.decompiler.flash.easygui.TimelineDepthPanel.PADDING;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -44,8 +47,9 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     private int scrollOffset = 0;
 
     private int selectedFrame = -1;
+    private int leftPos = 0;
 
-    private final List<FrameSelectionListener> listeners = new ArrayList<>();
+    private final List<FrameSelectionListener> listeners = new ArrayList<>();   
 
     public TimelineTimePanel() {
         Dimension dim = new Dimension(Integer.MAX_VALUE, TimelineBodyPanel.FRAME_HEIGHT);
@@ -54,6 +58,15 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         addMouseListener(this);
     }
 
+    public void setTimeline(Timeline timeline) {
+        int maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
+        String maxDepthStr = Integer.toString(maxDepth);
+        setFont(getFont().deriveFont(FONT_SIZE));
+        int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
+        leftPos = maxDepthW + 2 * PADDING;
+    }
+    
+    
     public void addFrameSelectionListener(FrameSelectionListener l) {
         listeners.add(l);
     }
@@ -86,7 +99,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(borderColor);
-        int xofs = TimelineBodyPanel.FRAME_WIDTH - scrollOffset % TimelineBodyPanel.FRAME_WIDTH - 1;
+        int xofs = leftPos - TimelineBodyPanel.FRAME_WIDTH - scrollOffset % TimelineBodyPanel.FRAME_WIDTH;
         for (int f = 0; f <= end_f; f++) {
             g.drawLine(xofs + f * TimelineBodyPanel.FRAME_WIDTH + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * TimelineBodyPanel.FRAME_WIDTH + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength);
         }
@@ -103,7 +116,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
             if ((cur_f + 1) % 5 == 0 || cur_f == 0) {
                 String timeStr = Integer.toString(cur_f + 1);
                 int w = g.getFontMetrics().stringWidth(timeStr);
-                g.drawString(timeStr, xofs + (f - 1) * TimelineBodyPanel.FRAME_WIDTH + TimelineBodyPanel.FRAME_WIDTH / 2 - w / 2, TimelineBodyPanel.FRAME_HEIGHT - lineLength - lineTextSpace);
+                g.drawString(timeStr, xofs + (f - 1) * TimelineBodyPanel.FRAME_WIDTH + TimelineBodyPanel.FRAME_WIDTH / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - lineLength - lineTextSpace);
             }
         }
     }
