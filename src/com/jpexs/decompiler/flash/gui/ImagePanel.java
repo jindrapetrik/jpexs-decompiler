@@ -1148,10 +1148,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         freeTransformDepth(depthStateUnderCursor.depth);
                                         firePlaceObjectSelected();
                                     }
-                                } else if (selectionMode) {
+                                } else if ((altDown && !selectionMode) || selectionMode){
                                     selectDepth(depthStateUnderCursor.depth);
                                     firePlaceObjectSelected();
                                 }                                                               
+                            } else {
+                                if (transformSelectionMode) {
+                                    if (mode == Cursor.DEFAULT_CURSOR) {
+                                        freeTransformDepth(-1);
+                                        firePlaceObjectSelected();
+                                    }
+                                } else if ((altDown && !selectionMode) || selectionMode) {
+                                    selectDepth(-1);         
+                                    firePlaceObjectSelected();
+                                }
                             }
                             if (!selectionMode) {
                                 return;

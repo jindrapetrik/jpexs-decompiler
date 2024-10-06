@@ -63,6 +63,7 @@ public class TimelinePanel extends JPanel {
             public void run() {
                 timeline = timelined.getTimeline();
                 depthPanel.setTimeline(timeline);
+                timePanel.setTimeline(timeline);
             }
         });
 
@@ -159,5 +160,6 @@ public class TimelinePanel extends JPanel {
         this.timelined = timelined;
         timelineBodyPanel.setTimeline(timelined.getTimeline());
         depthPanel.setTimeline(timelined.getTimeline());
+        timePanel.setTimeline(timelined.getTimeline());
     }
 }
