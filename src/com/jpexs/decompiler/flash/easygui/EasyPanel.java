@@ -19,10 +19,12 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.TransformPanel;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
@@ -34,9 +36,11 @@ import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -68,9 +72,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author JPEXS
  */
-public class MainFrame extends JFrame {
+public class EasyPanel extends JPanel {
 
-    private SWF swf;
     private LibraryTreeTable libraryTreeTable;
     private JSplitPane verticalSplitPane;
     private JSplitPane horizontalSplitPane;
@@ -83,13 +86,9 @@ public class MainFrame extends JFrame {
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
 
-    public MainFrame() {
-        setTitle("JPEXS FFDec Easy GUI");
+    public EasyPanel() {
         setSize(1024, 768);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        Container cnt = getContentPane();
-        cnt.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         stagePanel = new ImagePanel();
         stagePanel.setTagNameResolver(new EasyTagNameResolver());
@@ -292,7 +291,7 @@ public class MainFrame extends JFrame {
         JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
         undoButton = new JButton(View.getIcon("rotateanticlockwise16"));
-        undoButton.setToolTipText("Undo");
+        //undoButton.setToolTipText("Undo");
         undoButton.setMargin(new Insets(5, 5, 5, 5));
         undoButton.addActionListener(new ActionListener() {
             @Override
@@ -302,7 +301,7 @@ public class MainFrame extends JFrame {
         });
 
         redoButton = new JButton(View.getIcon("rotateclockwise16"));
-        redoButton.setToolTipText("Redo");
+        //redoButton.setToolTipText("Redo");
         redoButton.setMargin(new Insets(5, 5, 5, 5));
         redoButton.addActionListener(new ActionListener() {
             @Override
@@ -317,14 +316,14 @@ public class MainFrame extends JFrame {
                 undoButton.setEnabled(undoManager.canUndo());
                 redoButton.setEnabled(undoManager.canRedo());
                 if (undoManager.canUndo()) {
-                    undoButton.setToolTipText("Undo " + undoManager.getUndoName());
+                    undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%",undoManager.getUndoName()));
                 } else {
-                    undoButton.setToolTipText("Cannot undo");
+                    undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
                 }
                 if (undoManager.canRedo()) {
-                    redoButton.setToolTipText("Redo " + undoManager.getRedoName());
+                    redoButton.setToolTipText(EasyStrings.translate("redo").replace("%action%", undoManager.getRedoName()));
                 } else {
-                    redoButton.setToolTipText("Cannot redo");
+                    redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
                 }
             }
         };
@@ -369,7 +368,7 @@ public class MainFrame extends JFrame {
         verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel);
 
         libraryTreeTable = new LibraryTreeTable();
-        JScrollPane libraryScrollPane = new JScrollPane(libraryTreeTable);
+        JScrollPane libraryScrollPane = new FasterScrollPane(libraryTreeTable);
 
         JPanel libraryPanel = new JPanel(new BorderLayout());
         libraryPanel.add(libraryScrollPane, BorderLayout.CENTER);
@@ -382,21 +381,29 @@ public class MainFrame extends JFrame {
         libraryPreviewPanel.setPreferredSize(new Dimension(200, 200));
 
         rightTabbedPane = new JTabbedPane();
-        rightTabbedPane.addTab("Library", libraryPanel);
+        rightTabbedPane.addTab(EasyStrings.translate("library"), libraryPanel);
 
         JPanel transformTab = new JPanel(new BorderLayout());
         transformPanel = new TransformPanel(stagePanel, false);
-        transformTab.add(new JScrollPane(transformPanel), BorderLayout.CENTER);
+        transformTab.add(new FasterScrollPane(transformPanel), BorderLayout.CENTER);
 
-        rightTabbedPane.addTab("Transform", transformTab);
+        rightTabbedPane.addTab(EasyStrings.translate("transform"), transformTab);
         rightTabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int depth = stagePanel.getSelectedDepth();
-                if (depth != -1) {
-                    DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(stagePanel.getFrame()).layers.get(depth);                    
-                    if (ds == null) {
+                if (stagePanel.getFrame() >= stagePanel.getTimelined().getFrameCount()) {
+                    depth = -1;
+                }
+                if (depth != -1) {  
+                    Frame frame = stagePanel.getTimelined().getTimeline().getFrame(stagePanel.getFrame());
+                    if (frame == null) {
                         depth = -1;
+                    } else {
+                        DepthState ds = frame.layers.get(depth);                    
+                        if (ds == null) {
+                            depth = -1;
+                        }
                     }
                 }
                 transformPanel.setVisible(depth != -1);
@@ -412,8 +419,13 @@ public class MainFrame extends JFrame {
         });
 
         horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane);
-        libraryScrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));
-        cnt.add(horizontalSplitPane, BorderLayout.CENTER);
+
+        if (View.isOceanic()) {
+            libraryScrollPane.getViewport().setBackground(Color.white);
+        } else {
+            libraryScrollPane.getViewport().setBackground(UIManager.getColor("Tree.background"));
+        }
+        add(horizontalSplitPane, BorderLayout.CENTER);
 
         libraryTreeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -438,18 +450,15 @@ public class MainFrame extends JFrame {
 
     private boolean transformEnabled() {
         return rightTabbedPane.getSelectedIndex() == 1;
-    }
-
-    public void open(File file) throws IOException, InterruptedException {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            swf = new SWF(fis, true);
-        }
-
+    }  
+    
+    public void setTimelined(Timelined timelined) {
+        SWF swf = timelined.getSwf();
         libraryTreeTable.setSwf(swf);
         stagePanel.setTimelined(swf, swf, 0, true, true, true, true, true, false, true);
         stagePanel.pause();
         stagePanel.gotoFrame(0);
-        timelinePanel.setTimelined(swf);        
+        timelinePanel.setTimelined(swf);  
     }
 
     @Override

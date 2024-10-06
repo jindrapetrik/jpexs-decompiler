@@ -16,15 +16,20 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author JPEXS
  */
-public class View {
-    public static Icon getIcon(String name) {
-        return new ImageIcon(com.jpexs.decompiler.flash.gui.View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
-    }       
+public class EasyStrings {
+    private static Class resourceClass;
+
+    private static ResourceBundle resourceBundle;   
+
+    public static String translate(String key) {
+        ResourceBundle b = ResourceBundle.getBundle("com.jpexs.decompiler.flash.gui.locales.EasyPanel");
+        return b.getString(key);
+    }
+
 }

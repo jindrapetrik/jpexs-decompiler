@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -30,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -37,6 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TreeModelListener;
+import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -46,10 +49,7 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public class LibraryTreeTable extends JTreeTable {
-    
-    private SWF swf;
-    private LibraryTreeTableModel model;
-    
+       
     public LibraryTreeTable() {
         super(new LibraryTreeTableModel(null));        
         getTree().setCellRenderer(new LibraryTreeCellRenderer());
@@ -98,10 +98,18 @@ public class LibraryTreeTable extends JTreeTable {
         setTransferHandler(new CharacterTagTransferHandler());
         setDragEnabled(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setUI(new BasicTableUI());
+        
+        setRowHeight(18);
+        getTree().setRowHeight(18);
+        
+        if (View.isOceanic()) {
+            setBackground(Color.WHITE);
+            getTree().setBackground(Color.WHITE);
+        }
     }
     
     public void setSwf(SWF swf) {
-        this.swf = swf;
         setTreeTableModel(new LibraryTreeTableModel(swf));
     }
         
@@ -162,6 +170,14 @@ public class LibraryTreeTable extends JTreeTable {
                     label.setText(tagNameResolver.getTagName((Tag) object));
                 }
             }
+            if (View.isOceanic()) {
+                if (selected) {
+                    label.setBackground(getBackgroundSelectionColor());
+                } else {
+                    label.setBackground(Color.white);
+                }
+                label.setOpaque(true);
+            }
             return label;
         }                
     }
@@ -173,15 +189,15 @@ public class LibraryTreeTable extends JTreeTable {
         public LibraryTreeTableModel(SWF swf) {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode("SWF");
         
-            DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode("images");
-            DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode("graphics");
-            DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode("shapeTweens");
-            DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode("texts");
-            DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode("fonts");
-            DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode("movieClips");
-            DefaultMutableTreeNode buttonsNode = new DefaultMutableTreeNode("buttons");
-            DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode("sounds");
-            DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode("videos");
+            DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.images"));
+            DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.graphics"));
+            DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.shapeTweens"));
+            DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.texts"));
+            DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.fonts"));
+            DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.movieClips"));
+            DefaultMutableTreeNode buttonsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.buttons"));
+            DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.sounds"));
+            DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode(EasyStrings.translate("library.folder.videos"));
 
 
             this.root = root;
@@ -260,9 +276,9 @@ public class LibraryTreeTable extends JTreeTable {
         public String getColumnName(int column) {
             switch (column) {
                 case 0:
-                    return "Name";
+                    return EasyStrings.translate("library.header.name");
                 case 1:
-                    return "AS Linkage";
+                    return EasyStrings.translate("library.header.asLinkage");
                 default:
                     return null;
             }

@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.easygui.EasyPanel;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
 import com.jpexs.decompiler.flash.exporters.Font4Exporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
@@ -321,7 +322,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final JPanel welcomePanel;
 
-    private final TimelineViewPanel timelineViewPanel;
+    private final EasyPanel easyPanel;
 
     private final MainFrameStatusPanel statusPanel;
 
@@ -1300,12 +1301,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
 
-        timelineViewPanel = new TimelineViewPanel();
+        easyPanel = new EasyPanel();
 
         contentPanel = new JPanel(new CardLayout());
         contentPanel.add(welcomePanel, WELCOME_PANEL);
         contentPanel.add(splitPane1, SPLIT_PANE1);
-        contentPanel.add(timelineViewPanel, TIMELINE_PANEL);
+        contentPanel.add(easyPanel, TIMELINE_PANEL);
         add(contentPanel);
         showContentPanelCard(WELCOME_PANEL);
 
@@ -5701,11 +5702,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         item = ((TagScript) item).getTag();
                     }
                     if (item instanceof Timelined) {
-                        timelineViewPanel.setTimelined((Timelined) item);
+                        easyPanel.setTimelined((Timelined) item);
                     } else if (item instanceof Frame) {
-                        timelineViewPanel.setTimelined(((Frame) item).timeline.timelined);
+                        easyPanel.setTimelined(((Frame) item).timeline.timelined);
                     } else {
-                        timelineViewPanel.setTimelined(swf);
+                        easyPanel.setTimelined(swf);
                     }
                     showContentPanelCard(TIMELINE_PANEL);
                     return true;

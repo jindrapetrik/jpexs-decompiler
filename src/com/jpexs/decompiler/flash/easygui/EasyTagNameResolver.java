@@ -38,40 +38,40 @@ public class EasyTagNameResolver implements TagNameResolverInterface {
     public String getTagName(Tag tag) {
         if (tag instanceof ImageTag) {
             ImageTag it = (ImageTag) tag;                                      
-            return "image " + it.getCharacterId() + it.getImageFormat().getExtension();
+            return EasyStrings.translate("item.image") + " " + it.getCharacterId() + it.getImageFormat().getExtension();
         }
         if (tag instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) tag;
-            return "graphic " + st.getCharacterId();
+            return EasyStrings.translate("item.graphic") + " " + st.getCharacterId();
         }
         if (tag instanceof MorphShapeTag) {
             MorphShapeTag mst = (MorphShapeTag) tag;
-            return "shapeTween " + mst.getCharacterId();
+            return EasyStrings.translate("item.shapeTween") + " " + mst.getCharacterId();
         }
         if (tag instanceof TextTag) {
             TextTag t = (TextTag) tag;
-            return "text " + t.getCharacterId();
+            return EasyStrings.translate("item.text") + " " + t.getCharacterId();
         }
         if (tag instanceof FontTag) {
             FontTag f = (FontTag) tag;
-            return "font " + f.getCharacterId();
+            return EasyStrings.translate("item.font") + " " + f.getCharacterId();
         }
         if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag st = (DefineSpriteTag) tag;
-            return "movieClip " + st.getCharacterId();
+            return EasyStrings.translate("item.movieClip") + " " + st.getCharacterId();
         }
         if (tag instanceof ButtonTag) {
             ButtonTag bt = (ButtonTag) tag;
-            return "button " + bt.getCharacterId();
+            return EasyStrings.translate("item.button") + " " + bt.getCharacterId();
         }
         if (tag instanceof SoundTag) {
             SoundTag st = (SoundTag) tag;
-            return "sound" + (st.getCharacterId() == -1 ? "" : " " + st.getCharacterId());
+            return EasyStrings.translate("item.sound") + (st.getCharacterId() == -1 ? "" : " " + st.getCharacterId());
         }
         if (tag instanceof DefineVideoStreamTag) {
             DefineVideoStreamTag vt = (DefineVideoStreamTag) tag;
-            return "video " + vt.getCharacterId();
+            return EasyStrings.translate("item.video") + " " + vt.getCharacterId();
         }
-        return "unknown";
+        return EasyStrings.translate("item.uknown");
     }    
 }
