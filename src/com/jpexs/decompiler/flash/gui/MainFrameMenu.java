@@ -1125,7 +1125,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
-        setMenuEnabled("/tools/timeline", swfSelected);
+        setMenuEnabled("/file/view/timeline", swfSelected);
         setMenuEnabled("/tools/abcExplorer", isAs3);
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
@@ -1270,6 +1270,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
+        addToggleMenuItem("/file/view/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
         finishMenu("/file/view");
 
         addSeparator("/file");
@@ -1321,8 +1322,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         addMenuItem("/tools/replace", translate("menu.tools.replace"), "replace32", this::replaceActionPerformed, PRIORITY_TOP, null, true, null, false);
-        addToggleMenuItem("/tools/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
-
+        
         addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abcexplorer32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
@@ -1533,7 +1533,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
-        setMenuChecked("/tools/timeline", false);
+        setMenuChecked("/file/view/timeline", false);
     }
 
     private void viewHexActionPerformed(ActionEvent evt) {
@@ -1549,7 +1549,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainPanel.showView(MainPanel.VIEW_DUMP);
         setGroupSelection("view", "/file/view/viewHex");
-        setMenuChecked("/tools/timeline", false);
+        setMenuChecked("/file/view/timeline", false);
     }
 
     private void viewTagListActionPerformed(ActionEvent evt) {
@@ -1561,7 +1561,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         setGroupSelection("view", "/file/view/viewTagList");
-        setMenuChecked("/tools/timeline", false);
+        setMenuChecked("/file/view/timeline", false);
     }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {
@@ -1577,9 +1577,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     private void timelineActionPerformed(ActionEvent evt) {
-        if (isMenuChecked("/tools/timeline")) {
+        if (isMenuChecked("/file/view/timeline")) {
             if (!mainFrame.getPanel().showView(MainPanel.VIEW_TIMELINE)) {
-                setMenuChecked("/tools/timeline", false);
+                setMenuChecked("/file/view/timeline", false);
             } else {
                 setGroupSelection("view", null);
             }
