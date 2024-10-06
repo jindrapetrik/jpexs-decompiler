@@ -95,7 +95,7 @@ public class LibraryTreeTable extends JTreeTable {
                 }
             }
         });
-        setTransferHandler(new TagTransferHandler());
+        setTransferHandler(new CharacterTagTransferHandler());
         setDragEnabled(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }

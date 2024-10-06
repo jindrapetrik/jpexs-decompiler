@@ -164,7 +164,7 @@ public class MainFrame extends JFrame {
         stagePanel.setTransferHandler(new TransferHandler() {
             @Override
             public boolean canImport(TransferHandler.TransferSupport support) {
-                return support.isDataFlavorSupported(TagTransferable.TAG_FLAVOR);
+                return support.isDataFlavorSupported(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
             }
 
             @Override
@@ -174,8 +174,8 @@ public class MainFrame extends JFrame {
                 }
                 try {
                     Transferable transferable = support.getTransferable();
-                    Tag tag = (Tag) transferable.getTransferData(TagTransferable.TAG_FLAVOR);
-
+                    Integer characterId = (Integer) transferable.getTransferData(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
+                    CharacterTag tag = stagePanel.getTimelined().getSwf().getCharacter(characterId);
                     if ((tag instanceof DefineSpriteTag)
                             || (tag instanceof ShapeTag)
                             || (tag instanceof TextTag)
@@ -197,6 +197,9 @@ public class MainFrame extends JFrame {
                                 int maxDepth = stagePanel.getTimelined().getTimeline().getMaxDepth();
                                 int newDepth = maxDepth + 1;
                                 Timelined timelined = stagePanel.getTimelined();
+                                
+                                tags = timelined.getSwf().getTags().toArrayList();
+                                
                                 ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(frame).showFrameTag;
                                 place = new PlaceObject2Tag(timelined.getSwf());
                                 place.depth = newDepth;
@@ -215,7 +218,7 @@ public class MainFrame extends JFrame {
                                     timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);                                    
                                 }
                                 
-                                tags = timelined.getSwf().getTags().toArrayList();
+                                
                                 DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
                                 boolean tagOrderChanged = fixer.fixDefineBeforeUsage(timelined.getSwf());
                                 if (!tagOrderChanged) {
@@ -330,7 +333,34 @@ public class MainFrame extends JFrame {
         topPanel.add(toolbarPanel, BorderLayout.NORTH);
         topPanel.add(stagePanel, BorderLayout.CENTER);
 
-        timelinePanel = new TimelinePanel();
+        timelinePanel = new TimelinePanel(undoManager);
+        
+        timelinePanel.addChangeListener(new Runnable() {
+            @Override
+            public void run() {
+                stagePanel.repaint();
+            }            
+        });
+        timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
+            @Override
+            public void frameSelected(int frame, int depth) {
+                stagePanel.pause();
+                stagePanel.gotoFrame(frame + 1);
+                stagePanel.selectDepth(depth);
+                if (transformEnabled()) {
+                    stagePanel.freeTransformDepth(depth);
+                }
+                
+                if (depth != -1) {
+                    DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(stagePanel.getFrame()).layers.get(depth);                    
+                    if (ds == null) {
+                        depth = -1;
+                    }
+                }
+                transformPanel.setVisible(depth != -1);
+            }
+        });
+        
         verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel);
 
         libraryTreeTable = new LibraryTreeTable();
@@ -414,26 +444,7 @@ public class MainFrame extends JFrame {
         stagePanel.setTimelined(swf, swf, 0, true, true, true, true, true, false, true);
         stagePanel.pause();
         stagePanel.gotoFrame(0);
-        timelinePanel.setTimelined(swf);
-        timelinePanel.addFrameSelectionListener(new FrameSelectionListener() {
-            @Override
-            public void frameSelected(int frame, int depth) {
-                stagePanel.pause();
-                stagePanel.gotoFrame(frame + 1);
-                stagePanel.selectDepth(depth);
-                if (transformEnabled()) {
-                    stagePanel.freeTransformDepth(depth);
-                }
-                
-                if (depth != -1) {
-                    DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(stagePanel.getFrame()).layers.get(depth);                    
-                    if (ds == null) {
-                        depth = -1;
-                    }
-                }
-                transformPanel.setVisible(depth != -1);
-            }
-        });
+        timelinePanel.setTimelined(swf);        
     }
 
     @Override

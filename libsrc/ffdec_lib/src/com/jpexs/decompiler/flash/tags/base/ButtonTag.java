@@ -64,7 +64,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
      */
     public static int FRAME_HITTEST = 3;
 
-    private Timeline timeline;
+    private transient Timeline timeline;
 
     private boolean isSingleFrameInitialized;
 

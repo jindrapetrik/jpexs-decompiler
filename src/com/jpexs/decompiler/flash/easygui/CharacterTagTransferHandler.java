@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import de.javagl.treetable.JTreeTable;
@@ -31,7 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author JPEXS
  */
- class TagTransferHandler extends TransferHandler {
+ class CharacterTagTransferHandler extends TransferHandler {
 
         @Override
         protected Transferable createTransferable(JComponent c) {
@@ -46,7 +47,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
                         || (o instanceof TextTag)
                         || (o instanceof ButtonTag)
                         ) {
-                    return new TagTransferable((Tag) o);
+                    return new CharacterTagTransferable((CharacterTag) o);
                 }
             }
             return null;

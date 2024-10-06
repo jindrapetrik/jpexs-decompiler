@@ -41,55 +41,30 @@ public class TimelinePanel extends JPanel {
 
     private Timeline timeline;
 
+    private Timelined timelined;
+    
     public static final int FRAME_WIDTH = 8;
 
     public static final int FRAME_HEIGHT = 18;
 
     
     private JScrollPane timelineBodyScrollPane;
-    
-    //public static final Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
-    public static Color getBackgroundColor() {
-        return SystemColor.control;        
-    }
 
-    public Timeline getTimeline() {
-        return timeline;
-    }
-
-    public void addFrameSelectionListener(FrameSelectionListener l) {
-        timelineBodyPanel.addFrameSelectionListener(l);
-    }
-
-    public void removeFrameSelectionListener(FrameSelectionListener l) {
-        timelineBodyPanel.removeFrameSelectionListener(l);
-    }
-
-    public void setDepth(int depth) {
-        timelineBodyPanel.depthSelect(depth);
-    }
-    
-    public void setFrame(int frame, int depth) {
-        timelineBodyPanel.frameSelect(frame, depth);
-    }
-    
-    public void refresh() {
-        timelineBodyPanel.refresh();
-    }
-    
-    public void setTimelined(Timelined timelined) {
-        this.removeAll();
-        if (timelined == null) {
-            this.revalidate();
-            return;
-        }
-        timeline = timelined.getTimeline();
-        timelineBodyPanel = new TimelineBodyPanel(timeline);
+    public TimelinePanel(UndoManager undoManager) {
+        timelineBodyPanel = new TimelineBodyPanel(undoManager);
         setLayout(new BorderLayout());
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
-        depthPanel = new TimelineDepthPanel(timeline);
+        depthPanel = new TimelineDepthPanel();
+        
+        timelineBodyPanel.addChangeListener(new Runnable() {
+            @Override
+            public void run() {
+                timeline = timelined.getTimeline();
+                depthPanel.setTimeline(timeline);
+            }
+        });
 
         timePanel = new TimelineTimePanel();
 
@@ -139,6 +114,50 @@ public class TimelinePanel extends JPanel {
                 ftimeline.frameSelect(frame, depth);
             }
         });
-        this.revalidate();
+    }
+    
+    
+    
+    //public static final Color backgroundColor = new Color(0xd9, 0xe7, 0xfa);
+    public static Color getBackgroundColor() {
+        return SystemColor.control;        
+    }
+
+    public Timeline getTimeline() {
+        return timeline;
+    }
+
+    public void addFrameSelectionListener(FrameSelectionListener l) {
+        timelineBodyPanel.addFrameSelectionListener(l);
+    }
+
+    public void removeFrameSelectionListener(FrameSelectionListener l) {
+        timelineBodyPanel.removeFrameSelectionListener(l);
+    }
+
+    public void setDepth(int depth) {
+        timelineBodyPanel.depthSelect(depth);
+    }
+    
+    public void setFrame(int frame, int depth) {
+        timelineBodyPanel.frameSelect(frame, depth);
+    }
+    
+    public void refresh() {
+        timelineBodyPanel.refresh();
+    }
+    
+    public void addChangeListener(Runnable l) {
+        timelineBodyPanel.addChangeListener(l);
+    }
+    
+    public void removeChangeListener(Runnable l) {
+        timelineBodyPanel.removeChangeListener(l);
+    }
+    
+    public void setTimelined(Timelined timelined) {
+        this.timelined = timelined;
+        timelineBodyPanel.setTimeline(timelined.getTimeline());
+        depthPanel.setTimeline(timelined.getTimeline());
     }
 }

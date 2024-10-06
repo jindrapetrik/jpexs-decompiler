@@ -28,12 +28,13 @@ import java.util.List;
 public class TweenDetector {
 
     public static List<TweenRange> detectRanges(List<DepthState> depthStates) {
+        return new ArrayList<>();
         //TODO: make this working :-(
-        if (depthStates.size() < 2 || depthStates.get(0).placeObjectTag == depthStates.get(1).placeObjectTag) {
+        /*if (depthStates.size() < 2 || depthStates.get(0).placeObjectTag == depthStates.get(1).placeObjectTag) {
             return new ArrayList<>();
         }
 
-        return new ArrayList<>(Arrays.asList(new TweenRange(0, depthStates.size() - 1)));
+        return new ArrayList<>(Arrays.asList(new TweenRange(0, depthStates.size() - 1)));*/
         /*
 
          List<TweenRange> ret = new ArrayList<>();
