@@ -3056,7 +3056,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             } 
         }
 
-        RGB backgroundColor = timeline.getFrame(frame).backgroundColor;
+        Frame fr = timeline.getFrame(frame);
+        if (fr == null) {
+            return image;
+        }
+        RGB backgroundColor = fr.backgroundColor;
         if (backgroundColor != null) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(backgroundColor.toColor());
@@ -3070,8 +3074,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         gg.setPaint(Color.green);
         gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
         DepthState ds = null;
-        if (selectedDepth > -1 && timeline.getFrameCount() > frame) {
-            ds = timeline.getFrame(frame).layers.get(selectedDepth);
+        if (selectedDepth > -1 && timeline.getFrameCount() > frame && fr != null) {
+            ds = fr.layers.get(selectedDepth);
         }
 
         if (ds != null && freeTransformDepth == -1) {
