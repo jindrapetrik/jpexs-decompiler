@@ -102,6 +102,7 @@ public class MainFrame extends JFrame {
                 if (pl != null) {
                     timelinePanel.setDepth(pl.getDepth());
                 }
+                transformPanel.setVisible(pl != null);
             }
         });
 
@@ -114,7 +115,7 @@ public class MainFrame extends JFrame {
                 MATRIX previousMatrix = null;
                 synchronized (stagePanel) {
                     DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                    previousMatrix = ds.matrix;
+                    previousMatrix = ds.placeObjectTag.getMatrix();
                 }
 
                 final Point2D regPoint = stagePanel.getRegistrationPoint();
@@ -129,7 +130,9 @@ public class MainFrame extends JFrame {
                     public void doOperation() {
                         timelinePanel.setFrame(frame, depth);
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                        ds.setMATRIX(newMatrix);
+                        ds.placeObjectTag.setMatrix(newMatrix);
+                        ds.placeObjectTag.setPlaceFlagHasMatrix(newMatrix != null);
+                        stagePanel.getTimelined().resetTimeline();
                         stagePanel.repaint();
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepth(depth);
@@ -144,7 +147,9 @@ public class MainFrame extends JFrame {
                     public void undoOperation() {
                         timelinePanel.setFrame(frame, depth);
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                        ds.setMATRIX(fpreviousMatrix);
+                        ds.placeObjectTag.setMatrix(fpreviousMatrix);
+                        ds.placeObjectTag.setPlaceFlagHasMatrix(fpreviousMatrix != null);
+                        stagePanel.getTimelined().resetTimeline();
                         stagePanel.repaint();
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepth(depth);

@@ -1156,6 +1156,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 if (transformSelectionMode) {
                                     if (mode == Cursor.DEFAULT_CURSOR) {
                                         freeTransformDepth(-1);
+                                        selectDepth(-1);
                                         firePlaceObjectSelected();
                                     }
                                 } else if ((altDown && !selectionMode) || selectionMode) {
