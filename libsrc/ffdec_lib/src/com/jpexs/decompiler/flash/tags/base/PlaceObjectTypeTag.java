@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -258,6 +259,10 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
 
     @Override
     public Map<String, String> getNameProperties() {
+        SWF swf = getSwf();
+        if (swf == null) {
+            return new HashMap<>();
+        }
         Map<String, String> ret = super.getNameProperties();
         int charId = getCharacterId();
         String charClassName = getClassName();

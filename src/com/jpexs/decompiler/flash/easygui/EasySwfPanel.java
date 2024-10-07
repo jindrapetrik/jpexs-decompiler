@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.TransformPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.player.ZoomPanel;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
@@ -291,7 +292,7 @@ public class EasySwfPanel extends JPanel {
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        
 
         undoButton = new JButton(View.getIcon("rotateanticlockwise16"));
         //undoButton.setToolTipText("Undo");
@@ -342,9 +343,17 @@ public class EasySwfPanel extends JPanel {
 
         undoManager.addChangeListener(undoChangeListener);
 
-        toolbarPanel.add(undoButton);
-        toolbarPanel.add(redoButton);
-
+        
+        JPanel toolbarPanel = new JPanel(new BorderLayout());
+        JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftToolbar.add(undoButton);
+        leftToolbar.add(redoButton);
+        
+        toolbarPanel.add(leftToolbar, BorderLayout.WEST);
+        
+        ZoomPanel zoomPanel = new ZoomPanel(stagePanel);
+        toolbarPanel.add(zoomPanel, BorderLayout.EAST);
+        
         topPanel.add(toolbarPanel, BorderLayout.NORTH);
         topPanel.add(stagePanel, BorderLayout.CENTER);
 
