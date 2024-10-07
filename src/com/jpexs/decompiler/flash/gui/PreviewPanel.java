@@ -2779,6 +2779,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             @Override
+            public boolean isModified() {
+                return false;
+            }
+                        
+            @Override
             public ReadOnlyTagList getTags() {
                 if (cachedTags == null) {
                     List<Tag> tags = new ArrayList<>();

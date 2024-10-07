@@ -54,6 +54,12 @@ public interface Timelined extends BoundedTag {
      * @param value True if modified
      */
     public void setModified(boolean value);
+    
+    /**
+     * Gets modification flag.
+     * @return  True of modified
+     */
+    public boolean isModified();
 
     /**
      * Gets tags.

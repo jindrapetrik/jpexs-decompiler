@@ -126,10 +126,13 @@ public class EasySwfPanel extends JPanel {
                 final boolean transformEnabled = transformEnabled();
                 undoManager.doOperation(new DoableOperation() {
 
+                    private boolean wasModified = false;
+                    
                     @Override
                     public void doOperation() {
                         timelinePanel.setFrame(frame, depth);
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
+                        wasModified = ds.placeObjectTag.isModified();
                         ds.placeObjectTag.setMatrix(newMatrix);
                         ds.placeObjectTag.setPlaceFlagHasMatrix(newMatrix != null);
                         ds.placeObjectTag.setModified(true);    
@@ -151,6 +154,9 @@ public class EasySwfPanel extends JPanel {
                         DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
                         ds.placeObjectTag.setMatrix(fpreviousMatrix);
                         ds.placeObjectTag.setPlaceFlagHasMatrix(fpreviousMatrix != null);
+                        if (!wasModified) {
+                            ds.placeObjectTag.setModified(false);
+                        }
                         stagePanel.getTimelined().resetTimeline();
                         stagePanel.repaint();
                         if (transformEnabled()) {
@@ -190,26 +196,27 @@ public class EasySwfPanel extends JPanel {
                             || (tag instanceof ButtonTag)
                             ) {
 
-                        undoManager.doOperation(new DoableOperation() {
+                        undoManager.doOperation(new TimelinedTagListDoableOperation(stagePanel.getTimelined()) {
                             
-                            private PlaceObject2Tag place;
-                            private RemoveObject2Tag remove;
-                            private List<Tag> tags;
-                            private int frame = stagePanel.getFrame();
-                            private int depth = stagePanel.getSelectedDepth();
+                            private List<Tag> swfTags;
+                            private final int fframe = stagePanel.getFrame();
+                            private final int fdepth = stagePanel.getSelectedDepth();
                             
                             @Override
                             public void doOperation() {
-                                timelinePanel.setFrame(frame, depth);
+                                super.doOperation();
+                                timelinePanel.setFrame(fframe, fdepth);
                                 CharacterTag ch = (CharacterTag) tag;
                                 int maxDepth = stagePanel.getTimelined().getTimeline().getMaxDepth();
                                 int newDepth = maxDepth + 1;
                                 Timelined timelined = stagePanel.getTimelined();
                                 
-                                tags = timelined.getSwf().getTags().toArrayList();
+                                if (timelined.getSwf() != timelined) {
+                                    swfTags = timelined.getSwf().getTags().toArrayList();
+                                }
                                 
-                                ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(frame).showFrameTag;
-                                place = new PlaceObject2Tag(timelined.getSwf());
+                                ShowFrameTag showFrameTag = timelined.getTimeline().getFrame(fframe).showFrameTag;
+                                PlaceObject2Tag place = new PlaceObject2Tag(timelined.getSwf());
                                 place.depth = newDepth;
                                 place.placeFlagHasCharacter = true;
                                 place.characterId = ch.getCharacterId();
@@ -221,7 +228,7 @@ public class EasySwfPanel extends JPanel {
                                 } else {
                                     timelined.addTag(timelined.indexOfTag(showFrameTag), place);
                                     
-                                    remove = new RemoveObject2Tag(timelined.getSwf());
+                                    RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
                                     remove.depth = newDepth;
                                     timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);                                    
                                 }
@@ -230,7 +237,7 @@ public class EasySwfPanel extends JPanel {
                                 DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
                                 boolean tagOrderChanged = fixer.fixDefineBeforeUsage(timelined.getSwf());
                                 if (!tagOrderChanged) {
-                                    tags = null;
+                                    swfTags = null;
                                 }
                                 
                                 timelined.resetTimeline();
@@ -241,33 +248,25 @@ public class EasySwfPanel extends JPanel {
 
                             @Override
                             public void undoOperation() {
-                                Timelined timelined = place.getTimelined();
-                                timelined.removeTag(place);
-                                if (remove != null) {
-                                    timelined.removeTag(remove);
-                                }
+                                super.undoOperation();
                                 timelined.resetTimeline();
                                 
                                 //Tag order changed, put the original tags back
-                                if (tags != null) {
+                                if (swfTags != null) {
                                     SWF swf = timelined.getSwf();
                                     ReadOnlyTagList newTags = swf.getTags();
                                     int size = newTags.size();
                                     for (int i = 0; i < size; i++) {
                                         swf.removeTag(0);
                                     }
-                                    for (int i = 0; i < tags.size(); i++) {
-                                        if (tags.get(i) == place) {
-                                            continue;
-                                        }
-                                        swf.addTag(tags.get(i));
+                                    for (int i = 0; i < swfTags.size(); i++) {                                        
+                                        swf.addTag(swfTags.get(i));
                                     }
                                     swf.resetTimeline();
-                                }
-                                
+                                }                                
                                 stagePanel.repaint();
                                 timelinePanel.refresh();
-                                timelinePanel.setFrame(frame, depth);
+                                timelinePanel.setFrame(fframe, fdepth);
                             }
 
                             @Override

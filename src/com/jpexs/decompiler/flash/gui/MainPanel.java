@@ -5962,6 +5962,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
 
                 @Override
+                public boolean isModified() {
+                    return false;
+                }                                
+
+                @Override
                 public ReadOnlyTagList getTags() {
                     if (cachedTags == null) {
                         List<Tag> tags = new ArrayList<>();
