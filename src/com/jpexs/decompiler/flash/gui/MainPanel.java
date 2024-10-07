@@ -118,7 +118,6 @@ import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeContextMenu;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
-import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import com.jpexs.decompiler.flash.importers.AS2ScriptImporter;
