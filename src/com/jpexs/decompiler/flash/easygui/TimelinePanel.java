@@ -158,8 +158,15 @@ public class TimelinePanel extends JPanel {
     
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
-        timelineBodyPanel.setTimeline(timelined.getTimeline());
-        depthPanel.setTimeline(timelined.getTimeline());
-        timePanel.setTimeline(timelined.getTimeline());
+        if (timelined == null) {
+            timelineBodyPanel.setTimeline(null);
+            depthPanel.setTimeline(null);
+            timePanel.setTimeline(null);
+        } else {
+            timelineBodyPanel.setTimeline(timelined.getTimeline());
+            depthPanel.setTimeline(timelined.getTimeline());
+            timePanel.setTimeline(timelined.getTimeline());
+            timelineBodyPanel.frameSelect(0, 0);
+        }        
     }
 }

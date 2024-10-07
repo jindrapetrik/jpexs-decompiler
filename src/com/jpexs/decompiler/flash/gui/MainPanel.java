@@ -1468,7 +1468,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
+        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);        
         previewPanel.clear();
         openables.set(index, newSwfs);
 
@@ -1477,6 +1477,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Main.searchResultsStorage.destroySwf(s);
         }
         Openable openable = newSwfs.size() > 0 ? newSwfs.get(0) : null;
+        
+        easyPanel.setSwfs(new ArrayList<>(getAllSwfs()));
+        if (openable instanceof SWF) {
+            easyPanel.setSwf((SWF) openable);
+        }
         if (openable != null) {
             updateUi(openable);
         }
@@ -1495,6 +1500,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
 
         openables.add(newOpenables);
+        
+        easyPanel.setSwfs(new ArrayList<>(getAllSwfs()));
+        
         Openable openable = newOpenables.size() > 0 ? newOpenables.get(0) : null;
         if (openable != null) {
             updateUi(openable);
@@ -1556,6 +1564,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 break;
             case VIEW_TIMELINE:
+                updateUi(easyPanel.getSwf());
                 break;
         }
     }
@@ -1564,7 +1573,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         if (isWelcomeScreen) {
-            showContentPanelCard(SPLIT_PANE1);
+            if (currentView == VIEW_TIMELINE) {
+                showContentPanelCard(TIMELINE_PANEL);
+            } else {
+                showContentPanelCard(SPLIT_PANE1);
+            }
             isWelcomeScreen = false;
         }
         SWF swf = null;
@@ -5695,7 +5708,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 pinsPanel.setVisible(false);
                 currentView = view;
                 Configuration.lastView.set(currentView);
-                final SWF swf = getCurrentSwf();
+                /*final SWF swf = getCurrentSwf();
                 if (swf != null) {
                     TreeItem item = tagTree.getCurrentTreeItem();
                     if (item instanceof TagScript) {
@@ -5712,8 +5725,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     return true;
                 } else {
                     showView(VIEW_RESOURCES);
-                }
-                return false;
+                }*/
+                Set<SWF> swfs = getAllSwfs();
+                easyPanel.setSwfs(new ArrayList<>(swfs));
+                if (!isWelcomeScreen) {
+                    showContentPanelCard(TIMELINE_PANEL);
+                }                
+                return true;
             case VIEW_TAGLIST:
                 pinsPanel.setVisible(true);
                 currentView = view;
@@ -6061,7 +6079,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (currentView == VIEW_DUMP) {
             dumpViewReload(forceReload);
             return;
-        }
+        }       
         /*else if (currentView == VIEW_TAGLIST) {
             tagListViewReload(forceReload);
             return;
@@ -6072,6 +6090,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreePath treePath = tree.getSelectionPath();
         if (treePath != null && tree.getFullModel().treePathExists(treePath)) {
             treeItem = (TreeItem) treePath.getLastPathComponent();
+        }
+        
+        if (currentView == VIEW_TIMELINE) {
+            if (treeItem != null) {
+                Openable op = treeItem.getOpenable();
+                if (op instanceof SWF) {
+                    easyPanel.setSwf((SWF) op);
+                }
+            }
+            return;
         }
 
         // save last selected node to config

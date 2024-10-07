@@ -94,4 +94,10 @@ public class UndoManager {
     public boolean canRedo() {
         return history.size() > historyPos;
     }
+    
+    public void clear() {
+        history.clear();
+        historyPos = 0;
+        fireChange();
+    }
 }

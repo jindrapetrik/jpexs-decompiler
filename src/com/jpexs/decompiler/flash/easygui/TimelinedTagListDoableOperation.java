@@ -37,6 +37,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
     @Override
     public void doOperation() {
         saveTagList();
+        timelined.setModified(true);
     }
 
     protected void saveTagList() {
