@@ -169,7 +169,7 @@ public class EasySwfPanel extends JPanel {
                     public String getDescription() {
                         return EasyStrings.translate(transformEnabled ? "action.transform" : "action.move");
                     }
-                });
+                }, timelined.getSwf());
 
             }
 
@@ -274,7 +274,7 @@ public class EasySwfPanel extends JPanel {
                                 return EasyStrings.translate("action.addToStage");
                             }
 
-                        });
+                        }, timelined.getSwf());
 
                         return true;
                     }
@@ -299,7 +299,7 @@ public class EasySwfPanel extends JPanel {
         undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                undoManager.undo();
+                undoManager.undo(timelined.getSwf());
             }
         });
 
@@ -309,7 +309,7 @@ public class EasySwfPanel extends JPanel {
         redoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                undoManager.redo();
+                undoManager.redo(timelined.getSwf());
             }
         });
 
@@ -321,22 +321,7 @@ public class EasySwfPanel extends JPanel {
         Runnable undoChangeListener = new Runnable() {
             @Override
             public void run() {
-                undoButton.setEnabled(undoManager.canUndo());
-                redoButton.setEnabled(undoManager.canRedo());
-                if (undoManager.canUndo()) {
-                    undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%",undoManager.getUndoName()));
-                } else {
-                    undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
-                }
-                if (undoManager.canRedo()) {
-                    redoButton.setToolTipText(EasyStrings.translate("redo").replace("%action%", undoManager.getRedoName()));
-                } else {
-                    redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
-                }
-                if (stagePanel.getTimelined() == null) {
-                    return;
-                }
-                Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();
+                updateUndos();
             }
         };
 
@@ -472,7 +457,7 @@ public class EasySwfPanel extends JPanel {
 
     private boolean transformEnabled() {
         return rightTabbedPane.getSelectedIndex() == 1;
-    }  
+    }
     
     public void setTimelined(Timelined timelined) {        
         this.timelined = timelined;
@@ -487,10 +472,33 @@ public class EasySwfPanel extends JPanel {
             stagePanel.gotoFrame(0);
             timelinePanel.setTimelined(swf);  
         }
-        undoManager.clear();
+        updateUndos();
     }
 
     public Openable getOpenable() {
         return timelined.getSwf();
+    }
+    
+    public void clearUndos() {
+        undoManager.clear();
+    }
+    
+    private void updateUndos() {
+        undoButton.setEnabled(timelined != null && undoManager.canUndo(timelined.getSwf()));
+        redoButton.setEnabled(timelined != null && undoManager.canRedo(timelined.getSwf()));
+        if (timelined != null && undoManager.canUndo(timelined.getSwf())) {
+            undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%",undoManager.getUndoName(timelined.getSwf())));
+        } else {
+            undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
+        }
+        if (timelined != null && undoManager.canRedo(timelined.getSwf())) {
+            redoButton.setToolTipText(EasyStrings.translate("redo").replace("%action%", undoManager.getRedoName(timelined.getSwf())));
+        } else {
+            redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
+        }
+        if (stagePanel.getTimelined() == null) {
+            return;
+        }
+        Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();
     }
 }
