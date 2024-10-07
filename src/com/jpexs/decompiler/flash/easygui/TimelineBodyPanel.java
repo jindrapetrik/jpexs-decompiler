@@ -727,7 +727,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public String getDescription() {
                 return EasyStrings.translate("action.removeFrame");
             }
-        });
+        }, timeline.timelined.getSwf());
     }
 
     private void addKeyFrame(ActionEvent e) {
@@ -799,7 +799,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public String getDescription() {
                 return EasyStrings.translate("action.addKeyFrame");
             }
-        });
+        }, timeline.timelined.getSwf());
     }
 
     private void addKeyFrameEmptyBefore(ActionEvent e) {
@@ -863,7 +863,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public String getDescription() {
                 return EasyStrings.translate("action.addKeyFrame"); //Intentionally not "...with blank frames before"
             }
-        });
+        }, timeline.timelined.getSwf());
     }
 
     private void addFrame(ActionEvent e) {
@@ -1030,7 +1030,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public String getDescription() {
                 return EasyStrings.translate("action.addFrame");
             }
-        });
+        }, timeline.timelined.getSwf());
     }
 
     @Override

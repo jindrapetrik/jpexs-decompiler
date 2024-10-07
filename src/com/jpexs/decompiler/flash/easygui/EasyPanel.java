@@ -46,7 +46,8 @@ public class EasyPanel extends JPanel {
         tabSwitcher.clear();
         for (SWF swf : swfs) {
             tabSwitcher.addTab(swf, swf.getShortPathTitle(), View.getIcon("flash16"));
-        }
+        }   
+        easySwfPanel.clearUndos();
     }
     
     public void setSwf(SWF swf) {
