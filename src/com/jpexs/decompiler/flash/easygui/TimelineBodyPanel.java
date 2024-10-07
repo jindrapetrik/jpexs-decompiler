@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -52,6 +53,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import org.pushingpixels.substance.internal.utils.SubstanceColorUtilities;
 
 /**
@@ -129,25 +134,42 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public static Color getBackgroundColor() {
-        return SystemColor.control;
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        } else {
+            return SystemColor.control;
+        }
     }
 
-    public static Color getSelectedColor() {
-        return SystemColor.textHighlight;
-    }
 
     public static Color getSelectedColorText() {
-        return SystemColor.textHighlightText;
-    }
-
-    private static Color getControlColor() {
-        return SystemColor.control;
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getForegroundColor();
+        } else {
+            return SystemColor.textHighlightText;
+        }
     }
 
     public static Color getFrameColor() {
         return SubstanceColorUtilities.getDarkerColor(getControlColor(), 0.1);
     }
 
+    public static Color getSelectedColor() {
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ROLLOVER_SELECTED).getBackgroundFillColor();
+        } else {
+            return SystemColor.textHighlight;
+        }
+    }
+
+    private static Color getControlColor() {
+        if (Configuration.useRibbonInterface.get()) {
+            return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
+        } else {
+            return SystemColor.control;
+        }
+    }
+    
     public void addFrameSelectionListener(FrameSelectionListener l) {
         selectionListeners.add(l);
     }
