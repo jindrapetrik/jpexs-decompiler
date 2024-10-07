@@ -1082,7 +1082,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public void setTimeline(Timeline timeline) {
-        this.timeline = timeline;
+        this.timeline = timeline;        
         refresh();
     }
 }

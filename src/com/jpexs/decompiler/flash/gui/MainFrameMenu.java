@@ -1125,7 +1125,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
-        setMenuEnabled("/file/view/timeline", swfSelected);
+        //setMenuEnabled("/file/view/timeline", swfSelected);
         setMenuEnabled("/tools/abcExplorer", isAs3);
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
@@ -1177,6 +1177,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     break;
                 case MainPanel.VIEW_DUMP:
                     setGroupSelection("view", "/file/view/viewHex");
+                    break;
+                case MainPanel.VIEW_TIMELINE:
+                    setMenuChecked("/file/view/timeline", true);
                     break;
             }
         }
@@ -1521,6 +1524,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 break;
             case MainPanel.VIEW_DUMP:
                 setMenuChecked("/file/view/viewHex", true);
+                break;
+            case MainPanel.VIEW_TIMELINE:
+                setMenuChecked("/file/view/timeline", true);
                 break;
         }
     }
