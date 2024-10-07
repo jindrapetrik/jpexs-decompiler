@@ -29,6 +29,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
 
     private final Timelined timelined;
     protected List<Tag> tags;
+    protected boolean wasModified = false;
 
     public TimelinedTagListDoableOperation(Timelined timelined) {
         this.timelined = timelined;
@@ -37,6 +38,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
     @Override
     public void doOperation() {
         saveTagList();
+        wasModified = timelined.isModified();
         timelined.setModified(true);
     }
 
@@ -55,13 +57,16 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
                 timelined.addTag(tags.get(i));
             }
             timelined.resetTimeline();
-            timelined.setFrameCount(timelined.getTimeline().getFrameCount());                
+            timelined.setFrameCount(timelined.getTimeline().getFrameCount());                            
         }
     }
 
     @Override
     public void undoOperation() {
         restoreTagList();
+        if (!wasModified) {
+            timelined.setModified(false);
+        }
     }
 
     @Override

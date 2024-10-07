@@ -306,6 +306,11 @@ public class TimelinedMaker {
             }
 
             @Override
+            public boolean isModified() {
+                return false;
+            }                        
+
+            @Override
             public ReadOnlyTagList getTags() {
                 return ReadOnlyTagList.EMPTY;
             }
