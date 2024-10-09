@@ -1125,7 +1125,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
-        //setMenuEnabled("/file/view/timeline", swfSelected);
+        //setMenuEnabled("/file/view/easy", swfSelected);
         setMenuEnabled("/tools/abcExplorer", isAs3);
 
         setMenuEnabled("/tools/gotoDocumentClass", hasAbc);
@@ -1178,8 +1178,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 case MainPanel.VIEW_DUMP:
                     setGroupSelection("view", "/file/view/viewHex");
                     break;
-                case MainPanel.VIEW_TIMELINE:
-                    setMenuChecked("/file/view/timeline", true);
+                case MainPanel.VIEW_EASY:
+                    setMenuChecked("/file/view/easy", true);
                     break;
             }
         }
@@ -1273,7 +1273,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
-        addToggleMenuItem("/file/view/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
+        addToggleMenuItem("/file/view/easy", translate("menu.file.view.easy"), null, "easy32", this::easyActionPerformed, PRIORITY_TOP, null);
         finishMenu("/file/view");
 
         addSeparator("/file");
@@ -1525,8 +1525,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
             case MainPanel.VIEW_DUMP:
                 setMenuChecked("/file/view/viewHex", true);
                 break;
-            case MainPanel.VIEW_TIMELINE:
-                setMenuChecked("/file/view/timeline", true);
+            case MainPanel.VIEW_EASY:
+                setMenuChecked("/file/view/easy", true);
                 break;
         }
     }
@@ -1539,7 +1539,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
-        setMenuChecked("/file/view/timeline", false);
+        setMenuChecked("/file/view/easy", false);
     }
 
     private void viewHexActionPerformed(ActionEvent evt) {
@@ -1555,7 +1555,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainPanel.showView(MainPanel.VIEW_DUMP);
         setGroupSelection("view", "/file/view/viewHex");
-        setMenuChecked("/file/view/timeline", false);
+        setMenuChecked("/file/view/easy", false);
     }
 
     private void viewTagListActionPerformed(ActionEvent evt) {
@@ -1567,7 +1567,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         setGroupSelection("view", "/file/view/viewTagList");
-        setMenuChecked("/file/view/timeline", false);
+        setMenuChecked("/file/view/easy", false);
     }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {
@@ -1582,10 +1582,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         //setMenuEnabled("/tools/debugger/debuggerInjectLoader", isMenuChecked("/tools/debugger/debuggerSwitch"));
     }
 
-    private void timelineActionPerformed(ActionEvent evt) {
-        if (isMenuChecked("/file/view/timeline")) {
-            if (!mainFrame.getPanel().showView(MainPanel.VIEW_TIMELINE)) {
-                setMenuChecked("/file/view/timeline", false);
+    private void easyActionPerformed(ActionEvent evt) {
+        if (isMenuChecked("/file/view/easy")) {
+            if (!mainFrame.getPanel().showView(MainPanel.VIEW_EASY)) {
+                setMenuChecked("/file/view/easy", false);
             } else {
                 setGroupSelection("view", null);
             }
