@@ -3273,6 +3273,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void setTagTreeSelectedNode(AbstractTagTree tree, TreeItem treeItem) {
         AbstractTagTreeModel ttm = tree.getFullModel();
+        if (ttm == null) {
+            return;
+        }
         TreePath tp = ttm.getTreePath(treeItem);
         if (tp != null) {
             tree.setSelectionPath(tp);
