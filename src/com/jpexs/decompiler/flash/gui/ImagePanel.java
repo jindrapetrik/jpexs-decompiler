@@ -3929,6 +3929,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         this.loop = loop;
     }
 
+    /**
+     * Goto frame
+     * @param frame 1-based frame
+     */
     @Override
     public synchronized void gotoFrame(int frame) {
         if (timelined == null) {
@@ -3936,10 +3940,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         Timeline timeline = timelined.getTimeline();
         if (frame > timeline.getFrameCount()) {
-            return;
+            frame = timeline.getFrameCount();           
         }
         if (frame < 1) {
-            return;
+            frame = 1;           
         }
 
         this.autoPlayed = true;
