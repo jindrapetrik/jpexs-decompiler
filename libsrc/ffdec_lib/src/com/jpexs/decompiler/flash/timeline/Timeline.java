@@ -234,6 +234,20 @@ public class Timeline {
         }
         return frames.get(index);
     }
+    
+    /**
+     * Gets depth state at specified frame and depth
+     * @param frame Frame
+     * @param depth Depth
+     * @return DepthState or null if it does not exist or frame does not exist
+     */
+    public synchronized DepthState getDepthState(int frame, int depth) {
+        Frame fr = getFrame(frame);
+        if (fr == null) {
+            return null;
+        }
+        return fr.layers.get(depth);
+    }
 
     /**
      * Adds a frame.
