@@ -388,7 +388,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static final String WELCOME_PANEL = "WELCOMEPANEL";
 
-    private static final String TIMELINE_PANEL = "TIMELINEPANEL";
+    private static final String EASY_PANEL = "EASYPANEL";
 
     private static final String RESOURCES_VIEW = "RESOURCES";
 
@@ -396,13 +396,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static final String TAGLIST_VIEW = "TAGLIST";
 
-    private static final String TIMELINE_VIEW = "TIMELINE";
+    private static final String EASY_VIEW = "EASY";
 
     private final JPersistentSplitPane splitPane1;
 
     private final JPersistentSplitPane splitPane2;
 
-    private JTabbedPane detailPanel;
+    private final JTabbedPane detailPanel;
 
     private QuickTreeFindPanel quickTreeFindPanel;
 
@@ -1305,7 +1305,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         contentPanel = new JPanel(new CardLayout());
         contentPanel.add(welcomePanel, WELCOME_PANEL);
         contentPanel.add(splitPane1, SPLIT_PANE1);
-        contentPanel.add(easyPanel, TIMELINE_PANEL);
+        contentPanel.add(easyPanel, EASY_PANEL);
         add(contentPanel);
         showContentPanelCard(WELCOME_PANEL);
 
@@ -1562,7 +1562,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
                 break;
-            case VIEW_TIMELINE:
+            case VIEW_EASY:
                 updateUi(easyPanel.getSwf());
                 break;
         }
@@ -1572,8 +1572,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         if (isWelcomeScreen) {
-            if (currentView == VIEW_TIMELINE) {
-                showContentPanelCard(TIMELINE_PANEL);
+            if (currentView == VIEW_EASY) {
+                showContentPanelCard(EASY_PANEL);
             } else {
                 showContentPanelCard(SPLIT_PANE1);
             }
@@ -2544,7 +2544,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return null;
         }
 
-        if (currentView == VIEW_TIMELINE) {
+        if (currentView == VIEW_EASY) {
             return easyPanel.getSwf();
         }
         if (treePanelMode == TreePanelMode.TAG_TREE) {
@@ -5491,7 +5491,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return -1;
         }
 
-        if (currentView == VIEW_TIMELINE) {
+        if (currentView == VIEW_EASY) {
             return -1;
         }
         TreePath path = getCurrentTree().getFullModel().getTreePath(treeItem);
@@ -5518,7 +5518,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             return null;
         }
-        if (currentView == VIEW_TIMELINE) {
+        if (currentView == VIEW_EASY) {
             return null;
         }
 
@@ -5583,7 +5583,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public static final int VIEW_DUMP = 1;
 
-    public static final int VIEW_TIMELINE = 2;
+    public static final int VIEW_EASY = 2;
 
     public static final int VIEW_TAGLIST = 3;
 
@@ -5709,7 +5709,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
                 updateUiWithCurrentOpenable();
                 return true;
-            case VIEW_TIMELINE:
+            case VIEW_EASY:
                 SWF swf = getCurrentSwf();                
                 pinsPanel.setVisible(false);
                 currentView = view;
@@ -5718,7 +5718,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 easyPanel.setSwfs(new ArrayList<>(swfs));
                 easyPanel.setSwf(swf);
                 if (!isWelcomeScreen) {
-                    showContentPanelCard(TIMELINE_PANEL);
+                    showContentPanelCard(EASY_PANEL);
                 }                
                 return true;
             case VIEW_TAGLIST:
@@ -6086,7 +6086,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             treeItem = (TreeItem) treePath.getLastPathComponent();
         }
         
-        if (currentView == VIEW_TIMELINE) {
+        if (currentView == VIEW_EASY) {
             if (treeItem != null) {
                 Openable op = treeItem.getOpenable();
                 if (op instanceof SWF) {
