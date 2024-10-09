@@ -2173,6 +2173,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         //updateScrollBars();
                     } else if (freeTransformDepth > -1) {
                         setAllowMove(true);
+                    } else if (selectionMode) {
+                        setAllowMove(false); 
                     } else {
                         boolean doMove = h > h2 || w > w2;
                         if (zoom.fit) {
