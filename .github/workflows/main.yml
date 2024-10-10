@@ -33,18 +33,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Set up JDK 8
-      uses: AdoptOpenJDK/install-jdk@v1
+    - name: Set up JDKs
+      uses: actions/setup-java@v4
       with:
-        version: '8'
+        distribution: oracle
         architecture: x64
-        targets: 'JDK_8;JAVA_HOME'
-    - name: Set up JDK 21
-      uses: AdoptOpenJDK/install-jdk@v1
-      with:
-        version: '21'
-        architecture: x64
-        targets: 'JDK_21'
+        java-version: |
+          8
+          21
     - name: Set up PHP
       run: |
         apt update -y -qq
