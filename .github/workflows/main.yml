@@ -36,7 +36,7 @@ jobs:
     - name: Set up JDKs
       uses: actions/setup-java@v4
       with:
-        distribution: oracle
+        distribution: adopt
         architecture: x64
         java-version: |
           8
