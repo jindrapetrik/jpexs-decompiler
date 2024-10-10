@@ -56,7 +56,9 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.List;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -87,6 +89,8 @@ public class EasySwfPanel extends JPanel {
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
     private Timelined timelined;
+    private JLabel timelineLabel;
+    private JButton closeTimelineButton;
 
     public EasySwfPanel() {
         setLayout(new BorderLayout());
@@ -332,6 +336,20 @@ public class EasySwfPanel extends JPanel {
         JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         leftToolbar.add(undoButton);
         leftToolbar.add(redoButton);
+        leftToolbar.add(Box.createHorizontalStrut(10));
+        timelineLabel = new JLabel("");
+        leftToolbar.add(timelineLabel);
+        leftToolbar.add(Box.createHorizontalStrut(5));
+        closeTimelineButton = new JButton(View.getIcon("cancel16"));
+        closeTimelineButton.setMargin(new Insets(5, 5, 5, 5));        
+        leftToolbar.add(closeTimelineButton);
+        closeTimelineButton.setToolTipText(EasyStrings.translate("timeline.item.cancel"));
+        closeTimelineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTimelined(timelined.getSwf());
+            }            
+        });
         
         toolbarPanel.add(leftToolbar, BorderLayout.WEST);
         
@@ -466,6 +484,8 @@ public class EasySwfPanel extends JPanel {
             timelinePanel.setTimelined(null);
             libraryTreeTable.setSwf(null);
             libraryPreviewPanel.clearAll();
+            closeTimelineButton.setVisible(false);
+            timelineLabel.setText("");
         } else {
             SWF swf = timelined.getSwf();
             libraryTreeTable.setSwf(swf);
@@ -474,6 +494,14 @@ public class EasySwfPanel extends JPanel {
             stagePanel.pause();
             stagePanel.gotoFrame(0);
             timelinePanel.setTimelined(timelined);  
+            if (timelined instanceof SWF) {
+                timelineLabel.setText(EasyStrings.translate("timeline.main"));
+                closeTimelineButton.setVisible(false);
+            } else {
+                EasyTagNameResolver nameResolver = new EasyTagNameResolver();
+                timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
+                closeTimelineButton.setVisible(true);
+            }
         }
         updateUndos();
     }
