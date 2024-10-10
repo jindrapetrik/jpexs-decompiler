@@ -1426,7 +1426,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceNoFillButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
+                mainPanel.replaceNoFill(mainPanel.getCurrentTree().getCurrentTreeItem());
             }
         });
         replaceShapeUpdateBoundsButton.setVisible(false);
