@@ -371,7 +371,7 @@ public class EasySwfPanel extends JPanel {
         
         verticalSplitPane = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel, Configuration.guiSplitPaneEasyVerticaldividerLocationPercent);
 
-        libraryTreeTable = new LibraryTreeTable();
+        libraryTreeTable = new LibraryTreeTable(this);
         JScrollPane libraryScrollPane = new FasterScrollPane(libraryTreeTable);
 
         JPanel libraryPanel = new JPanel(new BorderLayout());
@@ -464,13 +464,16 @@ public class EasySwfPanel extends JPanel {
         if (timelined == null) {
             stagePanel.clearAll();
             timelinePanel.setTimelined(null);
+            libraryTreeTable.setSwf(null);
+            libraryPreviewPanel.clearAll();
         } else {
             SWF swf = timelined.getSwf();
             libraryTreeTable.setSwf(swf);
-            stagePanel.setTimelined(swf, swf, 0, true, true, true, true, true, false, true);
+            libraryPreviewPanel.clearAll();
+            stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true);
             stagePanel.pause();
             stagePanel.gotoFrame(0);
-            timelinePanel.setTimelined(swf);  
+            timelinePanel.setTimelined(timelined);  
         }
         updateUndos();
     }
@@ -500,5 +503,10 @@ public class EasySwfPanel extends JPanel {
             return;
         }
         Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();
+    }
+    
+    public void dispose() {
+        setTimelined(null);
+        undoManager.clear();
     }
 }

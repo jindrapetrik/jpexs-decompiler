@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 
@@ -56,5 +57,10 @@ public class EasyPanel extends JPanel {
     
     public SWF getSwf() {
         return tabSwitcher.getSelectedValue();
+    }
+    
+    public void dispose() {
+        setSwfs(new ArrayList<>());
+        easySwfPanel.dispose();
     }
 }

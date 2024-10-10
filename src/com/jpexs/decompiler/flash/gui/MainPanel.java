@@ -6503,6 +6503,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void dispose() {
+        easyPanel.dispose();
         if (calculateMissingNeededThread != null) {
             calculateMissingNeededThread.interrupt();
         }
