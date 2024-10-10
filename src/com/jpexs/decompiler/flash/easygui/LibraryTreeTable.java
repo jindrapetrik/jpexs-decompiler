@@ -29,15 +29,19 @@ import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import de.javagl.treetable.JTreeTable;
 import de.javagl.treetable.TreeTableModel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -49,8 +53,11 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public class LibraryTreeTable extends JTreeTable {
+
+    private final EasySwfPanel easySwfPanel;
+    private SWF swf;
        
-    public LibraryTreeTable() {
+    public LibraryTreeTable(EasySwfPanel easySwfPanel) {
         super(new LibraryTreeTableModel(null));        
         getTree().setCellRenderer(new LibraryTreeCellRenderer());
         getTree().setRootVisible(false);
@@ -107,9 +114,32 @@ public class LibraryTreeTable extends JTreeTable {
             setBackground(Color.WHITE);
             getTree().setBackground(Color.WHITE);
         }
+        this.easySwfPanel = easySwfPanel;
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                    int selectedRow = getSelectedRow();
+                    if (selectedRow == -1) {
+                        return;
+                    }
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) getValueAt(selectedRow, 0);
+                    Object obj = node.getUserObject();
+                    if (obj instanceof Timelined) {
+                        easySwfPanel.setTimelined((Timelined) obj);
+                    }
+                }
+            }            
+        });
+        
     }
     
     public void setSwf(SWF swf) {
+        if (swf == this.swf) {
+            return;
+        }
+        this.swf = swf;
         setTreeTableModel(new LibraryTreeTableModel(swf));
     }
         
