@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - [#2334] AS1/2 P-code export - Do not export on(xxx) header
 - [#2338] AS decompiling threads got stuck after cancelling / timeout
 - [#2338] AS2 class detection in some minor cases
+- [#2337], [#2339] Replace shape update bounds - allow selecting multiple shapes
 
 ## [21.1.0] - 2024-09-23
 ### Added
@@ -3618,6 +3619,8 @@ Major version of SWF to XML export changed to 2.
 [#2335]: https://www.free-decompiler.com/flash/issues/2335
 [#2334]: https://www.free-decompiler.com/flash/issues/2334
 [#2338]: https://www.free-decompiler.com/flash/issues/2338
+[#2337]: https://www.free-decompiler.com/flash/issues/2337
+[#2339]: https://www.free-decompiler.com/flash/issues/2339
 [#943]: https://www.free-decompiler.com/flash/issues/943
 [#1812]: https://www.free-decompiler.com/flash/issues/1812
 [#2287]: https://www.free-decompiler.com/flash/issues/2287

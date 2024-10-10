@@ -517,7 +517,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceNoFillMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceNoFillButtonActionPerformed(getCurrentItem());
+                mainPanel.replaceNoFillButtonActionPerformed(getSelectedItems());
             }
         });
         replaceNoFillMenuItem.setIcon(View.getIcon("replaceitem16"));

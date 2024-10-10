@@ -5006,6 +5006,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean replace(List<TreeItem> items, boolean create) {
+        return replace(items, create, true);
+    }
+    public boolean replace(List<TreeItem> items, boolean create, boolean fill) {
         if (items.isEmpty()) {
             return false;
         }
@@ -5037,12 +5040,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return false;
         }
         for (TreeItem ti : items) {
-            doReplaceAction(ti, file, create);
+            doReplaceAction(ti, file, create, fill);
         }
         return true;
     }
 
-    private void doReplaceAction(TreeItem item, File selectedFile, boolean create) {
+    private void doReplaceAction(TreeItem item, File selectedFile, boolean create, boolean fill) {
         if (selectedFile == null) {
             return;
         }
@@ -5118,16 +5121,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 Tag newTag = null;
                 if (st instanceof ShapeTag) {
                     if (svgText != null) {
-                        newTag = new SvgImporter().importSvg((ShapeTag) st, svgText);
+                        newTag = new SvgImporter().importSvg((ShapeTag) st, svgText, fill);
                     } else {
-                        newTag = new ShapeImporter().importImage((ShapeTag) st, data);
+                        newTag = new ShapeImporter().importImage((ShapeTag) st, data, 0, fill);
                     }
                 }
                 if (st instanceof MorphShapeTag) {
                     if (svgText != null) {
-                        newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText);
+                        newTag = new SvgImporter().importSvg((MorphShapeTag) st, svgText, fill);
                     } else {
-                        newTag = new ShapeImporter().importImage((MorphShapeTag) st, data);
+                        newTag = new ShapeImporter().importImage((MorphShapeTag) st, data, 0, fill);
                     }
                 }
                 SWF swf = st.getSwf();
@@ -5210,58 +5213,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         replaceSpriteWithGif(item);
     }
 
-    public void replaceNoFillButtonActionPerformed(TreeItem item) {
-        replaceNoFill(item);
-    }
+    public void replaceNoFillButtonActionPerformed(List<TreeItem> items) {
+        replace(items, false, false);
+    }   
 
     public boolean replaceNoFill(TreeItem item) {
-        if (item == null) {
-            return false;
-        }
-
-        if (item instanceof MorphShapeTag) {
-            return replaceMorphShape((MorphShapeTag) item, false, false);
-        }
-        if (item instanceof ShapeTag) {
-            ShapeTag st = (ShapeTag) item;
-            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
-            File selectedFile = showImportFileChooser(filter, true, "importshape");
-            if (selectedFile != null) {
-                File selfile = Helper.fixDialogFile(selectedFile);
-                byte[] data = null;
-                String svgText = null;
-                if (".svg".equals(Path.getExtension(selfile))) {
-                    svgText = Helper.readTextFile(selfile.getAbsolutePath());
-                    showSvgImportWarning();
-                } else {
-                    data = Helper.readFile(selfile.getAbsolutePath());
-                }
-                try {
-                    Tag newTag = null;
-                    if (svgText != null) {
-                        newTag = new SvgImporter().importSvg(st, svgText, false);
-                    } else {
-                        newTag = new ShapeImporter().importImage(st, data, 0, false);
-                    }
-                    SWF swf = st.getSwf();
-                    if (newTag != null) {
-                        refreshTree(swf);
-                        setTagTreeSelectedNode(getCurrentTree(), newTag);
-                    }
-
-                    swf.clearImageCache();
-                    swf.clearShapeCache();
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, "Invalid image", ex);
-                    ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                }
-                reload(true);
-                return true;
-            }
-        }
-        return false;
+        List<TreeItem> items = new ArrayList<>();
+        items.add(item);
+        return replace(items, false, false);
     }
-
+    
     private void showSvgImportWarning() {
         ViewMessages.showMessageDialog(this, AppStrings.translate("message.warning.svgImportExperimental"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningSvgImport);
     }
