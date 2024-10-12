@@ -301,4 +301,9 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     public boolean hasImage() {
         return false;
     }
+    
+    @Override
+    public void setColorTransform(ColorTransform colorTransform) {
+        this.colorTransform = new CXFORM(colorTransform);
+    }
 }

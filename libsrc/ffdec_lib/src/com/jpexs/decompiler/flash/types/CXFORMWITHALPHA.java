@@ -146,6 +146,10 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
      * Constructor.
      */
     public CXFORMWITHALPHA() {
+        alphaMultTerm = 256;
+        redMultTerm = 256;
+        greenMultTerm = 256;
+        blueMultTerm = 256;
     }
 
     /**
@@ -160,7 +164,7 @@ public class CXFORMWITHALPHA extends ColorTransform implements Serializable {
         greenAddTerm = cxform.greenAddTerm;
         blueAddTerm = cxform.blueAddTerm;
         alphaAddTerm = 0;
-        alphaMultTerm = 255;
+        alphaMultTerm = 256;
     }
 
     /**

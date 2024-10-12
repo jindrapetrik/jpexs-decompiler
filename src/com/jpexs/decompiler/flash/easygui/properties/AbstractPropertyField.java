@@ -1,0 +1,227 @@
+/*
+ * Copyright (C) 2024 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jpexs.decompiler.flash.easygui.properties;
+
+import java.awt.AWTEvent;
+import java.awt.BasicStroke;
+import java.awt.CardLayout;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+/**
+ *
+ * @author JPEXS
+ */
+public abstract class AbstractPropertyField<E> extends JPanel {
+    private static final String CARD_READ = "Read";
+    private static final String CARD_WRITE = "Write";
+    
+    protected JLabel readLabel;
+    protected JTextField writeField;
+    
+    private final List<PropertyValidationInteface<E>> validations = new ArrayList<>();
+    private final List<ChangeListener> changeListeners = new ArrayList<>();
+    
+    private AWTEventListener aeListener;
+    
+    public void addValidation(PropertyValidationInteface<E> validation) {
+        validations.add(validation);
+    }
+    
+    public void removeValidation(PropertyValidationInteface<E> validation) {
+        validations.remove(validation);
+    }
+    
+    public void addChangeListener(ChangeListener changeListener) {
+        changeListeners.add(changeListener);
+    }
+    
+    public void removeChangeListener(ChangeListener changeListener) {
+        changeListeners.remove(changeListener);
+    }
+    
+    private void fireChange() {
+        for (ChangeListener listener : changeListeners) {
+            listener.stateChanged(new ChangeEvent(this));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")        
+    public AbstractPropertyField(String text) {
+        setLayout(new CardLayout());
+        readLabel = new DottedUnderlineLabel(text);        
+               
+        readLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        writeField = new JTextField(text);
+        add(readLabel, CARD_READ);
+        add(writeField, CARD_WRITE);
+        
+        readLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_WRITE);
+                    writeField.requestFocus();
+                    writeField.selectAll();
+                    
+                    Toolkit.getDefaultToolkit().addAWTEventListener(aeListener, AWTEvent.MOUSE_EVENT_MASK);
+                }
+            }            
+        });
+        
+        writeField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                finishEdit();
+            }            
+        });
+        writeField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    e.consume();
+                    finishEdit();
+                }    
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    e.consume();
+                    cancelEdit();
+                }
+            }
+        });  
+        
+        aeListener = new AWTEventListener() {
+            @Override
+            public void eventDispatched(AWTEvent event) {
+                if (event instanceof MouseEvent) {
+                    MouseEvent me = (MouseEvent) event;
+                    if (!SwingUtilities.isDescendingFrom(me.getComponent(), writeField)) {
+                        if (me.getClickCount() > 0) {
+                            finishEdit();
+                        }
+                    }
+                }
+            }
+        };
+        
+        
+    }
+    
+    protected abstract E textToValue(String text);
+    protected abstract String valueToText(E value);
+    
+    private void finishEdit() {
+        
+        String textBefore = readLabel.getText();
+        String textAfter = writeField.getText();
+        
+        if (textBefore.equals(textAfter)) {
+            cancelEdit();
+            return;
+        }
+        
+        Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);
+        
+        boolean ok = true;
+        E value = textToValue(textAfter);
+        if (value == null) {
+            ok = false;
+        } else {  
+            for (PropertyValidationInteface<E> validation : validations) {
+                if (!validation.validate(value)) {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        
+        if (!ok) {
+            cancelEdit();
+            return;
+        }
+        readLabel.setText(valueToText(value));
+        ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+        fireChange();
+    }
+    
+    private void cancelEdit() {
+        Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);        
+        writeField.setText(readLabel.getText());
+        ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+    }
+    
+    public E getValue() {
+        return textToValue(writeField.getText());
+    }
+    
+    public void setValue(E value) {
+        String text = valueToText(value);
+        readLabel.setText(text);
+        writeField.setText(text);
+        fireChange();
+    }
+}
+
+class DottedUnderlineLabel extends JLabel {
+
+    public DottedUnderlineLabel(String text) {
+        super(text);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        Font font = getFont();
+        FontMetrics metrics = getFontMetrics(font);
+        String text = getText();
+
+        int x = 0;
+        int y = metrics.getAscent();
+               
+        g2d.setPaint(getForeground());
+        
+        int textWidth = metrics.stringWidth(text);
+        int underlineY = y + 6;
+
+        float[] dash = {1f, 1f};
+        Stroke dotted = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1f, dash, 0f);
+        g2d.setStroke(dotted);
+
+        g2d.draw(new Line2D.Float(x, underlineY, x + textWidth, underlineY));
+    }
+}
