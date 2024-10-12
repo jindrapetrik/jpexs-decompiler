@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
+import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.easygui.properties.panels.DocumentPropertiesPanel;
+import com.jpexs.decompiler.flash.easygui.properties.panels.GeneralPropertiesPanel;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -45,6 +49,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -91,6 +96,12 @@ public class EasySwfPanel extends JPanel {
     private Timelined timelined;
     private JLabel timelineLabel;
     private JButton closeTimelineButton;
+    private JPanel propertiesPanel;
+    
+    private static final String PROPERTIES_DOCUMENT = "Document";
+    private static final String PROPERTIES_GENERAL = "General";
+    private DocumentPropertiesPanel documentPropertiesPanel;
+    private GeneralPropertiesPanel generalPropertiesPanel;
 
     public EasySwfPanel() {
         setLayout(new BorderLayout());
@@ -107,6 +118,7 @@ public class EasySwfPanel extends JPanel {
                     timelinePanel.setDepth(pl.getDepth());
                 }
                 transformPanel.setVisible(pl != null);
+                updatePropertiesPanel();
             }
         });
 
@@ -384,6 +396,7 @@ public class EasySwfPanel extends JPanel {
                     }
                 }
                 transformPanel.setVisible(depth != -1);
+                updatePropertiesPanel();
             }
         });
         
@@ -403,6 +416,19 @@ public class EasySwfPanel extends JPanel {
         libraryPreviewPanel.setPreferredSize(new Dimension(200, 200));
 
         rightTabbedPane = new JTabbedPane();
+        
+        
+        propertiesPanel = new JPanel();
+        documentPropertiesPanel = new DocumentPropertiesPanel(undoManager);
+        propertiesPanel.setLayout(new CardLayout());
+        
+        generalPropertiesPanel = new GeneralPropertiesPanel(this, undoManager);
+        propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
+        propertiesPanel.add(generalPropertiesPanel, PROPERTIES_GENERAL);
+        
+        
+        rightTabbedPane.addTab(EasyStrings.translate("properties"), propertiesPanel);
+
         rightTabbedPane.addTab(EasyStrings.translate("library"), libraryPanel);
 
         JPanel transformTab = new JPanel(new BorderLayout());
@@ -473,8 +499,19 @@ public class EasySwfPanel extends JPanel {
         });
     }
 
+    private void updatePropertiesPanel() {
+        CardLayout cl = (CardLayout) propertiesPanel.getLayout();
+        PlaceObjectTypeTag place = getSelectedPlaceTag();
+        if (place == null) {
+            cl.show(propertiesPanel, PROPERTIES_DOCUMENT);
+            return;
+        }
+        generalPropertiesPanel.update();
+        cl.show(propertiesPanel, PROPERTIES_GENERAL);        
+    }
+    
     private boolean transformEnabled() {
-        return rightTabbedPane.getSelectedIndex() == 1;
+        return rightTabbedPane.getSelectedIndex() == 2;
     }
     
     public void setTimelined(Timelined timelined) {        
@@ -486,8 +523,11 @@ public class EasySwfPanel extends JPanel {
             libraryPreviewPanel.clearAll();
             closeTimelineButton.setVisible(false);
             timelineLabel.setText("");
+            documentPropertiesPanel.setSwf(null);
+            generalPropertiesPanel.update();
         } else {
             SWF swf = timelined.getSwf();
+            documentPropertiesPanel.setSwf(swf);
             libraryTreeTable.setSwf(swf);
             libraryPreviewPanel.clearAll();
             stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true);
@@ -502,6 +542,7 @@ public class EasySwfPanel extends JPanel {
                 timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
                 closeTimelineButton.setVisible(true);
             }
+            generalPropertiesPanel.update();
         }
         updateUndos();
     }
@@ -536,5 +577,38 @@ public class EasySwfPanel extends JPanel {
     public void dispose() {
         setTimelined(null);
         undoManager.clear();
+    }
+    
+    public int getDepth() {
+        return stagePanel.getSelectedDepth();
+    }
+    
+    public int getFrame() {
+        return stagePanel.getFrame();
+    }
+
+    public ImagePanel getStagePanel() {
+        return stagePanel;
+    }        
+    
+    public SWF getSwf() {
+        return timelined == null ? null : timelined.getSwf();
+    }
+    
+    public DepthState getSelectedDepthState() {
+        if (timelined == null) {
+            return null;
+        }
+        int frame = stagePanel.getFrame();
+        int depth = stagePanel.getSelectedDepth();
+        DepthState ds = timelined.getTimeline().getDepthState(frame, depth);
+        return ds;
+    }
+    public PlaceObjectTypeTag getSelectedPlaceTag() {
+        DepthState ds = getSelectedDepthState();
+        if (ds == null) {
+            return null;
+        }
+        return ds.placeObjectTag;
     }
 }

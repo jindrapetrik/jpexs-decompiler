@@ -719,4 +719,10 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public boolean hasImage() {
         return placeFlagHasImage;
     }
+    
+    @Override
+    public void setColorTransform(ColorTransform colorTransform) {
+        this.colorTransform = new CXFORMWITHALPHA(colorTransform);
+        placeFlagHasColorTransform = true;
+    }
 }

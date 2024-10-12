@@ -208,6 +208,12 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
      * @param placeFlagMove Place flag move
      */
     public abstract void setPlaceFlagMove(boolean placeFlagMove);
+    
+    /**
+     * Sets color transform.
+     * @param colorTransform Color transform 
+     */
+    public abstract void setColorTransform(ColorTransform colorTransform);
 
     /**
      * Checks if place equals.
