@@ -105,7 +105,7 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         return cardContents.get(id).isVisible();
     }
 
-    private void setCardOpened(String id, boolean opened) {
+    protected void setCardOpened(String id, boolean opened) {
         JPanel contents = cardContents.get(id);
         contents.setVisible(opened);
         contents.setMaximumSize(new Dimension(Integer.MAX_VALUE, contents.getPreferredSize().height));

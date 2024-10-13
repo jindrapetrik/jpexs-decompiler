@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
-import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
-import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
@@ -101,9 +99,9 @@ public class EasySwfPanel extends JPanel {
     private JPanel propertiesPanel;
     
     private static final String PROPERTIES_DOCUMENT = "Document";
-    private static final String PROPERTIES_GENERAL = "General";
+    private static final String PROPERTIES_INSTANCE = "Instance";
     private DocumentPropertiesPanel documentPropertiesPanel;
-    private InstancePropertiesPanel generalPropertiesPanel;
+    private InstancePropertiesPanel instancePropertiesPanel;
 
     public EasySwfPanel() {
         setLayout(new BorderLayout());
@@ -434,9 +432,9 @@ public class EasySwfPanel extends JPanel {
         documentPropertiesPanel = new DocumentPropertiesPanel(undoManager);
         propertiesPanel.setLayout(new CardLayout());
         
-        generalPropertiesPanel = new InstancePropertiesPanel(this, undoManager);
+        instancePropertiesPanel = new InstancePropertiesPanel(this, undoManager);
         propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
-        propertiesPanel.add(generalPropertiesPanel, PROPERTIES_GENERAL);
+        propertiesPanel.add(instancePropertiesPanel, PROPERTIES_INSTANCE);
         
         
         rightTabbedPane.addTab(EasyStrings.translate("properties"), propertiesPanel);
@@ -521,8 +519,8 @@ public class EasySwfPanel extends JPanel {
             cl.show(propertiesPanel, PROPERTIES_DOCUMENT);
             return;
         }
-        generalPropertiesPanel.update();
-        cl.show(propertiesPanel, PROPERTIES_GENERAL);        
+        instancePropertiesPanel.update();
+        cl.show(propertiesPanel, PROPERTIES_INSTANCE);        
     }
     
     private boolean transformEnabled() {
@@ -542,7 +540,7 @@ public class EasySwfPanel extends JPanel {
             closeTimelineButton.setVisible(false);
             timelineLabel.setText("");
             documentPropertiesPanel.setSwf(null);
-            generalPropertiesPanel.update();
+            instancePropertiesPanel.update();
         } else {
             SWF swf = timelined.getSwf();
             documentPropertiesPanel.setSwf(swf);
@@ -560,7 +558,7 @@ public class EasySwfPanel extends JPanel {
                 timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
                 closeTimelineButton.setVisible(true);
             }
-            generalPropertiesPanel.update();
+            instancePropertiesPanel.update();
         }
         updateUndos();
     }
