@@ -45,6 +45,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -94,6 +95,11 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
 
     public DocumentPropertiesPanel(UndoManager undoManager) {
         super("document");
+        setLayout(new BorderLayout());
+
+        JLabel documentLabel = new JLabel(EasyStrings.translate("properties.document"));
+        documentLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        add(documentLabel, BorderLayout.NORTH);
         
         FlowLayout layout = new FlowLayout(SwingConstants.WEST);
         layout.setHgap(0);

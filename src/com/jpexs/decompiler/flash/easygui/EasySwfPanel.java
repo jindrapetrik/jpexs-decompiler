@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.properties.panels.DocumentPropertiesPanel;
-import com.jpexs.decompiler.flash.easygui.properties.panels.GeneralPropertiesPanel;
+import com.jpexs.decompiler.flash.easygui.properties.panels.InstancePropertiesPanel;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
@@ -103,7 +103,7 @@ public class EasySwfPanel extends JPanel {
     private static final String PROPERTIES_DOCUMENT = "Document";
     private static final String PROPERTIES_GENERAL = "General";
     private DocumentPropertiesPanel documentPropertiesPanel;
-    private GeneralPropertiesPanel generalPropertiesPanel;
+    private InstancePropertiesPanel generalPropertiesPanel;
 
     public EasySwfPanel() {
         setLayout(new BorderLayout());
@@ -434,7 +434,7 @@ public class EasySwfPanel extends JPanel {
         documentPropertiesPanel = new DocumentPropertiesPanel(undoManager);
         propertiesPanel.setLayout(new CardLayout());
         
-        generalPropertiesPanel = new GeneralPropertiesPanel(this, undoManager);
+        generalPropertiesPanel = new InstancePropertiesPanel(this, undoManager);
         propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
         propertiesPanel.add(generalPropertiesPanel, PROPERTIES_GENERAL);
         

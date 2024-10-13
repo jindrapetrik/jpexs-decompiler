@@ -47,13 +47,9 @@ public abstract class AbstractPropertiesPanel extends JPanel {
     
     private final Map<String, JPanel> cardContents = new LinkedHashMap<>();
     private final Map<String, JLabel> cardPlusMinusLabels = new LinkedHashMap<>();
-    
+   
     public AbstractPropertiesPanel(String titleIdentifier) {
-        setLayout(new BorderLayout());
-
-        JLabel documentLabel = new JLabel(EasyStrings.translate("properties." + titleIdentifier));
-        add(documentLabel, BorderLayout.NORTH);
-        this.titleIdentifier = titleIdentifier;
+        this.titleIdentifier =  titleIdentifier;
     }
     
     protected String formatPropertyName(String id) {

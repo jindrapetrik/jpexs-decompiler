@@ -19,14 +19,13 @@ package com.jpexs.decompiler.flash.easygui.properties.panels;
 import com.jpexs.decompiler.flash.easygui.ChangeDoableOperation;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.EasySwfPanel;
+import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
 import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInteface;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
-import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
@@ -44,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,7 +54,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author JPEXS
  */
-public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
+public class InstancePropertiesPanel extends AbstractPropertiesPanel {
 
     private final FloatPropertyField xPropertyField = new FloatPropertyField(0, -8192, 8192);
     private final FloatPropertyField yPropertyField = new FloatPropertyField(0, -8192, 8192);
@@ -75,8 +75,16 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
     
     private Rectangle2D lastBounds = null;
     
-    public GeneralPropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
-        super("general");
+    private JLabel instanceLabel;
+    
+    public InstancePropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
+        super("instance");
+        setLayout(new BorderLayout());
+
+        instanceLabel = new JLabel(EasyStrings.translate("properties.instance.none"));
+        instanceLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        add(instanceLabel, BorderLayout.NORTH);
+        
         GridBagLayout gridBag;
         GridBagConstraints gbc;
         
@@ -387,10 +395,18 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
     public void update() {
         List<DepthState> dss = swfPanel.getSelectedDepthStates();
         if (dss == null || dss.isEmpty()) {
+            instanceLabel.setText(EasyStrings.translate("properties.instance.none"));
             propertiesPanel.setVisible(false);
             return;
         }
         propertiesPanel.setVisible(true);
+        
+        if (dss.size() == 1) {
+            EasyTagNameResolver resolver = new EasyTagNameResolver();
+            instanceLabel.setText(EasyStrings.translate("properties.instance.single").replace("%item%", resolver.getTagName(dss.get(0).getCharacter())));
+        } else {
+            instanceLabel.setText(EasyStrings.translate("properties.instance.multiple").replace("%count%", "" + dss.size()));
+        }
         
         //swfPanel.getStagePanel().gett
         
