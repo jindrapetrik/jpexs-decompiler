@@ -37,10 +37,11 @@ import java.util.List;
  * @author JPEXS
  */
 public class PlaceObjectTypeConverter {
-    
+
     /**
-     * Gets minimum PlaceObject type number (PlaceObject, PlaceObject2, ...)
-     * to cover all features that passed placeTag has
+     * Gets minimum PlaceObject type number (PlaceObject, PlaceObject2, ...) to
+     * cover all features that passed placeTag has
+     *
      * @param placeTag PlaceObject tag
      * @return Minimum type number
      */
@@ -82,20 +83,25 @@ public class PlaceObjectTypeConverter {
         if (placeTag.getVisible() != null) {
             minPlaceNum = 3;
         }
+        if (placeTag.hasImage()) {
+            minPlaceNum = 3;
+        }
         if (placeTag.getAmfData() != null) {
             minPlaceNum = 4;
         }
         return minPlaceNum;
     }
-    
+
     /**
      * Converts versions of PlaceObject tag (PlaceObject, PlaceObject2, ...)
+     *
      * @param sourcePlaceTag Source place tag
      * @param targetSWF Target SWF
      * @param targetPlaceNum Target place type number
+     * @param deepClone Deep clone all items
      * @return Place object of target type
      */
-    public PlaceObjectTypeTag convertTagType(PlaceObjectTypeTag sourcePlaceTag, SWF targetSWF, int targetPlaceNum) {
+    public PlaceObjectTypeTag convertTagType(PlaceObjectTypeTag sourcePlaceTag, SWF targetSWF, int targetPlaceNum, boolean deepClone) {
         ColorTransform colorTransform = sourcePlaceTag.getColorTransform();
         CLIPACTIONS clipActions = sourcePlaceTag.getClipActions();
         MATRIX matrix = sourcePlaceTag.getMatrix();
@@ -103,20 +109,20 @@ public class PlaceObjectTypeConverter {
         List<FILTER> filters = sourcePlaceTag.getFilters();
         Integer visible = sourcePlaceTag.getVisible();
         Amf3Value amfData = sourcePlaceTag.getAmfData();
-        switch(targetPlaceNum) {
+        switch (targetPlaceNum) {
             case 1:
                 PlaceObjectTag place1 = new PlaceObjectTag(targetSWF);
-                place1.characterId = sourcePlaceTag.getCharacterId();                
+                place1.characterId = sourcePlaceTag.getCharacterId();
                 if (colorTransform != null) {
-                    place1.colorTransform = new CXFORM(colorTransform);
+                    place1.colorTransform = !deepClone && colorTransform.getClass() == CXFORM.class ? (CXFORM) colorTransform : new CXFORM(colorTransform);
                 }
                 place1.depth = sourcePlaceTag.getDepth();
                 if (matrix != null) {
-                    place1.matrix = new MATRIX(matrix);
+                    place1.matrix = deepClone ? new MATRIX(matrix) : matrix;
                 } else {
                     place1.matrix = new MATRIX();
                 }
-                
+
                 return place1;
             case 2:
                 PlaceObject2Tag place2 = new PlaceObject2Tag(targetSWF);
@@ -126,20 +132,20 @@ public class PlaceObjectTypeConverter {
                     place2.placeFlagHasCharacter = true;
                 }
                 if (clipActions != null) {
-                    place2.clipActions = Helper.deepCopy(clipActions);
+                    place2.clipActions = deepClone ? Helper.deepCopy(clipActions) : clipActions;
                     place2.placeFlagHasClipActions = true;
-                }               
+                }
                 place2.clipDepth = sourcePlaceTag.getClipDepth();
                 if (place2.clipDepth > -1) {
                     place2.placeFlagHasClipDepth = true;
-                }                
+                }
                 if (colorTransform != null) {
-                    place2.colorTransform = new CXFORMWITHALPHA(colorTransform);
+                    place2.colorTransform = !deepClone && colorTransform.getClass() == CXFORMWITHALPHA.class ? (CXFORMWITHALPHA) colorTransform : new CXFORMWITHALPHA(colorTransform);
                     place2.placeFlagHasColorTransform = true;
                 }
                 place2.depth = sourcePlaceTag.getDepth();
                 if (matrix != null) {
-                    place2.matrix = new MATRIX(matrix);               
+                    place2.matrix = deepClone ? new MATRIX(matrix) : matrix;
                     place2.placeFlagHasMatrix = true;
                 }
                 place2.name = sourcePlaceTag.getInstanceName();
@@ -149,7 +155,7 @@ public class PlaceObjectTypeConverter {
                 place2.ratio = sourcePlaceTag.getRatio();
                 if (place2.ratio > -1) {
                     place2.placeFlagHasRatio = true;
-                }                      
+                }
                 return place2;
             case 3:
                 PlaceObject3Tag place3 = new PlaceObject3Tag(targetSWF);
@@ -159,20 +165,20 @@ public class PlaceObjectTypeConverter {
                     place3.placeFlagHasCharacter = true;
                 }
                 if (clipActions != null) {
-                    place3.clipActions = Helper.deepCopy(clipActions);
+                    place3.clipActions = deepClone ? Helper.deepCopy(clipActions) : clipActions;
                     place3.placeFlagHasClipActions = true;
-                }               
+                }
                 place3.clipDepth = sourcePlaceTag.getClipDepth();
                 if (place3.clipDepth > -1) {
                     place3.placeFlagHasClipDepth = true;
-                }                
+                }
                 if (colorTransform != null) {
-                    place3.colorTransform = new CXFORMWITHALPHA(colorTransform);
+                    place3.colorTransform = !deepClone && colorTransform.getClass() == CXFORMWITHALPHA.class ? (CXFORMWITHALPHA) colorTransform : new CXFORMWITHALPHA(colorTransform);
                     place3.placeFlagHasColorTransform = true;
                 }
                 place3.depth = sourcePlaceTag.getDepth();
                 if (matrix != null) {
-                    place3.matrix = new MATRIX(matrix);               
+                    place3.matrix = new MATRIX(matrix);
                     place3.placeFlagHasMatrix = true;
                 }
                 place3.name = sourcePlaceTag.getInstanceName();
@@ -190,7 +196,7 @@ public class PlaceObjectTypeConverter {
                 place3.backgroundColor = sourcePlaceTag.getBackgroundColor();
                 if (place3.backgroundColor != null) {
                     place3.placeFlagOpaqueBackground = true;
-                }                
+                }
                 if (bitmapCache != null) {
                     place3.bitmapCache = bitmapCache;
                     place3.placeFlagHasCacheAsBitmap = true;
@@ -200,14 +206,17 @@ public class PlaceObjectTypeConverter {
                     place3.placeFlagHasBlendMode = true;
                 }
                 if (filters != null && !filters.isEmpty()) {
-                    place3.surfaceFilterList = Helper.deepCopy(filters);
+                    place3.surfaceFilterList = deepClone ? Helper.deepCopy(filters) : filters;
                     place3.placeFlagHasFilterList = true;
                 }
                 if (visible != null) {
                     place3.visible = visible;
                     place3.placeFlagHasVisible = true;
-                }                
-                return place3;             
+                }
+                if (sourcePlaceTag.hasImage()) {
+                    place3.placeFlagHasImage = true;
+                }
+                return place3;
             case 4:
                 PlaceObject4Tag place4 = new PlaceObject4Tag(targetSWF);
                 place4.placeFlagMove = sourcePlaceTag.flagMove();
@@ -216,20 +225,20 @@ public class PlaceObjectTypeConverter {
                     place4.placeFlagHasCharacter = true;
                 }
                 if (clipActions != null) {
-                    place4.clipActions = Helper.deepCopy(clipActions);
+                    place4.clipActions = deepClone ? Helper.deepCopy(clipActions) : clipActions;
                     place4.placeFlagHasClipActions = true;
-                }               
+                }
                 place4.clipDepth = sourcePlaceTag.getClipDepth();
                 if (place4.clipDepth > -1) {
                     place4.placeFlagHasClipDepth = true;
-                }                
+                }
                 if (colorTransform != null) {
-                    place4.colorTransform = new CXFORMWITHALPHA(colorTransform);
+                    place4.colorTransform = !deepClone && colorTransform.getClass() == CXFORMWITHALPHA.class ? (CXFORMWITHALPHA) colorTransform : new CXFORMWITHALPHA(colorTransform);
                     place4.placeFlagHasColorTransform = true;
                 }
                 place4.depth = sourcePlaceTag.getDepth();
                 if (matrix != null) {
-                    place4.matrix = new MATRIX(matrix);               
+                    place4.matrix = new MATRIX(matrix);
                     place4.placeFlagHasMatrix = true;
                 }
                 place4.name = sourcePlaceTag.getInstanceName();
@@ -247,7 +256,7 @@ public class PlaceObjectTypeConverter {
                 place4.backgroundColor = sourcePlaceTag.getBackgroundColor();
                 if (place4.backgroundColor != null) {
                     place4.placeFlagOpaqueBackground = true;
-                }                
+                }
                 if (bitmapCache != null) {
                     place4.bitmapCache = bitmapCache;
                     place4.placeFlagHasCacheAsBitmap = true;
@@ -257,32 +266,37 @@ public class PlaceObjectTypeConverter {
                     place4.placeFlagHasBlendMode = true;
                 }
                 if (filters != null && !filters.isEmpty()) {
-                    place4.surfaceFilterList = Helper.deepCopy(filters);
+                    place4.surfaceFilterList = deepClone ? Helper.deepCopy(filters) : filters;
                     place4.placeFlagHasFilterList = true;
                 }
                 if (visible != null) {
                     place4.visible = visible;
                     place4.placeFlagHasVisible = true;
-                }               
-                if (amfData != null) {
-                    place4.amfData = Helper.deepCopy(amfData);                   
                 }
-                return place4;                  
+                if (amfData != null) {
+                    place4.amfData = deepClone ? Helper.deepCopy(amfData) : amfData;
+                }
+                if (sourcePlaceTag.hasImage()) {
+                    place4.placeFlagHasImage = true;
+                }
+                return place4;
             default:
                 throw new IllegalArgumentException("PlaceNum must be between 1 and 4. Provided: " + targetPlaceNum);
-        }        
+        }
     }
-    
+
     /**
-     * Converts versions of PlaceObject tag (PlaceObject, PlaceObject2, ...)
-     * and place result in the position where original tag was.
+     * Converts versions of PlaceObject tag (PlaceObject, PlaceObject2, ...) and
+     * place result in the position where original tag was.
+     *
      * @param placeTag Place tag
      * @param targetPlaceNum Target place num
+     * @return Converted place tag
      */
-    public PlaceObjectTypeTag convertTagType(PlaceObjectTypeTag placeTag, int targetPlaceNum) {        
-        PlaceObjectTypeTag converted = convertTagType(placeTag, placeTag.getSwf(), targetPlaceNum);
+    public PlaceObjectTypeTag convertTagType(PlaceObjectTypeTag placeTag, int targetPlaceNum) {
+        PlaceObjectTypeTag converted = convertTagType(placeTag, placeTag.getSwf(), targetPlaceNum, false);
         converted.setTimelined(placeTag.getTimelined());
-        placeTag.getTimelined().replaceTag(placeTag, converted);        
+        placeTag.getTimelined().replaceTag(placeTag, converted);
         placeTag.getTimelined().resetTimeline();
         return converted;
     }
