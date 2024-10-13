@@ -51,8 +51,8 @@ public class TimelinePanel extends JPanel {
     
     private JScrollPane timelineBodyScrollPane;
 
-    public TimelinePanel(UndoManager undoManager) {
-        timelineBodyPanel = new TimelineBodyPanel(undoManager);
+    public TimelinePanel(EasySwfPanel swfPanel, UndoManager undoManager) {
+        timelineBodyPanel = new TimelineBodyPanel(swfPanel, undoManager);
         setLayout(new BorderLayout());
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);

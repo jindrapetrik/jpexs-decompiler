@@ -27,16 +27,26 @@ import java.util.List;
  */
 public abstract class TimelinedTagListDoableOperation implements DoableOperation {
 
+    private final EasySwfPanel swfPanel;
+
     private final Timelined timelined;
     protected List<Tag> tags;
     protected boolean wasModified = false;
+    protected int fframe;
+    protected List<Integer> fdepths;
 
-    public TimelinedTagListDoableOperation(Timelined timelined) {
+    public TimelinedTagListDoableOperation(EasySwfPanel swfPanel, Timelined timelined) {
+        this.swfPanel = swfPanel;
         this.timelined = timelined;
+        this.fframe = swfPanel.getFrame();
+        this.fdepths = swfPanel.getDepths();        
     }
 
     @Override
     public void doOperation() {
+        swfPanel.setTimelined(timelined);
+        swfPanel.setFrame(fframe, fdepths);
+       
         saveTagList();
         wasModified = timelined.isModified();
         timelined.setModified(true);
@@ -46,7 +56,7 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
         tags = timelined.getTags().toArrayList();
     }
 
-    protected void restoreTagList() {
+    protected void restoreTagList() {        
         if (tags != null) {
             ReadOnlyTagList newTags = timelined.getTags();
             int size = newTags.size();
@@ -63,6 +73,8 @@ public abstract class TimelinedTagListDoableOperation implements DoableOperation
 
     @Override
     public void undoOperation() {
+        swfPanel.setTimelined(timelined);
+        swfPanel.setFrame(fframe, fdepths);
         restoreTagList();
         if (!wasModified) {
             timelined.setModified(false);
