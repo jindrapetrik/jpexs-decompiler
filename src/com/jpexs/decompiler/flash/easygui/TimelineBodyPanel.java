@@ -110,6 +110,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private final List<Runnable> changeListeners = new ArrayList<>();
 
     public Set<Point> cursor = new LinkedHashSet<>();
+    private final EasySwfPanel swfPanel;
 
     /*private int frame = 0;
 
@@ -198,11 +199,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
     }
 
-    public TimelineBodyPanel(UndoManager undoManager) {
+    public TimelineBodyPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         refresh();
         addMouseListener(this);
         addKeyListener(this);
         setFocusable(true);
+        this.swfPanel = swfPanel;
         this.undoManager = undoManager;
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -688,7 +690,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private void removeFrame(ActionEvent e) {        
        
         Set<Point> orderedCursor = getBackOrderedCursor();
-        undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
+        undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timeline.timelined) {
 
             @Override
             public void doOperation() {
@@ -834,7 +836,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         Set<Point> orderedCursor = getBackOrderedCursor();
 
-        undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
+        undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timeline.timelined) {
 
             @Override
             public void doOperation() {
@@ -900,9 +902,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private void addKeyFrameEmptyBefore(ActionEvent e) {
-        final int fframe = getFirstFrame();
         final int fdepth = getFirstDepth();
-        undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
+        undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timeline.timelined) {
 
             @Override
             public void doOperation() {
@@ -986,7 +987,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private void addFrame(ActionEvent e) {
         Set<Point> orderedCursor = getBackOrderedCursor();
 
-        undoManager.doOperation(new TimelinedTagListDoableOperation(timeline.timelined) {
+        undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timeline.timelined) {
             @Override
             public void doOperation() {
                 super.doOperation();

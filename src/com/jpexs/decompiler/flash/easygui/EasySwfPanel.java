@@ -129,12 +129,6 @@ public class EasySwfPanel extends JPanel {
                 final List<Integer> depths = stagePanel.getSelectedDepths();
                 final int frame = stagePanel.getFrame();
                 final Matrix newMatrix = stagePanel.getNewMatrix();
-                MATRIX previousMatrix = new MATRIX();
-                /*synchronized (stagePanel) {
-                    DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depths);
-                    previousMatrix = ds.placeObjectTag.getMatrix();
-                }*/
-
                 final Point2D regPoint = stagePanel.getRegistrationPoint();
                 final RegistrationPointPosition regPointPos = stagePanel.getRegistrationPointPosition();
 
@@ -155,9 +149,11 @@ public class EasySwfPanel extends JPanel {
                 undoManager.doOperation(new DoableOperation() {
 
                     private final List<Boolean> wasModified = new ArrayList<>();
+                    Timelined timelined = stagePanel.getTimelined();
                     
                     @Override
                     public void doOperation() {
+                        setTimelined(timelined);
                         timelinePanel.setFrame(frame, depths);
                         for (int i = 0; i < depths.size(); i++) {
                             int depth = depths.get(i);
@@ -170,7 +166,7 @@ public class EasySwfPanel extends JPanel {
                             ds.placeObjectTag.setPlaceFlagHasMatrix(newMatrix != null);
                             ds.placeObjectTag.setModified(true);    
                         }
-                        stagePanel.getTimelined().resetTimeline();
+                        timelined.resetTimeline();
                         stagePanel.repaint();
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepths(depths);
@@ -184,6 +180,7 @@ public class EasySwfPanel extends JPanel {
 
                     @Override
                     public void undoOperation() {
+                        setTimelined(timelined);
                         timelinePanel.setFrame(frame, depths);
                         for (int i = 0; i < depths.size(); i++) {
                             int depth = depths.get(i);
@@ -233,20 +230,16 @@ public class EasySwfPanel extends JPanel {
                             || (tag instanceof ButtonTag)
                             ) {
 
-                        undoManager.doOperation(new TimelinedTagListDoableOperation(stagePanel.getTimelined()) {
+                        undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, stagePanel.getTimelined()) {
                             
                             private List<Tag> swfTags;
-                            private final int fframe = stagePanel.getFrame();
-                            private final List<Integer> fdepths = stagePanel.getSelectedDepths();
-                            
+                                                        
                             @Override
                             public void doOperation() {
                                 super.doOperation();
-                                timelinePanel.setFrame(fframe, fdepths);
                                 CharacterTag ch = (CharacterTag) tag;
-                                int maxDepth = stagePanel.getTimelined().getTimeline().getMaxDepth();
+                                int maxDepth = timelined.getTimeline().getMaxDepth();
                                 int newDepth = maxDepth + 1;
-                                Timelined timelined = stagePanel.getTimelined();
                                 
                                 if (timelined.getSwf() != timelined) {
                                     swfTags = timelined.getSwf().getTags().toArrayList();
@@ -392,7 +385,7 @@ public class EasySwfPanel extends JPanel {
         topPanel.add(toolbarPanel, BorderLayout.NORTH);
         topPanel.add(stagePanel, BorderLayout.CENTER);
 
-        timelinePanel = new TimelinePanel(undoManager);
+        timelinePanel = new TimelinePanel(this, undoManager);
         
         timelinePanel.addChangeListener(new Runnable() {
             @Override
@@ -533,6 +526,9 @@ public class EasySwfPanel extends JPanel {
     }
     
     public void setTimelined(Timelined timelined) {        
+        if (this.timelined == timelined) {
+            return;
+        }
         this.timelined = timelined;
         if (timelined == null) {
             stagePanel.clearAll();
@@ -644,4 +640,8 @@ public class EasySwfPanel extends JPanel {
     public Timelined getTimelined() {
         return timelined;
     }        
+    
+    public void setFrame(int frame, List<Integer> depths) {
+        timelinePanel.setFrame(frame, depths);
+    }
 }
