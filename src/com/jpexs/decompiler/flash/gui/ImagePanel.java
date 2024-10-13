@@ -1402,7 +1402,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                         }
                         if (selectionMode && !doFreeTransform) {
-                            transform = null;
+                            //transform = null;
                         }
                         mode = Cursor.DEFAULT_CURSOR;
                     }
@@ -3170,19 +3170,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         Matrix fullM = m.clone();
 
-        List<MATRIX> oldMatrices = new ArrayList<>();
-        
         for (int i = 0; i < selectedDepths.size(); i++) {
             if (newMatrix != null) {
                 DepthState ds = timeline.getFrame(frame).layers.get(selectedDepths.get(i));
                 if (ds != null) {
-                    oldMatrices.add(ds.matrix);
-                    timeline.getFrame(frame).layers.get(selectedDepths.get(i)).matrix = newMatrix.concatenate(new Matrix(ds.matrix)).toMATRIX();
-                } else {
-                    oldMatrices.add(null);
-                }
-            } else {
-                oldMatrices.add(null);
+                    ds.temporaryMatrix = newMatrix.concatenate(new Matrix(ds.matrix)).toMATRIX();
+                } 
             }
         }        
 
@@ -3262,15 +3255,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         
                         Matrix transform2 = transform;
                         
-                        if (oldMatrices != null) {
-                            transform2 = transform2.concatenate(new Matrix(oldMatrices.get(i)));
-                        }
+                        transform2 = transform2.concatenate(new Matrix(ds.matrix));
                         
                         Shape outline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, transform2, true, viewRect, zoom);
 
                         if (temporaryMatrix != null) {
                             Matrix tMatrix = temporaryMatrix;
-                            tMatrix = tMatrix.concatenate(new Matrix(ds.matrix));
+                            tMatrix = tMatrix.concatenate(new Matrix(ds.temporaryMatrix));
                             Shape tempOutline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, tMatrix, true, viewRect, zoom);
                             gg.setStroke(new BasicStroke(1));
                             gg.setPaint(Color.black);
@@ -3305,13 +3296,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             drawRegistrationPoint(gg, regPoint);
         }
         
-        if (doFreeTransform && oldMatrices != null && timeline != null && timeline.getFrameCount() > frame) {
+        if (timeline != null && timeline.getFrameCount() > frame) {
             for (int i = 0; i < selectedDepths.size(); i++) {
                 int selectedDepth = selectedDepths.get(i);
-                MATRIX oldMatrix = oldMatrices.get(i);
-                if (oldMatrix != null) {
-                    timeline.getFrame(frame).layers.get(selectedDepth).matrix = oldMatrix;
-                }
+                DepthState ds = timeline.getDepthState(frame, selectedDepth);
+                if (ds != null) {
+                    ds.temporaryMatrix = null;
+                }         
             }
         }
         img = image;

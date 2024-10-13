@@ -175,6 +175,8 @@ public class EasySwfPanel extends JPanel {
                                 stagePanel.setRegistrationPointPosition(regPointPos);
                             }
                             transformPanel.setVisible(true);
+                        } else {
+                            stagePanel.selectDepths(depths);
                         }
                     }
 
@@ -196,6 +198,8 @@ public class EasySwfPanel extends JPanel {
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepths(depths);
                             transformPanel.setVisible(true);
+                        } else {
+                            stagePanel.selectDepths(depths);
                         }
                     }
 
