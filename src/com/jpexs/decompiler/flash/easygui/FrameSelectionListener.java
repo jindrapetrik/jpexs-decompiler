@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import java.util.List;
+
 
 /**
  * @author JPEXS
@@ -23,5 +25,5 @@ package com.jpexs.decompiler.flash.easygui;
 @FunctionalInterface
 public interface FrameSelectionListener {
 
-    public void frameSelected(int frame, int depth);
+    public void frameSelected(int frame, List<Integer> depths);
 }

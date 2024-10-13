@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -58,6 +59,8 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     private final List<ChangeListener> changeListeners = new ArrayList<>();
     
     private AWTEventListener aeListener;
+    
+    private boolean undetermined = false;
     
     public void addValidation(PropertyValidationInteface<E> validation) {
         validations.add(validation);
@@ -173,6 +176,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
             cancelEdit();
             return;
         }
+        undetermined = false;
         readLabel.setText(valueToText(value));
         ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
         fireChange();
@@ -180,15 +184,37 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     
     private void cancelEdit() {
         Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);        
-        writeField.setText(readLabel.getText());
+        if (undetermined) {
+            writeField.setText("");
+        } else {
+            writeField.setText(readLabel.getText());
+        }
         ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
     }
     
-    public E getValue() {
+    public E getValue() {        
+        if (undetermined) {
+            return null;
+        }
         return textToValue(writeField.getText());
     }
     
+    public void setValue(Set<E> value) {
+        if (value.size() != 1) {
+            setValue((E) null);
+        } else {
+            setValue(value.iterator().next());
+        }
+    }
+    
     public void setValue(E value) {
+        if (value == null) {
+            readLabel.setText("-");
+            writeField.setText("");
+            undetermined = true;
+            fireChange();
+            return;
+        }
         String text = valueToText(value);
         readLabel.setText(text);
         writeField.setText(text);

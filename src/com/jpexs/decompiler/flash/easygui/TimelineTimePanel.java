@@ -127,7 +127,7 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
         int frame = (scrollOffset + e.getX()) / TimelineBodyPanel.FRAME_WIDTH;
         frameSelect(frame);
         for (FrameSelectionListener l : listeners) {
-            l.frameSelected(frame, -1);
+            l.frameSelected(frame, new ArrayList<>());
         }
     }
 

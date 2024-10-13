@@ -33,6 +33,10 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -270,74 +274,119 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
 
     public void update() {
         updating = true;        
-        DepthState ds = swfPanel.getSelectedDepthState();
-        if (ds == null || ds.placeObjectTag == null) {
+        List<DepthState> dss = swfPanel.getSelectedDepthStates();
+        if (dss == null || dss.isEmpty()) {
             propertiesPanel.setVisible(false);
             return;
         }
         propertiesPanel.setVisible(true);
-        ColorTransform colorTransform = ds.colorTransForm;
-        if (colorTransform == null) {
-            alphaPercentPropertyField.setValue(100);
-            alphaAddPropertyField.setValue(0);
-            redPercentPropertyField.setValue(100);
-            redAddPropertyField.setValue(0);
-            greenPercentPropertyField.setValue(100);
-            greenAddPropertyField.setValue(0);
-            bluePercentPropertyField.setValue(100);
-            blueAddPropertyField.setValue(0);            
-        } else {
-            alphaPercentPropertyField.setValue(colorTransform.getAlphaMulti() * 100 / 256);
-            alphaAddPropertyField.setValue(colorTransform.getAlphaAdd());
-            redPercentPropertyField.setValue(colorTransform.getRedMulti() * 100 / 256);
-            redAddPropertyField.setValue(colorTransform.getRedAdd());
-            greenPercentPropertyField.setValue(colorTransform.getGreenMulti() * 100 / 256);
-            greenAddPropertyField.setValue(colorTransform.getGreenAdd());
-            bluePercentPropertyField.setValue(colorTransform.getBlueMulti() * 100 / 256);
-            blueAddPropertyField.setValue(colorTransform.getBlueAdd());
+        Set<Integer> alphaPercent = new HashSet<>();
+        Set<Integer> alphaAdd = new HashSet<>();
+        Set<Integer> redPercent = new HashSet<>();
+        Set<Integer> redAdd = new HashSet<>();
+        Set<Integer> greenPercent = new HashSet<>();
+        Set<Integer> greenAdd = new HashSet<>();
+        Set<Integer> bluePercent = new HashSet<>();
+        Set<Integer> blueAdd = new HashSet<>();
+        
+        for (DepthState ds : dss) {
+            if (ds == null) {
+                continue;
+            }
+            ColorTransform colorTransform = ds.colorTransForm;
+            if (colorTransform == null) {
+                alphaPercent.add(100);
+                alphaAdd.add(0);
+                redPercent.add(100);
+                redAdd.add(0);
+                greenPercent.add(100);
+                greenAdd.add(0);
+                bluePercent.add(100);
+                blueAdd.add(0);
+            } else {
+                alphaPercent.add(colorTransform.getAlphaMulti() * 100 / 256);
+                alphaAdd.add(colorTransform.getAlphaAdd());
+                redPercent.add(colorTransform.getRedMulti() * 100 / 256);
+                redAdd.add(colorTransform.getRedAdd());
+                greenPercent.add(colorTransform.getGreenMulti() * 100 / 256);
+                greenAdd.add(colorTransform.getGreenAdd());
+                bluePercent.add(colorTransform.getBlueMulti() * 100 / 256);
+                blueAdd.add(colorTransform.getBlueAdd());
+            }
         }
+        
+        
+        alphaPercentPropertyField.setValue(alphaPercent);
+        alphaAddPropertyField.setValue(alphaAdd);
+        redPercentPropertyField.setValue(redPercent);
+        redAddPropertyField.setValue(redAdd);
+        greenPercentPropertyField.setValue(greenPercent);
+        greenAddPropertyField.setValue(greenAdd);
+        bluePercentPropertyField.setValue(bluePercent);
+        blueAddPropertyField.setValue(blueAdd);
+        
         updating = false;
     }
 
     abstract class PlaceChangeDoableOperation extends ChangeDoableOperation {
 
-        int fdepth = swfPanel.getDepth();
+        List<Integer> fdepths = swfPanel.getDepths();
         int fframe = swfPanel.getFrame();
 
-        DepthState depthStateBefore = swfPanel.getSelectedDepthState();
-        PlaceObjectTypeTag placeObjectBefore = depthStateBefore.placeObjectTag;
-        PlaceObjectTypeTag placeObjectAfter = null;
-        private final int minPlace;
+        List<DepthState> depthStatesBefore = swfPanel.getSelectedDepthStates();
+        List<PlaceObjectTypeTag> placeObjectsBefore = swfPanel.getSelectedPlaceTags();
+        List<PlaceObjectTypeTag> placeObjectsAfter = new ArrayList<>();
         
-        private final boolean timelinedModifiedBefore = placeObjectBefore.getTimelined().isModified();
+        private final boolean timelinedModifiedBefore = swfPanel.getTimelined().isModified();
+        
+        private Timelined timelined = swfPanel.getTimelined();
+        
+        
         
         public PlaceChangeDoableOperation(String itemIdentifier, int minPlace) {
             super(itemIdentifier);
-            this.minPlace = minPlace;
+            
+            for (int i = 0; i < fdepths.size(); i++) {
+                PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
+                int convNum = placeObjectBefore.getPlaceObjectNum() < minPlace ? minPlace : placeObjectBefore.getPlaceObjectNum();
+                PlaceObjectTypeConverter conv = new PlaceObjectTypeConverter();
+                PlaceObjectTypeTag placeObjectAfter = conv.convertTagType(placeObjectBefore, timelined.getSwf(), convNum, false);                
+                placeObjectsAfter.add(placeObjectAfter);
+            }
         }
 
         @Override
         public final void doOperation() {
             swfPanel.getStagePanel().gotoFrame(fframe + 1);
-            swfPanel.getStagePanel().selectDepth(fdepth);
-
-            int convNum = placeObjectBefore.getPlaceObjectNum() < minPlace ? minPlace : placeObjectBefore.getPlaceObjectNum();
-            PlaceObjectTypeConverter conv = new PlaceObjectTypeConverter();
-            placeObjectAfter = conv.convertTagType(placeObjectBefore, convNum);
-
-            doPlaceOperation(placeObjectAfter, depthStateBefore);
-            placeObjectAfter.getTimelined().resetTimeline();            
+            swfPanel.getStagePanel().selectDepths(fdepths);
+            
+            for (int i = 0; i < fdepths.size(); i++) {
+                PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
+                PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
+                
+                int index = timelined.indexOfTag(placeObjectBefore);
+                timelined.removeTag(index);
+                timelined.addTag(index, placeObjectAfter);
+                timelined.setModified(true);
+                DepthState depthStateBefore = depthStatesBefore.get(i);                
+                doPlaceOperation(placeObjectAfter, depthStateBefore);
+            }
+            
+            timelined.resetTimeline();            
             update();
         }
 
         @Override
         public final void undoOperation() {
             swfPanel.getStagePanel().gotoFrame(fframe + 1);
-            swfPanel.getStagePanel().selectDepth(fdepth);
-            int index = placeObjectAfter.getTimelined().indexOfTag(placeObjectAfter);
-            Timelined timelined = placeObjectAfter.getTimelined();
-            timelined.removeTag(index);
-            timelined.addTag(index, placeObjectBefore);
+            swfPanel.getStagePanel().selectDepths(fdepths);
+            for (int i = 0; i < placeObjectsAfter.size(); i++) {
+                PlaceObjectTypeTag placeObjectAfter = placeObjectsAfter.get(i);
+                PlaceObjectTypeTag placeObjectBefore  = placeObjectsBefore.get(i);
+                int index = timelined.indexOfTag(placeObjectAfter);
+                timelined.removeTag(index);
+                timelined.addTag(index, placeObjectBefore);
+            }
             if (!timelinedModifiedBefore) {
                 timelined.setModified(false);
             }
