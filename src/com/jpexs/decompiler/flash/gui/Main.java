@@ -3013,6 +3013,16 @@ public class Main {
                     openFile(sourceInfos, (Openable openable) -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
+                        
+                        Set<SWF> allSwfs = mainFrame.getPanel().getAllSwfs();
+                        
+                        for (SWF s : allSwfs) {
+                            String name = s.getFile() + "|" + s.getFileTitle();
+                            if (name.equals(Configuration.lastSessionEasySwf.get())) {
+                                mainFrame.getPanel().getEasyPanel().setSwf(s);
+                            }
+                        }
+                        
                         setSessionLoaded(true);
                         mainFrame.getPanel().reload(true);
                         mainFrame.getPanel().updateUiWithCurrentOpenable();

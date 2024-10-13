@@ -6706,4 +6706,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean fontEmbed(TreeItem item, boolean create) {
         return previewPanel.getFontPanel().fontEmbed(item, create);
     }
+
+    public EasyPanel getEasyPanel() {
+        return easyPanel;
+    }        
 }

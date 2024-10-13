@@ -1038,7 +1038,9 @@ public final class Configuration {
     @ConfigurationName("gui.splitPaneEasyHorizontal.dividerLocationPercent")
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiSplitPaneEasyHorizontaldividerLocationPercent = null;
-
+    
+    public static ConfigurationItem<String> lastSessionEasySwf = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
