@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.easygui.properties.panels;
 
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
-import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -47,6 +46,9 @@ public abstract class AbstractPropertiesPanel extends JPanel {
     
     private final Map<String, JPanel> cardContents = new LinkedHashMap<>();
     private final Map<String, JLabel> cardPlusMinusLabels = new LinkedHashMap<>();
+    
+    private static final char PLUS_CHAR = '\u2BC8';
+    private static final char MINUS_CHAR = '\u2BC6';
    
     public AbstractPropertiesPanel(String titleIdentifier) {
         this.titleIdentifier =  titleIdentifier;
@@ -67,14 +69,14 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         }
         label.setHorizontalAlignment(JLabel.CENTER);
         headerPanel.add(label, BorderLayout.CENTER);
-        JLabel plusMinusLabel = new JLabel("+");
-        plusMinusLabel.setFont(plusMinusLabel.getFont().deriveFont(plusMinusLabel.getFont().getSize2D() * 1.8f));
+        JLabel plusMinusLabel = new JLabel("" + PLUS_CHAR);
+        plusMinusLabel.setFont(plusMinusLabel.getFont().deriveFont(plusMinusLabel.getFont().getSize2D() * 1.4f));
         plusMinusLabel.setHorizontalAlignment(JLabel.CENTER);
-        plusMinusLabel.setPreferredSize(new Dimension(30, 30));
+        plusMinusLabel.setPreferredSize(new Dimension(25, 20));
         headerPanel.add(plusMinusLabel, BorderLayout.WEST);
         headerPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        headerPanel.setMinimumSize(new Dimension(0, 40));
+        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        headerPanel.setMinimumSize(new Dimension(0, 30));
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
@@ -111,9 +113,9 @@ public abstract class AbstractPropertiesPanel extends JPanel {
         contents.setMaximumSize(new Dimension(Integer.MAX_VALUE, contents.getPreferredSize().height));
         JLabel plusMinusLabel = cardPlusMinusLabels.get(id);
         if (opened) {
-            plusMinusLabel.setText("-");
+            plusMinusLabel.setText("" + MINUS_CHAR);
         } else {
-            plusMinusLabel.setText("+");
+            plusMinusLabel.setText("" + PLUS_CHAR);
         }
     }
     
