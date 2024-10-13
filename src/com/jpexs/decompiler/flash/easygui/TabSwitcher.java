@@ -61,8 +61,8 @@ public class TabSwitcher<E> extends JPanel {
         this.tabComponent = tabComponent;
         centralPanel = new JPanel();
         centralPanel.setLayout(null);
-        centralPanel.add(tabbedPane);
         centralPanel.add(tabComponent);
+        centralPanel.add(tabbedPane);
         setLayout(new BorderLayout());
         add(centralPanel, BorderLayout.CENTER);
         addComponentListener(new ComponentAdapter() {
@@ -97,7 +97,8 @@ public class TabSwitcher<E> extends JPanel {
                 maxH = h;
             }
         }
-        tabbedPane.setBounds(0, 0, centralPanel.getWidth(), maxH);
+        maxH += 2;
+        tabbedPane.setBounds(0, 0, centralPanel.getWidth(), maxH + 10);
         tabComponent.setBounds(0, maxH, centralPanel.getWidth(), centralPanel.getHeight() - maxH); 
     }
 
