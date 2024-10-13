@@ -1394,7 +1394,7 @@ public class Timeline {
             if (character == null) {
                 continue;
             }
-            Matrix layerMatrix = new Matrix(layer.matrix);
+            Matrix layerMatrix = new Matrix(layer.getDrawingMatrix());
 
             Matrix mat = transformation.concatenate(layerMatrix);
             Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
@@ -1726,7 +1726,7 @@ public class Timeline {
             CharacterTag character = layer.getCharacter();
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                Matrix m = transformation.concatenate(new Matrix(layer.matrix));
+                Matrix m = transformation.concatenate(new Matrix(layer.getDrawingMatrix()));
 
                 int drawableFrameCount = drawable.getNumFrames();
                 if (drawableFrameCount == 0) {

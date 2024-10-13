@@ -57,6 +57,11 @@ public class DepthState {
      * Matrix
      */
     public MATRIX matrix;
+    
+    /**
+     * Temporary matrix
+     */
+    public MATRIX temporaryMatrix;
 
     /**
      * Instance name
@@ -375,5 +380,13 @@ public class DepthState {
             return false;
         }
         return Arrays.equals(this.amfData, other.amfData);
+    }
+    
+    public MATRIX getDrawingMatrix() {
+        MATRIX temp = temporaryMatrix;
+        if (temp != null) {
+            return temp;
+        }
+        return matrix;
     }
 }

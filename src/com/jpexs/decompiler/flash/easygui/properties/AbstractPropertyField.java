@@ -61,6 +61,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     private AWTEventListener aeListener;
     
     private boolean undetermined = false;
+    private boolean editing = false;
     
     public void addValidation(PropertyValidationInteface<E> validation) {
         validations.add(validation);
@@ -97,12 +98,13 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         readLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
+                if (e.getClickCount() == 1) {                    
                     ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_WRITE);
                     writeField.requestFocus();
                     writeField.selectAll();
                     
                     Toolkit.getDefaultToolkit().addAWTEventListener(aeListener, AWTEvent.MOUSE_EVENT_MASK);
+                    editing = true;
                 }
             }            
         });
@@ -147,7 +149,10 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     protected abstract E textToValue(String text);
     protected abstract String valueToText(E value);
     
-    private void finishEdit() {
+    private synchronized void finishEdit() {
+        if (!editing) {
+            return;
+        }
         
         String textBefore = readLabel.getText();
         String textAfter = writeField.getText();
@@ -179,10 +184,14 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         undetermined = false;
         readLabel.setText(valueToText(value));
         ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+        editing = false;        
         fireChange();
     }
     
     private void cancelEdit() {
+        if (!editing) {
+            return;
+        }
         Toolkit.getDefaultToolkit().removeAWTEventListener(aeListener);        
         if (undetermined) {
             writeField.setText("");
@@ -190,6 +199,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
             writeField.setText(readLabel.getText());
         }
         ((CardLayout)AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_READ);
+        editing = false;
     }
     
     public E getValue() {        
@@ -200,25 +210,36 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     }
     
     public void setValue(Set<E> value) {
+        setValue(value, false);
+    }
+    public void setValue(Set<E> value, boolean silent) {
         if (value.size() != 1) {
-            setValue((E) null);
+            setValue((E) null, silent);
         } else {
-            setValue(value.iterator().next());
+            setValue(value.iterator().next(), silent);
         }
     }
     
     public void setValue(E value) {
+        setValue(value, false);
+    }
+    
+    public void setValue(E value, boolean silent) {
         if (value == null) {
             readLabel.setText("-");
             writeField.setText("");
             undetermined = true;
-            fireChange();
+            if (!silent) {
+                fireChange();
+            }
             return;
         }
         String text = valueToText(value);
         readLabel.setText(text);
         writeField.setText(text);
-        fireChange();
+        if (!silent) {
+            fireChange();
+        }
     }
 }
 

@@ -20,9 +20,14 @@ import com.jpexs.decompiler.flash.easygui.ChangeDoableOperation;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.EasySwfPanel;
 import com.jpexs.decompiler.flash.easygui.UndoManager;
+import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
+import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInteface;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
+import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -33,6 +38,8 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +56,11 @@ import javax.swing.event.ChangeListener;
  */
 public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
 
+    private final FloatPropertyField xPropertyField = new FloatPropertyField(0, -8192, 8192);
+    private final FloatPropertyField yPropertyField = new FloatPropertyField(0, -8192, 8192);
+    private final FloatPropertyField wPropertyField = new FloatPropertyField(0, -8192, 8192);
+    private final FloatPropertyField hPropertyField = new FloatPropertyField(0, -8192, 8192);
+    
     private final IntegerPropertyField alphaPercentPropertyField = new IntegerPropertyField(100, -100, 100);
     private final IntegerPropertyField redPercentPropertyField = new IntegerPropertyField(100, -100, 100);
     private final IntegerPropertyField greenPercentPropertyField = new IntegerPropertyField(100, -100, 100);
@@ -61,17 +73,59 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
 
     private final JPanel propertiesPanel;
     
-    private boolean updating = false;
+    private Rectangle2D lastBounds = null;
     
     public GeneralPropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         super("general");
-
-        JPanel colorEffectPanel = new JPanel();
-
-        GridBagLayout gridBag = new GridBagLayout();
+        GridBagLayout gridBag;
+        GridBagConstraints gbc;
+        
+        JPanel positionSizePanel = new JPanel();        
+        gridBag = new GridBagLayout();
+        positionSizePanel.setLayout(gridBag);
+        gbc = new GridBagConstraints();
+        gbc.weightx = 0;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        positionSizePanel.add(new JLabel(formatPropertyName("positionSize.x")), gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        positionSizePanel.add(xPropertyField, gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.EAST;        
+        positionSizePanel.add(new JLabel(formatPropertyName("positionSize.y")), gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        positionSizePanel.add(yPropertyField, gbc);
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.EAST;        
+        positionSizePanel.add(new JLabel(formatPropertyName("positionSize.width")), gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;        
+        positionSizePanel.add(wPropertyField, gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.EAST;        
+        positionSizePanel.add(new JLabel(formatPropertyName("positionSize.height")), gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        positionSizePanel.add(hPropertyField, gbc);       
+        
+        gbc.gridx++;
+        gbc.gridy = 0;
+        gbc.gridheight = 2;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        positionSizePanel.add(new JPanel(), gbc);
+        
+        JPanel colorEffectPanel = new JPanel();                       
+        
+        gridBag = new GridBagLayout();
         colorEffectPanel.setLayout(gridBag);
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        gbc = new GridBagConstraints();
         gbc.weightx = 0;
         gbc.insets = new Insets(3, 3, 3, 3);
         gbc.gridx = 0;
@@ -133,15 +187,13 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         propertiesPanel = new JPanel();
         propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
         
+        propertiesPanel.add(makeCard("positionSize", null, positionSizePanel));
         propertiesPanel.add(makeCard("colorEffect", null, colorEffectPanel));
         this.swfPanel = swfPanel;
 
         alphaPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = alphaPercentPropertyField.getValue();
                     @Override
@@ -155,9 +207,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         alphaAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {                    
                     int value = alphaAddPropertyField.getValue();                    
                     @Override
@@ -172,9 +221,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         redPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = redPercentPropertyField.getValue();
                     @Override
@@ -188,9 +234,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         redAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = redAddPropertyField.getValue();
                     @Override
@@ -205,9 +248,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         greenPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = greenPercentPropertyField.getValue();
                     @Override
@@ -221,9 +261,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         greenAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = greenAddPropertyField.getValue();
                     @Override
@@ -238,9 +275,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         bluePercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = bluePercentPropertyField.getValue();
                     @Override
@@ -254,9 +288,6 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         blueAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (updating) {
-                    return;
-                }
                 undoManager.doOperation(new ColorEffectChangeDoableOperation() {
                     int value = blueAddPropertyField.getValue();
                     @Override
@@ -268,18 +299,101 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
             }
         });
         
-        add(propertiesPanel, BorderLayout.CENTER);;
+        xPropertyField.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                double xBefore = lastBounds.getX();
+                double xAfter = xPropertyField.getValue() * 20;
+                double xDelta = Math.round(xAfter - xBefore);
+                swfPanel.getStagePanel().applyTransformMatrix(Matrix.getTranslateInstance(xDelta, 0));
+            }
+        });
+        
+        yPropertyField.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                double yBefore = lastBounds.getY();
+                double yAfter = yPropertyField.getValue() * 20;
+                double yDelta = Math.round(yAfter - yBefore);
+                swfPanel.getStagePanel().applyTransformMatrix(Matrix.getTranslateInstance(0, yDelta));
+            }
+        });
+        
+        PropertyValidationInteface<Float> nonZeroFloatValidation = new PropertyValidationInteface<Float>() {
+            @Override
+            public boolean validate(Float value) {
+                return value != 0f;
+            }            
+        };
+        
+        wPropertyField.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {                
+                double wBefore = lastBounds.getWidth();
+                if (wBefore == 0) {
+                    return;
+                }
+                double wAfter = wPropertyField.getValue() * 20;
+                double wScale = wAfter / wBefore;
+                Matrix m = new Matrix();
+                m.translate(Math.round(lastBounds.getX()), Math.round(lastBounds.getY()));
+                m.scale(wScale, 1);
+                m.translate(-Math.round(lastBounds.getX()), -Math.round(lastBounds.getY()));
+                swfPanel.getStagePanel().applyTransformMatrix(m);
+            }
+        });
+        wPropertyField.addValidation(nonZeroFloatValidation);
+        
+        hPropertyField.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {                
+                double hBefore = lastBounds.getHeight();
+                if (hBefore == 0) {
+                    return;
+                }
+                double hAfter = hPropertyField.getValue() * 20;
+                double hScale = hAfter / hBefore;
+                Matrix m = new Matrix();
+                m.translate(Math.round(lastBounds.getX()), Math.round(lastBounds.getY()));
+                m.scale(1, hScale);
+                m.translate(-Math.round(lastBounds.getX()), -Math.round(lastBounds.getY()));
+                swfPanel.getStagePanel().applyTransformMatrix(m);
+            }
+        });
+        hPropertyField.addValidation(nonZeroFloatValidation);
+        
+        add(propertiesPanel, BorderLayout.CENTER);
+               
+        swfPanel.getStagePanel().addBoundsChangeListener(new BoundsChangeListener() {
+            @Override
+            public void boundsChanged(Rectangle2D newBounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
+                lastBounds = newBounds;
+                xPropertyField.setValue(twipToPixelValue(newBounds.getX()), true);
+                yPropertyField.setValue(twipToPixelValue(newBounds.getY()), true);
+                wPropertyField.setValue(twipToPixelValue(newBounds.getWidth()), true);
+                hPropertyField.setValue(twipToPixelValue(newBounds.getHeight()), true);
+            }            
+        });
 
     }
 
+    private static float twipToPixelValue(double val) {
+        float ret = (float) val;
+        ret = Math.round(ret);
+        ret = ret / 20;
+        return ret;
+    }
+    
     public void update() {
-        updating = true;        
         List<DepthState> dss = swfPanel.getSelectedDepthStates();
         if (dss == null || dss.isEmpty()) {
             propertiesPanel.setVisible(false);
             return;
         }
         propertiesPanel.setVisible(true);
+        
+        //swfPanel.getStagePanel().gett
+        
         Set<Integer> alphaPercent = new HashSet<>();
         Set<Integer> alphaAdd = new HashSet<>();
         Set<Integer> redPercent = new HashSet<>();
@@ -316,16 +430,14 @@ public class GeneralPropertiesPanel extends AbstractPropertiesPanel {
         }
         
         
-        alphaPercentPropertyField.setValue(alphaPercent);
-        alphaAddPropertyField.setValue(alphaAdd);
-        redPercentPropertyField.setValue(redPercent);
-        redAddPropertyField.setValue(redAdd);
-        greenPercentPropertyField.setValue(greenPercent);
-        greenAddPropertyField.setValue(greenAdd);
-        bluePercentPropertyField.setValue(bluePercent);
-        blueAddPropertyField.setValue(blueAdd);
-        
-        updating = false;
+        alphaPercentPropertyField.setValue(alphaPercent, true);
+        alphaAddPropertyField.setValue(alphaAdd, true);
+        redPercentPropertyField.setValue(redPercent, true);
+        redAddPropertyField.setValue(redAdd, true);
+        greenPercentPropertyField.setValue(greenPercent, true);
+        greenAddPropertyField.setValue(greenAdd, true);
+        bluePercentPropertyField.setValue(bluePercent, true);
+        blueAddPropertyField.setValue(blueAdd, true);
     }
 
     abstract class PlaceChangeDoableOperation extends ChangeDoableOperation {
