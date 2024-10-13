@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -103,7 +104,7 @@ public class TimelinePanel extends JPanel {
         timelineBodyPanel.addFrameSelectionListener(new FrameSelectionListener() {
 
             @Override
-            public void frameSelected(int frame, int depth) {
+            public void frameSelected(int frame, List<Integer> depths) {
                 ftime.frameSelect(frame);
             }
         });
@@ -111,8 +112,8 @@ public class TimelinePanel extends JPanel {
         timePanel.addFrameSelectionListener(new FrameSelectionListener() {
 
             @Override
-            public void frameSelected(int frame, int depth) {
-                ftimeline.frameSelect(frame, depth);
+            public void frameSelected(int frame, List<Integer> depths) {
+                ftimeline.frameSelect(frame, depths);
             }
         });
     }
@@ -140,8 +141,16 @@ public class TimelinePanel extends JPanel {
         timelineBodyPanel.depthSelect(depth);
     }
     
+    public void setDepths(List<Integer> depths) {
+        timelineBodyPanel.depthsSelect(depths);
+    }
+    
     public void setFrame(int frame, int depth) {
         timelineBodyPanel.frameSelect(frame, depth);
+    }
+    
+    public void setFrame(int frame, List<Integer> depths) {
+        timelineBodyPanel.frameSelect(frame, depths);
     }
     
     public void refresh() {
