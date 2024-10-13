@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [21.1.1] - 2024-10-13
 ### Added 
 - [#2321] Commandline option to generate HTML docs for AS1/2 Actions
@@ -3439,6 +3441,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.1...dev
 [21.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.0...version21.1.1
 [21.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.5...version21.1.0
 [21.0.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.0.4...version21.0.5
