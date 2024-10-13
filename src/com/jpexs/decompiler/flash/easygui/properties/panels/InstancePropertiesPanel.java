@@ -196,6 +196,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
         
         propertiesPanel.add(makeCard("positionSize", null, positionSizePanel));
+        
+        setCardOpened("positionSize", true);
+        
         propertiesPanel.add(makeCard("colorEffect", null, colorEffectPanel));
         this.swfPanel = swfPanel;
 

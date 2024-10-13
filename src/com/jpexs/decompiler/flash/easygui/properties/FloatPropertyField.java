@@ -72,6 +72,10 @@ public class FloatPropertyField extends AbstractPropertyField<Float> {
 
     @Override
     protected String valueToText(Float value) {
-        return "" + value;
+        String ret = "" + value;
+        if (ret.endsWith(".0")) {
+            ret = ret.substring(0, ret.length() - 2);
+        }
+        return ret;
     }
 }
