@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
@@ -155,6 +156,13 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     Configuration.lastSessionFiles.set(sb.toString());
                     Configuration.lastSessionFileTitles.set(sbt.toString());
 
+                    SWF easySwf = panel.getEasyPanel().getSwf();
+                    if (easySwf != null) {
+                        Configuration.lastSessionEasySwf.set(easySwf.getFile()+ "|" + easySwf.getFileTitle());
+                    } else {
+                        Configuration.lastSessionEasySwf.set("");
+                    }
+                    
                     String pathResources = panel.tagTree.getSelectionPathString();
                     if (pathResources != null) {
                         Configuration.lastSessionSelection.set(pathResources);
