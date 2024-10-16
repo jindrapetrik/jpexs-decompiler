@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. WIP
 
+### Fixed
+- [#2344] Export to FLA CS4 and below with more than 255 library items
+
 ## [21.1.1] - 2024-10-13
 ### Added 
 - [#2321] Commandline option to generate HTML docs for AS1/2 Actions
@@ -3609,6 +3612,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2344]: https://www.free-decompiler.com/flash/issues/2344
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
 [#2328]: https://www.free-decompiler.com/flash/issues/2328
