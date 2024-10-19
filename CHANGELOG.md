@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2344] Export to FLA CS4 and below with more than 255 library items,
   bitmap fills or frame duration
+- [#2341] FLA export - linkage and imported fonts do not work correctly
 
 ## [21.1.1] - 2024-10-13
 ### Added 
@@ -3614,6 +3615,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2344]: https://www.free-decompiler.com/flash/issues/2344
+[#2341]: https://www.free-decompiler.com/flash/issues/2341
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
 [#2328]: https://www.free-decompiler.com/flash/issues/2328
