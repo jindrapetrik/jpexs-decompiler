@@ -1019,8 +1019,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                     break;
                                 }
                             }
-                        }                                                        
-
+                        }                                     
+                       
                         int lastFrame = timelined.getFrameCount() - 1;
                         //Add removeTag to other layers
                         for (int d = 1; d <= timeline.maxDepth; d++) {
@@ -1061,17 +1061,14 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                         ds = timeline.getDepthState(f, nd);
                         boolean empty = ds == null || ds.getCharacter() == null;
                         if (!empty || somethingAfter) {                                
-                            int moveFrameCount = nf - f;
-                            if (moveFrameCount == 0) {
-                                moveFrameCount = 1;
-                            }
-                            boolean frameAdded = false;
+                            int moveFrameCount = somethingAfter ? 1 : nf - f;
                             for (int mf = 0; mf < moveFrameCount; mf++) {
                                 int pos = timelined.indexOfTag(timeline.getFrame(f).showFrameTag);
                                 ReadOnlyTagList tags = timelined.getTags();
                                 List<Tag> lastFrameDepthTags = new ArrayList<>();
                                 int f2 = f + 1;
                                 boolean endsWithRemove = false;
+                                boolean removeOnly = true;
                                 for (int i = pos + 1; i < tags.size(); i++) {
                                     Tag t = tags.get(i);
                                     if (t instanceof PlaceObjectTypeTag) {
@@ -1100,7 +1097,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                             i++;
                                         }
 
-                                        boolean removeOnly = true;
+                                        removeOnly = true;
                                         for (Tag lt : lastFrameDepthTags) {
                                             if (!(lt instanceof RemoveTag)) {
                                                 removeOnly = false;
@@ -1117,57 +1114,32 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                                             }
                                         }
 
-                                        //Add beyond current total frameCount
-                                        if (onLastFrame) {
-                                            if ((!removeOnly && !lastFrameDepthTags.isEmpty()) || !endsWithRemove) {
-                                                //Add removeTag to other layers
-                                                for (int d = 1; d <= timeline.maxDepth; d++) {
-                                                    if (d == nd) {
-                                                        continue;
-                                                    }
-                                                    ds = timeline.getDepthState(f2, d);
-                                                    if (ds != null && ds.getCharacter() != null) {
-                                                        RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
-                                                        rt.setTimelined(timelined);
-                                                        rt.setDepth(d);
-                                                        timelined.addTag(i, rt);
-                                                        i++;
-                                                    }
-                                                }
-
-                                                frameAdded = true;
-                                                ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
-                                                sf.setTimelined(timelined);
-                                                timelined.addTag(sf);
-                                                i++;
-                                                timelined.setFrameCount(timelined.getFrameCount() + 1);
-                                            }
-                                        }
                                         lastFrameDepthTags.clear();
                                         f2++;
                                     }
                                 }
-                            }
-                            /*if (!frameAdded && fframe == timelined.getFrameCount() - 1) {
-                                //Add removeTag to other layers
-                                for (int d = 1; d <= timeline.maxDepth; d++) {
-                                    if (d == nd) {
-                                        continue;
+                                
+                                if ((!removeOnly && !lastFrameDepthTags.isEmpty()) || !endsWithRemove) {
+                                    //Add removeTag to other layers
+                                    for (int d = 1; d <= timeline.maxDepth; d++) {
+                                        if (d == nd) {
+                                            continue;
+                                        }
+                                        ds = timeline.getDepthState(f2 - 1, d);
+                                        if (ds != null && ds.getCharacter() != null) {
+                                            RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
+                                            rt.setTimelined(timelined);
+                                            rt.setDepth(d);
+                                            timelined.addTag(rt);
+                                        }
                                     }
-                                    ds = timeline.getFrame(fframe).layers.get(d);
-                                    if (ds != null && ds.getCharacter() != null) {
-                                        RemoveTag rt = new RemoveObject2Tag(timelined.getSwf());
-                                        rt.setTimelined(timelined);
-                                        rt.setDepth(d);
-                                        timelined.addTag(rt);
-                                    }
-                                }
-                                for (int mf = 0; mf < moveFrameCount; mf++) {
+
                                     ShowFrameTag sf = new ShowFrameTag(timelined.getSwf());
                                     sf.setTimelined(timelined);
                                     timelined.addTag(sf);
+                                    timelined.setFrameCount(timelined.getFrameCount() + 1);
                                 }
-                            }*/
+                            }                            
                             break;
                         }
                     }
