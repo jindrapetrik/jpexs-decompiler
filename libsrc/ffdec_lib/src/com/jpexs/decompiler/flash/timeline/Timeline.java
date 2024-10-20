@@ -1100,10 +1100,10 @@ public class Timeline {
 
         boolean canUseSameImage = true;
         if (img == null) {
-            int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
-            int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
-            int deltaX = (int) (rect.xMin / SWF.unitDivisor);
-            int deltaY = (int) (rect.yMin / SWF.unitDivisor);
+            int newWidth = (int) Math.ceil(rect.getWidth() / SWF.unitDivisor);
+            int newHeight = (int) Math.ceil(rect.getHeight() / SWF.unitDivisor);
+            int deltaX = (int) Math.ceil(rect.xMin / SWF.unitDivisor);
+            int deltaY = (int) Math.ceil(rect.yMin / SWF.unitDivisor);
             newWidth = Math.min(image.getWidth() - deltaX, newWidth);
             newHeight = Math.min(image.getHeight() - deltaY, newHeight);
 
