@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2344] Export to FLA CS4 and below with more than 255 library items,
   bitmap fills or frame duration
-- [#2341] FLA export - linkage and imported fonts do not work correctly
+- [#2341] FLA export - linkage and imported fonts did not work correctly
 - [#2345] items smaller than 20 twips were not drawn - caused PDF problems - now ceil is used
 
 ## [21.1.1] - 2024-10-13
