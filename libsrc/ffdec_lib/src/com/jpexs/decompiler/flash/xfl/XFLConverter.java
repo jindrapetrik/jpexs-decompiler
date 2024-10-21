@@ -5585,6 +5585,10 @@ public class XFLConverter {
                     alignment = "unknown";
                 }
             }
+            if (det.hasTextColor) {
+                color = det.textColor.toHexRGB();
+            }
+            
             this.chatacterTags = characterTags;
             this.characterImportLinkageURL = characterImportLinkageURL;
             this.lastImportedId = lastImportedId;
