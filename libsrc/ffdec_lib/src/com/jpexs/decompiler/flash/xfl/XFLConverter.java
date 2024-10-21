@@ -5479,6 +5479,8 @@ public class XFLConverter {
         private String fontFace = "";
 
         private String color = "";
+        
+        private int colorAlpha = 255;
 
         private boolean autoKern = false;
 
@@ -5514,6 +5516,7 @@ public class XFLConverter {
         private Stack<Integer> fontSizeStack = new Stack<>();
         private Stack<String> fontFaceStack = new Stack<>();
         private Stack<String> fontColorStack = new Stack<>();
+        private Stack<Integer> fontColorAlphaStack = new Stack<>();
         private Stack<Boolean> fontKerningStack = new Stack<>();
         private final Map<CharacterTag, String> characterImportLinkageURL;
         private final Reference<Integer> lastImportedId;
@@ -5587,6 +5590,7 @@ public class XFLConverter {
             }
             if (det.hasTextColor) {
                 color = det.textColor.toHexRGB();
+                colorAlpha = det.textColor.alpha;
             }
             
             this.chatacterTags = characterTags;
@@ -5666,6 +5670,7 @@ public class XFLConverter {
                     String c = attributes.getValue("color");
                     if (c != null) {
                         color = c;
+                        colorAlpha = 255;
                     }
                     String f = attributes.getValue("face");
                     if (f != null) {
@@ -5697,6 +5702,7 @@ public class XFLConverter {
                         }
                     }
                     fontColorStack.push(color);
+                    fontColorAlphaStack.push(colorAlpha);
                     fontFaceStack.push(fontFace);
                     fontSizeStack.push(size);
                     fontLetterSpacingStack.push(letterSpacing);
@@ -5726,14 +5732,17 @@ public class XFLConverter {
             }
             if (qName.equals("font")) {
                 fontColorStack.pop();
+                fontColorAlphaStack.pop();
                 fontFaceStack.pop();
                 fontKerningStack.pop();
                 fontLetterSpacingStack.pop();
                 fontSizeStack.pop();
                 color = null;
+                colorAlpha = 255;
                 if (!fontColorStack.isEmpty()) {
                     color = fontColorStack.peek();
-                }
+                    colorAlpha = fontColorAlphaStack.peek();
+                }                
                 fontFace = null;
                 if (!fontFaceStack.isEmpty()) {
                     fontFace = fontFaceStack.peek();
@@ -5788,6 +5797,9 @@ public class XFLConverter {
                 }
                 if (color != null && !color.isEmpty()) {
                     result.writeAttribute("fillColor", color);
+                    if (colorAlpha != 255) {
+                        result.writeAttribute("alpha", colorAlpha / 255.0);
+                    }
                 }
                 if (url != null) {
                     result.writeAttribute("url", url);

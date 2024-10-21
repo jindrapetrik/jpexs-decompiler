@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#2341] FLA export - linkage and imported fonts did not work correctly
 - [#2345] items smaller than 20 twips were not drawn - caused PDF problems - now ceil is used
 - [#2341] FLA export - DefineEditText - use its default text color on HTML enabled inputs
+- FLA export - DefineEditText default text color alpha
 
 ## [21.1.1] - 2024-10-13
 ### Added 
