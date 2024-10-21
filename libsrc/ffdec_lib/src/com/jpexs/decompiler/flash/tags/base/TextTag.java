@@ -621,7 +621,9 @@ public abstract class TextTag extends DrawableTag {
             double rat = textHeight / 1024.0 / divider;
 
             Matrix matScale = Matrix.getScaleInstance(rat);
-            Color textColor2 = new Color(textColor, true);
+            Color textColor2 = new Color(textColor, true); 
+            Color textColor3 = textColor2;
+            Color noAlphaTextColor = new Color(textColor2.getRed(), textColor2.getGreen(), textColor2.getBlue());
             for (GLYPHENTRY entry : rec.glyphEntries) {
                 matScale.translateX = x;
                 matScale.translateY = y;
@@ -637,14 +639,16 @@ public abstract class TextTag extends DrawableTag {
                         FontTag fnt = swf.getFontByName(dynamicEntry.fontFace);
                         if (fnt != null && entry.glyphIndex != -1) {
                             shape = fnt.getGlyphShapeTable().get(entry.glyphIndex);
+                            textColor3 = textColor2;
                         } else {
                             shape = SHAPERECORD.fontCharacterToSHAPE(new Font(dynamicEntry.fontFace, dynamicEntry.fontStyle, 12), (int) Math.round(divider * 1024), dynamicEntry.character);
+                            textColor3 = noAlphaTextColor;
                         }
                     }
                 }
 
                 if (shape != null) {
-                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, textColor2, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
+                    BitmapExporter.export(ShapeTag.WIND_EVEN_ODD, 1, swf, shape, textColor3, image, 1 /*FIXME??*/, mat, mat, colorTransform, true, false);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
