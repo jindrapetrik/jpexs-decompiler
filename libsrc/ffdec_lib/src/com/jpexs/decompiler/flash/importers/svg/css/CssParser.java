@@ -107,14 +107,14 @@ public class CssParser {
 
     private boolean ruleset() throws IOException, CssParseException {
         int posSelectorStart = lexer.getPos();
-        int specifity = selector();
-        if (specifity == -1) {
+        int specificity = selector();
+        if (specificity == -1) {
             return false;
         }
         CssParsedSymbol symb = lex();
         while (symb.isType(",")) {
             sstar();
-            specifity += selector();
+            specificity += selector();
             symb = lex();
         }
         expect(symb, "{");
@@ -122,7 +122,7 @@ public class CssParser {
         int posSelectorEnd = lexer.getPos() - 1;
         String selectorStr = s.substring(posSelectorStart, posSelectorEnd).trim();
         selectors.add(selectorStr);
-        specificities.add(specifity);
+        specificities.add(specificity);
 
         int declarationsStart = lexer.getPos();
         Reference<String> propName = new Reference<>("");
@@ -164,8 +164,8 @@ public class CssParser {
     }
 
     private int selector() throws IOException, CssParseException {
-        int specifity = simple_selector();
-        if (specifity == -1) {
+        int specificity = simple_selector();
+        if (specificity == -1) {
             return -1;
         }
 
@@ -176,44 +176,44 @@ public class CssParser {
             }
             if (symb.isType("+", ">")) {
                 sstar();
-                specifity += selector();
+                specificity += selector();
             } else {
                 lexer.pushback(symb);
                 if (symb.isType("*", ".", "[", ":") || symb.isType(CssSymbolType.IDENT, CssSymbolType.HASH)) {
-                    specifity += selector();
+                    specificity += selector();
                 }
             }
         } else if (symb.isType("+", ">")) {
             sstar();
-            specifity += selector();
+            specificity += selector();
         } else {
             lexer.pushback(symb);
         }
-        return specifity;
+        return specificity;
     }
 
     private int simple_selector() throws IOException, CssParseException {
         CssParsedSymbol symb = lex();
-        int specifity = 0;
+        int specificity = 0;
         if (symb.isType(CssSymbolType.IDENT) || symb.isType("*")) {
             if (symb.isType(CssSymbolType.IDENT)) {
-                specifity += 1;
+                specificity += 1;
             }
             while (true) {
                 symb = lex();
                 if (symb.type == CssSymbolType.HASH) {
-                    specifity += 100;
+                    specificity += 100;
                 } else if (symb.isType(".")) {
                     expect(CssSymbolType.IDENT);
-                    specifity += 10;
+                    specificity += 10;
                 } else if (symb.isType("[")) {
                     lexer.pushback(symb);
                     attrib();
-                    specifity += 10;
+                    specificity += 10;
                 } else if (symb.isType(":")) {
                     lexer.pushback(symb);
                     pseudo();
-                    specifity += 10;
+                    specificity += 10;
                 } else {
                     lexer.pushback(symb);
                     break;
@@ -223,21 +223,21 @@ public class CssParser {
             int count = 0;
             while (true) {
                 if (symb.type == CssSymbolType.HASH) {
-                    specifity += 100;
+                    specificity += 100;
                     count++;
                 } else if (symb.isType(".")) {
                     expect(CssSymbolType.IDENT);
-                    specifity += 10;
+                    specificity += 10;
                     count++;
                 } else if (symb.isType("[")) {
                     lexer.pushback(symb);
                     attrib();
-                    specifity += 10;
+                    specificity += 10;
                     count++;
                 } else if (symb.isType(":")) {
                     lexer.pushback(symb);
                     pseudo();
-                    specifity += 10;
+                    specificity += 10;
                     count++;
                 } else {
                     if (count == 0) {
@@ -250,7 +250,7 @@ public class CssParser {
             }
             lexer.pushback(symb);
         }
-        return specifity;
+        return specificity;
     }
 
     private void pseudo() throws IOException, CssParseException {
@@ -524,11 +524,11 @@ public class CssParser {
     }
 
     /**
-     * Gets specifity of ruleset.
+     * Gets specificity of ruleset.
      * @param index Index of ruleset
-     * @return Specifity
+     * @return Specificity
      */
-    public int getSpecifity(int index) {
+    public int getSpecificity(int index) {
         return specificities.get(index);
     }
 }
