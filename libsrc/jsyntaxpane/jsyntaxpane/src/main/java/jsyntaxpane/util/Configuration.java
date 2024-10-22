@@ -220,7 +220,7 @@ public class Configuration implements Map<String, String> {
     /**
      * Returns ALL property names from this Configuration's parents and
      * this Configuration.  As usual, parents are added first so they
-     * are overriden by children.
+     * are overridden by children.
      *
      * @return Set of all String keys in this and parents
      */
