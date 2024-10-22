@@ -77,7 +77,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
     /**
      * Constuctor for specifying the LayoutManager of the panel.
      *
-     * @param layout the LayountManger for the panel
+     * @param layout the LayoutManger for the panel
      */
     public ScrollablePanel(LayoutManager layout) {
         super(layout);
