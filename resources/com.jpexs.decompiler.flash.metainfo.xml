@@ -800,7 +800,7 @@
 				<p>Fixed</p>
 				<ul>
 					<li>#1948 Timeout while deobfuscation did not skip method</li>
-					<li>#1948 NullPointerException on Simplify expressions on incrementent/decrement</li>
+					<li>#1948 NullPointerException on Simplify expressions on increment/decrement</li>
 					<li>#1941 Export when no node is selected after SWF opening</li>
 					<li>Exception handling in cache clearing thread</li>
 					<li>DottedChain.PathPart NoSerializable exception</li>
