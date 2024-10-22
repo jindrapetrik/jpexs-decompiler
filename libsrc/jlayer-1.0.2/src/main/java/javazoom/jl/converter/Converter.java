@@ -311,7 +311,7 @@ public class Converter {
                 pw.println("File is a " + headerString);
             } else if (isDetail(MAX_DETAIL)) {
                 String headerString = header.toString();
-                pw.println("Prased frame " + frameNo + ": " + headerString);
+                pw.println("Parsed frame " + frameNo + ": " + headerString);
             }
         }
 
