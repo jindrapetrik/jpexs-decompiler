@@ -164,7 +164,7 @@ public final class AbcIndexing {
          * @param parent Parent type (usually TypeItem)
          * @param abc ABC for private/protected namespace resolving
          * @param propNsIndex Index of property(trait) namespace for
-         * private/protected namespace reolving
+         * private/protected namespace resolving
          */
         public PropertyDef(String propName, GraphTargetItem parent, ABC abc, int propNsIndex) {
 
