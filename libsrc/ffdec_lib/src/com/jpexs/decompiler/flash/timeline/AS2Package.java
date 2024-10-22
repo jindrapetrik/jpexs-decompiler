@@ -48,7 +48,7 @@ public class AS2Package implements TreeItem {
     private final AS2Package parent;
 
     /**
-     * Subpackges
+     * Subpackages
      */
     public Map<String, AS2Package> subPackages = new TreeMap<>();
 
