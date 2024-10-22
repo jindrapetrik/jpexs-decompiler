@@ -334,7 +334,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Vanishing source code in some cases
 - AS1/2 Debugger tooltips exception
 - [#2131] UseOutline flag for DefineEditText
-- Wordrapping long words in DefineEditText
+- Wordwrapping long words in DefineEditText
 - [#2133] Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it
 - [#2135] FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames
 - [#1194] FLA Export - stream sound export
