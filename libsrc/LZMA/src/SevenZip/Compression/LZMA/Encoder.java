@@ -14,7 +14,7 @@ public class Encoder
 
 
 
-	static final int kIfinityPrice = 0xFFFFFFF;
+	static final int kInfinityPrice = 0xFFFFFFF;
 
 	static byte[] g_FastPos = new byte[1 << 11];
 
@@ -639,7 +639,7 @@ public class Encoder
 
 		int len = lenEnd;
 		do
-			_optimum[len--].Price = kIfinityPrice;
+			_optimum[len--].Price = kInfinityPrice;
 		while (len >= 2);
 
 		for (i = 0; i < Base.kNumRepDistances; i++)
@@ -860,7 +860,7 @@ public class Encoder
 					{
 						int offset = cur + 1 + lenTest2;
 						while (lenEnd < offset)
-							_optimum[++lenEnd].Price = kIfinityPrice;
+							_optimum[++lenEnd].Price = kInfinityPrice;
 						int curAndLenPrice = nextRepMatchPrice + GetRepPrice(
 								0, lenTest2, state2, posStateNext);
 						Optimal optimum = _optimum[offset];
@@ -887,7 +887,7 @@ public class Encoder
 				do
 				{
 					while (lenEnd < cur + lenTest)
-						_optimum[++lenEnd].Price = kIfinityPrice;
+						_optimum[++lenEnd].Price = kInfinityPrice;
 					int curAndLenPrice = repMatchPrice + GetRepPrice(repIndex, lenTest, state, posState);
 					Optimal optimum = _optimum[cur + lenTest];
 					if (curAndLenPrice < optimum.Price)
@@ -930,7 +930,7 @@ public class Encoder
 						{
 							int offset = lenTest + 1 + lenTest2;
 							while (lenEnd < cur + offset)
-								_optimum[++lenEnd].Price = kIfinityPrice;
+								_optimum[++lenEnd].Price = kInfinityPrice;
 							int curAndLenPrice = nextRepMatchPrice + GetRepPrice(0, lenTest2, state2, posStateNext);
 							Optimal optimum = _optimum[cur + offset];
 							if (curAndLenPrice < optimum.Price)
@@ -959,7 +959,7 @@ public class Encoder
 			{
 				normalMatchPrice = matchPrice + SevenZip.Compression.RangeCoder.Encoder.GetPrice0(_isRep[state]);
 				while (lenEnd < cur + newLen)
-					_optimum[++lenEnd].Price = kIfinityPrice;
+					_optimum[++lenEnd].Price = kInfinityPrice;
 
 				int offs = 0;
 				while (startLen > _matchDistances[offs])
@@ -1003,7 +1003,7 @@ public class Encoder
 
 								int offset = lenTest + 1 + lenTest2;
 								while (lenEnd < cur + offset)
-									_optimum[++lenEnd].Price = kIfinityPrice;
+									_optimum[++lenEnd].Price = kInfinityPrice;
 								curAndLenPrice = nextRepMatchPrice + GetRepPrice(0, lenTest2, state2, posStateNext);
 								optimum = _optimum[cur + offset];
 								if (curAndLenPrice < optimum.Price)
