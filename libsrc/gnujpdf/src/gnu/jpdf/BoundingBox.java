@@ -87,7 +87,7 @@ public class BoundingBox extends Rectangle {
     public static final int HORIZ_ALIGN_LEFT = 4;
 
     /**
-     * Used to aling a String to the right in a box
+     * Used to align a String to the right in a box
      */
     public static final int HORIZ_ALIGN_RIGHT = 5;
 
