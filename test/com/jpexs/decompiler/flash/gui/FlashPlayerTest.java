@@ -359,13 +359,13 @@ public class FlashPlayerTest {
 
             adobeExecutor.executeAvm2(tasks);
 
-            StringBuilder expeced = new StringBuilder();
+            StringBuilder expected = new StringBuilder();
             StringBuilder current = new StringBuilder();
             for (AS3ExecuteTask task : tasks) {
                 if (!task.flashResult.equals(task.ffdecResult)) {
                     System.out.println("Flash result (" + task.description + "): " + task.flashResult);
                     System.out.println("FFDec execute result: " + task.ffdecResult);
-                    expeced.append(task.flashResult).append(Helper.newLine);
+                    expected.append(task.flashResult).append(Helper.newLine);
                     current.append(task.ffdecResult).append(Helper.newLine);
                 }
 
@@ -381,7 +381,7 @@ public class FlashPlayerTest {
                 assertEquals(task.ffdecResult, task.flashResult);
             }
 
-            //Helper.writeFile("expected\\" + i + ".txt", Utf8Helper.getBytes(expeced.toString()));
+            //Helper.writeFile("expected\\" + i + ".txt", Utf8Helper.getBytes(expected.toString()));
             //Helper.writeFile("current\\" + i + ".txt", Utf8Helper.getBytes(current.toString()));
         }
     }
@@ -598,13 +598,13 @@ public class FlashPlayerTest {
 
         adobeExecutor.executeActionLists(tasks);
 
-        StringBuilder expeced = new StringBuilder();
+        StringBuilder expected = new StringBuilder();
         StringBuilder current = new StringBuilder();
         for (AS2ExecuteTask task : tasks) {
             if (!task.flashResult.equals(task.ffdecResult)) {
                 System.out.println("Flash result (" + task.description + "): " + task.flashResult);
                 System.out.println("FFDec result: " + task.ffdecResult);
-                expeced.append(task.description).append(task.flashResult).append(Helper.newLine);
+                expected.append(task.description).append(task.flashResult).append(Helper.newLine);
                 current.append(task.description).append(task.ffdecResult).append(Helper.newLine);
             }
 
@@ -642,7 +642,7 @@ public class FlashPlayerTest {
             }
         }
 
-        //Helper.writeFile("expected.txt", Utf8Helper.getBytes(expeced.toString()));
+        //Helper.writeFile("expected.txt", Utf8Helper.getBytes(expected.toString()));
         //Helper.writeFile("current.txt", Utf8Helper.getBytes(current.toString()));
     }
 
