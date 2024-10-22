@@ -150,7 +150,7 @@ public class ActionListReader {
 
         ActionList actions = fixActionList(new ActionList(actionMap.values(), sis.getCharset()), nextOffsets);
 
-        // jump to the entry action when it is diffrent from the first action in the map
+        // jump to the entry action when it is different from the first action in the map
         if (entryAction != actions.get(0)) {
             ActionJump jump = new ActionDeobfuscateJump(0, sis.getCharset());
             actions.addAction(0, jump);
