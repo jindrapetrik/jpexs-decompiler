@@ -680,7 +680,7 @@ Major version of SWF to XML export changed to 2.
 
 ### Fixed
 - [#1948] Timeout while deobfuscation did not skip method
-- [#1948] NullPointerException on Simplify expressions on incrementent/decrement
+- [#1948] NullPointerException on Simplify expressions on increment/decrement
 - [#1941] Export when no node is selected after SWF opening
 - Exception handling in cache clearing thread
 - DottedChain.PathPart NoSerializable exception
