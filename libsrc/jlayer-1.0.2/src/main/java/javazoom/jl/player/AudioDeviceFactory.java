@@ -36,7 +36,7 @@ import javazoom.jl.decoder.JavaLayerException;
  * implementation. This is so that the application as a whole
  * can run without these classes being present. The audio
  * device implementation, however, will usually statically link to the classes
- * required. (See the JavaSound deivce and factory for an example
+ * required. (See the JavaSound device and factory for an example
  * of this.)
  *
  * @author Mat McGowan
