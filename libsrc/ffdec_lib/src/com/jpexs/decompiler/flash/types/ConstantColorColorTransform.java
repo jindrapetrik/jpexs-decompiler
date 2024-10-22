@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import java.io.Serializable;
 
 /**
- * Single color color transform.
+ * Single color transform.
  *
  * @author JPEXS
  */
