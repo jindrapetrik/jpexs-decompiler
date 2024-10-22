@@ -5266,7 +5266,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public void sortCharacterIds() {
         int maxId = Math.max(tags.size(), getNextCharacterId());
         int id = maxId;
-        // first set the chatacter ids to surely not used ids
+        // first set the character ids to surely not used ids
         for (Tag tag : getTags()) {
             if (tag instanceof CharacterTag) {
                 CharacterTag characterTag = (CharacterTag) tag;
