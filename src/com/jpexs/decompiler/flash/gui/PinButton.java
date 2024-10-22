@@ -274,7 +274,7 @@ public class PinButton extends JPanel {
         actionListeners.add(listener);
     }
 
-    public void removeActionListner(ActionListener listener) {
+    public void removeActionListener(ActionListener listener) {
         actionListeners.remove(listener);
     }
 
