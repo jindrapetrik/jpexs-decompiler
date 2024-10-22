@@ -674,7 +674,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             Logger.getLogger(DebuggerHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //Respon to InProcessTag with OutProcessedTag
+        //Respond to InProcessTag with OutProcessedTag
         con.addMessageListener(new DebugMessageListener<InProcessTag>() {
             @Override
             public void message(InProcessTag message) {
