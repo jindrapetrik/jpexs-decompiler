@@ -6,7 +6,7 @@ public class LzmaAlone
 	{
 		public static final int kEncode = 0;
 		public static final int kDecode = 1;
-		public static final int kBenchmak = 2;
+		public static final int kBenchmark = 2;
 		
 		public int Command = -1;
 		public int NumBenchmarkPasses = 10;
@@ -108,13 +108,13 @@ public class LzmaAlone
 					else if (s.equalsIgnoreCase("d"))
 						Command = kDecode;
 					else if (s.equalsIgnoreCase("b"))
-						Command = kBenchmak;
+						Command = kBenchmark;
 					else
 						return false;
 				}
 				else if(pos == 1)
 				{
-					if (Command == kBenchmak)
+					if (Command == kBenchmark)
 					{
 						try
 						{
@@ -178,7 +178,7 @@ public class LzmaAlone
 			return;
 		}
 		
-		if (params.Command == CommandLine.kBenchmak)
+		if (params.Command == CommandLine.kBenchmark)
 		{
 			int dictionary = (1 << 21);
 			if (params.DictionarySizeIsDefined)
