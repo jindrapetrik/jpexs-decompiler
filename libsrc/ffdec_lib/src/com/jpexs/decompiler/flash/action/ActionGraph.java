@@ -195,7 +195,7 @@ public class ActionGraph extends Graph {
      * @param allParts All parts
      */
     @Override
-    protected void afterPopupateAllParts(Set<GraphPart> allParts) {
+    protected void afterPopulateAllParts(Set<GraphPart> allParts) {
 
     }
 
