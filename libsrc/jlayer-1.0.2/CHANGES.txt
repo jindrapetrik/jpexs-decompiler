@@ -66,7 +66,7 @@
 03/04/2002: JavaLayer 0.1.2
 ---------------------------
  - API improved to let developers get MP3 bitrate, framelength and total time features.
- - Additionnal files added (CHANGES.txt and LICENSE.txt).
+ - Additional files added (CHANGES.txt and LICENSE.txt).
 
 
 10/01/2001: JavaLayer 0.1.1
