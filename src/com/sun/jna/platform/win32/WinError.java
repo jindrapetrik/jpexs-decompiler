@@ -35116,7 +35116,7 @@ public interface WinError {
     // MessageText:
     //
     // {No DWM redirection surface is available}
-    // The DWM was unable to provide a redireciton surface to complete the
+    // The DWM was unable to provide a redirection surface to complete the
     // DirectX present.
     //
     int DWM_E_NO_REDIRECTION_SURFACE_AVAILABLE = 0x80263003;
