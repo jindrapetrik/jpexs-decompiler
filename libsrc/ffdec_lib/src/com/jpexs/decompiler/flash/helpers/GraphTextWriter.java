@@ -257,7 +257,7 @@ public abstract class GraphTextWriter {
      * @param offset Offset
      * @return GraphTextWriter
      */
-    public static String hilighOffset(String text, long offset) {
+    public static String hilightOffset(String text, long offset) {
         return "";
     }
 

@@ -185,7 +185,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
             setText(textHexOnly);
         }
-        hilighOffset(oldOffset);
+        hilightOffset(oldOffset);
     }
 
     public void setIgnoreCaret(boolean ignoreCaret) {
@@ -222,7 +222,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
     }
 
-    public void hilighOffset(long offset) {
+    public void hilightOffset(long offset) {
         if (isEditable()) {
             return;
         }

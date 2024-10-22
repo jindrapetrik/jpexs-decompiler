@@ -105,8 +105,8 @@ public class MethodCodePanel extends JPanel {
         sourceTextArea.setIgnoreCaret(ignoreCaret);
     }
 
-    public void hilighOffset(long offset) {
-        sourceTextArea.hilighOffset(offset);
+    public void hilightOffset(long offset) {
+        sourceTextArea.hilightOffset(offset);
     }
 
     public void hilighSpecial(HighlightSpecialType type, String specialValue) {
