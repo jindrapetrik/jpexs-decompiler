@@ -14366,7 +14366,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The transactional resource manager had too many tranactions outstanding
+    // The transactional resource manager had too many transactions outstanding
     // that could not be aborted. The transactional resource manger has been
     // shut down.
     //
