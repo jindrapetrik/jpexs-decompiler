@@ -55,7 +55,7 @@ public class JpegFixer {
                 }
                 return;
             }
-            //Check for errorneous header at the beginning, before first SOI marker
+            //Check for erroneous header at the beginning, before first SOI marker
             if (val == EOI) {
                 val = is.read();
                 int val2 = is.read();
