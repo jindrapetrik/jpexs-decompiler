@@ -75,7 +75,7 @@ public class SyntaxView extends PlainView {
         Color saveColor = graphics.getColor();
         SyntaxDocument doc = (SyntaxDocument) getDocument();
         Segment segment = getLineBuffer();
-        // Draw the right margin first, if needed.  This way the text overalys
+        // Draw the right margin first, if needed.  This way the text overlays
         // the margin
         if (rightMarginColumn > 0) {
             int m_x = rightMarginColumn * graphics.getFontMetrics().charWidth('m');
