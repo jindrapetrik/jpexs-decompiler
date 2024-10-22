@@ -1616,7 +1616,7 @@ final class LayerIIIDecoder implements FrameDecoder {
 
             // 9 point IDCT on even indices
 
-            // 5 points on odd indices (not realy an IDCT)
+            // 5 points on odd indices (not really an IDCT)
             float i00 = in[0] + in[0];
             float iip12 = i00 + in[12];
 
@@ -1635,7 +1635,7 @@ final class LayerIIIDecoder implements FrameDecoder {
             tmp3_ = in[2] * 0.68404028665134f - i66_ + in[10] * 1.9696155060244f - in[14] * 1.2855752193731f;
 
             // 9 point IDCT on odd indices
-            // 5 points on odd indices (not realy an IDCT)
+            // 5 points on odd indices (not really an IDCT)
             float i0 = in[0 + 1] + in[0 + 1];
             float i0p12 = i0 + in[12 + 1];
 
