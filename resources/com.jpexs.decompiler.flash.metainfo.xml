@@ -419,7 +419,7 @@
 					<li>#2138, #2156 FLA Export - Missing morphshapes (incorrect holes calculation)</li>
 					<li>#2138 FLA Export - Mask layer was visible when did not contain a masked layer</li>
 					<li>FLA Export - frame numbering problem</li>
-					<li>#2145 FLA Export - missing frames, cliping layers order, nullpointer, empty sound layers</li>
+					<li>#2145 FLA Export - missing frames, clipping layers order, nullpointer, empty sound layers</li>
 					<li>#2142 XML Export - string values containing only spaces</li>
 					<li>AS3 - Nullpointer in MethodBody when no ABC set</li>
 					<li>#2148 AS2 Uninitialized class fields detector</li>
