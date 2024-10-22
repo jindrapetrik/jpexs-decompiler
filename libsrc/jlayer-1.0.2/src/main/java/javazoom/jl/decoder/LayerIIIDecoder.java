@@ -820,7 +820,7 @@ final class LayerIIIDecoder implements FrameDecoder {
         float g_gain;
         float[][] xr_1d = xr;
 
-        // choose correct scalefactor band per block type, initalize boundary
+        // choose correct scalefactor band per block type, initialize boundary
 
         if ((gr_info.window_switching_flag != 0) && (gr_info.block_type == 2)) {
             if (gr_info.mixed_block_flag != 0)

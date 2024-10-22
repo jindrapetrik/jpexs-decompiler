@@ -437,12 +437,12 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public boolean isSingleFrame() {
         if (!isSingleFrameInitialized) {
-            initialiteIsSingleFrame();
+            initializeIsSingleFrame();
         }
         return isSingleFrame;
     }
 
-    private synchronized void initialiteIsSingleFrame() {
+    private synchronized void initializeIsSingleFrame() {
         if (!isSingleFrameInitialized) {
             if (getTimeline().getRealFrameCount() > 1) {
                 isSingleFrameInitialized = true;

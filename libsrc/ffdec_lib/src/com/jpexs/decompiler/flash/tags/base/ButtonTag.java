@@ -150,12 +150,12 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     @Override
     public boolean isSingleFrame() {
         if (!isSingleFrameInitialized) {
-            initialiteIsSingleFrame();
+            initializeIsSingleFrame();
         }
         return isSingleFrame;
     }
 
-    private synchronized void initialiteIsSingleFrame() {
+    private synchronized void initializeIsSingleFrame() {
         if (!isSingleFrameInitialized) {
             isSingleFrame = getTimeline().isSingleFrame();
             isSingleFrameInitialized = true;
