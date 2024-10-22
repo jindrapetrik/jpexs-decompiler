@@ -27,7 +27,7 @@ public class GifSequenceWriter {
    * 
    * @param outputStream the ImageOutputStream to be written to
    * @param imageType one of the imageTypes specified in BufferedImage
-   * @param timeBetweenFramesMS the time between frames in miliseconds
+   * @param timeBetweenFramesMS the time between frames in milliseconds
    * @param loopContinuously wether the gif should loop repeatedly
    * @throws IIOException if no gif ImageWriters are found
    *
