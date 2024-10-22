@@ -771,7 +771,7 @@ public abstract class AbstractCommandButton extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.jvnet.flamingo.common.RichToolTipManager.JTrackableComponent#
+	 * @see org.jvnet.flamingo.common.RichToolTipManager.JTrackableComponent#
 	 * getRichTooltip(java.awt.event.MouseEvent)
 	 */
 	@Override
