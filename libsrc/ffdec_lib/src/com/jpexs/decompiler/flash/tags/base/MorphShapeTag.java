@@ -441,7 +441,7 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     @Override
     public boolean isSingleFrame() {
-        // Morpshape is a single frame specified with the ratio
+        // Morphshape is a single frame specified with the ratio
         return true;
     }
 
