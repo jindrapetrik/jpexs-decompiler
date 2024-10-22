@@ -335,7 +335,7 @@ public class FlamingoUtilities {
 	 * Clips string based on specified font metrics and available width (in
 	 * pixels). Returns the clipped string, which contains the beginning and the
 	 * end of the input string separated by ellipses (...) in case the string is
-	 * too long to fit into the specified width, and the origianl string
+	 * too long to fit into the specified width, and the original string
 	 * otherwise.
 	 * 
 	 * @param metrics
@@ -346,7 +346,7 @@ public class FlamingoUtilities {
 	 *            String to clip.
 	 * @return The clipped string, which contains the beginning and the end of
 	 *         the input string separated by ellipses (...) in case the string
-	 *         is too long to fit into the specified width, and the origianl
+	 *         is too long to fit into the specified width, and the original
 	 *         string otherwise.
 	 */
 	public static String clipString(FontMetrics metrics, int availableWidth,
