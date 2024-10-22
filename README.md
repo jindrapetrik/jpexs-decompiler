@@ -81,11 +81,11 @@ All notable changes are listed in the file [CHANGELOG.md](CHANGELOG.md)
 ## Deployment
 
 ### Nightly builds
-When a commit is pushed/merged into `dev` branch, a new prerelease version is created automatically by Github actions CI.
+When a commit is pushed/merged into `dev` branch, a new prerelease version is created automatically by GitHub actions CI.
 These prerelease versions are called nightly builds. On releasing a new nightly build, the previous nightly build is removed.
 
 ### Stable versions
-A new stable version is created automatically by the Github Actions CI when marking a revision in `master` branch with a tag in format `versionx.y.z`.
+A new stable version is created automatically by the GitHub Actions CI when marking a revision in `master` branch with a tag in format `versionx.y.z`.
 
 ## Contributing
 
