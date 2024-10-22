@@ -39,6 +39,6 @@ digraph try_finally_swftools {
   
   /*
   Finally is inlined in every its usage.
-  In try_f_target there is finnally alone with throw - we can take it from there.
+  In try_f_target there is finally alone with throw - we can take it from there.
   */
 }
