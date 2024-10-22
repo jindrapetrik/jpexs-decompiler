@@ -105,7 +105,7 @@ public interface TreeTableModel extends TreeModel
     Object getValueAt(Object node, int column);
 
     /**
-     * Indicates whether the the value for the given node in the
+     * Indicates whether the value for the given node in the
      * specified column is editable
      * 
      * @param node The node

@@ -165,7 +165,7 @@ public class ActionUtils {
 	}
 
 	/**
-	 * Returns the the Token at pos as a String
+	 * Returns the Token at pos as a String
 	 * @param doc
 	 * @param pos
 	 * @return
