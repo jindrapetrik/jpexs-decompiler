@@ -465,7 +465,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 	 * This is called by Swing to create a Document for the JEditorPane document
 	 * This may be called before you actually get a reference to the control.
 	 * We use it here to create a proper lexer and pass it to the
-	 * SyntaxDcument we return.
+	 * SyntaxDocument we return.
 	 * @return
 	 */
 	@Override

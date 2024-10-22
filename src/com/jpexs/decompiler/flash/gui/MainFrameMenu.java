@@ -863,7 +863,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Main.loadFromMemory();
     }
 
-    protected void gotoDucumentClassOnStartupActionPerformed(ActionEvent evt) {
+    protected void gotoDocumentClassOnStartupActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
 
@@ -940,7 +940,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }, 1000); // It takes some time registry change to apply
     }
 
-    protected void gotoDucumentClassActionPerformed(ActionEvent evt) {
+    protected void gotoDocumentClassActionPerformed(ActionEvent evt) {
         mainFrame.getPanel().gotoDocumentClass(mainFrame.getPanel().getCurrentSwf());
     }
 
@@ -1346,7 +1346,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
          //addMenuItem("/tools/debugger/debuggerInjectLoader", "Inject Loader", "debuggerreplace16", this::debuggerInjectLoader, PRIORITY_MEDIUM, null, true,false);
          addMenuItem("/tools/debugger/debuggerShowLog", translate("menu.debugger.showlog"), "debuggerlog16", this::debuggerShowLogActionPerformed, PRIORITY_MEDIUM, null, true, null,false);
          finishMenu("/tools/debugger");*/
-        addMenuItem("/tools/gotoDocumentClass", translate("menu.tools.gotoDocumentClass"), "gotomainclass32", this::gotoDucumentClassActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/tools/gotoDocumentClass", translate("menu.tools.gotoDocumentClass"), "gotomainclass32", this::gotoDocumentClassActionPerformed, PRIORITY_TOP, null, true, null, false);
         finishMenu("/tools");
 
         //Settings
@@ -1358,7 +1358,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/settings/parallelSpeedUp", translate("menu.settings.parallelspeedup"), null, null, this::parallelSpeedUpActionPerformed, 0, null);
         addToggleMenuItem("/settings/disableDecompilation", translate("menu.settings.disabledecompilation"), null, null, this::disableDecompilationActionPerformed, 0, null);
         //addToggleMenuItem("/settings/cacheOnDisk", translate("menu.settings.cacheOnDisk"), null, null, this::cacheOnDiskActionPerformed, 0, null);
-        addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDucumentClassOnStartupActionPerformed, 0, null);
+        addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDocumentClassOnStartupActionPerformed, 0, null);
         addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0, null);
         addToggleMenuItem("/settings/autoOpenLoadedSWFs", translate("menu.settings.autoOpenLoadedSWFs"), null, null, this::autoOpenLoadedSWFsActionPerformed, 0, null);
         addToggleMenuItem("/settings/flattenASPackages", translate("menu.settings.flattenASPackages"), null, null, this::flattenASPackagesActionPerformed, 0, null);
