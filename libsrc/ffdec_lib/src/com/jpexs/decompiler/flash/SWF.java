@@ -1797,7 +1797,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets specifif header bytes.
+     * Gets specific header bytes.
      *
      * @param compression Compression
      * @param gfx GFX
