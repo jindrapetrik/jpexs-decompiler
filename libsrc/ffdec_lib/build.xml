@@ -184,7 +184,7 @@
     <target name="-dotimestamp">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET" locale="en"/>
-            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET" locale="en"/>
+            <format property="VERDATE" pattern="yyyyMMdd_hhmm" timezone="CET" locale="en"/>
         </tstamp>                         
     </target>
       
@@ -318,4 +318,3 @@
         <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
     </target>   
 </project>
-
