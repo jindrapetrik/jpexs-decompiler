@@ -486,7 +486,7 @@ public class ActionUtils {
 	 * <li>{@code #{p:AnyText}} will be replaced by {@code any text} and then
 	 * set the text selection to {@code AnyText}
 	 *
-	 * This methood does NOT perform any indentation and the template should
+	 * This method does NOT perform any indentation and the template should
 	 * generally span one line only
 	 *
 	 * @param target
