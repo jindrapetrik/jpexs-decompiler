@@ -4381,7 +4381,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The data provider was not able to intrepret the flags set for a column
+    // The data provider was not able to interpret the flags set for a column
     // binding in an accessor.
     //
     int ERROR_BAD_ACCESSOR_FLAGS = 773;
@@ -37250,7 +37250,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The key handle cannot be intrepreted.
+    // The key handle cannot be interpreted.
     //
     int TPM_E_INVALID_KEYHANDLE = 0x8028000C;
 
