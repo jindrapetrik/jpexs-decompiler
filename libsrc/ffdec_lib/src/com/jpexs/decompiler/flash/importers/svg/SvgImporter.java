@@ -471,11 +471,11 @@ public class SvgImporter {
                         NamedNodeMap attrs = node.getAttributes();
                         Node styleAttr = attrs.getNamedItem("ffdec-style");
                         if (styleAttr != null) {
-                            styleAttr.setNodeValue(styleAttr.getNodeValue() + ";" + "{" + cssParser.getSpecifity(i) + "}" + cssParser.getDeclarations(i));
+                            styleAttr.setNodeValue(styleAttr.getNodeValue() + ";" + "{" + cssParser.getSpecificity(i) + "}" + cssParser.getDeclarations(i));
                             attrs.setNamedItem(styleAttr);
                         } else {
                             Node styleNode = doc.createAttribute("ffdec-style");
-                            styleNode.setNodeValue("{" + cssParser.getSpecifity(i) + "}" + cssParser.getDeclarations(i));
+                            styleNode.setNodeValue("{" + cssParser.getSpecificity(i) + "}" + cssParser.getDeclarations(i));
                             attrs.setNamedItem(styleNode);
                         }
                     }
