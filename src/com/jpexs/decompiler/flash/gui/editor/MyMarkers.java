@@ -88,7 +88,7 @@ public class MyMarkers {
                 hiliter.addHighlight(start, end, marker);
                 return;
             }
-            // selection starts within the highlight, highlight before slection
+            // selection starts within the highlight, highlight before selection
             if (selStart > start && selStart < end) {
                 hiliter.addHighlight(start, selStart, marker);
             }
