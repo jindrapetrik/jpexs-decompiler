@@ -37697,7 +37697,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The NV area is locked and not writtable.
+    // The NV area is locked and not writable.
     //
     int TPM_E_AREA_LOCKED = 0x8028003C;
 
