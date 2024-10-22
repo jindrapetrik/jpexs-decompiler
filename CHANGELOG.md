@@ -1383,7 +1383,7 @@ Major version of SWF to XML export changed to 2.
 - [#1741] AS1/2 direct editation - new String constructor call
 - [#1726] Decompiling AS - missing break when on false branch vs continue on true
 - AS3 jumps deobfuscator
-- [#1699] AS1/2 detection of unitialized vars stuck
+- [#1699] AS1/2 detection of uninitialized vars stuck
 - [#1686] AS1/2 decompilation and editation of nested tellTarget
 - [#1685] Generic tag editor - removing multiple items at once vs single item
 - [#1684] Internal viewer - animated subsprites
