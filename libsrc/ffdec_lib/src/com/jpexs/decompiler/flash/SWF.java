@@ -3766,7 +3766,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
             int requiredStackSize = ins.getStackPopCount(localData, stack);
             if (stack.size() < requiredStackSize) {
-                // probably obfucated code, never executed branch
+                // probably obfuscated code, never executed branch
                 break;
             }
 
