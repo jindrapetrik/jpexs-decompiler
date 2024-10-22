@@ -9,7 +9,7 @@ package mypkg
     
          public function test(arg_d:decimal): void
          {
-            //Presision values: HALF_EVEN, DOWN, FLOOR, UP, CEILING, HALF_UP, HALF_DOWN                                                
+            //Precision values: HALF_EVEN, DOWN, FLOOR, UP, CEILING, HALF_UP, HALF_DOWN                                                
             
             var a:decimal = 10000000010000000002000000000300000000040000000005m;
             var b:int = 10;
