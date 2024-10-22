@@ -41,7 +41,7 @@ public class ReplaceDialog extends javax.swing.JDialog
 	/**
 	 * Creates new form FindDialog
 	 * @param text
-	 * @param dsd DocumentSerachData
+	 * @param dsd DocumentSearchData
 	 */
 	public ReplaceDialog(JTextComponent text,
 		DocumentSearchData dsd) {
