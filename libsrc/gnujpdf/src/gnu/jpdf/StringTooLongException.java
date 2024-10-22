@@ -25,7 +25,7 @@ package gnu.jpdf;
  * This exception is thrown from {@link gnu.jpdf.BoundingBox} if the string
  * won't fit into the box</p>
  *
- * @author Eric Z. Beard, erizbeard@hotmail.com
+ * @author Eric Z. Beard, ericzbeard@hotmail.com
  * @version $Revision: 1.1 $ $Date: 2007/08/22 01:02:32 $
  */
 public class StringTooLongException extends Exception {
