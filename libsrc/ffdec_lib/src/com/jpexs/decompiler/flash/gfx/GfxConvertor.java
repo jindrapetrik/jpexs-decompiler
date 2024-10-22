@@ -187,7 +187,7 @@ public class GfxConvertor {
         ret.frameCount = defineSprite.frameCount;
         ret.hasEndTag = defineSprite.hasEndTag;
         ret.spriteId = defineSprite.spriteId;
-        converTags(defineSprite, ret);
+        convertTags(defineSprite, ret);
         return ret;
     }
 
@@ -197,7 +197,7 @@ public class GfxConvertor {
      * @param target Target
      * @return List of tags
      */
-    public List<Tag> converTags(Timelined source, Timelined target) {
+    public List<Tag> convertTags(Timelined source, Timelined target) {
         List<Tag> ret = new ArrayList<>();
         for (Tag t : source.getTags()) {
             List<Tag> convertedTags = convertTag(t);
@@ -290,7 +290,7 @@ public class GfxConvertor {
         ret.frameCount = gfxSwf.frameCount;
         ret.gfx = false;
         ret.hasEndTag = gfxSwf.hasEndTag;
-        converTags(gfxSwf, ret);
+        convertTags(gfxSwf, ret);
 
         return ret;
     }
