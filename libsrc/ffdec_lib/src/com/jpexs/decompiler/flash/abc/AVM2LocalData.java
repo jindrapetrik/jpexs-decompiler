@@ -117,7 +117,7 @@ public class AVM2LocalData extends BaseLocalData {
     public List<Integer> parsedExceptionIds = new ArrayList<>();
 
     /**
-     * Mapped jumps from pushbyte xx part to apropriate lookupswitch branch
+     * Mapped jumps from pushbyte xx part to appropriate lookupswitch branch
      */
     public Map<GraphPart, GraphPart> finallyJumps = new HashMap<>();
 

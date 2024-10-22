@@ -195,8 +195,8 @@ public class As3ClassLinkageDialog extends AppDialog {
 
         JLabel classFoundLabel = new JLabel(translate("class.found"));
         classFoundPanel.add(classFoundLabel);
-        JLabel symbolClassApropriateLabel = new JLabel(translate("symbolClassAppropriate"));
-        classFoundPanel.add(symbolClassApropriateLabel);
+        JLabel symbolClassAppropriateLabel = new JLabel(translate("symbolClassAppropriate"));
+        classFoundPanel.add(symbolClassAppropriateLabel);
 
         JPanel classNotFoundPanel = new JPanel();
         classNotFoundPanel.setLayout(new BoxLayout(classNotFoundPanel, BoxLayout.Y_AXIS));
@@ -235,9 +235,9 @@ public class As3ClassLinkageDialog extends AppDialog {
 
         createNewClassPanel.add(abcTargetPanel);
 
-        JLabel symbolClassApropriate2Label = new JLabel(translate("symbolClassAppropriate"));
-        classFoundPanel.add(symbolClassApropriate2Label);
-        createNewClassPanel.add(symbolClassApropriate2Label);
+        JLabel symbolClassAppropriate2Label = new JLabel(translate("symbolClassAppropriate"));
+        classFoundPanel.add(symbolClassAppropriate2Label);
+        createNewClassPanel.add(symbolClassAppropriate2Label);
 
         JPanel doNotCreateNewClassPanel = new JPanel();
         doNotCreateNewClassPanel.setLayout(new BoxLayout(doNotCreateNewClassPanel, BoxLayout.Y_AXIS));
