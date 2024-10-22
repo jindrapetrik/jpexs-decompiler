@@ -13536,7 +13536,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Log service enountered an error when attempting to read from a log
+    // Log service encountered an error when attempting to read from a log
     // container.
     //
     int ERROR_LOG_CONTAINER_READ_FAILED = 6639;
@@ -13546,7 +13546,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Log service enountered an error when attempting to write to a log
+    // Log service encountered an error when attempting to write to a log
     // container.
     //
     int ERROR_LOG_CONTAINER_WRITE_FAILED = 6640;
@@ -13556,7 +13556,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Log service enountered an error when attempting open a log container.
+    // Log service encountered an error when attempting open a log container.
     //
     int ERROR_LOG_CONTAINER_OPEN_FAILED = 6641;
 
@@ -13565,7 +13565,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Log service enountered an invalid container state when attempting a
+    // Log service encountered an invalid container state when attempting a
     // requested action.
     //
     int ERROR_LOG_CONTAINER_STATE_INVALID = 6642;
