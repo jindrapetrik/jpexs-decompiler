@@ -72,6 +72,6 @@ public class EasyTagNameResolver implements TagNameResolverInterface {
             DefineVideoStreamTag vt = (DefineVideoStreamTag) tag;
             return EasyStrings.translate("item.video") + " " + vt.getCharacterId();
         }
-        return EasyStrings.translate("item.uknown");
+        return EasyStrings.translate("item.unknown");
     }    
 }
