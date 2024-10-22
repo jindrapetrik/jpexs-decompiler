@@ -210,7 +210,7 @@
 					<li>Asking more than once for the same imported (ImportAssets) URL</li>
 					<li>ABC Explorer problems when index out of bounds (Usually in obfuscated code)</li>
 					<li>Go to document class for classes with obfuscated name</li>
-					<li>#2270 AS3 decompilation - unnnecessary local registers assignments as part of expressions when using optimization like `dup, setlocal N` instead of `setlocal N, getlocal N`</li>
+					<li>#2270 AS3 decompilation - unnecessary local registers assignments as part of expressions when using optimization like `dup, setlocal N` instead of `setlocal N, getlocal N`</li>
 					<li>Movies (DefineVideoStream) preview not working</li>
 				</ul>
 			</description>

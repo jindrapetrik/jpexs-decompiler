@@ -140,7 +140,7 @@ All notable changes to this project will be documented in this file.
 - Asking more than once for the same imported (ImportAssets) URL
 - ABC Explorer problems when index out of bounds (Usually in obfuscated code)
 - Go to document class for classes with obfuscated name
-- [#2270] AS3 decompilation - unnnecessary local registers assignments as part
+- [#2270] AS3 decompilation - unnecessary local registers assignments as part
   of expressions when using optimization like `dup, setlocal N`
   instead of `setlocal N, getlocal N`
 - Movies (DefineVideoStream) preview not working
