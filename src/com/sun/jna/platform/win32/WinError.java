@@ -24241,7 +24241,7 @@ public interface WinError {
     // interfaces.
     //
     //
-    // Generic OLE errors that may be returned by many inerfaces
+    // Generic OLE errors that may be returned by many interfaces
     //
     int OLE_E_FIRST = 0x80040000;
 
