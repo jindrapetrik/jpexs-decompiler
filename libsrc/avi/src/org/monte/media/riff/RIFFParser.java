@@ -537,7 +537,7 @@ if (DEBUG)System.out.println("RIFFParser.parseLocalChunk "+idToString(id));
     }
 
     /**
-     * Checks wether the ID of the chunk has been declared as a
+     * Checks whether the ID of the chunk has been declared as a
      * property chunk.
      *
      * <p>Pre condition
@@ -556,7 +556,7 @@ if (DEBUG)System.out.println("RIFFParser.parseLocalChunk "+idToString(id));
     }
 
     /**
-     * Checks wether the ID of the chunk has been declared as a
+     * Checks whether the ID of the chunk has been declared as a
      * collection chunk.
      *
      * <p>Pre condition
@@ -727,7 +727,7 @@ if (DEBUG)System.out.println("RIFFParser.parseLocalChunk "+idToString(id));
 
     /* ---- Class methods ---- */
     /**
-     * Checks wether the argument represents a valid RIFF GroupID.
+     * Checks whether the argument represents a valid RIFF GroupID.
      *
      * <p>Validation
      * <ul>
@@ -742,7 +742,7 @@ if (DEBUG)System.out.println("RIFFParser.parseLocalChunk "+idToString(id));
     }
 
     /**
-     * Checks wether the argument represents a valid RIFF Group Type.
+     * Checks whether the argument represents a valid RIFF Group Type.
      *
      * <p>Validation
      * <ul>
