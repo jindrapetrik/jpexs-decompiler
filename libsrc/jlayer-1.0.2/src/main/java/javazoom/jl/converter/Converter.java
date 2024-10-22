@@ -225,7 +225,7 @@ public class Converter {
          *
          * @param frameNo The 0-based sequence number of the frame.
          * @param header  The Header rerpesenting the frame just read.
-         * @param o       The Obuffer the deocded data was written to.
+         * @param o       The Obuffer the decoded data was written to.
          */
         void decodedFrame(int frameNo, Header header, Obuffer o);
 
