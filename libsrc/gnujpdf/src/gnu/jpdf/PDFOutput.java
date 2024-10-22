@@ -126,7 +126,7 @@ public class PDFOutput {
         os.flush();
 
         // we use baos to speed things up a little.
-        // Also, offset is preserved, and marks the begining of this block.
+        // Also, offset is preserved, and marks the beginning of this block.
         // This is required by PDF at the end of the PDF file.
         baos.reset();
         baos.write("xref\n".getBytes("UTF-8"));
