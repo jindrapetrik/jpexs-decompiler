@@ -24,7 +24,7 @@ import java.util.Comparator;
 public class StringUtils {
 
     /**
-     * Perfrom a String startsWith match with support for CamelCase.
+     * Perform a String startsWith match with support for CamelCase.
      * @param word full word
      * @param abbr abbreviated word
      * @return true if the word startsWith abbr, or if any uppercase char in abbr

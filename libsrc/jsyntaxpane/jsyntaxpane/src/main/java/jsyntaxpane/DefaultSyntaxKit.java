@@ -604,7 +604,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 	}
         
 	/**
-	 * Return the Configurations object for a Kit.  Perfrom lazy creation of a
+	 * Return the Configurations object for a Kit.  Perform lazy creation of a
 	 * Configuration object if nothing is created.
 	 *
 	 * @param kit
