@@ -30,7 +30,7 @@ public class StringUtils {
      * @return true if the word startsWith abbr, or if any uppercase char in abbr
      * matches the next uppercase char in word
      *
-     * FIXME: not so effecient as it creates a StringBuilder, but works
+     * FIXME: not so efficient as it creates a StringBuilder, but works
      * FIXME: add {@code Comparator<String, String>}
      */
     public static boolean camelCaseMatch(String word, String abbr) {
