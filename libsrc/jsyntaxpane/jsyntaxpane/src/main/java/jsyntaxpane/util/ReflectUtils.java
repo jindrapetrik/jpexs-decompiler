@@ -353,7 +353,7 @@ public class ReflectUtils {
      * The Key String will be of the format objectClass.property(valueclass)
      * Where:
      * objectClass = obj.getClass().getName
-     * property = property (as passed in to callSetter), before set is appended
+     * property = property (as passed into callSetter), before set is appended
      * valueCLass = value.getClass().getName()
      * The Method will be either the method, or null if a search was not and no
      * method is found.
