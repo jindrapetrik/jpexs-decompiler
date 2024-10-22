@@ -73,7 +73,7 @@ public class CssSelectorToXPath {
     private final String regex_string_literal = "(\"[^\"\\x1E]*\"|'[^'\\x1E]*'|=\\s*[^\\s\\]\\'\\\"]+)"; // /g
     private final String regex_escaped_literal = "['\"]?(\\x1E+)['\"]?"; // /g;
     private final String regex_css_wrap_pseudo = "(\\x1F\\)|[^\\)])\\:(first|limit|last|gt|lt|eq|nth)([^\\-]|$)"; // bez g
-    private final String regex_specal_chars = "[\\x1C-\\x1F]+"; // /g;
+    private final String regex_special_chars = "[\\x1C-\\x1F]+"; // /g;
     private final String regex_first_axis = "^([\\s\\(\\x1F]*)(\\.?[^\\.\\/\\(]{1,2}[a-z]*:*)";
     private final String regex_filter_prefix = "(^|\\/|\\:)\\["; // /g;
     private final String regex_attr_prefix = "([^\\(\\[\\/\\|\\s\\x1F])\\@"; // /g;
@@ -693,7 +693,7 @@ public class CssSelectorToXPath {
         });
 
         // Remove any special characters
-        s = s.replaceAll(regex_specal_chars, "");
+        s = s.replaceAll(regex_special_chars, "");
 
         // add * to stand-alone filters
         s = s.replaceAll(regex_filter_prefix, "$1*[");
