@@ -448,7 +448,7 @@ public class CssSelectorToXPath {
         return buf.toString();
     }
 
-    // Find the begining of the selector, starting at i and working backwards
+    // Find the beginning of the selector, starting at i and working backwards
     private int selectorStart(String s, int i) {
         int depth = 0;
         int offset = 0;
@@ -707,7 +707,7 @@ public class CssSelectorToXPath {
     s = escapeChar(s, '[', ']', filter_char);
     s = s.replace(/(\x1D+)\]\[\1(.+?[^\x1D])\1\]/g, ' and ($2)$1]')
          */
-        s = prependAxis(s, ".//"); // prepend ".//" axis to begining of CSS selector
+        s = prependAxis(s, ".//"); // prepend ".//" axis to beginning of CSS selector
         return s;
     }
 
