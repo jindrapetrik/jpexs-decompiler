@@ -111,7 +111,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem get(int index) {
         if (path != null) {
             if (index >= this.size() || index < 0) {
-                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Get item outside of bounds of stack", path);
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Get item outside of bounds of stack", path);
                 return getPop();
             }
         }
@@ -127,7 +127,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem peek() {
         if (path != null) {
             if (this.isEmpty()) {
-                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Peek empty stack", path);
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Peek empty stack", path);
                 return getPop();
             }
         }
@@ -143,7 +143,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
     public synchronized GraphTargetItem peek(int index) {
         if (path != null) {
             if (index > this.size()) {
-                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Peek item from stack", path);
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Peek item from stack", path);
                 return getPop();
             }
         }
@@ -161,7 +161,7 @@ public class TranslateStack extends Stack<GraphTargetItem> {
             if (this.isEmpty()) {
                 PopItem oldpop = getPop();
                 pop = null;
-                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attemp to Pop empty stack", path);
+                Logger.getLogger(TranslateStack.class.getName()).log(Level.FINE, "{0}: Attempt to Pop empty stack", path);
                 return oldpop;
             }
         }
