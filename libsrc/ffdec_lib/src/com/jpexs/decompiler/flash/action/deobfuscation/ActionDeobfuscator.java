@@ -244,12 +244,12 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             executeActions(actionItem, localData, cPool, result, fakeFunctions, useVariables, first);
 
             if (result.item != null && result.resultValue == null) {
-                int newIstructionCount = 1 /*jump */ + result.stack.size();
+                int newInstructionCount = 1 /*jump */ + result.stack.size();
                 if (result.constantPool != null) {
-                    newIstructionCount++;
+                    newInstructionCount++;
                 }
 
-                newIstructionCount += 3 * result.variables.size();
+                newInstructionCount += 3 * result.variables.size();
                 /* 2x Push + Set or Define */
 
                 boolean allValueValid = true;
@@ -260,13 +260,13 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     }
                 }
 
-                if (allValueValid && newIstructionCount < result.maxSkippedInstructions) {
+                if (allValueValid && newInstructionCount < result.maxSkippedInstructions) {
                     int unreachableCount = result.minSkippedInstructions;
-                    if (newIstructionCount >= result.minSkippedInstructions) {
+                    if (newInstructionCount >= result.minSkippedInstructions) {
                         unreachableCount = actions.getUnreachableActionCount(actionItem, result.item);
                     }
 
-                    if (newIstructionCount < unreachableCount) {
+                    if (newInstructionCount < unreachableCount) {
                         if (result.stack.isEmpty() && result.variables.isEmpty() && result.constantPool == null && actionItem.action instanceof ActionJump) {
                             actionItem.setJumpTarget(result.item);
                         } else {
