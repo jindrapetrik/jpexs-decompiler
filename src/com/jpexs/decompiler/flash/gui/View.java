@@ -604,8 +604,8 @@ public class View {
                 TreePath path = tree.getPathForRow(i);
                 if (tree.isExpanded(path)) {
                     List<String> pathAsStringList = new ArrayList<>();
-                    for (Object pathCompnent : path.getPath()) {
-                        pathAsStringList.add(pathCompnent.toString());
+                    for (Object pathComponent : path.getPath()) {
+                        pathAsStringList.add(pathComponent.toString());
                     }
                     expandedNodes.add(pathAsStringList);
                 }
