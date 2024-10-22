@@ -83,11 +83,11 @@ doSilent:
 flashSetupFinished:
   DetailPrint "$(STRING_FLASH_AX_SETUPFINISHED)"
   Delete "$TEMP\flash_ax_setup.exe"
-  StrCmp $0 "0" InstallVerif 0
+  StrCmp $0 "0" InstallVerify 0
   Push "$(STRING_FLASH_AX_INTERRUPTED) $0"
   Goto ExitInstallFlash
  
-InstallVerif:
+InstallVerify:
   DetailPrint "$(STRING_FLASH_AX_SETUPOUTCOME)"
   SetRegView 32
   ClearErrors

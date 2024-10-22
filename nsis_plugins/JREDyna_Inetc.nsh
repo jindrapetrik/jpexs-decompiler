@@ -246,11 +246,11 @@ doSilent:
 jreSetupFinished:
   DetailPrint "$(STRING_JRE_SETUPFINISHED)"
   Delete "$TEMP\jre_setup.exe"
-  StrCmp $0 "0" InstallVerif 0
+  StrCmp $0 "0" InstallVerify 0
   Push "$(STRING_JRE_INTERRUPTED)$0"
   Goto ExitInstallJRE
  
-InstallVerif:
+InstallVerify:
   DetailPrint "$(STRING_JRE_SETUPOUTCOME)"
   Push "${JRE_VERSION}"
   Call DetectJRE  
