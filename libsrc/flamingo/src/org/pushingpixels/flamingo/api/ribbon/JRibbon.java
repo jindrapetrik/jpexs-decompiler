@@ -69,7 +69,7 @@ import org.pushingpixels.flamingo.internal.ui.ribbon.RibbonUI;
  * The contextual ribbon task groups allow showing and hiding ribbon tasks based
  * on the current selection in the application. For example, Word only shows the
  * table tasks when a table is selected in the document. By default, tasks
- * belonging to the groups adde by
+ * belonging to the groups added by
  * {@link #addContextualTaskGroup(RibbonContextualTaskGroup)} are not visible.
  * To show the tasks belonging to the specific group, call
  * {@link #setVisible(RibbonContextualTaskGroup, boolean)} API. Note that you
