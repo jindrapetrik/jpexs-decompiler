@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * SooundStreamHead2 tag - contains sound stream information for streaming
+ * SoundStreamHead2 tag - contains sound stream information for streaming
  * sound. Extends functionality of SoundStreamHead tag.
  *
  * @author JPEXS
