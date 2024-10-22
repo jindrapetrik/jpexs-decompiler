@@ -49,8 +49,8 @@ public class InWindow
 			if (numReadBytes == -1)
 			{
 				_posLimit = _streamPos;
-				int pointerToPostion = _bufferOffset + _posLimit;
-				if (pointerToPostion > _pointerToLastSafePosition)
+				int pointerToPosition = _bufferOffset + _posLimit;
+				if (pointerToPosition > _pointerToLastSafePosition)
 					_posLimit = _pointerToLastSafePosition - _bufferOffset;
 				
 				_streamEndWasReached = true;
@@ -95,8 +95,8 @@ public class InWindow
 		_pos++;
 		if (_pos > _posLimit)
 		{
-			int pointerToPostion = _bufferOffset + _pos;
-			if (pointerToPostion > _pointerToLastSafePosition)
+			int pointerToPosition = _bufferOffset + _pos;
+			if (pointerToPosition > _pointerToLastSafePosition)
 				MoveBlock();
 			ReadBlock();
 		}

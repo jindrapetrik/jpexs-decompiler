@@ -248,7 +248,7 @@ public class ActionUtils {
 	 * @param editor
 	 * @param line the first being 1
 	 * @param column the first being 1
-	 * @return the closest positon for the text component at given line and
+	 * @return the closest position for the text component at given line and
 	 * column
 	 */
 	public static int getDocumentPosition(JTextComponent editor, int line,

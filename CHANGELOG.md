@@ -2882,7 +2882,7 @@ Major version of SWF to XML export changed to 2.
 - [#287] Typo in parallelSpeedUp parameter
 - [#290],[#291] improved select language dialog
 - [#294] minor GUI fixes
-- [#298] Progressbar positition issues
+- [#298] Progressbar position issues
 - [#296] better export directory remembering
 - [#314] Better deobfuscating filenames
 - [#316] Readonly editor panes accepted Ctrl+Z/Y
