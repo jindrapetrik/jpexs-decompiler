@@ -1936,7 +1936,7 @@ public class Graph {
 
     /**
      * Check of Part passing output. Allows you to switch part for another. If
-     * not overriden, then it calls checkPart.
+     * not overridden, then it calls checkPart.
      *
      * @param output List of GraphTargetItems
      * @param stack Translate stack
@@ -2053,7 +2053,7 @@ public class Graph {
     }
 
     /**
-     * Check loop. Can be overriden to provide custom behavior.
+     * Check loop. Can be overridden to provide custom behavior.
      *
      * @param output List of GraphTargetItems
      * @param loopItem Loop item
@@ -2108,7 +2108,7 @@ public class Graph {
     }
 
     /**
-     * Checks whether a part can be a break candidate. Can be overriden to
+     * Checks whether a part can be a break candidate. Can be overridden to
      * provide custom behavior.
      *
      * @param localData Local data
@@ -2121,7 +2121,7 @@ public class Graph {
     }
 
     /**
-     * Check part in get loops walk. Can be overriden to provide custom
+     * Check part in get loops walk. Can be overridden to provide custom
      * behavior.
      *
      * @param part Graph part
@@ -2586,7 +2586,7 @@ public class Graph {
     }
 
     /**
-     * Get next parts of a part. Can be overriden to provide custom behavior.
+     * Get next parts of a part. Can be overridden to provide custom behavior.
      *
      * @param localData Local data
      * @param part Part
@@ -2666,7 +2666,7 @@ public class Graph {
 
     /**
      * Checks whether part can be checked over visited parts list. Defaults to
-     * true. Can be overriden to provide custom behavior.
+     * true. Can be overridden to provide custom behavior.
      *
      * @param localData Local data
      * @param part Graph part
@@ -2720,7 +2720,7 @@ public class Graph {
 
     /**
      * Gets if expression from stack.
-     * Can be overriden for custom handling
+     * Can be overridden for custom handling
      * @param localData Local data
      * @param stack Stack
      * @param output Output

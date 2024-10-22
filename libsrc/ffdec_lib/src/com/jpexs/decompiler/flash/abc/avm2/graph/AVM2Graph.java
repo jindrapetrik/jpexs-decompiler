@@ -1826,7 +1826,7 @@ public class AVM2Graph extends Graph {
     }
 
     /**
-     * Get next parts of a part. Can be overriden to provide custom behavior.
+     * Get next parts of a part. Can be overridden to provide custom behavior.
      *
      * @param localData Local data
      * @param part Part
