@@ -330,7 +330,7 @@ public class CommandLineHelp {
                                     }
                                 } else {
                                     if (!commands.containsKey(a.toLowerCase())) {
-                                        throw new RuntimeException("Invalid command in appliesto: " + a);
+                                        throw new RuntimeException("Invalid command in applies to: " + a);
                                     }
                                     for (Command c : commands.get(a.toLowerCase())) {
                                         c.addPreOption(opt);
