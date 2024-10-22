@@ -37545,7 +37545,7 @@ public interface WinError {
     // MessageText:
     //
     // A mode parameter is bad, such as capArea or subCapArea for
-    // TPM_GetCapability, phsicalPresence parameter for TPM_PhysicalPresence, or
+    // TPM_GetCapability, physicalPresence parameter for TPM_PhysicalPresence, or
     // migrationType for TPM_CreateMigrationBlob.
     //
     int TPM_E_BAD_MODE = 0x8028002C;
