@@ -73,7 +73,7 @@ public class FontEmbedDialog extends AppDialog {
 
     private int result = ERROR_OPTION;
 
-    private JLabel individialSample;
+    private JLabel individualSample;
 
     private Font customFont;
 
@@ -183,7 +183,7 @@ public class FontEmbedDialog extends AppDialog {
 
         installedRadio.setSelected(true);
 
-        individialSample = new JLabel();
+        individualSample = new JLabel();
         familyNamesSelection = new JComboBox<>(FontPanel.getFamilyModel());
         familyNamesSelection.setSelectedItem(new FontFamily(selectedFace.font));
         faceSelection = new JComboBox<>();
@@ -279,11 +279,11 @@ public class FontEmbedDialog extends AppDialog {
         specialPanel.add(new JLabel(translate("label.individual")));
         individualCharsField = new JTextField();
         individualCharsField.setPreferredSize(new Dimension(100, individualCharsField.getPreferredSize().height));
-        individialSample = new JLabel();
+        individualSample = new JLabel();
         specialPanel.add(individualCharsField);
 
         cnt.add(specialPanel);
-        cnt.add(individialSample);
+        cnt.add(individualSample);
 
         importAscentDescentLeadingCheckBox = new JCheckBox(translate("ascentdescentleading"));
         importAscentDescentLeadingCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -346,7 +346,7 @@ public class FontEmbedDialog extends AppDialog {
                 visibleChars.append(chars.charAt(i));
             }
         }
-        individialSample.setText(visibleChars.toString());
+        individualSample.setText(visibleChars.toString());
     }
 
     private void updateCheckboxes() {
@@ -373,7 +373,7 @@ public class FontEmbedDialog extends AppDialog {
             rangeCheckboxes[i].setText(translate("range.description").replace("%available%", Integer.toString(avail)).replace("%name%", rangeNames[i]).replace("%total%", Integer.toString(codes.length)));
         }
         allCheckbox.setText(translate("allcharacters").replace("%available%", Integer.toString(allChars.size())));
-        individialSample.setFont(f);
+        individualSample.setFont(f);
         updateIndividual();
     }
 
