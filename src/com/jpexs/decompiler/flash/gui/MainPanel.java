@@ -2268,7 +2268,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     Path.createDirectorySafe(new File(scriptsFolder));
                     boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
                     if (parallel && singleScriptFile) {
-                        logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                        logger.log(Level.WARNING, AppStrings.translate("export.script.singleFileParallelModeWarning"));
                         singleScriptFile = false;
                     }
 
@@ -2375,7 +2375,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Path.createDirectorySafe(new File(scriptsFolder));
             boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
             if (parallel && singleScriptFile) {
-                logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                logger.log(Level.WARNING, AppStrings.translate("export.script.singleFileParallelModeWarning"));
                 singleScriptFile = false;
             }
 
@@ -2492,7 +2492,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 Path.createDirectorySafe(new File(scriptsFolder));
                 boolean singleScriptFile = Configuration.scriptExportSingleFile.get();
                 if (parallel && singleScriptFile) {
-                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFileParallelModeWarning"));
                     singleScriptFile = false;
                 }
 
