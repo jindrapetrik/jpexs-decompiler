@@ -216,7 +216,7 @@ Filters._moveRGB = function (width, height, rgb, deltaX, deltaY, fill) {
     Filters._setRGB(ig, 0, 0, width, height, rgb);
     var retImg = createCanvas(width, height);
     retImg.width = width;
-    retImg.heigth = height;
+    retImg.height = height;
     var g = retImg.getContext("2d");
     g.fillStyle = fill;
     g.globalCompositeOperation = "copy";
