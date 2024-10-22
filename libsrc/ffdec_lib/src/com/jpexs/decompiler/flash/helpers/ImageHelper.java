@@ -228,7 +228,7 @@ public class ImageHelper {
                 return "bmp";
         }
 
-        throw new Error("Unsuported image format: " + format);
+        throw new Error("Unsupported image format: " + format);
     }
 
     /**
