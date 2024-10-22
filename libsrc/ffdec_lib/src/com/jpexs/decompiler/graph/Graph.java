@@ -882,7 +882,7 @@ public class Graph {
      *
      * @param allParts All parts
      */
-    protected void afterPopupateAllParts(Set<GraphPart> allParts) {
+    protected void afterPopulateAllParts(Set<GraphPart> allParts) {
 
     }
 
@@ -912,7 +912,7 @@ public class Graph {
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
-        afterPopupateAllParts(allParts);
+        afterPopulateAllParts(allParts);
         if (debugPrintAllParts) {
             System.err.println("parts:");
             for (GraphPart p : allParts) {
