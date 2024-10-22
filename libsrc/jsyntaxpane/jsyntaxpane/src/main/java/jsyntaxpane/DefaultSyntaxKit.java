@@ -156,7 +156,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 
 	/**
 	 * Find the SyntaxCOmponent with given classname that is installed
-	 * on the given pane, then deinstalls and removes it fom the
+	 * on the given pane, then deinstalls and removes it from the
 	 * editorComponents list
 	 * @param pane
 	 * @param classname
