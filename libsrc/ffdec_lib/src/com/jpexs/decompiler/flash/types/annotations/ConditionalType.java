@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark for field that its type is different whern certain field (value) is set.
+ * Mark for field that its type is different when certain field (value) is set.
  *
  * @author JPEXS
  */
