@@ -257,8 +257,8 @@ private final static boolean DEBUG =false;
      * AbortException during tree traversal.
      *
      * @exception ParseException
-     * Is thrown when an interpretation error occured.
-     * The stream is positioned where the error occured.
+     * Is thrown when an interpretation error occurred.
+     * The stream is positioned where the error occurred.
      * @exception	AbortException
      * Is thrown when the visitor decided to abort the
      * interpretation.

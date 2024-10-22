@@ -56,8 +56,8 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
         }
         Scanner sc = new Scanner(System.in);
         if (thrown != null) {
-            Logger.getLogger(ConsoleAbortRetryIgnoreHandler.class.getName()).log(Level.SEVERE, "Error occured", thrown);
-            System.out.println("Error occured: " + thrown.getLocalizedMessage());
+            Logger.getLogger(ConsoleAbortRetryIgnoreHandler.class.getName()).log(Level.SEVERE, "Error occurred", thrown);
+            System.out.println("Error occurred: " + thrown.getLocalizedMessage());
         }
         do {
             System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
