@@ -28024,7 +28024,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The notified event sink will not inF;uence the storage operation.
+    // The notified event sink will not influence the storage operation.
     //
     int STG_S_MONITORING = 0x00030203;
 
