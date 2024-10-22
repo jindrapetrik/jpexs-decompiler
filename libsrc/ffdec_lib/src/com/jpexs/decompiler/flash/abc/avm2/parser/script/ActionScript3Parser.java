@@ -1676,7 +1676,7 @@ public class ActionScript3Parser {
                     if (ss2.type == SymbolType.PARENT_OPEN) {
                         List<GraphTargetItem> args = call(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables, abc);
                         ret = new ConstructSuperAVM2Item(null, null, new LocalRegAVM2Item(null, null, 0, null, new TypeItem("Object") /*?*/), args);
-                    } else { //no costructor call, but it could be calling parent methods... => handle in expression
+                    } else { //no constructor call, but it could be calling parent methods... => handle in expression
                         lexer.pushback(ss2);
                         lexer.pushback(s);
                     }

@@ -1163,7 +1163,7 @@ public class ActionScript2Parser {
                     VariableActionItem supItem = new VariableActionItem(s.value.toString(), null, false);
                     variables.add(supItem);
                     ret = new CallMethodActionItem(null, null, supItem, new DirectValueActionItem(null, null, 0, Undefined.INSTANCE, constantPool), args);
-                } else { //no costructor call, but it could be calling parent methods... => handle in expression
+                } else { //no constructor call, but it could be calling parent methods... => handle in expression
                     lexer.pushback(ss2);
                     lexer.pushback(s);
                 }
