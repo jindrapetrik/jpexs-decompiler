@@ -593,7 +593,7 @@ final class Stroker implements PathConsumer2D {
     {
         // if p1=p2 or p3=p4 it means that the derivative at the endpoint
         // vanishes, which creates problems with computeOffset. Usually
-        // this happens when this stroker object is trying to winden
+        // this happens when this stroker object is trying to widen
         // a curve with a cusp. What happens is that curveTo splits
         // the input curve at the cusp, and passes it to this function.
         // because of inaccuracies in the splitting, we consider points
