@@ -1074,7 +1074,7 @@ public class DefineEditTextTag extends TextTag {
             CharacterWithStyle cs = txt.get(i);
             char c = cs.character;
             if (c != '\r' && c != '\n') {
-                // create new SameStyleTextRecord for all words and all diffrent style text parts
+                // create new SameStyleTextRecord for all words and all different style text parts
                 if (lastWasWhiteSpace && !Character.isWhitespace(c)) {
                     textModel.newWord();
                     lastWasWhiteSpace = false;
@@ -1300,7 +1300,7 @@ public class DefineEditTextTag extends TextTag {
                     tr2.styleFlagsHasColor = true;
                     tr2.textColorA = tr.style.textColor;
                 }
-                // always add xOffset, because no xOffset and 0 xOffset is diffrent in text rendering
+                // always add xOffset, because no xOffset and 0 xOffset is different in text rendering
                 tr2.styleFlagsHasXOffset = true;
                 tr2.xOffset = tr.xOffset;
                 if (yOffset != 0) {
