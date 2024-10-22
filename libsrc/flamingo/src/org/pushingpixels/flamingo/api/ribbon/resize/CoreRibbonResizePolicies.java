@@ -259,7 +259,7 @@ public class CoreRibbonResizePolicies {
 			int medSize = mediumButtons.size();
 			if (medSize > 0) {
 				// try to move buttons from low to med to make
-				// three-somes.
+				// threesomes.
 				while (((mediumButtons.size() % 3) != 0)
 						&& (smallButtons.size() > 0)) {
 					AbstractCommandButton low = smallButtons.remove(0);
@@ -567,7 +567,7 @@ public class CoreRibbonResizePolicies {
 					// next - medium priority
 					if (mapped.get(RibbonElementPriority.MEDIUM).size() > 0) {
 						// try to move buttons from small to medium to make
-						// three-somes.
+						// threesomes.
 						while (((mapped.get(RibbonElementPriority.MEDIUM)
 								.size() % 3) != 0)
 								&& (mapped.get(RibbonElementPriority.LOW)
