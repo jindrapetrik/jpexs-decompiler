@@ -81,7 +81,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public int lastTraitIndex = GraphTextWriter.TRAIT_UNKNOWN;
 
-    public boolean ignoreCarret = false;
+    public boolean ignoreCaret = false;
 
     private boolean reset = false;
 
@@ -185,12 +185,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
         for (Highlighting h : allh) {
             if (h.getProperties().subtype.equals(type) && (h.getProperties().index == index)) {
-                ignoreCarret = true;
+                ignoreCaret = true;
                 if (h.startPos <= getDocument().getLength()) {
                     setCaretPosition(h.startPos);
                 }
                 getCaret().setVisible(true);
-                ignoreCarret = false;
+                ignoreCaret = false;
                 break;
             }
         }
@@ -202,12 +202,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
         Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset, currentMethodHighlight.startPos, currentMethodHighlight.startPos + currentMethodHighlight.len);
         if (h2 != null) {
-            ignoreCarret = true;
+            ignoreCaret = true;
             if (h2.startPos <= getDocument().getLength()) {
                 setCaretPosition(h2.startPos);
             }
             getCaret().setVisible(true);
-            ignoreCarret = false;
+            ignoreCaret = false;
         }
     }
 
@@ -620,13 +620,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (abc == null) {
             return;
         }
-        if (ignoreCarret) {
+        if (ignoreCaret) {
             return;
         }
 
         getCaret().setVisible(true);
         int pos = getCaretPosition();
-        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCarret(true);
+        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCaret(true);
         lastTraitIndex = GraphTextWriter.TRAIT_UNKNOWN;
         try {
             classIndex = -1;
@@ -729,7 +729,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
             setNoTrait();
         } finally {
-            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCarret(false);
+            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCaret(false);
         }
     }
 
@@ -779,12 +779,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (tm != null) {
             int pos = 0;
             if (tm.len > 1) {
-                ignoreCarret = true;
+                ignoreCaret = true;
                 int startPos = tm.startPos + tm.len - 1;
                 if (startPos <= getDocument().getLength()) {
                     setCaretPosition(startPos);
                 }
-                ignoreCarret = false;
+                ignoreCaret = false;
             }
             pos = tm.startPos;
 
@@ -838,12 +838,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             int pos = 0;
             if (th != null) {
                 if (th.len > 1) {
-                    ignoreCarret = true;
+                    ignoreCaret = true;
                     int startPos = th.startPos + th.len - 1;
                     if (startPos <= getDocument().getLength()) {
                         setCaretPosition(startPos);
                     }
-                    ignoreCarret = false;
+                    ignoreCaret = false;
                 }
                 pos = th.startPos;
             } else if (tc != null) {

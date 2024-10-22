@@ -1669,7 +1669,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
         detailPanel.setVisible(!val);
 
-        decompiledTextArea.ignoreCarret = val;
+        decompiledTextArea.ignoreCaret = val;
         if (val) {
             decompiledTextArea.requestFocusInWindow();
         }

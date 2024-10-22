@@ -160,7 +160,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public JLabel decLabel = new HeaderLabel(AppStrings.translate("panel.decompiled"));
 
-    private boolean ignoreCarret = false;
+    private boolean ignoreCaret = false;
 
     private boolean editMode = false;
 
@@ -337,7 +337,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private void setDecompiledText(final String scriptName, final String breakPointScriptName, final String text) {
         View.checkAccess();
 
-        ignoreCarret = true;
+        ignoreCaret = true;
         decompiledEditor.setScriptName(scriptName, breakPointScriptName);
         decompiledEditor.setText(text);
         BrokenScriptDetector det = new BrokenScriptDetector();
@@ -347,17 +347,17 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             brokenHintPanel.setVisible(false);
         }
 
-        ignoreCarret = false;
+        ignoreCaret = false;
     }
 
     private void setEditorText(final String scriptName, final String breakPointScriptName, final String text, final String contentType) {
         View.checkAccess();
 
-        ignoreCarret = true;
+        ignoreCaret = true;
         editor.setScriptName("#PCODE " + scriptName, "#PCODE " + breakPointScriptName);
         editor.changeContentType(contentType);
         editor.setText(text);
-        ignoreCarret = false;
+        ignoreCaret = false;
     }
 
     private void setText(final HighlightedText text, final String contentType, final String scriptName, final String breakPointScriptName) {
@@ -999,7 +999,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
-                if (ignoreCarret) {
+                if (ignoreCaret) {
                     return;
                 }
                 if (editMode || editDecompiledMode) {
@@ -1017,12 +1017,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 Long ofs = lastH == null ? 0 : lastH.getProperties().offset;
                 Highlighting h2 = Highlighting.searchOffset(lastDecompiled.getInstructionHighlights(), ofs);
                 if (h2 != null) {
-                    ignoreCarret = true;
+                    ignoreCaret = true;
                     if (h2.startPos <= decompiledEditor.getDocument().getLength()) {
                         decompiledEditor.setCaretPosition(h2.startPos);
                     }
                     decompiledEditor.getCaret().setVisible(true);
-                    ignoreCarret = false;
+                    ignoreCaret = false;
 
                 }
             }
@@ -1031,7 +1031,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         decompiledEditor.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
-                if (ignoreCarret) {
+                if (ignoreCaret) {
                     return;
                 }
                 if (editMode || editDecompiledMode) {
@@ -1043,12 +1043,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 if (h != null) {
                     Highlighting h2 = Highlighting.searchOffset(disassembledText.getInstructionHighlights(), h.getProperties().offset);
                     if (h2 != null) {
-                        ignoreCarret = true;
+                        ignoreCaret = true;
                         if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {
                             editor.setCaretPosition(h2.startPos);
                         }
                         editor.getCaret().setVisible(true);
-                        ignoreCarret = false;
+                        ignoreCaret = false;
                     }
                 }
             }

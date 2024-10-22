@@ -89,7 +89,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     private final DecompiledEditorPane decompiledEditor;
 
-    private boolean ignoreCarret = false;
+    private boolean ignoreCaret = false;
 
     private String name;
 
@@ -188,8 +188,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         hilighOffset(oldOffset);
     }
 
-    public void setIgnoreCarret(boolean ignoreCarret) {
-        this.ignoreCarret = ignoreCarret;
+    public void setIgnoreCaret(boolean ignoreCaret) {
+        this.ignoreCaret = ignoreCaret;
     }
 
     public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
@@ -213,12 +213,12 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             }
         }
         if (h2 != null) {
-            ignoreCarret = true;
+            ignoreCaret = true;
             if (h2.startPos <= getDocument().getLength()) {
                 setCaretPosition(h2.startPos);
             }
             getCaret().setVisible(true);
-            ignoreCarret = false;
+            ignoreCaret = false;
         }
     }
 
@@ -228,12 +228,12 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
         Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset);
         if (h2 != null) {
-            ignoreCarret = true;
+            ignoreCaret = true;
             if (h2.startPos <= getDocument().getLength()) {
                 setCaretPosition(h2.startPos);
             }
             getCaret().setVisible(true);
-            ignoreCarret = false;
+            ignoreCaret = false;
         }
     }
 
@@ -723,7 +723,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public void caretUpdate(CaretEvent e) {
         updateDocs();
 
-        if (ignoreCarret) {
+        if (ignoreCaret) {
             return;
         }
         if (isEditable()) {
