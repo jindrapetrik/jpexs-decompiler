@@ -968,7 +968,7 @@ Major version of SWF to XML export changed to 2.
 ## [17.0.0] - 2022-11-20
 ### Added
 - [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
-- [#1871] Toogle buttons for disabling subsprite animation, display preview of sprites/frames
+- [#1871] Toggle buttons for disabling subsprite animation, display preview of sprites/frames
 - [#1875] Remove no longer accessed items from cache after certain amount of time
 - [#1280] AS3 Direct editation of traits with the same name
 - [#1743] GFX - Adding DefineExternalImage2 and DefineSubImage tags
