@@ -1578,7 +1578,7 @@
 					<li>AS - direct editation - long integer values</li>
 					<li>AS1/2 - on keypress key escaping</li>
 					<li>AS1/2 - stop/play/etc. can be used in expressions, pushing undefined</li>
-					<li>AS1/2 - startDrag constaint</li>
+					<li>AS1/2 - startDrag constraint</li>
 					<li>AS1/2 - gotoAndStop/play with simple label compiled as gotolabel</li>
 				</ul>
 			</description>
