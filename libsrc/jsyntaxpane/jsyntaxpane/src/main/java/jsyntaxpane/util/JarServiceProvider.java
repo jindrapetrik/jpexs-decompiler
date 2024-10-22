@@ -100,7 +100,7 @@ public class JarServiceProvider {
     /**
      * Read a file in the META-INF/services location. File name will be fully
      * qualified classname, in all lower-case, appended with ".properties" If no
-     * file is found, then a an empty Property instance will be returned
+     * file is found, then an empty Property instance will be returned
      *
      * @param clazz
      * @return Property file read.
@@ -113,7 +113,7 @@ public class JarServiceProvider {
      * Read a file in the META-INF/services named name appended with
      * ".properties"
      *
-     * If no file is found, then a an empty Property instance will be returned
+     * If no file is found, then an empty Property instance will be returned
      *
      * @param name name of file (use dots to separate subfolders).
      * @return Property file read.
@@ -146,7 +146,7 @@ public class JarServiceProvider {
     /**
      * Read a file in the META-INF/services named name appended with
      * ".properties", and returns it as a
-     * <code>Map<String, String></code> If no file is found, then a an empty
+     * <code>Map<String, String></code> If no file is found, then an empty
      * Property instance will be returned
      *
      * @param name name of file (use dots to separate subfolders).
