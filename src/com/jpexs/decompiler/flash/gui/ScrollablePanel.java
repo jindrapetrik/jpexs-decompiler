@@ -33,7 +33,7 @@ import javax.swing.SwingConstants;
  * customize the scrollable features by using newly provided setter methods so
  * you don't have to extend this class every time.
  * <p>
- * Scrollable amounts can be specifed as a percentage of the viewport size or as
+ * Scrollable amounts can be specified as a percentage of the viewport size or as
  * an actual pixel value. The amount can be changed for both unit and block
  * scrolling for both horizontal and vertical scrollbars.
  * <p>
