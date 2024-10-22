@@ -98,7 +98,7 @@ public class PDFOutput {
     /**
      * This method writes a PDFObject to the stream.
      *
-     * @param ob PDFObject Obeject to write
+     * @param ob PDFObject Object to write
      * @exception IOException on error
      */
     protected void write(PDFObject ob) throws IOException {
