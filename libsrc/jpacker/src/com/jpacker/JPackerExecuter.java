@@ -79,16 +79,16 @@ public class JPackerExecuter {
     // zero encoding - just removal of whitespace and comments
     private String minify(String script) {
         JPackerParser parser = new JPackerParser();
-        ReplacementStrategy defaultStrat = new DefaultReplacementStrategy();
+        ReplacementStrategy defaultStrategy = new DefaultReplacementStrategy();
         // protect data
         parser = addDataRegEx(parser);
-        script = parser.exec(script, defaultStrat);
+        script = parser.exec(script, defaultStrategy);
         // remove white-space
         parser = addWhiteSpaceRegEx(parser);
-        script = parser.exec(script, defaultStrat);
+        script = parser.exec(script, defaultStrategy);
         // clean
         parser = addCleanUpRegEx(parser);
-        script = parser.exec(script, defaultStrat);
+        script = parser.exec(script, defaultStrategy);
         // done
         return script;
     }
