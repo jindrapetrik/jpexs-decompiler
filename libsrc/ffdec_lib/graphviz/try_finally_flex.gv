@@ -52,7 +52,7 @@ digraph try_finally_flex {
   
   /*
   All ways go through finally clause. There is also lookupswitch which uses value on stack..
-  Value -1 is pushed on stack after in_try and after catch bodys.
+  Value -1 is pushed on stack after in_try and after catch bodies.
   For every return/continue, there is also specific value pushed to stack.
   Lookupswitch then decides what will happen.
   */
