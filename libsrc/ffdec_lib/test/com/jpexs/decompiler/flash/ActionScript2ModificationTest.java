@@ -289,7 +289,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     }
 
     @Test
-    public void testAddAtionFirst() {
+    public void testAddActionFirst() {
         String actionsString
                 = "ConstantPool\n"
                 + "DefineFunction \"test\", 1, \"p1\" {\n"
@@ -316,7 +316,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     }
 
     @Test
-    public void testAddAtion1() {
+    public void testAddAction1() {
         String actionsString
                 = "ConstantPool\n"
                 + "DefineFunction \"test\", 1, \"p1\" {\n"
@@ -343,7 +343,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
     }
 
     @Test
-    public void testAddAtionToContainer() {
+    public void testAddActionToContainer() {
         String actionsString
                 = "ConstantPool\n"
                 + "DefineFunction \"test\", 1, \"p1\" {\n"
