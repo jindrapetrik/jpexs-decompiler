@@ -39,7 +39,7 @@ import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizeSequencingPo
  * 
  * <p>
  * The resize sequencing policy defines which ribbon band will be chosen next
- * when the ribbon is shrinked / expanded. It is installed with the
+ * when the ribbon is shrunk / expanded. It is installed with the
  * {@link RibbonTask#setResizeSequencingPolicy(RibbonBandResizeSequencingPolicy)}
  * .
  * </p>
