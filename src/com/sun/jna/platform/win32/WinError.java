@@ -21816,7 +21816,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Sent DOS cookie notify to intiator.
+    // Sent DOS cookie notify to initiator.
     //
     int ERROR_IPSEC_IKE_DOS_COOKIE_SENT = 13890;
 
