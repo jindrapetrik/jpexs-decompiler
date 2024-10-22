@@ -5444,7 +5444,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 try {
                     s.injectDebugInfo(decompileDir, swfHash);
                 } catch (Throwable t) {
-                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Errorr injecting debug info", t);
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error injecting debug info", t);
                 }
             }
         }
