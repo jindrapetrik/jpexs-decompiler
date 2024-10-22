@@ -296,7 +296,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         // This is a non-deflated stream
         /*
     os.write("/Length ".getBytes("UTF-8"));
-    // Accout for stream\n ... >\nendstream
+    // Account for stream\n ... >\nendstream
     os.write(Integer.toString(buf.size() + 18).getBytes("UTF-8"));
     os.write("\n/Filter /ASCII85Decode".getBytes("UTF-8"));
     os.write("\n>>\nstream\n".getBytes("UTF-8"));
