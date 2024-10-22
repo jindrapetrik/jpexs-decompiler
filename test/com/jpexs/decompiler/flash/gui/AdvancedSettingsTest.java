@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 public class AdvancedSettingsTest {
 
     @Test
-    public void testAdvancedSettginsDialog() {
+    public void testAdvancedSettingsDialog() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(AdvancedSettingsDialog.class));
         AdvancedSettingsDialog.getCategories("", "", new HashMap<>(), new HashMap<>(), "", new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new JComboBox<>(), resourceBundle);
     }
