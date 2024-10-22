@@ -122,7 +122,7 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     /**
-     * Cache of string to dottted chain conversion.
+     * Cache of string to dotted chain conversion.
      */
     @Internal
     public Map<String, DottedChain> dottedChainCache = new HashMap<>();
