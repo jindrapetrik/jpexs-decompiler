@@ -109,7 +109,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
      * @param value Value
      */
     public SetMemberActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.object = object;
         this.objectName = objectName;
     }

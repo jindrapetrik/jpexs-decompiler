@@ -91,7 +91,7 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
      * @param value Value
      */
     public SetPropertyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.target = target;
         this.propertyIndex = propertyIndex;
     }

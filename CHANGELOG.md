@@ -40,7 +40,7 @@ All notable changes to this project will be documented in this file.
 - [#2320] AS3 direct editation - modified flag of scripts vanishes after editing other script with and having error
 - [#2272] Filters strength attribute caps at 100%
 - [#2322] AS3 Construct property name formatting
-- [#2322] AS3 Assigment position when using dup
+- [#2322] AS3 Assignment position when using dup
 - [#2323] AS3 direct editation - Number class traits are duplicated in constructor
 - [#2324] AS3 direct editation - nested loop continue/break (with labels)
 - [#2325] AS3 direct editation - allow single quoted attributes in XML

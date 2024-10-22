@@ -116,7 +116,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
      * @param isStatic Is static
      */
     public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT);
         this.object = object;
         this.propertyName = propertyName;
         this.value = value;
