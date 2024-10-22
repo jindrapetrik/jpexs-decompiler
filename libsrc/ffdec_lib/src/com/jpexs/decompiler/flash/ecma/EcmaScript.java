@@ -117,7 +117,7 @@ public class EcmaScript {
      * @return Value
      */
     public static Object object_get(ObjectType o, String p) {
-        //TODO: isDataDesciptor, etc. ECMA 8.12.3
+        //TODO: isDataDescriptor, etc. ECMA 8.12.3
         return object_getProperty(o, p);
     }
 
