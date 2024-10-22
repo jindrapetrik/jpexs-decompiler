@@ -60,14 +60,14 @@ public class CssSelectorToXPath {
     private final String xpath_lower_case = xpath_to_lower(null);
     private final String xpath_ns_uri = "ancestor-or-self::*[last()]/@url";
     private final String xpath_ns_path = xpath_url_path(xpath_url(xpath_ns_uri));
-    private final String xpath_has_protocal = "(starts-with(" + xpath_url_attrs + ",\"http://\") or starts-with(" + xpath_url_attrs + ",\"https://\"))";
+    private final String xpath_has_protocol = "(starts-with(" + xpath_url_attrs + ",\"http://\") or starts-with(" + xpath_url_attrs + ",\"https://\"))";
     private final String xpath_is_internal = "starts-with(" + xpath_url(null) + "," + xpath_url_domain(xpath_ns_uri) + ") or " + xpath_ends_with(xpath_url_domain(null), xpath_url_domain(xpath_ns_uri));
-    private final String xpath_is_local = "(" + xpath_has_protocal + " and starts-with(" + xpath_url(null) + "," + xpath_url(xpath_ns_uri) + "))";
+    private final String xpath_is_local = "(" + xpath_has_protocol + " and starts-with(" + xpath_url(null) + "," + xpath_url(xpath_ns_uri) + "))";
     private final String xpath_is_path = "starts-with(" + xpath_url_attrs + ",\"/\")";
     private final String xpath_is_local_path = "starts-with(" + xpath_url_path(null) + "," + xpath_ns_path + ")";
     private final String xpath_normalize_space = "normalize-space()";
-    private final String xpath_internal = "[not(" + xpath_has_protocal + ") or " + xpath_is_internal + "]";
-    private final String xpath_external = "[" + xpath_has_protocal + " and not(" + xpath_is_internal + ")]";
+    private final String xpath_internal = "[not(" + xpath_has_protocol + ") or " + xpath_is_internal + "]";
+    private final String xpath_external = "[" + xpath_has_protocol + " and not(" + xpath_is_internal + ")]";
     private final char escape_literal = (char) 30;
     private final char escape_parens = (char) 31;
     private final String regex_string_literal = "(\"[^\"\\x1E]*\"|'[^'\\x1E]*'|=\\s*[^\\s\\]\\'\\\"]+)"; // /g
