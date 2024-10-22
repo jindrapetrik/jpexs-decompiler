@@ -235,7 +235,7 @@ public class PDFOutline extends PDFObject implements Serializable {
                 os.write("\n".getBytes("UTF-8"));
             }
         } else {
-            // were a decendent, so by default we are closed. Find out how many
+            // were a descendent, so by default we are closed. Find out how many
             // entries are below us
             int c = descendants();
             if (c > 0) {
