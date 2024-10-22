@@ -249,7 +249,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         boolean success = false;
         Highlighting h = Highlighting.searchPos(highlightedText.getInstructionHighlights(), pos);
         if (h != null) {
-            methodCodePanel.hilighOffset(h.getProperties().offset);
+            methodCodePanel.hilightOffset(h.getProperties().offset);
             success = true;
         }
         Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
