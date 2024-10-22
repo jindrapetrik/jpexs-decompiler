@@ -1065,7 +1065,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      */
     public GraphTextWriter appendCommands(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands, boolean asBlock) throws InterruptedException {
 
-        //This may be useful in the future, but we must handle obfuscated SWFs where there is only one debugline instruction on the beggining.
+        //This may be useful in the future, but we must handle obfuscated SWFs where there is only one debugline instruction on the beginning.
         final boolean useLineInfo = false;
 
         int prevLine = prevLineItem == null ? 0 : prevLineItem.getLine();
