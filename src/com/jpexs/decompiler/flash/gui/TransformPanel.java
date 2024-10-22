@@ -179,8 +179,8 @@ public class TransformPanel extends JPanel {
 
         imagePanel.addBoundsChangeListener(new BoundsChangeListener() {
             @Override
-            public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint, RegistrationPointPosition registrationPointPosition) {
-                update(newBounds, registraionPoint, registrationPointPosition);
+            public void boundsChanged(Rectangle2D newBounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
+                update(newBounds, registrationPoint, registrationPointPosition);
             }
         });
         //setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -470,9 +470,9 @@ public class TransformPanel extends JPanel {
         loadOpenedCards();
     }
 
-    private void update(Rectangle2D bounds, Point2D registraionPoint, RegistrationPointPosition registrationPointPosition) {
+    private void update(Rectangle2D bounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
         this.bounds = bounds;
-        this.registrationPoint = registraionPoint;
+        this.registrationPoint = registrationPoint;
         this.registrationPointPanel.setSelectedPosition(registrationPointPosition);
         if (!moveRelativeCheckBox.isSelected()) {
             moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
