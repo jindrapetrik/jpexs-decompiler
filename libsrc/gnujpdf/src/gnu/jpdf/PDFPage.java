@@ -292,15 +292,15 @@ public class PDFPage extends PDFObject implements Serializable {
      * problems.
      *
      * @param orientation a PageFormat orientation constant:
-     * PageFormat.PORTRAIT, PageFormat.LANDSACPE or PageFormat.REVERSE_LANDSACPE
+     * PageFormat.PORTRAIT, PageFormat.LANDSCAPE or PageFormat.REVERSE_LANDSCAPE
      */
     public void setOrientation(int orientation) {
         pageFormat.setOrientation(orientation);
     }
 
     /**
-     * Returns the pages orientation: PageFormat.PORTRAIT, PageFormat.LANDSACPE
-     * or PageFormat.REVERSE_LANDSACPE
+     * Returns the pages orientation: PageFormat.PORTRAIT, PageFormat.LANDSCAPE
+     * or PageFormat.REVERSE_LANDSCAPE
      *
      * @see java.awt.print.PageFormat
      * @return current orientation of the page
