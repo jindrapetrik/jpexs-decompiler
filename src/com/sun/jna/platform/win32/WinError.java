@@ -20584,7 +20584,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Problem with some part of the filterspec or providerspecific buffer in
+    // Problem with some part of the filterspec or provider specific buffer in
     // general.
     //
     int WSA_QOS_BAD_OBJECT = 11013;
