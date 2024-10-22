@@ -554,7 +554,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
         }
 
-        //Search all fully qualitfied types
+        //Search all fully qualified types
         if (!isProperty) {
             for (int i = 0; i < name.size(); i++) {
                 DottedChain fname = name.subChain(i + 1);
