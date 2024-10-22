@@ -3975,7 +3975,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         } else {
                             frameOverMaxShouldBeNow = startFrame + ticksFromStart;
 
-                            //Apply maximum frames repating, this is actual frame which should be drawed now
+                            //Apply maximum frames repeating, this is actual frame which should be drawed now
                             int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
 
                             skipFrames = frameShouldBeNow - curFrame;
