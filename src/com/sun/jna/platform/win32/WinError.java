@@ -22857,7 +22857,7 @@ public interface WinError {
     // MessageText:
     //
     // A string containing localized substitutable content was malformed. Either
-    // a dollar sign ($) was follwed by something other than a left parenthesis
+    // a dollar sign ($) was followed by something other than a left parenthesis
     // or another dollar sign or an substitution's right parenthesis was not
     // found.
     //
