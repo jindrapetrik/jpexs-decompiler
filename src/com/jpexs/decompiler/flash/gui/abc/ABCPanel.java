@@ -1432,7 +1432,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public void hilightScript(String nameIncludingSwfHash) {
         if (!nameIncludingSwfHash.contains(":")) {
-            throw new RuntimeException("Script name should conatin swfHash");
+            throw new RuntimeException("Script name should contain swfHash");
         }
         String swfHash = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":"));
         String name = nameIncludingSwfHash.substring(nameIncludingSwfHash.indexOf(":") + 1);
