@@ -2741,7 +2741,7 @@ public class ActionScript3Parser {
                 }
 
                 /*else if (isUse) {
-                    //Note: in this case, fullName attribute will be changed to real NS insude NamespaceItem
+                    //Note: in this case, fullName attribute will be changed to real NS including NamespaceItem
                     openedNamespaces.add(new NamespaceItem(fullName, Namespace.KIND_NAMESPACE));
                 } else */
                 if (isStar) {
