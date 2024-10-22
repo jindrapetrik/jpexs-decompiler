@@ -13848,7 +13848,7 @@ public interface WinError {
     // The call to create a superior Enlistment on this Transaction object could
     // not be completed, because the Transaction object specified for the
     // enlistment is a subordinate branch of the Transaction. Only the root of
-    // the Transactoin can be enlisted on as a superior.
+    // the Transaction can be enlisted on as a superior.
     //
     int ERROR_TRANSACTION_NOT_ROOT = 6721;
 
