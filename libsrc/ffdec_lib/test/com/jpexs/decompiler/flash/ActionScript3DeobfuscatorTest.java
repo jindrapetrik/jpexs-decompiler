@@ -348,7 +348,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     //TODO: JPEXS @Test
-    public void testEvailExpressionAfterWhile() throws Exception {
+    public void testEvalExpressionAfterWhile() throws Exception {
         String res = recompile("var a = 5;"
                 + "while(true){"
                 + "if(a==73){"
