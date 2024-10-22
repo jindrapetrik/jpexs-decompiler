@@ -338,7 +338,7 @@ public class PDFJob extends PrintJob implements Serializable {
      *
      * <p>
      * Like with java.awt, Graphics instances created with PrintJob implement
-     * the PrintGraphics interface. Here we implement that method, and overide
+     * the PrintGraphics interface. Here we implement that method, and override
      * PDFGraphics.create() method, so all instances have this interface.</p>
      */
     class graphic extends PDFGraphics implements PrintGraphics {
