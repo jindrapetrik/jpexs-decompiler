@@ -1393,11 +1393,11 @@ public class AVM2ConstantPool implements Cloneable {
         namespaceSetMap.put(0, 0);
         for (int i = 1; i < secondPool.constant_namespace_set.size(); i++) {
             NamespaceSet secondNamespaceSet = secondPool.constant_namespace_set.get(i);
-            int[] mappedsNss = new int[secondNamespaceSet.namespaces.length];
+            int[] mappedNss = new int[secondNamespaceSet.namespaces.length];
             for (int n = 0; n < secondNamespaceSet.namespaces.length; n++) {
-                mappedsNss[n] = namespaceMap.get(secondNamespaceSet.namespaces[n]);
+                mappedNss[n] = namespaceMap.get(secondNamespaceSet.namespaces[n]);
             }
-            int mappedId = getNamespaceSetId(mappedsNss, true);
+            int mappedId = getNamespaceSetId(mappedNss, true);
             namespaceSetMap.put(i, mappedId);
         }
         multinameMap.put(0, 0);
