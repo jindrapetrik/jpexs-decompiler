@@ -1969,7 +1969,7 @@ public class AVM2Code implements Cloneable {
                         ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                         ip++;
                         break;
-                        //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
+                        //throw new ConvertException("Unknown pattern after DUP:" + insComparison.toString());
                     }
                 } while (ins.definition instanceof DupIns);
             } else
