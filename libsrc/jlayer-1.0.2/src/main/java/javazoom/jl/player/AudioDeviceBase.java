@@ -113,7 +113,7 @@ public abstract class AudioDeviceBase implements AudioDevice {
      * @param len     The number of samples from the array to write.
      * @throws JavaLayerException if the audio data could not be
      *                            written to the audio device.
-     *                            If the audio device is not open, this method does nthing.
+     *                            If the audio device is not open, this method does nothing.
      */
     public void write(short[] samples, int offs, int len)
             throws JavaLayerException {
