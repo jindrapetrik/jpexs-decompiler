@@ -89,7 +89,7 @@ public class HexViewTableModel extends AbstractTableModel {
     }
 
     @Override
-    public void fireTableCellUpdated(int row, int columnd) {
-        super.fireTableCellUpdated(bytesInRow, bytesInRow);
+    public void fireTableCellUpdated(int row, int column) {
+        super.fireTableCellUpdated(row, column);
     }
 }
