@@ -38,7 +38,7 @@ public class CssParser {
     private final List<List<String>> propNames = new ArrayList<>();
     private final List<List<String>> propValues = new ArrayList<>();
 
-    private final List<Integer> specifities = new ArrayList<>();
+    private final List<Integer> specificities = new ArrayList<>();
 
     /**
      * Constructor.
@@ -122,7 +122,7 @@ public class CssParser {
         int posSelectorEnd = lexer.getPos() - 1;
         String selectorStr = s.substring(posSelectorStart, posSelectorEnd).trim();
         selectors.add(selectorStr);
-        specifities.add(specifity);
+        specificities.add(specifity);
 
         int declarationsStart = lexer.getPos();
         Reference<String> propName = new Reference<>("");
@@ -529,6 +529,6 @@ public class CssParser {
      * @return Specifity
      */
     public int getSpecifity(int index) {
-        return specifities.get(index);
+        return specificities.get(index);
     }
 }
