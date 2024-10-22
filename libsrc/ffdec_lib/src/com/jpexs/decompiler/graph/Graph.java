@@ -177,7 +177,7 @@ public class Graph {
      * input edges are already visited (not counting back edges), then all its
      * output edges are processed.
      * <p>
-     * This time is useful when sorting nodes according their occurence in
+     * This time is useful when sorting nodes according their occurrence in
      * getMostCommonPart method - used for switch detection
      *
      * @param loops Already calculated loops to get backedges from.
