@@ -23407,7 +23407,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The log of the subscription is in disabled state, and can not be used to
+    // The log of the subscription is in disabled state, and cannot be used to
     // forward events to. The log must first be enabled before the subscription
     // can be activated.
     //
@@ -40475,7 +40475,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Network interface can not process the request because it is being reset.
+    // Network interface cannot process the request because it is being reset.
     //
     int ERROR_NDIS_RESET_IN_PROGRESS = 0x8034000D;
 
@@ -40575,7 +40575,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An attempt was made to map a file that can not be found.
+    // An attempt was made to map a file that cannot be found.
     //
     int ERROR_NDIS_FILE_NOT_FOUND = 0x8034001B;
 
@@ -40708,7 +40708,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The wireless local area network interface is busy and can not perform the
+    // The wireless local area network interface is busy and cannot perform the
     // requested operation.
     //
     int ERROR_NDIS_DOT11_MEDIA_IN_USE = 0x80342001;

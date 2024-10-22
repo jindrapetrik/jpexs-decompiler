@@ -340,7 +340,7 @@ public class JRibbon extends JComponent {
      */
     public void removeTask(RibbonTask task) {
         if (task == null) {
-            throw new IllegalArgumentException("RibbonTask can not be null");
+            throw new IllegalArgumentException("RibbonTask cannot be null");
         }
 
         int posOfTask = this.tasks.indexOf(task);
