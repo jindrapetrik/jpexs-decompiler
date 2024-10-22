@@ -36,7 +36,7 @@ git checkout dev
 ```
 
 ### GIT recommended
-It is recommended to have [GIT] commandline executables installed. Building script uses GIT to include revision number in to the binary. (For Windows, you must enable Git in windows command line during installation.)
+It is recommended to have [GIT] commandline executables installed. Building script uses GIT to include revision number into the binary. (For Windows, you must enable Git in windows command line during installation.)
 
 ### Netbeans project
 

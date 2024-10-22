@@ -13764,7 +13764,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The buffer passed in to PushTransaction or PullTransaction is not in a
+    // The buffer passed into PushTransaction or PullTransaction is not in a
     // valid format.
     //
     int ERROR_TRANSACTION_INVALID_MARSHALL_BUFFER = 6713;
