@@ -2139,7 +2139,7 @@ Major version of SWF to XML export changed to 2.
 - [#953] Mac application permission fix (maybe)
 - [#954] IndexOutOfBounds fix
 - [#950] AddTrait setting modified fix
-- [#945] AS1/2 directeditation fix - member named as global function
+- [#945] AS1/2 direct editation fix - member named as global function
 - [#957] AS1/2 IndexOutOfBounds fix
 - [#956] Invalid jump offsets warning
 - [#968] Sprites export with wrong coloring
