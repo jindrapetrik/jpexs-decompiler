@@ -2853,7 +2853,7 @@ Major version of SWF to XML export changed to 2.
 - [#292] Change background color in SWF preview
 - [#301] Clear errors log button
 - [#313] Command line parameter for ignore all errors
-- [#330] Protection agains adding same characters
+- [#330] Protection against adding same characters
 - [#332] AS1/2 Showing elapsed times during commandline export
 - [#344] Reload opened SWF
 - Decompilation timeouts
