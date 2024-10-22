@@ -417,7 +417,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             if (action instanceof ActionDefineFunction) {
                 ActionDefineFunction def = (ActionDefineFunction) action;
                 if (def.paramNames.isEmpty() && def.functionName.length() > 0) {
-                    // remove funcion only when the function name contains only non printable characters
+                    // remove function only when the function name contains only non printable characters
                     if (!isFakeName(def.functionName)) {
                         continue;
                     }
