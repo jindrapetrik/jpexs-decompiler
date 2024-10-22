@@ -48,7 +48,7 @@ public class IggyShapeNode implements StructureInterface {
     float controlY; // for curves, negative 
     @IggyFieldType(DataType.uint8_t)  //1-moveto, 2-lineto , 3 - curve to
     int node_type;
-    @IggyFieldType(DataType.uint8_t) // 208 start smooth (for j=1 only), 61 smooth interupt (muze a nemusi byt pro novy oddeleny kus charu - kdyz je subtype predchoziho vetsi nez 0 (kupr 5) bude pro oddeleny usek 61, jinak pokud je subtype predchoziho 0 bude pro oddeleny usek 0)
+    @IggyFieldType(DataType.uint8_t) // 208 start smooth (for j=1 only), 61 smooth interrupt (muze a nemusi byt pro novy oddeleny kus charu - kdyz je subtype predchoziho vetsi nez 0 (kupr 5) bude pro oddeleny usek 61, jinak pokud je subtype predchoziho 0 bude pro oddeleny usek 0)
     int node_subtype;
     @IggyFieldType(DataType.uint8_t)
     int zer1;
