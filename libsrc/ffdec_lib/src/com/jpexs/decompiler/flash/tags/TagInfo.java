@@ -41,7 +41,7 @@ public class TagInfo {
     }
 
     public void addInfo(String categoryName, String name, Object value) {
-        categoryName = "general"; // temporary add everything to general catagory
+        categoryName = "general"; // temporary add everything to general category
         List<TagInfoItem> category = infos.get(categoryName);
         if (category == null) {
             category = new ArrayList<>();
