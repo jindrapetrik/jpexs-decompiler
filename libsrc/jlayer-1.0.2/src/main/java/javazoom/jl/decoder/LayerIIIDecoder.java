@@ -1610,7 +1610,7 @@ final class LayerIIIDecoder implements FrameDecoder {
             //         http://www.iro.umontreal.ca/~boyerf
             //
             // The code has been optimized for Intel processors
-            //  (takes a lot of time to convert float to and from iternal FPU representation)
+            //  (takes a lot of time to convert float to and from internal FPU representation)
             //
             // It is a simple "factorization" of the IDCT matrix.
 
