@@ -174,7 +174,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * Specify the information needed to do block scrolling.
      *
      * @param orientation specify the scrolling orientation. Must be either:
-     * SwingContants.HORIZONTAL or SwingContants.VERTICAL.
+     * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
      * @param type
      * @param amount a value used with the IncrementType to determine the
      * scrollable amount
@@ -192,7 +192,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * Specify the information needed to do block scrolling.
      *
      * @param orientation specify the scrolling orientation. Must be either:
-     * SwingContants.HORIZONTAL or SwingContants.VERTICAL.
+     * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
      * @param info An IncrementInfo object containing information of how to
      * calculate the scrollable amount.
      */
@@ -236,7 +236,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * Specify the information needed to do unit scrolling.
      *
      * @param orientation specify the scrolling orientation. Must be either:
-     * SwingContants.HORIZONTAL or SwingContants.VERTICAL.
+     * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
      * @param amount a value used with the IncrementType to determine the
      * scrollable amount
      * @paran type specify how the amount parameter in the calculation of the
@@ -253,7 +253,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * Specify the information needed to do unit scrolling.
      *
      * @param orientation specify the scrolling orientation. Must be either:
-     * SwingContants.HORIZONTAL or SwingContants.VERTICAL.
+     * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
      * @param info An IncrementInfo object containing information of how to
      * calculate the scrollable amount.
      */
