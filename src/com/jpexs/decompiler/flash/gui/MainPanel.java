@@ -5319,9 +5319,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         if (imagePreview) {
             fc.setAccessory(new FileChooserImagePreview(fc));
-            Dimension prefferedSize = new Dimension(fc.getPreferredSize());
-            prefferedSize.width += FileChooserImagePreview.PREVIEW_SIZE;
-            fc.setPreferredSize(prefferedSize);
+            Dimension preferredSize = new Dimension(fc.getPreferredSize());
+            preferredSize.width += FileChooserImagePreview.PREVIEW_SIZE;
+            fc.setPreferredSize(preferredSize);
         }
         boolean first = true;
         for (int i = 0; i < filterArray.length; i += 2) {

@@ -491,7 +491,7 @@ public class View {
     }
 
     public static ImageIcon getIcon(String name, int size) {
-        ImageIcon icon = getIcon(getPrefferedIconName(name, size));
+        ImageIcon icon = getIcon(getPreferredIconName(name, size));
         if (icon.getIconWidth() == size && icon.getIconHeight() == size) {
             return icon;
         }
@@ -527,7 +527,7 @@ public class View {
         return View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + resource + ".png") != null;
     }
 
-    private static String getPrefferedIconName(String resource, int preferredSize) {
+    private static String getPreferredIconName(String resource, int preferredSize) {
         Matcher m = Pattern.compile("(.*[^0-9])([0-9]+)").matcher(resource);
         if (m.matches()) {
             int origSize = Integer.parseInt(m.group(2));
@@ -542,7 +542,7 @@ public class View {
     }
 
     public static ImageWrapperResizableIcon getResizableIcon(String resource, int preferredSize) {
-        return getResizableIcon(getPrefferedIconName(resource, preferredSize));
+        return getResizableIcon(getPreferredIconName(resource, preferredSize));
     }
 
     public static ImageWrapperResizableIcon getResizableIcon(String resource) {
