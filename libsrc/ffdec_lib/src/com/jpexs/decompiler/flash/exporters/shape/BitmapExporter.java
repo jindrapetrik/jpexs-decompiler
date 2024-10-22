@@ -104,7 +104,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private double unzoom;
 
-    private static boolean linearGradientColorWarnignShown = false;
+    private static boolean linearGradientColorWarningShown = false;
 
     private boolean scaleStrokes;
 
