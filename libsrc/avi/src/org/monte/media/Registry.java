@@ -114,7 +114,7 @@ public abstract class Registry {
     }
 
     /**
-     * Gets the first codec which can encode the specified foramt.
+     * Gets the first codec which can encode the specified format.
      *
      * @param outputFormat The output format.
      * @return A codec. Returns null if no codec was found.
