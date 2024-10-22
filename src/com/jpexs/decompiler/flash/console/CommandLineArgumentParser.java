@@ -4124,7 +4124,7 @@ public class CommandLineArgumentParser {
 
                                 subcnt++;
                                 try {
-                                    proccessInfoSWF(file, worker.get(), pw);
+                                    processInfoSWF(file, worker.get(), pw);
                                 } catch (CancellationException | ExecutionException | InterruptedException ex) {
                                     logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
                                 }
@@ -4160,7 +4160,7 @@ public class CommandLineArgumentParser {
                             worker.execute();
 
                             try {
-                                proccessInfoSWF(null, worker.get(), pw);
+                                processInfoSWF(null, worker.get(), pw);
                             } catch (CancellationException | ExecutionException | InterruptedException ex) {
                                 logger.log(Level.WARNING, "Loading SWF was cancelled.");
                             }
@@ -4185,7 +4185,7 @@ public class CommandLineArgumentParser {
         return ds;
     }
 
-    private static void proccessInfoSWF(File bundle, SWF swf, PrintWriter pw) throws IOException {
+    private static void processInfoSWF(File bundle, SWF swf, PrintWriter pw) throws IOException {
         pw.println("[swf]");
         pw.println("file=" + (bundle == null ? swf.getFile() : bundle + ":" + swf.getFileTitle()));
         pw.println("fileSize=" + swf.fileSize);
