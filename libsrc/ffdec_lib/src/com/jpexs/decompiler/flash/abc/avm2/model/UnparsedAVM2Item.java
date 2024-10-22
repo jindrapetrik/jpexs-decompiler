@@ -24,7 +24,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
 /**
- * Unparsed data. This just ouputs string as is, without any processing.
+ * Unparsed data. This just outputs string as is, without any processing.
  *
  * @author JPEXS
  */
