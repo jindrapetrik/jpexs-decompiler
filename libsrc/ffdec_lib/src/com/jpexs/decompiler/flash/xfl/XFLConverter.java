@@ -5504,7 +5504,7 @@ public class XFLConverter {
 
         private String alignment = null;
 
-        private final Set<CharacterTag> chatacterTags;
+        private final Set<CharacterTag> characterTags;
 
         private boolean bold = false;
 
@@ -5599,7 +5599,7 @@ public class XFLConverter {
                 colorAlpha = det.textColor.alpha;
             }
             
-            this.chatacterTags = characterTags;
+            this.characterTags = characterTags;
             this.characterImportLinkageURL = characterImportLinkageURL;
             this.lastImportedId = lastImportedId;
             this.characterNameMap = characterNameMap;
@@ -5680,7 +5680,7 @@ public class XFLConverter {
                     }
                     String f = attributes.getValue("face");
                     if (f != null) {
-                        for (Tag tag : chatacterTags) {
+                        for (Tag tag : characterTags) {
                             if (tag instanceof FontTag) {
                                 FontTag ft = (FontTag) tag;
                                 String fontName = null;
