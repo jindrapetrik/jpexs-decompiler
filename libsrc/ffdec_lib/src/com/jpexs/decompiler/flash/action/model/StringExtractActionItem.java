@@ -65,7 +65,7 @@ public class StringExtractActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         value.toString(writer, localData);
         writer.append(".substr");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
         index.toString(writer, localData);
         writer.append(",");

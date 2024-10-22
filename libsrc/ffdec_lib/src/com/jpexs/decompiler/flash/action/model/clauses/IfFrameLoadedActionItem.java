@@ -78,7 +78,7 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("ifFrameLoaded");
-        writer.spaceBeforeCallParenthesies(1);
+        writer.spaceBeforeCallParenthesis(1);
         writer.append("(");
         frame.toString(writer, localData);
         writer.append(")").startBlock();

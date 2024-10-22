@@ -253,7 +253,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
                 writer.append(fname);
             }
         }
-        writer.spaceBeforeCallParenthesies(paramNames.size());
+        writer.spaceBeforeCallParenthesis(paramNames.size());
         writer.append("(");
 
         Map<String, Integer> n2r = new HashMap<>();

@@ -55,7 +55,7 @@ public class StrictModeActionItem extends ActionItem {
             writer.append("#strict");
         } else {
             writer.append("§§strict");
-            writer.spaceBeforeCallParenthesies(0);
+            writer.spaceBeforeCallParenthesis(0);
             writer.append("(").append(mode).append(")");            
         }
         return writer;

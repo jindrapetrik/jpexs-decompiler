@@ -67,7 +67,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
             }
         }
 
-        writer.append("new Namespace").spaceBeforeCallParenthesies(1).append("(");
+        writer.append("new Namespace").spaceBeforeCallParenthesis(1).append("(");
         writer.append("\"").append(Helper.escapeActionScriptString(constants.getNamespace(namespaceIndex).getRawName(constants))).append("\""); //assume not null name        
         writer.append(")");
         return writer;
