@@ -75,7 +75,7 @@ public class WaveFileObuffer extends Obuffer {
     }
 
     /**
-     * Write the samples to the file (Random Acces).
+     * Write the samples to the file (Random Access).
      */
     short[] myBuffer = new short[2];
 

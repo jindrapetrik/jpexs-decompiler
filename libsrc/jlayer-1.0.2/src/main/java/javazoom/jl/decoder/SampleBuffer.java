@@ -93,7 +93,7 @@ public class SampleBuffer extends Obuffer {
 
 
     /**
-     * Write the samples to the file (Random Acces).
+     * Write the samples to the file (Random Access).
      */
     public void write_buffer(int val) {
 
