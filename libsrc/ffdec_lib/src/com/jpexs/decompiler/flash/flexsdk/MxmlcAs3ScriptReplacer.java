@@ -265,7 +265,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             }
             ((Tag) pack.abc.parentTag).setModified(true);
             pack.abc.getSwf().getAbcIndex().refreshAbc(pack.abc);
-            deinitReplacement(pack); //successfull finish
+            deinitReplacement(pack); //successful finish
         }
 
     }
