@@ -409,7 +409,7 @@
 					<li>AS1/2 Vanishing source code in some cases</li>
 					<li>AS1/2 Debugger tooltips exception</li>
 					<li>#2131 UseOutline flag for DefineEditText</li>
-					<li>Wordrapping long words in DefineEditText</li>
+					<li>Wordwrapping long words in DefineEditText</li>
 					<li>#2133 Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it</li>
 					<li>#2135 FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames</li>
 					<li>#1194 FLA Export - stream sound export</li>
