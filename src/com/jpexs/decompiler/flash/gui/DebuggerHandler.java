@@ -81,7 +81,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     private Map<Integer, Integer> moduleToSwfIndex = new HashMap<>();
 
     //Marks swfIndices that are fully loaded - at least one break was on it (including onloaded break)
-    private Set<Integer> swfIndicesCommited = new HashSet<>();
+    private Set<Integer> swfIndicesCommitted = new HashSet<>();
 
     private Map<Integer, String> swfIndicesNewToSwfHash = new HashMap<>();
 
@@ -687,7 +687,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
         });
 
-        swfIndicesCommited.clear();
+        swfIndicesCommitted.clear();
         swfIndicesNewToSwfHash.clear();
 
         Map<Integer, String> moduleNames = new HashMap<>();
@@ -772,11 +772,11 @@ public class DebuggerHandler implements DebugConnectionListener {
                                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.WARNING, "SWF with hash {0} not found", swfHash);
                             } else {
                                 Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "adding {0} to debugSwfs", swfIndex);
-                                swfIndicesCommited.add(swfIndex);
+                                swfIndicesCommitted.add(swfIndex);
                                 debuggedSwfs.add(swf);
                             }
                         } else {
-                            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "Swf index already commited");
+                            Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "Swf index already committed");
                         }
                     }
                     con.dropMessage(sc);
@@ -1004,7 +1004,7 @@ public class DebuggerHandler implements DebugConnectionListener {
         synchronized (this) {
             Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINEST, "sending breakpoints of {0} swfs", debuggedSwfs.size());
             for (int swfIndex = 0; swfIndex < debuggedSwfs.size(); swfIndex++) {
-                if (!swfIndicesCommited.contains(swfIndex)) {
+                if (!swfIndicesCommitted.contains(swfIndex)) {
                     continue;
                 }
                 SWF debuggedSwf = debuggedSwfs.get(swfIndex);
