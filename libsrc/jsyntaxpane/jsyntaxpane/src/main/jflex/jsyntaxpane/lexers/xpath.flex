@@ -45,7 +45,7 @@ import jsyntaxpane.TokenType;
         return yychar;
     }
 
-    private static final byte PARAN     = 1;
+    private static final byte PAREN     = 1;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
 
@@ -215,8 +215,8 @@ S	   =   	[\u20] | [\u9] | [\uD] | [\uA]
   {VariableReference} { return token(TokenType.IDENTIFIER); }
   {Number} { return token(TokenType.NUMBER); }
   {AxisName} { return token(TokenType.TYPE); }
-  "("                            { return token(TokenType.OPERATOR,  PARAN); }
-  ")"                            { return token(TokenType.OPERATOR, -PARAN); }
+  "("                            { return token(TokenType.OPERATOR,  PAREN); }
+  ")"                            { return token(TokenType.OPERATOR, -PAREN); }
   "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
   "["                            { return token(TokenType.OPERATOR,  BRACKET); }
