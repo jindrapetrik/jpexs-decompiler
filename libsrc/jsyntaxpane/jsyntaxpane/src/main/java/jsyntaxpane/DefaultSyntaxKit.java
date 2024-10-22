@@ -642,7 +642,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 	}
 
 	/**
-	 * Adds an abbrevisation to this kit's abbreviations.
+	 * Adds an abbreviation to this kit's abbreviations.
 	 * @param abbr
 	 * @param template
 	 */
