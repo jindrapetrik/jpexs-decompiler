@@ -2087,7 +2087,7 @@ Major version of SWF to XML export changed to 2.
 - AVM2 code execution fix
 - [#1016] AS3 direct editation fixes
 - [#1010] AS2 direct editation - internal and override is not a reserved word
-- [#1008] pushshort instruction diassembly
+- [#1008] pushshort instruction disassembly
 - [#1004] this/super can be AS1/2 variable
 - [#933] AS3 allow numbers as object literal keys
 
