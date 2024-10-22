@@ -329,9 +329,9 @@ public interface Kernel32 extends WinNT {
 
     //Needed for some Windows 7 Versions
     //boolean EnumProcesses(int[] ProcessIDsOut, int size, int[] BytesReturned);
-    int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int lenght);
+    int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int length);
 
-    DWORD QueryDosDevice(String lpDeviceName, char[] lpTargetPath, int lenght);
+    DWORD QueryDosDevice(String lpDeviceName, char[] lpTargetPath, int length);
 
     boolean VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, int flNewProtect, IntByReference lpflOldProtect);
 
