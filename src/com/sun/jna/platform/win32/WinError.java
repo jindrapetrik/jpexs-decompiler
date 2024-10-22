@@ -23271,7 +23271,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The xpath expression exceeded supported complexity. Please symplify it or
+    // The xpath expression exceeded supported complexity. Please simplify it or
     // split it into two or more simple expressions.
     //
     int ERROR_EVT_FILTER_TOO_COMPLEX = 15026;
