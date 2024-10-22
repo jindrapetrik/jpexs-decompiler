@@ -2237,7 +2237,7 @@ Major version of SWF to XML export changed to 2.
 
 ### Changed
 - AS1/2: Shown only the constant pool(s) in pcode editor
-- Do not allow to chage tag tree selection, when current tag is under editing
+- Do not allow to change tag tree selection, when current tag is under editing
 - Faster bitmap export
 - Using less memory when playing sounds
 - Error message changed when the opened file is not swf
