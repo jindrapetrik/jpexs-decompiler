@@ -62,7 +62,7 @@ public class ShapeFixer {
 
         @Override
         public boolean equals(Object obj) {
-            //simplified to be fast, not so neccessarily accurate
+            //simplified to be fast, not so necessarily accurate
             return hashCode() == obj.hashCode();
             /*if (this == obj) {
                 return true;

@@ -351,7 +351,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Map of characterId to CharacterTag including imported tags. The
-     * CharacterTags.getCharacterId() does not neccessarily be the characterId
+     * CharacterTags.getCharacterId() does not necessarily be the characterId
      * in the map since there can be imported CharacterTags from other SWFs.
      */
     @Internal
