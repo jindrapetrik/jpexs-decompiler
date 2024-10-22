@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * An attemp to detect tweens. FIXME!! NOT WORKING STUB!!!
+ * An attempt to detect tweens. FIXME!! NOT WORKING STUB!!!
  *
  * @author JPEXS
  */
