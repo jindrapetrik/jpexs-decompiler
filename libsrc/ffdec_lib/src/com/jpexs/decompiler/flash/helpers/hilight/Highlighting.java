@@ -292,7 +292,7 @@ public class Highlighting implements Serializable {
     }
 
     /**
-     * Searche all highlightings with the specified position.
+     * Search all highlightings with the specified position.
      * @param list List of highlightings
      * @param pos Position
      * @return List of highlightings
@@ -309,7 +309,7 @@ public class Highlighting implements Serializable {
     }
 
     /**
-     * Searche all highlightings with the specified index.
+     * Search all highlightings with the specified index.
      * @param list List of highlightings
      * @param index Index
      * @return List of highlightings
@@ -328,7 +328,7 @@ public class Highlighting implements Serializable {
 
 
     /**
-     * Searche all highlightings with the specified local name.
+     * Search all highlightings with the specified local name.
      * @param list List of highlightings
      * @param localName Local name
      * @return List of highlightings

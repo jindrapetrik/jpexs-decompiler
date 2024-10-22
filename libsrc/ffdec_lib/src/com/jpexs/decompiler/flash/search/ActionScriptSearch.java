@@ -155,7 +155,7 @@ public class ActionScriptSearch {
      * @return List of search results
      */
     public List<ABCSearchResult> searchAs3(final Openable openable, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, ScriptSearchListener listener, List<ScriptPack> scope) {
-        // todo: pcode seach
+        // todo: pcode search
         if (txt != null && !txt.isEmpty()) {
             List<String> ignoredClasses = new ArrayList<>();
             List<String> ignoredNss = new ArrayList<>();
