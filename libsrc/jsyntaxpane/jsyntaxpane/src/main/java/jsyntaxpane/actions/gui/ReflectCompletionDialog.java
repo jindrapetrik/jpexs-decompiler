@@ -280,7 +280,7 @@ public class ReflectCompletionDialog
 		if (aClass != null) {
 			// for now, add everything:
 			theClass = aClass;
-			ReflectUtils.addConstrcutors(aClass, items);
+			ReflectUtils.addConstructors(aClass, items);
 			ReflectUtils.addMethods(aClass, items);
 			ReflectUtils.addFields(aClass, items);
 			ActionUtils.insertIntoCombo(jCmbClassName, className);
