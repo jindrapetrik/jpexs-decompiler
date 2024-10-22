@@ -1324,7 +1324,7 @@ Major version of SWF to XML export changed to 2.
 - AS - direct editation - long integer values
 - AS1/2 - on keypress key escaping
 - AS1/2 - stop/play/etc. can be used in expressions, pushing undefined
-- AS1/2 - startDrag constaint
+- AS1/2 - startDrag constraint
 - AS1/2 - gotoAndStop/play with simple label compiled as gotolabel
 
 ## [14.6.0] - 2021-11-22
