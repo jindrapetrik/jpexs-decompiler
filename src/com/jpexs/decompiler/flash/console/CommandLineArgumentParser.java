@@ -2190,7 +2190,7 @@ public class CommandLineArgumentParser {
                 }
 
                 if (parallel && singleScriptFile) {
-                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFilePallelModeWarning"));
+                    logger.log(Level.WARNING, AppStrings.translate("export.script.singleFileParallelModeWarning"));
                     singleScriptFile = false;
                 }
 
