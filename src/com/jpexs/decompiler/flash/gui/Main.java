@@ -457,7 +457,7 @@ public class Main {
 
         @Override
         public SWF prepare(SWF instrSWF, String swfHash) throws InterruptedException {
-            EventListener prepEventListner = new EventListener() {
+            EventListener prepEventListener = new EventListener() {
                 @Override
                 public void handleExportingEvent(String type, int index, int count, Object data) {
                 }
@@ -473,7 +473,7 @@ public class Main {
                     }
                 }
             };
-            instrSWF.addEventListener(prepEventListner);
+            instrSWF.addEventListener(prepEventListener);
             try {
                 File fTempFile = new File(instrSWF.getFile());
                 instrSWF.enableDebugging(true, new File("."), true, doPCode, swfHash);
@@ -523,7 +523,7 @@ public class Main {
             } catch (IOException ex) {
                 //ignore, return instrSWF
             }
-            instrSWF.removeEventListener(prepEventListner);
+            instrSWF.removeEventListener(prepEventListener);
 
             //instrSWF = super.prepare(instrSWF);
             if (!DebuggerTools.hasDebugger(instrSWF)) {
