@@ -2311,7 +2311,7 @@ Major version of SWF to XML export changed to 2.
 - Default color skin altered
 - [#350] Allow only one running instance (Windows only, can be turned off)
 - SWFs in zip based bundles (SWC for example) can be modified & saved
-- Performace improvements
+- Performance improvements
 - More compact SWF-XML format
 - Marking changed parentnodes as bold too
 
