@@ -176,7 +176,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     }
 
     @Test
-    public void testEvailExpressionAfterWhile() throws Exception {
+    public void testEvalExpressionAfterWhile() throws Exception {
         String res = recompile("var a = 5;"
                 + "while(true){"
                 + "if(a==73){"
