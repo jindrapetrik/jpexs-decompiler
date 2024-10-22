@@ -101,7 +101,7 @@ public class ReflectUtils {
      * @param list
      * @return number of constructors added
      */
-    public static int addConstrcutors(Class aClass, List<Member> list) {
+    public static int addConstructors(Class aClass, List<Member> list) {
         Constructor[] constructors = aClass.getConstructors();
         for (Constructor c : constructors) {
             list.add(c);
