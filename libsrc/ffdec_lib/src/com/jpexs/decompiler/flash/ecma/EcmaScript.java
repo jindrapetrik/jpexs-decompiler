@@ -85,10 +85,10 @@ public class EcmaScript {
     /**
      * Converts value to a primitive.
      * @param o Value to convert
-     * @param prefferedType Preferred type
+     * @param preferredType Preferred type
      * @return Primitive value
      */
-    public static Object toPrimitive(Object o, String prefferedType) {
+    public static Object toPrimitive(Object o, String preferredType) {
         if (o == Undefined.INSTANCE) {
             return o;
         }
@@ -105,7 +105,7 @@ public class EcmaScript {
             return o;
         }
         if (o instanceof ObjectType) {
-            return object_defaultValue((ObjectType) o, prefferedType);
+            return object_defaultValue((ObjectType) o, preferredType);
         }
         return Undefined.INSTANCE; //??
     }
