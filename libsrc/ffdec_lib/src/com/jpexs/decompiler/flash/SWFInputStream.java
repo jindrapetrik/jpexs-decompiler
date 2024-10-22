@@ -3326,9 +3326,9 @@ public class SWFInputStream implements AutoCloseable {
         MORPHGRADIENT ret = new MORPHGRADIENT();
         newDumpLevel(name, "MORPHGRADIENT");
         // Despite of documentation (UI8 1-8), there are two fields
-        // spreadMode and interPolationMode which are same as in GRADIENT
+        // spreadMode and interpolationMode which are same as in GRADIENT
         ret.spreadMode = (int) readUB(2, "spreadMode");
-        ret.interPolationMode = (int) readUB(2, "interPolationMode");
+        ret.interpolationMode = (int) readUB(2, "interpolationMode");
         int numGradients = (int) readUB(4, "numGradients");
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
@@ -3352,7 +3352,7 @@ public class SWFInputStream implements AutoCloseable {
         MORPHFOCALGRADIENT ret = new MORPHFOCALGRADIENT();
         newDumpLevel(name, "MORPHFOCALGRADIENT");
         ret.spreadMode = (int) readUB(2, "spreadMode");
-        ret.interPolationMode = (int) readUB(2, "interPolationMode");
+        ret.interpolationMode = (int) readUB(2, "interpolationMode");
         int numGradients = (int) readUB(4, "numGradients");
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {

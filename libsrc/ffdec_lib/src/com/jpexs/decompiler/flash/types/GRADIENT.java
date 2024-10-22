@@ -117,7 +117,7 @@ public class GRADIENT implements Serializable {
      */
     public MORPHGRADIENT toMorphGradient() {
         MORPHGRADIENT morphGradient = new MORPHGRADIENT();
-        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.interpolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
@@ -141,7 +141,7 @@ public class GRADIENT implements Serializable {
         } else {
             morphGradient = new MORPHGRADIENT();
         }
-        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.interpolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {

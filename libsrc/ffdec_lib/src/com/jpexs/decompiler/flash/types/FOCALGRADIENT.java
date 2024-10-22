@@ -51,7 +51,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
     @Override
     public MORPHGRADIENT toMorphGradient() {
         MORPHFOCALGRADIENT morphGradient = new MORPHFOCALGRADIENT();
-        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.interpolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
@@ -69,7 +69,7 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
             return null;
         }
         MORPHFOCALGRADIENT morphGradient = new MORPHFOCALGRADIENT();
-        morphGradient.interPolationMode = interpolationMode;
+        morphGradient.interpolationMode = interpolationMode;
         morphGradient.spreadMode = spreadMode;
         morphGradient.gradientRecords = new MORPHGRADRECORD[gradientRecords.length];
         for (int i = 0; i < gradientRecords.length; i++) {
