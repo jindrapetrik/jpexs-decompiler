@@ -588,7 +588,7 @@
     <target name="-timestamp" depends="-loadversion,git-tag">
         <tstamp>
             <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET" locale="en"/>
-            <format property="VERDATE" pattern="yyyyddMM_hhmm" timezone="CET" locale="en"/>
+            <format property="VERDATE" pattern="yyyyMMdd_hhmm" timezone="CET" locale="en"/>
         </tstamp>        
         <echo level="info" message="Version: ${version}"/>
     </target>
