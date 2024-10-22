@@ -6124,7 +6124,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         oldItem = treeItem;
 
         // show the preview of the tag when the user clicks to the tagname inside the scripts node, too
-        // this is a little bit inconsistent, beacuse the frames (FrameScript) are not shown
+        // this is a little bit inconsistent, because the frames (FrameScript) are not shown
         boolean preferScript = false;
         if (treeItem instanceof TagScript) {
             treeItem = ((TagScript) treeItem).getTag();
