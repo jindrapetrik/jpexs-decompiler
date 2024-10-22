@@ -36865,7 +36865,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An internal Monitor Configuration API error occured.
+    // An internal Monitor Configuration API error occurred.
     //
     int ERROR_GRAPHICS_MCA_INTERNAL_ERROR = 0xC0262588;
 
@@ -39051,7 +39051,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An error occured while attempting to compress or extract the data.
+    // An error occurred while attempting to compress or extract the data.
     //
     int PLA_E_CABAPI_FAILURE = 0x80300113;
 
@@ -40584,7 +40584,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An error occured while NDIS tried to map the file.
+    // An error occurred while NDIS tried to map the file.
     //
     int ERROR_NDIS_ERROR_READING_FILE = 0x8034001C;
 
