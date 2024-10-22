@@ -26,7 +26,7 @@ public class StringUtils {
     /**
      * Perfrom a String startsWith match with support for CamelCase.
      * @param word full word
-     * @param abbr abbriviated word
+     * @param abbr abbreviated word
      * @return true if the word startsWith abbr, or if any uppercase char in abbr
      * matches the next uppercase char in word
      *

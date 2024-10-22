@@ -83,7 +83,7 @@ public class CompleteWordAction extends DefaultSyntaxAction {
      * Add words from the matcher m that match the word abbr to matches
      * List
      * @param m matcher instance, could be null, to iterate through
-     * @param abbr abbriviated word
+     * @param abbr abbreviated word
      * @param matches List of matches
      */
     private void addWords(Matcher m, String abbr, List<String> matches) {
