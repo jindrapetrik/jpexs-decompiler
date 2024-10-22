@@ -1238,7 +1238,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }                            
                         }
                         
-                        mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
+                        mouseMoved(e); //to correctly calculate mode, because mouseMoved event is not called during dragging
                         setDragStart(e.getPoint());                                                
                       
                         if (!shiftDown) {
