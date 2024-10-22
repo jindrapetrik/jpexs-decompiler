@@ -22,7 +22,7 @@ import com.jpacker.strategies.DefaultReplacementStrategy;
  * ReplacementStrategy has been set, each {@link JPackerPattern} should have an
  * {@link Evaluator} object that'll evaluate a certain match of a pattern
  * expression and return a suitable replacement String. Commonly, after all
- * expressions have been added the the {@link JPackerParser} object, a one-line
+ * expressions have been added the {@link JPackerParser} object, a one-line
  * String that contains all expressions is created by the {@link JPackerParser}
  * object using the {@link JPackerParser#getJPatterns()} method. In the
  * {@link #evaluate(Matcher, int)} method, the offset integer parameter

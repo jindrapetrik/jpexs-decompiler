@@ -129,7 +129,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 	}
 
 	/**
-	 * Creates a SyntaxComponent of the the given classname and installs
+	 * Creates a SyntaxComponent of the given classname and installs
 	 * it on the pane
 	 * @param pane
 	 * @param classname

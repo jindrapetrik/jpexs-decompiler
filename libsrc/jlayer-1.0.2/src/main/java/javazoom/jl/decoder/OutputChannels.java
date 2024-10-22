@@ -22,7 +22,7 @@ package javazoom.jl.decoder;
 
 
 /**
- * A Type-safe representation of the the supported output channel
+ * A Type-safe representation of the supported output channel
  * constants.
  * <p>
  * This class is immutable and, hence, is thread safe.

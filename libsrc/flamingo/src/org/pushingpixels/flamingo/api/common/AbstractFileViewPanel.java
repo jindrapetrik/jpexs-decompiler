@@ -196,7 +196,7 @@ public abstract class AbstractFileViewPanel<T> extends JCommandButtonPanel {
 	 * Sets the current entries to show. The current contents of the panel are
 	 * discarded. For each matching entry determined by the
 	 * {@link #toShowFile(StringValuePair)} call, a new {@link JCommandButton}
-	 * hosting an the matching implementation of {@link ResizableIcon} is added
+	 * hosting the matching implementation of {@link ResizableIcon} is added
 	 * to the panel.
 	 * 
 	 * @param leafs
