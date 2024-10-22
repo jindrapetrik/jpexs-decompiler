@@ -1024,7 +1024,7 @@
 					<li>#1898 Keyboard shortcut to remove tags (DEL, SHIFT+DEL)</li>
 					<li>#1511, #1765 Quick search tree (Ctrl+F) for everything, not just AS3 classes</li>
 					<li>Quick search (Ctrl+F) for tag list view</li>
-					<li>#1884 Memory search - show size and adress in hex, show only aligned to N bytes</li>
+					<li>#1884 Memory search - show size and address in hex, show only aligned to N bytes</li>
 					<li>AS3 - "internal" keyword support</li>
 					<li>ProductInfo tag information display</li>
 					<li>DebugId tag proper display and editation</li>
