@@ -178,7 +178,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * @param type
      * @param amount a value used with the IncrementType to determine the
      * scrollable amount
-     * @paran type specify how the amount parameter in the calculation of the
+     * @param type specify how the amount parameter in the calculation of the
      * scrollable amount. Valid values are: IncrementType.PERCENT - treat the
      * amount as a % of the viewport size IncrementType.PIXEL - treat the amount
      * as the scrollable amount
@@ -239,7 +239,7 @@ public class ScrollablePanel extends JPanel implements Scrollable, SwingConstant
      * SwingConstants.HORIZONTAL or SwingConstants.VERTICAL.
      * @param amount a value used with the IncrementType to determine the
      * scrollable amount
-     * @paran type specify how the amount parameter in the calculation of the
+     * @param type specify how the amount parameter in the calculation of the
      * scrollable amount. Valid values are: IncrementType.PERCENT - treat the
      * amount as a % of the viewport size IncrementType.PIXEL - treat the amount
      * as the scrollable amount
