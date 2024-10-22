@@ -580,7 +580,7 @@ public abstract class AbstractAVIStream {
      * left corner. If // "height" is negative, the bitmap is a top-down DIB
      * with the origin // at the upper left corner. // - For YUV bitmaps, the
      * bitmap is always top-down, regardless of the // sign of "height".
-     * Decoders should offer YUV formats with postive // "height", but for
+     * Decoders should offer YUV formats with positive // "height", but for
      * backward compatibility they should accept YUV // formats with either
      * positive or negative "height". // - For compressed formats, height must
      * be positive, regardless of // image orientation. WORD planes; //
