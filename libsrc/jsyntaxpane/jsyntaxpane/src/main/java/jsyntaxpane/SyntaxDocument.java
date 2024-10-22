@@ -236,7 +236,7 @@ public class SyntaxDocument extends PlainDocument {
      *
      * @param start start position for getting tokens
      * @param end position for last token
-     * @return Iterator for tokens that overal with range from start to end
+     * @return Iterator for tokens that overall with range from start to end
      */
     public Iterator<Token> getTokens(int start, int end) {
         return new TokenIterator(start, end);
