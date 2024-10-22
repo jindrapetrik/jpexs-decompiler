@@ -1234,7 +1234,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - [PR116] Display object depth in flash panel
 - Show imported files on script import, able to cancel import
-- [#270] AS3 show progress on deofuscating p-code
+- [#270] AS3 show progress on deobfuscating p-code
 - [#1718] Show progress on injecting debug info / SWD generation (before Debugging)
 
 ### Changed
