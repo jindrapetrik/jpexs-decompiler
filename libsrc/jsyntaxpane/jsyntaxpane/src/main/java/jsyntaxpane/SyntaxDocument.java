@@ -348,7 +348,7 @@ public class SyntaxDocument extends PlainDocument {
         }
         Token p = null;
         int ndx = tokens.indexOf(t);
-        // w will be similar to a stack. The openers weght is added to it
+        // w will be similar to a stack. The openers weight is added to it
         // and the closers are subtracted from it (closers are already negative)
         int w = t.pairValue;
         int direction = (t.pairValue > 0) ? 1 : -1;
