@@ -96,7 +96,7 @@ public class DocumentSearchData {
 
 	/**
 	 * Get the Search data from a Document.  If document does not have any
-	 * search data, then a new instance is added, put and reurned.
+	 * search data, then a new instance is added, put and returned.
 	 * @param target JTextCOmponent we are attaching to
 	 * @return
 	 */
