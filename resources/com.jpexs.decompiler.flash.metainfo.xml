@@ -1032,7 +1032,7 @@
 					<li>List of treenode subitems on otherwise empty panel (with 32x32 icons)</li>
 					<li>DefineVideoStream codecId and videoFlagsDeblocking handled as enums in raw editation</li>
 					<li>Option to mute frame sounds</li>
-					<li>Experimental option to fix conflation artifacts in antialising (slow)</li>
+					<li>Experimental option to fix conflation artifacts in antialiasing (slow)</li>
 					<li>Option to disable autoplay of sounds (DefineSound)</li>
 					<li>#1181 Remembering choice of loading assets via importassets tag</li>
 					<li>#1900 Free transform whole sprites</li>

@@ -871,7 +871,7 @@ Major version of SWF to XML export changed to 2.
 - List of treenode subitems on otherwise empty panel (with 32x32 icons)
 - DefineVideoStream codecId and videoFlagsDeblocking handled as enums in raw editation
 - Option to mute frame sounds
-- Experimental option to fix conflation artifacts in antialising (slow)
+- Experimental option to fix conflation artifacts in antialiasing (slow)
 - Option to disable autoplay of sounds (DefineSound)
 - [#1181] Remembering choice of loading assets via importassets tag
 - [#1900] Free transform whole sprites
