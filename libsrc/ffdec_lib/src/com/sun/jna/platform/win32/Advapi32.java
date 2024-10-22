@@ -273,7 +273,7 @@ public interface Advapi32 extends StdCallLibrary {
 
     /**
      * The RegOpenKeyEx function opens the specified registry key. Note that key
-     * names are not case sensitive.
+     * names are not case-sensitive.
      *
      * @param hKey Handle to an open key.
      * @param lpSubKey Pointer to a null-terminated string containing the name
@@ -462,7 +462,7 @@ public interface Advapi32 extends StdCallLibrary {
 
     /**
      * The RegDeleteValue function removes a named value from the specified
-     * registry key. Note that value names are not case sensitive.
+     * registry key. Note that value names are not case-sensitive.
      *
      * @param hKey Handle to an open key. The key must have been opened with the
      * KEY_SET_VALUE access right.
