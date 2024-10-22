@@ -113,7 +113,7 @@ JavaLayer 0.0.7 contains significant improvements over version 0.0 :
 02/28/1999: JavaLayer 0.0
 -------------------------
 JavaLayer V0.0 does not play any MP3 but it allows the MP3toWAV conversion.
-This is the first step in this project. We do it thanks to free mp3 ressources 
+This is the first step in this project. We do it thanks to free mp3 resources 
 available on the net:
 
  - MAPlay for the OO MP3 decoder (C++).
