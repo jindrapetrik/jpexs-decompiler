@@ -261,7 +261,7 @@ public class IggyToSwfConvertor {
             System.out.print("(2/2) Exporting SWF files to " + args[1] + "...");
             exportAllSwfsToDir(iggyFile, new File(args[1]));
             System.out.println("OK");
-            System.out.println("All finished sucessfully.");
+            System.out.println("All finished successfully.");
             System.exit(0);
         } catch (IOException ex) {
             System.out.println("FAIL");
