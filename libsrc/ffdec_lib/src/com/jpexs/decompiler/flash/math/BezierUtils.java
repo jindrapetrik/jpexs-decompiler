@@ -350,7 +350,7 @@ public class BezierUtils {
         return t;
     }
 
-    // compute intersection of line segnet from first to last control point with horizontal axis
+    // compute intersection of line segment from first to last control point with horizontal axis
     private double computeXIntercept(List<Point2D> _v, int _degree) {
         double XNM = _v.get(_degree).getX() - _v.get(0).getX();
         double YNM = _v.get(_degree).getY() - _v.get(0).getY();
