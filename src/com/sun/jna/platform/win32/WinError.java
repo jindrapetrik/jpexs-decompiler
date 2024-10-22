@@ -40593,7 +40593,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An attempt was made to map a file that is alreay mapped.
+    // An attempt was made to map a file that is already mapped.
     //
     int ERROR_NDIS_ALREADY_MAPPED = 0x8034001D;
 
