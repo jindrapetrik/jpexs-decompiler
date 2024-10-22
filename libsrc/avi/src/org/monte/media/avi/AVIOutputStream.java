@@ -316,7 +316,7 @@ public class AVIOutputStream extends AbstractAVIStream {
     public float getCompressionQuality(int track) {
         return ((VideoTrack) tracks.get(track)).videoQuality;
     }    /**
-     * Sets the state of the QuickTimeOutpuStream to started. <p> If the state
+     * Sets the state of the QuickTimeOutputStream to started. <p> If the state
      * is changed by this method, the prolog is written.
      */
     protected void ensureStarted() throws IOException {
@@ -327,7 +327,7 @@ public class AVIOutputStream extends AbstractAVIStream {
     }
 
     /**
-     * Sets the state of the QuickTimeOutpuStream to finished. <p> If the state
+     * Sets the state of the QuickTimeOutputStream to finished. <p> If the state
      * is changed by this method, the prolog is written.
      */
     protected void ensureFinished() throws IOException {
