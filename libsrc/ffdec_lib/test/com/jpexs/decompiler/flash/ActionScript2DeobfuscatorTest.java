@@ -137,7 +137,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
             fail("if false OnTrue not removed");
         }
         if (res.contains("var ")) {
-            fail("variables for obsucation not removed");
+            fail("variables for obfuscation not removed");
         }
         if (res.contains("if")) {
             fail("if clauses not removed");
