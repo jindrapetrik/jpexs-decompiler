@@ -1490,7 +1490,7 @@ Major version of SWF to XML export changed to 2.
 ### Fixed
 - Exception when switching from nonribbon interface to ribbon
 - [#1396], [#1254] FLA Export - AS3 frame scripts
-- FLA Export - mutliple FrameLabel layers
+- FLA Export - multiple FrameLabel layers
 - [#1636] Nullpointer exception on empty editorpane
 - [#1156] Rendering - 9 slice scaling (DefineScalingGrid) clipping
 - [#1647] Copying to clipboard - Transparency support
