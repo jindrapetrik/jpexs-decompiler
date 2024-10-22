@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DefineFradientMap tag - gradient map.
+ * DefineGradientMap tag - gradient map.
  *
  * @author JPEXS
  */
