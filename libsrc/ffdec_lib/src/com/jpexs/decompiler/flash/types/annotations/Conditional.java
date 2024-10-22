@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark for field that it is available only whern certain field (value) is set.
+ * Mark for field that it is available only when certain field (value) is set.
  *
  * @author JPEXS
  */
