@@ -3,7 +3,7 @@
  *
  * 18/06/01  Michael Scheerer,  Fixed bugs which causes
  *           negative indexes in method huffmann_decode and in method
- *           dequanisize_sample.
+ *           dequantize_sample.
  *
  * 16/07/01  Michael Scheerer, Catched a bug in method
  *           huffmann_decode, which causes an outOfIndexException.
