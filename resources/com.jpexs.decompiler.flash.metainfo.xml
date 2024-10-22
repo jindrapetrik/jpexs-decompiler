@@ -85,7 +85,7 @@
 					<li>#2320 AS3 direct editation - modified flag of scripts vanishes after editing other script with and having error</li>
 					<li>#2272 Filters strength attribute caps at 100%</li>
 					<li>#2322 AS3 Construct property name formatting</li>
-					<li>#2322 AS3 Assigment position when using dup</li>
+					<li>#2322 AS3 Assignment position when using dup</li>
 					<li>#2323 AS3 direct editation - Number class traits are duplicated in constructor</li>
 					<li>#2324 AS3 direct editation - nested loop continue/break (with labels)</li>
 					<li>#2325 AS3 direct editation - allow single quoted attributes in XML</li>

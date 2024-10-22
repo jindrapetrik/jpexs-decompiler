@@ -89,7 +89,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public static final int PRECEDENCE_CONDITIONAL = 13;
 
-    public static final int PRECEDENCE_ASSIGMENT = 14;
+    public static final int PRECEDENCE_ASSIGNMENT = 14;
 
     public static final int PRECEDENCE_COMMA = 15;
 

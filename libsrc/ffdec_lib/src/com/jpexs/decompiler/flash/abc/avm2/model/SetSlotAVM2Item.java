@@ -107,7 +107,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
      * @param type Type
      */
     public SetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.slotName = slotName;
         this.scope = scope;
         this.slotObject = slotObject;

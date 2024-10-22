@@ -91,7 +91,7 @@ public class AVM2GraphSource extends GraphSource {
     /**
      * Local register assignment IPs - map of register index to IP
      */
-    HashMap<Integer, Integer> localRegAssigmentIps;
+    HashMap<Integer, Integer> localRegAssignmentIps;
 
     /**
      * Get AVM2 code
@@ -114,9 +114,9 @@ public class AVM2GraphSource extends GraphSource {
      * @param body Method body
      * @param localRegNames Local register names
      * @param fullyQualifiedNames Fully qualified names
-     * @param localRegAssigmentIp Local register assignment IPs
+     * @param localRegAssignmentIp Local register assignment IPs
      */
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssignmentIp) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;
@@ -126,7 +126,7 @@ public class AVM2GraphSource extends GraphSource {
         this.localRegNames = localRegNames;
         this.fullyQualifiedNames = fullyQualifiedNames;
         this.scriptIndex = scriptIndex;
-        this.localRegAssigmentIps = localRegAssigmentIp;
+        this.localRegAssignmentIps = localRegAssignmentIp;
         code.calculateDebugFileLine(abc);
     }
 
@@ -203,7 +203,7 @@ public class AVM2GraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         Reference<GraphSourceItem> lineStartItem = new Reference<>(localData.lineStartInstruction);
-        ConvertOutput co = code.toSourceOutput(localData.allSwitchParts, ((AVM2LocalData) localData).callStack, ((AVM2LocalData) localData).abcIndex, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).thisHasDefaultToPrimitive, lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, ((AVM2LocalData) localData).scopeStack, ((AVM2LocalData) localData).localScopeStack, abc, body, start, end, localRegNames, ((AVM2LocalData) localData).localRegTypes, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, ((AVM2LocalData) localData).bottomSetLocals);
+        ConvertOutput co = code.toSourceOutput(localData.allSwitchParts, ((AVM2LocalData) localData).callStack, ((AVM2LocalData) localData).abcIndex, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).thisHasDefaultToPrimitive, lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, ((AVM2LocalData) localData).scopeStack, ((AVM2LocalData) localData).localScopeStack, abc, body, start, end, localRegNames, ((AVM2LocalData) localData).localRegTypes, fullyQualifiedNames, new boolean[size()], localRegAssignmentIps, ((AVM2LocalData) localData).bottomSetLocals);
         localData.lineStartInstruction = lineStartItem.getVal();
         ret.addAll(co.output);
         return ret;

@@ -250,7 +250,7 @@ public enum SymbolType {
     /**
      * Operator: =
      */
-    ASSIGN(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &gt;
      */
@@ -362,55 +362,55 @@ public enum SymbolType {
     /**
      * Operator: +=
      */
-    ASSIGN_PLUS(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_PLUS(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: -=
      */
-    ASSIGN_MINUS(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_MINUS(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: *=
      */
-    ASSIGN_MULTIPLY(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_MULTIPLY(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: /=
      */
-    ASSIGN_DIVIDE(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_DIVIDE(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &amp;=
      */
-    ASSIGN_BITAND(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_BITAND(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: |=
      */
-    ASSIGN_BITOR(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_BITOR(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: ^=
      */
-    ASSIGN_XOR(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_XOR(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: %=
      */
-    ASSIGN_MODULO(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_MODULO(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &lt;&lt;=
      */
-    ASSIGN_SHIFT_LEFT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_SHIFT_LEFT(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &gt;&gt;=
      */
-    ASSIGN_SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &gt;&gt;&gt;=
      */
-    ASSIGN_USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: &amp;&amp;=
      */
-    ASSIGN_AND(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_AND(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: ||=
      */
-    ASSIGN_OR(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_OR(GraphTargetItem.PRECEDENCE_ASSIGNMENT, true, true),
     /**
      * Operator: as
      */

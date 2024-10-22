@@ -110,7 +110,7 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
      * @param isStatic Is static
      */
     public SetSuperAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.object = object;
         this.propertyName = propertyName;
         this.type = type;
