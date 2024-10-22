@@ -280,7 +280,7 @@ public class ReflectUtils {
      * any that may be thrown.
      * This will also find a setter that accepts an interface that the value
      * implements.
-     * <b>This is still not very effcient and should only be called if
+     * <b>This is still not very efficient and should only be called if
      * performance is not of an issue.</b>
      * You can check the return value to see if the call was seuccessful or
      * not.
