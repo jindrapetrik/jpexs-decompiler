@@ -99,7 +99,7 @@ public class Node {
     }
 
     /**
-     * Replces previous node.
+     * Replaces previous node.
      * @param newNode New node
      */
     public void replacePrevs(Node newNode) {
