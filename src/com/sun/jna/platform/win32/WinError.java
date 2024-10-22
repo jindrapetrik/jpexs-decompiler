@@ -35571,7 +35571,7 @@ public interface WinError {
     // MessageText:
     //
     // Specified VidPN modality is not supported (e.g. at least two of the
-    // pinned modes are not cofunctiona;.
+    // pinned modes are not cofunctional.
     //
     int ERROR_GRAPHICS_VIDPN_MODALITY_NOT_SUPPORTED = 0xC0262306;
 
