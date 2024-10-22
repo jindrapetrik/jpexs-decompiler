@@ -92,7 +92,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     }
 
     @Override
-    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode) {
         String ret = "WaitForFrame " + frame + ", " + skipCount;
         return ret;
     }

@@ -852,11 +852,11 @@ public abstract class Action implements GraphSourceItem {
      * Converts action to ASM source.
      *
      * @param container Container
-     * @param knownAddreses List of important offsets to mark as labels
+     * @param knownAddresses List of important offsets to mark as labels
      * @param exportMode PCode or hex?
      * @return String of P-code source
      */
-    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode) {
         return toString();
     }
 
@@ -1441,13 +1441,13 @@ public abstract class Action implements GraphSourceItem {
      * Get ASM source with replaced Actions.
      *
      * @param container Container
-     * @param knownAddreses Known addresses
+     * @param knownAddresses Known addresses
      * @param exportMode Export mode
      * @param writer Writer
      * @return Writer
      */
-    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
-        writer.appendNoHilight(getASMSource(container, knownAddreses, exportMode));
+    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode, GraphTextWriter writer) {
+        writer.appendNoHilight(getASMSource(container, knownAddresses, exportMode));
         return writer;
     }
 

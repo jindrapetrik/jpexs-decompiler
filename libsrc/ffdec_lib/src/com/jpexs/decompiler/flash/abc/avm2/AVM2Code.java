@@ -1110,7 +1110,7 @@ public class AVM2Code implements Cloneable {
         DumpInfo diParent = ais.dumpInfo;
         List<Long> addresses = new ArrayList<>();
         //Do not add new jumps when processing these addresses (unreachable code,etc.)
-        List<Long> unAdresses = new ArrayList<>();
+        List<Long> unAddresses = new ArrayList<>();
         //Handle lookupswitches at the end - they can be invalid. Handle other instruction first so we can decide lookupswitch to be invalid based on other instructions inside it
         //Flashplayer does not check casecount in lookupswitch instruction so the instruction can "be" long and over other instructions
         List<Long> switchAddresses = new ArrayList<>();
@@ -1129,7 +1129,7 @@ public class AVM2Code implements Cloneable {
         }
 
         loopaddr:
-        while (!addresses.isEmpty() || !switchAddresses.isEmpty() || !unAdresses.isEmpty()) {
+        while (!addresses.isEmpty() || !switchAddresses.isEmpty() || !unAddresses.isEmpty()) {
             long address;
             boolean isSwitch = false;
             boolean handleJumps = true;
@@ -1139,7 +1139,7 @@ public class AVM2Code implements Cloneable {
                 address = switchAddresses.remove(0);
                 isSwitch = true;
             } else {
-                address = unAdresses.remove(0);
+                address = unAddresses.remove(0);
                 handleJumps = false;
             }
             if (address < startPos) { // no jump outside block            
@@ -1257,7 +1257,7 @@ public class AVM2Code implements Cloneable {
                                 if (handleJumps) {
                                     long target = ais.getPosition() + actualOperands[0];
                                     addresses.add(target);
-                                    unAdresses.add(ais.getPosition());
+                                    unAddresses.add(ais.getPosition());
                                     continue loopaddr;
                                 } else {
                                     actualOperands[0] = 0;
@@ -1266,7 +1266,7 @@ public class AVM2Code implements Cloneable {
 
                             if (instr.isExitInstruction()) { //do not process jumps if there is return/throw instruction
                                 if (handleJumps) {
-                                    unAdresses.add(ais.getPosition());
+                                    unAddresses.add(ais.getPosition());
                                     continue loopaddr;
                                 }
                             }
@@ -1277,7 +1277,7 @@ public class AVM2Code implements Cloneable {
                                     for (int c = 2; c < actualOperands.length; c++) {
                                         addresses.add(startOffset + actualOperands[c]);
                                     }
-                                    unAdresses.add(ais.getPosition());
+                                    unAddresses.add(ais.getPosition());
                                     continue loopaddr;
                                 } else {
                                     int swlen = (int) (endOffset - startOffset);
@@ -1379,7 +1379,7 @@ public class AVM2Code implements Cloneable {
     }
 
     /**
-     * Sets instruction addesses by their position.
+     * Sets instruction addresses by their position.
      */
     public void markOffsets() {
         long address = 0;
