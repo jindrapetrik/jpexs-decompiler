@@ -158,13 +158,13 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     }
 
     @Override
-    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode) {
         String ret = "WaitForFrame2 " + skipCount;
         /*for (int i = 0; i < skipped.size(); i++) {
          if (skipped.get(i) instanceof ActionEnd) {
          break;
          }
-         ret += "\r\n" + skipped.get(i).getASMSource(container, knownAddreses, version, exportMode);
+         ret += "\r\n" + skipped.get(i).getASMSource(container, knownAddresses, version, exportMode);
          }*/
         return ret;
     }

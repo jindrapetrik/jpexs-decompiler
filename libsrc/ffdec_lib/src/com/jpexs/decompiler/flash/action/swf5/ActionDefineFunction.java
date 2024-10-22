@@ -180,7 +180,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public String getASMSource(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode) {
+    public String getASMSource(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode) {
         StringBuilder paramStr = new StringBuilder();
         for (int i = 0; i < paramNames.size(); i++) {
             paramStr.append(", ");
@@ -191,7 +191,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode, GraphTextWriter writer) {
         List<String> oldParamNames = paramNames;
         if (replacedParamNames != null) {
             paramNames = replacedParamNames;
@@ -200,7 +200,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(container, knownAddreses, exportMode);
+        String ret = getASMSource(container, knownAddresses, exportMode);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         writer.appendNoHilight(ret);
