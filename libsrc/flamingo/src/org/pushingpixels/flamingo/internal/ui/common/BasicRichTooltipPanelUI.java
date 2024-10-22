@@ -361,12 +361,12 @@ public class BasicRichTooltipPanelUI extends RichTooltipPanelUI {
 
 			// The title label
 			int titleLabelWidth = parent.getWidth() - ins.left - ins.right;
-			AttributedString titleAtributedDescription = new AttributedString(
+			AttributedString titleAttributedDescription = new AttributedString(
 					tooltipInfo.getTitle());
-			titleAtributedDescription.addAttribute(TextAttribute.FONT,
+			titleAttributedDescription.addAttribute(TextAttribute.FONT,
 					titleFont);
 			LineBreakMeasurer titleLineBreakMeasurer = new LineBreakMeasurer(
-					titleAtributedDescription.getIterator(), frc);
+					titleAttributedDescription.getIterator(), frc);
 			int titleCurrOffset = 0;
 			while (true) {
 				TextLayout tl = titleLineBreakMeasurer
