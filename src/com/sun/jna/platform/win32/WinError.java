@@ -17418,14 +17418,14 @@ public interface WinError {
     int ERROR_DS_DST_NC_MISMATCH = 8486;
 
     //
-    // MessageId: ERROR_DS_NOT_AUTHORITIVE_FOR_DST_NC
+    // MessageId: ERROR_DS_NOT_AUTHORITATIVE_FOR_DST_NC
     //
     // MessageText:
     //
     // Destination of a cross-domain move is not authoritative for the
     // destination naming context.
     //
-    int ERROR_DS_NOT_AUTHORITIVE_FOR_DST_NC = 8487;
+    int ERROR_DS_NOT_AUTHORITATIVE_FOR_DST_NC = 8487;
 
     //
     // MessageId: ERROR_DS_SRC_GUID_MISMATCH
