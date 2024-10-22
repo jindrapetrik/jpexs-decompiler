@@ -3316,7 +3316,7 @@ Major version of SWF to XML export changed to 2.
 
 ### Fixed
 - [#32] - AS2: Action255 bug
-- [#31] - Erorrneous tags are now ignored
+- [#31] - Erroneous tags are now ignored
 - DefineBitsLossLess 1&2 on 8bit colormapped images
 
 ## [1.3.0] - 2013-02-17
