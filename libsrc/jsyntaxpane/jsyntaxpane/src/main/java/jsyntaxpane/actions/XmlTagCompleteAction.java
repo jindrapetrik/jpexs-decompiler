@@ -20,7 +20,7 @@ import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
 
 /**
- * Completes an the Tag.
+ * Completes the Tag.
  * @author Ayman Al-Sairafi
  */
 public class XmlTagCompleteAction extends DefaultSyntaxAction {

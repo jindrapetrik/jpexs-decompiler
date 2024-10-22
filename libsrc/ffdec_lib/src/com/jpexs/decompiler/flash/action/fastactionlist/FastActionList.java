@@ -880,7 +880,7 @@ public class FastActionList implements Collection<ActionItem> {
     /**
      * Converts the list to an array.
      *
-     * @param a the array into which the elements of this collection are to be
+     * @param the array into which the elements of this collection are to be
      * stored, if it is big enough; otherwise, a new array of the same runtime
      * type is allocated for this purpose.
      * @param <T> Type
