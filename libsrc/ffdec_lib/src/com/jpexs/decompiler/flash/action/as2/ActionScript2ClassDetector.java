@@ -789,7 +789,7 @@ public class ActionScript2ClassDetector {
                 }
             }
 
-            if (constructor != null) { //constructor should be there always, but just in calse
+            if (constructor != null) { //constructor should be there always, but just in case
                 //add constructor as trait                                
                 traitsStatic.add(0, false);
                 DirectValueActionItem classBaseName = new DirectValueActionItem(classNamePath.get(classNamePath.size() - 1));
