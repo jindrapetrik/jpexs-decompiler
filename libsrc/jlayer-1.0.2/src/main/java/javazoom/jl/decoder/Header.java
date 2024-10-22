@@ -202,7 +202,7 @@ public final class Header {
     }
 
     /**
-     * Parse frame to extract optionnal VBR frame.
+     * Parse frame to extract optional VBR frame.
      *
      * @param firstFrame
      * @author E.B (javalayer@javazoom.net)

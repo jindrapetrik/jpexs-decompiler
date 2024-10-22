@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
-public class ActionScript3OptinalParametersTest extends ActionScript3DecompileTestBase {
+public class ActionScript3OptionalParametersTest extends ActionScript3DecompileTestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
