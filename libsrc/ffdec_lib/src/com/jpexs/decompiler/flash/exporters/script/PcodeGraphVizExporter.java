@@ -57,7 +57,7 @@ public class PcodeGraphVizExporter {
     private final String BLOCK_STYLE = "shape=\"box\"";
 
     private static final int INS_LEN_LIMIT = 80;
-    private static final String ELIPSIS = "...";
+    private static final String ELLIPSIS = "...";
 
     private String getBlockName(GraphSource list, GraphPart part) {
         return "loc" + Helper.formatAddress(list.pos2adr(part.start, true));
@@ -209,17 +209,17 @@ public class PcodeGraphVizExporter {
         Token t;
         StringBuilder sb = new StringBuilder();
         int lineStart = 0;
-        boolean afterElipsis = false;
+        boolean afterEllipsis = false;
         int rawLen = 0;
         try {
             while ((t = lexer.yylex()) != null) {
                 if (t.type == TokenType.NEWLINE) {
                     sb.append("<BR />");
-                    afterElipsis = false;
+                    afterEllipsis = false;
                     lineStart = rawLen;
                     continue;
                 }
-                if (afterElipsis) {
+                if (afterEllipsis) {
                     continue;
                 }
                 String color = null;
@@ -278,8 +278,8 @@ public class PcodeGraphVizExporter {
                     sb.append("</FONT>");
                 }
                 if (tooLong) {
-                    sb.append(ELIPSIS);
-                    afterElipsis = true;
+                    sb.append(ELLIPSIS);
+                    afterEllipsis = true;
                 }
             }
         } catch (IOException ex) {
