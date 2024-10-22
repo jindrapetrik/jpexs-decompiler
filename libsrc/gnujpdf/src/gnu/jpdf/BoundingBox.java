@@ -523,7 +523,7 @@ public class BoundingBox extends Rectangle {
      * @throws IllegalArgumentException if the args are invalid
      * @throws StringTooLongException if the string won't fit this will only
      * happen if the fm or padding has been changed since getStringBounds was
-     * called succesfully
+     * called successfully
      */
     public void drawWrappedString(Graphics g,
             FontMetrics fm,
