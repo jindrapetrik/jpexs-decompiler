@@ -513,7 +513,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 	 * Register the given content type to use the given class name as its kit
 	 * When this is called, an entry is added into the private HashMap of the
 	 * registered editors kits.  This is needed so that the SyntaxPane library
-	 * has it's own registration of all the EditorKits
+	 * has its own registration of all the EditorKits
 	 * @param type
 	 * @param classname
 	 */
