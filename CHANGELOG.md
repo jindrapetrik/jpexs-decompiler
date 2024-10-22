@@ -755,7 +755,7 @@ Major version of SWF to XML export changed to 2.
 
 ### Fixed
 - GFX - DefineExternalImage2 display and correct handling if standalone
-- [#1931], [#1934] DefineSprite rectange calculation (incorrect export dimensions)
+- [#1931], [#1934] DefineSprite rectangle calculation (incorrect export dimensions)
 - [#1929], [#1932] Wrong subsprite frames display
 - [#1933] AS3 - Detection of variable names from debug info on multiple debug ins with same regindex
 - GFX - ExporterInfo prefix is NetString
