@@ -237,7 +237,7 @@ public class CubicToQuad {
         // and corresponding quadratic curve that estimates the cubic one, assuming
         // that the boundary points of cubic and quadratic points are equal.
         //
-        // The distance calculation method comes from Hausdorff distance defenition
+        // The distance calculation method comes from Hausdorff distance definition
         // (https://en.wikipedia.org/wiki/Hausdorff_distance), but with following simplifications
         // * it looks for maximum distance only for finite number of points of cubic curve
         // * it doesn't perform reverse check that means selecting set of fixed points on
