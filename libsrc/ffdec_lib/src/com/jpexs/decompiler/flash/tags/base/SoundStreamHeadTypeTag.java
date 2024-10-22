@@ -52,8 +52,8 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
     public abstract List<SoundStreamFrameRange> getRanges();
 
     /**
-     * Checks if the MP3 sound is higher than 160 kbps.
-     * @return True if the MP3 sound is higher than 160 kbps, false otherwise
+     * Checks if the MP3 sound is greater than 160 kbps.
+     * @return True if the MP3 sound is greater than 160 kbps, false otherwise
      */
     protected boolean isMp3HigherThan160Kbps() {
         List<SoundStreamFrameRange> ranges = getRanges();

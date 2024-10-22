@@ -198,7 +198,7 @@ public class SwfVsCodeExporter {
 "	\n" +
 "	<!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. \n" +
 "	Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.\n" +
-"	An updated version of application must have a versionNumber value higher than the previous version. Required for namespace >= 2.5 . -->\n" +
+"	An updated version of application must have a versionNumber value greater than the previous version. Required for namespace >= 2.5 . -->\n" +
 "	<versionNumber>1.0.0</versionNumber>\n" +
 "		         \n" +
 "	<!-- A string value (such as \"v1\", \"2.5\", or \"Alpha 1\") that represents the version of the application, as it should be shown to users. Optional. -->\n" +
