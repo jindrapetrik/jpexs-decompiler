@@ -1938,7 +1938,7 @@ Major version of SWF to XML export changed to 2.
 - some AS2 deobfuscation fixes
 - [#1183] Index out of bounds fix
 - Implicit coercion on binary/unary opfix
-- debugger: corect display variable values through getters
+- debugger: correct display variable values through getters
 - Multiple XLF export fix
 - [#1193] FLA export - text tag advance fix, one layer shape fix
 - [#1193] FLA export - smoothed image detection, export raw JPEG data
