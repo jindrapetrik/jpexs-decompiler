@@ -35040,7 +35040,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The specifiec context is already attached to another object
+    // The specific context is already attached to another object
     //
     int ERROR_FLT_CONTEXT_ALREADY_LINKED = 0x801F001C;
 
