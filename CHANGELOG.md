@@ -2794,7 +2794,7 @@ Major version of SWF to XML export changed to 2.
 - [#382],[#396] AS3: Adding new trait (method/slot/const)
 - AS3: Highlighting pair parenthesis/bracket
 - AS3: Editing various new P-code parameters
-- AS3: Highligting of trait names/types/parameters
+- AS3: Highlighting of trait names/types/parameters
 - AS3: Global rename identifier for traits
 - [#357] Playback controls for DefineSound
 - [#391] AS3: Native methods mark
