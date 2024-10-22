@@ -306,11 +306,11 @@ public class JRibbonGallery extends JComponent {
 	}
 
 	/**
-	 * Returns the list of buttons in the specifed button group.
+	 * Returns the list of buttons in the specified button group.
 	 * 
 	 * @param buttonGroupName
 	 *            Button group name.
-	 * @return The list of buttons in the specifed button group.
+	 * @return The list of buttons in the specified button group.
 	 */
 	public List<JCommandToggleButton> getButtonGroup(String buttonGroupName) {
 		for (StringValuePair<List<JCommandToggleButton>> group : this.buttonGroups) {
