@@ -2645,7 +2645,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         boolean uncompressed = hdr[0] == 'F' || hdr[0] == 'G'; // FWS or GFX
         if (!uncompressed) {
-            // fisrt decompress, then compress to the given format
+            // first decompress, then compress to the given format
             is.reset();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             decompress(is, baos, false);
