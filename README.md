@@ -97,7 +97,7 @@ Versions are in format `x.y.z`, for example `9.1.2`.
 For the versions available, see the [tags on this repository](https://github.com/jindrapetrik/jpexs-decompiler/tags).
 
 Nightly builds have additional suffix `_nightlyN` where `N` is number which increments with every (automatic) nightly release
-and does not depend on the `x.y.z` numbers. (This means nightly number is *NOT* reseted to 0 when releasing stable)
+and does not depend on the `x.y.z` numbers. (This means nightly number is *NOT* reset to 0 when releasing stable)
 Older nightly builds are *NOT* available through git tags.
 
 ## Authors
