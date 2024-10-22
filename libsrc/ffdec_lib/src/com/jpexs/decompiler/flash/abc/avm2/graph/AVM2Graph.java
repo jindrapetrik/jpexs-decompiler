@@ -489,13 +489,13 @@ public class AVM2Graph extends Graph {
                 }
 
                 if (finallyThrowPushByte != null) {
-                    GraphPart finnalyThrowPart;
+                    GraphPart finallyThrowPart;
                     if (finallyThrowPushByte == null || finallyThrowPushByte < 0 || finallyThrowPushByte > switchPart.nextParts.size() - 2) {
-                        finnalyThrowPart = switchPart.nextParts.get(0);
+                        finallyThrowPart = switchPart.nextParts.get(0);
                     } else {
-                        finnalyThrowPart = switchPart.nextParts.get(1 + finallyThrowPushByte);
+                        finallyThrowPart = switchPart.nextParts.get(1 + finallyThrowPushByte);
                     }
-                    localData.finallyThrowParts.put(e, finnalyThrowPart);
+                    localData.finallyThrowParts.put(e, finallyThrowPart);
                 }
 
                 for (GraphPart r : finallyPart.refs) {
@@ -955,7 +955,7 @@ public class AVM2Graph extends Graph {
         long maxEndAddr = -1;
         finallyIndex.setVal(-1);
 
-        List<Integer> finnalysIndicesToBe = new ArrayList<>();
+        List<Integer> finallysIndicesToBe = new ArrayList<>();
         maxEndAddr = -1;
         for (int e = 0; e < body.exceptions.length; e++) {
             long fixedExStart = avm2code.pos2adr(avm2code.adr2pos(body.exceptions[e].start, true));
@@ -965,7 +965,7 @@ public class AVM2Graph extends Graph {
                     ABCException ex = body.exceptions[e];
                     if (ex.isFinally()) {
                         if (fixedExEnd >= maxEndAddr) {
-                            finnalysIndicesToBe.add(e);
+                            finallysIndicesToBe.add(e);
                         }
                     } else {
                         long endAddr = fixedExEnd;
@@ -976,9 +976,9 @@ public class AVM2Graph extends Graph {
                             catchedExceptionIds.add(e);
 
                             //filter finallys that have lower endAddr - they do not belong to these catches
-                            for (int k = 0; k < finnalysIndicesToBe.size(); k++) {
-                                if (body.exceptions[finnalysIndicesToBe.get(k)].end < endAddr) {
-                                    finnalysIndicesToBe.remove(k);
+                            for (int k = 0; k < finallysIndicesToBe.size(); k++) {
+                                if (body.exceptions[finallysIndicesToBe.get(k)].end < endAddr) {
+                                    finallysIndicesToBe.remove(k);
                                     k--;
                                 }
                             }
@@ -990,7 +990,7 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        Collections.sort(finnalysIndicesToBe, new Comparator<Integer>() {
+        Collections.sort(finallysIndicesToBe, new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
                 return body.exceptions[o2].end - body.exceptions[o1].end;
@@ -1002,21 +1002,21 @@ public class AVM2Graph extends Graph {
             outSideExceptionPart = searchFirstPartOutSideTryCatch(localData, body.exceptions[catchedExceptionIds.get(0)], loops, allParts);
         }
 
-        if (!finnalysIndicesToBe.isEmpty()) {
+        if (!finallysIndicesToBe.isEmpty()) {
             long maxEnd = 0;
             int maxF = -1;
-            for (int f : finnalysIndicesToBe) {
+            for (int f : finallysIndicesToBe) {
                 long fixedExEnd = avm2code.pos2adr(avm2code.adr2pos(body.exceptions[f].end, true));
                 if (fixedExEnd > maxEnd) {
                     maxEnd = fixedExEnd;
                     maxF = f;
                 }
             }
-            finnalysIndicesToBe.clear();
-            finnalysIndicesToBe.add(maxF);
+            finallysIndicesToBe.clear();
+            finallysIndicesToBe.add(maxF);
         }
 
-        for (int e : finnalysIndicesToBe) {
+        for (int e : finallysIndicesToBe) {
             ABCException finallyExceptionToBe = body.exceptions[e];
             if (catchedExceptionIds.isEmpty() || outSideExceptionPart == null) {
                 //there's no exception, finally only                
@@ -1050,9 +1050,9 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        if (finallyIndex.getVal() == -1 && !finnalysIndicesToBe.isEmpty()) {
+        if (finallyIndex.getVal() == -1 && !finallysIndicesToBe.isEmpty()) {
             catchedExceptionIds.clear();
-            finallyIndex.setVal(finnalysIndicesToBe.get(0));
+            finallyIndex.setVal(finallysIndicesToBe.get(0));
         }
     }
 
@@ -2584,7 +2584,7 @@ public class AVM2Graph extends Graph {
                     }
 
                     //§§push(int) in every return/throw in try..finally block
-                    //there may be multiple pushes as finnaly clauses may be nested
+                    //there may be multiple pushes as finally clauses may be nested
                     int numPushes = 0;
                     while (i + 1 + numPushes < list.size() && isIntegerOrPopInteger(list.get(i + 1 + numPushes))) {
                         numPushes++;
@@ -2628,7 +2628,7 @@ public class AVM2Graph extends Graph {
             }
 
             //§§push(int) before every continue/returnvoid in try..finally block
-            //there may be multiple pushes as finnaly clauses may be nested
+            //there may be multiple pushes as finally clauses may be nested
             //TODO: handle this better - actually remove only really needed
             if ((list.get(i) instanceof ContinueItem) || (list.get(i) instanceof BreakItem) || (list.get(i) instanceof ReturnVoidAVM2Item)) {
                 for (int j = i - 1; j >= 0; j--) {
