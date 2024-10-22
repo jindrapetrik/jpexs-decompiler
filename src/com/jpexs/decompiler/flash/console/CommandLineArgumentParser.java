@@ -4119,7 +4119,7 @@ public class CommandLineArgumentParser {
                                         return swf;
                                     }
                                 };
-                                //loadingDialog.setWroker(worker);
+                                //loadingDialog.setWorker(worker);
                                 worker.execute();
 
                                 subcnt++;
