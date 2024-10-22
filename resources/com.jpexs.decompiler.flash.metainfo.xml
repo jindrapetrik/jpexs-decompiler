@@ -378,7 +378,7 @@
 					<li>#2021, #2000 Caret position in editors when using tabs and / or unicode</li>
 					<li>#2021 Indent continuation when using tabs</li>
 					<li>#2116 DefineEditText display - correct getting fonts</li>
-					<li>#2116 DefineEditText display - apostroph decoding</li>
+					<li>#2116 DefineEditText display - apostrophe decoding</li>
 					<li>#2116 Apply colortransform after filters</li>
 					<li>#2116 Limit maximum number of box blur pixels</li>
 					<li>#2122 `-header` command did not support negative integers for displayrect</li>

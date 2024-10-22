@@ -303,7 +303,7 @@ All notable changes to this project will be documented in this file.
 - [#2021], [#2000] Caret position in editors when using tabs and / or unicode
 - [#2021] Indent continuation when using tabs
 - [#2116] DefineEditText display - correct getting fonts
-- [#2116] DefineEditText display - apostroph decoding
+- [#2116] DefineEditText display - apostrophe decoding
 - [#2116] Apply colortransform after filters
 - [#2116] Limit maximum number of box blur pixels
 - [#2122] `-header` command did not support negative integers for displayrect
