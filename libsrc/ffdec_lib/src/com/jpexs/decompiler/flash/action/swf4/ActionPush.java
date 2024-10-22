@@ -356,7 +356,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter getASMSourceReplaced(ActionList container, Set<Long> knownAddresses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString(writer);
         }
@@ -370,12 +370,12 @@ public class ActionPush extends Action {
     /**
      * Converts the parameters to string - use replacements when available.
      * @param container Container
-     * @param knownAddreses Known addresses
+     * @param knownAddresses Known addresses
      * @param exportMode Export mode
      * @param writer Writer
      * @return Writer
      */
-    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, Set<Long> knownAddreses, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter paramsToStringReplaced(List<? extends GraphSourceItem> container, Set<Long> knownAddresses, ScriptExportMode exportMode, GraphTextWriter writer) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString(writer);
         }
