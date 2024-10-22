@@ -53,7 +53,7 @@ public class PreIncrementActionItem extends UnaryOpItem {
      * @param object Object
      */
     public PreIncrementActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++", "" /*"Number" Causes unneccessary ++Number(xx) when xx not number*/);
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "++", "" /*"Number" Causes unnecessary ++Number(xx) when xx not number*/);
     }
 
     @Override

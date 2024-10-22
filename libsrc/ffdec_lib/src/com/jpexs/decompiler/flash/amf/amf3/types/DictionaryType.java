@@ -49,7 +49,7 @@ public class DictionaryType extends ListMap<Object, Object> implements WithSubVa
      */
     public DictionaryType(boolean weakKeys, Map<Object, Object> entries) {
         super(true /*IdentityMap*/, entries);
-        this.weakKeys = weakKeys; //TODO? Really make the Map weak - something like WeakIdentityMap - but is it neccessary for serialization?
+        this.weakKeys = weakKeys; //TODO? Really make the Map weak - something like WeakIdentityMap - but is it necessary for serialization?
     }
 
     @Override
