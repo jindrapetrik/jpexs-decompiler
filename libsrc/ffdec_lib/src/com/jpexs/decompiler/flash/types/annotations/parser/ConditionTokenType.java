@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.types.annotations.parser;
 
 /**
- * Type of codition token.
+ * Type of condition token.
  *
  * @author JPEXS
  */
