@@ -5451,7 +5451,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Enables debugging. Adds tags to enable debugging and optinally injects
+     * Enables debugging. Adds tags to enable debugging and optionally injects
      * debugline and debugfile instructions to AS3 code by decompiling it first
      *
      * @param injectAS3Code Modify AS3 code with debugfile / debugline ?
