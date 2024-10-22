@@ -1,5 +1,5 @@
 /*
- * 09/26/08     throw exception on subbband alloc error: Christopher G. Jennings (cjennings@acm.org)
+ * 09/26/08     throw exception on subband alloc error: Christopher G. Jennings (cjennings@acm.org)
  * 11/19/04        1.0 moved to LGPL.
  * 01/12/99        Initial version.    mdm@techie.com
  *-----------------------------------------------------------------------
