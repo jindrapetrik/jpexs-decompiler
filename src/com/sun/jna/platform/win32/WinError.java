@@ -40466,7 +40466,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Netowork interface aborted the request.
+    // Network interface aborted the request.
     //
     int ERROR_NDIS_REQUEST_ABORTED = 0x8034000C;
 
