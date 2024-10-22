@@ -1265,7 +1265,7 @@ public interface User32 extends StdCallLibrary, WinUser {
      * - an invalid parameter value - the system class was registered by a
      * different module - The WH_CBT hook is installed and returns a failure
      * code - if one of the controls in the dialog template is not registered,
-     * or its window window procedure fails WM_CREATE or WM_NCCREATE
+     * or its window procedure fails WM_CREATE or WM_NCCREATE
      */
     public HWND CreateWindowEx(int dwExStyle, WString lpClassName,
             String lpWindowName, int dwStyle, int x, int y, int nWidth,
