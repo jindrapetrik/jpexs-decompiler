@@ -130,9 +130,9 @@ public class ZoomPanel extends JPanel implements MediaDisplayListener {
         }
     }
 
-    private static double roundZoom(double realZoom, int mantisa) {
+    private static double roundZoom(double realZoom, int mantissa) {
         double l10 = Math.log10(realZoom);
-        int lg = (int) (-Math.floor(l10) + mantisa - 1);
+        int lg = (int) (-Math.floor(l10) + mantissa - 1);
         if (lg < 0) {
             lg = 0;
         }

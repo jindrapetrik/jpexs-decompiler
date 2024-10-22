@@ -885,9 +885,9 @@ public class SWFInputStream implements AutoCloseable {
         float ret = Float.intBitsToFloat(val);
         endDumpLevel(ret);
         /*int sign = val >> 31;
-         int mantisa = val & 0x3FFFFF;
+         int mantissa = val & 0x3FFFFF;
          int exp = (val >> 22) & 0xFF;
-         float ret =(sign == 1 ? -1 : 1) * (float) Math.pow(2, exp)*  (1+((mantisa)/ (float)(1<<23)));*/
+         float ret =(sign == 1 ? -1 : 1) * (float) Math.pow(2, exp)*  (1+((mantissa)/ (float)(1<<23)));*/
         return ret;
     }
 
@@ -902,9 +902,9 @@ public class SWFInputStream implements AutoCloseable {
         newDumpLevel(name, "FLOAT16");
         int val = readUI16Internal();
         int sign = val >> 15;
-        int mantisa = val & 0x3FF;
+        int mantissa = val & 0x3FF;
         int exp = (val >> 10) & 0x1F;
-        float ret = (sign == 1 ? -1 : 1) * (float) Math.pow(2, exp) * (1 + ((mantisa) / (float) (1 << 10)));
+        float ret = (sign == 1 ? -1 : 1) * (float) Math.pow(2, exp) * (1 + ((mantissa) / (float) (1 << 10)));
         endDumpLevel(ret);
         return ret;
     }
