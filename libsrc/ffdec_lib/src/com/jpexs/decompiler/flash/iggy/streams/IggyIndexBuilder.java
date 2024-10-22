@@ -243,7 +243,7 @@ public class IggyIndexBuilder {
         } else if (i == 6) {
             return 8;
         }
-        throw new RuntimeException("Uknown platform num");
+        throw new RuntimeException("Unknown platform num");
     }
 
     private long writeIndex(int code, boolean is64, long val) {
