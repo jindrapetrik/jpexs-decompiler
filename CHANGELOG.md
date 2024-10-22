@@ -1411,7 +1411,7 @@ Major version of SWF to XML export changed to 2.
 - Generic tag editor - remove more items at once
 - [#1669] Flash viewer - Smoothed vs non-smoothed bitmaps
 - PDF export - Smoothed bitmaps
-- Flash viewer - slow on larger zooms (now only diplayed rect is rendered)
+- Flash viewer - slow on larger zooms (now only displayed rect is rendered)
 - Flash viewer - scaling grid - ignore nonshapes when scaling
 - [#1672] Raw editor - digits grouping causing incorrect cursor movement
 - Rename invalid identifiers renames identifiers with a dollar sign
