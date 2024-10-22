@@ -2211,7 +2211,7 @@ Major version of SWF to XML export changed to 2.
 - [#832] AS3 direct edit - other ABCs resolving fix
 - [#904] Cannot export images
 - [#910] Missing instructions
-- Opening not existent files on restoring last session
+- Opening nonexistent files on restoring last session
 - [#922] Edit text leading
 - Put image before shape on shape replace
 - [#916] Replacing Shape corrupts SWF

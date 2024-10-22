@@ -33319,7 +33319,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An attempt was made to end a non-existent transaction.
+    // An attempt was made to end a nonexistent transaction.
     //
     int SCARD_E_NOT_TRANSACTED = 0x80100016;
 
