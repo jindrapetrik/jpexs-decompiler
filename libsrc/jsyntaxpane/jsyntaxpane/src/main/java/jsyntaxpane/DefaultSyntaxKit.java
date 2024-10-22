@@ -375,7 +375,7 @@ public class DefaultSyntaxKit extends DefaultEditorKit implements ViewFactory {
 			for (int i = 1; i < values.length; i++) {
 				String keyStrokeString = values[i].replace("menu ", MENU_MASK_STRING);
 				KeyStroke ks = KeyStroke.getKeyStroke(keyStrokeString);
-				// we may have more than onr value ( for key action ), but we will use the 
+				// we may have more than one value ( for key action ), but we will use the 
 				// last one in the single value here.  This will display the key in the
 				// popup menus.  Pretty neat.
 				if (ks == null) {
