@@ -11,7 +11,7 @@ In the past (before 2018), we were using *free-decompiler.com* domain as homepag
 
 ## Download application
 For downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
-Older versions and nightly builds are availabe at the [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+Older versions and nightly builds are available at the [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
 
 ### How to install
 See [installation section of the wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Installation)
