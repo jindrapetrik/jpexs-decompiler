@@ -97,7 +97,7 @@ public class ComboCompletionDialog
             Rectangle rt = target.modelToView(target.getSelectionStart());
             Point loc = new Point(rt.x, rt.y);
             setLocationRelativeTo(window);
-            // convert the location from Text Componet coordinates to
+            // convert the location from Text Component coordinates to
             // Frame coordinates...
             loc = SwingUtilities.convertPoint(target, loc, window);
             // and then to Screen coordinates

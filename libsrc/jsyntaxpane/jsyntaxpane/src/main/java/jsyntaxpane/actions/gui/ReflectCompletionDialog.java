@@ -311,7 +311,7 @@ public class ReflectCompletionDialog
 			Window window = SwingUtilities.getWindowAncestor(target);
 			Rectangle rt = target.modelToView(dot);
 			Point loc = new Point(rt.x, rt.y);
-			// convert the location from Text Componet coordinates to
+			// convert the location from Text Component coordinates to
 			// Frame coordinates...
 			loc = SwingUtilities.convertPoint(target, loc, window);
 			// and then to Screen coordinates
