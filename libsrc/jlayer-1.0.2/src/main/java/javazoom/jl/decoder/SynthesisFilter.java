@@ -50,7 +50,7 @@ final class SynthesisFilter {
     private float[] eq;
 
     /**
-     * Contructor.
+     * Constructor.
      * The scalefactor scales the calculated float pcm samples to short values
      * (raw pcm samples are in [-1.0, 1.0], if no violations occur).
      */
