@@ -3091,7 +3091,7 @@ public class CommandLineArgumentParser {
                         }
 
                         if (!found) {
-                            System.err.println(objectToReplace + " is not reocginized as a CharacterId or a script name.");
+                            System.err.println(objectToReplace + " is not recognized as a CharacterId or a script name.");
                             System.exit(1);
                         }
                     }
