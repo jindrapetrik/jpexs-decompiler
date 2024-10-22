@@ -18647,7 +18647,7 @@ public interface WinError {
     // MessageText:
     //
     // The FSMO role ownership could not be verified because its directory
-    // partition has not replicated successfully with atleast one replication
+    // partition has not replicated successfully with at least one replication
     // partner.
     //
     int ERROR_DS_ROLE_NOT_VERIFIED = 8610;
