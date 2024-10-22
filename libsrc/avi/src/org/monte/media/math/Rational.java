@@ -328,7 +328,7 @@ public class Rational extends Number {
             }
         }
 
-        // Work with longs if overflow can not occur
+        // Work with longs if overflow cannot occur
         if (abs(this.num) < Integer.MAX_VALUE
                 && abs(this.den) < Integer.MAX_VALUE
                 && abs(that.num) < Integer.MAX_VALUE
@@ -476,7 +476,7 @@ public class Rational extends Number {
      * number</li> <li>As a double number</li> <li>As an integer/integer
      * rational number</li>
      *
-     * @throws NumberFormatException if str can not be parsed.
+     * @throws NumberFormatException if str cannot be parsed.
      */
     public static Rational valueOf(String str) {
         int p = str.indexOf('/');

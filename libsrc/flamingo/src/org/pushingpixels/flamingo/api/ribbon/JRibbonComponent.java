@@ -108,7 +108,7 @@ public class JRibbonComponent extends RichToolTipManager.JTrackableComponent {
 	 * Creates a simple wrapper with no icon and no caption.
 	 * 
 	 * @param mainComponent
-	 *            Wrapped component. Can not be <code>null</code>.
+	 *            Wrapped component. Cannot be <code>null</code>.
 	 * @throws IllegalArgumentException
 	 *             if <code>mainComponent</code> is <code>null</code>.
 	 */
@@ -131,9 +131,9 @@ public class JRibbonComponent extends RichToolTipManager.JTrackableComponent {
 	 * @param icon
 	 *            Wrapper icon. Can be <code>null</code>.
 	 * @param caption
-	 *            Wrapper caption. Can not be <code>null</code>.
+	 *            Wrapper caption. Cannot be <code>null</code>.
 	 * @param mainComponent
-	 *            Wrapped component. Can not be <code>null</code>.
+	 *            Wrapped component. Cannot be <code>null</code>.
 	 * @throws IllegalArgumentException
 	 *             if <code>caption</code> or <code>mainComponent</code> is
 	 *             <code>null</code>.
