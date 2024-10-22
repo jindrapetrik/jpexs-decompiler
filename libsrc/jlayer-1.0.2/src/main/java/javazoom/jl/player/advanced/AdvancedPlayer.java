@@ -104,7 +104,7 @@ public class AdvancedPlayer {
     }
 
     /**
-     * Cloases this player. Any audio currently playing is stopped
+     * Closes this player. Any audio currently playing is stopped
      * immediately.
      */
     public synchronized void close() {
