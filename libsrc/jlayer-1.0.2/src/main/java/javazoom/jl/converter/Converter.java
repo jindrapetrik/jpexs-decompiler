@@ -216,7 +216,7 @@ public class Converter {
          * but before it has been decoded.
          *
          * @param frameNo The 0-based sequence number of the frame.
-         * @param header  The Header rerpesenting the frame just read.
+         * @param header  The Header representing the frame just read.
          */
         void readFrame(int frameNo, Header header);
 
@@ -224,7 +224,7 @@ public class Converter {
          * This method is called after a frame has been decoded.
          *
          * @param frameNo The 0-based sequence number of the frame.
-         * @param header  The Header rerpesenting the frame just read.
+         * @param header  The Header representing the frame just read.
          * @param o       The Obuffer the decoded data was written to.
          */
         void decodedFrame(int frameNo, Header header, Obuffer o);
