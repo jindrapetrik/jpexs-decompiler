@@ -42,7 +42,7 @@ import jsyntaxpane.TokenType;
         super();
     }
 
-    private static final byte PARAN     = 1;
+    private static final byte PAREN     = 1;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
 
@@ -191,8 +191,8 @@ Exponent = [eE] [+\-]? [0-9]+
 
   
   /* separators */
-  "("                            { return token(TokenType.OPERATOR,  PARAN); }
-  ")"                            { return token(TokenType.OPERATOR, -PARAN); }
+  "("                            { return token(TokenType.OPERATOR,  PAREN); }
+  ")"                            { return token(TokenType.OPERATOR, -PAREN); }
   "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
   "["                            { return token(TokenType.OPERATOR,  BRACKET); }

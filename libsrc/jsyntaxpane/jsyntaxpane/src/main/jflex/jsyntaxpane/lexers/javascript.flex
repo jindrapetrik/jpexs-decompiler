@@ -43,7 +43,7 @@ import jsyntaxpane.TokenType;
         return yychar;
     }
 
-    private static final byte PARAN     = 1;
+    private static final byte PAREN     = 1;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
     
@@ -154,8 +154,8 @@ SStringCharacter = [^\r\n\'\\]
   
   /* operators */
 
-  "("                            { return token(TokenType.OPERATOR,  PARAN); }
-  ")"                            { return token(TokenType.OPERATOR, -PARAN); }
+  "("                            { return token(TokenType.OPERATOR,  PAREN); }
+  ")"                            { return token(TokenType.OPERATOR, -PAREN); }
   "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
   "["                            { return token(TokenType.OPERATOR,  BRACKET); }
