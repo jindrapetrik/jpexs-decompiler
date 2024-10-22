@@ -29,7 +29,7 @@ import jsyntaxpane.Token;
  * right by one tab-width space character.
  *
  * Since this is also used as an abbreviation completion action,
- * Abbreviiations are processed by this event.
+ * Abbreviations are processed by this event.
  *
  * FIXME:  Move the abbreviation expansion to an ActionUtils proc
  * @author Ayman Al-Sairafi
