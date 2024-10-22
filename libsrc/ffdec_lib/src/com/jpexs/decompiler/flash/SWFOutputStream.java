@@ -410,9 +410,9 @@ public class SWFOutputStream extends OutputStream {
         int bits = Float.floatToRawIntBits(value);
         int sign = bits >> 31;
         int exponent = (bits >> 22) & 0xff;
-        int mantisa = bits & 0x3FFFFF;
-        mantisa >>= 13;
-        writeUI16((sign << 15) + (exponent << 10) + mantisa);
+        int mantissa = bits & 0x3FFFFF;
+        mantissa >>= 13;
+        writeUI16((sign << 15) + (exponent << 10) + mantissa);
     }
 
     /**
