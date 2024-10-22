@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Detects "precontinues" in Graph. A precontinue is target of continue
  * statement in a for loop. For loop in this case has single backedge.
- * Precontinue is predeccessor of loops backedge. Precontinue can have branches
+ * Precontinue is predecessor of loops backedge. Precontinue can have branches
  * in it (and in some special cases like xml .() operator a while too). This
  * class tries to simplify graph up to the level that precontinue is a single
  * node.
