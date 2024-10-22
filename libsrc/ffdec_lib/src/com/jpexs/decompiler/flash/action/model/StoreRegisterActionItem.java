@@ -106,7 +106,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
      * @param define Define
      */
     public StoreRegisterActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, RegisterNumber register, GraphTargetItem value, boolean define) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.register = register;
         this.define = define;
     }

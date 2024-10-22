@@ -103,7 +103,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
      * @param isStatic Is static
      */
     public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
+        super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.object = object;
         this.propertyName = propertyName;
         this.type = type;

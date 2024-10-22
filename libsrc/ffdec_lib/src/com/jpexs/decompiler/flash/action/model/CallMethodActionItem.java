@@ -104,7 +104,7 @@ public class CallMethodActionItem extends ActionItem {
                 } else if (methodNameStr.startsWith("__set__") && arguments.size() == 1) {
                     special = SPECIAL_SETTER;
                     setterGetterVarName = methodNameStr.substring(7);
-                    precedence = PRECEDENCE_ASSIGMENT;
+                    precedence = PRECEDENCE_ASSIGNMENT;
                 }
             }
         }
