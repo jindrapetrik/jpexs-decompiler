@@ -23372,7 +23372,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The publisher has been disabled and its resource is not avaiable. This
+    // The publisher has been disabled and its resource is not available. This
     // usually occurs when the publisher is in the process of being uninstalled
     // or upgraded.
     //
@@ -37878,7 +37878,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The DAA command has no resources availble to execute the command.
+    // The DAA command has no resources available to execute the command.
     //
     int TPM_E_DAA_RESOURCES = 0x80280050;
 
