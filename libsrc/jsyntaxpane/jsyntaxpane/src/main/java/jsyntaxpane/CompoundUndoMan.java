@@ -27,7 +27,7 @@ import javax.swing.undo.UndoableEdit;
  * relatively next to the previous change, like when continuous typing, then the
  * undoes are grouped together.
  *
- * This is cutomized from the
+ * This is customized from the
  *
  * http://www.camick.com/java/source/CompoundUndoMan.java
  *
