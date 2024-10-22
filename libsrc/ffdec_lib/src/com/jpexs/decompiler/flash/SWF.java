@@ -2451,7 +2451,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets title of this SWF incuding parent nodes like SwfList and
+     * Gets title of this SWF including parent nodes like SwfList and
      * DefineBinaryData.
      *
      * @return Title of the SWF
