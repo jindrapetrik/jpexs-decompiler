@@ -24277,7 +24277,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Can't enumerate any more, because the associated data is missing
+    // Can't enumerate anymore, because the associated data is missing
     //
     int OLE_E_ENUM_NOMORE = 0x80040002;
 
