@@ -2369,7 +2369,7 @@ Major version of SWF to XML export changed to 2.
 - [#773] Scripts associated with ClipActions are not shown
 - [#776] Stop working after setting "number of threads" to 0
 - [#783] No OK box when edited script or text was saved
-- [#785] Text search. Remember last choise, Unicode case insensitive search
+- [#785] Text search. Remember last choise, Unicode case-insensitive search
 - [#787] Search in AS bug (when navigating to searched results)
 - [#788] Add DefineCompactedFont Tag to gfx file
 - [#790] Impossible to change letters under a font
