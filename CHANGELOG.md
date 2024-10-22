@@ -2766,7 +2766,7 @@ Major version of SWF to XML export changed to 2.
 - [#427] Exception on linux fixed
 - [#405], [#420], [#421] Some decompilation issues fixed
 - [#430] Configuration default value problem fixed
-- [#397], [#431] Deobfuscation stucked sometimes problem fixed
+- [#397], [#431] Deobfuscation stuck sometimes problem fixed
 
 ## [1.7.4] - 2013-11-10
 ### Added
