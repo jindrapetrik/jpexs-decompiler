@@ -1,4 +1,4 @@
 /**
- * Stream helpets.
+ * Stream helpers.
  */
 package com.jpexs.helpers.streams;
