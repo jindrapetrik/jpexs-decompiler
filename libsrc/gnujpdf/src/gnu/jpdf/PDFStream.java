@@ -97,7 +97,7 @@ public class PDFStream extends PDFObject implements Serializable {
     }
 
     /**
-     * Returs true if the stream will be compressed.
+     * Returns true if the stream will be compressed.
      *
      * @return true if compression is enabled
      */
