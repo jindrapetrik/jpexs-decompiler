@@ -551,7 +551,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      */
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         GraphTargetItem t = this;
-        if (!implicitCoerce.isEmpty()) {    //if implicit oerce equals explicit
+        if (!implicitCoerce.isEmpty()) {    //if implicit coerce equals explicit
             /*if (t instanceof ConvertAVM2Item) {
                 if (implicitCoerce.equals((((ConvertAVM2Item) t).type.toString()))) {
                     t = t.value;
