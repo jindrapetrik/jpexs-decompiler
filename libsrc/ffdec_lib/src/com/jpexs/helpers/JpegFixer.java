@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Fixes probles in some JPEGs to be readable by standard viewers.
+ * Fixes problems in some JPEGs to be readable by standard viewers.
  * <p>
  * It removes: 1) EOI markers followed by SOI markers 2) EOI SOI on the
  * beginning of the file 3) Second or more SOI markers in the file
