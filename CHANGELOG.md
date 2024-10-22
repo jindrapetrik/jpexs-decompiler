@@ -863,7 +863,7 @@ Major version of SWF to XML export changed to 2.
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
 - [#1511], [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
 - Quick search (Ctrl+F) for tag list view
-- [#1884] Memory search - show size and adress in hex, show only aligned to N bytes
+- [#1884] Memory search - show size and address in hex, show only aligned to N bytes
 - AS3 - "internal" keyword support
 - ProductInfo tag information display
 - DebugId tag proper display and editation
