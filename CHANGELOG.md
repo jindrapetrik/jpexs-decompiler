@@ -1204,7 +1204,7 @@ Major version of SWF to XML export changed to 2.
 - [#1771] DefineShape4 line filled using single color
 - Minimum stroke width should be 1 px
 - [#1828] Closing path in shape strokes from last moveTo only
-- Shape not clipped when clip area ouside of view
+- Shape not clipped when clip area outside of view
 - Sound tag player now uses less memory / threads - does not use Clip sound class
 - Freetransform tool dragging not always started on mousedown
 - [#1695] Freetransform tool vs zooming
