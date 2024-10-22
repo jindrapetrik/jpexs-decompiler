@@ -44,7 +44,7 @@ public enum HorizontalAlignment {
 
 	/**
 	 * If the preferred width is less than the available width, the relevant
-	 * component is horizontally centerd in its parent.
+	 * component is horizontally centered in its parent.
 	 */
 	CENTER,
 
