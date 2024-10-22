@@ -240,7 +240,7 @@ public class CMYKJPEGImageReader extends ImageReader {
                     // YCCK colors are inverted?
 
                     // We must have a color profile in order to perform a 
-                    // conersion from CMYK to RGB.
+                    // conversion from CMYK to RGB.
                     // I case none has been supplied, we create a default one here.
                     if (profile == null) {
                         profile = ICC_Profile.getInstance(CMYKJPEGImageReader.class.getResourceAsStream("Generic CMYK Profile.icc"));

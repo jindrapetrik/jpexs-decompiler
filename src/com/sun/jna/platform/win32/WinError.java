@@ -35306,7 +35306,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Not able to present with color convertion
+    // Not able to present with color conversion
     //
     int ERROR_GRAPHICS_CANNOTCOLORCONVERT = 0xC0262008;
 
