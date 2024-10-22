@@ -136,7 +136,7 @@ public class ReflectUtils {
     }
 
     /**
-     * Adds the class SimpleNames, comma sepearated and surrounded by paranthesis to the
+     * Adds the class SimpleNames, comma sepearated and surrounded by parentheses to the
      * call StringBuffer
      * @param call
      * @param params
@@ -187,7 +187,7 @@ public class ReflectUtils {
     }
 
     /**
-     * Return a paranthesis enclosed, comma sepearated String of all
+     * Return a parentheses enclosed, comma sepearated String of all
      * SimpleClass names in params.
      * @param params
      * @return
