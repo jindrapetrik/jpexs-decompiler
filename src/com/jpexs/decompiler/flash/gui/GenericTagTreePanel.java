@@ -1222,7 +1222,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays or Lists
                 try {
                     if (field.get(fnode.obj) == null) {
-                        // todo: instanciate the (Array)List or Array to allow adding items to it
+                        // todo: instantiate the (Array)List or Array to allow adding items to it
                         return 0;
                     }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
