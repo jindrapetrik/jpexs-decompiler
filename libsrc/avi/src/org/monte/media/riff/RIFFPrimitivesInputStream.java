@@ -14,7 +14,7 @@ import java.io.*;
 
 /**
  * A RIFF primitives input stream lets an application read primitive data
- * types in the Microsoft Resource Interfache File Format (RIFF) format from an
+ * types in the Microsoft Resource Interchange File Format (RIFF) format from an
  * underlying input stream.
  *
  * Reference:
