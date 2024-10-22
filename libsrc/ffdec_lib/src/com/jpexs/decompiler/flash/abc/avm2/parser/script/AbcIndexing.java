@@ -571,7 +571,7 @@ public final class AbcIndexing {
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
 
     /**
-     * Rebuids package to objects name map.
+     * Rebuilds package to objects name map.
      */
     public void rebuildPkgToObjectsNameMap() {
         pkgToObjectsName.clear();
