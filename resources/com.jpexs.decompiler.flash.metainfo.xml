@@ -1009,7 +1009,7 @@
 				<ul>
 					<li>Warning before switching deobfuscation is now optional</li>
 					<li>#1690 Redesigned Deobfuscation tool dialog.</li>
-					<li>Shape/image/script/text import does not require specific folder name inside (but still preffers it when exists)</li>
+					<li>Shape/image/script/text import does not require specific folder name inside (but still prefers it when exists)</li>
 				</ul>
 				<p>Removed</p>
 				<ul>

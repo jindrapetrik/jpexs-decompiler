@@ -853,7 +853,7 @@ Major version of SWF to XML export changed to 2.
 ### Changed
 - Warning before switching deobfuscation is now optional
 - [#1690] Redesigned Deobfuscation tool dialog.
-- Shape/image/script/text import does not require specific folder name inside (but still preffers it when exists)
+- Shape/image/script/text import does not require specific folder name inside (but still prefers it when exists)
 
 ### Removed
 - "Restore control flow" deobfuscation level as it was the same as "Remove traps"
