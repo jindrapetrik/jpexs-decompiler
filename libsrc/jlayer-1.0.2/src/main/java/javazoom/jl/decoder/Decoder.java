@@ -43,7 +43,7 @@ public class Decoder implements DecoderErrors {
     private SynthesisFilter filter1;
 
     /**
-     * Sythesis filter for the right channel.
+     * Synthesis filter for the right channel.
      */
     private SynthesisFilter filter2;
 
