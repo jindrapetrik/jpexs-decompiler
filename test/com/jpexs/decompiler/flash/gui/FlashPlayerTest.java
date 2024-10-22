@@ -167,7 +167,7 @@ public class FlashPlayerTest {
 
                     for (AS3ExecuteTask task : tasks) {
                         System.out.println("Flash result (" + task.description + "): " + task.flashResult);
-                        System.out.println("FFDec execte result: " + task.ffdecResult);
+                        System.out.println("FFDec execute result: " + task.ffdecResult);
                         if (!task.ffdecResult.equals(task.flashResult)) {
                             System.out.println(code.toASMSource(testAbc, testAbc.constants));
                         }
@@ -221,7 +221,7 @@ public class FlashPlayerTest {
 
         for (AS3ExecuteTask task : tasks) {
             System.out.println("Flash result (" + task.description + "): " + task.flashResult);
-            System.out.println("FFDec execte result: " + task.ffdecResult);
+            System.out.println("FFDec execute result: " + task.ffdecResult);
             assertEquals(task.ffdecResult, task.flashResult);
         }
     }
@@ -364,7 +364,7 @@ public class FlashPlayerTest {
             for (AS3ExecuteTask task : tasks) {
                 if (!task.flashResult.equals(task.ffdecResult)) {
                     System.out.println("Flash result (" + task.description + "): " + task.flashResult);
-                    System.out.println("FFDec execte result: " + task.ffdecResult);
+                    System.out.println("FFDec execute result: " + task.ffdecResult);
                     expeced.append(task.flashResult).append(Helper.newLine);
                     current.append(task.ffdecResult).append(Helper.newLine);
                 }
