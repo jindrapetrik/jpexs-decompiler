@@ -346,7 +346,7 @@ Pre-options:
     Values for <flaversion>: f5,mx,mx2004,f8,cs3,cs4,cs5,cs5.5,cs6,cc
     You can set multiple formats at once using comma (,)
     DO NOT PUT space between comma (,) and next value.
-    The prefix with colon (:) is neccessary.
+    The prefix with colon (:) is necessary.
 
 -cli
     Applies to: main

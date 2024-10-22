@@ -41,7 +41,7 @@ public class PreDecrementAVM2Item extends UnaryOpItem implements AssignmentAVM2I
      * @param object Object
      */
     public PreDecrementAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object) {
-        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unneccessary ++Number(xx) when xx not number*/);
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, object, "--", "" /*"Number" Causes unnecessary ++Number(xx) when xx not number*/);
     }
 
     @Override

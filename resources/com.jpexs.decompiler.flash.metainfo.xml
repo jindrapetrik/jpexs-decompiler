@@ -631,7 +631,7 @@
 					<li>#2077 AS3 direct editation - switch statement missing offset</li>
 					<li>#2077 AS3 allow star string as property name (XML access)</li>
 					<li>#2077 AS3 try..catch parts outside block</li>
-					<li>AS3 try..catch inside loop unneccessary continue</li>
+					<li>AS3 try..catch inside loop unnecessary continue</li>
 					<li>#2077 AS3 colliding types in current package with trait names</li>
 					<li>NullPointer on reload / uncache</li>
 					<li>#2076 Auto rename identifiers infinite loop caused by renaming in playerglobal library</li>
