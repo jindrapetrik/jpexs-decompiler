@@ -50,7 +50,7 @@ Version 0.9.3 - Start of scripts for the document:
         actions (in the addKeyActions of DefaultSyntaxKit
     * Added Text AA property to SyntaxView
 Version 0.9.2:
-    * Fixing Java Indentation and Un-Indentattion Actions
+    * Fixing Java Indentation and Un-Indentation Actions
     * Added and used (in the Tester) clearUndoes on the SyntaxDocument
     * Added Basic JFlex Syntax
     * Added getContentTypes to DefaultSyntaxKit to get all registered
