@@ -853,7 +853,7 @@ public abstract class Advapi32Util {
      * Get a table of registry values.
      *
      * @param root Registry root.
-     * @param keyPath Regitry key path.
+     * @param keyPath Registry key path.
      * @return Table of values.
      */
     public static TreeMap<String, Object> registryGetValues(HKEY root, String keyPath) {
