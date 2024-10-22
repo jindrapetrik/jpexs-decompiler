@@ -2071,7 +2071,7 @@ Major version of SWF to XML export changed to 2.
 
 ### Removed
 - Removed old "debugger" buttons
-- Removed search from browsers cache - inactual code
+- Removed search from browsers cache - in actual code
 
 ### Fixed
 - Many AS3 direct editation related bugs
