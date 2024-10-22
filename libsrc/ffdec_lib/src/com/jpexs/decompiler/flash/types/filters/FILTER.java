@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 public abstract class FILTER implements Serializable {
 
     /**
-     * Identificator of type of the filter
+     * Identifier of type of the filter
      */
     @SWFType(BasicType.UI8)
     public int id;
@@ -45,7 +45,7 @@ public abstract class FILTER implements Serializable {
     /**
      * Constructor
      *
-     * @param id Type identificator
+     * @param id Type identifier
      */
     public FILTER(int id) {
         this.id = id;
