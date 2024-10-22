@@ -1714,7 +1714,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Gets all tags with specified type id.
      *
-     * @param tagId Identificator of tag type
+     * @param tagId Identifier of tag type
      * @return List of tags
      */
     public List<Tag> getTagData(int tagId) {
