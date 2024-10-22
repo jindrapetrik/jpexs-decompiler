@@ -72,7 +72,7 @@ public class GifSequenceWriter {
     IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
     commentsNode.setAttribute("CommentExtension", "Created by MAH");
 
-    IIOMetadataNode appEntensionsNode = getNode(
+    IIOMetadataNode appExtensionsNode = getNode(
       root,
       "ApplicationExtensions");
 
@@ -85,7 +85,7 @@ public class GifSequenceWriter {
 
     child.setUserObject(new byte[]{ 0x1, (byte) (loop & 0xFF), (byte)
       ((loop >> 8) & 0xFF)});
-    appEntensionsNode.appendChild(child);
+    appExtensionsNode.appendChild(child);
 
     imageMetaData.setFromTree(metaFormatName, root);
 
