@@ -70,7 +70,7 @@ public class ActionScriptFunction extends ActionScriptObject {
     }
 
     /**
-     * Constucts a new ActionScriptFunction
+     * Constructs a new ActionScriptFunction
      *
      * @param functionOffset Offset of the function
      * @param functionLength Length of the function
