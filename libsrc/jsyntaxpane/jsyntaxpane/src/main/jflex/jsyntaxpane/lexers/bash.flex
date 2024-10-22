@@ -37,7 +37,7 @@ import jsyntaxpane.TokenType;
         super();
     }
 
-    private static final byte PARAN     = 1;
+    private static final byte PAREN     = 1;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
     private static final byte DO        = 4;
@@ -79,8 +79,8 @@ BackQuoteChars  = [^\r\n\`\\]
   "$(("                         { return token(TokenType.KEYWORD,  INT_EXPR); }
   "))"                          { return token(TokenType.KEYWORD, -INT_EXPR); }
 
-  "("                           { return token(TokenType.OPERATOR,  PARAN); }
-  ")"                           { return token(TokenType.OPERATOR, -PARAN); }
+  "("                           { return token(TokenType.OPERATOR,  PAREN); }
+  ")"                           { return token(TokenType.OPERATOR, -PAREN); }
   "{"                           { return token(TokenType.OPERATOR,  CURLY); }
   "}"                           { return token(TokenType.OPERATOR, -CURLY); }
   "["                           { return token(TokenType.OPERATOR,  BRACKET); }
