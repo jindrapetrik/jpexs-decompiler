@@ -98,7 +98,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, receiver, propertyName, localData, isStatic);
-        writer.spaceBeforeCallParenthesies(arguments.size());
+        writer.spaceBeforeCallParenthesis(arguments.size());
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {               

@@ -86,7 +86,7 @@ public class GetPropertyActionItem extends ActionItem {
             return writer;
         }*/
         writer.append("getProperty");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
         target.appendTo(writer, localData);
         writer.append(", ");

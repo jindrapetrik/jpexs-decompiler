@@ -73,7 +73,7 @@ public class ConstructSuperAVM2Item extends AVM2Item {
             object.toString(writer, localData);
             writer.allowWrapHere().append(".");
         }
-        writer.spaceBeforeCallParenthesies(args.size());
+        writer.spaceBeforeCallParenthesis(args.size());
         writer.append("super(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {

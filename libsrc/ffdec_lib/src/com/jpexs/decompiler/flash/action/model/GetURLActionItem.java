@@ -49,7 +49,7 @@ public class GetURLActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         writer.append("getUrl");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(\"");
         writer.append(Helper.escapeActionScriptString(urlString));
         writer.append("\", \"");

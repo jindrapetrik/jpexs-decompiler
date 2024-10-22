@@ -85,7 +85,7 @@ public class LoadVariablesActionItem extends ActionItem {
             methodStr = ",\"POST\"";
         }
         writer.append("loadVariables");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
         urlString.toString(writer, localData);
         writer.append(",");

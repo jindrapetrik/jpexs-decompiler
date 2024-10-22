@@ -79,7 +79,7 @@ public class CallMethodAVM2Item extends AVM2Item {
         }
         writer.allowWrapHere().append(".");
         writer.append(methodName);
-        writer.spaceBeforeCallParenthesies(arguments.size());
+        writer.spaceBeforeCallParenthesis(arguments.size());
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {

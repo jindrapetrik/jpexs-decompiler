@@ -77,7 +77,7 @@ public class NextNameAVM2Item extends AVM2Item {
             return writer;
         }
         writer.append("§§nextname");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
         index.toString(writer, localData);
         writer.append(",");

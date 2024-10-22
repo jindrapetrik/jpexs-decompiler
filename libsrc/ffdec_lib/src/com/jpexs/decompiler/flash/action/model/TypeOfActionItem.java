@@ -52,7 +52,7 @@ public class TypeOfActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("typeof ");
-        writer.spaceBeforeCallParenthesies(1);
+        writer.spaceBeforeCallParenthesis(1);
         if (value.getPrecedence() > getPrecedence()) {
             writer.append("(");
         }

@@ -82,7 +82,7 @@ public class ConstructAVM2Item extends AVM2Item {
         if (object.getPrecedence() > getPrecedence() || objectIsCall) {
             writer.append(")");
         }
-        writer.spaceBeforeCallParenthesies(args.size());
+        writer.spaceBeforeCallParenthesis(args.size());
         if (object instanceof InitVectorAVM2Item) {
             return writer;
         }
