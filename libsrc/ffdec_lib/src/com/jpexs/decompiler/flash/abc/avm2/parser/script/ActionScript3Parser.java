@@ -2923,7 +2923,7 @@ public class ActionScript3Parser {
 
         List<GraphTargetItem> ret = parseScript(importedClasses, openedNamespaces, allOpenedNamespaces, scriptIndex, fileName, numberContextRef, abc, sinitNeedsActivation, sinitVariables);
         if (lexer.lex().type != SymbolType.EOF) {
-            throw new AVM2ParseException("Parsing finisned before end of the file", lexer.yyline());
+            throw new AVM2ParseException("Parsing finished before end of the file", lexer.yyline());
         }
         return ret;
     }
