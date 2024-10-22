@@ -1438,7 +1438,7 @@
 					<li>#1771 DefineShape4 line filled using single color</li>
 					<li>Minimum stroke width should be 1 px</li>
 					<li>#1828 Closing path in shape strokes from last moveTo only</li>
-					<li>Shape not clipped when clip area ouside of view</li>
+					<li>Shape not clipped when clip area outside of view</li>
 					<li>Sound tag player now uses less memory / threads - does not use Clip sound class</li>
 					<li>Freetransform tool dragging not always started on mousedown</li>
 					<li>#1695 Freetransform tool vs zooming</li>
