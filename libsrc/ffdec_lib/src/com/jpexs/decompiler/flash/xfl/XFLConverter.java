@@ -1491,7 +1491,7 @@ public class XFLConverter {
 
         for (CharacterTag symbol : characters) {
             if ((symbol instanceof ShapeTag) && nonLibraryShapes.contains(symbol)) {
-                continue; //shapes with 1 ocurrence and single layer are not added to library
+                continue; //shapes with 1 occurrence and single layer are not added to library
             }
 
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {

@@ -133,7 +133,7 @@ import javax.imageio.stream.ImageInputStream;
  * before starting the interpreter.
  * <p>
  * Once at least one chunk has been declared, the interpreter will only call the
- * visitor for occurences of the declared group chunks and data chunks. The property
+ * visitor for occurrences of the declared group chunks and data chunks. The property
  * chunks and the collection chunks can be obtained from the current group chunk
  * by calling #getProperty or #getCollection.
  * <br>Note: All information the visitor can obtain during interpretation is only
