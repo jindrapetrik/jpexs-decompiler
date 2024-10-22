@@ -1228,7 +1228,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefined exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).start = offset;
                 continue;
@@ -1237,7 +1237,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefined exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).end = offset;
                 continue;
@@ -1246,7 +1246,7 @@ public class ASM3Parser {
                 int exIndex = (Integer) symb.value;
                 int listIndex = exceptionIndices.indexOf(exIndex);
                 if (listIndex == -1) {
-                    throw new AVM2ParseException("Undefinex exception index", lexer.yyline());
+                    throw new AVM2ParseException("Undefined exception index", lexer.yyline());
                 }
                 exceptions.get(listIndex).target = offset;
                 continue;
