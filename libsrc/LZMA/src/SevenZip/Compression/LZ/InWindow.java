@@ -64,11 +64,11 @@ public class InWindow
 	
 	void Free() { _bufferBase = null; }
 	
-	public void Create(int keepSizeBefore, int keepSizeAfter, int keepSizeReserv)
+	public void Create(int keepSizeBefore, int keepSizeAfter, int keepSizeReserve)
 	{
 		_keepSizeBefore = keepSizeBefore;
 		_keepSizeAfter = keepSizeAfter;
-		int blockSize = keepSizeBefore + keepSizeAfter + keepSizeReserv;
+		int blockSize = keepSizeBefore + keepSizeAfter + keepSizeReserve;
 		if (_bufferBase == null || _blockSize != blockSize)
 		{
 			Free();
