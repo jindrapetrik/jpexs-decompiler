@@ -22423,7 +22423,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Manifest Parse Error : Invalid character for hexidecimal digit.
+    // Manifest Parse Error : Invalid character for hexadecimal digit.
     //
     int ERROR_SXS_XML_E_INVALID_HEXIDECIMAL = 14048;
 
