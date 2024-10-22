@@ -39051,7 +39051,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An error occured while attemption to compress or extract the data.
+    // An error occured while attempting to compress or extract the data.
     //
     int PLA_E_CABAPI_FAILURE = 0x80300113;
 
