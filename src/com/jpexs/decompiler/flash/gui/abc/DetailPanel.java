@@ -63,7 +63,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
     public static final String SLOT_CONST_TRAIT_CARD = "abc.detail.slotconsttrait";
 
-    public static final String CLASS_TRAIT_CARD = "abc.detail.classstrait";
+    public static final String CLASS_TRAIT_CARD = "abc.detail.classtrait";
 
     private final JPanel innerPanel;
 
