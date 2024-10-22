@@ -3183,7 +3183,7 @@ Major version of SWF to XML export changed to 2.
 - [#83] Fixed images transparency (zlib fix)
 - Fixed graphparts with only jump in it (obfuscators)
 - MORPHGRADIENT FIX
-- Trasparency in DefineBitsJPEG3 and 4
+- Transparency in DefineBitsJPEG3 and 4
 - Displaying shapes,morphshapes and sprites with bitmaps
 
 ## [1.5.1] - 2013-05-01
