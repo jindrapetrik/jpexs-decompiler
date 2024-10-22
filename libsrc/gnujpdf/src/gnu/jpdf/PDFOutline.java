@@ -148,7 +148,7 @@ public class PDFOutline extends PDFObject implements Serializable {
      * outline is selected, the supplied region is displayed.
      *
      * <p>
-     * Note: the coordiates are in Java space. They are converted to User space.
+     * Note: the coordinates are in Java space. They are converted to User space.
      *
      * <p>
      * This allows you to have an outline for say a Chapter, then under the
