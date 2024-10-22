@@ -699,7 +699,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
-     * Gets main ABCIndexing object for playerflobal.swc
+     * Gets main ABCIndexing object for playerglobal.swc
      *
      * @return ABCIndexing
      */
