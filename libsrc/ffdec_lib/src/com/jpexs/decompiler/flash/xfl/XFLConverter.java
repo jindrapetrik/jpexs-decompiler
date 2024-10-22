@@ -1430,7 +1430,7 @@ public class XFLConverter {
                     } else if (v instanceof String) {
                         writer.writeStartElement("PD");
                         writer.writeAttribute("n", n);
-                        //missing t attrinute = string (maybe "s"?)
+                        //missing t attribute = string (maybe "s"?)
                         writer.writeAttribute("v", (String) v);
                         writer.writeEndElement();
                         exportedNames.add(n);
