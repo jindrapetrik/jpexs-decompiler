@@ -820,7 +820,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     /**
-     * Set operand value the right way - update offsets neccessarily. Because
+     * Set operand value the right way - update offsets necessarily. Because
      * some operand types are variable length (like U30).
      *
      * @param operandIndex Index of operand
@@ -840,7 +840,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     /**
-     * Set operand values the right way - update offsets neccessarily. Because
+     * Set operand values the right way - update offsets necessarily. Because
      * some operand types are variable length (like U30).
      *
      * @param operands Operands
