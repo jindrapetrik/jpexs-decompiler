@@ -978,13 +978,13 @@ public class Multiname {
     }
 
     /**
-     * Checks if this multiname is effectively a QName. Efectively means that it
+     * Checks if this multiname is effectively a QName. Effectively means that it
      * is a QName or QNameA or MULTINAME with only one namespace.
      *
      * @param thisCpool This constant pool
      * @return True if it's effectively a QName
      */
-    private boolean isEfectivelyQname(AVM2ConstantPool thisCpool) {
+    private boolean isEffectivelyQname(AVM2ConstantPool thisCpool) {
         return kind == QNAME || kind == QNAMEA || isMULTINAMEwithOneNs(thisCpool);
     }
 
@@ -997,7 +997,7 @@ public class Multiname {
      * @return True if this qname effectively equals to other qname
      */
     public boolean qnameEquals(AVM2ConstantPool thisCpool, Multiname other, AVM2ConstantPool otherCpool) {
-        if (!isEfectivelyQname(thisCpool) || !other.isEfectivelyQname(otherCpool)) {
+        if (!isEffectivelyQname(thisCpool) || !other.isEffectivelyQname(otherCpool)) {
             return false;
         }
         Namespace otherNs = other.getSingleNamespace(otherCpool);
