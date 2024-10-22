@@ -1859,7 +1859,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     /**
      * Save file to byte array.
      *
-     * @param includeImported Include imported characterss
+     * @param includeImported Include imported characters
      * @return Byte array
      * @throws IOException On I/O error
      */
@@ -1871,7 +1871,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Save file to byte array with GFX option.
      *
      * @param gfx GFX
-     * @param includeImported Include imported characterss
+     * @param includeImported Include imported characters
      * @return Byte array
      * @throws IOException On I/O error
      */
