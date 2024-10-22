@@ -29,5 +29,5 @@ public interface Psapi extends StdCallLibrary {
 //For some Windows 7 Versions and older down to XP
     //boolean EnumProcesses(int[] ProcessIDsOut, int size, int[] BytesReturned);
 
-    int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int lenght);
+    int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int length);
 }

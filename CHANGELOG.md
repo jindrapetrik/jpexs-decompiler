@@ -2006,7 +2006,7 @@ Major version of SWF to XML export changed to 2.
 - [#1107] Text Offset Incorrect fixed
 - [#1106] New Shapes replace function fix
 - [#1113] It takes too long to switch between rendered sprite
-- [#1075] Lenght of DefineText in some cases
+- [#1075] Length of DefineText in some cases
 - [#1127] autoRenameIdentifiers is not supported in CLI mode
 - [#1128] Letterspacing bug (after font embed): ignore letterspacing when character changed
 - [#1103] Foreach variables fixes
