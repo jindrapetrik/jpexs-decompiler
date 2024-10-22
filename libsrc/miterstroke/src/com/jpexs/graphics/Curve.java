@@ -241,7 +241,7 @@ final class Curve {
     // curve to be broken should be in pts
     // this will change the contents of pts but not Ts
     // TODO: There's no reason for Ts to be an array. All we need is a sequence
-    // of t values at which to subdivide. An array statisfies this condition,
+    // of t values at which to subdivide. An array satisfies this condition,
     // but is unnecessarily restrictive. Ts should be an Iterator<Float> instead.
     // Doing this will also make dashing easier, since we could easily make
     // LengthIterator an Iterator<Float> and feed it to this function to simplify
