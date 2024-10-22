@@ -86,7 +86,7 @@ public class SerializableImage implements Serializable {
         return image;
     }
 
-    public BufferedImage getComatibleBufferedImage() {
+    public BufferedImage getCompatibleBufferedImage() {
         BufferedImage img = getBufferedImage();
 
         if (GraphicsEnvironment.isHeadless()) { //No GUI, no compatible image
