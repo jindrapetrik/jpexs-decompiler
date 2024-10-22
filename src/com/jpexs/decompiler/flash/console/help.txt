@@ -12,7 +12,7 @@ alias --help
 alias /?
     Show help options about a command.
     Show help topic about specified <command>.
-    If parameter is ommited, then main help for the app is shown.
+    If parameter is omitted, then main help for the app is shown.
     If -all parameter passed, help for all commands is printed.
 
 <infile> [<infile2> <infile3> ...]
@@ -218,7 +218,7 @@ alias /?
                 When present, only value from subkey <key> is shown,
                 whole object value otherwise.
     -datafile <datafile> (optional): File to write the data to.
-                                     If ommited, stdout is used.
+                                     If omitted, stdout is used.
     <swffile>: SWF file to read metadata from.
 
 -setInstanceMetadata -instance <instanceName>  [-inputFormat <inputFormat>] \
@@ -237,7 +237,7 @@ alias /?
     If no -value or -infile parameter present, the value to set is taken
     from stdin.
     -outfile <outfile> (optional): Where to save resulting file.
-                                   If ommited, original SWF file is overwritten.
+                                   If omitted, original SWF file is overwritten.
     <swffile>: SWF file to search instance in
 
 -removeInstanceMetadata -instance <instanceName> [-key <key>] \
@@ -249,13 +249,13 @@ alias /?
         the AMF object is removed.
         Otherwise all metadata are removed from the instance.
     -outfile <outfile> (optional): Where to save resulting file.
-                                   If ommited, original SWF file is overwritten.
+                                   If omitted, original SWF file is overwritten.
     <swffile>: SWF file to search instance in
 
 -linkReport [-outfile <outfile>] <swffile>
     Generate linker report for the swffile.
     -outfile <outfile> (optional): Saves XML report to <outfile>. 
-                                  When ommited, the report is printed to stdout.
+                                  When omitted, the report is printed to stdout.
     <swffile>: SWF file to search instance in
 
 -swf2swc <outfile> <swffile>
