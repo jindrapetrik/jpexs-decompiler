@@ -172,7 +172,7 @@ public class UndoFixedEditorPane extends JEditorPane {
 
                 sw.stop();
                 if (!plain && sw.getElapsedMilliseconds() > 5000) {
-                    Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.WARNING, "Syntax highlightig took long time. You can try to decrease the syntax highlight limit in advanced settings.");
+                    Logger.getLogger(UndoFixedEditorPane.class.getName()).log(Level.WARNING, "Syntax highlighting took long time. You can try to decrease the syntax highlight limit in advanced settings.");
                 }
 
                 clearUndos();

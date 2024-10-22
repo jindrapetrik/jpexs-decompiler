@@ -27,7 +27,7 @@ import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.Token;
 
 /**
- * This class contains static utility methods to make highliting in text 
+ * This class contains static utility methods to make highlighting in text 
  * components easier.
  * 
  * @author Ayman Al-Sairafi
