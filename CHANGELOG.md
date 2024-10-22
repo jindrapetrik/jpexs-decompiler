@@ -2730,7 +2730,7 @@ Major version of SWF to XML export changed to 2.
 - [#451] dialog windows are not on the center of the screen
 - [#454] Text syntax highlighting
 - [#455],[#465] classic interface issues
-- [#474] changeing language only available one time
+- [#474] changing language only available one time
 - [#477] log window localization
 - [#481] SVG export fix
 - [#484] Oversized advance value after editing DefineText with DefineFont2 font
