@@ -116,7 +116,7 @@ public class ClassActionItem extends ActionItem implements Block {
         for (MyEntry<GraphTargetItem, GraphTargetItem> it : traits) {
             if (it.getValue() instanceof FunctionActionItem) {
                 FunctionActionItem f = (FunctionActionItem) it.getValue();
-                detectUnitializedVars(f.actions, allUsages);
+                detectUninitializedVars(f.actions, allUsages);
             }
         }
         Set<String> allMembers = new HashSet<>();
@@ -139,7 +139,7 @@ public class ClassActionItem extends ActionItem implements Block {
         return false;
     }
 
-    private void detectUnitializedVars(GraphTargetItem item, List<GraphTargetItem> ret) {
+    private void detectUninitializedVars(GraphTargetItem item, List<GraphTargetItem> ret) {
         if (item == null) {
             return;
         }
@@ -157,12 +157,12 @@ public class ClassActionItem extends ActionItem implements Block {
             }
         }
 
-        detectUnitializedVars(item.getAllSubItems(), ret);
+        detectUninitializedVars(item.getAllSubItems(), ret);
     }
 
-    private void detectUnitializedVars(List<GraphTargetItem> items, List<GraphTargetItem> ret) {
+    private void detectUninitializedVars(List<GraphTargetItem> items, List<GraphTargetItem> ret) {
         for (GraphTargetItem it : items) {
-            detectUnitializedVars(it, ret);
+            detectUninitializedVars(it, ret);
         }
     }
 
