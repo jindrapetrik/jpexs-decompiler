@@ -108,7 +108,7 @@ public class NewMethodActionItem extends ActionItem {
                 writer.append("]");
             }
         }
-        writer.spaceBeforeCallParenthesies(arguments.size());
+        writer.spaceBeforeCallParenthesis(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {

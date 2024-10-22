@@ -108,7 +108,7 @@ public class StartDragActionItem extends ActionItem {
             }
         }
         writer.append("startDrag");
-        writer.spaceBeforeCallParenthesies(2);
+        writer.spaceBeforeCallParenthesis(2);
         writer.append("(");
         target.toString(writer, localData);
         writer.append(",");

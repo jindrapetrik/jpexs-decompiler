@@ -92,7 +92,7 @@ public class GotoFrame2ActionItem extends ActionItem {
             prefix = "gotoAndPlay";
         }
         writer.append(prefix);
-        writer.spaceBeforeCallParenthesies(1);
+        writer.spaceBeforeCallParenthesis(1);
         writer.append("(");
         if (sceneBiasFlag) {
             writer.append(sceneBias + ", ");

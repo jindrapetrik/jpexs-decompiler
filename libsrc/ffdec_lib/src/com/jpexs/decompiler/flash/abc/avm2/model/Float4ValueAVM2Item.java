@@ -60,7 +60,7 @@ public class Float4ValueAVM2Item extends NumberValueAVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {       
         writer.append("float4");
-        writer.spaceBeforeCallParenthesies(precedence);
+        writer.spaceBeforeCallParenthesis(precedence);
         writer.append("(");
         writer.append(EcmaScript.toString(value.values[0]));
         if (Float.isFinite(value.values[0])) {

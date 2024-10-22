@@ -104,7 +104,7 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
         }
 
         writer.append("setProperty");
-        writer.spaceBeforeCallParenthesies(3);
+        writer.spaceBeforeCallParenthesis(3);
         writer.append("(");
         target.appendTo(writer, localData);
         writer.append(", ");
