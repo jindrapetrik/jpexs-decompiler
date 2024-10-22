@@ -2959,7 +2959,7 @@ public class CommandLineArgumentParser {
                                 System.exit(2);
                             }
                             if (!ok) {
-                                System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
+                                System.err.println("Import FAILED. Maybe unsupported media type? Only MP3 and uncompressed WAV are available.");
                                 System.exit(1);
                             }
                         } else if (characterTag instanceof DefineBinaryDataTag) {
@@ -3018,7 +3018,7 @@ public class CommandLineArgumentParser {
                                 ok = false;
                             }
                             if (!ok) {
-                                System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
+                                System.err.println("Import FAILED. Maybe unsupported media type? Only MP3 and uncompressed WAV are available.");
                                 System.exit(1);
                             }
                         } else if (characterTag instanceof DefineVideoStreamTag) {

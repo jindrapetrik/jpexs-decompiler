@@ -67,7 +67,7 @@ public class SerializableImage implements Serializable {
 
     public SerializableImage(int width, int height, int imageType, int[] pixels) {
         if (imageType != BufferedImage.TYPE_INT_ARGB_PRE && imageType != BufferedImage.TYPE_INT_RGB) {
-            throw new Error("Unsuppported image type: " + imageType);
+            throw new Error("Unsupported image type: " + imageType);
         }
 
         image = new BufferedImage(width, height, imageType);
