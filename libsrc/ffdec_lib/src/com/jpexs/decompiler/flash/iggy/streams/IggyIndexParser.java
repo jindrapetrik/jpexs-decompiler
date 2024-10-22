@@ -60,7 +60,7 @@ public class IggyIndexParser {
      * Parser for index data. It creates table of indices and table of offsets
      *
      * @param indexStream Stream of index
-     * @param indexTableEntry Output index tabke
+     * @param indexTableEntry Output index table
      * @param offsets Output list of offsets
      * @throws IOException on error
      */
