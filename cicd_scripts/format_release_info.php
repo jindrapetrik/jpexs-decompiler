@@ -149,7 +149,7 @@ if($do_images)
   $ossupport_map=[
   "windows" => "Works on Windows",
   "linux" => "Works on Linux",
-  "macosx" => "Works with Mac OSX",
+  "macosx" => "Works with macOS",
   "java" => "Works on java"
   ];
 }else{

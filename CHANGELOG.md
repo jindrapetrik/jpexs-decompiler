@@ -1719,7 +1719,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [12.0.1] - 2021-01-14
 ### Fixed
-- Critical fix - application GUI did not start on OSes without flashplayer (Linux, MacOS, even Windows)
+- Critical fix - application GUI did not start on OSes without flashplayer (Linux, macOS, even Windows)
 
 ## [12.0.0] - 2021-01-12
 ### Added
@@ -3033,7 +3033,7 @@ Major version of SWF to XML export changed to 2.
 - [#196],[#197] switch issues
 - [#198] DefineFont2 empty check
 - [#200] DefineBitsLossLess fix
-- [#201] Nonworking main window in Linux/MacOS (due toAssociation)
+- [#201] Nonworking main window in Linux/macOS (due toAssociation)
 
 ## [1.6.4 update 1] - 2013-06-30
 ### Fixed
