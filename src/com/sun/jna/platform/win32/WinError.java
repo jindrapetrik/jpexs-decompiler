@@ -23674,7 +23674,7 @@ public interface WinError {
     // with several fields encoded in the value. The parts of an
     // HRESULT are shown below.
     //
-    // Many of the macros and functions below were orginally defined to
+    // Many of the macros and functions below were originally defined to
     // operate on SCODEs. SCODEs are no longer used. The macros are
     // still present for compatibility and easy porting of Win16 code.
     // Newly written code should use the HRESULT macros and functions.
