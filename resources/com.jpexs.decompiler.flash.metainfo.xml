@@ -269,7 +269,7 @@
 					<li>Exe export mode can be selected in in Save EXE dialog (select filetype) - wrapper or projectors</li>
 					<li>Optimized (faster) context menu for large SWF trees</li>
 					<li>Optimized (faster) deleting items for large SWF trees</li>
-					<li>AS debugger - More varible flags</li>
+					<li>AS debugger - More variable flags</li>
 					<li>AS3 direct editation - edit files with native keyword</li>
 					<li>#1383 AS Debugger - debugging nested SWFs (enable "Open loaded SWFs while playing")</li>
 				</ul>
