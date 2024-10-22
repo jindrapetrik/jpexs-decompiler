@@ -213,7 +213,7 @@ public class TtfParser {
             seek(input, tableOffsets.get("cmap") + offset);
             int format = readUnsignedShort(input);
             switch (format) {
-                case 0: //byte enconding table
+                case 0: //byte encoding table
                 {
                     int length = readUnsignedShort(input);
                     int languageCode = readUnsignedShort(input);
