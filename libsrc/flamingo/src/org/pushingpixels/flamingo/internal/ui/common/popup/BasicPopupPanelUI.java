@@ -123,7 +123,7 @@ public class BasicPopupPanelUI extends PopupPanelUI {
 	 * Installs listeners on the associated command popup menu.
 	 */
 	protected void installListeners() {
-		initiliazeGlobalListeners();
+		initializeGlobalListeners();
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class BasicPopupPanelUI extends PopupPanelUI {
 	/**
 	 * Initializes the global listeners.
 	 */
-	protected static synchronized void initiliazeGlobalListeners() {
+	protected static synchronized void initializeGlobalListeners() {
 		if (popupPanelManagerListener != null) {
 			return;
 		}
