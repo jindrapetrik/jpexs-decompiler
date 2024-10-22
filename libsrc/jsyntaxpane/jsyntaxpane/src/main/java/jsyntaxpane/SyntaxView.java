@@ -102,7 +102,7 @@ public class SyntaxView extends PlainView {
                 int s = t.start;
                 // ... unless the token starts before p0:
                 if (s < p0) {
-                    // token is before what is requested. adgust the length and s
+                    // token is before what is requested. adjust the length and s
                     l -= (p0 - s);
                     s = p0;
                 }
