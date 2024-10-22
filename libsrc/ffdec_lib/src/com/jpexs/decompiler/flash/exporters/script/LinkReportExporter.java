@@ -107,7 +107,7 @@ public class LinkReportExporter {
         for (ScriptPack sp : revList) {
             String scriptName = "script" + sp.scriptIndex;
             sb.append(indent(2)).append("<script name=\"").append(scriptName).append("\">").append(newLineChar);
-            //TODO: additional atributes - mod="1469951734131" size="525" optimizedsize="508
+            //TODO: additional attributes - mod="1469951734131" size="525" optimizedsize="508
             ScriptInfo script = sp.abc.script_info.get(sp.scriptIndex);
             for (int traitIndex : sp.traitIndices) {
                 Trait trait = script.traits.traits.get(traitIndex);
