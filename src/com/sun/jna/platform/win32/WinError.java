@@ -25635,7 +25635,7 @@ public interface WinError {
     //
     // The requested semantics of retention of isolation across retaining commit
     // and abort boundaries cannot be supported by this transaction
-    // implementation, or isoF;ags was not equal to zero.
+    // implementation, or isoFlags was not equal to zero.
     //
     int XACT_E_NOISORETAIN = 0x8004D00B;
 
@@ -25673,7 +25673,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // An invalid combination of F;ags was specified
+    // An invalid combination of Flags was specified
     //
     int XACT_E_NOTSUPPORTED = 0x8004D00F;
 
@@ -29033,7 +29033,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // Invalid F;ags specified.
+    // Invalid Flags specified.
     //
     int NTE_BAD_FLAGS = 0x80090009;
 
@@ -40128,7 +40128,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The F;ags field contains an invalid value.
+    // The Flags field contains an invalid value.
     //
     int FWP_E_INVALID_FLAGS = 0x8032001E;
 
