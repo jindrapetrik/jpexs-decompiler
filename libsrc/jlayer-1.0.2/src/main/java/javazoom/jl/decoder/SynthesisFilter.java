@@ -1524,7 +1524,7 @@ final class SynthesisFilter {
      * @param array The array to retrieve a subarra from.
      * @param offs  The offset in the array that corresponds to
      *              the first index of the subarray.
-     * @param len   The number of indeces in the subarray.
+     * @param len   The number of indices in the subarray.
      * @return The subarray, which may be of length 0.
      */
     static private float[] subArray(final float[] array, final int offs, int len) {
