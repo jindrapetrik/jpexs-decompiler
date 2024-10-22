@@ -34,7 +34,7 @@ public class Scene implements TreeItem {
     private SWF swf;
 
     /**
-     * Start frame (zero-ased).
+     * Start frame (zero-based).
      */
     public int startFrame;
 
