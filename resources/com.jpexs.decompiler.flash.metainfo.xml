@@ -890,7 +890,7 @@
 				<p>Fixed</p>
 				<ul>
 					<li>GFX - DefineExternalImage2 display and correct handling if standalone</li>
-					<li>#1931, #1934 DefineSprite rectange calculation (incorrect export dimensions)</li>
+					<li>#1931, #1934 DefineSprite rectangle calculation (incorrect export dimensions)</li>
 					<li>#1929, #1932 Wrong subsprite frames display</li>
 					<li>#1933 AS3 - Detection of variable names from debug info on multiple debug ins with same regindex</li>
 					<li>GFX - ExporterInfo prefix is NetString</li>
