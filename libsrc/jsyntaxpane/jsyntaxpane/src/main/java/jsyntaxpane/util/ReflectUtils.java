@@ -282,7 +282,7 @@ public class ReflectUtils {
      * implements.
      * <b>This is still not very efficient and should only be called if
      * performance is not of an issue.</b>
-     * You can check the return value to see if the call was seuccessful or
+     * You can check the return value to see if the call was successful or
      * not.
      * @param obj Object to receive the call
      * @param property property name (without set. First letter will be
