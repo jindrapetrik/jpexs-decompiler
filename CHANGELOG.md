@@ -217,7 +217,7 @@ All notable changes to this project will be documented in this file.
 - Nullpointer on recent searches loader
 - [#2177] Leftover process when invalid SWF opened - now main window is shown
 - Opening files with "Open with FFDec" on windows did not use same instance
-- [#2183] AS1/2 Direct editation - case sensitive identifiers since SWF version 7
+- [#2183] AS1/2 Direct editation - case-sensitive identifiers since SWF version 7
 - [#2203] GFX - DefineSubImage with TGA bitmapFormat
 - [#2207] AS - Index -2 out of bounds for some of the switches
 - [#2190] AS1/2 - for..in inside switch before break

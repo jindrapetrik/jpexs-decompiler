@@ -289,7 +289,7 @@
 					<li>Nullpointer on recent searches loader</li>
 					<li>#2177 Leftover process when invalid SWF opened - now main window is shown</li>
 					<li>Opening files with "Open with FFDec" on windows did not use same instance</li>
-					<li>#2183 AS1/2 Direct editation - case sensitive identifiers since SWF version 7</li>
+					<li>#2183 AS1/2 Direct editation - case-sensitive identifiers since SWF version 7</li>
 					<li>#2203 GFX - DefineSubImage with TGA bitmapFormat</li>
 					<li>#2207 AS - Index -2 out of bounds for some of the switches</li>
 					<li>#2190 AS1/2 - for..in inside switch before break</li>
