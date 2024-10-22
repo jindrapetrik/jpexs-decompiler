@@ -199,7 +199,7 @@ public class ShapeForMorphExporter extends ShapeExporterBase {
                     }
                 }
                 if (minPos > -1) {
-                    //Rearange shape to start with the top left point
+                    //Rearrange shape to start with the top left point
                     for (int j = 0; j < minPos; j++) {
                         shape.add(shape.remove(0));
                         bezierLengths.get(i).add(bezierLengths.get(i).remove(0));
