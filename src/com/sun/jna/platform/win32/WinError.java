@@ -27848,11 +27848,11 @@ public interface WinError {
     int STG_E_UNIMPLEMENTEDFUNCTION = 0x800300FE;
 
     //
-    // MessageId: STG_E_INVALIDF;AG
+    // MessageId: STG_E_INVALIDFLAG
     //
     // MessageText:
     //
-    // Invalid F;ag error.
+    // Invalid Flag error.
     //
     int STG_E_INVALIDFLAG = 0x800300FF;
 
@@ -27970,7 +27970,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The compound file was not created with the STGM_SIMPLE F;ag
+    // The compound file was not created with the STGM_SIMPLE Flag
     //
     int STG_E_NOTSIMPLEFORMAT = 0x80030112;
 
@@ -29029,7 +29029,7 @@ public interface WinError {
     int NTE_BAD_ALGID = 0x80090008;
 
     //
-    // MessageId: NTE_BAD_F;AGS
+    // MessageId: NTE_BAD_FLAGS
     //
     // MessageText:
     //
@@ -37186,7 +37186,7 @@ public interface WinError {
     //
     // MessageText:
     //
-    // The clear disable F;ag is set and all clear operations now require
+    // The clear disable Flag is set and all clear operations now require
     // physical access.
     //
     int TPM_E_CLEAR_DISABLED = 0x80280005;
@@ -40124,7 +40124,7 @@ public interface WinError {
     int FWP_E_INVALID_ENUMERATOR = 0x8032001D;
 
     //
-    // MessageId: FWP_E_INVALID_F;AGS
+    // MessageId: FWP_E_INVALID_FLAGS
     //
     // MessageText:
     //
