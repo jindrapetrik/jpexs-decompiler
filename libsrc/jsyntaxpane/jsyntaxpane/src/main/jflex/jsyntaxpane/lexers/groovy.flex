@@ -100,6 +100,7 @@ RegexCharacter  = [^\r\n\/]
 
   /* keywords */
   "abstract"                     |
+  "assert"                       |
   "boolean"                      |
   "break"                        |
   "byte"                         |
@@ -151,7 +152,6 @@ RegexCharacter  = [^\r\n\/]
 
   /* Groovy reserved words not in Java */
   "as"                           |
-  "asssert"                      | 
   "def"                          |
   "in"                           |
   "threadsafe"                   |
