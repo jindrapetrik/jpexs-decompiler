@@ -2849,7 +2849,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             user selects existing ExportAssets tag via dialog or selects position for new
                     if the dialog is cancelled, exit
     If the file is AS1/2:
-            If the user choosed to create new class (cls is its fully qualified name)
+            If the user chose to create new class (cls is its fully qualified name)
                     Frame of Exportassets is determined
                     New DoInitAction for the character is created in the EA frame which has Object.registerClass("linkageIdentifier", cls) in code
                     New empty DefineSprite is created in frame 1, and its name in ExportAssets tag is set to "__Packages." + cls
