@@ -2722,7 +2722,7 @@ Major version of SWF to XML export changed to 2.
 ### Changed
 - [#369] new SVG and preview image rendering
 - [#390] refresh font list without reloading the application
-- [#453] update texts aftert adding new character to a font tag
+- [#453] update texts after adding new character to a font tag
 - [#459] remember text panel splitter position
 - [#461] font panel gui redesigned
 
