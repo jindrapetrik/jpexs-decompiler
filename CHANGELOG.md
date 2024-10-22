@@ -540,7 +540,7 @@ All notable changes to this project will be documented in this file.
 - [#2077] AS3 direct editation - switch statement missing offset
 - [#2077] AS3 allow star string as property name (XML access)
 - [#2077] AS3 try..catch parts outside block
-- AS3 try..catch inside loop unneccessary continue
+- AS3 try..catch inside loop unnecessary continue
 - [#2077] AS3 colliding types in current package with trait names
 - NullPointer on reload / uncache
 - [#2076] Auto rename identifiers infinite loop caused by renaming in playerglobal library
@@ -1740,7 +1740,7 @@ Major version of SWF to XML export changed to 2.
 - Changed /bin/bash to /usr/bin/env bash
 - Building does not require Naashorn - uses Beanshell instead
 - Use object.§§slot[index] syntax instead of /* UnknownSlot */ comment when slot cannot be determined (AS3)
-- Show §§findproperty when neccessary (AS3)
+- Show §§findproperty when necessary (AS3)
 
 ### Fixed
 - Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
@@ -2395,7 +2395,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [4.0.4] - 2014-11-23
 ### Changed
-- better file cache, removing unneccessary temp files
+- better file cache, removing unnecessary temp files
 
 ### Fixed
 - obfuscated identifiers
