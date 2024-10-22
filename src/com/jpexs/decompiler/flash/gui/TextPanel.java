@@ -137,7 +137,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textSaveButton = createButton("button.save", "save16", null, e -> saveText(true));
         textCancelButton = createButton("button.cancel", "cancel16", null, e -> cancelText());
 
-        // hide the buttonts to aviod panel resize problems on other views
+        // hide the buttonts to avoid panel resize problems on other views
         textEditButton.setVisible(false);
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
