@@ -123,7 +123,7 @@ public class ActionListReader {
      */
     public static ActionList readActionList(List<DisassemblyListener> listeners, SWFInputStream sis, int version, int ip, int endIp, String path, int deobfuscationMode) throws IOException, InterruptedException {
         // Map of the actions. Use TreeMap to sort the keys in ascending order
-        // actionMap and nextOffsets should contain exaclty the same keys
+        // actionMap and nextOffsets should contain exactly the same keys
         Map<Long, Action> actionMap = new TreeMap<>();
         Map<Long, Long> nextOffsets = new HashMap<>();
         Action entryAction = readActionListAtPos(listeners, null,
