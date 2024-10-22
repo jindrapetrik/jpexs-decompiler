@@ -1480,7 +1480,7 @@
 				<ul>
 					<li>Display object depth in flash panel</li>
 					<li>Show imported files on script import, able to cancel import</li>
-					<li>#270 AS3 show progress on deofuscating p-code</li>
+					<li>#270 AS3 show progress on deobfuscating p-code</li>
 					<li>#1718 Show progress on injecting debug info / SWD generation (before Debugging)</li>
 				</ul>
 				<p>Changed</p>
