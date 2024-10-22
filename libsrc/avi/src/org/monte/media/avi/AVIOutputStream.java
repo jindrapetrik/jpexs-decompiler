@@ -339,8 +339,8 @@ public class AVIOutputStream extends AbstractAVIStream {
     /**
      * Writes an already encoded palette change into the specified track. <p> If
      * a track contains palette changes, then all key frames must be immediately
-     * preceeded by a palette change chunk which also is a key frame. If a key
-     * frame is not preceeded by a key frame palette change chunk, it will be
+     * preceded by a palette change chunk which also is a key frame. If a key
+     * frame is not preceded by a key frame palette change chunk, it will be
      * downgraded to a delta frame.
      *
      * @throws IllegalArgumentException if the track is not a video track.
@@ -423,7 +423,7 @@ public class AVIOutputStream extends AbstractAVIStream {
         // If a stream has palette changes, then only palette change samples can
         // be marked as keyframe.
         if (isKeyframe && 0 != (tr.flags & STRH_FLAG_VIDEO_PALETTE_CHANGES)) {
-            // If a keyframe sample is immediately preceeded by a palette change
+            // If a keyframe sample is immediately preceded by a palette change
             // we can raise the palette change to a keyframe.
             if (tr.samples.size() > 0) {
                 Sample s = tr.samples.get(tr.samples.size() - 1);
@@ -460,7 +460,7 @@ public class AVIOutputStream extends AbstractAVIStream {
      * method does not inspect the contents of the samples. The contents has to
      * match the format and dimensions of the media in this track. <p> If a
      * track contains palette changes, then all key frames must be immediately
-     * preceeded by a palette change chunk. If a key frame is not preceeded by a
+     * preceded by a palette change chunk. If a key frame is not preceded by a
      * palette change chunk, it will be downgraded to a delta frame.
      *
      * @param track The track index.
