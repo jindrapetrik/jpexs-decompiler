@@ -7,7 +7,7 @@
  *
  * 14/02/99     MPEG_Args Based Class - E.B
  * Adapted from javalayer and MPEG_Args.
- * Doc'ed and integerated with JL converter. Removed
+ * Doc'ed and integrated with JL converter. Removed
  * Win32 specifics from original Maplay code.
  *-----------------------------------------------------------------------
  *   This program is free software; you can redistribute it and/or modify
