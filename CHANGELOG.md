@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. WIP
 
+- Cache as bitmap background color support (rendering)
+
 ### Fixed
 - [#2344] Export to FLA CS4 and below with more than 255 library items,
   bitmap fills or frame duration

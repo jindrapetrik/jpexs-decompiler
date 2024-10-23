@@ -70,6 +70,7 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1001,7 +1002,7 @@ public class Timeline {
      * @param drawable Drawable
      * @param filters Filters
      * @param unzoom Unzoom
-     * @param clrTrans Color transform
+     * @param mergedColorTransform Color transform
      * @param sameImage Same image
      * @param viewRect View rect
      * @param fullTransformation Full transformation
@@ -1009,7 +1010,7 @@ public class Timeline {
      * @param drawMode Draw mode
      * @param canUseSmoothing Can use smoothing
      */
-    private void drawDrawable(SWF swf, Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, int parentBlendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, boolean canUseSmoothing) {
+    private void drawDrawable(SWF swf, Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, int parentBlendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform mergedColorTransform, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, boolean canUseSmoothing) {
         Matrix drawMatrix = new Matrix();
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
@@ -1149,6 +1150,10 @@ public class Timeline {
             if (clipDepth > -1) {
                 canUseSameImage = false;
             }
+            
+            if (cacheAsBitmap) {
+                canUseSameImage = false;
+            }
 
             Matrix mfull = fullTransformation.concatenate(layerMatrix);
             if (canUseSameImage && sameImage) {
@@ -1156,18 +1161,18 @@ public class Timeline {
                 m = mat.clone();
                 g.setTransform(new AffineTransform());
             } else {
-                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
+                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);                
                 img.fillTransparent();
             }
 
-            ColorTransform clrTrans2 = clrTrans;
+            ColorTransform mergedColorTransform2 = mergedColorTransform;
 
             if (blendMode > 1) {
-                clrTrans2 = null;
+                mergedColorTransform2 = null;
             }
 
             if (filters != null && !filters.isEmpty()) {
-                clrTrans2 = null;
+                mergedColorTransform2 = null;
             }
 
             if (clipDepth > -1) {
@@ -1179,11 +1184,11 @@ public class Timeline {
                 clrMask.redMultTerm = 0;
                 clrMask.greenMultTerm = 0;
                 clrMask.blueMultTerm = 0;
-                clrTrans2 = clrMask;
+                mergedColorTransform2 = clrMask;
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
+                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, mergedColorTransform2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode, canUseSmoothing);
             } else {
                 // todo: show one time warning
             }
@@ -1298,9 +1303,16 @@ public class Timeline {
             }
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
-
-                if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && clrTrans != null) {
-                    img = clrTrans.apply(img);
+                               
+                if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && mergedColorTransform != null) {
+                    img = mergedColorTransform.apply(img);
+                }
+                
+                if (cacheAsBitmap && layer.backGroundColor != null) {
+                    Graphics2D g2 = (Graphics2D) img.getGraphics();
+                    g2.setComposite(AlphaComposite.DstOver);
+                    g2.setColor(layer.backGroundColor.toColor());
+                    g2.fillRect(0, 0, img.getWidth(), img.getHeight());  
                 }
 
                 if (!((blendMode == 11 || blendMode == 12) && parentBlendMode <= 1)) { //alpha and erase modes require parent blendmode not normal
