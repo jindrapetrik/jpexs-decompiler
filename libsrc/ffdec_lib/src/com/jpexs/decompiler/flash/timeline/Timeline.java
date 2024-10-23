@@ -61,6 +61,7 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -603,6 +604,11 @@ public class Timeline {
                         if (clipDepth2 > -1) {
                             fl.clipDepth = clipDepth2;
                         }
+                        
+                        RGBA bgColor = po.getBackgroundColor();
+                        if (bgColor != null) {
+                            fl.backGroundColor = bgColor;
+                        }
 
                         fl.isVisible = po.isVisible();
                     } else {
@@ -616,6 +622,7 @@ public class Timeline {
                         fl.clipActions = po.getClipActions();
                         fl.clipDepth = po.getClipDepth();
                         fl.isVisible = po.isVisible();
+                        fl.backGroundColor = po.getBackgroundColor();
                     }
                 }
 

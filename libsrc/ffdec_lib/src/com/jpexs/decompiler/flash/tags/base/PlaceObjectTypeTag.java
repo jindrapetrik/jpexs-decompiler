@@ -214,7 +214,39 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, 
      * @param colorTransform Color transform 
      */
     public abstract void setColorTransform(ColorTransform colorTransform);
+    
+    public void setVisible(int visible) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setPlaceFlagHasVisible(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setBlendMode(int value) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setPlaceFlagHasBlendMode(boolean value) {        
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setBitmapCache(int value) {
+        throw new UnsupportedOperationException();
+    }
 
+    public void setPlaceFlagHasCacheAsBitmap(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setBackgroundColor(RGBA value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPlaceFlagOpaqueBackground(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+    
     /**
      * Checks if place equals.
      * @param other Other place object type tag
