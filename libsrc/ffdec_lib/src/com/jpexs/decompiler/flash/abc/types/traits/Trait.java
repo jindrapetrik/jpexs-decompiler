@@ -1035,7 +1035,7 @@ public abstract class Trait implements Cloneable, Serializable {
     public abstract void getMethodInfos(ABC abc, int traitId, int classIndex, List<MethodId> methodInfos);
 
     /**
-     * Convets kind to string.
+     * Converts kind to string.
      *
      * @return String
      */
