@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.easygui.properties.panels;
 
-import com.jpexs.decompiler.flash.easygui.ChangeDoableOperation;
 import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.easygui.EasySwfPanel;
 import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
@@ -27,7 +26,6 @@ import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInteface;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
-import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -49,7 +47,6 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -354,11 +351,11 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         alphaPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("alpha") {
                     int value = alphaPercentPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
-                        colorTransform.alphaMultTerm = value * 256 / 100;
+                        colorTransform.alphaMultTerm = Math.round(value * 256 / 100f);
                         colorTransform.hasMultTerms = true;
                     }
                 }, swfPanel.getSwf());
@@ -367,7 +364,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         alphaAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {                    
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("alpha") {                    
                     int value = alphaAddPropertyField.getValue();                    
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
@@ -381,11 +378,11 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         redPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("red") {
                     int value = redPercentPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
-                        colorTransform.redMultTerm = value * 256 / 100;
+                        colorTransform.redMultTerm = Math.round(value * 256 / 100f);
                         colorTransform.hasMultTerms = true;
                     }
                 }, swfPanel.getSwf());
@@ -394,7 +391,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         redAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("red") {
                     int value = redAddPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
@@ -408,11 +405,11 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         greenPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("green") {
                     int value = greenPercentPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
-                        colorTransform.greenMultTerm = value * 256 / 100;
+                        colorTransform.greenMultTerm = Math.round(value * 256 / 100f);
                         colorTransform.hasMultTerms = true;
                     }
                 }, swfPanel.getSwf());
@@ -421,7 +418,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         greenAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("green") {
                     int value = greenAddPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
@@ -435,11 +432,11 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         bluePercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("blue") {
                     int value = bluePercentPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
-                        colorTransform.blueMultTerm = value * 256 / 100;
+                        colorTransform.blueMultTerm = Math.round(value * 256 / 100f);
                         colorTransform.hasMultTerms = true;
                     }
                 }, swfPanel.getSwf());
@@ -448,7 +445,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         blueAddPropertyField.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                undoManager.doOperation(new ColorEffectChangeDoableOperation() {
+                undoManager.doOperation(new ColorEffectChangeDoableOperation("blue") {
                     int value = blueAddPropertyField.getValue();
                     @Override
                     public void doColorEffectOperation(CXFORMWITHALPHA colorTransform) {
@@ -863,8 +860,8 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
 
         CXFORMWITHALPHA colorTransformAfter;
 
-        public ColorEffectChangeDoableOperation() {
-            super("instance.header.colorEffect", 2);
+        public ColorEffectChangeDoableOperation(String colorProperty) {
+            super("instance.colorEffect." + colorProperty, 2);
         }
 
         @Override
