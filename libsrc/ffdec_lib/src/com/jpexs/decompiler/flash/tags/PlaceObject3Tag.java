@@ -577,7 +577,7 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
 
     @Override
     public boolean cacheAsBitmap() {
-        return placeFlagHasCacheAsBitmap;
+        return placeFlagHasCacheAsBitmap && bitmapCache == 1;
     }
 
     @Override
@@ -704,4 +704,45 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.colorTransform = new CXFORMWITHALPHA(colorTransform);
         placeFlagHasColorTransform = true;
     }    
+
+    @Override
+    public void setVisible(int value) {
+        this.visible = value;
+        placeFlagHasVisible = true;
+    }        
+
+    @Override
+    public void setPlaceFlagHasVisible(boolean value) {
+        this.placeFlagHasVisible = value;
+    }
+
+    @Override
+    public void setBlendMode(int value) {
+        this.blendMode = value;
+        this.placeFlagHasBlendMode = true;
+    }
+
+    @Override
+    public void setPlaceFlagHasBlendMode(boolean value) {
+        this.placeFlagHasBlendMode = value;
+    }       
+
+    public void setBitmapCache(int value) {
+        this.bitmapCache = value;
+        this.placeFlagHasCacheAsBitmap = true;
+    }
+
+    public void setPlaceFlagHasCacheAsBitmap(boolean value) {
+        this.placeFlagHasCacheAsBitmap = value;
+    }        
+
+    public void setBackgroundColor(RGBA value) {
+        this.backgroundColor = value;
+        this.placeFlagOpaqueBackground = true;
+    }
+
+    public void setPlaceFlagOpaqueBackground(boolean value) {
+        this.placeFlagOpaqueBackground = value;
+    }        
+    
 }

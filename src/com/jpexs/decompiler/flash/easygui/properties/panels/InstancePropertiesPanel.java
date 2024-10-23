@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInteface;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -34,9 +35,12 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -45,10 +49,23 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import com.jpexs.decompiler.flash.easygui.properties.JTriStateCheckBox;
+import com.jpexs.decompiler.flash.easygui.properties.PropertyChangeDoableOperation;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -76,6 +93,16 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private Rectangle2D lastBounds = null;
     
     private JLabel instanceLabel;
+    
+    private final JTriStateCheckBox visibleCheckBox = new JTriStateCheckBox();
+    private final JComboBox<String> blendingComboBox = new JComboBox<>();
+    private final JTriStateCheckBox cacheAsBitmapCheckBox = new JTriStateCheckBox();
+    private final JComboBox<String> backgroundComboBox = new JComboBox<>();
+    private final JPanel backgroundColorPanel = new JPanel();
+    private final JLabel backgroundColorLabel = new JLabel();
+    
+    private boolean updating = false;
+        
     
     public InstancePropertiesPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         super("instance");
@@ -192,6 +219,125 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         colorEffectPanel.add(new JPanel(), gbc);
 
         
+        JPanel displayPanel = new JPanel();
+        gridBag = new GridBagLayout();
+        displayPanel.setLayout(gridBag);        
+        gbc = new GridBagConstraints();                        
+        
+        gbc.insets = new Insets(3, 3, 3, 3);        
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;        
+        gbc.anchor = GridBagConstraints.EAST;
+        displayPanel.add(new JLabel(formatPropertyName("display.visible")), gbc);
+        
+        
+        gbc.gridx++;
+        gbc.gridwidth = 2;        
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        
+        displayPanel.add(visibleCheckBox, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;        
+        gbc.anchor = GridBagConstraints.EAST;        
+        displayPanel.add(new JLabel(formatPropertyName("display.blending")), gbc);
+        
+        
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.normal"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.layer"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.multiply"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.screen"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.lighten"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.darken"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.difference"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.add"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.subtract"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.invert"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.alpha"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.erase"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.overlay"));
+        blendingComboBox.addItem(EasyStrings.translate("property.instance.display.blending.hardlight"));
+        
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridwidth = 2;        
+        displayPanel.add(blendingComboBox, gbc);
+                        
+        gbc.gridy++;
+        
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;                
+        gbc.anchor = GridBagConstraints.EAST;
+        displayPanel.add(new JLabel(formatPropertyName("display.cacheAsBitmap")), gbc);
+        
+        gbc.gridx++;
+        gbc.gridwidth = 2;        
+        gbc.anchor = GridBagConstraints.WEST;        
+        
+        displayPanel.add(cacheAsBitmapCheckBox, gbc);
+                        
+        backgroundComboBox.addItem(EasyStrings.translate("property.instance.display.cacheAsBitmap.transparent"));
+        backgroundComboBox.addItem(EasyStrings.translate("property.instance.display.cacheAsBitmap.opaque"));
+        
+        
+        backgroundColorPanel.setLayout(new BorderLayout());
+        backgroundColorPanel.add(backgroundColorLabel, BorderLayout.CENTER);
+        backgroundColorPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        backgroundColorPanel.setPreferredSize(new Dimension(16,16));
+        
+        
+        gbc.gridy++;        
+        gbc.gridx = 1;
+        gbc.gridwidth = 1;        
+        displayPanel.add(backgroundComboBox, gbc);
+        gbc.gridx++;       
+        displayPanel.add(backgroundColorPanel, gbc);
+        
+        cacheAsBitmapCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                backgroundComboBox.setVisible(cacheAsBitmapCheckBox.isSelected());
+                backgroundColorPanel.setVisible(cacheAsBitmapCheckBox.isSelected() && backgroundComboBox.getSelectedIndex() == backgroundComboBox.getItemCount() - 1);
+                revalidate();
+            }            
+        });
+        
+        backgroundComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                backgroundColorPanel.setVisible(backgroundComboBox.getSelectedIndex() == backgroundComboBox.getItemCount() - 1);                
+                revalidate();
+            }
+        });
+        
+        gbc.gridy++;
+        gbc.gridx=0;
+        gbc.gridwidth=3;
+        gbc.weightx = 0;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        displayPanel.add(new JPanel(), gbc);
+        
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.gridheight = 4;
+        gbc.weighty = 0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        displayPanel.add(new JPanel(), gbc);
+               
+        
+        
         propertiesPanel = new JPanel();
         propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.Y_AXIS));
         
@@ -200,6 +346,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         setCardOpened("positionSize", true);
         
         propertiesPanel.add(makeCard("colorEffect", null, colorEffectPanel));
+        
+        propertiesPanel.add(makeCard("display", null, displayPanel));
+        
         this.swfPanel = swfPanel;
 
         alphaPercentPropertyField.addChangeListener(new ChangeListener() {
@@ -373,6 +522,102 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         });
         hPropertyField.addValidation(nonZeroFloatValidation);
         
+        visibleCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.visible", 3) {
+                    int visible = visibleCheckBox.isSelected() ? 1 : 0;
+                    @Override
+                    public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
+                        placeObject.setVisible(visible);
+                    }                    
+                }, swfPanel.getSwf());
+            }            
+        });
+        
+        blendingComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.blending", 3) {
+                    int blendMode = blendingComboBox.getSelectedIndex() + 1;
+                    @Override
+                    public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
+                        placeObject.setBlendMode(blendMode);
+                    }
+                }, swfPanel.getSwf());
+            }            
+        });
+        
+        cacheAsBitmapCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.cacheAsBitmap", 3) {
+                    int bitmapCache = cacheAsBitmapCheckBox.isSelected() ? 1 : 0;
+                    @Override
+                    public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {
+                        placeObject.setBitmapCache(bitmapCache);
+                        placeObject.setPlaceFlagHasCacheAsBitmap(bitmapCache == 1);
+                        if (bitmapCache == 0) {
+                            placeObject.setBackgroundColor(null);
+                            placeObject.setPlaceFlagOpaqueBackground(false);
+                        }
+                    }                    
+                }, swfPanel.getSwf());
+            }            
+        });
+        
+        backgroundComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updating) {
+                    return;
+                }
+                boolean isOpaque = backgroundComboBox.getSelectedIndex() == backgroundComboBox.getItemCount() - 1;
+                undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.cacheAsBitmap", 3) {
+                    RGBA color = isOpaque ? new RGBA(backgroundColorPanel.getBackground()) : null;
+                    @Override
+                    public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {                       
+                        if (color != null) {
+                            backgroundColorLabel.setText("");
+                            placeObject.setBackgroundColor(color);
+                        } else {
+                            placeObject.setPlaceFlagOpaqueBackground(false);
+                        }
+                    }                    
+                }, swfPanel.getSwf());
+            }            
+        });
+        
+        backgroundColorPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
+                    Color newColor = ViewMessages.showColorDialog(InstancePropertiesPanel.this, backgroundColorPanel.getBackground(), false);
+                    if (newColor != null) {
+                        backgroundColorPanel.setBackground(newColor);
+                        backgroundColorLabel.setText("");
+                        
+                        undoManager.doOperation(new PlaceChangeDoableOperation("instance.display.cacheAsBitmap", 3) {
+                            RGBA color = new RGBA(newColor);
+                            @Override
+                            public void doPlaceOperation(PlaceObjectTypeTag placeObject, DepthState depthState) {                       
+                                placeObject.setBackgroundColor(color);
+                            }                    
+                        }, swfPanel.getSwf());
+                    }
+                }
+            }            
+        });
+        
         add(propertiesPanel, BorderLayout.CENTER);
                
         swfPanel.getStagePanel().addBoundsChangeListener(new BoundsChangeListener() {
@@ -396,6 +641,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     }
     
     public void update() {
+        updating = true;
         List<DepthState> dss = swfPanel.getSelectedDepthStates();
         if (dss == null || dss.isEmpty()) {
             instanceLabel.setText(EasyStrings.translate("properties.instance.none"));
@@ -421,6 +667,10 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         Set<Integer> greenAdd = new HashSet<>();
         Set<Integer> bluePercent = new HashSet<>();
         Set<Integer> blueAdd = new HashSet<>();
+        Set<Boolean> visible = new HashSet<>();
+        Set<Integer> blendMode = new HashSet<>();
+        Set<Boolean> cacheAsBitmap = new HashSet<>();
+        Set<RGBA> backgroundColor = new HashSet<>();
         
         for (DepthState ds : dss) {
             if (ds == null) {
@@ -446,6 +696,14 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
                 bluePercent.add(colorTransform.getBlueMulti() * 100 / 256);
                 blueAdd.add(colorTransform.getBlueAdd());
             }
+            visible.add(ds.isVisible);
+            int bm = ds.blendMode;
+            if (bm == 0) {
+                bm = 1;
+            }
+            blendMode.add(bm);
+            cacheAsBitmap.add(ds.cacheAsBitmap);
+            backgroundColor.add(ds.backGroundColor);
         }
         
         
@@ -457,9 +715,81 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         greenAddPropertyField.setValue(greenAdd, true);
         bluePercentPropertyField.setValue(bluePercent, true);
         blueAddPropertyField.setValue(blueAdd, true);
+        
+        
+        if (visible.size() > 1) {
+            visibleCheckBox.setSelectionState(1);
+        } else {
+            visibleCheckBox.setSelected(visible.iterator().next());
+        }       
+        
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) blendingComboBox.getModel();            
+        if (blendMode.size() > 1) {
+            if (!model.getElementAt(0).equals("")) {
+                model.addAll(0, Arrays.asList(""));
+            }
+            blendingComboBox.setSelectedIndex(0);
+        } else {
+            if (model.getElementAt(0).equals("")) {
+                model.removeElementAt(0);
+            }            
+            int bm = blendMode.iterator().next();
+            
+            bm--;
+            blendingComboBox.setSelectedIndex(bm);
+        }
+        if (cacheAsBitmap.size() > 1) {
+            cacheAsBitmapCheckBox.setSelectionState(1);
+        } else {
+            cacheAsBitmapCheckBox.setSelected(cacheAsBitmap.iterator().next());
+        }
+                
+        backgroundComboBox.setVisible(cacheAsBitmapCheckBox.getSelectionState() == 2);
+        
+        
+        DefaultComboBoxModel<String> backgroundModel = (DefaultComboBoxModel<String>) backgroundComboBox.getModel();
+        if (backgroundColor.size() > 1) {
+            
+            if (backgroundColor.contains(null)) {
+                if (backgroundModel.getSize() == 2) {
+                    backgroundModel.addAll(0, Arrays.asList(""));
+                }
+                backgroundComboBox.setSelectedIndex(0);
+                backgroundColorPanel.setVisible(false);
+            } else {
+                if (backgroundModel.getSize() == 3) {
+                    backgroundModel.removeElementAt(0);
+                }
+                backgroundComboBox.setSelectedIndex(1);
+                
+                backgroundColorPanel.setVisible(true);
+                backgroundColorLabel.setText("--");
+                backgroundColorPanel.setBackground(Color.WHITE);
+                backgroundColorPanel.setOpaque(true);
+            }                                  
+        } else {
+            if (backgroundModel.getSize() == 3) {
+                backgroundModel.removeElementAt(0);
+            }
+            RGBA bgColor = backgroundColor.iterator().next();
+            backgroundComboBox.setSelectedIndex(bgColor == null ? 0 : 1);
+            backgroundColorLabel.setText("");
+            
+            if (bgColor == null) {
+                backgroundColorPanel.setVisible(false);
+            } else {
+                backgroundColorPanel.setVisible(true);
+                backgroundColorPanel.setBackground(bgColor.toColor());
+                backgroundColorPanel.setOpaque(true);
+            }         
+            
+            
+        }
+        updating = false;
+        revalidate();        
     }
 
-    abstract class PlaceChangeDoableOperation extends ChangeDoableOperation {
+    abstract class PlaceChangeDoableOperation extends PropertyChangeDoableOperation {
 
         List<Integer> fdepths = swfPanel.getDepths();
         int fframe = swfPanel.getFrame();
@@ -470,12 +800,12 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         
         private final boolean timelinedModifiedBefore = swfPanel.getTimelined().isModified();
         
-        private Timelined timelined = swfPanel.getTimelined();
+        private final Timelined timelined = swfPanel.getTimelined();
         
         
         
-        public PlaceChangeDoableOperation(String itemIdentifier, int minPlace) {
-            super(itemIdentifier);
+        public PlaceChangeDoableOperation(String propertyIdentifier, int minPlace) {
+            super(propertyIdentifier);
             
             for (int i = 0; i < fdepths.size(); i++) {
                 PlaceObjectTypeTag placeObjectBefore = placeObjectsBefore.get(i);
@@ -534,7 +864,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         CXFORMWITHALPHA colorTransformAfter;
 
         public ColorEffectChangeDoableOperation() {
-            super("colorEffect", 2);
+            super("instance.header.colorEffect", 2);
         }
 
         @Override
