@@ -2237,7 +2237,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         SWFInputStream sis = new SWFInputStream(this, uncompressedData);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);
         sis.dumpInfo = dumpInfo;
-        sis.skipBytesEx(3, "signature"); // skip siganture
+        sis.skipBytesEx(3, "signature"); // skip signature
         version = sis.readUI8("version");
 
         if (version > 5) {
