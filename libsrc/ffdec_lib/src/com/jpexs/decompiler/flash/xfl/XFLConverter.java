@@ -1316,6 +1316,9 @@ public class XFLConverter {
         if (!isVisible && flaVersion.ordinal() >= FLAVersion.CS5_5.ordinal()) {
             writer.writeAttribute("isVisible", false);
         }
+        if (backgroundColor != null) {
+            writer.writeAttribute("bits32", false);
+        }
         writer.writeStartElement("matrix");
         convertMatrix(matrix, writer);
         writer.writeEndElement();
@@ -2510,6 +2513,9 @@ public class XFLConverter {
                             } else {
                                 isVisible = true;
                             }
+                            if (po.getBackgroundColor() != null) {
+                                backGroundColor = po.getBackgroundColor();
+                            }
                         } else {
                             metadata = po.getAmfData();
                             matrix = po.getMatrix();
@@ -2521,6 +2527,7 @@ public class XFLConverter {
                             ratio = po.getRatio();
                             clipActions = po.getClipActions();
                             isVisible = po.isVisible();
+                            backGroundColor = po.getBackgroundColor();
                         }
                     }
                 }
