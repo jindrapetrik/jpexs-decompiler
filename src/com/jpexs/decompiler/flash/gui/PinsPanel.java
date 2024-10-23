@@ -98,6 +98,13 @@ public class PinsPanel extends JPanel {
         if (lastSelectedButton != null) {
             lastSelectedButton.setSelected(false);
         }
+        
+        if (item == null) {
+            current = null;
+            rebuild();
+            return;
+        }
+        
         TreeItem itemNoTs = item;
         if (item instanceof TagScript) {
             itemNoTs = ((TagScript) item).getTag();

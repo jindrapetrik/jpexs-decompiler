@@ -464,6 +464,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void clearPins() {
+        pinsPanel.setCurrent(null);
         pinsPanel.clear();
     }
 

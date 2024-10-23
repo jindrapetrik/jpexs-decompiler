@@ -10,8 +10,8 @@ All notable changes to this project will be documented in this file.
 - Cache as bitmap background color support (rendering, image and FLA export)
 
 ### Fixed
-- [#2344] Export to FLA CS4 and below with more than 255 library items,
-  bitmap fills or frame duration
+- [#2344], [#2348] Export to FLA CS4 and below with more than 255 library items,
+  instances, bitmap fills or frame duration
 - [#2341] FLA export - linkage and imported fonts did not work correctly
 - [#2345] items smaller than 20 twips were not drawn - caused PDF problems - now ceil is used
 - [#2341] FLA export - DefineEditText - use its default text color on HTML enabled inputs
@@ -3620,6 +3620,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2344]: https://www.free-decompiler.com/flash/issues/2344
+[#2348]: https://www.free-decompiler.com/flash/issues/2348
 [#2341]: https://www.free-decompiler.com/flash/issues/2341
 [#2345]: https://www.free-decompiler.com/flash/issues/2345
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
