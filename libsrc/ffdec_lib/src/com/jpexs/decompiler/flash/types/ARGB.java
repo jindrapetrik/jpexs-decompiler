@@ -65,7 +65,7 @@ public class ARGB implements Serializable {
     }
 
     /**
-     * Convers this to integer.
+     * Converts this to integer.
      * @return Integer
      */
     public int toInt() {
