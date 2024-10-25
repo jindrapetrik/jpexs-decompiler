@@ -654,7 +654,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             instanceLabel.setText(EasyStrings.translate("properties.instance.multiple").replace("%count%", "" + dss.size()));
         }
         
-        //swfPanel.getStagePanel().gett
+        //swfPanel.getStagePanel().get
         
         Set<Integer> alphaPercent = new HashSet<>();
         Set<Integer> alphaAdd = new HashSet<>();
