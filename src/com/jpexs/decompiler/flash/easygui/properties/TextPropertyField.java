@@ -27,7 +27,7 @@ public class TextPropertyField extends AbstractPropertyField<String> {
         
         writeField.setColumns(maxLength);
         
-        addValidation(new PropertyValidationInteface<String>(){
+        addValidation(new PropertyValidationInterface<String>(){
             @Override
             public boolean validate(String value) {
                 return value.length() <= maxLength;

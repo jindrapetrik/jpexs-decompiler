@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
 import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.IntegerPropertyField;
-import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInteface;
+import com.jpexs.decompiler.flash.easygui.properties.PropertyValidationInterface;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.BoundsChangeListener;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
@@ -476,7 +476,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         });
         
-        PropertyValidationInteface<Float> nonZeroFloatValidation = new PropertyValidationInteface<Float>() {
+        PropertyValidationInterface<Float> nonZeroFloatValidation = new PropertyValidationInterface<Float>() {
             @Override
             public boolean validate(Float value) {
                 return value != 0f;
