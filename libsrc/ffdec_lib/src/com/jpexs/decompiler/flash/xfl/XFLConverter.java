@@ -2038,10 +2038,6 @@ public class XFLConverter {
                         }
                     }
                     if (isBitmapData) {
-                        if (!charactersExportedInFirstFrame.contains(symbol)) {
-                            writer.writeAttribute("linkageExportInFirstFrame", "false");
-                        }
-                        writer.writeAttribute("linkageExportForAS", true);
                         linkageExportForAS = true;
                         writer.writeAttribute("linkageClassName", characterClasses.get(symbol));
                     }
@@ -2051,6 +2047,9 @@ public class XFLConverter {
                 if (characterVariables.containsKey(symbol)) {
                     linkageExportForAS = true;
                     writer.writeAttribute("linkageIdentifier", characterVariables.get(symbol));
+                }
+                if (characterImportLinkageURL.containsKey(symbol)) {
+                    linkageExportForAS = false;
                 }
                 if (linkageExportForAS) {
                     if (!charactersExportedInFirstFrame.contains(symbol)) {
@@ -2200,18 +2199,18 @@ public class XFLConverter {
             linkageExportForAS = true;
             writer.writeAttribute("linkageIdentifier", characterVariables.get(symbol));
         }
+        if (characterImportLinkageURL.containsKey(symbol)) {
+            writer.writeAttribute("linkageImportForRS", "true");
+            writer.writeAttribute("linkageURL", characterImportLinkageURL.get(symbol));
+            linkageExportForAS = false;
+        }
         if (linkageExportForAS) {
             if (!charactersExportedInFirstFrame.contains(symbol)) {
                 writer.writeAttribute("linkageExportInFirstFrame", "false");
             }
 
             writer.writeAttribute("linkageExportForAS", true);
-        }
-        
-        if (characterImportLinkageURL.containsKey(symbol)) {
-            writer.writeAttribute("linkageImportForRS", "true");
-            writer.writeAttribute("linkageURL", characterImportLinkageURL.get(symbol));
-        }
+        }                
     }
     
     private String prettyFormatXML(String input) {
