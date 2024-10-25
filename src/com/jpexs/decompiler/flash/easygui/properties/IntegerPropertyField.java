@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.easygui.properties;
  */
 public class IntegerPropertyField extends AbstractPropertyField<Integer> {            
     
-    private PropertyValidationInteface<Integer> minValidation = null;
-    private PropertyValidationInteface<Integer> maxValidation = null;
+    private PropertyValidationInterface<Integer> minValidation = null;
+    private PropertyValidationInterface<Integer> maxValidation = null;
     
     public IntegerPropertyField(int value, int min, int max) {
         super("" + value);
@@ -40,7 +40,7 @@ public class IntegerPropertyField extends AbstractPropertyField<Integer> {
         if (maxValidation != null) {
             removeValidation(maxValidation);
         }
-        maxValidation = new PropertyValidationInteface<Integer>() {
+        maxValidation = new PropertyValidationInterface<Integer>() {
             @Override
             public boolean validate(Integer value) {
                 return value <= max;
@@ -53,7 +53,7 @@ public class IntegerPropertyField extends AbstractPropertyField<Integer> {
         if (minValidation != null) {
             removeValidation(minValidation);
         }
-        minValidation = new PropertyValidationInteface<Integer>() {
+        minValidation = new PropertyValidationInterface<Integer>() {
             @Override
             public boolean validate(Integer value) {
                 return value >= min;

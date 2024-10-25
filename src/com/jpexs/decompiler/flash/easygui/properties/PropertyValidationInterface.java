@@ -21,6 +21,6 @@ package com.jpexs.decompiler.flash.easygui.properties;
  * @author JPEXS
  * @param <E>
  */
-public interface PropertyValidationInteface<E> {
+public interface PropertyValidationInterface<E> {
     public boolean validate(E value);
 }
