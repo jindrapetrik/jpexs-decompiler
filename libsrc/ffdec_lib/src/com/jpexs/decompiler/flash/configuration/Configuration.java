@@ -1032,7 +1032,7 @@ public final class Configuration {
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.splitPaneEasyVertical.dividerLocationPercent")
     @ConfigurationInternal
-    public static ConfigurationItem<Double> guiSplitPaneEasyVerticaldividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiSplitPaneEasyVerticalDividerLocationPercent = null;
     
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.splitPaneEasyHorizontal.dividerLocationPercent")
