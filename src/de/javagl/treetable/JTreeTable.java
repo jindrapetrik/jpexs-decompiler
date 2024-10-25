@@ -103,7 +103,7 @@ public class JTreeTable extends JTable
         // No grid.
         setShowGrid(false);
 
-        // No intercell spacing
+        // No inter cell spacing
         setIntercellSpacing(new Dimension(0, 0));
 
         // And update the height of the trees row to match that of
