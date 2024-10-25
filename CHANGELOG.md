@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Simple editor view - new simplified UI based on timeline view, 
-  which ressembles Flash Pro UI. Easier moving objects,
+  which resembles Flash Pro UI. Easier moving objects,
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. WIP
 - Cache as bitmap background color support (rendering, image and FLA export)
