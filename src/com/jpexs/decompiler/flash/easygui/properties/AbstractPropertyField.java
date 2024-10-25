@@ -55,7 +55,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     protected JLabel readLabel;
     protected JTextField writeField;
     
-    private final List<PropertyValidationInteface<E>> validations = new ArrayList<>();
+    private final List<PropertyValidationInterface<E>> validations = new ArrayList<>();
     private final List<ChangeListener> changeListeners = new ArrayList<>();
     
     private AWTEventListener aeListener;
@@ -63,11 +63,11 @@ public abstract class AbstractPropertyField<E> extends JPanel {
     private boolean undetermined = false;
     private boolean editing = false;
     
-    public void addValidation(PropertyValidationInteface<E> validation) {
+    public void addValidation(PropertyValidationInterface<E> validation) {
         validations.add(validation);
     }
     
-    public void removeValidation(PropertyValidationInteface<E> validation) {
+    public void removeValidation(PropertyValidationInterface<E> validation) {
         validations.remove(validation);
     }
     
@@ -169,7 +169,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         if (value == null) {
             ok = false;
         } else {  
-            for (PropertyValidationInteface<E> validation : validations) {
+            for (PropertyValidationInterface<E> validation : validations) {
                 if (!validation.validate(value)) {
                     ok = false;
                     break;

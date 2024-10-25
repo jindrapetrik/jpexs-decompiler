@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.easygui.properties;
  */
 public class FloatPropertyField extends AbstractPropertyField<Float> {
     
-    private PropertyValidationInteface<Float> minValidation = null;
-    private PropertyValidationInteface<Float> maxValidation = null;
+    private PropertyValidationInterface<Float> minValidation = null;
+    private PropertyValidationInterface<Float> maxValidation = null;
     
     public FloatPropertyField(float value, float min, float max) {
         super("" + value);
@@ -39,7 +39,7 @@ public class FloatPropertyField extends AbstractPropertyField<Float> {
         if (maxValidation != null) {
             removeValidation(maxValidation);
         }
-        maxValidation = new PropertyValidationInteface<Float>() {
+        maxValidation = new PropertyValidationInterface<Float>() {
             @Override
             public boolean validate(Float value) {
                 return value <= max;
@@ -52,7 +52,7 @@ public class FloatPropertyField extends AbstractPropertyField<Float> {
         if (minValidation != null) {
             removeValidation(minValidation);
         }
-        minValidation = new PropertyValidationInteface<Float>() {
+        minValidation = new PropertyValidationInterface<Float>() {
             @Override
             public boolean validate(Float value) {
                 return value >= min;
