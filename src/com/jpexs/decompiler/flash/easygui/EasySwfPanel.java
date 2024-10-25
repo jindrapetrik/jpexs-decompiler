@@ -482,7 +482,7 @@ public class EasySwfPanel extends JPanel {
             }
         });
 
-        horizontalSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane, Configuration.guiSplitPaneEasyHorizontaldividerLocationPercent);
+        horizontalSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalSplitPane, rightTabbedPane, Configuration.guiSplitPaneEasyHorizontalDividerLocationPercent);
 
         if (View.isOceanic()) {
             libraryScrollPane.getViewport().setBackground(Color.white);
