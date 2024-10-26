@@ -1041,6 +1041,10 @@ public final class Configuration {
     
     public static ConfigurationItem<String> lastSessionEasySwf = null;
     
+    @ConfigurationDefaultInt(1000)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> maxScriptLineLength = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

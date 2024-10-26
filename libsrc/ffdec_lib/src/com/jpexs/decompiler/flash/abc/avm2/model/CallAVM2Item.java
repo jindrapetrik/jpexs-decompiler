@@ -236,7 +236,7 @@ public class CallAVM2Item extends AVM2Item {
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             arguments.get(a).toString(writer, localData);
         }

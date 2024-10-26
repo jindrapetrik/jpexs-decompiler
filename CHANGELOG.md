@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2341] FLA export - DefineEditText - use its default text color on HTML enabled inputs
 - FLA export - DefineEditText default text color alpha
 - Text display - Alpha channel should not be supported for texts using device fonts
+- [#2192] Long script lines are now wrapped (1000 chars limit by default) to avoid problems on Linux
 
 ## [21.1.1] - 2024-10-13
 ### Added 
@@ -3623,6 +3624,7 @@ Major version of SWF to XML export changed to 2.
 [#2348]: https://www.free-decompiler.com/flash/issues/2348
 [#2341]: https://www.free-decompiler.com/flash/issues/2341
 [#2345]: https://www.free-decompiler.com/flash/issues/2345
+[#2192]: https://www.free-decompiler.com/flash/issues/2192
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
 [#2328]: https://www.free-decompiler.com/flash/issues/2328

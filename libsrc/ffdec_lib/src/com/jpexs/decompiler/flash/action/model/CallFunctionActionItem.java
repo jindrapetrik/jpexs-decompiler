@@ -103,7 +103,7 @@ public class CallFunctionActionItem extends ActionItem {
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             arguments.get(t).toStringNL(writer, localData);
         }

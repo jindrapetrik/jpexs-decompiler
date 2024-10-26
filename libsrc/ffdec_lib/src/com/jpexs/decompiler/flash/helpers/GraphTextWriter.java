@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -41,7 +42,12 @@ public abstract class GraphTextWriter {
      * Code formatting
      */
     protected CodeFormatting formatting;
-
+    
+    /**
+     * Line length
+     */
+    protected int lineLength = 0;
+        
     /**
      * Trait index - instance initializer
      */
@@ -316,6 +322,14 @@ public abstract class GraphTextWriter {
     public abstract GraphTextWriter append(String str, long offset, long fileOffset);
 
     /**
+     * Enlarges line length
+     * @param len Length to add
+     */
+    protected final void addLineLength(int len) {
+        lineLength += len;
+    }
+    
+    /**
      * Appends text without highlight.
      * @param i Text
      * @return GraphTextWriter
@@ -350,6 +364,7 @@ public abstract class GraphTextWriter {
      * @return GraphTextWriter
      */
     public GraphTextWriter newLine() {
+        lineLength = 0;        
         return this;
     }
 
@@ -431,6 +446,13 @@ public abstract class GraphTextWriter {
         return append(" ");
     }
 
+    public GraphTextWriter allowWrapHere() {
+        if (Configuration.maxScriptLineLength.get() > 0 && lineLength > Configuration.maxScriptLineLength.get()) {
+            newLine();
+        }
+        return this;
+    }        
+    
     /**
      * Space before call parenthesies.
      * @param argCount Argument count

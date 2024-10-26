@@ -129,7 +129,7 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
             objectName.toString(writer, localData);
             writer.append("]");
         } else {
-            writer.append(".");
+            writer.allowWrapHere().append(".");
             stripQuotes(objectName, localData, writer);
         }
         if (compoundOperator != null) {
