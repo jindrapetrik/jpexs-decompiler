@@ -567,6 +567,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (timeline == null) {
+            return;
+        }
         Point p = e.getPoint();
         p.x = p.x / FRAME_WIDTH;
         p.y = p.y / FRAME_HEIGHT;
