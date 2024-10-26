@@ -1321,6 +1321,8 @@ public class Timeline {
             }
             if (g instanceof BlendModeSetable) {
                 ((BlendModeSetable) g).setBlendMode(0);
+            } else {
+                g.setComposite(AlphaComposite.SrcOver);
             }
         }
     }
