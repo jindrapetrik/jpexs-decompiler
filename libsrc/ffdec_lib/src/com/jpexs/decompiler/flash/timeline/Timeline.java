@@ -236,9 +236,10 @@ public class Timeline {
         }
         return frames.get(index);
     }
-    
+
     /**
      * Gets depth state at specified frame and depth
+     *
      * @param frame Frame
      * @param depth Depth
      * @return DepthState or null if it does not exist or frame does not exist
@@ -605,7 +606,7 @@ public class Timeline {
                         if (clipDepth2 > -1) {
                             fl.clipDepth = clipDepth2;
                         }
-                        
+
                         RGBA bgColor = po.getBackgroundColor();
                         if (bgColor != null) {
                             fl.backGroundColor = bgColor;
@@ -680,15 +681,11 @@ public class Timeline {
             for (int f = 0; f <= frames.size(); f++) {
                 DepthState ds = f >= frames.size() ? null : frames.get(f).layers.get(d);
 
-                if (ds != null 
-                        && (characterId != -1 || charClassName != null) 
+                if (ds != null
+                        && (characterId != -1 || charClassName != null)
                         && (ds.characterId == characterId && Objects.equals(ds.className, charClassName))
-                        && (
-                        (ds.getCharacter() instanceof MorphShapeTag)
-                        ||
-                        Objects.equals(ds.matrix, matrix)
-                        )
-                        ) {
+                        && ((ds.getCharacter() instanceof MorphShapeTag)
+                        || Objects.equals(ds.matrix, matrix))) {
                     len++;
                 } else {
                     /*if (characterId != -1 || charClassName != null) {
@@ -709,7 +706,7 @@ public class Timeline {
                             frames.get(startPos + r.startPosition).layers.get(d).key = true;
                         }                        
                     }*/
-                    
+
                     len = 1;
                     if (ds != null) {
                         ds.key = true;
@@ -718,7 +715,7 @@ public class Timeline {
 
                 characterId = ds == null ? -1 : ds.characterId;
                 charClassName = ds == null ? null : ds.className;
-                matrix = ds == null ? null : ds.matrix;                
+                matrix = ds == null ? null : ds.matrix;
             }
         }
     }
@@ -1091,7 +1088,7 @@ public class Timeline {
                 double y = filter.getDeltaY();
                 deltaXMax = Math.max(x, deltaXMax);
                 deltaYMax = Math.max(y, deltaYMax);
-            }
+            }            
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
             rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
@@ -1099,9 +1096,9 @@ public class Timeline {
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
             viewRect2.yMin -= deltaYMax * SWF.unitDivisor;
-            viewRect2.yMax += deltaYMax * SWF.unitDivisor;
+            viewRect2.yMax += deltaYMax * SWF.unitDivisor;   
         }
-
+                    
         drawMatrix.translate(rect.xMin, rect.yMin);
         drawMatrix.translateX /= SWF.unitDivisor;
         drawMatrix.translateY /= SWF.unitDivisor;
@@ -1114,6 +1111,7 @@ public class Timeline {
             int deltaY = (int) Math.ceil(rect.yMin / SWF.unitDivisor);
             newWidth = Math.min(image.getWidth() - deltaX, newWidth);
             newHeight = Math.min(image.getHeight() - deltaY, newHeight);
+            
 
             if (newWidth <= 0 || newHeight <= 0) {
                 return;
@@ -1150,7 +1148,7 @@ public class Timeline {
             if (clipDepth > -1) {
                 canUseSameImage = false;
             }
-            
+
             if (cacheAsBitmap) {
                 canUseSameImage = false;
             }
@@ -1161,7 +1159,7 @@ public class Timeline {
                 m = mat.clone();
                 g.setTransform(new AffineTransform());
             } else {
-                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);                
+                img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                 img.fillTransparent();
             }
 
@@ -1192,6 +1190,18 @@ public class Timeline {
             } else {
                 // todo: show one time warning
             }
+            
+            if (cacheAsBitmap && layer.backGroundColor != null && (blendMode <= 1 || (filters != null && !filters.isEmpty()))) {
+                Graphics2D g2 = (Graphics2D) img.getGraphics();
+                g2.setComposite(AlphaComposite.DstOver);
+                Color bgColor = layer.backGroundColor.toColor();
+                g2.setColor(bgColor);                
+                g2.fillRect((int) Math.round(deltaXMax * unzoom),
+                        (int) Math.round(deltaYMax * unzoom),                        
+                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
+                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
+                );                        
+            }
 
             if (filters != null) {
                 for (FILTER filter : filters) {
@@ -1203,7 +1213,7 @@ public class Timeline {
                     img = colorTransForm.apply(img);
                 }
             }
-
+            
             if (!sameImage && cacheAsBitmap && renderContext.displayObjectCache != null) {
                 renderContext.clearPlaceObjectCache(layer.placeObjectTag);
                 renderContext.displayObjectCache.put(new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect), img);
@@ -1303,17 +1313,22 @@ public class Timeline {
             }
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
-                               
+
                 if ((blendMode > 1 || (filters != null && !filters.isEmpty())) && mergedColorTransform != null) {
-                    img = mergedColorTransform.apply(img);
+                    img = mergedColorTransform.apply(img);                   
                 }
                 
-                if (cacheAsBitmap && layer.backGroundColor != null) {
+                if (blendMode > 1 && (filters == null || filters.isEmpty()) && cacheAsBitmap && layer.backGroundColor != null) {
                     Graphics2D g2 = (Graphics2D) img.getGraphics();
                     g2.setComposite(AlphaComposite.DstOver);
-                    g2.setColor(layer.backGroundColor.toColor());
-                    g2.fillRect(0, 0, img.getWidth(), img.getHeight());  
-                }
+                    Color bgColor = layer.backGroundColor.toColor();
+                    g2.setColor(bgColor);
+                    g2.fillRect((int) Math.round(deltaXMax * unzoom),
+                        (int) Math.round(deltaYMax * unzoom),                        
+                        (int) Math.round(rect.getWidth() / SWF.unitDivisor  - 2 * deltaXMax * unzoom),
+                        (int) Math.round(rect.getHeight()/ SWF.unitDivisor  - 2 * deltaYMax * unzoom)
+                    );
+                }                
 
                 if (!((blendMode == 11 || blendMode == 12) && parentBlendMode <= 1)) { //alpha and erase modes require parent blendmode not normal
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
