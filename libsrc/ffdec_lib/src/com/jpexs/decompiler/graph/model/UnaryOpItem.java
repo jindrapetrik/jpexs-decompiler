@@ -61,6 +61,9 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     public GraphTargetItem simplify(String implicitCoerce) {
         GraphTargetItem r = clone();
         r.value = r.value.simplify(coerce);
+        if (r.value == this.value) {
+            r = this;
+        }
         return simplifySomething(r, implicitCoerce);
     }
 
