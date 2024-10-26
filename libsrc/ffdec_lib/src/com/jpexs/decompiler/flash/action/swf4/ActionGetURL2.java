@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
 import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
 import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.flash.action.model.PrintAsBitmapNumActionItem;
 import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StringAddActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -187,7 +189,7 @@ public class ActionGetURL2 extends Action {
     public void translate(Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem targetString = stack.pop();
         GraphTargetItem urlString = stack.pop();
-        Integer num = null;
+        GraphTargetItem num = null;
         if (targetString.isCompileTime()) {
             Object res = targetString.getResult();
             if (res instanceof String) {
@@ -195,16 +197,35 @@ public class ActionGetURL2 extends Action {
                 String levelPrefix = "_level";
                 if (tarStr.startsWith(levelPrefix)) {
                     try {
-                        num = Integer.valueOf(tarStr.substring(levelPrefix.length()));
+                        num = new DirectValueActionItem(Long.valueOf(tarStr.substring(levelPrefix.length())));
                     } catch (NumberFormatException nfe) {
                         //ignored
                     }
                 }
             }
         }
+        if (num == null) {
+            if (targetString instanceof StringAddActionItem) {
+                StringAddActionItem sa = (StringAddActionItem) targetString;
+                if (sa.leftSide.isCompileTime()) {
+                    Object res = sa.leftSide.getResult();
+                    if (res instanceof String) {
+                        String tarStr = (String) res;
+                        String levelPrefix = "_level";
+                        if (tarStr.equals(levelPrefix)) {
+                            num = sa.rightSide;
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
         if (loadVariablesFlag) {
             if (num != null) {
-                output.add(new LoadVariablesNumActionItem(this, lineStartAction, urlString, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
+                output.add(new LoadVariablesNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
             } else {
                 output.add(new LoadVariablesActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
@@ -215,28 +236,72 @@ public class ActionGetURL2 extends Action {
                 output.add(new LoadMovieActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
         } else {
-            String printPrefix = "print:#";
-            String printAsBitmapPrefix = "printasbitmap:#";
-            String urlStr = null;
+            final String printPrefix = "print:#";
+            final String printAsBitmapPrefix = "printasbitmap:#";
+            final String fscommandPrefix = "FSCommand:";
+            GraphTargetItem printType = null;
+            boolean doPrint = false;
+            boolean doPrintAsBitmap = false;
+            boolean doFSCommand = false;
+            boolean doUnload = false;
+                                    
             if (urlString.isCompileTime() && (urlString.getResult() instanceof String)) {
-                urlStr = (String) urlString.getResult();
-            }
+                String urlStr = (String) urlString.getResult();
+                if ("".equals(urlStr)) {
+                    doUnload = true;
+                } else if (urlStr.startsWith(printPrefix)) {
+                    printType = new DirectValueActionItem(urlStr.substring(printPrefix.length()));
+                    doPrint = true;
+                } else if (urlStr.startsWith(printAsBitmapPrefix)) {
+                    printType = new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()));
+                    doPrintAsBitmap = true;
+                } else if (urlStr.startsWith(fscommandPrefix)) {
+                    urlString = new DirectValueActionItem(urlStr.substring(fscommandPrefix.length()));
+                    doFSCommand = true;
+                }
+            } else if (urlString instanceof StringAddActionItem) {
+                    StringAddActionItem sa = (StringAddActionItem) urlString;
+                    if (sa.leftSide.isCompileTime()) {
+                        Object res = sa.leftSide.getResult();
+                        if (res instanceof String) {
+                            String urlStr = (String) res;
+                            switch (urlStr) {
+                                case printPrefix:
+                                    printType = sa.rightSide;
+                                    doPrint = true;
+                                    urlString = null;
+                                    break;
+                                case printAsBitmapPrefix:
+                                    printType = sa.rightSide;
+                                    doPrintAsBitmap = true;
+                                    urlString = null;
+                                    break;
+                                case fscommandPrefix:
+                                    urlString = sa.rightSide;
+                                    doFSCommand = true;
+                                    break;                                
+                            }
+                        }
+                    }
+                }
 
             if (num != null) {
-                if ("".equals(urlStr)) {
-                    output.add(new UnLoadMovieNumActionItem(this, lineStartAction, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>())));
-                } else if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                    output.add(new PrintNumActionItem(this, lineStartAction, new DirectValueActionItem((Long) (long) (int) num),
-                            new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
-                } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                    output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, new DirectValueActionItem((Long) (long) (int) num), new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
+                if (doUnload) {
+                    output.add(new UnLoadMovieNumActionItem(this, lineStartAction, num));
+                } else if (doPrint) {
+                    output.add(new PrintNumActionItem(this, lineStartAction, num,
+                            printType));
+                } else if (doPrintAsBitmap) {
+                    output.add(new PrintAsBitmapNumActionItem(this, lineStartAction, num, printType));
                 } else {
-                    output.add(new LoadMovieNumActionItem(this, lineStartAction, urlString, new DirectValueActionItem(null, null, 0, (Long) (long) (int) num, new ArrayList<>()), sendVarsMethod));
+                    output.add(new LoadMovieNumActionItem(this, lineStartAction, urlString, num, sendVarsMethod));
                 }
-            } else if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                output.add(new PrintActionItem(this, lineStartAction, targetString, new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
-            } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                output.add(new PrintAsBitmapActionItem(this, lineStartAction, targetString, new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
+            } else if (doPrint) {
+                output.add(new PrintActionItem(this, lineStartAction, targetString, printType));
+            } else if (doPrintAsBitmap) {
+                output.add(new PrintAsBitmapActionItem(this, lineStartAction, targetString, printType));
+            } else if (doFSCommand) {
+                output.add(new FSCommandActionItem(this, lineStartAction, urlString, targetString));
             } else {
                 output.add(new GetURL2ActionItem(this, lineStartAction, urlString, targetString, sendVarsMethod));
             }
