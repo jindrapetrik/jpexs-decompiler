@@ -120,7 +120,7 @@ public class CallMethodActionItem extends ActionItem {
             } else {
                 scriptObject.toString(writer, localData);
             }
-            writer.append(".");
+            writer.allowWrapHere().append(".");
             writer.append(setterGetterVarName);
             return writer;
         } else if (special == SPECIAL_SETTER) {
@@ -131,7 +131,7 @@ public class CallMethodActionItem extends ActionItem {
             } else {
                 scriptObject.toString(writer, localData);
             }
-            writer.append(".");
+            writer.allowWrapHere().append(".");
             writer.append(setterGetterVarName);
             writer.append(" = ");
             arguments.get(0).toStringNL(writer, localData);
@@ -160,7 +160,7 @@ public class CallMethodActionItem extends ActionItem {
                 }
                 if (!(((DirectValueActionItem) methodName).value instanceof RegisterNumber)
                         && IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
-                    writer.append(".");
+                    writer.allowWrapHere().append(".");
                     methodName.toStringNoQuotes(writer, localData);
                 } else {
                     writer.append("[");
@@ -189,7 +189,7 @@ public class CallMethodActionItem extends ActionItem {
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             arguments.get(t).toStringNL(writer, localData);
         }

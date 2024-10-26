@@ -71,13 +71,13 @@ public class ConstructSuperAVM2Item extends AVM2Item {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (!object.toString().equals("this")) {
             object.toString(writer, localData);
-            writer.append(".");
+            writer.allowWrapHere().append(".");
         }
         writer.spaceBeforeCallParenthesies(args.size());
         writer.append("super(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             args.get(a).toString(writer, localData);
         }

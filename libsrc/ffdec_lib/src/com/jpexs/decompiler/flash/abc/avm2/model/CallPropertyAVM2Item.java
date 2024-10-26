@@ -101,8 +101,8 @@ public class CallPropertyAVM2Item extends AVM2Item {
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {
-            if (a > 0) {
-                writer.append(",");
+            if (a > 0) {               
+                writer.allowWrapHere().append(",");
             }
             arguments.get(a).toString(writer, localData);
         }

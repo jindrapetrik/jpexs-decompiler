@@ -174,16 +174,16 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 if (((FullMultinameAVM2Item) propertyName).namespace != null) {
                     //writer.append(".");
-                    writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
+                    writer.allowWrapHere().hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 }
                 return propertyName.toString(writer, localData);
             } else {
-                writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
+                writer.allowWrapHere().hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 //writer.append(".");
                 return propertyName.toString(writer, localData);
             }
         } else {
-            writer.append("[");
+            writer.append("[").allowWrapHere();
             propertyName.toString(writer, localData);
             return writer.append("]");
         }

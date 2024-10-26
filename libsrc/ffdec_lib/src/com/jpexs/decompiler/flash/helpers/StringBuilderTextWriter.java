@@ -46,36 +46,42 @@ public class StringBuilderTextWriter extends GraphTextWriter {
 
     @Override
     public GraphTextWriter hilightSpecial(String text, HighlightSpecialType type, String specialValue, HighlightData data) {
+        addLineLength(text.length());
         writeToOutputStream(text);
         return this;
     }
 
     @Override
     public GraphTextWriter appendWithData(String str, HighlightData data) {
+        addLineLength(str.length());
         writeToOutputStream(str);
         return this;
     }
 
     @Override
     public StringBuilderTextWriter append(String str) {
+        addLineLength(str.length());
         writeToOutputStream(str);
         return this;
     }
 
     @Override
     public StringBuilderTextWriter append(String str, long offset, long fileOffset) {
+        addLineLength(str.length());
         writeToOutputStream(str);
         return this;
     }
 
     @Override
     public StringBuilderTextWriter appendNoHilight(int i) {
+        addLineLength(Integer.toString(i).length());
         writeToOutputStream(Integer.toString(i));
         return this;
     }
 
     @Override
     public StringBuilderTextWriter appendNoHilight(String str) {
+        addLineLength(str.length());
         writeToOutputStream(str);
         return this;
     }
@@ -96,6 +102,7 @@ public class StringBuilderTextWriter extends GraphTextWriter {
     public StringBuilderTextWriter newLine() {
         writeToOutputStream(formatting.newLineChars);
         newLine = true;
+        lineLength = 0;        
         return this;
     }
 

@@ -224,7 +224,8 @@ public class HighlightedTextWriter extends GraphTextWriter {
     }
 
     @Override
-    public HighlightedTextWriter appendWithData(String str, HighlightData data) {
+    public HighlightedTextWriter appendWithData(String str, HighlightData data) {     
+        addLineLength(str.length());
         Highlighting h = null;
         if (!offsets.empty()) {
             GraphSourceItemPosition itemPos = offsets.peek();
@@ -258,11 +259,13 @@ public class HighlightedTextWriter extends GraphTextWriter {
 
     @Override
     public HighlightedTextWriter append(String str) {
+        addLineLength(str.length());
         return appendWithData(str, null);
     }
 
     @Override
     public HighlightedTextWriter append(String str, long offset, long fileOffset) {
+        addLineLength(str.length());
         Highlighting h = null;
         if (hilight) {
             HighlightData data = new HighlightData();
@@ -280,12 +283,14 @@ public class HighlightedTextWriter extends GraphTextWriter {
 
     @Override
     public HighlightedTextWriter appendNoHilight(int i) {
+        addLineLength(Integer.toString(i).length());
         appendNoHilight(Integer.toString(i));
         return this;
     }
 
     @Override
     public HighlightedTextWriter appendNoHilight(String str) {
+        addLineLength(str.length());
         appendToSb(str);
         return this;
     }
@@ -307,6 +312,7 @@ public class HighlightedTextWriter extends GraphTextWriter {
         appendToSb(formatting.newLineChars);
         newLine = true;
         newLineCount++;
+        lineLength = 0;
         return this;
     }
 

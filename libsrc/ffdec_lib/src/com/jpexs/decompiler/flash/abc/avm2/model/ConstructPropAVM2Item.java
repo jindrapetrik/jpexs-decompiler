@@ -91,7 +91,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             args.get(a).toString(writer, localData);
         }

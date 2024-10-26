@@ -78,7 +78,7 @@ public class GetMemberActionItem extends ActionItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         object.toString(writer, localData);
         if ((memberName instanceof DirectValueActionItem) && printObfuscatedMemberName) {
-            writer.append(".");
+            writer.allowWrapHere().append(".");
             StringBuilder sb = new StringBuilder();
             StringBuilderTextWriter sbw = new StringBuilderTextWriter(new CodeFormatting(), sb);
             stripQuotes(memberName, localData, sbw);
@@ -90,7 +90,7 @@ public class GetMemberActionItem extends ActionItem {
             memberName.toString(writer, localData);
             return writer.append("]");
         }
-        writer.append(".");
+        writer.allowWrapHere().append(".");
         return stripQuotes(memberName, localData, writer);
     }
 

@@ -67,7 +67,7 @@ public class NewArrayAVM2Item extends AVM2Item {
         writer.append("[");
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {
-                writer.append(",");
+                writer.allowWrapHere().append(",");
             }
             values.get(a).toString(writer, localData);
         }
