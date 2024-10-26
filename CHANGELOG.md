@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Text display - Alpha channel should not be supported for texts using device fonts
 - [#2192] Long script lines are now wrapped (1000 chars limit by default) to avoid problems on Linux
 - [#2354] Simplify expressions problems in some cases
+- [#2353] AS1/2 - fscommand and other dynamic GetURL related calls (decompilation + editation)
 
 ## [21.1.1] - 2024-10-13
 ### Added 
@@ -3627,6 +3628,7 @@ Major version of SWF to XML export changed to 2.
 [#2345]: https://www.free-decompiler.com/flash/issues/2345
 [#2192]: https://www.free-decompiler.com/flash/issues/2192
 [#2354]: https://www.free-decompiler.com/flash/issues/2354
+[#2353]: https://www.free-decompiler.com/flash/issues/2353
 [#2321]: https://www.free-decompiler.com/flash/issues/2321
 [#2305]: https://www.free-decompiler.com/flash/issues/2305
 [#2328]: https://www.free-decompiler.com/flash/issues/2328

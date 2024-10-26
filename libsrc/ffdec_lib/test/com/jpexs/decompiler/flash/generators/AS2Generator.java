@@ -41,6 +41,7 @@ public class AS2Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
+        Configuration.simplifyExpressions.set(false);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as2/as2.swf")), false);
         DoABC2Tag tag = null;
         DoActionTag doa = null;

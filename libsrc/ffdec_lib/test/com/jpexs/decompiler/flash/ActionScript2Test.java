@@ -2478,4 +2478,21 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var g = 0x0641 ^ a;\r\n"
         );
     }
+
+    @Test
+    public void frame91_dynamicGetUrlTest() {
+        compareSrc(91, "trace(\"dynamicGetUrlTest\");\r\n"
+                + "var n = 5;\r\n"
+                + "unloadMovieNum(n);\r\n"
+                + "printNum(n,\"bmax\");\r\n"
+                + "printAsBitmapNum(n,\"bmax\");\r\n"
+                + "loadMovieNum(\"something.swf\",n,\"POST\");\r\n"
+                + "var v = _root.something;\r\n"
+                + "print(v,\"bmax\");\r\n"
+                + "printAsBitmap(v,\"bmax\");\r\n"
+                + "var r = 5;\r\n"
+                + "getURL(\"file\" + r + \".swf\",\"_blank\",\"POST\");\r\n"
+                + "fscommand(\"test\" + r,\"xx\");\r\n"
+        );
+    }
 }

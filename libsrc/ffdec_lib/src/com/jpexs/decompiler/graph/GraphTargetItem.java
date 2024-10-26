@@ -142,6 +142,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     /**
      * Converts a value to an item
      *
+     * FIXME!!! This should only convert to values relatable to current Graph type, 
+     * e.g. ActionItems for AS1/2, AVM2Items for AS3
+     * 
      * @param r Value
      * @return Graph target item
      */
