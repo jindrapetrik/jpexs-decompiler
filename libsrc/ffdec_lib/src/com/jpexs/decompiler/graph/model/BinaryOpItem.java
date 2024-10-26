@@ -92,8 +92,14 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     @Override
     public GraphTargetItem simplify(String implicitCoerce) {
         BinaryOpItem r = (BinaryOpItem) clone();
-        r.leftSide = r.leftSide.simplify(coerceLeft);
+        r.leftSide = r.leftSide.simplify(coerceLeft);                
         r.rightSide = r.rightSide.simplify(coerceRight);
+        
+        if (r.leftSide == this.leftSide
+                && r.rightSide == this.rightSide) {
+            r = this;
+        }
+        
         return simplifySomething(r, implicitCoerce);
     }
 

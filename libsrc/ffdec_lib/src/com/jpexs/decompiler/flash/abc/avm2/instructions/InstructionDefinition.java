@@ -709,10 +709,10 @@ public abstract class InstructionDefinition implements Serializable {
                                         }
                                         if (getProperty.object instanceof SetLocalAVM2Item) {
                                             SetLocalAVM2Item objSetLocalReg = (SetLocalAVM2Item) getProperty.object;
-
+                                            
                                             if ((valueLocalReg.regIndex == valueSetLocalReg.regIndex)
                                                     && (propertyName.multinameIndex == multinameIndex)
-                                                    && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg.regIndex == nameSetLocalReg.regIndex))
+                                                    && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg != null && nameSetLocalReg != null && nameLocalReg.regIndex == nameSetLocalReg.regIndex))
                                                     && (objLocalReg.regIndex == objSetLocalReg.regIndex)) {
                                                 if (nameSetLocalReg != null) {
                                                     propertyName.name = nameSetLocalReg.value;
