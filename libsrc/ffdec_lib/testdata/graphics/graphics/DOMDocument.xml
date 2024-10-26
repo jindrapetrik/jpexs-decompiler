@@ -1,7 +1,7 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" timelineLabelWidth="236" viewAngle3D="50.6510299754819" nextSceneIdentifier="87" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
           <DOMFontItem name="MyFont" itemID="6546c026-00000d2d" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
+          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -333,10 +333,10 @@ stop();]]></script>
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
+                                                  <Edge fillStyle1="1" edges="
+!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
                                                   <Edge fillStyle0="1" fillStyle1="2" edges="
 !3500 4001|3500 2500!3500 2500|5000 2500"/>
-                                                  <Edge fillStyle0="1" edges="
-!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -865,10 +865,10 @@ stop();]]></script>
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="6" edges="
-!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="7" edges="
 !1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
+                                                  <Edge strokeStyle="6" edges="
+!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1467,18 +1467,18 @@ stop();]]></script>
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="5" edges="
-!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
+                                                  <Edge strokeStyle="5" edges="
+!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="4" edges="
-!1000 3660/1295 4670!1295 4670/1372 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="6" edges="
 !4647 3660/4942 4670!4942 4670/5019 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="4" edges="
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2697,6 +2697,56 @@ stop();]]></script>
                                              <transformationPoint>
                                                   <Point x="25" y="25"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color redMultiplier="0.1015625" blueMultiplier="0.1015625" greenMultiplier="0.5" redOffset="100"/>
+                                             </color>
+                                             <MatteColor color="#00FF00"/>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="PinkCircle" cacheAsBitmap="true" centerPoint3DX="100" centerPoint3DY="200">
+                                             <matrix>
+                                                  <Matrix tx="75" ty="175"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25" y="25"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <DropShadowFilter color="#FF0000"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="PinkCircle" cacheAsBitmap="true" centerPoint3DX="200" centerPoint3DY="200" bits32="false">
+                                             <matrix>
+                                                  <Matrix tx="175" ty="175"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25" y="25"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <DropShadowFilter color="#FF0000"/>
+                                             </filters>
+                                             <MatteColor color="#00FF00"/>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="PinkCircle" cacheAsBitmap="true" blendMode="subtract" centerPoint3DX="300" centerPoint3DY="200" bits32="false">
+                                             <matrix>
+                                                  <Matrix tx="275" ty="175"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25" y="25"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <DropShadowFilter color="#FF0000"/>
+                                             </filters>
+                                             <MatteColor color="#00FF00"/>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="PinkCircle" cacheAsBitmap="true" blendMode="subtract" centerPoint3DX="400" centerPoint3DY="200" bits32="false">
+                                             <matrix>
+                                                  <Matrix tx="375" ty="175"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25" y="25"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <DropShadowFilter color="#FF0000"/>
+                                             </filters>
                                              <color>
                                                   <Color redMultiplier="0.1015625" blueMultiplier="0.1015625" greenMultiplier="0.5" redOffset="100"/>
                                              </color>
@@ -4122,6 +4172,8 @@ stop();]]></script>
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1432703" publishTime="1729956785"/>
+          <PublishItem publishSize="1432670" publishTime="1729956687"/>
           <PublishItem publishSize="1432375" publishTime="1701024987"/>
           <PublishItem publishSize="1432371" publishTime="1701024827"/>
           <PublishItem publishSize="1432369" publishTime="1701024230"/>
@@ -4140,7 +4192,5 @@ stop();]]></script>
           <PublishItem publishSize="1431716" publishTime="1697292302"/>
           <PublishItem publishSize="1431768" publishTime="1697292246" publishDebug="true"/>
           <PublishItem publishSize="1583" publishTime="1678292643"/>
-          <PublishItem publishSize="1574" publishTime="1678292643"/>
-          <PublishItem publishSize="1575" publishTime="1678292643"/>
      </publishHistory>
 </DOMDocument>
