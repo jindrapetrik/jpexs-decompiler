@@ -62,7 +62,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, GraphicsGroupable, GraphicsTextDrawable {
+public class DualPdfGraphics2D extends Graphics2D implements BlendModeSettable, GraphicsGroupable, GraphicsTextDrawable {
 
     private final Graphics2D imageGraphics;
 
