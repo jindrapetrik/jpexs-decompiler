@@ -119,3 +119,4 @@
 ^resources/flashlib/
 _[a-z]+(?:_[A-Z]+|)\.properties$
 ignore$
+Lexer\.java$
