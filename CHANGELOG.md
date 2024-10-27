@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#2192] Long script lines are now wrapped (1000 chars limit by default) to avoid problems on Linux
 - [#2354] Simplify expressions problems in some cases
 - [#2353] AS1/2 - fscommand and other dynamic GetURL related calls (decompilation + editation)
+- FFDec source code typos
 
 ## [21.1.1] - 2024-10-13
 ### Added 
