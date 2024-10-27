@@ -614,7 +614,9 @@ public class ActionGraph extends Graph {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
         }
-        makeDefineRegistersUp(ret, new HashSet<>());
+        ActionLocalData ald = (ActionLocalData) localData;
+        
+        makeDefineRegistersUp(ret, new HashSet<>(ald.regNames.keySet()));
         return ret;
     }
 
