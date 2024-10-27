@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
+import com.jpexs.decompiler.flash.exporters.BlendModeSettable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -1222,8 +1222,8 @@ public class Timeline {
 
         AffineTransform trans = drawMatrix.toTransform();
 
-        if (g instanceof BlendModeSetable) {
-            ((BlendModeSetable) g).setBlendMode(blendMode);
+        if (g instanceof BlendModeSettable) {
+            ((BlendModeSettable) g).setBlendMode(blendMode);
         } else {
             switch (blendMode) {
                 case 0:
@@ -1334,8 +1334,8 @@ public class Timeline {
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
                 }
             }
-            if (g instanceof BlendModeSetable) {
-                ((BlendModeSetable) g).setBlendMode(0);
+            if (g instanceof BlendModeSettable) {
+                ((BlendModeSettable) g).setBlendMode(0);
             } else {
                 g.setComposite(AlphaComposite.SrcOver);
             }
