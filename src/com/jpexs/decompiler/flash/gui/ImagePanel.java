@@ -675,13 +675,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         
-        /*if (selectedDepths.size() == 1) {
+        if (selectedDepths.size() == 1) {
             ds = timeline.getFrame(frame).layers.get(selectedDepths.get(0));
-        }*/
+        }
 
         _viewRect = getViewRect();
 
-        /*if (ds != null) {
+        /*if (ds != null && !selectionMode) {
             CharacterTag cht = ds.getCharacter();
             if (cht != null) {
                 if (cht instanceof DrawableTag) {
@@ -3265,7 +3265,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         if (temporaryMatrix != null) {
                             Matrix tMatrix = temporaryMatrix;
-                            tMatrix = tMatrix.concatenate(new Matrix(ds.temporaryMatrix));
+                            tMatrix = tMatrix.concatenate(new Matrix(ds.matrix));
                             Shape tempOutline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, tMatrix, true, viewRect, zoom);
                             gg.setStroke(new BasicStroke(1));
                             gg.setPaint(Color.black);
