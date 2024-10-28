@@ -2298,7 +2298,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else if (doFreeTransform) {
                         setAllowMove(true);
                     } else if (selectionMode) {
-                        setAllowMove(false); 
+                        setAllowMove(false);
+                        if (h < h2 && w < w2) {
+                            offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2 - dx, iconPanel.getHeight() / 2 - h / 2 - dy);
+                            updateScrollBars();
+                        }                        
                     } else {
                         boolean doMove = h > h2 || w > w2;
                         if (zoom.fit) {
@@ -2795,8 +2799,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             int dx = (int) (((cursorTransAfter.getX() - cursorTransBefore.getX()) * zoomDouble) / SWF.unitDivisor);
             int dy = (int) (((cursorTransAfter.getY() - cursorTransBefore.getY()) * zoomDouble) / SWF.unitDivisor);
-
-            offsetPoint.setLocation(offsetPoint.getX() + dx, offsetPoint.getY() + dy);
+            
+            offsetPoint.setLocation(offsetPoint.getX() + dx, offsetPoint.getY() + dy);            
 
             updateScrollBars();
 
