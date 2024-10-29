@@ -33,7 +33,7 @@ public class EasyPanel extends JPanel {
      * TODO: switch to true when Easy mode is released.
      * I think it's not production ready yet.
      */
-    public static boolean EASY_AVAILABLE = false;
+    public static final boolean EASY_AVAILABLE = true;
     
     private TabSwitcher<SWF> tabSwitcher;
     private EasySwfPanel easySwfPanel;
