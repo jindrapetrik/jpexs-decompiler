@@ -65,6 +65,32 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="21.1.2" date="2024-10-29">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Cache as bitmap background color support (rendering, image and FLA export)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2344, #2348 Export to FLA CS4 and below with more than 255 library items, instances, bitmap fills or frame duration</li>
+					<li>#2341 FLA export - linkage and imported fonts did not work correctly</li>
+					<li>#2345 items smaller than 20 twips were not drawn - caused PDF problems - now ceil is used</li>
+					<li>#2341 FLA export - DefineEditText - use its default text color on HTML enabled inputs</li>
+					<li>FLA export - DefineEditText default text color alpha</li>
+					<li>Text display - Alpha channel should not be supported for texts using device fonts</li>
+					<li>#2192 Long script lines are now wrapped (1000 chars limit by default) to avoid problems on Linux</li>
+					<li>#2354 Simplify expressions problems in some cases</li>
+					<li>#2353 AS1/2 - fscommand and other dynamic GetURL related calls (decompilation + editation)</li>
+					<li>FFDec source code typos</li>
+					<li>#2353 AS1/2 incorrect declaration propagation causing null assignments to registers</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Timeline view in favor of new Simple view which is in development (not part of this version)</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.1.1" date="2024-10-13">
 			<description>
 				<p>Added</p>
