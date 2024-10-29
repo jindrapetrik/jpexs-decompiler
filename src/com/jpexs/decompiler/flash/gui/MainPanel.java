@@ -5669,7 +5669,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean showView(int view) {
         View.checkAccess();
-
+        
+        if (view == VIEW_EASY && !EasyPanel.EASY_AVAILABLE) {
+            view = VIEW_RESOURCES;
+        }            
+        
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
