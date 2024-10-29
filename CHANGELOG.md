@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [21.1.3] - 2024-10-29
 ### Fixed
 - Java 8 compatibility
@@ -3464,6 +3466,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...dev
 [21.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.2...version21.1.3
 [21.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.1...version21.1.2
 [21.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.0...version21.1.1
