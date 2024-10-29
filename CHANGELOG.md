@@ -2,11 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-### Added
-- Simple editor view - new simplified UI based on timeline view, 
-  which resembles Flash Pro UI. Easier moving objects,
-  resizing, adding frames, adding objects to stage. Instance property editation.
-  Undo / redo feature. WIP
+### Fixed
+- Java 8 compatibility
 
 ## [21.1.2] - 2024-10-29
 ### Added

@@ -732,7 +732,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) blendingComboBox.getModel();            
         if (blendMode.size() > 1) {
             if (!model.getElementAt(0).equals("")) {
-                model.addAll(0, Arrays.asList(""));
+                model.insertElementAt("", 0);
             }
             blendingComboBox.setSelectedIndex(0);
         } else {
@@ -758,7 +758,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             
             if (backgroundColor.contains(null)) {
                 if (backgroundModel.getSize() == 2) {
-                    backgroundModel.addAll(0, Arrays.asList(""));
+                    backgroundModel.insertElementAt("", 0);
                 }
                 backgroundComboBox.setSelectedIndex(0);
                 backgroundColorPanel.setVisible(false);
