@@ -1363,8 +1363,9 @@ public class Timeline {
      * @param drawMode Draw mode
      * @param blendMode Blend mode
      * @param canUseSmoothing Can use smoothing
+     * @param ignoreDepths Ignore these depths when drawing
      */
-    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, List<Integer> ignoreDepths) {
         if (getFrameCount() <= frame) {
             return;
         }
@@ -1385,7 +1386,7 @@ public class Timeline {
 
         int maxDepth = getMaxDepth();
         int clipCount = 0;
-        for (int i = 0; i <= maxDepth; i++) {
+        for (int i = 0; i <= maxDepth; i++) {                        
             boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
@@ -1448,6 +1449,11 @@ public class Timeline {
             if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SHAPES && (character instanceof ShapeTag)) {
                 continue;
             }
+            
+            if (ignoreDepths.contains(i)) {
+                continue;
+            }
+            
             if (character instanceof DrawableTag) {
 
                 RECT scalingRect = null;
