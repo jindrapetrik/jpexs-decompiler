@@ -11,10 +11,10 @@ VERSION_PROP_FILE="version.properties"
 if [ -z ${GITHUB_ACCESS_TOKEN+x} ]; then
   # password not set,  just make private release without publishing result
   echo "No password set, making private release..."
-  JAVA_HOME=$JAVA_HOME_8_x64
+  JAVA_HOME=$JAVA_HOME_8_X64
   ant all
   # Javadoc generation is buggy with Java 8, lets generate it with Java 21
-  JAVA_HOME=$JAVA_HOME_21_x64
+  JAVA_HOME=$JAVA_HOME_21_X64
   ant javadoc
 else
   # if tag set
@@ -38,13 +38,13 @@ else
       echo "revision=$CICD_COMMIT">>$VERSION_PROP_FILE
       echo "debug=false">>$VERSION_PROP_FILE
            
-      JAVA_HOME=$JAVA_HOME_8_x64
+      JAVA_HOME=$JAVA_HOME_8_X64
 
       #compile, build, create files
       ant new-version
 
       # Javadoc generation is buggy with Java 8, lets generate it with Java 21
-      JAVA_HOME=$JAVA_HOME_21_x64
+      JAVA_HOME=$JAVA_HOME_21_X64
       ant release_lib_javadoc
             
       # release standard version based on tag
@@ -94,12 +94,12 @@ else
       echo "revision=$CICD_COMMIT">>$VERSION_PROP_FILE
       echo "debug=true">>$VERSION_PROP_FILE
       
-      JAVA_HOME=$JAVA_HOME_8_x64
+      JAVA_HOME=$JAVA_HOME_8_X64
       #compile, build, create files
       ant new-version
 
       # Javadoc generation is buggy with Java 8, lets generate it with Java 21
-      JAVA_HOME=$JAVA_HOME_21_x64
+      JAVA_HOME=$JAVA_HOME_21_X64
       ant release_lib_javadoc
                         
       CURRENT_DATE=`date +%Y-%m-%dT%H:%M:%SZ`
