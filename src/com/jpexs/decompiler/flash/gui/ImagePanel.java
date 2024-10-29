@@ -47,6 +47,8 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -207,10 +209,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Point2D registrationPoint = null;
     private Point2D registrationPointUpdated = null;
-
+    
     private int mode = Cursor.DEFAULT_CURSOR;
     private Rectangle2D bounds;
-
+    
     private Matrix transform;
     private AffineTransform transformUpdated;
 
@@ -321,7 +323,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean inMoving = false;
     
     private List<Integer> selectedDepths = new ArrayList<>();
+    
+    private final List<Integer> parentFrames = new ArrayList<>();
+    
+    private final List<Integer> parentDepths = new ArrayList<>();
 
+    private final List<Timelined> parentTimelineds = new ArrayList<>();
+        
     public boolean isMultiSelect() {
         return multiSelect;
     }   
@@ -1170,6 +1178,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    
+                    if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
+                        
+                        if (true) { //WIP, not yet ready
+                            return;
+                        }
+                        
+                        DepthState ds = depthStateUnderCursor;
+                        if (ds != null) {
+                            CharacterTag cht = ds.getCharacter();
+                            if (cht instanceof Timelined) {
+                                synchronized(lock) {
+                                    parentTimelineds.add(timelined);
+                                    parentDepths.add(ds.depth);
+                                    parentFrames.add(ds.frame.frame);
+                                    timelined = (Timelined) cht;
+                                    selectedDepths.clear();
+                                    frame = 0;
+                                }
+                                fireMediaDisplayStateChanged();
+                            }
+                        }
+                        
+                        return;
+                    }
+                    
                     if (shiftDown) {
                         List<Integer> newSelectedPoints = new ArrayList<>(pointsUnderCursor);
                         for (int i : selectedPoints) {
@@ -1498,25 +1532,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         return;
                     }
                     
+                    //move in selection mode
                     if (dragStart != null && selectionMode && !doFreeTransform) {
                         if (transform == null) {
                             return;
-                        }
+                        }                        
+                        Matrix p = getParentMatrix();
+                        
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
+                        //mouseTransPoint = p.transform(mouseTransPoint);
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
+                        //dragStartTransPoint = p.transform(dragStartTransPoint);
                         double dsx = dragStartTransPoint.getX();
                         double dsy = dragStartTransPoint.getY();
                         
                         double deltaX = ex - dsx;
                         double deltaY = ey - dsy;
 
+                        //AffineTransform pt = p.toTransform();
+                        
                         AffineTransform newTransform = new AffineTransform(transform.toTransform());
                         AffineTransform t = new AffineTransform();
                         t.translate(deltaX, deltaY);
                         newTransform.preConcatenate(t);
-
+                        
                         Point2D newRegistrationPoint = new Point2D.Double();
                         t.transform(registrationPoint, newRegistrationPoint);
 
@@ -1531,10 +1572,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
 
+                        Matrix parentMatrix = getParentMatrix();                        
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
+                        //mouseTransPoint = parentMatrix.inverse().transform(mouseTransPoint);
+                        
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
+                        Point2D parentRegistrationPoint = parentMatrix.transform(registrationPoint);
                         double dsx = dragStartTransPoint.getX();
                         double dsy = dragStartTransPoint.getY();
 
@@ -1544,15 +1589,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(bounds.getX(), bounds.getY());
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));
+                            t.translate(bStart.getX(), bStart.getY());
                             t.shear(shearX, 0);
-                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(-bStart.getX(), -bStart.getY());
                             t.translate(ex - dsx, 0);
 
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1564,14 +1609,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(bounds.getX(), bounds.getY());
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));
+                            
+                            t.translate(bStart.getX(), bStart.getY());
                             t.shear(shearX, 0);
-                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(-bStart.getX(), -bStart.getY());
 
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1583,15 +1629,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(bounds.getX(), bounds.getY());
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));                            
+                            t.translate(bStart.getX(), bStart.getY());
                             t.shear(0, shearY);
-                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(-bStart.getX(), -bStart.getY());
                             t.translate(0, ey - dsy);
 
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1602,14 +1648,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(bounds.getX(), bounds.getY());
+                            Point2D bStart = parentMatrix.transform(new Point2D.Double(bounds.getX(), bounds.getY()));                                                        
+                            t.translate(bStart.getX(), bStart.getY());
                             t.shear(0, shearY);
-                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(-bStart.getX(), -bStart.getY());
 
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1647,11 +1693,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            t.rotate(deltaTheta, parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1689,11 +1734,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            t.rotate(deltaTheta, parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1731,11 +1775,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            t.rotate(deltaTheta, parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1773,11 +1816,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            t.rotate(deltaTheta, parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1797,9 +1839,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             AffineTransform t = new AffineTransform();
                             t.translate(deltaX, deltaY);
                             newTransform.preConcatenate(t);
-
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1812,14 +1853,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleX = deltaX / deltaBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), 0);
+                            t.translate(parentRegistrationPoint.getX(), 0);
                             t.scale(scaleX, 1);
-                            t.translate(-registrationPoint.getX(), 0);
+                            t.translate(-parentRegistrationPoint.getX(), 0);
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
-
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
+                            
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
                             repaint();
@@ -1830,13 +1870,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleX = deltaX / deltaBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), 0);
+                            t.translate(parentRegistrationPoint.getX(), 0);
                             t.scale(scaleX, 1);
-                            t.translate(-registrationPoint.getX(), 0);
+                            t.translate(-parentRegistrationPoint.getX(), 0);
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1849,13 +1888,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(0, registrationPoint.getY());
+                            t.translate(0, parentRegistrationPoint.getY());
                             t.scale(1, scaleY);
-                            t.translate(0, -registrationPoint.getY());
+                            t.translate(0, -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1867,13 +1905,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(0, registrationPoint.getY());
+                            t.translate(0, parentRegistrationPoint.getY());
                             t.scale(1, scaleY);
-                            t.translate(0, -registrationPoint.getY());
+                            t.translate(0, -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1888,13 +1925,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaYBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.translate(parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             t.scale(scaleX, scaleY);
-                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            t.translate(-parentRegistrationPoint.getX(), -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1910,13 +1946,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaYBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.translate(parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             t.scale(scaleX, scaleY);
-                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            t.translate(-parentRegistrationPoint.getX(), -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1932,13 +1967,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaYBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.translate(parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             t.scale(scaleX, scaleY);
-                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            t.translate(-parentRegistrationPoint.getX(), -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -1954,13 +1988,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double scaleY = deltaY / deltaYBefore;
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
                             AffineTransform t = new AffineTransform();
-                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.translate(parentRegistrationPoint.getX(), parentRegistrationPoint.getY());
                             t.scale(scaleX, scaleY);
-                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            t.translate(-parentRegistrationPoint.getX(), -parentRegistrationPoint.getY());
                             newTransform.preConcatenate(t);
 
-                            Point2D newRegistrationPoint = new Point2D.Double();
-                            t.transform(registrationPoint, newRegistrationPoint);
+                            Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                             transformUpdated = newTransform;
                             registrationPointUpdated = newRegistrationPoint;
@@ -2242,7 +2275,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private void calcRect(Zoom z) {
             synchronized (ImagePanel.this) {
-                if (_img != null || timelined != null) {
+                
+                
+                Timelined topTimelined = getTopTimelined();
+                if (_img != null || topTimelined != null) {
                     //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                     //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                     double zoomDouble = z.fit ? getZoomToFit() : z.value;
@@ -2250,16 +2286,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     int h1;
                     int dx;
                     int dy;
-                    if (timelined == null || (!autoPlayed && _img != null)) {
+                    if (topTimelined == null || (!autoPlayed && _img != null)) {
                         w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                         h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                         dx = 0;
                         dy = 0;
                     } else {
-                        w1 = (int) (timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
-                        h1 = (int) (timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
-                        dx = (int) (timelined.getRect().Xmin * zoomDouble / SWF.unitDivisor);
-                        dy = (int) (timelined.getRect().Ymin * zoomDouble / SWF.unitDivisor);
+                        w1 = (int) (topTimelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
+                        h1 = (int) (topTimelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
+                        dx = (int) (topTimelined.getRect().Xmin * zoomDouble / SWF.unitDivisor);
+                        dy = (int) (topTimelined.getRect().Ymin * zoomDouble / SWF.unitDivisor);
                     }
 
                     //HERE
@@ -2929,6 +2965,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
+            this.parentTimelineds.clear();
+            this.parentFrames.clear();
+            this.parentDepths.clear();            
             centerImage();
             this.swf = swf;
             zoomAvailable = allowZoom;
@@ -3151,8 +3190,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         fireMediaDisplayStateChanged();
     }
+    
+    public Matrix getParentMatrix() {
+        synchronized (lock) {
+            Matrix parentMatrix = new Matrix();
+            for (int i = 0; i < parentTimelineds.size(); i++) {
+                DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
 
-    private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode) {
+                parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
+            }
+            return parentMatrix;
+        }        
+    }
+
+    private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
+            List<Timelined> parentTimelineds, List<Integer> parentDepths, List<Integer> parentFrames,
+            Matrix parentMatrix
+            ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
 
@@ -3173,7 +3227,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         m.scale(zoom);
 
         Matrix fullM = m.clone();
-
+                
         for (int i = 0; i < selectedDepths.size(); i++) {
             if (newMatrix != null) {
                 DepthState ds = timeline.getFrame(frame).layers.get(selectedDepths.get(i));
@@ -3184,17 +3238,45 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }        
 
         Frame fr = timeline.getFrame(frame);
-        if (fr == null) {
+        
+        Frame bgFr = timeline.getFrame(frame);
+        
+        if (!parentTimelineds.isEmpty()) {
+            bgFr = parentTimelineds.get(0).getTimeline().getFrame(parentFrames.get(0));
+        }
+        
+        if (bgFr == null || fr == null) {
             return image;
         }
-        RGB backgroundColor = fr.backgroundColor;
+        RGB backgroundColor = bgFr.backgroundColor;
         if (backgroundColor != null) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             g.setPaint(backgroundColor.toColor());
             g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+        }       
+                
+        
+        parentMatrix = new Matrix();
+        List<Integer> ignoreDepths = new ArrayList<>();
+        for (int i = 0; i < parentTimelineds.size(); i++) {
+            Timelined parentTimelined = parentTimelineds.get(i);            
+            DepthState parentDepthState = parentTimelineds.get(i).getTimeline().getDepthState(parentFrames.get(i), parentDepths.get(i));
+            
+            ignoreDepths.add(parentDepthState.depth);
+            parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
+                    parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
+                    ignoreDepths);
+            parentMatrix = parentMatrix.concatenate(new Matrix(parentDepthState.matrix));
+            ignoreDepths.clear();            
         }
-
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, viewRect, fullM, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get());
+        
+        if (!parentTimelineds.isEmpty()) {
+            Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
+            g.setPaint(new Color(255, 255, 255, 128));
+            g.fillRect(realRect.x, realRect.y, realRect.width, realRect.height);
+        }
+        
+        timeline.toImage(frame, time, renderContext, image, image, false, parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(), ignoreDepths);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
@@ -3219,7 +3301,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
 
                             int dframe = time % drawableFrameCount;
-                            Matrix transformation = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix)));
+                            Matrix transformation = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(parentMatrix).concatenate(new Matrix(ds.matrix)));
                             RECT dtRect = dt.getRect();
                             Rectangle2D dtRect2D = new Rectangle2D.Double(dtRect.Xmin, dtRect.Ymin, dtRect.getWidth(), dtRect.getHeight());
                             Shape outline = transformation.toTransform().createTransformedShape(dtRect2D);
@@ -3259,7 +3341,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         
                         Matrix transform2 = transform;
                         
-                        transform2 = transform2.concatenate(new Matrix(ds.matrix));
+                        transform2 = transform.concatenate(new Matrix(ds.matrix));
                         
                         Shape outline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, transform2, true, viewRect, zoom);
 
@@ -3487,6 +3569,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             cursorPosition = this.cursorPosition;
             if (cursorPosition != null) {
                 Point2D p2d = toTransformPoint(cursorPosition);
+                //p2d = getParentMatrix().inverse().transform(p2d);
                 cursorPosition = new Point((int) Math.round(p2d.getX() / SWF.unitDivisor), (int) Math.round(p2d.getY() / SWF.unitDivisor));
             }
 
@@ -3507,6 +3590,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null && (!doFreeTransform || transformSelectionMode)) {
             renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
+            renderContext.cursorPosition = getParentMatrix().transform(renderContext.cursorPosition);
         }
 
         renderContext.mouseButton = mouseButton;
@@ -3538,17 +3622,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     synchronized (lock) {
                         Reference<Rectangle2D> boundsRef = new Reference<>(null);
 
-                        RECT rect = timelined.getRect();
+                        RECT rect = getTopTimelined().getRect();
 
                         _viewRect = getViewRect();
 
                         Matrix trans2 = transform == null ? new Matrix() : transform.clone();
 
                         trans2 = toImageMatrix(trans2);
-
+                        
                         AffineTransform tempTrans2 = null;
                         if (transformUpdated != null) {
                             Matrix matrixUpdated = new Matrix(transformUpdated);
+                            //Matrix p = getParentMatrix();
+                            //matrixUpdated = p.concatenate(matrixUpdated);
                             matrixUpdated = toImageMatrix(matrixUpdated);
                             tempTrans2 = matrixUpdated.toTransform();
                         }
@@ -3596,7 +3682,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                             img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                         } else {
-                            img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode);
+                            img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
                         }
                         /*if(freeTransformDepth > -1) 
                         {
@@ -4206,7 +4292,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void applyTransformMatrix(Matrix matrix) {
+        Matrix parentMatrix = getParentMatrix();
         transform = transform.preConcatenate(matrix);
+        transform = parentMatrix.concatenate(transform).concatenate(parentMatrix.inverse());
 
         Point2D newRegistrationPoint = new Point2D.Double();
         matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
@@ -4217,15 +4305,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireTransformChanged();
     }
 
-    private Point2D toTransformPoint(Point2D point) {
+    private Point2D toTransformPoint(Point2D point) {       
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         if (lowQuality) {
             zoomDouble /= LQ_FACTOR;
         }
-        RECT timRect = timelined.getRect();
+        //RECT timRect = timelined.getRect();
         double rx = (point.getX() - offsetPoint.getX()) * SWF.unitDivisor / zoomDouble; // + timRect.Xmin;
         double ry = (point.getY() - offsetPoint.getY()) * SWF.unitDivisor / zoomDouble; // + timRect.Ymin;
         Point2D ret = new Point2D.Double(rx, ry);
+        ret = getParentMatrix().inverse().transform(ret);
         return ret;
     }
 
@@ -4239,10 +4328,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         m.translate(-_viewRect.xMin * zoom, -_viewRect.yMin * zoom);
         m.scale(zoom);
 
-        return Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(transform);
+        Matrix p = getParentMatrix();
+        return Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(transform).concatenate(p);
     }
 
     private Point2D toImagePoint(Point2D point) {
+        point = getParentMatrix().transform(point);
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         if (lowQuality) {
             zoomDouble /= LQ_FACTOR;
@@ -4257,6 +4348,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Rectangle2D toImageRect(Rectangle2D rect) {
         Point2D topLeft = toImagePoint(new Point2D.Double(rect.getMinX(), rect.getMinY()));
         Point2D bottomRight = toImagePoint(new Point2D.Double(rect.getMaxX(), rect.getMaxY()));
+        return new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), bottomRight.getX() - topLeft.getX(), bottomRight.getY() - topLeft.getY());
+    }
+    
+    private Point2D toParentPoint(Point2D point) {
+        point = getParentMatrix().transform(point);
+        return point;
+    }
+    
+    private Rectangle2D toParentRect(Rectangle2D rect) {
+        Point2D topLeft = toParentPoint(new Point2D.Double(rect.getMinX(), rect.getMinY()));
+        Point2D bottomRight = toParentPoint(new Point2D.Double(rect.getMaxX(), rect.getMaxY()));
         return new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), bottomRight.getX() - topLeft.getX(), bottomRight.getY() - topLeft.getY());
     }
 
@@ -4305,7 +4407,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             drawableFrameCount = 1;
                         }
 
-                        Matrix b = newMatrix; //.concatenate(new Matrix(ds.matrix).inverse());
+                        Matrix b = newMatrix; //getParentMatrix().concatenate(newMatrix); //.concatenate(new Matrix(ds.matrix).inverse());
                         int dframe = time % drawableFrameCount;
                         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                         if (lowQuality) {
@@ -4342,4 +4444,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.closestPoint = closestPoint;
         }
     }        
+    
+    public Timelined getTopTimelined() {
+        synchronized (lock) {
+            if (!parentTimelineds.isEmpty()) {
+                return parentTimelineds.get(0);
+            }
+            return timelined;
+        }
+    }
 }

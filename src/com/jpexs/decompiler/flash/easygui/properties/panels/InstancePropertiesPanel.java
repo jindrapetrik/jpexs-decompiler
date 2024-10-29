@@ -649,7 +649,12 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         
         if (dss.size() == 1) {
             EasyTagNameResolver resolver = new EasyTagNameResolver();
-            instanceLabel.setText(EasyStrings.translate("properties.instance.single").replace("%item%", resolver.getTagName(dss.get(0).getCharacter())));
+            DepthState ds = dss.get(0);
+            if (ds == null) {
+                instanceLabel.setText("");
+            } else {
+                instanceLabel.setText(EasyStrings.translate("properties.instance.single").replace("%item%", resolver.getTagName(ds.getCharacter())));
+            }
         } else {
             instanceLabel.setText(EasyStrings.translate("properties.instance.multiple").replace("%count%", "" + dss.size()));
         }
@@ -701,6 +706,10 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             blendMode.add(bm);
             cacheAsBitmap.add(ds.cacheAsBitmap);
             backgroundColor.add(ds.backGroundColor);
+        }
+        
+        if (visible.size() == 0) {
+            return;
         }
         
         

@@ -31,6 +31,8 @@ import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.TransformPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
+import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.ZoomPanel;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
@@ -111,6 +113,30 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
         stagePanel.setMultiSelect(true);
+        
+        stagePanel.addEventListener(new MediaDisplayListener() {
+            @Override
+            public void mediaDisplayStateChanged(MediaDisplay source) {
+                if (stagePanel.getTimelined() != timelined) {
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            setTimelined(stagePanel.getTimelined(), false);
+                        }                        
+                    });
+                    
+                }
+            }
+
+            @Override
+            public void playingFinished(MediaDisplay source) {
+            }
+
+            @Override
+            public void statusChanged(String status) {
+            }            
+        });
+        
         stagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -126,7 +152,8 @@ public class EasySwfPanel extends JPanel {
             public void run() {
                 final List<Integer> depths = stagePanel.getSelectedDepths();
                 final int frame = stagePanel.getFrame();
-                final Matrix newMatrix = stagePanel.getNewMatrix();
+                final Matrix parentMatrix = stagePanel.getParentMatrix();
+                final Matrix newMatrix = parentMatrix.inverse().concatenate(stagePanel.getNewMatrix()).concatenate(parentMatrix);
                 final Point2D regPoint = stagePanel.getRegistrationPoint();
                 final RegistrationPointPosition regPointPos = stagePanel.getRegistrationPointPosition();
 
@@ -151,14 +178,16 @@ public class EasySwfPanel extends JPanel {
                     
                     @Override
                     public void doOperation() {
-                        setTimelined(timelined);
+                        if (timelined != EasySwfPanel.this.timelined) {
+                            setTimelined(timelined);
+                        }
                         timelinePanel.setFrame(frame, depths);
                         for (int i = 0; i < depths.size(); i++) {
                             int depth = depths.get(i);
                             DepthState ds = stagePanel.getTimelined().getTimeline().getFrame(frame).layers.get(depth);
-                            wasModified.add(ds.placeObjectTag.isModified());
+                            wasModified.add(ds.placeObjectTag.isModified());                                                        
                             
-                            Matrix contMat = new Matrix(fpreviousMatrices.get(i)).preConcatenate(newMatrix);
+                            Matrix contMat = newMatrix.concatenate(new Matrix(fpreviousMatrices.get(i)));
                             
                             ds.placeObjectTag.setMatrix(contMat.toMATRIX());
                             ds.placeObjectTag.setPlaceFlagHasMatrix(newMatrix != null);
@@ -528,6 +557,9 @@ public class EasySwfPanel extends JPanel {
     }
     
     public void setTimelined(Timelined timelined) {        
+        setTimelined(timelined, true);
+    }
+    private void setTimelined(Timelined timelined, boolean updateStage) {        
         if (this.timelined == timelined) {
             return;
         }
@@ -546,9 +578,11 @@ public class EasySwfPanel extends JPanel {
             documentPropertiesPanel.setSwf(swf);
             libraryTreeTable.setSwf(swf);
             libraryPreviewPanel.clearAll();
-            stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true);
-            stagePanel.pause();
-            stagePanel.gotoFrame(0);
+            if (updateStage) {
+                stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true);
+                stagePanel.pause();
+                stagePanel.gotoFrame(0);
+            }
             timelinePanel.setTimelined(timelined);  
             if (timelined instanceof SWF) {
                 timelineLabel.setText(EasyStrings.translate("timeline.main"));
@@ -645,5 +679,5 @@ public class EasySwfPanel extends JPanel {
     
     public void setFrame(int frame, List<Integer> depths) {
         timelinePanel.setFrame(frame, depths);
-    }
+    }       
 }

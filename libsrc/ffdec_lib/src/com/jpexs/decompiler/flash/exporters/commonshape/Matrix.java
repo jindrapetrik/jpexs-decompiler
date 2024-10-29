@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters.commonshape;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Matrix class, used in shape export.
@@ -92,6 +93,15 @@ public final class Matrix implements Cloneable {
         scaleY = 1;
     }
 
+    public Matrix(double scaleX, double scaleY, double rotateSkew0, double rotateSkew1, double translateX, double translateY) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        this.rotateSkew0 = rotateSkew0;
+        this.rotateSkew1 = rotateSkew1;
+        this.translateX = translateX;
+        this.translateY = translateY;
+    }
+    
     public Matrix(MATRIX matrix) {
         if (matrix == null) {
             matrix = new MATRIX();
@@ -170,6 +180,11 @@ public final class Matrix implements Cloneable {
         return new Point2D.Double(p.x, p.y);
     }
 
+    public Rectangle2D transform(Rectangle2D rect) {
+        ExportRectangle er = transform(new ExportRectangle(rect));
+        return new Rectangle2D.Double(er.xMin, er.yMin, er.getWidth(), er.getHeight());
+    }
+    
     public ExportRectangle transform(ExportRectangle rect) {
         double minX = Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
