@@ -3,10 +3,6 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- Simple editor view - new simplified UI based on timeline view, 
-  which resembles Flash Pro UI. Easier moving objects,
-  resizing, adding frames, adding objects to stage. Instance property editation.
-  Undo / redo feature.
 - Cache as bitmap background color support (rendering, image and FLA export)
 
 ### Fixed
@@ -22,6 +18,9 @@ All notable changes to this project will be documented in this file.
 - [#2353] AS1/2 - fscommand and other dynamic GetURL related calls (decompilation + editation)
 - FFDec source code typos
 - [#2353] AS1/2 incorrect declaration propagation causing null assignments to registers
+
+### Removed
+- Timeline view in favor of new Simple view which is in development (not part of this version)
 
 ## [21.1.1] - 2024-10-13
 ### Added 
