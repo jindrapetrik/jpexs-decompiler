@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.easygui.EasyPanel;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
@@ -1179,7 +1180,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     setGroupSelection("view", "/file/view/viewHex");
                     break;
                 case MainPanel.VIEW_EASY:
-                    setMenuChecked("/file/view/easy", true);
+                    if (EasyPanel.EASY_AVAILABLE) {
+                        setMenuChecked("/file/view/easy", true);
+                    }
                     break;
             }
         }
@@ -1273,7 +1276,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
-        addToggleMenuItem("/file/view/easy", translate("menu.file.view.easy"), null, "easy32", this::easyActionPerformed, PRIORITY_TOP, null);
+        if (EasyPanel.EASY_AVAILABLE) {
+            addToggleMenuItem("/file/view/easy", translate("menu.file.view.easy"), null, "easy32", this::easyActionPerformed, PRIORITY_TOP, null);
+        }
         finishMenu("/file/view");
 
         addSeparator("/file");
@@ -1539,7 +1544,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
-        setMenuChecked("/file/view/easy", false);
+        if (EasyPanel.EASY_AVAILABLE) {
+            setMenuChecked("/file/view/easy", false);
+        }
     }
 
     private void viewHexActionPerformed(ActionEvent evt) {
@@ -1555,7 +1562,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainPanel.showView(MainPanel.VIEW_DUMP);
         setGroupSelection("view", "/file/view/viewHex");
-        setMenuChecked("/file/view/easy", false);
+        if (EasyPanel.EASY_AVAILABLE) {
+            setMenuChecked("/file/view/easy", false);
+        }
     }
 
     private void viewTagListActionPerformed(ActionEvent evt) {
@@ -1567,7 +1576,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         setGroupSelection("view", "/file/view/viewTagList");
-        setMenuChecked("/file/view/easy", false);
+        if (EasyPanel.EASY_AVAILABLE) {
+            setMenuChecked("/file/view/easy", false);
+        }
     }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {

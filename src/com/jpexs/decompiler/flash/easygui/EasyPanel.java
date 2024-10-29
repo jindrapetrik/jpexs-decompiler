@@ -28,6 +28,13 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class EasyPanel extends JPanel {
+    
+    /**
+     * TODO: switch to true when Easy mode is released.
+     * I think it's not production ready yet.
+     */
+    public static boolean EASY_AVAILABLE = false;
+    
     private TabSwitcher<SWF> tabSwitcher;
     private EasySwfPanel easySwfPanel;
     public EasyPanel() {
