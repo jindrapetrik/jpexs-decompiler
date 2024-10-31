@@ -1179,11 +1179,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     
-                    if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {
-                        
-                        if (true) { //WIP, not yet ready
-                            return;
-                        }
+                    if (e.getClickCount() == 2 && selectionMode && !transformSelectionMode) {                                               
                         
                         DepthState ds = depthStateUnderCursor;
                         if (ds != null) {
@@ -1537,29 +1533,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (transform == null) {
                             return;
                         }                        
-                        Matrix p = getParentMatrix();
+                        Matrix parentMatrix = getParentMatrix();
                         
                         Point2D mouseTransPoint = toTransformPoint(new Point2D.Double(e.getX(), e.getY()));
-                        //mouseTransPoint = p.transform(mouseTransPoint);
                         double ex = mouseTransPoint.getX();
                         double ey = mouseTransPoint.getY();
                         Point2D dragStartTransPoint = toTransformPoint(dragStart);
-                        //dragStartTransPoint = p.transform(dragStartTransPoint);
                         double dsx = dragStartTransPoint.getX();
                         double dsy = dragStartTransPoint.getY();
                         
                         double deltaX = ex - dsx;
                         double deltaY = ey - dsy;
 
-                        //AffineTransform pt = p.toTransform();
-                        
                         AffineTransform newTransform = new AffineTransform(transform.toTransform());
-                        AffineTransform t = new AffineTransform();
+                        AffineTransform t = parentMatrix.toTransform();
                         t.translate(deltaX, deltaY);
+                        t.concatenate(parentMatrix.inverse().toTransform());
                         newTransform.preConcatenate(t);
                         
-                        Point2D newRegistrationPoint = new Point2D.Double();
-                        t.transform(registrationPoint, newRegistrationPoint);
+                        Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
 
                         transformUpdated = newTransform;
                         registrationPointUpdated = newRegistrationPoint;
@@ -1836,8 +1828,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double deltaY = ey - dsy;
 
                             AffineTransform newTransform = new AffineTransform(transform.toTransform());
-                            AffineTransform t = new AffineTransform();
+                            AffineTransform t = parentMatrix.toTransform();
                             t.translate(deltaX, deltaY);
+                            t.concatenate(parentMatrix.inverse().toTransform());
                             newTransform.preConcatenate(t);
                             
                             Point2D newRegistrationPoint = new Matrix(t).preConcatenate(parentMatrix.inverse()).concatenate(parentMatrix).transform(registrationPoint);
