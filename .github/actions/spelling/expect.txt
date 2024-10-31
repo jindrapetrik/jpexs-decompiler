@@ -361,7 +361,6 @@ BText
 BTV
 bufferer
 bufferp
-BUFFERSIZE
 bufferu
 bugtracker
 buildingscripttree
@@ -1917,7 +1916,6 @@ lessthan
 Leung
 Levl
 lexers
-LEXSTATE
 lfcanvas
 lfctx
 lfimgd
@@ -2618,7 +2616,6 @@ osx
 otherdoc
 otherns
 otherone
-ourset
 oursidetrycatch
 outdir
 outdirectory
@@ -2903,7 +2900,6 @@ REFTYPE
 refu
 REGDB
 regdeo
-regexes
 regexpmapper
 regid
 regindex
@@ -3004,7 +3000,6 @@ rootswf
 rotateanticlockwise
 rotateclockwise
 rotateskew
-ROWMAP
 rownum
 ROWTYPE
 rozdilne
@@ -3154,7 +3149,6 @@ serr
 SERVICEPACKMAJOR
 SERVICEPACKMINOR
 serz
-Setable
 setadvancevalues
 SETCOUNT
 setcursor
@@ -3537,7 +3531,6 @@ textfields
 textfile
 textindent
 textplain
-textposition
 TEXTRECORD
 textsfolder
 textsformatted
@@ -3903,7 +3896,6 @@ WELCOMEFINISHPAGE
 WELCOMEPANEL
 welcometo
 wellbehaved
-wellformed
 wenn
 werden
 werner
@@ -4071,9 +4063,7 @@ YXDOMAIN
 YXRRSET
 yybegin
 yychar
-yycharat
 yyclose
-yycolumn
 yyeof
 YYINITIAL
 yylength
@@ -4084,7 +4074,6 @@ yypushback
 yypushbackstr
 yyreset
 yyrset
-yystate
 yytext
 yyy
 Zabcdefghijklmnopqrstuvwxyz
