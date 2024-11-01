@@ -1825,6 +1825,7 @@ public class AVM2Code implements Cloneable {
 
     /**
      * Converts to source output.
+     *
      * @param switchParts Switch parts
      * @param callStack Call stack
      * @param abcIndex ABC indexing
@@ -1910,7 +1911,7 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
-            
+
             if (ins.definition instanceof KillIns) {
                 int killedReg = ins.operands[0];
                 if (output.size() >= 2 && !stack.isEmpty()) {
@@ -1923,7 +1924,7 @@ public class AVM2Code implements Cloneable {
                                 if (insAfter != null && (insAfter.definition instanceof PopIns)) {
                                     if (setProp.value instanceof LocalRegAVM2Item) {
                                         LocalRegAVM2Item locReg = (LocalRegAVM2Item) setProp.value;
-                                        if  (locReg.regIndex == killedReg) {
+                                        if (locReg.regIndex == killedReg) {
                                             setProp.value = setLoc.value;
                                             output.remove(output.size() - 2);
                                             stack.pop();
@@ -1931,7 +1932,7 @@ public class AVM2Code implements Cloneable {
                                             continue;
                                         }
                                     }
-                                    
+
                                 }
                             }
                         }
@@ -1973,7 +1974,7 @@ public class AVM2Code implements Cloneable {
                     }
                 } while (ins.definition instanceof DupIns);
             } else
-            */    
+             */
             if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
                 ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
                 //ip = end + 1;
@@ -2016,12 +2017,11 @@ public class AVM2Code implements Cloneable {
                 nft.functionName = functionName;
                 ip++;
             } else {
-                try {                    
+                try {
                     ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, localScopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssignmentIps, ip, this, thisHasDefaultToPrimitive, bottomStackSetLocals);
-                    
-                    
+
                     if (stack.size() == 1 && (stack.peek() instanceof SetLocalAVM2Item)) {
-                       bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
+                        bottomStackSetLocals.add((SetLocalAVM2Item) stack.peek());
                     }
                 } catch (RuntimeException re) {
                     /*String last="";
@@ -2513,8 +2513,9 @@ public class AVM2Code implements Cloneable {
             }
         }*/
     }
-    
+
     private static interface BlockVisitor {
+
         public void visitBlock(List<GraphTargetItem> items);
     }
 
@@ -2561,7 +2562,7 @@ public class AVM2Code implements Cloneable {
         } catch (SecondPassException spe) {
             list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
         }
-        if (initTraits != null) {
+        if (initTraits != null) {            
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
@@ -2589,6 +2590,11 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 }
+                
+                /*
+                TODO: All this requires a better care for instance attributes,
+                for example using the assigned values only when it is referenced by const.
+                */
                 if ((ti instanceof InitPropertyAVM2Item) || (ti instanceof SetPropertyAVM2Item)) {
                     int multinameIndex = 0;
                     GraphTargetItem value = null;
@@ -2606,16 +2612,17 @@ public class AVM2Code implements Cloneable {
                         Multiname tm = abc.constants.getMultiname(t.name_index);
                         if (tm != null && tm.equals(m)) {
                             if ((t instanceof TraitSlotConst)) {
-                                if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
+                                //if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) 
+                                {
                                     TraitSlotConst tsc = (TraitSlotConst) t;
                                     if (value != null && !convertData.assignedValues.containsKey(tsc)) {
 
-                                        /*if (ti instanceof SetPropertyAVM2Item) { //only for slots
+                                        if (!isStatic) {
                                             Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
                                             subItems.add(value);
                                             List<Multiname> laterMultinames = new ArrayList<>();
-                                            for (int k = j + 1; k < ts.traits.size(); k++) {
-                                                int tMultinameIndex = ts.traits.get(k).name_index;
+                                            for (int k = j + 1; k < initTraits.traits.size(); k++) {
+                                                int tMultinameIndex = initTraits.traits.get(k).name_index;
                                                 if (tMultinameIndex > 0) {
                                                     Multiname tMultiname = abc.constants.getMultiname(tMultinameIndex);
                                                     laterMultinames.add(tMultiname);
@@ -2623,7 +2630,7 @@ public class AVM2Code implements Cloneable {
                                             }
                                             for (GraphTargetItem item : subItems) {
 
-                                                //if later slot is referenced, we must add it as {} block instead of direct assignment
+                                                //if later slot is referenced, we must add it in constructor instead of direct assignment
                                                 if (item instanceof GetPropertyAVM2Item) {
                                                     Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
                                                     if (laterMultinames.contains(multiName)) {
@@ -2637,19 +2644,21 @@ public class AVM2Code implements Cloneable {
                                                     }
                                                 }
 
-                                                if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
+                                                if (item instanceof LocalRegAVM2Item) { //it is surely in constructor block, not in slot/const
                                                     continue loopi;
                                                 }
-                                            }
-                                        }*/
+                                            }                                            
+                                        }
                                         if (value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
                                             f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
                                         }
                                         AssignedValue av = new AssignedValue(ti, value, initializerType, methodIndex);
                                         convertData.assignedValues.put(tsc, av);
-                                        //list.remove(i);
-                                        //i--;
+                                        if (!isStatic) {
+                                            list.remove(i);
+                                            i--;
+                                        }
                                         continue loopi;
                                     }
                                 }
@@ -2657,14 +2666,14 @@ public class AVM2Code implements Cloneable {
                             }
                         }
                     }
-                } else {
-                    // In obfuscated code, SetLocal instructions comes first
-                    //break;
+                } else if (!isStatic) {
+                    //We will ignore the fact, that in obfuscated code, the constructor can
+                    //start with SetLocal in favor of turning on the deobfuscation...
+                    break;
                 }
             }
         }
-        
-        
+
         int lastPos = list.size() - 1;
         if (lastPos < 0) {
             lastPos = 0;
@@ -2686,10 +2695,10 @@ public class AVM2Code implements Cloneable {
                 } else {
                     list.set(lastPos, rv.value);
                 }
-                
+
             }
         }
-        
+
         if (initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             Map<GraphTargetItem, AssignedValue> commandToAssigned = new IdentityHashMap<>();
             Map<GraphTargetItem, TraitSlotConst> commandToTrait = new IdentityHashMap<>();
@@ -2698,26 +2707,25 @@ public class AVM2Code implements Cloneable {
                 commandToAssigned.put(asv.command, asv);
                 commandToTrait.put(asv.command, tsc);
             }
-                        
+
             for (int i = 0; i < list.size(); i++) {
-                GraphTargetItem ti = list.get(i);                                
+                GraphTargetItem ti = list.get(i);
                 if (commandToAssigned.containsKey(ti)) {
                     AssignedValue asv = commandToAssigned.get(ti);
                     TraitSlotConst tsc = commandToTrait.get(ti);
-                    
+
                     int nsKind = tsc.getName(abc).getSimpleNamespaceKind(abc.constants);
                     if (classIndex == -1 && (nsKind == Namespace.KIND_PACKAGE || nsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
                         list.remove(i);
                         i--;
                         continue;
                     }
-                
-                    
+
                     TraitSlotConstAVM2Item item = new TraitSlotConstAVM2Item(
-                            ti.getSrc(), 
+                            ti.getSrc(),
                             ti.getLineStartItem(),
-                            tsc, 
-                            asv.value, 
+                            tsc,
+                            asv.value,
                             isStatic,
                             scriptIndex,
                             classIndex,
@@ -2728,20 +2736,20 @@ public class AVM2Code implements Cloneable {
                     list.set(i, item);
                 }
             }
-            
+
             if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
-                                
+
                 //Eliminate all setlocals, can sometimes happen
                 BlockVisitor bv = new BlockVisitor() {
                     @Override
                     public void visitBlock(List<GraphTargetItem> items) {
-                                                
+
                         for (int i = 0; i < items.size(); i++) {
                             GraphTargetItem item = items.get(i);
                             if (item instanceof SetLocalAVM2Item) {
                                 items.set(i, item.value);
                             }
-                            
+
                             if (item instanceof Block) {
                                 Block b = (Block) item;
                                 for (List<GraphTargetItem> list : b.getSubs()) {
@@ -2752,7 +2760,7 @@ public class AVM2Code implements Cloneable {
                     }
                 };
                 bv.visitBlock(list);
-                
+
                 PackageAVM2Item currentPkg = null;
                 for (int i = 0; i < list.size(); i++) {
                     GraphTargetItem ti = list.get(i);
@@ -2765,7 +2773,7 @@ public class AVM2Code implements Cloneable {
                                 currentPkg = new PackageAVM2Item(new ArrayList<>(), newPkgName);
                                 currentPkg.addItem(tsci);
                                 list.set(i, currentPkg);
-                            } else if (currentPkg.getPackageName().equals(newPkgName)){
+                            } else if (currentPkg.getPackageName().equals(newPkgName)) {
                                 currentPkg.addItem(tsci);
                                 list.remove(i);
                                 i--;
@@ -2791,14 +2799,10 @@ public class AVM2Code implements Cloneable {
                                                 TraitSlotConst tsc = (TraitSlotConst) t;
                                                 if (tsc.slot_id == gs.slotIndex) {
                                                     int nsKind = tsc.getName(abc).getNamespace(abc.constants).kind;
-                                                    if (
-                                                            (
-                                                            nsKind == Namespace.KIND_PACKAGE_INTERNAL
-                                                            && !currentPkgName.equals(tsc.getName(abc).getNamespace(abc.constants).getRawName(abc.constants))
-                                                            )
-                                                            || (nsKind == Namespace.KIND_PRIVATE)
-                                                        ) {
-                                                            insidePackage.setVal(false);                                                    
+                                                    if ((nsKind == Namespace.KIND_PACKAGE_INTERNAL
+                                                            && !currentPkgName.equals(tsc.getName(abc).getNamespace(abc.constants).getRawName(abc.constants)))
+                                                            || (nsKind == Namespace.KIND_PRIVATE)) {
+                                                        insidePackage.setVal(false);
                                                     }
                                                 }
                                             }
@@ -2819,7 +2823,7 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
-            
+
             List<GraphTargetItem> newList = new ArrayList<>();
             for (GraphTargetItem ti : list) {
                 if (!(ti instanceof ReturnVoidAVM2Item)) {
@@ -2871,7 +2875,7 @@ public class AVM2Code implements Cloneable {
         for (int ir = 0; ir < r; ir++) {
             paramNamesList.add(AVM2Item.localRegName(localRegNames, ir));
         }
-        injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);       
+        injectDeclarations(0, paramNamesList, list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
 
         return list;
     }

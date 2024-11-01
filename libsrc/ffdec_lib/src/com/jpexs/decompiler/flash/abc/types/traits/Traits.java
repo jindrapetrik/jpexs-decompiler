@@ -333,7 +333,7 @@ public class Traits implements Cloneable, Serializable {
                 continue;
             }
             
-            if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait)) {
+            if ((trait instanceof TraitSlotConst) && convertData.assignedValues.containsKey((TraitSlotConst) trait) && isStatic) {
                 continue;
             }
             
