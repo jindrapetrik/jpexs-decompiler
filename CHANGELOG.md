@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. Double click movie clips to edit sub-objects.
 
+### Fixed
+- [#2357] AS3 instance var/const initialization
+
 ## [21.1.3] - 2024-10-29
 ### Fixed
 - Java 8 compatibility
@@ -3636,6 +3639,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2357]: https://www.free-decompiler.com/flash/issues/2357
 [#2344]: https://www.free-decompiler.com/flash/issues/2344
 [#2348]: https://www.free-decompiler.com/flash/issues/2348
 [#2341]: https://www.free-decompiler.com/flash/issues/2341
