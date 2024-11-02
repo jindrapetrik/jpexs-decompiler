@@ -2248,9 +2248,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             Matrix matrix = displayEditImagePanel.getNewMatrix();
             if (displayEditTag instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
-                placeTag.setPlaceFlagHasMatrix(true);
                 Matrix origMatrix = new Matrix(placeTag.getMatrix());
                 placeTag.setMatrix(matrix.concatenate(origMatrix).toMATRIX());
+                placeTag.setPlaceFlagHasMatrix(true);                
             }
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
