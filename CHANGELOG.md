@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2357] AS3 instance var/const initialization
 - [#2361] Transform tool for PlaceObject tags
+- [#2357] FLA export letterspacing on two character texts
+- [#2357] FLA export to CS4 and lower - files exceeding 0x7FFF objects limit
+- [#2357] FLA export to CS4 and lower - speed optimization
 
 ## [21.1.3] - 2024-10-29
 ### Fixed
