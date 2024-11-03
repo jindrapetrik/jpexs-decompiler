@@ -423,10 +423,10 @@ public abstract class TextTag extends DrawableTag {
                     letterSpacing = 0;
                 } else {
                     int newLetterSpacing = adv - defaultAdvance;
-                    if (e == 0 || e == rec.glyphEntries.size() - 1) {
-                        if (rec.glyphEntries.size() == 1) {
-                            letterSpacing = 0;
-                        }
+                    if (rec.glyphEntries.size() == 1) {
+                        letterSpacing = 0;
+                    } else if (e == rec.glyphEntries.size() - 1) {
+                        //empty
                     } else if (newLetterSpacing < letterSpacing) {
                         letterSpacing = newLetterSpacing;
                     }
