@@ -86,7 +86,7 @@ public final class Configuration {
     @ConfigurationCategory("decompilation")
     public static ConfigurationItem<Boolean> parallelSpeedUp = null;
 
-    @ConfigurationDefaultInt(10)
+    @ConfigurationDefaultInt(0)
     @ConfigurationCategory("decompilation")
     public static ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
@@ -1480,12 +1480,19 @@ public final class Configuration {
      * @return Number of parallel threads
      */
     public static int getParallelThreadCount() {
-        int count = parallelSpeedUpThreadCount.get();
-        if (count < 2) {
-            count = 2;
+        int processorCount = Runtime.getRuntime().availableProcessors();
+        
+        int threadCount = parallelSpeedUpThreadCount.get();
+        
+        if (threadCount <= 0) {
+            threadCount = processorCount - 1;
         }
-
-        return count;
+        
+        if (threadCount < 2) {
+            threadCount = 2;
+        }
+        
+        return threadCount;
     }
 
     /**

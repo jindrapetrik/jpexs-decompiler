@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. Double click movie clips to edit sub-objects.
 
+- [#1619] Option to set thread count to 0 for auto setting processor count - 1
+
 ### Fixed
 - [#2357] AS3 instance var/const initialization
 - [#2361] Transform tool for PlaceObject tags
@@ -15,6 +17,9 @@ All notable changes to this project will be documented in this file.
 - [#2357] FLA export to CS4 and lower - files exceeding 0x7FFF objects limit
 - [#2357] FLA export to CS4 and lower - speed optimization
 - [#2362] Generating error log ExecutionException - InterruptedException log on switching flash/air swc
+
+### Changed
+- [#1619] Default thread count is set to 0 ( = auto)
 
 ## [21.1.3] - 2024-10-29
 ### Fixed
@@ -3644,6 +3649,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1619]: https://www.free-decompiler.com/flash/issues/1619
 [#2357]: https://www.free-decompiler.com/flash/issues/2357
 [#2361]: https://www.free-decompiler.com/flash/issues/2361
 [#2362]: https://www.free-decompiler.com/flash/issues/2362
