@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#2357] FLA export letterspacing on two character texts
 - [#2357] FLA export to CS4 and lower - files exceeding 0x7FFF objects limit
 - [#2357] FLA export to CS4 and lower - speed optimization
+- [#2362] Generating error log ExecutionException - InterruptedException log on switching flash/air swc
 
 ## [21.1.3] - 2024-10-29
 ### Fixed
@@ -3645,6 +3646,7 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#2357]: https://www.free-decompiler.com/flash/issues/2357
 [#2361]: https://www.free-decompiler.com/flash/issues/2361
+[#2362]: https://www.free-decompiler.com/flash/issues/2362
 [#2344]: https://www.free-decompiler.com/flash/issues/2344
 [#2348]: https://www.free-decompiler.com/flash/issues/2348
 [#2341]: https://www.free-decompiler.com/flash/issues/2341
