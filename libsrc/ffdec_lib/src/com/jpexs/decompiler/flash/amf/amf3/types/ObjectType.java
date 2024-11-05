@@ -17,13 +17,13 @@
 package com.jpexs.decompiler.flash.amf.amf3.types;
 
 import com.jpexs.decompiler.flash.amf.amf3.ListMap;
-import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.WithSubValues;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -436,7 +436,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
 
     @Override
     public Set<String> keySet() {
-        Set<String> ret = new ListSet<>();
+        Set<String> ret = new LinkedHashSet<>();
         ret.addAll(sealedMembers.keySet());
         ret.addAll(dynamicMembers.keySet());
         ret.addAll(serializedMembers.keySet());
@@ -448,7 +448,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
      * @return The key set of the sealed members.
      */
     public Set<String> sealedMembersKeySet() {
-        return new ListSet<>(sealedMembers.keySet());
+        return new LinkedHashSet<>(sealedMembers.keySet());
     }
 
     /**
@@ -456,7 +456,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
      * @return The key set of the dynamic members.
      */
     public Set<String> dynamicMembersKeySet() {
-        return new ListSet<>(dynamicMembers.keySet());
+        return new LinkedHashSet<>(dynamicMembers.keySet());
     }
 
     /**
@@ -464,7 +464,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
      * @return The key set of the serialized members.
      */
     public Set<String> serializedMembersKeySet() {
-        return new ListSet<>(serializedMembers.keySet());
+        return new LinkedHashSet<>(serializedMembers.keySet());
     }
 
     @Override
@@ -486,7 +486,7 @@ public class ObjectType implements WithSubValues, Amf3ValueType, Map<String, Obj
     @Override
     public Set<Entry<String, Object>> entrySet() {
         Set<String> keys = keySet();
-        Set<Entry<String, Object>> ret = new ListSet<>();
+        Set<Entry<String, Object>> ret = new LinkedHashSet<>();
         for (String key : keys) {
             ret.add(new ListMap.MyEntry<>(key, get(key)));
         }

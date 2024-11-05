@@ -14,22 +14,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.importers.amf.amf3;
+package com.jpexs.decompiler.flash.importers.amf.amf0;
 
-import com.jpexs.decompiler.flash.amf.amf3.ListMap;
-import com.jpexs.decompiler.flash.amf.amf3.Traits;
-import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
-import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ByteArrayType;
-import com.jpexs.decompiler.flash.amf.amf3.types.DateType;
-import com.jpexs.decompiler.flash.amf.amf3.types.DictionaryType;
-import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
-import com.jpexs.decompiler.flash.amf.amf3.types.VectorDoubleType;
-import com.jpexs.decompiler.flash.amf.amf3.types.VectorIntType;
-import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
-import com.jpexs.decompiler.flash.amf.amf3.types.VectorUIntType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
-import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
+import com.jpexs.decompiler.flash.amf.amf0.types.ArrayType;
+import com.jpexs.decompiler.flash.amf.amf0.types.BasicType;
+import com.jpexs.decompiler.flash.amf.amf0.types.DateType;
+import com.jpexs.decompiler.flash.amf.amf0.types.EcmaArrayType;
+import com.jpexs.decompiler.flash.amf.amf0.types.ObjectType;
+import com.jpexs.decompiler.flash.amf.amf0.types.TypedObjectType;
+import com.jpexs.decompiler.flash.amf.amf0.types.XmlDocumentType;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Lexer;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.amf3.ParsedSymbol;
+import com.jpexs.decompiler.flash.importers.amf.amf3.SymbolType;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.StringReader;
@@ -37,21 +34,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * AMF3 importer.
+ * AMF0 importer.
  */
-public class Amf3Importer {
+public class Amf0Importer {
 
     private Amf3Lexer lexer;
 
     /**
      * Constructor.
      */
-    public Amf3Importer() {
+    public Amf0Importer() {
     }
 
     private ParsedSymbol lex() throws IOException, Amf3ParseException {
@@ -145,7 +143,7 @@ public class Amf3Importer {
             return sb.toString();
         }
 
-        private final Map<Object, Object> values = new ListMap<>();
+        private final Map<Object, Object> values = new LinkedHashMap<>();
 
         public Object remove(Object key) {
             return values.remove(key);
@@ -257,6 +255,10 @@ public class Amf3Importer {
         public Long getLong(Object key) throws Amf3ParseException {
             return (Long) getRequired(key, "Long");
         }
+        
+        public Double getDouble(Object key) throws Amf3ParseException {
+            return (Double) getRequired(key, "Double");
+        }
 
         public Object getRequired(Object key, String requiredType) throws Amf3ParseException {
             if (!containsKey(key)) {
@@ -314,7 +316,7 @@ public class Amf3Importer {
         }
 
         public Map<String, Object> getStringMapped() {
-            Map<String, Object> ret = new ListMap<>();
+            Map<String, Object> ret = new LinkedHashMap<>();
             for (Object key : values.keySet()) {
                 if (key instanceof String) {
                     String keyStr = (String) key;
@@ -370,75 +372,40 @@ public class Amf3Importer {
                         case "Date":
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
                             String dateStr = typedObject.getString("value");
+                            int timeZone = (int) (long) (double) typedObject.getDouble("timezone");
                             try {
-                                resultObject = new DateType((double) sdf.parse(dateStr).getTime());
+                                resultObject = new DateType((double) sdf.parse(dateStr).getTime(), timeZone);
                             } catch (ParseException ex) {
                                 throw new Amf3ParseException("Invalid date format: " + dateStr, lexer.yyline());
                             }
                             break;
-                        case "XML":
-                            resultObject = new XmlType(typedObject.getString("value"));
-                            break;
                         case "XMLDocument":
-                            resultObject = new XmlDocType(typedObject.getString("value"));
+                            resultObject = new XmlDocumentType(typedObject.getString("data"));
                             break;
                         case "Object":
-                            String className = typedObject.getString("className");
-                            if (typedObject.containsKey("serialized")) {
-                                //TODO
-                            } else {
-                                boolean dynamic = typedObject.getBoolean("dynamic");
-                                typedObject.resolve("sealedMembers", objectTable, false);
-                                JsObject jsoSealed = typedObject.getJsObject("sealedMembers");
-
-                                Map<String, Object> sealedMembers = jsoSealed.getStringMapped();
-                                typedObject.resolve("dynamicMembers", objectTable, false);
-                                Map<String, Object> dynamicMembers = typedObject.getJsObject("dynamicMembers").getStringMapped();
-
-                                List<String> sealedMemberNames = new ArrayList<>(jsoSealed.stringKeys());
-                                resultObject = new ObjectType(new Traits(className, dynamic, sealedMemberNames), sealedMembers, dynamicMembers);
-                            }
+                            ObjectType ot = new ObjectType();
+                            typedObject.resolve("members", objectTable, false);                            
+                            ot.properties = typedObject.getJsObject("members").getStringMapped();
+                            resultObject = ot;
+                            break;
+                        case "TypedObject":
+                            TypedObjectType tot = new TypedObjectType();
+                            tot.className = typedObject.getString("className");
+                            typedObject.resolve("members", objectTable, false);
+                            tot.properties = typedObject.getJsObject("members").getStringMapped();
+                            resultObject = tot;
+                            break;
+                        case "EcmaArray":
+                            EcmaArrayType eat = new EcmaArrayType();
+                            typedObject.resolve("members", objectTable, false);
+                            eat.values = typedObject.getJsObject("members").getStringMapped();
+                            resultObject = eat;
                             break;
                         case "Array":
-                            typedObject.resolve("denseValues", objectTable, false);
-                            List<Object> denseValues = typedObject.getJsArray("denseValues").getValues();
-                            typedObject.resolve("associativeValues", objectTable, false);
-                            JsObject resolvedArr = typedObject.getJsObject("associativeValues");
-                            Map<String, Object> associativeValues = resolvedArr.getStringMapped();
-                            resultObject = new ArrayType(denseValues, associativeValues);
-                            break;
-
-                        case "Vector":
-                            boolean fixed = typedObject.getBoolean("fixed");
-                            String subtype = typedObject.getString("subtype");
-                            typedObject.resolve("values", objectTable, false);
-                            switch (subtype) {
-                                case "int":
-                                    resultObject = new VectorIntType(fixed, typedObject.getJsArrayOfInt("values"));
-                                    break;
-                                case "uint":
-                                    resultObject = new VectorUIntType(fixed, typedObject.getJsArrayOfUint("values"));
-                                    break;
-                                case "Number":
-                                    resultObject = new VectorDoubleType(fixed, typedObject.getJsArrayOfNumber("values"));
-                                    break;
-                                default:
-                                    resultObject = new VectorObjectType(fixed, subtype, typedObject.getJsArrayOfObject("values"));
-                                    break;
-                            }
-                            break;
-                        case "ByteArray":
-                            try {
-                                resultObject = new ByteArrayType(Helper.hexToByteArray(typedObject.getString("value")));
-                            } catch (IllegalArgumentException iex) {
-                                throw new Amf3ParseException("Invalid hex byte sequence", lexer.yyline());
-                            }
-                            break;
-                        case "Dictionary":
-                            boolean weakKeys = typedObject.getBoolean("weakKeys");
-                            typedObject.resolve("entries", objectTable, false);
-                            Map<Object, Object> entries = typedObject.getJsObject("entries").getAll();
-                            resultObject = new DictionaryType(weakKeys, entries);
+                            ArrayType at = new ArrayType();
+                            typedObject.resolve("values", objectTable, false);                            
+                            at.values = typedObject.getJsArray("values").getValues();
+                            resultObject = at;
                             break;
                         default:
                             throw new Amf3ParseException("Unknown object type: " + typeStr, lexer.yyline());
@@ -451,17 +418,17 @@ public class Amf3Importer {
                 JsObject jsObject = (JsObject) object;
                 for (Object key : jsObject.keySet()) {
                     Object val = jsObject.get(key);
-                    Object resKey = resolveObjects(key, objectTable, true);
+                    //Object resKey = resolveObjects(key, objectTable, true);
                     Object resVal = resolveObjects(val, objectTable, true);
-                    jsObject.remove(key);
-                    jsObject.put(resKey, resVal);
+                    //jsObject.remove(key);
+                    jsObject.put(key, resVal);
                 }
                 resultObject = jsObject;
             }
         }
         return resultObject;
-    }   
-    
+    }
+
     private Map<String, Object> map(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
         Map<String, Object> result = new HashMap<>();
         expectedType(SymbolType.CURLY_OPEN);
@@ -475,12 +442,12 @@ public class Amf3Importer {
             expectedType(SymbolType.COLON);
             result.put(key, value(objectTable));
             s = lex();
-        } while(s.type == SymbolType.COMMA);
-        
+        } while (s.type == SymbolType.COMMA);
+
         expected(s, lexer.yyline(), SymbolType.CURLY_CLOSE);
         return result;
     }
-    
+
     private Object value(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
         ParsedSymbol s = lex();
         switch (s.type) {
@@ -492,8 +459,9 @@ public class Amf3Importer {
                 return parseArray(objectTable);
             case STRING:
             case DOUBLE:
-            case INTEGER:
                 return s.value;
+            case INTEGER:
+                return (double) (long) (Long) s.value;
             case UNDEFINED:
                 return BasicType.UNDEFINED;
             case NULL:
@@ -528,37 +496,23 @@ public class Amf3Importer {
             return objectsTable.get(key);
         } else if (object instanceof ObjectType) {
             ObjectType ot = (ObjectType) object;
-            for (String key : ot.sealedMembersKeySet()) {
-                ot.putSealedMember(key, replaceReferences(ot.getSealedMember(key), objectsTable));
+            for (String key : ot.properties.keySet()) {
+                ot.properties.put(key, replaceReferences(ot.properties.get(key), objectsTable));
             }
-            for (String key : ot.dynamicMembersKeySet()) {
-                ot.putDynamicMember(key, replaceReferences(ot.getDynamicMember(key), objectsTable));
+        } else if (object instanceof TypedObjectType) {
+            TypedObjectType tot = (TypedObjectType) object;
+            for (String key : tot.properties.keySet()) {
+                tot.properties.put(key, replaceReferences(tot.properties.get(key), objectsTable));
             }
-            for (String key : ot.serializedMembersKeySet()) {
-                ot.putSerializedMember(key, replaceReferences(ot.getSerializedMember(key), objectsTable));
+        } else if (object instanceof EcmaArrayType) {
+            EcmaArrayType eat = (EcmaArrayType) object;
+            for (String key : eat.values.keySet()) {
+                eat.values.put(key, replaceReferences(eat.values.get(key), objectsTable));
             }
-
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
-            for (String key : at.associativeKeySet()) {
-                at.putAssociative(key, replaceReferences(at.getAssociative(key), objectsTable));
-            }
-            for (int i = 0; i < at.getDenseValues().size(); i++) {
-                at.setDense(i, replaceReferences(at.getDense(i), objectsTable));
-            }
-        } else if (object instanceof VectorObjectType) {
-            VectorObjectType vot = (VectorObjectType) object;
-            for (int i = 0; i < vot.getValues().size(); i++) {
-                vot.getValues().set(i, replaceReferences(vot.getValues().get(i), objectsTable));
-            }
-        } else if (object instanceof DictionaryType) {
-            DictionaryType dt = (DictionaryType) object;
-            for (Object key : dt.keySet()) {
-                Object val = dt.get(key);
-                Object newKey = replaceReferences(key, objectsTable);
-                Object newVal = replaceReferences(val, objectsTable);
-                dt.remove(key);
-                dt.put(newKey, newVal);
+            for (int i = 0; i < at.values.size(); i++) {
+                at.values.set(i, replaceReferences(at.values.get(i), objectsTable));
             }
         }
 
@@ -589,7 +543,7 @@ public class Amf3Importer {
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws Amf3ParseException On parse error    
+     * @throws Amf3ParseException On parse error
      */
     public Object stringToAmf(String val) throws IOException, Amf3ParseException {
         lexer = new Amf3Lexer(new StringReader(val));
@@ -600,30 +554,30 @@ public class Amf3Importer {
         Object resultNoRef = replaceReferences(resultResolved, objectsTable);
         return resultNoRef;
     }
-    
+
     /**
      * Convert AMF3 map string to object
      *
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws Amf3ParseException On parse error    
+     * @throws Amf3ParseException On parse error
      */
     public Map<String, Object> stringToAmfMap(String val) throws IOException, Amf3ParseException {
         lexer = new Amf3Lexer(new StringReader(val));
         Map<String, Object> objectsTable = new HashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Map<String, Object> result = map(objectsTable);
-        for (String key: result.keySet()) {
+        for (String key : result.keySet()) {
             Object resultResolved = resolveObjects(result.get(key), objectsTable, true);
             result.put(key, resultResolved);
         }
-        
-        for (String key: result.keySet()) {
+
+        for (String key : result.keySet()) {
             Object resultNoRef = replaceReferences(result.get(key), objectsTable);
             result.put(key, resultNoRef);
         }
-            
+
         return result;
     }
 }

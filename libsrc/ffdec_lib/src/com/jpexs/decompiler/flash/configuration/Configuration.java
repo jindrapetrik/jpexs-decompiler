@@ -1045,6 +1045,10 @@ public final class Configuration {
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> maxScriptLineLength = null;
     
+    @ConfigurationDefaultString(".")
+    @ConfigurationDirectory
+    public static ConfigurationItem<String> lastSolEditorDirectory = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

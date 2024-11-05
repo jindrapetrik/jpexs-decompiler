@@ -182,7 +182,7 @@ public class Amf3OutputStream extends OutputStream {
      * @param stringTable String table
      * @throws IOException On I/O error
      */
-    private void writeUtf8Vr(String val, List<String> stringTable) throws IOException {
+    public void writeUtf8Vr(String val, List<String> stringTable) throws IOException {
         int stringIndex = stringTable.indexOf(val);
         if (stringIndex == -1) {
             if (!val.isEmpty()) {
@@ -336,7 +336,17 @@ public class Amf3OutputStream extends OutputStream {
         writeValue(object, serializers, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
-    private void writeValue(Object object, Map<String, ObjectTypeSerializeHandler> serializers, List<String> stringTable, List<Traits> traitsTable, List<Object> objectTable) throws IOException, NoSerializerExistsException {
+    /**
+     * Writes value.
+     * @param object Object
+     * @param serializers Serializers 
+     * @param stringTable String table
+     * @param traitsTable Traits table
+     * @param objectTable Object table
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
+    public void writeValue(Object object, Map<String, ObjectTypeSerializeHandler> serializers, List<String> stringTable, List<Traits> traitsTable, List<Object> objectTable) throws IOException, NoSerializerExistsException {
         if (object == BasicType.UNDEFINED) {
             writeU8(Marker.UNDEFINED);
         } else if (object == BasicType.NULL) {

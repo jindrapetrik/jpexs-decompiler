@@ -115,6 +115,30 @@ public class Amf3Exporter {
         populateObjects(amfValue, refCount, objectList, objectAlias);
         return amfToString(indentStr, newLine, new ArrayList<>(), 0, amfValue, refCount, objectAlias);
     }
+    
+    public static String amfMapToString(Map<String, Object> map, String indentStr, String newLine, int level) {
+        Map<Object, Integer> refCount = new HashMap<>();
+        List<Object> objectList = new ArrayList<>();
+        Map<Object, String> objectAlias = new HashMap<>();
+        for (Object val : map.values()) {
+            populateObjects(val, refCount, objectList, objectAlias);
+        }        
+        List<Object> processedObjects = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("{").append(newLine);
+        boolean first = true;
+        for (String key: map.keySet()) {
+            if (!first) {
+                sb.append(", ").append(newLine);
+            }
+            first = false;
+            sb.append(indent(level + 1)).append("\"").append(Helper.escapeActionScriptString(key)).append("\": ");
+            sb.append(amfToString(indentStr, newLine, processedObjects, level + 1, map.get(key), refCount, objectAlias));
+        }
+        sb.append(newLine);
+        sb.append(indent(level)).append("}");
+        return sb.toString();
+    }
 
     /**
      * Processes one level of object and converts it to string
@@ -226,7 +250,7 @@ public class Amf3Exporter {
                     for (String key : ot.dynamicMembersKeySet()) {
                         Object val = ot.getDynamicMember(key);
                         ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 2, key, referenceCount, objectAlias));
-                        ret.append(":");
+                        ret.append(": ");
                         ret.append(amfToString(indentStr, newLine, processedObjects, level + 2, val, referenceCount, objectAlias));
                         if (i < ot.dynamicMembersSize() - 1) {
                             ret.append(",");
