@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.importers.amf.amf3;
+package com.jpexs.decompiler.flash.importers.amf;
 
 /**
- * AMF3 parsed symbol.
+ * AMF parsed symbol.
  *
  * @author JPEXS
  */

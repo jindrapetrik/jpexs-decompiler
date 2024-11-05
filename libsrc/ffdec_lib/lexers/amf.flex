@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.importers.amf.amf3;
+package com.jpexs.decompiler.flash.importers.amf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -22,12 +22,12 @@ import java.util.Stack;
 %%
 
 %public
-%class Amf3Lexer
+%class AmfLexer
 %final
 %unicode
 %char
 %type ParsedSymbol
-%throws Amf3ParseException
+%throws AmfParseException
 
 %{
 
@@ -51,7 +51,7 @@ import java.util.Stack;
     }
 
     ParsedSymbol last;
-    public ParsedSymbol lex() throws java.io.IOException, Amf3ParseException{
+    public ParsedSymbol lex() throws java.io.IOException, AmfParseException {
         ParsedSymbol ret = null;
         if (!pushedBack.isEmpty()){
             ret = last = pushedBack.pop();

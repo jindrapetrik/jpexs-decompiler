@@ -14,29 +14,22 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.importers.amf.amf3;
+package com.jpexs.decompiler.flash.importers.amf;
 
 /**
- * Parsed symbol type.
+ * Parsed symbol group.
  *
  * @author JPEXS
  */
-public enum SymbolType {
-    NULL,
-    UNDEFINED,
-    FALSE,
-    TRUE,
-    CURLY_OPEN,
-    CURLY_CLOSE,
-    BRACKET_OPEN,
-    BRACKET_CLOSE,
-    COMMA,
-    COLON,
-    UNKNOWN,
-    REFERENCE,
+public enum SymbolGroup {
+    OPERATOR,
+    KEYWORD,
+    STRING,
+    COMMENT,
     IDENTIFIER,
     INTEGER,
-    STRING,
     DOUBLE,
-    EOF
+    EOF,
+    GLOBALCONST,
+    UNKNOWN
 }

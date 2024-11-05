@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import java.awt.BorderLayout;
@@ -212,10 +212,10 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
             if (!textVal.trim().isEmpty()) {
                 importer.stringToAmf(textVal);
             }
-        } catch (IOException | Amf3ParseException ex) {
+        } catch (IOException | AmfParseException ex) {
 
-            if (ex instanceof Amf3ParseException) {
-                Amf3ParseException ape = (Amf3ParseException) ex;
+            if (ex instanceof AmfParseException) {
+                AmfParseException ape = (AmfParseException) ex;
                 if (ape.line > 0) {
                     editor.gotoLine((int) ape.line);
                 }
@@ -240,7 +240,7 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
         String textVal = editor.getText();
         try {
             return textVal.trim().isEmpty() ? null : new Amf3Value(importer.stringToAmf(textVal));
-        } catch (IOException | Amf3ParseException ex) {
+        } catch (IOException | AmfParseException ex) {
             return value;
         }
     }

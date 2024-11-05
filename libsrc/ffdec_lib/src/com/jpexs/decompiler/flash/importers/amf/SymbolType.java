@@ -14,23 +14,29 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.importers.amf.amf3;
-
-import com.jpexs.decompiler.flash.ParseException;
+package com.jpexs.decompiler.flash.importers.amf;
 
 /**
- * Exception thrown when AMF3 parsing fails.
+ * Parsed symbol type.
  *
  * @author JPEXS
  */
-public class Amf3ParseException extends ParseException {
-
-    /**
-     * Constructor.
-     * @param text Text
-     * @param line Line
-     */
-    public Amf3ParseException(String text, long line) {
-        super(text, line);
-    }
+public enum SymbolType {
+    NULL,
+    UNDEFINED,
+    FALSE,
+    TRUE,
+    CURLY_OPEN,
+    CURLY_CLOSE,
+    BRACKET_OPEN,
+    BRACKET_CLOSE,
+    COMMA,
+    COLON,
+    UNKNOWN,
+    REFERENCE,
+    IDENTIFIER,
+    INTEGER,
+    STRING,
+    DOUBLE,
+    EOF
 }
