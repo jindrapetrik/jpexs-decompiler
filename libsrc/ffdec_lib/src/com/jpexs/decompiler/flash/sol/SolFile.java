@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.importers.amf.amf0.Amf0Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -199,7 +199,7 @@ public class SolFile {
                     Map<String, Object> imported = importer.stringToAmfMap(amf0string);
                     String amf0stringNew = Amf0Exporter.amfMapToString(imported, 0, "\r\n");
                     System.err.println("same0 = " + amf0stringNew.equals(amf0string));
-                } catch (Amf3ParseException ex) {
+                } catch (AmfParseException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -216,7 +216,7 @@ public class SolFile {
                     Map<String, Object> imported = importer.stringToAmfMap(amf3string);
                     String amf3stringNew = Amf3Exporter.amfMapToString(imported, "  ", "\r\n", 0);;
                     System.err.println("same3 = " + amf3stringNew.equals(amf3string));
-                } catch (Amf3ParseException ex) {
+                } catch (AmfParseException ex) {
                     ex.printStackTrace();
                 }
             }

@@ -132,7 +132,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -1304,7 +1304,7 @@ public class CommandLineArgumentParser {
                     amfValue = ais.readValue("val");
                     break;
             }
-        } catch (IOException | Amf3ParseException | NoSerializerExistsException ex) {
+        } catch (IOException | AmfParseException | NoSerializerExistsException ex) {
             System.err.println("Error parsing input value: " + ex.getMessage());
             System.exit(1);
             return;

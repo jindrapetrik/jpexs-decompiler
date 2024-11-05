@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.amf.amf3.types.Amf3ValueType;
 import com.jpexs.decompiler.flash.amf.amf3.types.BasicType;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class Amf3Value {
         Amf3Importer imp = new Amf3Importer();
         try {
             return imp.stringToAmf(data);
-        } catch (IOException | Amf3ParseException ex) {
+        } catch (IOException | AmfParseException ex) {
             return BasicType.UNKNOWN;
         }
     }

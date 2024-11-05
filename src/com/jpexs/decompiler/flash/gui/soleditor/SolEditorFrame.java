@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.importers.amf.amf0.Amf0Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
-import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
 import com.jpexs.decompiler.flash.sol.SolFile;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -269,7 +269,7 @@ public class SolEditorFrame extends AppFrame {
             amfVersionComboBox.setVisible(false);
             amfVersionLabel.setVisible(true);
             ViewMessages.showMessageDialog(this, translate("info.saved"), AppStrings.translate("message.info"), JOptionPane.INFORMATION_MESSAGE);
-        } catch (Amf3ParseException ex) {
+        } catch (AmfParseException ex) {
             editor.gotoLine((int) ex.line);
             editor.markError();
             ViewMessages.showMessageDialog(this, translate("error.parse").replace("%reason%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);

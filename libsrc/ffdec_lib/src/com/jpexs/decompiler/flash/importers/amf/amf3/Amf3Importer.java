@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.importers.amf.amf3;
 
+import com.jpexs.decompiler.flash.importers.amf.AmfLexer;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
+import com.jpexs.decompiler.flash.importers.amf.SymbolType;
 import com.jpexs.decompiler.flash.amf.amf3.ListMap;
 import com.jpexs.decompiler.flash.amf.amf3.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.types.ArrayType;
@@ -30,6 +33,7 @@ import com.jpexs.decompiler.flash.amf.amf3.types.VectorObjectType;
 import com.jpexs.decompiler.flash.amf.amf3.types.VectorUIntType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlDocType;
 import com.jpexs.decompiler.flash.amf.amf3.types.XmlType;
+import com.jpexs.decompiler.flash.importers.amf.ParsedSymbol;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.StringReader;
@@ -46,7 +50,7 @@ import java.util.Set;
  */
 public class Amf3Importer {
 
-    private Amf3Lexer lexer;
+    private AmfLexer lexer;
 
     /**
      * Constructor.
@@ -54,7 +58,7 @@ public class Amf3Importer {
     public Amf3Importer() {
     }
 
-    private ParsedSymbol lex() throws IOException, Amf3ParseException {
+    private ParsedSymbol lex() throws IOException, AmfParseException {
         ParsedSymbol ret = lexer.lex();
         return ret;
     }
@@ -63,7 +67,7 @@ public class Amf3Importer {
         lexer.pushback(s);
     }
 
-    private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, Amf3ParseException {
+    private void expected(ParsedSymbol symb, int line, Object... expected) throws IOException, AmfParseException {
         boolean found = false;
         for (Object t : expected) {
             if (symb.type == t) {
@@ -83,17 +87,17 @@ public class Amf3Importer {
                 expStr += e;
                 first = false;
             }
-            throw new Amf3ParseException("" + expStr + " expected but " + symb.type + " found", line);
+            throw new AmfParseException("" + expStr + " expected but " + symb.type + " found", line);
         }
     }
 
-    private ParsedSymbol expectedType(Object... type) throws IOException, Amf3ParseException {
+    private ParsedSymbol expectedType(Object... type) throws IOException, AmfParseException {
         ParsedSymbol symb = lex();
         expected(symb, lexer.yyline(), type);
         return symb;
     }
 
-    private JsArray parseArray(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
+    private JsArray parseArray(Map<String, Object> objectTable) throws IOException, AmfParseException {
         expectedType(SymbolType.BRACKET_OPEN);
         List<Object> arrayVals = new ArrayList<>();
         ParsedSymbol s = lex();
@@ -163,48 +167,48 @@ public class Amf3Importer {
             values.put(key, value);
         }
 
-        public String getString(Object key) throws Amf3ParseException {
+        public String getString(Object key) throws AmfParseException {
             return (String) getRequired(key, "String");
         }
 
-        public Boolean getBoolean(Object key) throws Amf3ParseException {
+        public Boolean getBoolean(Object key) throws AmfParseException {
             return (Boolean) getRequired(key, "Boolean");
         }
 
-        public JsObject getJsObject(Object key) throws Amf3ParseException {
+        public JsObject getJsObject(Object key) throws AmfParseException {
             return (JsObject) getRequired(key, "JsObject");
         }
 
-        public List<Object> getJsArrayOfObject(Object key) throws Amf3ParseException {
+        public List<Object> getJsArrayOfObject(Object key) throws AmfParseException {
             return getJsArray(key).getValues();
         }
 
         @SuppressWarnings("unchecked")
-        public List<String> getJsArrayOfString(Object key) throws Amf3ParseException {
+        public List<String> getJsArrayOfString(Object key) throws AmfParseException {
             return (List<String>) getJsArray(key, "String");
         }
 
         @SuppressWarnings("unchecked")
-        public List<Long> getJsArrayOfInt(Object key) throws Amf3ParseException {
+        public List<Long> getJsArrayOfInt(Object key) throws AmfParseException {
             return (List<Long>) getJsArray(key, "int");
         }
 
         @SuppressWarnings("unchecked")
 
-        public List<Long> getJsArrayOfUint(Object key) throws Amf3ParseException {
+        public List<Long> getJsArrayOfUint(Object key) throws AmfParseException {
             return (List<Long>) getJsArray(key, "uint");
         }
 
         @SuppressWarnings("unchecked")
-        public List<Double> getJsArrayOfNumber(Object key) throws Amf3ParseException {
+        public List<Double> getJsArrayOfNumber(Object key) throws AmfParseException {
             return (List<Double>) getJsArray(key, "Number");
         }
 
-        public JsArray getJsArray(Object key) throws Amf3ParseException {
+        public JsArray getJsArray(Object key) throws AmfParseException {
             return (JsArray) getRequired(key, "JsArray");
         }
 
-        public List getJsArray(Object key, String valueType) throws Amf3ParseException {
+        public List getJsArray(Object key, String valueType) throws AmfParseException {
             JsArray jsArr = (JsArray) getRequired(key, "JsArray");
             switch (valueType) {
                 case "String":
@@ -214,7 +218,7 @@ public class Amf3Importer {
                         if (v instanceof String) {
                             sv = (String) v;
                         } else {
-                            throw new Amf3ParseException("Not String: " + v, 0);
+                            throw new AmfParseException("Not String: " + v, 0);
                         }
                         stringList.add(sv);
                     }
@@ -227,10 +231,10 @@ public class Amf3Importer {
                         if (v instanceof Long) {
                             lv = (Long) v;
                         } else {
-                            throw new Amf3ParseException("Not an Integer value: " + v, 0);
+                            throw new AmfParseException("Not an Integer value: " + v, 0);
                         }
                         if (valueType.equals("uint") && lv < 0) {
-                            throw new Amf3ParseException("Not an Unsigned Integer value: " + v, 0);
+                            throw new AmfParseException("Not an Unsigned Integer value: " + v, 0);
                         }
                         longList.add(lv);
                     }
@@ -244,23 +248,23 @@ public class Amf3Importer {
                         } else if (v instanceof Double) {
                             cv = (Double) v;
                         } else {
-                            throw new Amf3ParseException("Not a Number: " + v, 0);
+                            throw new AmfParseException("Not a Number: " + v, 0);
                         }
                         doubleList.add(cv);
                     }
                     return doubleList;
                 default:
-                    throw new Amf3ParseException("Unsupported array value type: " + valueType, 0);
+                    throw new AmfParseException("Unsupported array value type: " + valueType, 0);
             }
         }
 
-        public Long getLong(Object key) throws Amf3ParseException {
+        public Long getLong(Object key) throws AmfParseException {
             return (Long) getRequired(key, "Long");
         }
 
-        public Object getRequired(Object key, String requiredType) throws Amf3ParseException {
+        public Object getRequired(Object key, String requiredType) throws AmfParseException {
             if (!containsKey(key)) {
-                throw new Amf3ParseException("\"" + key + "\" is missing", 0);
+                throw new AmfParseException("\"" + key + "\" is missing", 0);
             }
             Object val = get(key);
             boolean typeMatches = true;
@@ -284,7 +288,7 @@ public class Amf3Importer {
                 }
             }
             if (!typeMatches) {
-                throw new Amf3ParseException("\"" + key + "\" value must be of type " + requiredType, 0);
+                throw new AmfParseException("\"" + key + "\" value must be of type " + requiredType, 0);
             }
             return val;
         }
@@ -293,7 +297,7 @@ public class Amf3Importer {
             return values.containsKey(key);
         }
 
-        public void resolve(Object key, Map<String, Object> objectTable, boolean allowTypedObject) throws Amf3ParseException {
+        public void resolve(Object key, Map<String, Object> objectTable, boolean allowTypedObject) throws AmfParseException {
             Object val = values.get(key);
             Object resolved = resolveObjects(val, objectTable, allowTypedObject);
             values.put(key, resolved);
@@ -325,7 +329,7 @@ public class Amf3Importer {
         }
     }
 
-    private JsObject parseObject(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
+    private JsObject parseObject(Map<String, Object> objectTable) throws IOException, AmfParseException {
         JsObject ret = new JsObject();
 
         expectedType(SymbolType.CURLY_OPEN);
@@ -339,7 +343,7 @@ public class Amf3Importer {
                 ret.put(key, value);
                 if ("id".equals(key)) {
                     if (!(value instanceof String)) {
-                        throw new Amf3ParseException("id must be string value", lexer.yyline());
+                        throw new AmfParseException("id must be string value", lexer.yyline());
                     }
                     objectTable.put((String) value, BasicType.UNDEFINED);
                 }
@@ -351,7 +355,7 @@ public class Amf3Importer {
         return ret;
     }
 
-    private Object resolveObjects(Object object, Map<String, Object> objectTable, boolean allowTypedObject) throws Amf3ParseException {
+    private Object resolveObjects(Object object, Map<String, Object> objectTable, boolean allowTypedObject) throws AmfParseException {
         Object resultObject = object;
         if (object instanceof JsArray) {
             JsArray jsa = (JsArray) object;
@@ -373,7 +377,7 @@ public class Amf3Importer {
                             try {
                                 resultObject = new DateType((double) sdf.parse(dateStr).getTime());
                             } catch (ParseException ex) {
-                                throw new Amf3ParseException("Invalid date format: " + dateStr, lexer.yyline());
+                                throw new AmfParseException("Invalid date format: " + dateStr, lexer.yyline());
                             }
                             break;
                         case "XML":
@@ -431,7 +435,7 @@ public class Amf3Importer {
                             try {
                                 resultObject = new ByteArrayType(Helper.hexToByteArray(typedObject.getString("value")));
                             } catch (IllegalArgumentException iex) {
-                                throw new Amf3ParseException("Invalid hex byte sequence", lexer.yyline());
+                                throw new AmfParseException("Invalid hex byte sequence", lexer.yyline());
                             }
                             break;
                         case "Dictionary":
@@ -441,7 +445,7 @@ public class Amf3Importer {
                             resultObject = new DictionaryType(weakKeys, entries);
                             break;
                         default:
-                            throw new Amf3ParseException("Unknown object type: " + typeStr, lexer.yyline());
+                            throw new AmfParseException("Unknown object type: " + typeStr, lexer.yyline());
                     }
                     if (id != null) {
                         objectTable.put(id, resultObject);
@@ -462,7 +466,7 @@ public class Amf3Importer {
         return resultObject;
     }   
     
-    private Map<String, Object> map(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
+    private Map<String, Object> map(Map<String, Object> objectTable) throws IOException, AmfParseException {
         Map<String, Object> result = new HashMap<>();
         expectedType(SymbolType.CURLY_OPEN);
         ParsedSymbol s;
@@ -481,7 +485,7 @@ public class Amf3Importer {
         return result;
     }
     
-    private Object value(Map<String, Object> objectTable) throws IOException, Amf3ParseException {
+    private Object value(Map<String, Object> objectTable) throws IOException, AmfParseException {
         ParsedSymbol s = lex();
         switch (s.type) {
             case CURLY_OPEN:
@@ -508,7 +512,7 @@ public class Amf3Importer {
                 String referencedId = (String) s.value;
                 return new ReferencedObjectType(referencedId);
             default:
-                throw new Amf3ParseException("Unexpected symbol: " + s, lexer.yyline());
+                throw new AmfParseException("Unexpected symbol: " + s, lexer.yyline());
         }
     }
 
@@ -519,11 +523,11 @@ public class Amf3Importer {
      * @param objectsTable Objects table
      * @return Replaced object
      */
-    private Object replaceReferences(Object object, Map<String, Object> objectsTable) throws Amf3ParseException {
+    private Object replaceReferences(Object object, Map<String, Object> objectsTable) throws AmfParseException {
         if (object instanceof ReferencedObjectType) {
             String key = ((ReferencedObjectType) object).key;
             if (!objectsTable.containsKey(key)) {
-                throw new Amf3ParseException("Reference to undefined object: #" + key, 0);
+                throw new AmfParseException("Reference to undefined object: #" + key, 0);
             }
             return objectsTable.get(key);
         } else if (object instanceof ObjectType) {
@@ -589,10 +593,10 @@ public class Amf3Importer {
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws Amf3ParseException On parse error    
+     * @throws AmfParseException On parse error    
      */
-    public Object stringToAmf(String val) throws IOException, Amf3ParseException {
-        lexer = new Amf3Lexer(new StringReader(val));
+    public Object stringToAmf(String val) throws IOException, AmfParseException {
+        lexer = new AmfLexer(new StringReader(val));
         Map<String, Object> objectsTable = new HashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Object result = value(objectsTable);
@@ -607,10 +611,10 @@ public class Amf3Importer {
      * @param val AMF3 string
      * @return Object
      * @throws IOException On I/O error
-     * @throws Amf3ParseException On parse error    
+     * @throws AmfParseException On parse error    
      */
-    public Map<String, Object> stringToAmfMap(String val) throws IOException, Amf3ParseException {
-        lexer = new Amf3Lexer(new StringReader(val));
+    public Map<String, Object> stringToAmfMap(String val) throws IOException, AmfParseException {
+        lexer = new AmfLexer(new StringReader(val));
         Map<String, Object> objectsTable = new HashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Map<String, Object> result = map(objectsTable);
