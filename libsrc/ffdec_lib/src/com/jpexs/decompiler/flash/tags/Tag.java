@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
-import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -794,7 +793,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @return Missing needed characters
      */
     public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
-        Set<Integer> needed2 = new ListSet<>(needed);
+        Set<Integer> needed2 = new LinkedHashSet<>(needed);
         if (needed2.isEmpty()) {
             return new LinkedHashSet<>();
         }

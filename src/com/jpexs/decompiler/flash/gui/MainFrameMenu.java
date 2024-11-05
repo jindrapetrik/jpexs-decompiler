@@ -859,6 +859,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         Main.advancedSettings();
     }
+    
+    protected void solEditorActionPerformed(ActionEvent evt) {
+        Main.openSolEditor();
+    }
 
     protected void searchMemoryActionPerformed(ActionEvent evt) {
         Main.loadFromMemory();
@@ -1332,6 +1336,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/tools/replace", translate("menu.tools.replace"), "replace32", this::replaceActionPerformed, PRIORITY_TOP, null, true, null, false);
         
         addMenuItem("/tools/abcExplorer", translate("menu.tools.abcexplorer"), "abcexplorer32", this::abcExplorerActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/tools/gotoDocumentClass", translate("menu.tools.gotoDocumentClass"), "gotomainclass32", this::gotoDocumentClassActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/tools/solEditor", translate("menu.tools.solEditor"), "soleditor32", this::solEditorActionPerformed, PRIORITY_TOP, null, true, null, false);
         if (Platform.isWindows()) {
             addMenuItem("/tools/searchMemory", translate("menu.tools.searchMemory"), "loadmemory16", this::searchMemoryActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         }
@@ -1351,7 +1357,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
          //addMenuItem("/tools/debugger/debuggerInjectLoader", "Inject Loader", "debuggerreplace16", this::debuggerInjectLoader, PRIORITY_MEDIUM, null, true,false);
          addMenuItem("/tools/debugger/debuggerShowLog", translate("menu.debugger.showlog"), "debuggerlog16", this::debuggerShowLogActionPerformed, PRIORITY_MEDIUM, null, true, null,false);
          finishMenu("/tools/debugger");*/
-        addMenuItem("/tools/gotoDocumentClass", translate("menu.tools.gotoDocumentClass"), "gotomainclass32", this::gotoDocumentClassActionPerformed, PRIORITY_TOP, null, true, null, false);
         finishMenu("/tools");
 
         //Settings

@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
+import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -3423,5 +3424,10 @@ public class Main {
             }
         }
         return null;
+    }
+    
+    public static void openSolEditor() {
+        SolEditorFrame solEdit = new SolEditorFrame();
+        solEdit.setVisible(true);
     }
 }

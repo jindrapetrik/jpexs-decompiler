@@ -73,6 +73,11 @@ public class Amf3InputStream extends InputStream {
         this.is = is;
     }
 
+    @Override
+    public int available() throws IOException {
+        return is.available();
+    }    
+    
     /**
      * New dump level.
      * @param name Name
@@ -424,7 +429,18 @@ public class Amf3InputStream extends InputStream {
         return readValue(name, serializers, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
-    private Object readValue(String name, Map<String, ObjectTypeSerializeHandler> serializers,
+    /**
+     * Reads value
+     * @param name Name
+     * @param serializers Serializers
+     * @param objectTable Object table
+     * @param traitsTable Traits table
+     * @param stringTable String table
+     * @return Value
+     * @throws IOException On I/O error
+     * @throws NoSerializerExistsException If no serializer exists
+     */
+    public Object readValue(String name, Map<String, ObjectTypeSerializeHandler> serializers,
             List<Object> objectTable,
             List<Traits> traitsTable,
             List<String> stringTable
