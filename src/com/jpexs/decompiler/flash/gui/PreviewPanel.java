@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.SWFHeader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
+import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
+import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
@@ -32,7 +34,13 @@ import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
+import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
+import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
+import com.jpexs.decompiler.flash.importers.amf.AmfParseException;
+import com.jpexs.decompiler.flash.importers.amf.amf0.Amf0Importer;
+import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.math.BezierUtils;
+import com.jpexs.decompiler.flash.sol.SolFile;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -106,6 +114,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -115,14 +124,18 @@ import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -157,6 +170,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String EMPTY_CARD = "EMPTY";
 
+    private static final String COOKIE_CARD = "COOKIE";
+
     private static final String CARDTEXTPANEL = "Text card";
 
     private static final String CARDFONTPANEL = "Font card";
@@ -178,6 +193,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private MediaDisplay media;
 
     private BinaryPanel binaryPanel;
+
+    private LineMarkedEditorPane cookieEditor;
+
+    private JTextField cookieFilenameField;
+
+    private JLabel amfVersionLabel;
 
     private LineMarkedEditorPane metadataEditor;
 
@@ -250,6 +271,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JToggleButton displayEditShowEndButton;
 
+    private JButton cookieEditButton;
+
+    private JButton cookieSaveButton;
+
+    private JButton cookieCancelButton;
+
     private Component morphShowSpace;
 
     private JPanel parametersPanel;
@@ -261,6 +288,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private TextPanel textPanel;
 
     private MetadataTag metadataTag;
+
+    private Cookie cookie;
 
     private boolean readOnly = false;
 
@@ -315,6 +344,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPersistentSplitPane displayEditTransformSplitPane;
 
     private JPersistentSplitPane imageTransformSplitPane;
+    
+    private DocumentListener cookieDocumentListener;
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -338,6 +369,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createProductInfoCard(), PRODUCTINFO_TAG_CARD);
         viewerCards.add(createUnknownCard(), UNKNOWN_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
+        viewerCards.add(createCookieCard(), COOKIE_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
         viewerCards.add(createDisplayEditTagCard(), DISPLAYEDIT_TAG_CARD);
         viewerCards.add(createEmptyCard(), EMPTY_CARD);
@@ -669,9 +701,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return metadataSaveButton.isVisible() && metadataSaveButton.isEnabled();
     }
 
+    private boolean isCookieModified() {
+        return cookieSaveButton.isVisible() && cookieSaveButton.isEnabled();
+    }
+
     private void setMetadataModified(boolean value) {
         metadataSaveButton.setEnabled(value);
         metadataCancelButton.setEnabled(value);
+    }
+
+    private void setCookieModified(boolean value) {
+        cookieSaveButton.setEnabled(value);
+        cookieCancelButton.setEnabled(value);
     }
 
     private void metadataTextChanged() {
@@ -689,12 +730,145 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         metadataCancelButton.setEnabled(metadataModified || !editorMode);
     }
 
+    private void updateCookieButtonsVisibility() {
+        boolean edit = cookieEditor.isEditable();
+        boolean editorMode = Configuration.editorMode.get();
+        cookieEditButton.setVisible(!readOnly && !edit);
+        cookieSaveButton.setVisible(!readOnly && edit);
+        boolean cookieModified = isCookieModified();
+        cookieCancelButton.setVisible(!readOnly && edit);
+        cookieCancelButton.setEnabled(cookieModified || !editorMode);
+    }
+
     private JPanel createBinaryCard() {
         JPanel binaryCard = new JPanel(new BorderLayout());
         binaryPanel = new BinaryPanel(mainPanel);
         binaryCard.add(binaryPanel, BorderLayout.CENTER);
         binaryCard.add(createBinaryButtonsPanel(), BorderLayout.SOUTH);
         return binaryCard;
+    }
+
+    private JPanel createCookieCard() {
+        JPanel cookieCard = new JPanel(new BorderLayout());
+        cookieFilenameField = new JTextField(30);
+        amfVersionLabel = new JLabel();
+        cookieEditor = new LineMarkedEditorPane();
+        
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.add(new JLabel(AppStrings.translate(SolEditorFrame.class, "filename")));
+        topPanel.add(cookieFilenameField);
+        topPanel.add(new JLabel(AppStrings.translate(SolEditorFrame.class, "amfVersion")));
+        topPanel.add(amfVersionLabel);
+
+        cookieCard.add(topPanel, BorderLayout.NORTH);
+        cookieCard.add(new FasterScrollPane(cookieEditor), BorderLayout.CENTER);
+        cookieCard.add(createCookieButtonsPanel(), BorderLayout.SOUTH);
+        
+        cookieEditor.setContentType("text/javascript");
+
+        cookieDocumentListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                setCookieModified(true);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                setCookieModified(true);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                setCookieModified(true);
+            }
+            
+        };        
+        return cookieCard;
+    }
+
+    private JPanel createCookieButtonsPanel() {
+        cookieEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
+        cookieEditButton.setMargin(new Insets(3, 3, 3, 10));
+        cookieEditButton.addActionListener(this::editCookieButtonActionPerformed);
+        cookieSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        cookieSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        cookieSaveButton.addActionListener(this::saveCookieButtonActionPerformed);
+        cookieSaveButton.setVisible(false);
+        cookieCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        cookieCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        cookieCancelButton.addActionListener(this::cancelCookieButtonActionPerformed);
+        cookieCancelButton.setVisible(false);
+
+        ButtonsPanel metadataTagButtonsPanel = new ButtonsPanel();
+        metadataTagButtonsPanel.add(cookieEditButton);
+        metadataTagButtonsPanel.add(cookieSaveButton);
+        metadataTagButtonsPanel.add(cookieCancelButton);
+        return metadataTagButtonsPanel;
+    }
+
+    private void editCookieButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof Cookie) {
+            cookieEditor.setEditable(true);
+            cookieFilenameField.setEditable(true);
+            updateCookieButtonsVisibility();
+            mainPanel.setEditingStatus();
+        }
+    }
+
+    private void saveCookieButtonActionPerformed(ActionEvent evt) {
+        //cookie.setModified(true);
+
+        String amfText = cookieEditor.getText();
+        int amfVersion = Integer.parseInt(amfVersionLabel.getText());
+        Map<String, Object> amfValues = null;
+        try {
+            switch (amfVersion) {
+                case 0:
+                    Amf0Importer a0i = new Amf0Importer();
+                    amfValues = a0i.stringToAmfMap(amfText);
+                    break;
+                case 3:
+                    Amf3Importer a3i = new Amf3Importer();
+                    amfValues = a3i.stringToAmfMap(amfText);
+                    break;
+            }
+
+            SolFile solFile = new SolFile(cookieFilenameField.getText(), amfVersion, amfValues);
+            try (FileOutputStream fos = new FileOutputStream(cookie.getSolFile())) {
+                solFile.writeTo(fos);
+            }
+        } catch (AmfParseException ex) {
+            cookieEditor.gotoLine((int) ex.line);
+            cookieEditor.markError();
+            ViewMessages.showMessageDialog(this, AppStrings.translate(SolEditorFrame.class, "error.parse").replace("%reason%", ex.text).replace("%line%", "" + ex.line), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (IOException ex) {
+            ViewMessages.showMessageDialog(this, ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        cookieEditor.setEditable(Configuration.editorMode.get());
+        cookieFilenameField.setEditable(false);
+        setCookieModified(false);
+        updateCookieButtonsVisibility();
+        mainPanel.repaintTree();
+        mainPanel.clearEditingStatus();
+    }
+
+    private void cancelCookieButtonActionPerformed(ActionEvent evt) {
+        cookieEditor.setEditable(false);
+        cookieFilenameField.setEditable(false);
+        readCookie();
+        metadataEditor.setEditable(Configuration.editorMode.get());
+        setCookieModified(false);
+        updateCookieButtonsVisibility();
+        mainPanel.clearEditingStatus();
     }
 
     private JPanel createProductInfoCard() {
@@ -1639,6 +1813,37 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
     }
 
+    private void readCookie() {
+        try (FileInputStream fis = new FileInputStream(cookie.getSolFile())) {
+            SolFile solFile = new SolFile(fis);
+            switch (solFile.getAmfVersion()) {
+                case 0:
+                    cookieEditor.setText(Amf0Exporter.amfMapToString(solFile.getAmfValues(), 0, "\r\n"));
+                    break;
+                case 3:
+                    cookieEditor.setText(Amf3Exporter.amfMapToString(solFile.getAmfValues(), "  ", "\r\n", 0));
+                    break;
+            }
+            cookieFilenameField.setText(solFile.getFileName());
+            amfVersionLabel.setText("" + solFile.getAmfVersion());
+        } catch (Exception ex) {
+            cookieEditor.setText("//Error: " + ex.getLocalizedMessage());
+        }
+    }
+
+    public void showCookiePanel(Cookie cookie) {
+        showCardLeft(COOKIE_CARD);
+        this.cookie = cookie;
+        cookieEditor.setEditable(!readOnly && Configuration.editorMode.get());
+        cookieFilenameField.setEditable(!readOnly && Configuration.editorMode.get());
+        readCookie();
+        cookieEditor.getDocument().addDocumentListener(cookieDocumentListener);
+        cookieFilenameField.getDocument().addDocumentListener(cookieDocumentListener);
+        setCookieModified(false);
+        updateCookieButtonsVisibility();
+        parametersPanel.setVisible(false);
+    }
+
     public void showMetaDataPanel(MetadataTag metadataTag) {
         showCardLeft(METADATA_TAG_CARD);
         this.metadataTag = metadataTag;
@@ -2250,7 +2455,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
                 Matrix origMatrix = new Matrix(placeTag.getMatrix());
                 placeTag.setMatrix(matrix.concatenate(origMatrix).toMATRIX());
-                placeTag.setPlaceFlagHasMatrix(true);                
+                placeTag.setPlaceFlagHasMatrix(true);
             }
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
@@ -2783,7 +2988,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             public boolean isModified() {
                 return false;
             }
-                        
+
             @Override
             public ReadOnlyTagList getTags() {
                 if (cachedTags == null) {
@@ -3018,6 +3223,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
                 || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled())
                 || (displayEditSaveButton.isVisible() && displayEditSaveButton.isEnabled())
+                || (cookieSaveButton.isVisible() && cookieSaveButton.isEnabled())
                 || fontPanel.isEditing()
                 || imageTransformSaveButton.isVisible();
     }

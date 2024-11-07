@@ -50,6 +50,8 @@ import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
+import com.jpexs.decompiler.flash.gui.soleditor.CookiesChangedListener;
+import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.gui.soleditor.SolEditorFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -105,6 +107,8 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -191,6 +195,8 @@ public class Main {
 
     private static File runTempFile;
 
+    private static CookiesChangedListener runCookieListener;
+    
     private static List<File> runTempFiles = new ArrayList<>();
 
     private static WatchService watcher;
@@ -217,6 +223,10 @@ public class Main {
 
     public static SWF getRunningSWF() {
         return runningSWF;
+    }
+
+    public static WatchService getWatcher() {
+        return watcher;
     }
 
     public static boolean isSwfAir(Openable openable) {
@@ -252,6 +262,7 @@ public class Main {
     public static void freeRun() {
         synchronized (Main.class) {
             if (runTempFile != null) {
+                deleteCookiesAfterRun(runTempFile);
                 runTempFile.delete();
                 runTempFile = null;
             }
@@ -638,6 +649,7 @@ public class Main {
             return;
         }
         if (tempFile != null) {
+            prepareCookiesForRun(tempFile, swf);
             synchronized (Main.class) {
                 runTempFile = tempFile;
                 runTempFiles = tempFiles;
@@ -647,6 +659,73 @@ public class Main {
             }
             runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
         }
+    }
+    
+    private static void deleteCookiesAfterRun(File tempFile) {
+        SharedObjectsStorage.removeChangedListener(tempFile, runCookieListener);
+        File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
+        if (solDir == null) {
+            return;
+        }
+        if (solDir.exists()) {
+            for (File f : solDir.listFiles()) {
+                f.delete();
+            }
+            solDir.delete();
+        }
+        synchronized (Main.class) {
+            runCookieListener = null;
+        }
+        getMainFrame().getPanel().refreshTree();
+    }
+
+    private static void prepareCookiesForRun(File tempFile, SWF swf) {
+        if (swf.getFile() == null) {
+            return;
+        }
+        File origSolDir = SharedObjectsStorage.getSolDirectoryForLocalFile(new File(swf.getFile()));
+        if (origSolDir == null) {
+            return;
+        }
+        File tempSolDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
+        if (tempSolDir == null) {
+            return;
+        }
+        tempSolDir.mkdirs();
+        if (origSolDir.exists()) {
+            for (File f : origSolDir.listFiles()) {
+                try {
+                    Files.copy(f.toPath(), tempSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    //ignored
+                }
+            }
+        }
+        
+        runCookieListener = new CookiesChangedListener() {
+            @Override
+            public void cookiesChanged(File swfFile, List<File> cookies) {
+                File origSolDir = SharedObjectsStorage.getSolDirectoryForLocalFile(new File(swf.getFile()));
+                if (cookies.isEmpty() && !origSolDir.exists()) {
+                    return;
+                }
+                origSolDir.mkdirs();
+                for (File f : origSolDir.listFiles()) {
+                    f.delete();
+                }
+                for (File f : cookies) {
+                    if (!f.exists()) {
+                        continue;
+                    }
+                    try {
+                        Files.copy(f.toPath(), origSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException ex) {
+                        //ignored
+                    }
+                }
+            }
+        };
+        SharedObjectsStorage.addChangedListener(tempFile,runCookieListener);
     }
 
     public static void runDebug(SWF swf, final boolean doPCode) {
@@ -700,6 +779,7 @@ public class Main {
 
                 @Override
                 protected void done() {
+                    prepareCookiesForRun(fTempFile, swf);
                     synchronized (Main.class) {
                         runTempFile = fTempFile;
                         runProcessDebug = true;
@@ -1900,6 +1980,12 @@ public class Main {
             String fileName = si.getFile();
             if (fileName != null) {
                 Configuration.addRecentFile(fileName);
+                SharedObjectsStorage.addChangedListener(new File(fileName), new CookiesChangedListener() {
+                    @Override
+                    public void cookiesChanged(File swfFile, List<File> cookies) {
+                        getMainFrame().getPanel().refreshTree();
+                    }
+                });
                 if (watcher != null) {
                     try {
                         File dir = new File(fileName).getParentFile();
@@ -2437,6 +2523,19 @@ public class Main {
 
                                 java.nio.file.Path filename = ev.context();
 
+                                if (SharedObjectsStorage.watchedCookieDirectories.containsKey(key)) {
+                                    File dir = SharedObjectsStorage.watchedCookieDirectories.get(key);
+                                    java.nio.file.Path child = dir.toPath().resolve(filename);
+                                    File fullPath = child.toFile();
+
+                                    View.execInEventDispatchLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            SharedObjectsStorage.watchedDirectoryChanged(fullPath);
+                                        }
+                                    });
+                                }
+
                                 if (watchedDirectories.containsKey(key)) {
                                     File dir = watchedDirectories.get(key);
                                     java.nio.file.Path child = dir.toPath().resolve(filename);
@@ -2474,10 +2573,10 @@ public class Main {
                             }
                             boolean valid = key.reset();
                             if (!valid) {
-                                break;
+                                SharedObjectsStorage.watchedCookieDirectories.remove(key);
+                                watchedDirectories.remove(key);                                
                             }
-                        }
-                        return null;
+                        }                        
                     }
                 };
                 watcherWorker.execute();
@@ -2918,12 +3017,11 @@ public class Main {
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
-        decodeLaunch5jArgs(args);        
+        decodeLaunch5jArgs(args);
         setSessionLoaded(false);
 
-        
         System.setProperty("sun.io.serialization.extendedDebugInfo", "true");
-        
+
         clearTemp();
 
         try {
@@ -3014,16 +3112,16 @@ public class Main {
                     openFile(sourceInfos, (Openable openable) -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
                         mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
-                        
+
                         Set<SWF> allSwfs = mainFrame.getPanel().getAllSwfs();
-                        
+
                         for (SWF s : allSwfs) {
                             String name = s.getFile() + "|" + s.getFileTitle();
                             if (name.equals(Configuration.lastSessionEasySwf.get())) {
                                 mainFrame.getPanel().getEasyPanel().setSwf(s);
                             }
                         }
-                        
+
                         setSessionLoaded(true);
                         mainFrame.getPanel().reload(true);
                         mainFrame.getPanel().updateUiWithCurrentOpenable();
@@ -3425,7 +3523,7 @@ public class Main {
         }
         return null;
     }
-    
+
     public static void openSolEditor() {
         SolEditorFrame solEdit = new SolEditorFrame();
         solEdit.setVisible(true);

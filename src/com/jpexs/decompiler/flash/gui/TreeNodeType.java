@@ -64,5 +64,6 @@ public enum TreeNodeType {
     SCALING_GRID,
     END,
     ERROR,
-    ABC
+    ABC,
+    COOKIE
 }

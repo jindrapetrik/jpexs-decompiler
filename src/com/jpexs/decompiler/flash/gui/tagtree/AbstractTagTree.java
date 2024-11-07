@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -447,6 +448,10 @@ public abstract class AbstractTagTree extends JTree {
 
         if (t instanceof ABC) {
             return TreeNodeType.ABC;
+        }
+        
+        if (t instanceof Cookie) {
+            return TreeNodeType.COOKIE;
         }
 
         return TreeNodeType.FOLDER;
