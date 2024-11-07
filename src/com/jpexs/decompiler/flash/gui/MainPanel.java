@@ -109,6 +109,7 @@ import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
+import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTree;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
@@ -5852,6 +5853,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
+        } else if (treeItem instanceof Cookie) {
+            previewPanel.showCookiePanel((Cookie) treeItem);
         } else if (treeItem instanceof BinaryDataInterface) {
             BinaryDataInterface binary = (BinaryDataInterface) treeItem;
             previewPanel.showBinaryPanel(binary);
@@ -6262,6 +6265,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof Scene) {
             showFolderPreviewList(treePath);
         } else if (treeItem instanceof MetadataTag) {
+            showPreview(treeItem, previewPanel, -1, null);
+            showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof Cookie) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof BinaryDataInterface) {

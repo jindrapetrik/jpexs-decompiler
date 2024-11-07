@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
+import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
+import com.jpexs.decompiler.flash.gui.soleditor.SharedObjectsStorage;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -51,6 +53,7 @@ import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +69,8 @@ import javax.swing.tree.TreePath;
  */
 public class TagTreeModel extends AbstractTagTreeModel {
 
+    public static final String FOLDER_COOKIES = "cookies";
+    
     public static final String FOLDER_SHAPES = "shapes";
 
     public static final String FOLDER_MORPHSHAPES = "morphshapes";
@@ -277,9 +282,18 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 }
             }
         }
+        
+        List<TreeItem> cookies = new ArrayList<>();
+        if (swf.getFile() != null) {
+            List<File> solFiles = SharedObjectsStorage.getSolFilesForLocalFile(new File(swf.getFile()));
+            for (File f : solFiles) {
+                cookies.add(new Cookie(swf, f));
+            }
+        }
 
         nodeList.add(new HeaderItem(swf, translate("node.header")));
 
+        addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.cookies"), FOLDER_COOKIES, swf, cookies);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.shapes"), FOLDER_SHAPES, swf, shapes);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf, morphShapes);
         addFolderItem(nodeList, emptyFolders, addAllFolders, translate("node.sprites"), FOLDER_SPRITES, swf, sprites);

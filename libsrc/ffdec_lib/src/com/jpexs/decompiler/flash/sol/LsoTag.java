@@ -98,7 +98,7 @@ public class LsoTag extends Tag {
             List<String> stringTable = new ArrayList<>();
 
             while (ais.available() > 0) {
-                String varName = ais.readUtf8Vr("varName", new ArrayList<>());
+                String varName = ais.readUtf8Vr("varName", stringTable);
                 try {
                     Object varValue = ais.readValue("varValue", new HashMap<>(), objectsTable, traitsTable, stringTable);
                     amfValues.put(varName, varValue);

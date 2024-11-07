@@ -49,6 +49,10 @@ public class AppStrings {
         ResourceBundle b = ResourceBundle.getBundle(bundle);
         return b.getString(key);
     }
+    
+    public static String translate(Class bundleClass, String key) {
+        return translate(getResourcePath(bundleClass), key);
+    }
 
     public static void updateLanguage() {
         resourceBundle = ResourceBundle.getBundle(getResourcePath(resourceClass));
