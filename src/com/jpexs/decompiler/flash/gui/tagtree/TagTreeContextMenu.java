@@ -1481,6 +1481,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     addInsideAddAllTags = true;
                 }
             }
+            
+            boolean isCookie = firstItem instanceof Cookie;
 
             addTagInsideMenu.removeAll();
             addAddTagInsideMenuItems(firstItem);
@@ -1493,7 +1495,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             addTagBeforeMenu.removeAll();
 
             addAddTagBeforeAfterMenuItems(true, addTagBeforeMenu, firstItem, this::addTagBeforeActionPerformed);
-            addTagBeforeMenu.setVisible(addTagBeforeMenu.getItemCount() > 0);
+            addTagBeforeMenu.setVisible(!isCookie && addTagBeforeMenu.getItemCount() > 0);
 
             addTagAfterMenu.removeAll();
             addAddTagBeforeAfterMenuItems(false, addTagAfterMenu, firstItem, this::addTagAfterActionPerformed);
@@ -1503,7 +1505,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 othersMenu.setIcon(View.getIcon("folder16"));
                 addAddTagMenuItems(null, othersMenu, firstItem, this::addTagAfterActionPerformed);
                 addTagAfterMenu.add(othersMenu);*/
-            addTagAfterMenu.setVisible(addTagAfterMenu.getItemCount() > 0);
+            addTagAfterMenu.setVisible(!isCookie && addTagAfterMenu.getItemCount() > 0);
 
             if ((firstItem instanceof CharacterTag)) {
                 CharacterTag cht = (CharacterTag) firstItem;
