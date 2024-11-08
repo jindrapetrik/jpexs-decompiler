@@ -196,7 +196,7 @@ public class Main {
     private static File runTempFile;
 
     private static CookiesChangedListener runCookieListener;
-    
+
     private static List<File> runTempFiles = new ArrayList<>();
 
     private static WatchService watcher;
@@ -660,23 +660,26 @@ public class Main {
             runPlayer(AppStrings.translate("work.running"), playerLocation, tempFile.getAbsolutePath(), flashVars);
         }
     }
-    
+
     private static void deleteCookiesAfterRun(File tempFile) {
         SharedObjectsStorage.removeChangedListener(tempFile, runCookieListener);
-        File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
-        if (solDir == null) {
-            return;
-        }
-        if (solDir.exists()) {
-            for (File f : solDir.listFiles()) {
-                f.delete();
+        View.execInEventDispatchLater(new Runnable() {
+            public void run() {
+                File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
+                if (solDir == null) {
+                    return;
+                }
+                if (solDir.exists()) {
+                    for (File f : solDir.listFiles()) {
+                        f.delete();
+                    }
+                    solDir.delete();
+                }                
             }
-            solDir.delete();
-        }
+        });
         synchronized (Main.class) {
             runCookieListener = null;
         }
-        getMainFrame().getPanel().refreshTree();
     }
 
     private static void prepareCookiesForRun(File tempFile, SWF swf) {
@@ -701,7 +704,7 @@ public class Main {
                 }
             }
         }
-        
+
         runCookieListener = new CookiesChangedListener() {
             @Override
             public void cookiesChanged(File swfFile, List<File> cookies) {
@@ -725,7 +728,7 @@ public class Main {
                 }
             }
         };
-        SharedObjectsStorage.addChangedListener(tempFile,runCookieListener);
+        SharedObjectsStorage.addChangedListener(tempFile, runCookieListener);
     }
 
     public static void runDebug(SWF swf, final boolean doPCode) {
@@ -2496,7 +2499,6 @@ public class Main {
             } catch (IOException ex) {
                 //ignore
             }
-            
 
             if (watcher != null) {
                 watcherWorker = new SwingWorker() {
@@ -2573,9 +2575,9 @@ public class Main {
                             boolean valid = key.reset();
                             if (!valid) {
                                 SharedObjectsStorage.watchedCookieDirectories.remove(key);
-                                watchedDirectories.remove(key);                                
+                                watchedDirectories.remove(key);
                             }
-                        }                        
+                        }
                     }
                 };
                 watcherWorker.execute();
