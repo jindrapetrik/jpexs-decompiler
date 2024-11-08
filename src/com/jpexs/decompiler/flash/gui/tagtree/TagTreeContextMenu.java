@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.As3ClassLinkageDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
+import com.jpexs.decompiler.flash.gui.soleditor.Cookie;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.packers.Packer;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -916,7 +917,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         boolean wasFrame = false;
         Timelined frameTimelined = null;
         for (TreeItem item : items) {
-            if (item instanceof Tag) {
+            if (item instanceof Cookie) {
+                if (wasFrame) {
+                    return false;
+                }            
+                wasNotFrame = true;
+            } else if (item instanceof Tag) {
                 if (wasFrame) {
                     return false;
                 }
@@ -3964,6 +3970,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 itemsToRemove.add(item);
                 itemsToRemoveParents.add(((BUTTONRECORD) item).getTag());
                 itemsToRemoveSprites.add(new Object());
+            } else if (item instanceof Cookie) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(new Object());
+                itemsToRemoveSprites.add(new Object());
             }
         }
 
@@ -4030,6 +4040,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                             Object item = itemsToRemove.get(i);
                             Object parent = itemsToRemoveParents.get(i);
 
+                            if (item instanceof Cookie) {
+                                Cookie cookie = (Cookie) item;
+                                ((Cookie) item).getSolFile().delete();
+                            }
+                            
                             if (item instanceof BUTTONRECORD) {
                                 ButtonTag button = (ButtonTag) parent;
                                 button.getRecords().remove((BUTTONRECORD) item);
