@@ -19,12 +19,14 @@ package com.jpexs.decompiler.flash.amf.amf0.types;
 import com.jpexs.decompiler.flash.amf.amf3.types.*;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * AMF0 date type.
  */
-public class DateType implements Amf3ValueType {
+public class DateType implements Amf3ValueType, ComplexObject {
 
     private int timezone;
     
@@ -77,6 +79,10 @@ public class DateType implements Amf3ValueType {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
         return sdf.format(toDate()) + " timezone " + timezone;
     }
-    
+
+    @Override
+    public List<Object> getSubValues() {
+        return new ArrayList<>();
+    }    
     
 }

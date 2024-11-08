@@ -17,11 +17,13 @@
 package com.jpexs.decompiler.flash.amf.amf0.types;
 
 import com.jpexs.decompiler.flash.amf.amf3.types.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AMF0 XML document type.
  */
-public class XmlDocumentType implements Amf3ValueType {
+public class XmlDocumentType implements Amf3ValueType, ComplexObject {
 
     /**
      * Data
@@ -57,4 +59,8 @@ public class XmlDocumentType implements Amf3ValueType {
         return data;
     }
 
+    @Override
+    public List<Object> getSubValues() {
+        return new ArrayList<>();
+    }
 }

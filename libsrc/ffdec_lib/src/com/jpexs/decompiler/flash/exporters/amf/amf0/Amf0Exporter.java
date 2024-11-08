@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.jpexs.decompiler.flash.amf.amf0.types.ComplexObject;
+import com.jpexs.decompiler.flash.amf.amf0.types.ReferenceType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 
 /**
@@ -91,7 +92,10 @@ public class Amf0Exporter {
             processedObjects.add(value);
         }
         
-        
+        if (value instanceof ReferenceType) {
+            ReferenceType rt = (ReferenceType) value;
+            return "#obj" + rt.referenceIndex;
+        }
         
         if (value instanceof Double) {
             return EcmaScript.toString(value);
@@ -166,6 +170,7 @@ public class Amf0Exporter {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"Date\",").append(newLine);
+            sb.append(addId);
             sb.append(indent(level + 1)).append("\"value\": \"").append(sdf.format(dt.toDate())).append("\",").append(newLine);
             sb.append(indent(level + 1)).append("\"timezone\": ").append(dt.getTimezone()).append(newLine);            
             sb.append(indent(level)).append("}");
@@ -177,6 +182,7 @@ public class Amf0Exporter {
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"XMLDocument\",").append(newLine);
+            sb.append(addId);
             sb.append(indent(level + 1)).append("\"data\": \"").append(Helper.escapeActionScriptString(xdt.getData())).append("\"").append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
@@ -238,13 +244,13 @@ public class Amf0Exporter {
         referenceCount.put(object, prevRef + 1);
         if (prevRef == 0) {
             if (object instanceof ComplexObject) {
+                objectAlias.put(object, "obj" + objectList.size());
+                objectList.add(object);            
                 List<Object> subvalues = ((ComplexObject) object).getSubValues();
                 for (Object o : subvalues) {
                     populateObjects(o, referenceCount, objectList, objectAlias);
                 }
-            }
-            objectList.add(object);
-            objectAlias.put(object, "obj" + objectList.size());
+            }            
         }
     }
 }

@@ -1828,6 +1828,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             amfVersionLabel.setText("" + solFile.getAmfVersion());
         } catch (Exception ex) {
             cookieEditor.setText("//Error: " + ex.getLocalizedMessage());
+            ex.printStackTrace();
         }
     }
 

@@ -40,7 +40,7 @@ import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -467,7 +467,7 @@ public class Amf3Importer {
     }   
     
     private Map<String, Object> map(Map<String, Object> objectTable) throws IOException, AmfParseException {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         expectedType(SymbolType.CURLY_OPEN);
         ParsedSymbol s;
         do {
@@ -597,7 +597,7 @@ public class Amf3Importer {
      */
     public Object stringToAmf(String val) throws IOException, AmfParseException {
         lexer = new AmfLexer(new StringReader(val));
-        Map<String, Object> objectsTable = new HashMap<>();
+        Map<String, Object> objectsTable = new LinkedHashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Object result = value(objectsTable);
         Object resultResolved = resolveObjects(result, objectsTable, true);
@@ -615,7 +615,7 @@ public class Amf3Importer {
      */
     public Map<String, Object> stringToAmfMap(String val) throws IOException, AmfParseException {
         lexer = new AmfLexer(new StringReader(val));
-        Map<String, Object> objectsTable = new HashMap<>();
+        Map<String, Object> objectsTable = new LinkedHashMap<>();
         List<ReferencedObjectType> references = new ArrayList<>();
         Map<String, Object> result = map(objectsTable);
         for (String key: result.keySet()) {
