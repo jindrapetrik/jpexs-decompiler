@@ -19,7 +19,13 @@ import flash.net.ObjectEncoding;
 import flash.xml.XMLDocument;
 import flash.net.registerClassAlias;
 
+var s:String = "";
+for (var i = 0; i < 70000; i++) {
+	s += "A";
+}
 
+var dt = new Date(2024,12-1,3,23,16);
+var xm = new XMLDocument("<ul><li>item</li></ul>");
 
 var amf0test:SharedObject = SharedObject.getLocal("amf0test");
 amf0test.objectEncoding = ObjectEncoding.AMF0;
@@ -33,10 +39,6 @@ var reftest = {a:refobj, b:refobj};
 reftest["c"] = reftest;
 
 
-var s:String = "";
-for (var i = 0; i < 70000; i++) {
-	s += "A";
-}
 registerClassAlias("MyClassAlias", MyClass);
 
 var data = {
@@ -47,10 +49,12 @@ var data = {
 	mynull : null,
 	myundefined : undefined,
 	myarray : ["a","b","c"],
-	mydate : new Date(2024,12-1,3,23,16),
+	mydate : dt,
+	mydate2 : dt,
 	myref: reftest,
 	mylongstring : s,
-	myxml : new XMLDocument("<ul><li>item</li></ul>"),
+	myxml : xm,
+	myxml2 : xm,
 	mytypedobject : new MyClass()
 	};
 
@@ -130,6 +134,11 @@ function fonLoad(event:MouseEvent):void {
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="21715" publishTime="1731055062"/>
+          <PublishItem publishSize="21697" publishTime="1731054903"/>
+          <PublishItem publishSize="21636" publishTime="1731052148"/>
+          <PublishItem publishSize="21602" publishTime="1731051747"/>
+          <PublishItem publishSize="21507" publishTime="1730740224"/>
           <PublishItem publishSize="21508" publishTime="1730740069"/>
           <PublishItem publishSize="21505" publishTime="1730740015"/>
           <PublishItem publishSize="21520" publishTime="1730739945"/>
@@ -145,10 +154,5 @@ function fonLoad(event:MouseEvent):void {
           <PublishItem publishSize="20794" publishTime="1730676730"/>
           <PublishItem publishSize="20793" publishTime="1730676669"/>
           <PublishItem publishSize="20792" publishTime="1730676587"/>
-          <PublishItem publishSize="20407" publishTime="1730676575"/>
-          <PublishItem publishSize="20409" publishTime="1730676542"/>
-          <PublishItem publishSize="20409" publishTime="1730676533"/>
-          <PublishItem publishSize="20251" publishTime="1730676524"/>
-          <PublishItem publishSize="20251" publishTime="1730676504"/>
      </publishHistory>
 </DOMDocument>

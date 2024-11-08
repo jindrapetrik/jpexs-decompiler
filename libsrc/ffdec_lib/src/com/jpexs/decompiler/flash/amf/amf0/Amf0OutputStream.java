@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.amf.amf0;
 
 import com.jpexs.decompiler.flash.amf.amf0.types.ArrayType;
 import com.jpexs.decompiler.flash.amf.amf0.types.BasicType;
+import com.jpexs.decompiler.flash.amf.amf0.types.ComplexObject;
 import com.jpexs.decompiler.flash.amf.amf0.types.DateType;
 import com.jpexs.decompiler.flash.amf.amf0.types.EcmaArrayType;
 import com.jpexs.decompiler.flash.amf.amf0.types.ObjectType;
@@ -167,13 +168,9 @@ public class Amf0OutputStream extends OutputStream {
     
     public void writeValue(Object value, List<Object> complexObjectsList) throws IOException {
         
-        if ((value instanceof ObjectType)
-                || (value instanceof TypedObjectType)
-                || (value instanceof ArrayType)
-                || (value instanceof EcmaArrayType)
-                ) {
+        if (value instanceof ComplexObject) {
             int index = complexObjectsList.indexOf(value);
-            if (index != -1 && index <= 65535 ) {
+            if (index != -1 && index <= 65535) {
                 write(Marker.REFERENCE);
                 writeU16(index);   
                 return;
