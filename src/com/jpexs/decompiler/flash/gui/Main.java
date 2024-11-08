@@ -1986,7 +1986,7 @@ public class Main {
                         getMainFrame().getPanel().refreshTree();
                     }
                 });
-                if (watcher != null) {
+                if (watcher != null && Configuration.checkForModifications.get()) {
                     try {
                         File dir = new File(fileName).getParentFile();
                         if (dir == null) {
@@ -2491,13 +2491,12 @@ public class Main {
             offerAssociation();
             loadingDialog = new LoadingDialog(getDefaultDialogsOwner());
 
-            if (Configuration.checkForModifications.get()) {
-                try {
-                    watcher = FileSystems.getDefault().newWatchService();
-                } catch (IOException ex) {
-                    //ignore
-                }
+            try {
+                watcher = FileSystems.getDefault().newWatchService();
+            } catch (IOException ex) {
+                //ignore
             }
+            
 
             if (watcher != null) {
                 watcherWorker = new SwingWorker() {
@@ -2536,7 +2535,7 @@ public class Main {
                                     });
                                 }
 
-                                if (watchedDirectories.containsKey(key)) {
+                                if (Configuration.checkForModifications.get() && watchedDirectories.containsKey(key)) {
                                     File dir = watchedDirectories.get(key);
                                     java.nio.file.Path child = dir.toPath().resolve(filename);
                                     File fullPath = child.toFile();
