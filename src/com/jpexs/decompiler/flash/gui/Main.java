@@ -145,7 +145,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
+import jsyntaxpane.DefaultSyntaxKit;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
@@ -3053,6 +3055,15 @@ public class Main {
                     showModeFrame();
                     reloadLastSession();
                 }
+            });
+        } else if (args.length == 1 && "-soleditor".equals(args[0])) {
+            initGui();
+            checkLibraryVersion();
+            View.execInEventDispatch(() -> {
+                DefaultSyntaxKit.initKit();
+                SolEditorFrame solEditor = new SolEditorFrame();
+                solEditor.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                solEditor.setVisible(true);
             });
         } else {
             checkLibraryVersion();
