@@ -698,7 +698,7 @@ public class Main {
         if (origSolDir.exists()) {
             for (File f : origSolDir.listFiles()) {
                 try {
-                    Files.copy(f.toPath(), tempSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(f.toPath(), tempSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException ex) {
                     //ignored
                 }
@@ -721,7 +721,7 @@ public class Main {
                         continue;
                     }
                     try {
-                        Files.copy(f.toPath(), origSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+                        Files.copy(f.toPath(), origSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
                     } catch (IOException ex) {
                         //ignored
                     }
