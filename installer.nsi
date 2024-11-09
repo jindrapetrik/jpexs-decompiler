@@ -261,6 +261,33 @@ IntOp ${Var} $0 - $1
 
 !define StrRPos "!insertmacro StrRPos"
 
+;--------------------------------
+;Pages
+
+
+
+  !insertmacro MUI_PAGE_LICENSE "resources/license.txt"
+  !insertmacro MUI_PAGE_COMPONENTS
+  !insertmacro MUI_PAGE_DIRECTORY
+  ;!insertmacro CUSTOM_PAGE_JREINFO
+  ;!insertmacro CUSTOM_PAGE_FLASHINFO
+
+var SMDir
+
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "${APP_NAME}"
+!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
+!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"
+!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Inno Setup: Icon Group"
+  !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
+  ;Page custom CUSTOM_PAGE_CONTEXTMENU
+  !insertmacro MUI_PAGE_INSTFILES
+  ;Page custom CUSTOM_PAGE_HELPUS
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXENAME}"
+  !insertmacro MUI_PAGE_FINISH
+
+
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
 
 ;--------------------------------
 ;Languages
@@ -316,36 +343,6 @@ IntOp ${Var} $0 - $1
   !insertmacro LANG_LOAD "Turkish"  
   !insertmacro LANG_LOAD "Ukrainian"
   !insertmacro LANG_LOAD "Italian"
-
-
-;--------------------------------
-;Pages
-
-
-
-  !insertmacro MUI_PAGE_LICENSE "resources/license.txt"
-  !insertmacro MUI_PAGE_COMPONENTS
-  !insertmacro MUI_PAGE_DIRECTORY
-  ;!insertmacro CUSTOM_PAGE_JREINFO
-  ;!insertmacro CUSTOM_PAGE_FLASHINFO
-
-var SMDir
-
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "${APP_NAME}"
-!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
-!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_UNINSTKEY}"
-!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Inno Setup: Icon Group"
-  !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
-  ;Page custom CUSTOM_PAGE_CONTEXTMENU
-  !insertmacro MUI_PAGE_INSTFILES
-  ;Page custom CUSTOM_PAGE_HELPUS
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXENAME}"
-  !insertmacro MUI_PAGE_FINISH
-
-
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
-
 
 
 ;--------------------------------
@@ -619,7 +616,6 @@ Section "FFDec" SecDummy
   File "dist\soleditor.lnk"
   File "dist\translator.bat"
   File "dist\translator.lnk"
-  File "dist\translator.exe"  
   
   SetOutPath "$INSTDIR"  
   File /r "dist\flashlib"
@@ -631,7 +627,7 @@ Section "FFDec" SecDummy
   CreateDirectory "$SMPROGRAMS\$SMDir"
   CreateShortCut "$SMPROGRAMS\$SMDir\Uninstall ${APP_NAME}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\$SMDir\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" "" "$INSTDIR\${APP_EXENAME}" 0
-  CreateShortCut "$SMPROGRAMS\$SMDir\${STRING_SOL_EDITOR}.lnk" "$INSTDIR\${APP_EXENAME}" "-soleditor" "$INSTDIR\${APP_EXENAME}" 2
+  CreateShortCut "$SMPROGRAMS\$SMDir\$(STRING_SOL_EDITOR).lnk" "$INSTDIR\${APP_EXENAME}" "-soleditor" "$INSTDIR\${APP_EXENAME}" 2
  !insertmacro MUI_STARTMENU_WRITE_END
 
   ;Store installation folder
