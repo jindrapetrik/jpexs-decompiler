@@ -18,6 +18,7 @@
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Pomožte nám!"
 !insertmacro LANG_STRING STRING_SWC "Stáhnout PlayerGlobal.swc"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Kontroluji stránky Adobe pro nejnovější soubor PlayerGlobal.swc"
+!insertmacro LANG_STRING STRING_SOL_EDITOR "Editor Sol cookies"
 
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Vyžadován ovládací prvek Flash Player ActiveX"

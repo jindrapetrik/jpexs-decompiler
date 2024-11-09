@@ -18,6 +18,7 @@
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Ayúdenos!"
 !insertmacro LANG_STRING STRING_SWC "Descarga PlayerGlobal.swc"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Comprobando sitio de Adobe por una nueva versión del archivo PlayerGlobal.swc"
+!insertmacro LANG_STRING STRING_SOL_EDITOR "Sol cookie editor"
 
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Se requiere el control ActiveX de Flash Player"

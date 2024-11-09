@@ -18,6 +18,7 @@
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Help ons!"
 !insertmacro LANG_STRING STRING_SWC "Download PlayerGlobal.swc"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Adobe-site controleren op het nieuwste PlayerGlobal.swc-bestand"
+!insertmacro LANG_STRING STRING_SOL_EDITOR "Sol cookie editor"
 
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Flash Player ActiveX-besturing vereist"
