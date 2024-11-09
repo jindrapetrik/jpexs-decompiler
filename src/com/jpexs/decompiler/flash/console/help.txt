@@ -295,6 +295,12 @@ alias /?
     List all available configuration keys and current values.
     These keys can be used in -config pre-option.
 
+-translator
+    Runs the Translator app for FFDec localization
+
+-soleditor
+    Runs the Sol cookie editor as standalone application
+
 Pre-options:
 -format <formats>
     Applies to: -export
