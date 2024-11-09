@@ -110,6 +110,11 @@ public class ApplicationInfo {
      * Project page
      */
     public static final String PROJECT_PAGE = "https://github.com/" + GIT_HUB_PROJECT;
+    
+    /**
+     * Project Wiki
+     */
+    public static final String WIKI_PAGE = PROJECT_PAGE + "/wiki";
 
     /**
      * URL for checking new updates
