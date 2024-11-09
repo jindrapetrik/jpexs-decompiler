@@ -183,7 +183,7 @@ public class Amf0Exporter {
 
         if (value instanceof DateType) {
             DateType dt = (DateType) value;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             StringBuilder sb = new StringBuilder();
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"Date\",").append(newLine);

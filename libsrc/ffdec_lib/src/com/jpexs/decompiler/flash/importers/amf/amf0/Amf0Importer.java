@@ -367,7 +367,7 @@ public class Amf0Importer {
                     String id = typedObject.containsKey("id") ? typedObject.getString("id") : null;
                     switch (typeStr) {                        
                         case "Date":
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                             String dateStr = typedObject.getString("value");
                             int timeZone = (int) (long) (double) typedObject.getDouble("timezone");
                             try {
