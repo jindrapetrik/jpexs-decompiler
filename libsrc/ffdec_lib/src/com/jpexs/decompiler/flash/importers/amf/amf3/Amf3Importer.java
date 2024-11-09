@@ -444,6 +444,12 @@ public class Amf3Importer {
                             Map<Object, Object> entries = typedObject.getJsObject("entries").getAll();
                             resultObject = new DictionaryType(weakKeys, entries);
                             break;
+                        case "Reference":
+                            resultObject = new ReferencedObjectType(typedObject.getString("referencedId"));
+                            break;
+                        case "Undefined":
+                            resultObject = BasicType.UNDEFINED;
+                            break;
                         default:
                             throw new AmfParseException("Unknown object type: " + typeStr, lexer.yyline());
                     }

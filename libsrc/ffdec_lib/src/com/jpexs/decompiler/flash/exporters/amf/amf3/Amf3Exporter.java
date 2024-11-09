@@ -157,16 +157,28 @@ public class Amf3Exporter {
         if (((List<? extends Class>) Arrays.asList(Long.class, Double.class, Boolean.class)).contains(object.getClass())) {
             return EcmaScript.toString(object);
         }
+        
+        StringBuilder ret = new StringBuilder();
 
+        if (object == BasicType.UNDEFINED) {
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Undefined\"").append(newLine);
+            ret.append(indent(level)).append("}");
+            return ret.toString();
+        }
+        
         if (object instanceof BasicType) {
             return object.toString();
         }
 
-        StringBuilder ret = new StringBuilder();
+        
 
         Integer refCount = referenceCount.get(object);
         if (refCount > 1 && processedObjects.contains(object)) {
-            ret.append("#").append(objectAlias.get(object));
+            ret.append("{").append(newLine);
+            ret.append(indent(level + 1)).append("\"type\": \"Reference\",").append(newLine);
+            ret.append(indent(level + 1)).append("\"referencedId\": \"").append(objectAlias.get(object)).append("\"").append(newLine);
+            ret.append(indent(level)).append("}");
             return ret.toString();
         }
         processedObjects.add(object);
