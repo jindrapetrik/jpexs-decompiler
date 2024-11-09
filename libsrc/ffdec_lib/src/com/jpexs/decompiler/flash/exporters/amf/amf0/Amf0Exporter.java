@@ -71,6 +71,15 @@ public class Amf0Exporter {
         sb.append(indent(level)).append("}");
         return sb.toString();
     }
+        
+    private static String referenceToString(String objectAlias, int level, String newLine) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{").append(newLine);
+        sb.append(indent(level + 1)).append("\"type\": \"Reference\",").append(newLine);
+        sb.append(indent(level + 1)).append("\"referencedId\": \"").append(objectAlias).append("\"").append(newLine);
+        sb.append(indent(level)).append("}");
+        return sb.toString();
+    }
     
     public static String amfToString(
             Object value,
@@ -84,7 +93,7 @@ public class Amf0Exporter {
         if (referenceCount.containsKey(value)) {
             Integer refCount = referenceCount.get(value);
             if (refCount > 1 && processedObjects.contains(value)) {
-                return "#" + objectAlias.get(value);            
+                return referenceToString(objectAlias.get(value), level, newLine);
             }
             if (refCount > 1) {
                 addId = indent(level + 1) + "\"id\": \"" + objectAlias.get(value) + "\"," + newLine;
@@ -94,7 +103,15 @@ public class Amf0Exporter {
         
         if (value instanceof ReferenceType) {
             ReferenceType rt = (ReferenceType) value;
-            return "#obj" + rt.referenceIndex;
+            return referenceToString("obj" + rt.referenceIndex, level, newLine);
+        }
+        
+        if (value == BasicType.UNDEFINED) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{").append(newLine);
+            sb.append(indent(level + 1)).append("\"type\": \"Undefined\"").append(newLine);
+            sb.append(indent(level)).append("}");
+            return sb.toString();
         }
         
         if (value instanceof Double) {

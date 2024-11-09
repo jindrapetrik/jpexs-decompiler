@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - [#1619] Default thread count is set to 0 ( = auto)
+- AMF3 (new AMF0 aswell) references and "undefined" values written as JSON objects
 
 ## [21.1.3] - 2024-10-29
 ### Fixed

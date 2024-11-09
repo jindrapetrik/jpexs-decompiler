@@ -365,7 +365,7 @@ public class Amf0Importer {
                 if (typedObject.containsKey("type")) {
                     String typeStr = typedObject.getString("type");
                     String id = typedObject.containsKey("id") ? typedObject.getString("id") : null;
-                    switch (typeStr) {
+                    switch (typeStr) {                        
                         case "Date":
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
                             String dateStr = typedObject.getString("value");
@@ -403,6 +403,13 @@ public class Amf0Importer {
                             typedObject.resolve("values", objectTable, false);                            
                             at.values = typedObject.getJsArray("values").getValues();
                             resultObject = at;
+                            break;
+                        case "Reference":
+                            ReferencedObjectType ref = new ReferencedObjectType(typedObject.getString("referencedId"));
+                            resultObject = ref;
+                            break;
+                        case "Undefined":
+                            resultObject = BasicType.UNDEFINED;
                             break;
                         default:
                             throw new AmfParseException("Unknown object type: " + typeStr, lexer.yyline());
