@@ -45,6 +45,7 @@ abovenormal
 abreak
 Abstaende
 abx
+accesing
 ACCESSDENIED
 acode
 acolor
@@ -1292,6 +1293,7 @@ gbc
 gbevin
 gbf
 Gby
+gc'ed
 gct
 gdi
 Geert
@@ -1966,6 +1968,7 @@ LOADURL
 LOADVARIABLES
 LOADVARIABLESNUM
 loadversion
+LOCALAPPDATA
 localcount
 localfile
 localreg
@@ -2498,6 +2501,7 @@ NOTUPDATED
 NOTZONE
 NOUNLOAD
 NOZORDER
+npapi
 nparams
 npe
 npp
@@ -2742,6 +2746,7 @@ popups
 Poskanzer
 powerstate
 poxyran
+ppapi
 ppkg
 pplace
 ppos
