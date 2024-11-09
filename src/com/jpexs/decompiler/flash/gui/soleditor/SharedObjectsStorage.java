@@ -36,7 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Service for accesing storage of Shared objects (.SOL files)
+ * Service for accessing storage of Shared objects (.SOL files)
  *
  * @author JPEXS
  */
