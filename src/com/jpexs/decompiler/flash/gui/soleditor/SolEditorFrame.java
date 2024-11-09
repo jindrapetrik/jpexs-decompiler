@@ -111,7 +111,13 @@ public class SolEditorFrame extends AppFrame {
         
         JButton openButton = new JButton(translate("button.open"), View.getIcon("open16"));
         openButton.addActionListener(this::openActionPerformed);
+        
+        JButton openNpApiButton = new JButton(translate("button.open.npapi"), View.getIcon("open16"));
+        openNpApiButton.addActionListener(this::openNpApiActionPerformed);
 
+        JButton openPpApiButton = new JButton(translate("button.open.ppapi"), View.getIcon("open16"));
+        openPpApiButton.addActionListener(this::openPpApiActionPerformed);
+        
         saveButton = new JButton(translate("button.save"), View.getIcon("save16"));
         saveButton.addActionListener(this::saveActionPerformed);
         saveButton.setEnabled(false);
@@ -121,6 +127,15 @@ public class SolEditorFrame extends AppFrame {
 
         topPanel.add(newButton);
         topPanel.add(openButton);
+        
+        File npApiDirectory = SharedObjectsStorage.getNpApiDirectory();
+        if (npApiDirectory != null && npApiDirectory.exists()) {
+            topPanel.add(openNpApiButton);
+        }
+        File ppApiDirectory = SharedObjectsStorage.getPpApiDirectory();
+        if (ppApiDirectory != null && ppApiDirectory.exists()) {
+            topPanel.add(openPpApiButton);
+        }
         topPanel.add(saveButton);
         topPanel.add(saveAsButton);
 
@@ -175,6 +190,18 @@ public class SolEditorFrame extends AppFrame {
     }
     
     private void openActionPerformed(ActionEvent e) {
+        openDirectory(new File(Configuration.lastSolEditorDirectory.get()));
+    }
+    
+    private void openNpApiActionPerformed(ActionEvent e) {
+        openDirectory(SharedObjectsStorage.getNpApiDirectory());
+    }
+    
+    private void openPpApiActionPerformed(ActionEvent e) {
+        openDirectory(SharedObjectsStorage.getPpApiDirectory());
+    }    
+    
+    private void openDirectory(File directory) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setFileFilter(new FileFilter() {
@@ -188,7 +215,7 @@ public class SolEditorFrame extends AppFrame {
                 return translate("filter.sol");
             }
         });
-        fileChooser.setCurrentDirectory(new File(Configuration.lastSolEditorDirectory.get()));
+        fileChooser.setCurrentDirectory(directory);
         if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
