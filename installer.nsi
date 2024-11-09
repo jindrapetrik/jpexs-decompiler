@@ -613,9 +613,14 @@ Section "FFDec" SecDummy
   File "dist\${APP_EXENAME}"
   File "dist\ffdec.bat"
   File "dist\ffdec.jar"
+  File "dist\ffdec-cli.exe"
+  File "dist\ffdec-cli.jar"
   File "dist\icon.ico"
   File "dist\license.txt"
+  File "dist\soleditor.bat"
+  File "dist\soleditor.lnk"
   File "dist\translator.bat"
+  File "dist\translator.lnk"
   File "dist\translator.exe"  
   
   SetOutPath "$INSTDIR"  
@@ -628,6 +633,7 @@ Section "FFDec" SecDummy
   CreateDirectory "$SMPROGRAMS\$SMDir"
   CreateShortCut "$SMPROGRAMS\$SMDir\Uninstall ${APP_NAME}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\$SMDir\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" "" "$INSTDIR\${APP_EXENAME}" 0
+  CreateShortCut "$SMPROGRAMS\$SMDir\${STRING_SOL_EDITOR}.lnk" "$INSTDIR\${APP_EXENAME}" "-soleditor" "$INSTDIR\${APP_EXENAME}" 2
  !insertmacro MUI_STARTMENU_WRITE_END
 
   ;Store installation folder

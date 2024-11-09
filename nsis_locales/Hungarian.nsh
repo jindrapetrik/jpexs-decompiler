@@ -18,6 +18,7 @@
 !insertmacro LANG_STRING STRING_HELP_US_BUTTON "Segítsen nekünk!"
 !insertmacro LANG_STRING STRING_SWC "PlayerGlobal.swc letöltése"
 !insertmacro LANG_STRING STRING_SWC_CHECK "Adobe oldal vizsgálata a legújabb PlayerGlobal.swc fájlhoz"
+!insertmacro LANG_STRING STRING_SOL_EDITOR "Sol cookie editor"
 
 ;Flash ActiveX:
 !insertmacro LANG_STRING STRING_FLASH_AX_REQUIRED_TITLE "Flash Player ActiveX vezérlő szükséges"
