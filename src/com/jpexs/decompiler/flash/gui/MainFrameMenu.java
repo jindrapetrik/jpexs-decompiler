@@ -804,6 +804,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
             ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("message.homepage").replace("%url%", homePageURL));
         }
     }
+    
+    protected void wikiActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+
+        String wikiURL = ApplicationInfo.WIKI_PAGE;
+        if (!View.navigateUrl(wikiURL)) {
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("message.wiki").replace("%url%", wikiURL));
+        }
+    }
 
     protected void aboutActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
@@ -1144,6 +1158,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/help/checkUpdates", !isWorking);
         //setMenuEnabled("/help/helpUs", !isWorking);
         setMenuEnabled("/help/homePage", !isWorking);
+        setMenuEnabled("/help/wiki", !isWorking);
         setMenuEnabled("_/about", !isWorking);
         setMenuEnabled("/help/about", !isWorking);
 
@@ -1455,6 +1470,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/help", translate("menu.help"), null, null, 0, null, false, null, false);
         //addMenuItem("/help/helpUs", translate("menu.help.helpus"), "donate32", this::helpUsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/help/homePage", translate("menu.help.homepage"), "homepage16", this::homePageActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/help/wiki", translate("menu.help.wiki"), "wiki16", this::wikiActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addSeparator("/help");
         addMenuItem("/help/checkUpdates", translate("menu.help.checkupdates"), "update16", this::checkUpdatesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/help/about", translate("menu.help.about"), "about32", this::aboutActionPerformed, PRIORITY_TOP, null, true, null, false);
