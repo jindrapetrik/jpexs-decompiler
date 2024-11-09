@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 - [#1619] Option to set thread count to 0 for auto setting processor count - 1
 - [#2360] SOL file (Flash Local Shared Object - flash cookie) editor
+- Cookies folder to easy edit NPAPI SOL files (only cookies in the swf root directory)
+- Link to FFDec Wiki on the Help menu
 
 ### Fixed
 - [#2357] AS3 instance var/const initialization
