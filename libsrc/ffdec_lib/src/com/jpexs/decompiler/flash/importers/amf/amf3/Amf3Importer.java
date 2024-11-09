@@ -372,7 +372,7 @@ public class Amf3Importer {
                     String id = typedObject.containsKey("id") ? typedObject.getString("id") : null;
                     switch (typeStr) {
                         case "Date":
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                             String dateStr = typedObject.getString("value");
                             try {
                                 resultObject = new DateType((double) sdf.parse(dateStr).getTime());

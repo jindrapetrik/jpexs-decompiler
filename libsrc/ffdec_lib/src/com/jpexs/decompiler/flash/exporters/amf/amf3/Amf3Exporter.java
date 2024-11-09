@@ -341,7 +341,7 @@ public class Amf3Exporter {
                     + indent(level) + "}";
         } else if (object instanceof DateType) {
             DateType dt = (DateType) object;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             return "{" + newLine
                     + indent(level + 1) + "\"type\": \"Date\"," + newLine
                     + addId
