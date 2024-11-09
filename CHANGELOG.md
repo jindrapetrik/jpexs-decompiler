@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
   which resembles Flash Pro UI. Easier moving objects,
   resizing, adding frames, adding objects to stage. Instance property editation.
   Undo / redo feature. Double click movie clips to edit sub-objects.
-
 - [#1619] Option to set thread count to 0 for auto setting processor count - 1
 - [#2360] SOL file (Flash Local Shared Object - flash cookie) editor
 - Cookies folder to easy edit NPAPI SOL files (only cookies in the swf root directory)
