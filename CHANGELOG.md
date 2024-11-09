@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - [#2360] SOL file (Flash Local Shared Object - flash cookie) editor
 - Cookies folder to easy edit NPAPI SOL files (only cookies in the swf root directory)
 - Link to FFDec Wiki on the Help menu
+- On Run/Debug SWF file in FFDec, Flash cookies (SOL files) are synced
+  from temporary SWF directory to actual SWF SOL directory
 
 ### Fixed
 - [#2357] AS3 instance var/const initialization
