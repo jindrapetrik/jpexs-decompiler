@@ -711,6 +711,10 @@
         <antcall target="build_cli"></antcall>
     </target>
 
+    <target name="run-for-screenshots" depends="-new-version-set,run">
+        
+    </target>
+
     <target name="run" depends="build">
         <java jar="${dist.dir}/${jar.filename}.jar" fork="true">
             <env key="VLC_VERBOSE" value="-1" />          
