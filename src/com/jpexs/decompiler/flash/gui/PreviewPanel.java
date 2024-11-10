@@ -1689,7 +1689,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(FLASH_VIEWER_CARD);
     }
 
-    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform, boolean allowZoom) {
+    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform, boolean allowZoom, boolean frozenButtons) {
         showCardLeft(DRAW_PREVIEW_CARD);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
@@ -1699,7 +1699,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         imageTransformSaveButton.setVisible(false);
         imageTransformCancelButton.setVisible(false);
-        imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom);
+        imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom, frozenButtons);
     }
 
     public void showImagePanel(SerializableImage image) {
@@ -1738,7 +1738,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false);
+            showImagePanel(TimelinedMaker.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false, false, true);
         }
     }
 
@@ -1757,7 +1757,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true);
+            showImagePanel(TimelinedMaker.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false, true, true);
         }
 
         showCardRight(CARDTEXTPANEL);
@@ -2020,16 +2020,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditImagePanel.selectDepth(-1);
         if (tag instanceof ShapeTag) {
             Timelined tim = TimelinedMaker.makeTimelined(tag);
-            displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true);
+            displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true);
         }
         if (tag instanceof MorphShapeTag) {
             Timelined tim = TimelinedMaker.makeTimelined(tag);
-            displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true);
+            displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true);
             morphDisplayMode = MORPH_ANIMATE;
             displayEditShowAnimationButton.setSelected(true);
         }
         if (tag instanceof PlaceObjectTypeTag) {
-            displayEditImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true);
+            displayEditImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, true, true);
             PlaceObjectTypeTag place = (PlaceObjectTypeTag) tag;
             displayEditImagePanel.selectDepth(place.getDepth());
         }
@@ -2710,19 +2710,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void showAnimationDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         morphDisplayMode = MORPH_ANIMATE;
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
-        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true);
     }
 
     private void showStartDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         morphDisplayMode = MORPH_START;
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
-        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true);
     }
 
     private void showEndDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         morphDisplayMode = MORPH_END;
         Timelined tim = TimelinedMaker.makeTimelined(displayEditTag);
-        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), tim.getFrameCount() - 1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), tim.getFrameCount() - 1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false, true, true);
     }
 
     private void editPointsDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -3064,7 +3064,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         };
 
-        imagePanel.setTimelined(tim, origSwf, 0, true, true, true, true, true, false, true);
+        imagePanel.setTimelined(tim, origSwf, 0, true, true, true, true, true, false, true, true);
         imagePanel.selectDepth(-1);
 
         replaceSpriteButton.setVisible(false);
@@ -3176,7 +3176,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
         if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false);
+            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true);
         }
     }
 
@@ -3185,7 +3185,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + 1) % pageCount;
         if (!MainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false);
+            imagePanel.setTimelined(TimelinedMaker.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true, true, true, true, true, false, false, true);
         }
     }
 

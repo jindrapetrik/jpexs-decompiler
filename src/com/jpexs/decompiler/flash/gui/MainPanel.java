@@ -5836,7 +5836,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
-                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false);
             } else {
                 previewPanel.setParametersPanelVisible(false);
                 previewPanel.showFlashViewerPanel();
@@ -5868,8 +5868,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ImageTag imageTag = (ImageTag) treeItem;
             previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false, false, false, false);
             SWF imageSWF = TimelinedMaker.makeTimelinedImage(imageTag);
-            previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true, true, false, false, true);
-
+            previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true, true, false, false, true, true);
         } else if (!isVideoButNotDrawable && (treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
             DrawableTag d = (DrawableTag) tag;
@@ -5890,11 +5889,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof DefineSpriteTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, false, false, false, false, !((Tag) treeItem).isReadOnly());
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get() && !(treeItem instanceof ButtonTag), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag) || (treeItem instanceof ShapeTag), true);
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get() && !(treeItem instanceof ButtonTag), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag) || (treeItem instanceof ShapeTag), true, false);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
-            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false);
         } else if (treeItem instanceof ShowFrameTag) {
             SWF swf;
             if (timelinedContainer instanceof DefineSpriteTag) {
@@ -5902,7 +5901,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 swf = (SWF) timelinedContainer;
             }
-            previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+            previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((SoundTag) treeItem).isReadOnly() && ((SoundTag) treeItem).importSupported(), false, false, false);
@@ -6034,7 +6033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     return getRect();
                 }
             };
-            previewPanel.showImagePanel(tim, origSwf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true);
+            previewPanel.showImagePanel(tim, origSwf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false, true, true);
         } else if (treeItem instanceof DefineFont4Tag) {
             previewPanel.showGenericTagPanel((Tag) treeItem);
         } else {
