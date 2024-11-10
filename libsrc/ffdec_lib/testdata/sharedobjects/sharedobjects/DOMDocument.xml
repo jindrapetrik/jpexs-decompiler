@@ -18,6 +18,8 @@ import flash.events.MouseEvent;
 import flash.net.ObjectEncoding;
 import flash.xml.XMLDocument;
 import flash.net.registerClassAlias;
+import flash.utils.ByteArray;
+import flash.utils.Dictionary;
 
 var s:String = "";
 for (var i = 0; i < 70000; i++) {
@@ -41,6 +43,36 @@ reftest["c"] = reftest;
 
 registerClassAlias("MyClassAlias", MyClass);
 
+var arr = ["a","b","c"];
+arr["akey"] = "hello";
+
+var cls = new MyClass();
+cls["c"] = "dynamicValue"
+
+var ba = new ByteArray();
+ba.writeByte(0x12);
+ba.writeByte(0x34);
+ba.writeByte(0xAB);
+
+var vi:Vector.<int> = new Vector.<int>();
+vi.push(10);
+vi.push(20);
+vi.push(30);
+
+var di:Dictionary = new Dictionary(false);
+
+var key1:Object = { id: 1 };
+var key2:Object = { id: 2 };
+
+di[key1] = "First";
+di[key2] = "Second";
+
+var diso:SharedObject = SharedObject.getLocal("dict");
+diso.objectEncoding = ObjectEncoding.AMF3;
+diso.data.mydict = di;
+diso.flush();
+
+
 var data = {
 	mynumber : 1.5,
     mybool : true,
@@ -48,14 +80,17 @@ var data = {
 	myobj : {a:1, b:2},
 	mynull : null,
 	myundefined : undefined,
-	myarray : ["a","b","c"],
+	myarray : arr,
 	mydate : dt,
 	mydate2 : dt,
 	myref: reftest,
 	mylongstring : s,
 	myxml : xm,
 	myxml2 : xm,
-	mytypedobject : new MyClass()
+	mytypedobject : cls,
+	mybytearray : ba,
+	myvectorint: vi,
+	mydictionary: di
 	};
 
 amf0test.data.tref = reftest;
@@ -134,6 +169,17 @@ function fonLoad(event:MouseEvent):void {
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="21920" publishTime="1731241363"/>
+          <PublishItem publishSize="21920" publishTime="1731241267"/>
+          <PublishItem publishSize="21884" publishTime="1731240255"/>
+          <PublishItem publishSize="21875" publishTime="1731239891"/>
+          <PublishItem publishSize="20278" publishTime="1731239868"/>
+          <PublishItem publishSize="21783" publishTime="1731239610"/>
+          <PublishItem publishSize="21775" publishTime="1731239428"/>
+          <PublishItem publishSize="21695" publishTime="1731238381"/>
+          <PublishItem publishSize="21633" publishTime="1731228977"/>
+          <PublishItem publishSize="21633" publishTime="1731228925"/>
+          <PublishItem publishSize="21599" publishTime="1731228388"/>
           <PublishItem publishSize="21570" publishTime="1731164207"/>
           <PublishItem publishSize="21571" publishTime="1731164104"/>
           <PublishItem publishSize="21715" publishTime="1731055062"/>
@@ -143,16 +189,5 @@ function fonLoad(event:MouseEvent):void {
           <PublishItem publishSize="21507" publishTime="1730740224"/>
           <PublishItem publishSize="21508" publishTime="1730740069"/>
           <PublishItem publishSize="21505" publishTime="1730740015"/>
-          <PublishItem publishSize="21520" publishTime="1730739945"/>
-          <PublishItem publishSize="21510" publishTime="1730739873"/>
-          <PublishItem publishSize="21496" publishTime="1730739737"/>
-          <PublishItem publishSize="21491" publishTime="1730738502"/>
-          <PublishItem publishSize="21497" publishTime="1730738131"/>
-          <PublishItem publishSize="21516" publishTime="1730705495"/>
-          <PublishItem publishSize="21264" publishTime="1730677777"/>
-          <PublishItem publishSize="20259" publishTime="1730677769"/>
-          <PublishItem publishSize="15819" publishTime="1730676977"/>
-          <PublishItem publishSize="15799" publishTime="1730676777"/>
-          <PublishItem publishSize="20794" publishTime="1730676730"/>
      </publishHistory>
 </DOMDocument>

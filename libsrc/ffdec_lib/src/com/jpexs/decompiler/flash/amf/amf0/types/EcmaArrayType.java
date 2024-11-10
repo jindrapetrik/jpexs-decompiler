@@ -26,7 +26,8 @@ import java.util.Map;
  * @author JPEXS
  */
 public class EcmaArrayType implements ComplexObject {
-    public Map<String, Object> values = new LinkedHashMap<>();
+    public Map<String, Object> denseValues = new LinkedHashMap<>();
+    public Map<String, Object> associativeValues = new LinkedHashMap<>();
 
     @Override
     public String toString() {
@@ -35,6 +36,9 @@ public class EcmaArrayType implements ComplexObject {
 
     @Override
     public List<Object> getSubValues() {
-        return new ArrayList<>(values.values());
+        List<Object> result = new ArrayList<>();
+        result.addAll(denseValues.values());
+        result.addAll(associativeValues.values());
+        return result;
     }
 }

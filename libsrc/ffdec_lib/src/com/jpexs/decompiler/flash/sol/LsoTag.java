@@ -81,7 +81,7 @@ public class LsoTag extends Tag {
             while (ais.available() > 0) {
                 String varName = ais.readUtf8("varName");
                 try {
-                    Object varValue = ais.readValue("varValue");
+                    Object varValue = ais.readValue("varValue");                    
                     amfValues.put(varName, varValue);
                 } catch (NoSerializerExistsException ex) {
                     throw new IllegalArgumentException("Serializer for class " + ex.getClassName() + " not found");

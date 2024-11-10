@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Amf3InputStream;
 import com.jpexs.decompiler.flash.amf.amf3.NoSerializerExistsException;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.exporters.amf.amf0.Amf0Exporter;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.io.DataInputStream;
@@ -37,6 +38,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -322,93 +324,118 @@ public class Amf0InputStream extends InputStream {
      */
     public Object readValue(String name) throws IOException, NoSerializerExistsException {
         newDumpLevel(name, "value-type");
-        try {
-            int marker = readInternal();
-            switch (marker) {
-                case Marker.NUMBER:                    
-                    return readDouble("DOUBLE");
-                case Marker.BOOLEAN:
-                    return readU8("U8") > 0;
-                case Marker.STRING:
-                    return readUtf8("UTF-8");
-                case Marker.OBJECT_END:
-                    return BasicType.OBJECT_END;
-                case Marker.OBJECT:
-                    ObjectType object = new ObjectType();
-                    String propName;
-                    Object val;
+        Object result = null;
+        int marker = readInternal();
+        System.err.println("marker " + Integer.toHexString(marker));
+        switch (marker) {
+            case Marker.NUMBER:                    
+                result = readDouble("DOUBLE");
+                break;
+            case Marker.BOOLEAN:
+                result = readU8("U8") > 0;
+                break;
+            case Marker.STRING:
+                result = readUtf8("UTF-8");
+                break;
+            case Marker.OBJECT_END:
+                result = BasicType.OBJECT_END;
+                break;
+            case Marker.OBJECT:
+                ObjectType object = new ObjectType();
+                String propName;
+                Object val;
 
-                    while (true) {
-                        propName = readUtf8("propertyName");
-                        val = readValue("propertyValue");
-                        if (propName.equals("")) {
-                            break;
-                        }
-                        object.properties.put(propName, val);
-                    }                    
-                    return object;
-                case Marker.MOVIECLIP:
-                    throw new IllegalArgumentException("MovieClip not supported in AMF0");
-                case Marker.NULL:
-                    return BasicType.NULL;
-                case Marker.UNDEFINED:
-                    return BasicType.UNDEFINED;
-                case Marker.REFERENCE:
-                    return new ReferenceType(readU16("referenceIndex"));
-                case Marker.ECMA_ARRAY:
-                    int associativeCount = (int) readU32("associative-count");
-                    EcmaArrayType ea = new EcmaArrayType();
-                    for (int a = 0; a < associativeCount; a++) {
-                        String eaKey = readUtf8("key");                        
-                        Object eaVal = readValue("value");
-                        ea.values.put(eaKey, eaVal);
+                while (true) {
+                    propName = readUtf8("propertyName");
+                    val = readValue("propertyValue");
+                    if (propName.equals("")) {
+                        break;
                     }
-                    readUtf8("UTF-8-empty");
-                    readValue("object-end");
-                    
-                    return ea;
-                case Marker.STRICT_ARRAY:
-                    int arrayCount = (int) readU32("array-count");
-                    ArrayType at = new ArrayType();
-                    for (int a = 0; a < arrayCount; a++) {
-                        at.values.add(readValue("value"));
+                    object.properties.put(propName, val);
+                }                    
+                result = object;
+                break;
+            case Marker.MOVIECLIP:
+                throw new IllegalArgumentException("MovieClip not supported in AMF0");
+            case Marker.NULL:
+                result = BasicType.NULL;
+                break;
+            case Marker.UNDEFINED:
+                result = BasicType.UNDEFINED;
+                break;
+            case Marker.REFERENCE:
+                result = new ReferenceType(readU16("referenceIndex"));
+                break;
+            case Marker.ECMA_ARRAY:
+                int associativeCount = (int) readU32("associative-count");
+                System.err.println("associativeCount = " + associativeCount);
+                EcmaArrayType ea = new EcmaArrayType();
+                for (int a = 0; a < associativeCount; a++) {
+                    String eaKey = readUtf8("key");                        
+                    Object eaVal = readValue("value");
+                    ea.denseValues.put(eaKey, eaVal);
+                }
+                while (true) {
+                    String eaKey = readUtf8("key");
+                    Object eaVal = readValue("value");
+                    if ("".equals(eaKey)) {
+                        break;
                     }
-                    return at;
-                case Marker.DATE:
-                    double dval = readDouble("epoch-millis");
-                    int timezone = readS16("time-zone");
-                    return new DateType(dval, timezone);
-                case Marker.LONG_STRING:
-                    return readUtf8Long("long-string");
-                case Marker.UNSUPPORTED:
-                    throw new IllegalArgumentException("Unsupported type");
-                case Marker.RECORDSET:
-                    throw new IllegalArgumentException("RecordSet not supported in AMF0");
-                case Marker.XML_DOCUMENT:
-                    return new XmlDocumentType(readUtf8Long("xml"));
-                case Marker.TYPED_OBJECT:
-                    String className = readUtf8("class-name");
-                    TypedObjectType typedObject = new TypedObjectType();
-                    typedObject.className = className;
+                    ea.associativeValues.put(eaKey, eaVal);
+                }
 
-                    while (true) {
-                        propName = readUtf8("propertyName");                            
-                        val = readValue("propertyValue");
-                        if (propName.equals("")) {
-                            break;
-                        }
-                        typedObject.properties.put(propName, val);
+                result = ea;
+                break;
+            case Marker.STRICT_ARRAY:
+                int arrayCount = (int) readU32("array-count");
+                ArrayType at = new ArrayType();
+                for (int a = 0; a < arrayCount; a++) {
+                    at.values.add(readValue("value"));
+                }
+                result = at;
+                break;
+            case Marker.DATE:
+                double dval = readDouble("epoch-millis");
+                int timezone = readS16("time-zone");
+                result = new DateType(dval, timezone);
+                break;
+            case Marker.LONG_STRING:
+                result = readUtf8Long("long-string");
+                break;
+            case Marker.UNSUPPORTED:
+                throw new IllegalArgumentException("Unsupported type");
+            case Marker.RECORDSET:
+                throw new IllegalArgumentException("RecordSet not supported in AMF0");
+            case Marker.XML_DOCUMENT:
+                return new XmlDocumentType(readUtf8Long("xml"));
+            case Marker.TYPED_OBJECT:
+                String className = readUtf8("class-name");
+                TypedObjectType typedObject = new TypedObjectType();
+                typedObject.className = className;
+
+                while (true) {
+                    propName = readUtf8("propertyName");                            
+                    val = readValue("propertyValue");
+                    if (propName.equals("")) {
+                        break;
                     }
-                    return typedObject;
-                case Marker.AVMPLUS_OBJECT:
-                    Amf3InputStream amf3 = new Amf3InputStream(is);
-                    return amf3.readValue("avm-plus-object");                    
-                default:
-                    throw new IllegalArgumentException("Unsupported type");
-            }
-        } finally {
-            endDumpLevel();
+                    typedObject.properties.put(propName, val);
+                }
+                result = typedObject;
+                break;
+            case Marker.AVMPLUS_OBJECT:
+                Amf3InputStream amf3 = new Amf3InputStream(is);
+                result = amf3.readValue("avm-plus-object");                    
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported type");
         }
+        
+        if (result != null) {
+            System.err.println("Read: " + Amf0Exporter.amfToString(result, 0, "\r\n", new ArrayList<>(), new HashMap<>(), new HashMap<>()));
+        }
+        endDumpLevel();
+        return result;
     }
     
     public void resolveMapReferences(Map<String, Object> map) {        
@@ -439,8 +466,11 @@ public class Amf0InputStream extends InputStream {
         }
         if (value instanceof EcmaArrayType) {
             EcmaArrayType eat = (EcmaArrayType) value;
-            for (String key : eat.values.keySet()) {
-                eat.values.put(key, resolveReferences(eat.values.get(key), complexObjects));                
+            for (String key : eat.denseValues.keySet()) {
+                eat.denseValues.put(key, resolveReferences(eat.denseValues.get(key), complexObjects));                
+            }
+            for (String key : eat.associativeValues.keySet()) {
+                eat.associativeValues.put(key, resolveReferences(eat.associativeValues.get(key), complexObjects));
             }
         }
         if (value instanceof ArrayType) {

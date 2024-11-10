@@ -209,9 +209,12 @@ public class Amf0OutputStream extends OutputStream {
         } else if (value instanceof EcmaArrayType) {
             write(Marker.ECMA_ARRAY);
             EcmaArrayType ea = (EcmaArrayType) value;
-            writeU32(ea.values.size());
-            for (String key : ea.values.keySet()) {
-                writeObjectProperty(key, ea.values.get(key), complexObjectsList);                
+            writeU32(ea.denseValues.size());
+            for (String key : ea.denseValues.keySet()) {
+                writeObjectProperty(key, ea.denseValues.get(key), complexObjectsList);                
+            }
+            for (String key : ea.associativeValues.keySet()) {
+                writeObjectProperty(key, ea.associativeValues.get(key), complexObjectsList);
             }
             writeUtf8Empty();
             write(Marker.OBJECT_END);

@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
  */
 public class SharedObjectsStorage {
 
+    public static boolean watchingPaused = false;
+    
     public static Map<WatchKey, File> watchedCookieDirectories = new HashMap<>();
     
     
@@ -77,7 +79,6 @@ public class SharedObjectsStorage {
         try {
             WatchKey key = dir.toPath().register(Main.getWatcher(), StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
             watchedCookieDirectories.put(key, dir);
-            //System.err.println("started monitoring " + dir.getAbsolutePath());
         } catch (IOException ex) {
             //ignored
             //ex.printStackTrace();
@@ -348,11 +349,9 @@ public class SharedObjectsStorage {
     }
     
     public static void watchedDirectoryChanged(File file) {        
-        //System.err.println("changed file: " + file.getAbsolutePath());
-        if (!file.exists()) {
-            //System.err.println("no exist");
-            //return;
-        }        
+        if (watchingPaused) {
+            return;
+        }
         
         List<File> swfFiles = new ArrayList<>(swfFileToListeners.keySet());
         for (File swfFile : swfFiles) {
@@ -379,6 +378,7 @@ public class SharedObjectsStorage {
         //System.err.println("- firing changed " + swfFile.getAbsolutePath());
         List<CookiesChangedListener> listeners = swfFileToListeners.get(swfFile);
         if (listeners != null) {
+            listeners = new ArrayList<>(listeners);
             for (CookiesChangedListener l:listeners) {
                 l.cookiesChanged(swfFile, files);
             }
