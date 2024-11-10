@@ -121,3 +121,4 @@ _[a-z]+(?:_[A-Z]+|)\.properties$
 ignore$
 Lexer\.java$
 \.sol$
+\.lnk$
