@@ -2271,12 +2271,14 @@ MXOFF
 myarray
 myas
 mybool
+mybytearray
 mycheckbox
 mycircle
 myclass
 myclip
 myconst
 mydata
+mydictionary
 mydir
 myf
 myfilecomp
@@ -2305,6 +2307,7 @@ mytypedobject
 myundefined
 myvargetonly
 myvarsetonly
+myvectorint
 myxml
 Naashorn
 nabc
