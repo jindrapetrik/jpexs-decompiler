@@ -129,7 +129,8 @@ public class Amf0Exporter {
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"Object\",").append(newLine);
             sb.append(addId);
-            membersToString(sb, ot.properties, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            membersToString("members", sb, ot.properties, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            sb.append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
@@ -139,7 +140,10 @@ public class Amf0Exporter {
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"EcmaArray\",").append(newLine);
             sb.append(addId);
-            membersToString(sb, eat.values, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            membersToString("denseValues", sb, eat.denseValues, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            sb.append(",").append(newLine);
+            membersToString("associativeValues", sb, eat.associativeValues, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            sb.append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
@@ -172,7 +176,8 @@ public class Amf0Exporter {
             sb.append(indent(level + 1)).append("\"type\": \"TypedObject\",").append(newLine);
             sb.append(addId);            
             sb.append(indent(level + 1)).append("\"className\": \"").append(Helper.escapeActionScriptString(tot.className)).append("\",").append(newLine);
-            membersToString(sb, tot.properties, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            membersToString("members", sb, tot.properties, level + 1, newLine, processedObjects, referenceCount, objectAlias);
+            sb.append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
@@ -209,6 +214,7 @@ public class Amf0Exporter {
     }
 
     private static void membersToString(
+            String membersLabel,
             StringBuilder sb,
             Map<String, Object> members,
             int level, 
@@ -216,7 +222,7 @@ public class Amf0Exporter {
             List<Object> processedObjects,
             Map<Object, Integer> referenceCount,
             Map<Object, String> objectAlias) {
-        sb.append(indent(level)).append("\"members\": {").append(newLine);
+        sb.append(indent(level)).append("\"").append(membersLabel).append("\": {").append(newLine);
         boolean first = true;
         for (String key : members.keySet()) {
             if (!first) {
@@ -227,7 +233,7 @@ public class Amf0Exporter {
             sb.append(amfToString(members.get(key), level + 1, newLine, processedObjects, referenceCount, objectAlias));
         }
         sb.append(newLine);
-        sb.append(indent(level)).append("}").append(newLine);
+        sb.append(indent(level)).append("}");
 
     }
 

@@ -665,20 +665,46 @@ public class Main {
 
     private static void deleteCookiesAfterRun(File tempFile) {
         SharedObjectsStorage.removeChangedListener(tempFile, runCookieListener);
-        View.execInEventDispatchLater(new Runnable() {
-            public void run() {
-                File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);
-                if (solDir == null) {
-                    return;
+        File solDir = SharedObjectsStorage.getSolDirectoryForLocalFile(tempFile);        
+        File origSolDir = runningSWF.getFile() == null ? null : SharedObjectsStorage.getSolDirectoryForLocalFile(new File(runningSWF.getFile()));
+        if (solDir != null) {
+            WatchKey foundKey = null;
+            for (WatchKey key : SharedObjectsStorage.watchedCookieDirectories.keySet()) {
+                if (SharedObjectsStorage.watchedCookieDirectories.get(key).equals(solDir)) {
+                    foundKey = key;
+                    break;
                 }
-                if (solDir.exists()) {
-                    for (File f : solDir.listFiles()) {
-                        f.delete();
-                    }
-                    solDir.delete();
-                }                
+            } 
+            if (foundKey != null) {
+                SharedObjectsStorage.watchedCookieDirectories.remove(foundKey);
             }
-        });
+            
+            View.execInEventDispatchLater(new Runnable() {
+                public void run() {                                    
+                    if (solDir.exists()) {
+                        
+                        if (origSolDir != null && origSolDir.exists()) {                                                        
+                            for (File f : origSolDir.listFiles()) {
+                                f.delete();
+                            }
+                            
+                            for (File f : solDir.listFiles()) {
+                                try {
+                                    Files.copy(f.toPath(), origSolDir.toPath().resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                                } catch (IOException ex) {
+                                    //ignored
+                                }
+                            }
+                        }
+                        
+                        for (File f : solDir.listFiles()) {
+                            f.delete();
+                        }
+                        solDir.delete();                                                
+                    }                
+                }
+            });
+        }
         synchronized (Main.class) {
             runCookieListener = null;
         }
@@ -704,7 +730,7 @@ public class Main {
                 } catch (IOException ex) {
                     //ignored
                 }
-            }
+            }            
         }
 
         runCookieListener = new CookiesChangedListener() {
@@ -727,7 +753,7 @@ public class Main {
                     } catch (IOException ex) {
                         //ignored
                     }
-                }
+                }                
             }
         };
         SharedObjectsStorage.addChangedListener(tempFile, runCookieListener);
@@ -1986,9 +2012,30 @@ public class Main {
             if (fileName != null) {
                 Configuration.addRecentFile(fileName);
                 SharedObjectsStorage.addChangedListener(new File(fileName), new CookiesChangedListener() {
+                    
+                    Timer timer;
+                    
                     @Override
-                    public void cookiesChanged(File swfFile, List<File> cookies) {
-                        getMainFrame().getPanel().refreshTree();
+                    public void cookiesChanged(File swfFile, List<File> cookies) {                        
+                        if (timer != null) {
+                            return;
+                        }
+                        
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                View.execInEventDispatchLater(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        getMainFrame().getPanel().refreshTree();
+                                        timer = null;
+                                    }                                    
+                                });
+                                
+                            }                            
+                        }, 500);
+                        
                     }
                 });
                 if (watcher != null && Configuration.checkForModifications.get()) {
@@ -2517,7 +2564,6 @@ public class Main {
                             for (WatchEvent<?> event : key.pollEvents()) {
                                 WatchEvent.Kind<?> kind = event.kind();
                                 if (kind == StandardWatchEventKinds.OVERFLOW) {
-                                    System.err.println("overflow");
                                     continue;
                                 }
 
@@ -2530,10 +2576,10 @@ public class Main {
                                     File dir = SharedObjectsStorage.watchedCookieDirectories.get(key);
                                     java.nio.file.Path child = dir.toPath().resolve(filename);
                                     File fullPath = child.toFile();
-
+                                    
                                     View.execInEventDispatchLater(new Runnable() {
                                         @Override
-                                        public void run() {
+                                        public void run() {                                            
                                             SharedObjectsStorage.watchedDirectoryChanged(fullPath);
                                         }
                                     });

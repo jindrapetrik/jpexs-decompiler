@@ -395,7 +395,8 @@ public class Amf0Importer {
                         case "EcmaArray":
                             EcmaArrayType eat = new EcmaArrayType();
                             typedObject.resolve("members", objectTable, false);
-                            eat.values = typedObject.getJsObject("members").getStringMapped();
+                            eat.denseValues = typedObject.getJsObject("denseValues").getStringMapped();
+                            eat.associativeValues = typedObject.getJsObject("associativeValues").getStringMapped();
                             resultObject = eat;
                             break;
                         case "Array":
@@ -510,8 +511,11 @@ public class Amf0Importer {
             }
         } else if (object instanceof EcmaArrayType) {
             EcmaArrayType eat = (EcmaArrayType) object;
-            for (String key : eat.values.keySet()) {
-                eat.values.put(key, replaceReferences(eat.values.get(key), objectsTable));
+            for (String key : eat.denseValues.keySet()) {
+                eat.denseValues.put(key, replaceReferences(eat.denseValues.get(key), objectsTable));
+            }
+            for (String key : eat.associativeValues.keySet()) {
+                eat.associativeValues.put(key, replaceReferences(eat.associativeValues.get(key), objectsTable));
             }
         } else if (object instanceof ArrayType) {
             ArrayType at = (ArrayType) object;
