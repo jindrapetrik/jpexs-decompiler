@@ -3107,8 +3107,7 @@ public class Main {
             checkLibraryVersion();
             View.execInEventDispatch(() -> {
                 DefaultSyntaxKit.initKit();
-                SolEditorFrame solEditor = new SolEditorFrame();
-                solEditor.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                SolEditorFrame solEditor = new SolEditorFrame(true);
                 solEditor.setVisible(true);
             });
         } else {
@@ -3583,7 +3582,7 @@ public class Main {
     }
 
     public static void openSolEditor() {
-        SolEditorFrame solEdit = new SolEditorFrame();
+        SolEditorFrame solEdit = new SolEditorFrame(false);
         solEdit.setVisible(true);
     }
 }

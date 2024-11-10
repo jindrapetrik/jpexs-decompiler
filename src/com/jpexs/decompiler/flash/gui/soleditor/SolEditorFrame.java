@@ -35,6 +35,8 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -72,9 +74,23 @@ public class SolEditorFrame extends AppFrame {
 
     private final DocumentListener modifiedListener;
 
-    public SolEditorFrame() {
-        setDefaultCloseOperation(HIDE_ON_CLOSE);
+    public SolEditorFrame(boolean exitOnClose) {
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setTitle(translate("dialog.title"));
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (modified && ViewMessages.showConfirmDialog(SolEditorFrame.this, translate("warning.loseChanges"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.OK_OPTION) {
+                    return;
+                }
+                if (exitOnClose) {
+                    System.exit(0);
+                } else {
+                    setVisible(false);
+                }
+            }
+        });
 
         modifiedListener = new DocumentListener() {
             @Override
@@ -105,19 +121,19 @@ public class SolEditorFrame extends AppFrame {
         cnt.setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        
+
         JButton newButton = new JButton(translate("button.new"), View.getIcon("newswf16"));
         newButton.addActionListener(this::newActionPerformed);
-        
+
         JButton openButton = new JButton(translate("button.open"), View.getIcon("open16"));
         openButton.addActionListener(this::openActionPerformed);
-        
+
         JButton openNpApiButton = new JButton(translate("button.open.npapi"), View.getIcon("open16"));
         openNpApiButton.addActionListener(this::openNpApiActionPerformed);
 
         JButton openPpApiButton = new JButton(translate("button.open.ppapi"), View.getIcon("open16"));
         openPpApiButton.addActionListener(this::openPpApiActionPerformed);
-        
+
         saveButton = new JButton(translate("button.save"), View.getIcon("save16"));
         saveButton.addActionListener(this::saveActionPerformed);
         saveButton.setEnabled(false);
@@ -127,7 +143,7 @@ public class SolEditorFrame extends AppFrame {
 
         topPanel.add(newButton);
         topPanel.add(openButton);
-        
+
         File npApiDirectory = SharedObjectsStorage.getNpApiDirectory();
         if (npApiDirectory != null && npApiDirectory.exists()) {
             topPanel.add(openNpApiButton);
@@ -151,11 +167,11 @@ public class SolEditorFrame extends AppFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 amfVersionLabel.setText(amfVersionComboBox.getSelectedItem().toString());
-            }            
+            }
         });
 
         amfVersionLabel.setVisible(false);
-        
+
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.add(new JLabel(translate("filename")));
         bottomPanel.add(fileNameField);
@@ -175,7 +191,7 @@ public class SolEditorFrame extends AppFrame {
     }
 
     private void newActionPerformed(ActionEvent e) {
-        if (modified && ViewMessages.showConfirmDialog(this, translate("warning.loseChanges"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE) != JOptionPane.OK_OPTION) {
+        if (modified && ViewMessages.showConfirmDialog(this, translate("warning.loseChanges"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.OK_OPTION) {
             return;
         }
         openedFile = null;
@@ -188,19 +204,19 @@ public class SolEditorFrame extends AppFrame {
         updateTitle();
         fileNameField.setText(translate("untitled"));
     }
-    
+
     private void openActionPerformed(ActionEvent e) {
         openDirectory(new File(Configuration.lastSolEditorDirectory.get()));
     }
-    
+
     private void openNpApiActionPerformed(ActionEvent e) {
         openDirectory(SharedObjectsStorage.getNpApiDirectory());
     }
-    
+
     private void openPpApiActionPerformed(ActionEvent e) {
         openDirectory(SharedObjectsStorage.getPpApiDirectory());
-    }    
-    
+    }
+
     private void openDirectory(File directory) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileHidingEnabled(false);
@@ -238,7 +254,7 @@ public class SolEditorFrame extends AppFrame {
             }
             fileNameField.setText(newFileName);
             amfVersionComboBox.setSelectedItem(newAmfVersion);
-            amfVersionLabel.setText("" + newAmfVersion);           
+            amfVersionLabel.setText("" + newAmfVersion);
         } catch (IOException | IllegalArgumentException ex) {
             ViewMessages.showMessageDialog(this, translate("error.cannotOpen") + " " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             return;
@@ -307,7 +323,7 @@ public class SolEditorFrame extends AppFrame {
 
     private void saveAsActionPerformed(ActionEvent e) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileHidingEnabled(false);        
+        fileChooser.setFileHidingEnabled(false);
         fileChooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
