@@ -200,7 +200,7 @@ public class Amf0Exporter {
             sb.append("{").append(newLine);
             sb.append(indent(level + 1)).append("\"type\": \"XMLDocument\",").append(newLine);
             sb.append(addId);
-            sb.append(indent(level + 1)).append("\"data\": \"").append(Helper.escapeActionScriptString(xdt.getData())).append("\"").append(newLine);
+            sb.append(indent(level + 1)).append("\"value\": \"").append(Helper.escapeActionScriptString(xdt.getData())).append("\"").append(newLine);
             sb.append(indent(level)).append("}");
             return sb.toString();
         }
