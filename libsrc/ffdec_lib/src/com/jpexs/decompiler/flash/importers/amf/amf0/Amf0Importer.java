@@ -377,7 +377,7 @@ public class Amf0Importer {
                             }
                             break;
                         case "XMLDocument":
-                            resultObject = new XmlDocumentType(typedObject.getString("data"));
+                            resultObject = new XmlDocumentType(typedObject.getString("value"));
                             break;
                         case "Object":
                             ObjectType ot = new ObjectType();
