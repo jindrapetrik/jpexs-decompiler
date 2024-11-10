@@ -341,12 +341,12 @@ public class Amf3Importer {
                 expectedType(SymbolType.COLON);
                 Object value = value(objectTable);
                 ret.put(key, value);
-                if ("id".equals(key)) {
+                /*if ("id".equals(key)) {
                     if (!(value instanceof String)) {
                         throw new AmfParseException("id must be string value", lexer.yyline());
                     }
                     objectTable.put((String) value, BasicType.UNDEFINED);
-                }
+                }*/
                 s = lex();
             } while (s.isType(SymbolType.COMMA));
         }
@@ -440,8 +440,22 @@ public class Amf3Importer {
                             break;
                         case "Dictionary":
                             boolean weakKeys = typedObject.getBoolean("weakKeys");
-                            typedObject.resolve("entries", objectTable, false);
-                            Map<Object, Object> entries = typedObject.getJsObject("entries").getAll();
+                            //typedObject.resolve("entries", objectTable, false);
+                            //Map<Object, Object> entries = typedObject.getJsObject("entries").getAll();
+                            Map<Object, Object> entries = new LinkedHashMap<>();
+                            List<Object> entryArray = typedObject.getJsArray("entries").values;
+                            for (Object entry : entryArray) {
+                                if (!(entry instanceof JsObject)) {
+                                    throw new AmfParseException("Invalid dictionary entry", lexer.yyline());
+                                }
+                                JsObject entryJso = (JsObject) entry;
+                                entryJso.resolve("key", objectTable, true);
+                                entryJso.resolve("value", objectTable, true);
+                                
+                                Object key = entryJso.get("key");
+                                Object value = entryJso.get("value");
+                                entries.put(key, value);
+                            }
                             resultObject = new DictionaryType(weakKeys, entries);
                             break;
                         case "Reference":

@@ -326,7 +326,7 @@ public class Amf0InputStream extends InputStream {
         newDumpLevel(name, "value-type");
         Object result = null;
         int marker = readInternal();
-        System.err.println("marker " + Integer.toHexString(marker));
+        //System.err.println("marker " + Integer.toHexString(marker));
         switch (marker) {
             case Marker.NUMBER:                    
                 result = readDouble("DOUBLE");
@@ -368,7 +368,6 @@ public class Amf0InputStream extends InputStream {
                 break;
             case Marker.ECMA_ARRAY:
                 int associativeCount = (int) readU32("associative-count");
-                System.err.println("associativeCount = " + associativeCount);
                 EcmaArrayType ea = new EcmaArrayType();
                 for (int a = 0; a < associativeCount; a++) {
                     String eaKey = readUtf8("key");                        
@@ -431,9 +430,9 @@ public class Amf0InputStream extends InputStream {
                 throw new IllegalArgumentException("Unsupported type");
         }
         
-        if (result != null) {
+        /*if (result != null) {
             System.err.println("Read: " + Amf0Exporter.amfToString(result, 0, "\r\n", new ArrayList<>(), new HashMap<>(), new HashMap<>()));
-        }
+        }*/
         endDumpLevel();
         return result;
     }

@@ -335,13 +335,7 @@ public class Amf0Importer {
                 Object key = value(objectTable);
                 expectedType(SymbolType.COLON);
                 Object value = value(objectTable);
-                ret.put(key, value);
-                if ("id".equals(key)) {
-                    if (!(value instanceof String)) {
-                        throw new AmfParseException("id must be string value", lexer.yyline());
-                    }
-                    objectTable.put((String) value, BasicType.UNDEFINED);
-                }
+                ret.put(key, value);                
                 s = lex();
             } while (s.isType(SymbolType.COMMA));
         }

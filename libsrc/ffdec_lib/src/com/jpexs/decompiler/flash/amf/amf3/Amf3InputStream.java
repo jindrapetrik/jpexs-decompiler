@@ -595,7 +595,7 @@ public class Amf3InputStream extends InputStream {
                         endDumpLevel();
                         LOGGER.log(Level.FINER, "Array value: dense_size={0},assocSize={1}", new Object[]{densePart.size(), assocPart.size()});
                         result = retArray;
-
+                        
                     } else {
                         renameU29O_ref();
                         int refIndexArray = (int) (arrayU29 >> 1);
