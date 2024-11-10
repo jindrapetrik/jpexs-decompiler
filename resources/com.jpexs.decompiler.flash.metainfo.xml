@@ -65,6 +65,34 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="22.0.0" date="2024-11-10">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Simple editor view - new simplified UI based on timeline view, which resembles Flash Pro UI. Easier moving objects, resizing, adding frames, adding objects to stage. Instance property editation. Undo / redo feature. Double click movie clips to edit sub-objects.</li>
+					<li>#1619 Option to set thread count to 0 for auto setting processor count - 1</li>
+					<li>#2360 SOL file (Flash Local Shared Object - flash cookie) editor</li>
+					<li>Cookies folder to easy edit NPAPI SOL files (only cookies in the swf root directory)</li>
+					<li>Link to FFDec Wiki on the Help menu</li>
+					<li>On Run/Debug SWF file in FFDec, Flash cookies (SOL files) are synced from temporary SWF directory to actual SWF SOL directory</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2357 AS3 instance var/const initialization</li>
+					<li>#2361 Transform tool for PlaceObject tags</li>
+					<li>#2357 FLA export letterspacing on two character texts</li>
+					<li>#2357 FLA export to CS4 and lower - files exceeding 0x7FFF objects limit</li>
+					<li>#2357 FLA export to CS4 and lower - speed optimization</li>
+					<li>#2362 Generating error log ExecutionException - InterruptedException log on switching flash/air swc</li>
+					<li>Buttons were not active where they should be</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1619 Default thread count is set to 0 ( = auto)</li>
+					<li>AMF3 (new AMF0 aswell) references and "undefined" values written as JSON objects</li>
+				</ul>
+			</description>
+		</release>
 		<release version="21.1.3" date="2024-10-29">
 			<description>
 				<p>Fixed</p>

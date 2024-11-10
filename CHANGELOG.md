@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [22.0.0] - 2024-11-10
 ### Added
 - Simple editor view - new simplified UI based on timeline view, 
   which resembles Flash Pro UI. Easier moving objects,
@@ -3490,7 +3490,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...dev
+[22.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...version22.0.0
 [21.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.2...version21.1.3
 [21.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.1...version21.1.2
 [21.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.0...version21.1.1
