@@ -47,10 +47,7 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
-import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
-import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
@@ -105,7 +102,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -263,6 +259,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean autoPlayed = false;
 
     private boolean frozen = false;
+    
+    private boolean frozenButtons = false;
 
     private boolean muted = false;
 
@@ -329,7 +327,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private final List<Integer> parentDepths = new ArrayList<>();
 
     private final List<Timelined> parentTimelineds = new ArrayList<>();
-        
+
+    public void setFrozenButtons(boolean frozenButtons) {
+        this.frozenButtons = frozenButtons;
+    }                
+    
     public boolean isMultiSelect() {
         return multiSelect;
     }   
@@ -2572,7 +2574,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (button != null && !doFreeTransform && !frozen) {
+                    if (button != null && !doFreeTransform && !frozenButtons) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (!muted && sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             CharacterTag soundCharTag = swf.getCharacter(sounds.buttonSoundChar2);
@@ -2617,7 +2619,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (!muted && button != null && !doFreeTransform && !frozen) {
+                    if (!muted && button != null && !doFreeTransform && !frozenButtons) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             CharacterTag soundCharTag = swf.getCharacter(sounds.buttonSoundChar3);
@@ -2891,7 +2893,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Timer setTimelinedTimer = null;
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -2999,6 +3001,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             autoPlayed = autoPlay;
             this.alwaysDisplay = alwaysDisplay;
             this.frozen = frozen;
+            this.frozenButtons = frozenButtons;
             this.muted = muted;
             this.resample = Configuration.previewResampleSound.get();
             this.mutable = mutable;
@@ -3588,7 +3591,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         renderContext.mouseButton = mouseButton;
         renderContext.stateUnderCursor = new ArrayList<>();
-        renderContext.enableButtons = !frozen;
+        renderContext.enableButtons = !frozenButtons;
 
         SerializableImage img;
         try {
@@ -3758,7 +3761,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozen;
+            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozenButtons;
 
             if (showObjectsUnderCursor && autoPlayed) {
 

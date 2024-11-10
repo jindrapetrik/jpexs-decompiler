@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#2357] FLA export to CS4 and lower - files exceeding 0x7FFF objects limit
 - [#2357] FLA export to CS4 and lower - speed optimization
 - [#2362] Generating error log ExecutionException - InterruptedException log on switching flash/air swc
+- Buttons were not active where they should be
 
 ### Changed
 - [#1619] Default thread count is set to 0 ( = auto)
