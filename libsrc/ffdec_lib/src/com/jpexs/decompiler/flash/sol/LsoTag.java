@@ -136,7 +136,7 @@ public class LsoTag extends Tag {
             List<Object> objectTable = new ArrayList<>();
             for(String key: amfValues.keySet()) {
                 try {
-                    a3os.writeUtf8Vr(key, new ArrayList<>()); //Intentionally not using string table
+                    a3os.writeUtf8Vr(key, stringTable);
                     a3os.writeValue(amfValues.get(key), new HashMap<>(), stringTable, traitTable, objectTable);
                 } catch (NoSerializerExistsException ex) {
                     throw new IllegalArgumentException("Serializer not found for class " + ex.getClassName());

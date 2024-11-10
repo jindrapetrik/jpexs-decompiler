@@ -67,12 +67,6 @@ var key2:Object = { id: 2 };
 di[key1] = "First";
 di[key2] = "Second";
 
-var diso:SharedObject = SharedObject.getLocal("dict");
-diso.objectEncoding = ObjectEncoding.AMF3;
-diso.data.mydict = di;
-diso.flush();
-
-
 var data = {
 	mynumber : 1.5,
     mybool : true,
@@ -169,6 +163,8 @@ function fonLoad(event:MouseEvent):void {
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="21934" publishTime="1731250388"/>
+          <PublishItem publishSize="21916" publishTime="1731241595"/>
           <PublishItem publishSize="21920" publishTime="1731241363"/>
           <PublishItem publishSize="21920" publishTime="1731241267"/>
           <PublishItem publishSize="21884" publishTime="1731240255"/>
@@ -187,7 +183,5 @@ function fonLoad(event:MouseEvent):void {
           <PublishItem publishSize="21636" publishTime="1731052148"/>
           <PublishItem publishSize="21602" publishTime="1731051747"/>
           <PublishItem publishSize="21507" publishTime="1730740224"/>
-          <PublishItem publishSize="21508" publishTime="1730740069"/>
-          <PublishItem publishSize="21505" publishTime="1730740015"/>
      </publishHistory>
 </DOMDocument>

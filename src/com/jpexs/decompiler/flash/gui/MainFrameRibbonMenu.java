@@ -680,6 +680,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     @Override
     public void setMenuEnabled(String path, boolean enabled) {
+        if (menuItems == null) {
+            return;
+        }
         if (!menuItems.containsKey(path)) {
             throw new IllegalArgumentException("Menu not found: " + path);
         }

@@ -293,17 +293,15 @@ public class Amf3Exporter {
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(newLine);
             }
-            if (true) {
-                int i = 0;
-                for (String key : at.associativeKeySet()) {
-                    Object val = at.getAssociative(key);
-                    ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 1, key, referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
-                    if (i < at.getAssociativeValues().size() - 1) {
-                        ret.append(",");
-                    }
-                    ret.append(newLine);
-                    i++;
+            int i = 0;
+            for (String key : at.associativeKeySet()) {
+                Object val = at.getAssociative(key);
+                ret.append(indent(level + 2)).append(amfToString(indentStr, newLine, processedObjects, level + 1, key, referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
+                if (i < at.getAssociativeValues().size() - 1) {
+                    ret.append(",");
                 }
+                ret.append(newLine);
+                i++;
             }
             if (!at.getAssociativeValues().isEmpty()) {
                 ret.append(indent(level + 1));
@@ -316,20 +314,21 @@ public class Amf3Exporter {
             ret.append(indent(level + 1)).append("\"type\": \"Dictionary\",").append(newLine);
             ret.append(addId);
             ret.append(indent(level + 1)).append("\"weakKeys\": ").append(dt.hasWeakKeys()).append(",").append(newLine);
-            ret.append(indent(level + 1)).append("\"entries\": {").append(newLine);
-            if (true) {
-                int i = 0;
-                for (Object key : dt.keySet()) {
-                    Object val = dt.get(key);
-                    ret.append(indent(level + 1)).append(amfToString(indentStr, newLine, processedObjects, level + 1, key, referenceCount, objectAlias)).append(" : ").append(amfToString(indentStr, newLine, processedObjects, level + 1, val, referenceCount, objectAlias));
-                    if (i < dt.size() - 1) {
-                        ret.append(",");
-                    }
-                    ret.append(newLine);
-                    i++;
+            ret.append(indent(level + 1)).append("\"entries\": [").append(newLine);
+            int i = 0;
+            for (Object key : dt.keySet()) {
+                Object val = dt.get(key);
+                ret.append(indent(level + 2)).append("{").append(newLine);
+                ret.append(indent(level + 3)).append("\"key\": ").append(amfToString(indentStr, newLine, processedObjects, level + 3, key, referenceCount, objectAlias)).append(",").append(newLine);
+                ret.append(indent(level + 3)).append("\"value\": ").append(amfToString(indentStr, newLine, processedObjects, level + 3, val, referenceCount, objectAlias)).append(newLine);
+                ret.append(indent(level + 2)).append("}");
+                if (i < dt.size() - 1) {
+                    ret.append(",");
                 }
+                ret.append(newLine);
+                i++;
             }
-            ret.append(indent(level + 1)).append("}").append(newLine);
+            ret.append(indent(level + 1)).append("]").append(newLine);
             ret.append(indent(level)).append("}");
         } else if (object instanceof ByteArrayType) {
             ByteArrayType ba = (ByteArrayType) object;
