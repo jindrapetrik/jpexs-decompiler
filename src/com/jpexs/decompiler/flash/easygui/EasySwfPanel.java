@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.RegistrationPointPosition;
 import com.jpexs.decompiler.flash.gui.TimelinedMaker;
 import com.jpexs.decompiler.flash.gui.TransformPanel;
@@ -104,8 +105,9 @@ public class EasySwfPanel extends JPanel {
     private static final String PROPERTIES_INSTANCE = "Instance";
     private DocumentPropertiesPanel documentPropertiesPanel;
     private InstancePropertiesPanel instancePropertiesPanel;
+    private final MainPanel mainPanel;
 
-    public EasySwfPanel() {
+    public EasySwfPanel(MainPanel mainPanel) {
         setLayout(new BorderLayout());
 
         stagePanel = new ImagePanel();
@@ -539,6 +541,7 @@ public class EasySwfPanel extends JPanel {
                 }
             }
         });
+        this.mainPanel = mainPanel;
     }
 
     private void updatePropertiesPanel() {
@@ -562,6 +565,9 @@ public class EasySwfPanel extends JPanel {
     private void setTimelined(Timelined timelined, boolean updateStage) {        
         if (this.timelined == timelined) {
             return;
+        }
+        if (mainPanel.getCurrentView() != MainPanel.VIEW_EASY) {
+            timelined = null;
         }
         this.timelined = timelined;
         if (timelined == null) {

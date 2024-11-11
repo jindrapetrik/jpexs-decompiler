@@ -1302,7 +1302,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
 
-        easyPanel = new EasyPanel();
+        easyPanel = new EasyPanel(this);
 
         contentPanel = new JPanel(new CardLayout());
         contentPanel.add(welcomePanel, WELCOME_PANEL);
@@ -5678,6 +5678,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
+                easyPanel.setNoSwf();
                 pinsPanel.setVisible(false);
                 currentView = view;
                 Configuration.lastView.set(currentView);
@@ -5693,6 +5694,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 detailPanel.setVisible(false);
                 return true;
             case VIEW_RESOURCES:
+                easyPanel.setNoSwf();
                 pinsPanel.setVisible(true);
                 currentView = view;
                 Configuration.lastView.set(currentView);
@@ -5715,7 +5717,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
                 updateUiWithCurrentOpenable();
                 return true;
-            case VIEW_EASY:
+            case VIEW_EASY:                
                 SWF swf = getCurrentSwf();                
                 pinsPanel.setVisible(false);
                 currentView = view;
@@ -5728,6 +5730,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }                
                 return true;
             case VIEW_TAGLIST:
+                easyPanel.setNoSwf();
                 pinsPanel.setVisible(true);
                 currentView = view;
                 Configuration.lastView.set(currentView);
