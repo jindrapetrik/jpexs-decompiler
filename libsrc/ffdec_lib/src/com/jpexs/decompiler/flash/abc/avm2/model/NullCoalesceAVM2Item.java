@@ -14,44 +14,31 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.abc.avm2.model;
 
-import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.SecondPassData;
-import java.util.HashSet;
-import java.util.Set;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Base local data
  *
  * @author JPEXS
  */
-public abstract class BaseLocalData {
+public class NullCoalesceAVM2Item extends BinaryOpItem {
 
-    /**
-     * Line start instruction
-     */
-    public GraphSourceItem lineStartInstruction;
-
-    /**
-     * Set of all switch parts
-     */
-    public Set<GraphPart> allSwitchParts = new HashSet<>();
-
-    /**
-     * Second pass data
-     */
-    public SecondPassData secondPassData = null;
-    
-    /**
-     * SWF version
-     */
-    public int swfVersion = -1;
-
-    /**
-     * Constructor.
-     */
-    public BaseLocalData() {
+    public NullCoalesceAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartItem, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, lineStartItem, PRECEDENCE_NULLCOALESCE, leftSide, rightSide, "??", null, null);
     }
+
+    @Override
+    public GraphTargetItem returnType() {
+        return leftSide.returnType();
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        return new ArrayList<>();
+    }  
 }

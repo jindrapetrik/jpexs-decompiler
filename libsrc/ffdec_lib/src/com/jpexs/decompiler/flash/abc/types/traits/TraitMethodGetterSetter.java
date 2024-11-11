@@ -69,24 +69,9 @@ public class TraitMethodGetterSetter extends Trait {
         abc.constants.getMultiname(name_index).deleted = d;
         abc.method_info.get(method_info).delete(abc, d);
     }
-
-    /**
-     * Converts header.
-     *
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     */
+  
     @Override
-    public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public void convertHeader(int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
     /**
@@ -122,7 +107,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
     
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
+    public GraphTextWriter toStringHeader(int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         String addKind = "";
         if (kindType == TRAIT_GETTER) {
             addKind = "get ";
@@ -146,38 +131,20 @@ public class TraitMethodGetterSetter extends Trait {
         abc.method_info.get(method_info).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         return writer;
     }
-
-    /**
-     * Converts trait.
-     *
-     * @param abcIndex ABC indexing
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param scopeStack Scope stack
-     * @throws InterruptedException On interrupt
-     */
+   
     @Override
-    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         int nsKind = getName(abc).getSimpleNamespaceKind(abc.constants);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
-        convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        convertHeader(swfVersion, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
                 if (bodyIndex != -1) {
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
+                    abc.bodies.get(bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
                 }
             }
         }
@@ -197,11 +164,11 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(this, convertData, abc, writer);
         writer.startMethod(method_info, getName(abc).getName(abc.constants, new ArrayList<>(), true, false));
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
-        toStringHeader(parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+        toStringHeader(swfVersion, parent, packageName, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");
@@ -215,7 +182,7 @@ public class TraitMethodGetterSetter extends Trait {
                     //writeUses(scriptIndex, classIndex, isStatic, abc, writer);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             } else {
                 String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc.constants, fullyQualifiedNames);

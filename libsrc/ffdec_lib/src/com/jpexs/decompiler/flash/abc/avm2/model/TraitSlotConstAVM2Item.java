@@ -93,6 +93,7 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
         cd.assignedValues.put(trait, new AssignedValue(null, assignedValue, initializer, methodIndex));
         boolean insideInterface = classIndex > -1 ? localData.abc.instance_info.get(classIndex).isInterface() : false;        
         trait.toString(
+                localData.swfVersion,
                 localData.abcIndex,
                 DottedChain.EMPTY /*??*/,
                 null, 

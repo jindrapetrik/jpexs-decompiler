@@ -64,6 +64,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullCoalesceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
@@ -79,6 +81,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.EqAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.NeqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -115,6 +119,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
@@ -156,6 +161,7 @@ public class AVM2Graph extends Graph {
      * Method body
      */
     private final MethodBody body;
+    private final int swfVersion;
 
     /**
      * ABC indexing
@@ -200,6 +206,7 @@ public class AVM2Graph extends Graph {
     /**
      * Constructs AVM2 graph
      *
+     * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param code AVM2 code
      * @param abc ABC
@@ -214,11 +221,12 @@ public class AVM2Graph extends Graph {
      * @param fullyQualifiedNames Fully qualified names
      * @param localRegAssignmentIps Local register assignment IPs
      */
-    public AVM2Graph(AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ScopeStack localScopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssignmentIps) {
+    public AVM2Graph(int swfVersion, AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ScopeStack localScopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssignmentIps) {
         super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssignmentIps), getExceptionEntries(body));
         this.avm2code = code;
         this.abc = abc;
         this.body = body;
+        this.swfVersion = swfVersion;
         this.abcIndex = abcIndex;
     }
 
@@ -725,6 +733,7 @@ public class AVM2Graph extends Graph {
     /**
      * Translates via Graph - decompiles.
      *
+     * @param swfVersion SWF version
      * @param secondPassData Second pass data
      * @param callStack Call stack
      * @param abcIndex ABC indexing
@@ -746,9 +755,9 @@ public class AVM2Graph extends Graph {
      * @return List of graph target items
      * @throws InterruptedException On interrupt
      */
-    public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(int swfVersion, SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssignmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         ScopeStack localScopeStack = new ScopeStack();
-        AVM2Graph g = new AVM2Graph(abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localScopeStack, localRegNames, fullyQualifiedNames, localRegAssignmentIps);
+        AVM2Graph g = new AVM2Graph(swfVersion, abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localScopeStack, localRegNames, fullyQualifiedNames, localRegAssignmentIps);
 
         AVM2LocalData localData = new AVM2LocalData();
         localData.secondPassData = secondPassData;
@@ -768,6 +777,7 @@ public class AVM2Graph extends Graph {
         localData.scriptIndex = scriptIndex;
         localData.ip = 0;
         localData.code = code;
+        localData.swfVersion = swfVersion;
         g.init(localData);
         Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : g.heads) {
@@ -3212,4 +3222,38 @@ public class AVM2Graph extends Graph {
         
         return result;
     }
+
+    @Override
+    protected GraphTargetItem handleTernar(TernarOpItem ternar, BaseLocalData localData) {
+        if (localData.swfVersion < 50) {
+            return ternar;
+        }
+        
+        if (true) { //FIXME, WIP - implement compiler part
+            return ternar;
+        }
+        if (ternar.expression instanceof EqAVM2Item) {
+            EqAVM2Item eq = (EqAVM2Item) ternar.expression;
+            if (eq.rightSide instanceof NullAVM2Item) {
+                if (ternar.onFalse.getNotCoerced() instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item gp = (GetPropertyAVM2Item) ternar.onFalse.getNotCoerced();
+                    if (gp.object.valueEquals(eq.leftSide)) {
+                        gp.nullCondition = true;
+                        return gp;
+                    }
+                }
+            }
+        }
+        
+        if (ternar.expression instanceof NeqAVM2Item) {
+            NeqAVM2Item neq = (NeqAVM2Item) ternar.expression;
+            if (neq.rightSide instanceof NullAVM2Item) {
+                if (ternar.onTrue.valueEquals(neq.leftSide)) {
+                    return new NullCoalesceAVM2Item(ternar.getSrc(), ternar.getLineStartItem(), ternar.onTrue, ternar.onFalse);
+                }
+            }
+        }
+        
+        return ternar;
+    }       
 }

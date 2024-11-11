@@ -159,8 +159,8 @@ public class AS3Generator {
 
                             List<MethodBody> callStack = new ArrayList<>();
                             callStack.add(b);
-                            b.convert(callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>());
-                            b.toString(callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
+                            b.convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(classId).instance_traits, true, new HashSet<>());
+                            b.toString(swf.version, callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             src.finishHilights();
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {

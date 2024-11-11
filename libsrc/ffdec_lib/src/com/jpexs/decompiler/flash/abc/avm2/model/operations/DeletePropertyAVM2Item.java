@@ -98,7 +98,7 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
-        formatProperty(writer, object, propertyName, localData, isStatic);
+        formatProperty(writer, object, propertyName, localData, isStatic, false);
         return writer;
     }
 

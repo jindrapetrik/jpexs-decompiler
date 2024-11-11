@@ -712,6 +712,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * To string.
      *
+     * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param packageName Package name
      * @param parent Parent trait
@@ -729,7 +730,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
@@ -737,6 +738,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Converts trait.
      *
+     * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -752,7 +754,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scopeStack Scope stack
      * @throws InterruptedException On interrupt
      */
-    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
     }
 
     /**
@@ -849,6 +851,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * ToString conversion including package.
      *
+     * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -865,7 +868,7 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toStringPackaged(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -878,7 +881,7 @@ public abstract class Trait implements Cloneable, Serializable {
             List<Trait> traits = new ArrayList<>();
             traits.add(this);           
             writeImports(traits, -1, abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);        
-            toString(abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+            toString(swfVersion, abcIndex, name.getNameWithNamespace(abc.constants, true).getWithoutLast(), parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
         }
@@ -888,6 +891,7 @@ public abstract class Trait implements Cloneable, Serializable {
     /**
      * Converts trait including package.
      *
+     * @param swfVersion
      * @param abcIndex ABC indexing
      * @param parent Parent trait
      * @param convertData Convert data
@@ -903,18 +907,19 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param scopeStack Scope stack
      * @throws InterruptedException On interrupt
      */
-    public void convertPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convertPackaged(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         Multiname name = abc.constants.getMultiname(name_index);
         int nskind = name.getSimpleNamespaceKind(abc.constants);
         if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
-            convert(abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
+            convert(swfVersion, abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
         }
     }
 
     /**
      * ToString of header.
      *
+     * @param swfVersion SWF version
      * @param parent Parent trait
      * @param packageName Package name
      * @param convertData Convert data
@@ -931,14 +936,15 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringHeader(Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        toString(null, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
+    public GraphTextWriter toStringHeader(int swfVersion, Trait parent, DottedChain packageName, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        toString(swfVersion, null, packageName, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         return writer;
     }
 
     /**
      * Converts header.
      *
+     * @param swfVersion SWF version
      * @param parent Parent trait
      * @param convertData Convert data
      * @param path Path
@@ -952,8 +958,8 @@ public abstract class Trait implements Cloneable, Serializable {
      * @param parallel Parallel
      * @throws InterruptedException On interrupt
      */
-    public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        convert(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
+    public void convertHeader(int swfVersion, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+        convert(swfVersion, null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, new ScopeStack());
     }
 
     /**

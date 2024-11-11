@@ -68,6 +68,11 @@ public class GetPropertyAVM2Item extends AVM2Item {
      * Is static
      */
     public boolean isStatic;
+    
+    /**
+     * Is null condition - ?.
+     */
+    public boolean nullCondition = false;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -171,7 +176,7 @@ public class GetPropertyAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return formatProperty(writer, object, propertyName, localData, isStatic);
+        return formatProperty(writer, object, propertyName, localData, isStatic, nullCondition);
     }
 
     @Override

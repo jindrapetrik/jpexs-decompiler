@@ -135,13 +135,13 @@ public class AS3ScriptExporter {
 
     }
 
-    private String handleMxmlMethod(AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
+    private String handleMxmlMethod(int swfVersion, AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
         StringBuilder out = new StringBuilder();
         int method = t.method_info;
         try {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(pack.abc.findBody(method));
-            pack.abc.findBody(method).convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+            pack.abc.findBody(method).convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
 
             List<GraphTargetItem> ci = pack.abc.findBody(method).convertedItems;
             if (!ci.isEmpty()) {
@@ -170,7 +170,7 @@ public class AS3ScriptExporter {
                                                                 int name2 = ((FullMultinameAVM2Item) cap.propertyName).multinameIndex;
                                                                 for (Trait ct : pack.abc.instance_info.get(cindex).instance_traits.traits) {
                                                                     if (ct.name_index == name2 && (ct instanceof TraitMethodGetterSetter)) {
-                                                                        tagContent.append(handleMxmlMethod(abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
+                                                                        tagContent.append(handleMxmlMethod(swfVersion, abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
                                                                     }
                                                                 }
                                                             }
@@ -210,13 +210,13 @@ public class AS3ScriptExporter {
         return out.toString();
     }
 
-    private String handleMxmlArrMethod(AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
+    private String handleMxmlArrMethod(int swfVersion, AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
         StringBuilder out = new StringBuilder();
         int method = t.method_info;
         try {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(pack.abc.findBody(method));
-            pack.abc.findBody(method).convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>()/*??*/);
+            pack.abc.findBody(method).convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>()/*??*/);
 
             List<GraphTargetItem> ci = pack.abc.findBody(method).convertedItems;
             if (!ci.isEmpty() && (ci.get(0) instanceof DeclarationAVM2Item)) {
@@ -232,7 +232,7 @@ public class AS3ScriptExporter {
                                         int name = ((FullMultinameAVM2Item) cp.propertyName).multinameIndex;
                                         for (Trait ct : pack.abc.instance_info.get(cindex).instance_traits.traits) {
                                             if (ct.name_index == name && (ct instanceof TraitMethodGetterSetter)) {
-                                                out.append(handleMxmlMethod(abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
+                                                out.append(handleMxmlMethod(swfVersion, abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
                                             }
                                         }
                                     }
@@ -285,7 +285,7 @@ public class AS3ScriptExporter {
         return ns + ":" + parentName;
     }
 
-    private String generateMxml(AbcIndexing abcIndex, ScriptPack pack) {
+    private String generateMxml(int swfVersion, AbcIndexing abcIndex, ScriptPack pack) {
         StringBuilder out = new StringBuilder();
         StringBuilder tagProp = new StringBuilder();
         StringBuilder tagContent = new StringBuilder();
@@ -309,7 +309,7 @@ public class AS3ScriptExporter {
                 try {
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(pack.abc.findBody(iinit));
-                    pack.abc.findBody(iinit).convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, iinit, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                    pack.abc.findBody(iinit).convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, iinit, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
                     List<GraphTargetItem> iinitBody = pack.abc.findBody(iinit).convertedItems;
                     for (GraphTargetItem it : iinitBody) {
                         if (it instanceof InitPropertyAVM2Item) {
@@ -325,7 +325,7 @@ public class AS3ScriptExporter {
                                         int name = ((FullMultinameAVM2Item) cp.propertyName).multinameIndex;
                                         for (Trait ct : pack.abc.instance_info.get(cindex).instance_traits.traits) {
                                             if (ct.name_index == name && (ct instanceof TraitMethodGetterSetter)) {
-                                                tagContent.append(handleMxmlMethod(abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
+                                                tagContent.append(handleMxmlMethod(swfVersion, abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
                                             }
                                         }
                                         tagContent.append("</").append(subtagName).append(">");
@@ -343,7 +343,7 @@ public class AS3ScriptExporter {
                                                         int name = ((FullMultinameAVM2Item) gp.propertyName).multinameIndex;
                                                         for (Trait ct : pack.abc.instance_info.get(cindex).instance_traits.traits) {
                                                             if (ct.name_index == name && (ct instanceof TraitMethodGetterSetter)) {
-                                                                tagContent.append(handleMxmlArrMethod(abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
+                                                                tagContent.append(handleMxmlArrMethod(swfVersion, abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
                                                             }
                                                         }
                                                     }
@@ -471,7 +471,7 @@ public class AS3ScriptExporter {
             if (flexClass != null && item.getClassPath().toRawString().equals(flexClass)) {
                 File file = item.getExportFile(outdir, ".mxml");
                 String filePath = file.getPath();
-                String mxml = generateMxml(swf.getAbcIndex(), item);
+                String mxml = generateMxml(swf.version, swf.getAbcIndex(), item);
                 if (mxml != null) {
                     Helper.writeFile(filePath, Utf8Helper.getBytes(mxml));
                     files.add(filePath.toLowerCase());
