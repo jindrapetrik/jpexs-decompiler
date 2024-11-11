@@ -11,7 +11,9 @@ package
     import flash.system.ApplicationDomain;
     
     public class Main extends Sprite
-    {        
+    {               
+    
+        Operators;     
     
         private var swfLoader: Loader;
         

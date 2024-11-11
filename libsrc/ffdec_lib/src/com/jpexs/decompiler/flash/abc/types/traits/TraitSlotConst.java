@@ -164,6 +164,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     /**
      * Gets value as string.
      *
+     * @param swfVersion SWF version
      * @param abcIndex ABC indexing
      * @param exportMode Export mode
      * @param convertData Convert data
@@ -172,7 +173,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
      * @param fullyQualifiedNames Fully qualified names
      * @throws InterruptedException On interrupt
      */
-    public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(int swfVersion, AbcIndexing abcIndex, ScriptExportMode exportMode, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -188,7 +189,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode));
+                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion));
             }
             writer.endMethod();
             writer.endTrait();
@@ -231,7 +232,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+    public GraphTextWriter toString(int swfVersion, AbcIndexing abcIndex, DottedChain packageName, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(this, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
@@ -252,40 +253,22 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 List<MethodBody> callStack = new ArrayList<>();
                 AssignedValue assignment = convertData.assignedValues.get(this);
                 callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode));
+                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
         if (hasValueStr(abc, convertData)) {
             writer.appendNoHilight(" = ");
-            getValueStr(abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";").newLine();
     }
 
-    /**
-     * Converts trait.
-     *
-     * @param abcIndex ABC indexing
-     * @param parent Parent trait
-     * @param convertData Convert data
-     * @param path Path
-     * @param abc ABC
-     * @param isStatic Is static
-     * @param exportMode Export mode
-     * @param scriptIndex Script index
-     * @param classIndex Class index
-     * @param writer Writer
-     * @param fullyQualifiedNames Fully qualified names
-     * @param parallel Parallel
-     * @param scopeStack Scope stack
-     * @throws InterruptedException On interrupt
-     */
     @Override
-    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
+    public void convert(int swfVersion, AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (hasValueStr(abc, convertData)) {
-            getValueStr(abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(swfVersion, abcIndex, exportMode, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 

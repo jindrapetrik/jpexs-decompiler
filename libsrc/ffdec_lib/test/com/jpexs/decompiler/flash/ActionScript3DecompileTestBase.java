@@ -107,9 +107,9 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
 
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).convert(callStack, swf.getAbcIndex(), new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(clsIndex).instance_traits, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(swf.version, callStack, swf.getAbcIndex(), new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), abc.instance_info.get(clsIndex).instance_traits, true, new HashSet<>());
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            abc.bodies.get(bodyIndex).toString(callStack, swf.getAbcIndex(), "run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(swf.version, callStack, swf.getAbcIndex(), "run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), new HashSet<>());
         } catch (InterruptedException ex) {
             fail();
             return;

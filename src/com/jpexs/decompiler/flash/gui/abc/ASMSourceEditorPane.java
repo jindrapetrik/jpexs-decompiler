@@ -267,7 +267,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
 
     public void graph() {
         try {
-            AVM2Graph gr = new AVM2Graph(null /*?*/, abc.bodies.get(bodyIndex).getCode(), abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<>(), new ScopeStack(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>()); //, abc.bodies.get(bodyIndex).getCode().visitCode(abc.bodies.get(bodyIndex)));
+            AVM2Graph gr = new AVM2Graph(-1, null /*?*/, abc.bodies.get(bodyIndex).getCode(), abc, abc.bodies.get(bodyIndex), false, -1, -1, new HashMap<>(), new ScopeStack(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>()); //, abc.bodies.get(bodyIndex).getCode().visitCode(abc.bodies.get(bodyIndex)));
             (new GraphDialog(getAbcPanel().getMainPanel().getMainFrame().getWindow(), gr, name)).setVisible(true);
         } catch (InterruptedException ex) {
             Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);

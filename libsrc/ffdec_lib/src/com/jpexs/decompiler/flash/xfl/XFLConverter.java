@@ -2813,6 +2813,11 @@ public class XFLConverter {
     }
 
     private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+        
+        int swfVersion = -1;
+        if (pack.getOpenable() instanceof SWF) {
+            swfVersion = ((SWF) pack.getOpenable()).version;
+        }
         Map<Integer, String> ret = new HashMap<>();
         int classIndex = getPackMainClassId(pack);
         if (classIndex > -1) {
@@ -2823,7 +2828,7 @@ public class XFLConverter {
             try {
                 List<MethodBody> callStack = new ArrayList<>();
                 callStack.add(constructorBody);
-                constructorBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
 
                 Map<Integer, String> frameToTraitName = new HashMap<>();
 
@@ -2889,10 +2894,11 @@ public class XFLConverter {
 
                         StringBuilder scriptBuilder = new StringBuilder();
                         callStack = new ArrayList<>();
-                        callStack.add(frameBody);
-                        frameBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                        callStack.add(frameBody);                                                
+                        
+                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
-                        frameBody.toString(callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
+                        frameBody.toString(swfVersion, callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 
                         String script = scriptBuilder.toString();
                         ret.put(frame, script);

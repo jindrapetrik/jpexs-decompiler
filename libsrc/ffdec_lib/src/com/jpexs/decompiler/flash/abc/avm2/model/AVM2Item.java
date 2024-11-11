@@ -107,10 +107,11 @@ public abstract class AVM2Item extends GraphTargetItem {
      * @param propertyName Property name
      * @param localData Local data
      * @param isStatic Is static
+     * @param nullCondition Null condition - ?.
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData, boolean isStatic) throws InterruptedException {
+    protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData, boolean isStatic, boolean nullCondition) throws InterruptedException {
         boolean empty = object.getThroughDuplicate() instanceof FindPropertyAVM2Item;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
@@ -170,16 +171,16 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
             data.namespaceIndex = namespaceIndex;
             data.isStatic = isStatic;
-
+            
+            String operator = nullCondition ? "?." : ".";
+            
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 if (((FullMultinameAVM2Item) propertyName).namespace != null) {
-                    //writer.append(".");
-                    writer.allowWrapHere().hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
+                    writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 }
                 return propertyName.toString(writer, localData);
             } else {
-                writer.allowWrapHere().hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
-                //writer.append(".");
+                writer.allowWrapHere().hilightSpecial(operator, HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 return propertyName.toString(writer, localData);
             }
         } else {

@@ -257,6 +257,11 @@ public class ScriptPack extends AS3ClassTreeItem {
      */
     public void convert(AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
+        int swfVersion = -1;
+        if (getOpenable() instanceof SWF) {
+            swfVersion = ((SWF) getOpenable()).version;
+        }
+        
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
         int sinit_bodyIndex = abc.findBodyIndex(sinit_index);
         if (sinit_bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) {
@@ -269,21 +274,21 @@ public class ScriptPack extends AS3ClassTreeItem {
             writer.mark();
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(sinit_bodyIndex));
-            abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path + "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>());
+            abc.bodies.get(sinit_bodyIndex).convert(swfVersion, callStack, abcIndex, convertData, path + "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), abc.script_info.get(scriptIndex).traits, true, new HashSet<>());
             scriptInitializerIsEmpty = !writer.getMark();
 
         }
         ScopeStack scopeStack = new ScopeStack();
         scopeStack.push(new GlobalAVM2Item(null, null));
-
+        
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.convertPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
+                trait.convertPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
             } else {
-                trait.convert(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
+                trait.convert(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, scopeStack);
             }
         }
     }
@@ -302,6 +307,12 @@ public class ScriptPack extends AS3ClassTreeItem {
      * @throws InterruptedException On interrupt
      */
     private void appendTo(AbcIndexing abcIndex, GraphTextWriter writer, List<Trait> traits, ConvertData convertData, ScriptExportMode exportMode, boolean parallel, boolean exportAllClasses) throws InterruptedException {
+        
+        int swfVersion = -1;
+        if (getOpenable() instanceof SWF) {
+            swfVersion = ((SWF) getOpenable()).version;
+        }
+        
         boolean first = true;
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
@@ -344,7 +355,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.newLine();
             }
             writer.startTrait(traitIndicesList.get(t));
-            trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, fullyQualifiedNames, parallel, false);
+            trait.toStringPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, fullyQualifiedNames, parallel, false);
 
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
@@ -375,7 +386,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.newLine();
             }
             writer.startTrait(traitIndicesList.get(t));
-            trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+            trait.toString(swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
 
             if (!(trait instanceof TraitClass)) {
                 writer.endTrait();
@@ -406,9 +417,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             Multiname name = trait.getName(abc);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                trait.toStringPackaged(abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toStringPackaged(swfVersion, abcIndex, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             } else {
-                trait.toString(abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
+                trait.toString(swfVersion, abcIndex, pkg, null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel, false);
             }
             writer.endTrait();
             first = false;
@@ -425,7 +436,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     if (!first) {
                         writer.newLine();
                     }
-                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(swfVersion, callStack, abcIndex, path + "/.scriptinitializer", exportMode, abc, null, writer, fullyQualifiedNames, new HashSet<>());
                 } else {
                     writer.append("");
                 }
@@ -452,6 +463,7 @@ public class ScriptPack extends AS3ClassTreeItem {
     /**
      * Converts the script pack to source.
      *
+     * @param swfVersion SWF version
      * @param abcIndex Abc indexing
      * @param writer Writer
      * @param traits Traits

@@ -56,13 +56,13 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         ConvertData convertData = new ConvertData();
         if (parentTraitIndex > -1) {
             if (traitsType == TRAITS_TYPE_CLASS) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).convertHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).convertHeader(-1, null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
             } else if (traitsType == TRAITS_TYPE_INSTANCE) {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).convertHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).convertHeader(-1, null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
             }
         }
         try {
-            ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS /*?? FIXME*/, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
+            ((TraitSlotConst) traits.traits.get(traitIndex)).convertHeader(-1, null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS /*?? FIXME*/, ScriptExportMode.AS, -1/*FIXME*/, classIndex, nulWriter, new ArrayList<>(), false);
         } catch (InterruptedException ex) {
             // ignore
         }
@@ -76,13 +76,13 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
         if (parentTraitIndex > -1) {
             if (traitsType == TRAITS_TYPE_CLASS) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             } else if (traitsType == TRAITS_TYPE_INSTANCE) {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             }
         }
         try {
-            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
+            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(-1, null, DottedChain.EMPTY /*??*/, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
         } catch (InterruptedException ex) {
             // ignore
         }

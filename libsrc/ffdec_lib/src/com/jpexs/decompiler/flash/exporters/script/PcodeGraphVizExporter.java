@@ -101,7 +101,7 @@ public class PcodeGraphVizExporter {
      * @throws InterruptedException On interrupt
      */
     public void exportAs3(AbcIndexing abcIndex, ABC abc, MethodBody body, GraphTextWriter writer) throws InterruptedException {
-        AVM2Graph gr = new AVM2Graph(abcIndex, body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>()); // body.getCode().visitCode(body));
+        AVM2Graph gr = new AVM2Graph(-1, abcIndex, body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>()); // body.getCode().visitCode(body));
         export(gr, writer);
     }
 

@@ -428,6 +428,7 @@ public final class MethodBody implements Cloneable {
     /**
      * Converts the method body.
      *
+     * @param swfVersion SWF version
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param convertData Convert data
@@ -448,7 +449,7 @@ public final class MethodBody implements Cloneable {
      * @param seenMethods Seen methods
      * @throws InterruptedException On interrupt
      */
-    public void convert(List<MethodBody> callStack, AbcIndexing abcIndex, final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, Traits initTraits, boolean firstLevel, Set<Integer> seenMethods) throws InterruptedException {
+    public void convert(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final ConvertData convertData, final String path, ScriptExportMode exportMode, final boolean isStatic, final int methodIndex, final int scriptIndex, final int classIndex, final ABC abc, final Trait trait, final ScopeStack scopeStack, final int initializerType, final NulWriter writer, final List<DottedChain> fullyQualifiedNames, Traits initTraits, boolean firstLevel, Set<Integer> seenMethods) throws InterruptedException {
         seenMethods.add(this.method_info);
         if (debugMode) {
             System.err.println("Decompiling " + path);
@@ -471,10 +472,10 @@ public final class MethodBody implements Cloneable {
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
-                                convertedItems1 = converted.getCode().toGraphTargetItems(callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>()); //converted.getCode().visitCode(converted)
+                                convertedItems1 = converted.getCode().toGraphTargetItems(swfVersion, callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>()); //converted.getCode().visitCode(converted)
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
-                                Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode));
+                                Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion));
                             }
                             convertedItems = convertedItems1;
                         }
@@ -522,6 +523,7 @@ public final class MethodBody implements Cloneable {
     /**
      * Returns a string representation of this MethodBody.
      *
+     * @param swfVersion SWF version
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param path Path
@@ -534,7 +536,7 @@ public final class MethodBody implements Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
+    public GraphTextWriter toString(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         seenMethods.add(method_info);
 
         if (exportMode != ScriptExportMode.AS) {
@@ -565,7 +567,7 @@ public final class MethodBody implements Cloneable {
                         fullyQualifiedNames2.remove(tname);
                     }
 
-                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods, exportMode));
+                    Graph.graphToString(convertedItems, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames2, seenMethods, exportMode, swfVersion));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {
                     // exception was logged in convert method
@@ -647,20 +649,21 @@ public final class MethodBody implements Cloneable {
     /**
      * Converts the method body to high-level source code.
      *
+     * @param swfVersion SWF version
      * @param callStack Call stack
      * @param abcIndex ABC indexing
      * @param scriptIndex Script index
      * @param seenMethods Seen methods
      * @return High-level source code
      */
-    public String toSource(List<MethodBody> callStack, AbcIndexing abcIndex, int scriptIndex, Set<Integer> seenMethods) {
+    public String toSource(int swfVersion, List<MethodBody> callStack, AbcIndexing abcIndex, int scriptIndex, Set<Integer> seenMethods) {
         ConvertData convertData = new ConvertData();
         convertData.deobfuscationMode = 0;
         try {
-            convert(callStack, abcIndex, convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, seenMethods);
+            convert(swfVersion, callStack, abcIndex, convertData, "", ScriptExportMode.AS, false, method_info, 0, 0, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, seenMethods);
             HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
             writer.indent().indent().indent();
-            toString(callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods);
+            toString(swfVersion, callStack, abcIndex, "", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), seenMethods);
             writer.unindent().unindent().unindent();
             writer.finishHilights();
             return writer.toString();

@@ -86,6 +86,11 @@ public class LocalData {
     public ScriptExportMode exportMode;
 
     /**
+     * SWF version
+     */
+    public int swfVersion;
+    
+    /**
      * Creates a new local data
      *
      * @param constants Constant pool
@@ -105,10 +110,11 @@ public class LocalData {
      * @param localRegNames Local register names
      * @param fullyQualifiedNames Fully qualified names
      * @param seenMethods Seen methods
-     * @param exportMode
+     * @param exportMode Export mode 
+     * @param swfVersion SWF version
      * @return Local data
      */
-    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode) {
+    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode, int swfVersion) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
@@ -118,6 +124,7 @@ public class LocalData {
         localData.abcIndex = abcIndex;
         localData.callStack = callStack;
         localData.exportMode = exportMode;                
+        localData.swfVersion = swfVersion;
         return localData;
     }
 }

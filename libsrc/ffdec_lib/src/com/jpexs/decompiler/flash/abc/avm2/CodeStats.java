@@ -84,7 +84,7 @@ public class CodeStats {
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
-            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(new ArrayList<>(), null, abc, null, fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS))).newLine();
+            writer.appendNoHilight(i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(writer, LocalData.create(new ArrayList<>(), null, abc, null, fullyQualifiedNames, new HashSet<>(), ScriptExportMode.AS, -1))).newLine();
             i++;
         }
         return writer;

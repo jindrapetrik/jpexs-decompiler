@@ -86,7 +86,7 @@ public class ConstructPropAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        formatProperty(writer, object, propertyName, localData, isStatic);        
+        formatProperty(writer, object, propertyName, localData, isStatic, false);        
         writer.spaceBeforeCallParenthesis(args.size());
         writer.append("(");
         for (int a = 0; a < args.size(); a++) {

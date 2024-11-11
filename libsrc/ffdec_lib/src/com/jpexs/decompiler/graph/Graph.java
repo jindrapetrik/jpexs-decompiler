@@ -3352,7 +3352,8 @@ public class Graph {
                             } else {
                                 ternarOnFalse = filteredOnFalse.get(0).value;
                             }
-                            stack.push(new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse));
+                            TernarOpItem top = new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);                            
+                            stack.push(handleTernar(top, localData));
                         } else {
                             boolean isIf = true;
                             //If the ontrue is empty, switch ontrue and onfalse
@@ -4291,5 +4292,15 @@ public class Graph {
      */
     protected boolean partIsSwitch(GraphPart part) {
         return false;
+    }
+    
+    /**
+     * Replaces ternar with custom value
+     * @param ternar Ternar
+     * @param localData Local data
+     * @return Custom item
+     */
+    protected GraphTargetItem handleTernar(TernarOpItem ternar, BaseLocalData localData) {
+        return ternar;
     }
 }
