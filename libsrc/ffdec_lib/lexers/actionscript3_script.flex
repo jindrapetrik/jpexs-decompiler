@@ -313,6 +313,8 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "<"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.LOWER_THAN, yytext());  }
   "!"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT, yytext());  }
   "~"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NEGATE, yytext());  }
+  "?."                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NULL_DOT, yytext());  }
+  "??"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NULL_COALESCE, yytext());  }
   "?"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.TERNAR, yytext());  }
   ":"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.COLON, yytext());  }
   "==="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_EQUALS, yytext());  }

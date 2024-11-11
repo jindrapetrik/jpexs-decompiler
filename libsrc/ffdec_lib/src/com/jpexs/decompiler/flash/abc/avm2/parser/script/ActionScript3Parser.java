@@ -291,7 +291,6 @@ public class ActionScript3Parser {
                 } else {
                     lexer.pushback(s2);
                 }
-
             } else {
                 lexer.pushback(s2);
             }

@@ -606,7 +606,16 @@ public enum SymbolType {
     /**
      * Other: namespace suffix
      */
-    NAMESPACESUFFIX;
+    NAMESPACESUFFIX,
+    /**
+     * Operator: ?.
+     */
+    NULL_DOT(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    
+    /**
+     * Operator: ??
+     */
+    NULL_COALESCE(GraphTargetItem.PRECEDENCE_PRIMARY, true, true);      
 
     private int precedence = GraphTargetItem.NOPRECEDENCE;
 
