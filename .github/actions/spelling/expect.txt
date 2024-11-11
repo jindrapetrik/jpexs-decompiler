@@ -2539,6 +2539,7 @@ NTranslate
 NTSTATUS
 NTVDM
 ntype
+NULLCOALESCE
 nullpointer
 NULLREGION
 Nullsoft
