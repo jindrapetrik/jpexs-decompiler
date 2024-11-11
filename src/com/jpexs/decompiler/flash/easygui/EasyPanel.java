@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class EasyPanel extends JPanel {
     
     private TabSwitcher<SWF> tabSwitcher;
     private EasySwfPanel easySwfPanel;
-    public EasyPanel() {
-        easySwfPanel = new EasySwfPanel();
+    public EasyPanel(MainPanel mainPanel) {
+        easySwfPanel = new EasySwfPanel(mainPanel);
         tabSwitcher = new TabSwitcher<>(easySwfPanel);
         setLayout(new BorderLayout());
         add(tabSwitcher, BorderLayout.CENTER);
@@ -60,6 +61,10 @@ public class EasyPanel extends JPanel {
     
     public void setSwf(SWF swf) {
         tabSwitcher.setValue(swf);
+    }
+    
+    public void setNoSwf() {
+        easySwfPanel.setTimelined(null);
     }
     
     public SWF getSwf() {
