@@ -502,17 +502,17 @@
         <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
         </java>-->
-        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${translator_exe.config}" />
-        </java>
+        </java>-->
     </target>
     <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-translator-config"> <!-- -exe-config -->
         <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
         </java>-->
-        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+        <!-- <java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${translator_exe.config}" />
-        </java>
+        </java> -->
     </target>   
          
     
