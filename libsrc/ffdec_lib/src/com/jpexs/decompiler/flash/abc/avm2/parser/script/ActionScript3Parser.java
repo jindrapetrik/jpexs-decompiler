@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullCoalesceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
@@ -196,10 +197,11 @@ public class ActionScript3Parser {
         }
         ParsedSymbol s = lex();
         GraphTargetItem ret = newcmds;
-        while (s.isType(SymbolType.DOT, SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME, SymbolType.FILTER, SymbolType.DESCENDANTS)) {
+        while (s.isType(SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME, SymbolType.FILTER, SymbolType.DESCENDANTS)) {
             switch (s.type) {
                 case BRACKET_OPEN:
                 case DOT:
+                case NULL_DOT:
                 case TYPENAME:
                     lexer.pushback(s);
                     ret = member(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables, abc);
@@ -282,10 +284,14 @@ public class ActionScript3Parser {
         }
         GraphTargetItem ret = obj;
         ParsedSymbol s = lex();
-        while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
+        while (s.isType(SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
             ParsedSymbol s2 = lex();
             boolean attr = false;
-            if (s.type == SymbolType.DOT) {
+            boolean nullDot = false;
+            if (s.type == SymbolType.NULL_DOT) {
+                nullDot = true;
+                lexer.pushback(s2);
+            } else if (s.type == SymbolType.DOT) {
                 if (s2.type == SymbolType.ATTRIBUTE) {
                     attr = true;
                 } else {
@@ -335,7 +341,7 @@ public class ActionScript3Parser {
                 if (ns != null) {
                     ret = new NamespacedAVM2Item(ns, propName, propItem, ret, attr, openedNamespaces, null);
                 } else {
-                    ret = new PropertyAVM2Item(ret, attr, propName, nsSuffix, abcIndex, openedNamespaces, new ArrayList<>());
+                    ret = new PropertyAVM2Item(ret, attr, propName, nsSuffix, abcIndex, openedNamespaces, new ArrayList<>(), nullDot);
                 }
                 s = lex();
             }
@@ -2284,6 +2290,9 @@ public class ActionScript3Parser {
                 case IS:
                     GraphTargetItem istype = rhs;
                     lhs = new IsTypeAVM2Item(null, null, lhs, istype);
+                    break;
+                case NULL_COALESCE:
+                    lhs = new NullCoalesceAVM2Item(null, null, lhs, rhs);
                     break;
                 case ASSIGN:
                 case ASSIGN_BITAND:

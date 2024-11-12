@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,12 @@ public class NullCoalesceAVM2Item extends BinaryOpItem {
         super(instruction, lineStartItem, PRECEDENCE_NULLCOALESCE, leftSide, rightSide, "??", null, null);
     }
 
+    @Override
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        AVM2SourceGenerator a2generator = (AVM2SourceGenerator) generator;
+        return a2generator.generate(localData, this);
+    }   
+    
     @Override
     public GraphTargetItem returnType() {
         return leftSide.returnType();
