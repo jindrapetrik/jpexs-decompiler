@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullCoalesceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
@@ -2671,10 +2672,31 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.addAll(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(xmlListReg)));
         return ret;
     }
-
+    
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, IfItem item) throws CompilationException {
         return generateIf(localData, item.expression, item.onTrue, item.onFalse, false);
+    }
+
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NullCoalesceAVM2Item item) throws CompilationException {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.addAll(GraphTargetItem.toSourceMerge(localData, this, item.leftSide));
+        ret.add(ins(AVM2Instructions.PushNull));
+        AVM2Instruction ifEq = ins(AVM2Instructions.IfEq, 0);
+        ret.add(ifEq);
+        
+        List<GraphSourceItem> onNotNull = GraphTargetItem.toSourceMerge(localData, this, item.leftSide);        
+        AVM2Instruction jump = ins(AVM2Instructions.Jump, 0);
+        onNotNull.add(jump);
+        ifEq.operands[0] = insToBytes(toInsList(onNotNull)).length;
+        
+        List<GraphSourceItem> onNull = GraphTargetItem.toSourceMerge(localData, this, item.rightSide);
+        jump.operands[0] = insToBytes(toInsList(onNull)).length;
+        
+        ret.addAll(onNotNull);
+        ret.addAll(onNull);
+        
+        return ret;
     }
 
     @Override
@@ -2989,7 +3011,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.NewObject, 0));
             ret.add(ins(AVM2Instructions.PushWith));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack));
+            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack, false));
         }
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         ret.add(ins(AVM2Instructions.NewFunction, method(null, false, constants.getStringId(item.functionName, true), true, false, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClassBaseName, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));

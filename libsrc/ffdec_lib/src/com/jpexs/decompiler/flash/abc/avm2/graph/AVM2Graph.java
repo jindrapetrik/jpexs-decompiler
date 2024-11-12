@@ -3229,9 +3229,6 @@ public class AVM2Graph extends Graph {
             return ternar;
         }
         
-        if (true) { //FIXME, WIP - implement compiler part
-            return ternar;
-        }
         if (ternar.expression instanceof EqAVM2Item) {
             EqAVM2Item eq = (EqAVM2Item) ternar.expression;
             if (eq.rightSide instanceof NullAVM2Item) {

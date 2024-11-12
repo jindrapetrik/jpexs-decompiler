@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -41,6 +42,8 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,10 +98,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      * Scope stack
      */
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
+    private final boolean nullish;
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack, nullish);
         return p;
     }
 
@@ -112,8 +116,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      * @param abcIndex ABC indexing
      * @param openedNamespaces Opened namespaces
      * @param callStack Call stack
+     * @param nullish Nullish
      */
-    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
+    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack, boolean nullish) {
         this.attribute = attribute;
         this.propertyName = propertyName;
         this.namespaceSuffix = namespaceSuffix;
@@ -121,6 +126,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         this.abcIndex = abcIndex;
         this.openedNamespaces = openedNamespaces;
         this.callStack = callStack;
+        this.nullish = nullish;
     }
 
     @Override
@@ -468,6 +474,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
      */
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
 
+        
+        AVM2SourceGenerator a2Generator = (AVM2SourceGenerator) generator;
         Reference<GraphTargetItem> objType = new Reference<>(null);
         Reference<GraphTargetItem> propType = new Reference<>(null);
         Reference<Integer> propIndex = new Reference<>(0);
@@ -507,14 +515,46 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                         needsReturn ? null : ins(AVM2Instructions.Pop)
                 );
             }
-            return toSourceMerge(localData, generator,
+            
+            List<GraphSourceItem> onFalse = toSourceMerge(localData, generator,
                     isSuper ? ins(AVM2Instructions.FindPropertyStrict, propertyId) : obj,
                     ins(isSuper ? AVM2Instructions.GetSuper : AVM2Instructions.GetProperty, propertyId),
                     needsReturn ? null : ins(AVM2Instructions.Pop)
             );
+            
+            if (!nullish) {
+                return onFalse;
+            }
+            
+            
+            AVM2Instruction ifFalse = ins(AVM2Instructions.IfFalse, 0);            
+            List<GraphSourceItem> result = toSourceMerge(localData, generator, obj, 
+                    ins(AVM2Instructions.PushNull),
+                    ins(AVM2Instructions.Equals),
+                     ifFalse
+                    );
+            
+            List<GraphSourceItem> onTrue = new ArrayList<>();
+            onTrue.add(ins(AVM2Instructions.PushNull));
+            AVM2Instruction jump = ins(AVM2Instructions.Jump, 0);
+            onTrue.add(jump);
+            ifFalse.operands[0] = getBytesLen(onTrue);
+            jump.operands[0] = getBytesLen(onFalse);
+            result.addAll(onTrue);
+            result.addAll(onFalse);                        
+            return result;
         }
     }
 
+    private int getBytesLen(List<GraphSourceItem> code) {
+        int len = 0;
+        for (GraphSourceItem instruction : code) {
+            AVM2Instruction ins = (AVM2Instruction) instruction;
+            len += ins.getBytes().length;
+        }
+        return len;        
+    }
+    
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, true);
