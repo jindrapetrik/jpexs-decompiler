@@ -235,6 +235,9 @@ SingleCharacter = [^\r\n\'\\]
 OIdentifierCharacter = [^\r\n\u00A7\\]
 Preprocessor = \u00A7\u00A7 {Identifier}
 
+VerbatimStringCharacter = [^\r\n\"]
+VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
+
 NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
@@ -295,6 +298,12 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
   "final"                        { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.FINAL, yytext()); }
   "native"                       { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.NATIVE, yytext()); }
+
+
+  {VerbatimString}               { 
+                                    String verbatimString = yytext();
+                                    verbatimString = verbatimString.substring(2, verbatimString.length() - 1);
+                                    return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, verbatimString); }
 
   /* operators */
 

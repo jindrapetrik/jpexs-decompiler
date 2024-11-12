@@ -148,6 +148,9 @@ NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
+VerbatimStringCharacter = [^\r\n\"]
+VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
+
 %state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, XMLCOMMENT, XMLCDATA
 
 %%
@@ -224,6 +227,8 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                      yybegin(XMLCDATA);
                                      return token(TokenType.STRING);
                                  }
+
+  {VerbatimString}              { return token(TokenType.STRING); }
 
   /* operators */
 

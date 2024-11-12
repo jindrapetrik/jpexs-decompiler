@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - AS3.1 null-conditional operator `?.` (air - swf version 50)
 - AS3.1 nullish coalescing operator `??` (air - swf version 50)
+- AS3 direct editation - verbatim strings `@"`
 
 ### Fixed
 - [#2366] Running simple editor on background slowing down other views
