@@ -111,25 +111,26 @@ public class TagInfoPanel extends JPanel {
 
     private void updateHtmlContent(boolean expand, boolean showDetails) {
         String categoryName = "general";
-        String result = "<html><body><table cellspacing='0' cellpadding='0'>";
+        StringBuilder result = new StringBuilder();
+        result.append("<html><body><table cellspacing='0' cellpadding='0'>");
         Boolean flipFlop = false;
 
         List<TagInfo.TagInfoItem> items = tagInfo.getInfos().get(categoryName);
 
         if (View.isOceanic()) {
-            result += "<tr bgcolor='#FDFDFD'>";
+            result.append("<tr bgcolor='#FDFDFD'>");
         } else {
-            result += "</tr>";
+            result.append("</tr>");
         }
-        result += String.format(
+        result.append(String.format(
                 "<td width='50%%' style='text-align:center;'>%s</td>",
                 mainPanel.translate("tagInfo.header.name")
-        );
-        result += String.format(
+        ));
+        result.append(String.format(
                 "<td width='50%%' style='text-align:center;'>%s</td>",
                 mainPanel.translate("tagInfo.header.value")
-        );
-        result += "</tr>";
+        ));
+        result.append("</tr>");
 
         SWF swf = tagInfo.getSwf();
         for (TagInfo.TagInfoItem item : items) {
@@ -137,9 +138,9 @@ public class TagInfoPanel extends JPanel {
             flipFlop = !flipFlop;
 
             if (View.isOceanic()) {
-                result += "<tr bgcolor='" + (flipFlop ? "#FDFDFD" : "#F4F4F4") + "'>";
+                result.append("<tr bgcolor='").append(flipFlop ? "#FDFDFD" : "#F4F4F4").append("'>");
             } else {
-                result += "<tr>";
+                result.append("<tr>");
             }
 
             String name = item.getName();
@@ -156,16 +157,17 @@ public class TagInfoPanel extends JPanel {
                 }
             }
 
-            result += "<td>" + name + "</td>";
+            result.append("<td>").append(name).append("</td>");
 
+            StringBuilder valueBuilder = new StringBuilder();
             Object value = item.getValue();
             if (value instanceof Boolean) {
                 boolean boolValue = (boolean) value;
-                value = boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
+                valueBuilder.append(boolValue ? AppStrings.translate("yes") : AppStrings.translate("no"));
             } else if (convertToLinkList) {
                 String[] strIds = ((String) value).split(", ");
                 List<Integer> sortedIds = new ArrayList<>();
-                String strValue = "";
+                StringBuilder strValue = new StringBuilder();
 
                 for (String strId : strIds) {
                     sortedIds.add(Integer.parseInt(strId));
@@ -188,7 +190,7 @@ public class TagInfoPanel extends JPanel {
                             } else {
                                 charName = Helper.escapeHTML(character.toString());
                             }
-                            strValue += String.format("<a href='%s://%d'>%s</a><br>", scheme, id, charName, id);
+                            strValue.append(String.format("<a href='%s://%d'>%s</a><br>", scheme, id, charName, id));
                         } else {
                             if (swf == null || character == null) {
                                 charName = "???";
@@ -196,30 +198,33 @@ public class TagInfoPanel extends JPanel {
                                 charName = character.getTagName();
                             }
 
-                            strValue += String.format("<a href='%s://%d'>%s (%d)</a><br>", scheme, id, charName, id);
+                            strValue.append(String.format("<a href='%s://%d'>%s (%d)</a><br>", scheme, id, charName, id));
                         }
                     } else {
-                        strValue += String.format("<a href='%s://%d'>%d</a>, ", scheme, id, displayId);
+                        strValue.append(String.format("<a href='%s://%d'>%d</a>, ", scheme, id, displayId));
                     }
                 }
 
-                value = strValue.substring(0, strValue.length() - 2);
+                String sVal = strValue.toString();
+                valueBuilder.append(sVal.substring(0, sVal.length() - 2));
 
                 if (!frameList && !expand) {
-                    value = value + " <a href='expand://all'>+</a>";
+                    valueBuilder.append(" <a href='expand://all'>+</a>");
                 } else if (!frameList && expand && !showDetails) {
-                    value = value + "<br><a href='expand://details'>+</a>";
+                    valueBuilder.append("<br><a href='expand://details'>+</a>");
                 }
+            } else {
+                valueBuilder.append(value.toString());
             }
 
-            result += "<td>" + value + "</td>";
+            result.append("<td>").append(valueBuilder.toString()).append("</td>");
 
-            result += "</tr>";
+            result.append("</tr>");
         }
 
-        result += "</table></body></html>";
+        result.append("</table></body></html>");
 
-        editorPane.setText(result);
+        editorPane.setText(result.toString());
     }
 
     private void buildHtmlContent() {
