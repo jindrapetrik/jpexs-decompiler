@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2366] Running simple editor on background slowing down other views
+- Rendering now does not slow down UI elements
 
 ## [22.0.0] - 2024-11-10
 ### Added
