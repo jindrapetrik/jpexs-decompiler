@@ -2662,7 +2662,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             // then we can draw immediately to avoid long waiting between frames.
             // This can happen on SWFs with small frameRate
             if (Float.compare(getFrameLoss(), 0f) == 0) {
-                drawFrame(thisTimer, true);
+                thisTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        drawFrame(thisTimer, true);
+                    }                    
+                }, 0);                
             }
         }
     }
@@ -3614,78 +3619,51 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (display) {
                 Stopwatch sw = Stopwatch.startNew();
 
+                Reference<Rectangle2D> boundsRef = new Reference<>(null);
+
+                RECT rect = getTopTimelined().getRect();
+
                 synchronized (ImagePanel.this) {
-                    synchronized (lock) {
-                        Reference<Rectangle2D> boundsRef = new Reference<>(null);
-
-                        RECT rect = getTopTimelined().getRect();
-
+                    synchronized (lock) {                        
                         _viewRect = getViewRect();
+                    }
+                }
 
-                        Matrix trans2 = transform == null ? new Matrix() : transform.clone();
+                Matrix trans2 = transform == null ? new Matrix() : transform.clone();
 
-                        trans2 = toImageMatrix(trans2);
-                        
-                        AffineTransform tempTrans2 = null;
-                        if (transformUpdated != null) {
-                            Matrix matrixUpdated = new Matrix(transformUpdated);
-                            //Matrix p = getParentMatrix();
-                            //matrixUpdated = p.concatenate(matrixUpdated);
-                            matrixUpdated = toImageMatrix(matrixUpdated);
-                            tempTrans2 = matrixUpdated.toTransform();
-                        }
+                trans2 = toImageMatrix(trans2);
 
-                        //HERE                       
-                        RECT timRect = timelined.getRect();
-                        double offsetX = (SWF.unitDivisor * iconPanel.getWidth() / zoomDouble / 2 - timRect.getWidth() / 2);
-                        double offsetY = (SWF.unitDivisor * iconPanel.getHeight() / zoomDouble / 2 - timRect.getHeight() / 2);
-                        offsetX *= zoomDouble;
-                        offsetY *= zoomDouble;
-                        offsetX /= SWF.unitDivisor;
-                        offsetY /= SWF.unitDivisor;
+                AffineTransform tempTrans2 = null;
+                if (transformUpdated != null) {
+                    Matrix matrixUpdated = new Matrix(transformUpdated);
+                    matrixUpdated = toImageMatrix(matrixUpdated);
+                    tempTrans2 = matrixUpdated.toTransform();
+                }
 
-                        if (offsetX < 0) {
-                            offsetX = -offsetX;
-                            //offsetX = 0;                           
-                        }
-                        if (offsetY < 0) {
-                            offsetY = -offsetY;
-                            //offsetY = 0;
-                        }
+                Rectangle realRect = new Rectangle(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin);
+                realRect.x *= zoomDouble;
+                realRect.y *= zoomDouble;
+                realRect.width *= zoomDouble;
+                realRect.height *= zoomDouble;
+                realRect.x /= SWF.unitDivisor;
+                realRect.y /= SWF.unitDivisor;
+                realRect.width /= SWF.unitDivisor;
+                realRect.height /= SWF.unitDivisor;
+                realRect.x += offsetPoint.getX();
+                realRect.y += offsetPoint.getY();
 
-                        offsetX = -offsetX;
-                        offsetY = -offsetY;
+                Point2D rawRegistrationPoint = registrationPoint == null ? null : toImagePoint(registrationPoint);                        
+                Reference<Point2D> registrationPointRef = new Reference<>(rawRegistrationPoint);
+                if (!autoPlayed) {
+                    img = getImagePlay();
+                } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
+                    img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+                } else {
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());                    
+                }
 
-                        Rectangle realRect = new Rectangle(rect.Xmin, rect.Ymin, rect.Xmax - rect.Xmin, rect.Ymax - rect.Ymin);
-                        realRect.x *= zoomDouble;
-                        realRect.y *= zoomDouble;
-                        realRect.width *= zoomDouble;
-                        realRect.height *= zoomDouble;
-                        realRect.x /= SWF.unitDivisor;
-                        realRect.y /= SWF.unitDivisor;
-                        realRect.width /= SWF.unitDivisor;
-                        realRect.height /= SWF.unitDivisor;
-                        realRect.x += offsetPoint.getX();
-                        realRect.y += offsetPoint.getY();
-
-                        Point2D rawRegistrationPoint = registrationPoint == null ? null : toImagePoint(registrationPoint);
-                        if (rawRegistrationPoint != null) {
-                            //rawRegistrationPoint.setLocation(rawRegistrationPoint.getX()+offsetX, rawRegistrationPoint.getY() + offsetY);
-                        }
-                        Reference<Point2D> registrationPointRef = new Reference<>(rawRegistrationPoint);
-                        if (!autoPlayed) {
-                            img = getImagePlay();
-                        } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
-                            img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
-                        } else {
-                            img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
-                        }
-                        /*if(freeTransformDepth > -1) 
-                        {
-                            Graphics2D gg = (Graphics2D) img.getBufferedImage().getGraphics();
-                            gg.setColor(Color.green);
-                            gg.drawRect(0, 0, img.getWidth() - 1, img.getHeight() - 1);
-                        }*/
+                synchronized (ImagePanel.this) {
+                    synchronized (lock) {                                               
 
                         Rectangle2D newBounds = getTransformBounds();
                         if (newBounds != null) {
@@ -3696,10 +3674,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         newBounds.getCenterY());
                             }
                         }
-                        //System.out.println("drawFrame "+frame);
-                    }
+                    }                    
                 }
-
+                    
                 sw.stop();
                 if (sw.getElapsedMilliseconds() > 100) {
                     if (Configuration.showSlowRenderingWarning.get()) {
@@ -3883,11 +3860,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
 
-                    drawReady = true;
-                    synchronized (delayObject) {
-                        delayObject.notify();
-                    }
+                    drawReady = true;                    
                 }
+            }
+            synchronized (delayObject) {
+                delayObject.notify();
             }
         }
     }
