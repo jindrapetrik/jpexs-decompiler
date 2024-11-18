@@ -58,6 +58,12 @@ public class Filtering {
     private static final Rectangle RECTANGLE_512_1 = new Rectangle(512, 1);
 
     private static void boxBlurSingleIteration(int[] pixels, int[] mask, int[] newColors, int w, int h, int radiusX, int radiusY) {
+
+        if (true) {
+            boxBlurSingleIterationTwoPass(pixels, mask, newColors, w, h, radiusX, radiusY);
+            return;
+        }
+
         if (radiusX == 0) {
             radiusX = 1;
         }
@@ -140,6 +146,161 @@ public class Filtering {
             for (int x = 0; x < w; x++) {
                 int index = y * w + x;
                 pixels[index] = newColors[index];
+            }
+        }
+    }
+
+    private static void boxBlurSingleIterationTwoPass(int[] pixels, int[] mask, int[] newColors, int w, int h, int radiusX, int radiusY) {
+
+        if (radiusX == 0) {
+            radiusX = 1;
+        }
+        if (radiusY == 0) {
+            radiusY = 1;
+        }
+
+        long limit = Configuration.boxBlurPixelsLimit.get() * 100000L;
+
+        if ((long) w * (long) h > limit) {
+            return;
+        }
+
+        while (((long) radiusY * (long) radiusX * (long) w * (long) h) > limit) {
+            // decrease radius
+            if (radiusY > 1) {
+                radiusY--;
+            }
+            if (radiusX > 1) {
+                radiusX--;
+            }
+        }
+
+        int[] secondPass = new int[w * h];
+        boxBlurHorizontal(pixels, mask, secondPass, w, h, radiusX);
+        boxBlurVertical(secondPass, mask, newColors, w, h, radiusY);
+        System.arraycopy(newColors, 0, pixels, 0, newColors.length);
+    }
+
+    private static void boxBlurHorizontal(int[] pixels, int[] mask, int[] result, int w, int h, int radius) {
+        if (radius == 0) {
+            radius = 1;
+        }
+
+        int radiusHalf = radius / 2;
+        double divisor = radius;
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+
+                double sumR = 0;
+                double sumG = 0;
+                double sumB = 0;
+                double sumA = 0;
+
+                for (int j = x - radiusHalf; j < x - radiusHalf + radius; j++) {
+                    int index2 = y * w + j;
+                    int v;
+                    if (j < 0 || j >= w || (mask != null && (((mask[index2] >> 24) & 0xff) == 0))) {
+                        v = 0;
+                    } else {
+                        v = pixels[index2];
+                    }
+                    double a = (v >> 24) & 0xff;
+                    double r = ((v >> 16) & 0xff);
+                    double g = ((v >> 8) & 0xff);
+                    double b = ((v) & 0xff);
+
+                    r = r * a / 255.0;
+                    g = g * a / 255.0;
+                    b = b * a / 255.0;
+
+                    sumA += a;
+                    sumR += r;
+                    sumG += g;
+                    sumB += b;
+                }
+
+                int da = (int) Math.floor(sumA / divisor);
+                int da_mod = da == 0 ? 255 : da;
+                int dr = (int) Math.floor(sumR / divisor * 255.0 / (double) da_mod);
+                int dg = (int) Math.floor(sumG / divisor * 255.0 / (double) da_mod);
+                int db = (int) Math.floor(sumB / divisor * 255.0 / (double) da_mod);
+
+                if (dr > 255) {
+                    dr = 255;
+                }
+                if (dg > 255) {
+                    dg = 255;
+                }
+                if (db > 255) {
+                    db = 255;
+                }
+
+                int index = y * w + x;
+
+                result[index] = RGBA.toInt(dr, dg, db, da);
+            }
+        }
+    }
+
+    private static void boxBlurVertical(int[] pixels, int[] mask, int[] result, int w, int h, int radius) {
+        if (radius == 0) {
+            radius = 1;
+        }
+
+        int radiusHalf = radius / 2;
+        double divisor = radius;
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+
+                double sumR = 0;
+                double sumG = 0;
+                double sumB = 0;
+                double sumA = 0;
+
+                for (int j = y - radiusHalf; j < y - radiusHalf + radius; j++) {
+                    int index2 = j * w + x;
+                    int v;
+                    if (j < 0 || j >= h || (mask != null && (((mask[index2] >> 24) & 0xff) == 0))) {
+                        v = 0;
+                    } else {
+                        v = pixels[index2];
+                    }
+                    double a = (v >> 24) & 0xff;
+                    double r = ((v >> 16) & 0xff);
+                    double g = ((v >> 8) & 0xff);
+                    double b = ((v) & 0xff);
+
+                    r = r * a / 255.0;
+                    g = g * a / 255.0;
+                    b = b * a / 255.0;
+
+                    sumA += a;
+                    sumR += r;
+                    sumG += g;
+                    sumB += b;
+                }
+
+                int da = (int) Math.floor(sumA / divisor);
+                int da_mod = da == 0 ? 255 : da;
+                int dr = (int) Math.floor(sumR / divisor * 255.0 / (double) da_mod);
+                int dg = (int) Math.floor(sumG / divisor * 255.0 / (double) da_mod);
+                int db = (int) Math.floor(sumB / divisor * 255.0 / (double) da_mod);
+
+                if (dr > 255) {
+                    dr = 255;
+                }
+                if (dg > 255) {
+                    dg = 255;
+                }
+                if (db > 255) {
+                    db = 255;
+                }
+
+                int index = y * w + x;
+
+                result[index] = RGBA.toInt(dr, dg, db, da);
             }
         }
     }
@@ -388,7 +549,7 @@ public class Filtering {
                 shadow[i] = (shadow[i] & 0xffffff) | (alpha << 24);
             }
         }
-        
+
         if (knockout || inner) {
             for (int i = 0; i < shadow.length; i++) {
                 int mask = (srcPixels[i] >> 24) & 0xff;
