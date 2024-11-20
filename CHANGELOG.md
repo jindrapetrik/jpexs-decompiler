@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [22.0.1] - 2024-11-20
 ### Added
 - AS3.1 null-conditional operator `?.` (air - swf version 50)
 - AS3.1 nullish coalescing operator `??` (air - swf version 50)
@@ -3501,7 +3501,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.0...dev
+[22.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version22.0.0...version22.0.1
 [22.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.3...version22.0.0
 [21.1.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.2...version21.1.3
 [21.1.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version21.1.1...version21.1.2

@@ -65,6 +65,22 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="22.0.1" date="2024-11-20">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3.1 null-conditional operator `?.` (air - swf version 50)</li>
+					<li>AS3.1 nullish coalescing operator `??` (air - swf version 50)</li>
+					<li>AS3 direct editation - verbatim strings `@"`</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2366, #2367, #2372 Running simple editor on background slowing down other views</li>
+					<li>Rendering now does not slow down UI elements</li>
+					<li>Using faster variant of blur</li>
+				</ul>
+			</description>
+		</release>
 		<release version="22.0.0" date="2024-11-10">
 			<description>
 				<p>Added</p>
