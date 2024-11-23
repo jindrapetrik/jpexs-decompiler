@@ -4,7 +4,7 @@
           <Include href="Symbol 2.xml" loadImmediate="false" itemID="67420f0e-000006f2" lastModified="1732382478"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="1">
+          <DOMTimeline name="Scene 1" currentFrame="3">
                <layers>
                     <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
                          <frames>
@@ -43,6 +43,7 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="4891" publishTime="1732398444"/>
           <PublishItem publishSize="5424" publishTime="1732396187"/>
           <PublishItem publishSize="1485" publishTime="1732384077"/>
           <PublishItem publishSize="1462" publishTime="1732383422"/>

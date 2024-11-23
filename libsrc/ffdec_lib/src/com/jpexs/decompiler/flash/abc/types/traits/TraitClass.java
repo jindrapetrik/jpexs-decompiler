@@ -462,7 +462,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     }
                 }
                 
-                if (convertData.ignoreAccessibility) {
+                if (convertData.ignoreAccessibility && false /*WIP*/) {
                     if (constructorBody.convertedItems != null) {
                         for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
                             GraphTargetItem ti = constructorBody.convertedItems.get(j);

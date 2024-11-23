@@ -2826,6 +2826,9 @@ public class XFLConverter {
 
     
     private static Map<String, String> getRootAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+        if (true) { //WIP
+            return new HashMap<>();
+        }
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
             swfVersion = ((SWF) pack.getOpenable()).version;
@@ -2911,6 +2914,9 @@ public class XFLConverter {
     
     
     private static Map<String, Map<String, String>> getAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+        if (true) { //WIP
+            return new HashMap<>(); 
+        }
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
             swfVersion = ((SWF) pack.getOpenable()).version;
