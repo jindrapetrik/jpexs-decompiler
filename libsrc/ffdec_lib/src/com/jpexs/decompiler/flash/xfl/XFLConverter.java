@@ -26,10 +26,13 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructPropAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
@@ -150,6 +153,8 @@ import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.flash.fla.converter.FlaConverter;
 import com.jpexs.flash.fla.converter.FlaFormatVersion;
 import com.jpexs.flash.fla.converter.streams.CfbOutputStorage;
@@ -1271,7 +1276,7 @@ public class XFLConverter {
         return (DEBUG_EXPORT_LAYER_DEPTHS ? "MaskedSymbol " : "Symbol ") + symbolId;
     }
 
-    private static void convertSymbolInstance(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertSymbolInstance(Map<String, Map<String, String>> accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1286,6 +1291,13 @@ public class XFLConverter {
         writer.writeStartElement("DOMSymbolInstance", new String[]{"libraryItemName", getSymbolName(lastImportedId, characterNameMap, swf, tag)});
         if (name != null) {
             writer.writeAttribute("name", name);
+            
+            if (accessibility.containsKey(name)) {
+                writer.writeAttribute("hasAccessibleData", "true");
+                for (String acKey : accessibility.get(name).keySet()) {
+                    writer.writeAttribute(acKey, accessibility.get(name).get(acKey));
+                }
+            }
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
@@ -1496,8 +1508,8 @@ public class XFLConverter {
 
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 statusStack.pushStatus(symbol.toString());
-                XFLXmlWriter symbolStr = new XFLXmlWriter();
-
+                XFLXmlWriter symbolStr = new XFLXmlWriter();                               
+                
                 String itemId = generateItemId(lastItemIdNumber);
                 symbolStr.writeStartElement("DOMSymbolItem", new String[]{
                     "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
@@ -1648,7 +1660,7 @@ public class XFLConverter {
                                             statusStack.popStatus();
                                         } else if (character instanceof TextTag) {
                                             statusStack.pushStatus(character.toString());
-                                            convertText(null, (TextTag) character, matrix, filters, recCharWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
+                                            convertText(new HashMap<>() /*???*/, null, (TextTag) character, matrix, filters, recCharWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
                                             statusStack.popStatus();
                                         } else if (character instanceof DefineVideoStreamTag) {
                                             statusStack.pushStatus(character.toString());
@@ -1659,7 +1671,7 @@ public class XFLConverter {
                                             convertImageInstance(lastImportedId, characterNameMap, swf, null, matrix, (ImageTag) character, recCharWriter);
                                             statusStack.popStatus();
                                         } else {
-                                            convertSymbolInstance(lastImportedId, characterNameMap, swf, null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, character.getSwf().getCharacter(rec.characterId), flaVersion, recCharWriter);
+                                            convertSymbolInstance(new HashMap<>() /*???*/, lastImportedId, characterNameMap, swf, null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, character.getSwf().getCharacter(rec.characterId), flaVersion, recCharWriter);
                                         }
 
                                         int duration = frame - lastFrame;
@@ -1701,9 +1713,9 @@ public class XFLConverter {
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite) ? characterScriptPacks.get(sprite) : null;
 
-                    extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, sprite.getTags(), swf.getCharacterId(sprite), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                    extractMultilevelClips(characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, sprite.getTags(), swf.getCharacterId(sprite), writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
 
-                    convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), sprite, swf.getCharacterId(sprite), characterVariables.get(sprite), nonLibraryShapes, tags, sprite.getTags(), getSymbolName(lastImportedId, characterNameMap, swf, symbol), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                    convertTimelines(characterScriptPacks, lastImportedId, characterNameMap, swf, swf.getAbcIndex(), sprite, swf.getCharacterId(sprite), characterVariables.get(sprite), nonLibraryShapes, tags, sprite.getTags(), getSymbolName(lastImportedId, characterNameMap, swf, symbol), flaVersion, files, symbolStr, spriteScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
 
                 } else if (symbol instanceof ShapeTag) {
                     symbolStr.writeStartElement("timeline");
@@ -1744,11 +1756,11 @@ public class XFLConverter {
         }
 
         statusStack.pushStatus("extracting multilevel clips");
-        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, swf.getTags(), -1, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+        extractMultilevelClips(characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, swf.getTags(), -1, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
         statusStack.popStatus();
 
         statusStack.pushStatus("converting multiusage morphshapes");
-        extractMultiUsageMorphShapes(lastItemIdNumber, lastImportedId, characterNameMap, writer, swf, nonLibraryShapes, flaVersion, files, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+        extractMultiUsageMorphShapes(characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, writer, swf, nonLibraryShapes, flaVersion, files, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
         statusStack.popStatus();
         /*if (hasSymbol) {
             
@@ -2397,7 +2409,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {
+    private static void convertFrames(Map<String, Map<String, String>> accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, int depth, FLAVersion flaVersion, XFLXmlWriter writer, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {
         Logger.getLogger(XFLConverter.class.getName()).log(Level.FINE, "Converting frames of {0}", symbolName);
         boolean lastIn = false;
         XFLXmlWriter writer2 = new XFLXmlWriter();
@@ -2610,7 +2622,7 @@ public class XFLConverter {
                 }
 
                 if (character instanceof ShapeTag && standaloneShapeTweener != null) {
-                    convertSymbolInstance(lastImportedId, characterNameMap, swf, instanceName, standaloneShapeTweenerMatrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, standaloneShapeTweener, flaVersion, elementsWriter);
+                    convertSymbolInstance(accessibility, lastImportedId, characterNameMap, swf, instanceName, standaloneShapeTweenerMatrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, standaloneShapeTweener, flaVersion, elementsWriter);
                     standaloneShapeTweener = null;
                 } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(character))) {
                     if (lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
@@ -2630,7 +2642,7 @@ public class XFLConverter {
                         shapeTweener = null;
                         standaloneShapeTweener = m;
                         standaloneShapeTweenerMatrix = matrix;
-                        convertSymbolInstance(lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter);
+                        convertSymbolInstance(accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter);
                     } else {
                         morphShapeRatios.add(ratio == -1 ? 0 : ratio);
                         if (lastCharacter == m && Objects.equals(matrix, lastMatrix)) {
@@ -2646,14 +2658,14 @@ public class XFLConverter {
                     shapeTween = false;
                     if (character instanceof TextTag) {
                         statusStack.pushStatus(character.toString());
-                        convertText(instanceName, (TextTag) character, matrix, filters, elementsWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
+                        convertText(accessibility, instanceName, (TextTag) character, matrix, filters, elementsWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
                         statusStack.popStatus();
                     } else if (character instanceof DefineVideoStreamTag) {
                         convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, elementsWriter);
                     } else if (character instanceof ImageTag) {
                         convertImageInstance(lastImportedId, characterNameMap, swf, instanceName, matrix, (ImageTag) character, elementsWriter);
                     } else if (character != null) {
-                        convertSymbolInstance(lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter);
+                        convertSymbolInstance(accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter);
                     }
                 }
 
@@ -2812,6 +2824,234 @@ public class XFLConverter {
         return -1;
     }
 
+    
+    private static Map<String, String> getRootAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+        int swfVersion = -1;
+        if (pack.getOpenable() instanceof SWF) {
+            swfVersion = ((SWF) pack.getOpenable()).version;
+        }
+        Map<String, String> ret = new HashMap<>();
+        int classIndex = getPackMainClassId(pack);
+        if (classIndex > -1) {
+            ABC abc = pack.abc;
+            InstanceInfo instanceInfo = abc.instance_info.get(classIndex);
+            int constructorMethodIndex = instanceInfo.iinit_index;
+            MethodBody constructorBody = abc.findBody(constructorMethodIndex);
+            try {
+                List<MethodBody> callStack = new ArrayList<>();
+                callStack.add(constructorBody);
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                if (constructorBody.convertedItems != null) {
+                    for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
+                        GraphTargetItem ti = constructorBody.convertedItems.get(j);                        
+                        if (ti instanceof SetPropertyAVM2Item) {
+                            if (ti.value instanceof ConstructPropAVM2Item) {
+                                ConstructPropAVM2Item cons = (ConstructPropAVM2Item) ti.value;
+                                if (cons.propertyName instanceof FullMultinameAVM2Item) {
+                                    FullMultinameAVM2Item fm = (FullMultinameAVM2Item) cons.propertyName;
+                                    if ("AccessibilityProperties".equals(fm.resolvedMultinameName)) {
+                                        
+                                        continue;
+                                    }
+                                }
+                            }
+                            SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) ti;
+                            if (setProp.object instanceof GetPropertyAVM2Item) {
+                                GetPropertyAVM2Item parentGetProp = (GetPropertyAVM2Item) setProp.object;
+                                if (parentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                    FullMultinameAVM2Item parentProp = (FullMultinameAVM2Item) parentGetProp.propertyName;
+                                    if ("accessibilityProperties".equals(parentProp.resolvedMultinameName)) {
+                                        if (parentGetProp.object instanceof GetPropertyAVM2Item) {
+                                            GetPropertyAVM2Item parentParentGetProp = (GetPropertyAVM2Item) parentGetProp.object;
+                                            if (parentParentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                FullMultinameAVM2Item parentParentProp = (FullMultinameAVM2Item) parentParentGetProp.propertyName;
+                                                if ("root".equals(parentParentProp.resolvedMultinameName)) {
+                                                    if (parentParentGetProp.object instanceof ThisAVM2Item) {
+                                                        if (setProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                            FullMultinameAVM2Item prop = (FullMultinameAVM2Item) setProp.propertyName;
+                                                            String acProp = prop.resolvedMultinameName;
+                                                            if (Arrays.asList("name", "description", "forceSimple", "noAutoLabeling", "shortcut").contains(acProp)) {
+                                                                boolean invert = false;
+                                                                if ("noAutoLabeling".equals(acProp)) {
+                                                                    acProp = "autoLabeling";
+                                                                    invert = true;
+                                                                }
+                                                                if ("name".equals(acProp)) {
+                                                                    acProp = "accName";
+                                                                }
+                                                                String val = "";
+                                                                if (setProp.value instanceof StringAVM2Item) {
+                                                                    val = (String) ((StringAVM2Item) setProp.value).getResult();
+                                                                }
+                                                                if (setProp.value instanceof TrueItem) {                                                                
+                                                                    val = invert ? "false": "true";
+                                                                }
+                                                                if (setProp.value instanceof FalseItem) {
+                                                                    val = invert ? "true": "false";
+                                                                }
+                                                                ret.put(acProp, val);                                                            
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (InterruptedException ex) {
+                //ignore
+            }
+        }
+        return ret;
+    }
+    
+    
+    private static Map<String, Map<String, String>> getAccessibilityFromPack(AbcIndexing abcIndex, ScriptPack pack) {
+        int swfVersion = -1;
+        if (pack.getOpenable() instanceof SWF) {
+            swfVersion = ((SWF) pack.getOpenable()).version;
+        }
+        Map<String, Map<String, String>> ret = new HashMap<>();
+        int classIndex = getPackMainClassId(pack);
+        if (classIndex > -1) {
+            ABC abc = pack.abc;
+            InstanceInfo instanceInfo = abc.instance_info.get(classIndex);
+            int constructorMethodIndex = instanceInfo.iinit_index;
+            MethodBody constructorBody = abc.findBody(constructorMethodIndex);
+            try {
+                List<MethodBody> callStack = new ArrayList<>();
+                callStack.add(constructorBody);
+                constructorBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                List<String> accessibilityTraitNames = new ArrayList<>();
+                if (constructorBody.convertedItems != null) {
+                    for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
+                        GraphTargetItem ti = constructorBody.convertedItems.get(j);
+                        if (ti instanceof CallPropertyAVM2Item) {
+                            CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
+                            if (callProp.propertyName instanceof FullMultinameAVM2Item) {
+                                FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                if (
+                                    propName.resolvedMultinameName != null
+                                    && (
+                                        propName.resolvedMultinameName.startsWith("__setAcc_")
+                                        || propName.resolvedMultinameName.startsWith("__setTab_")
+                                    )
+                                    && callProp.arguments.isEmpty()
+                                    ) {
+                                    accessibilityTraitNames.add(propName.resolvedMultinameName);                                    
+                                }
+                            }
+                        }                        
+                    }
+                }
+                
+                for (Trait t : instanceInfo.instance_traits.traits) {
+                    if (accessibilityTraitNames.contains(t.getName(abc).getName(abc.constants, new ArrayList<>(), true, false))) {
+                        if (t instanceof TraitMethodGetterSetter) {
+                            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
+                            MethodBody traitBody = abc.findBody(tm.method_info);
+                            List<MethodBody> traitCallStack = new ArrayList<>();
+                            traitCallStack.add(traitBody);
+                            traitBody.convert(swfVersion, traitCallStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>());
+                            if (traitBody.convertedItems != null) {
+                                for (int j = 0; j < traitBody.convertedItems.size(); j++) {
+                                    GraphTargetItem ti = traitBody.convertedItems.get(j);                                    
+                                    if (ti instanceof SetPropertyAVM2Item) {
+                                        if (ti.value instanceof ConstructPropAVM2Item) {
+                                            ConstructPropAVM2Item cons = (ConstructPropAVM2Item) ti.value;
+                                            if (cons.propertyName instanceof FullMultinameAVM2Item) {
+                                                FullMultinameAVM2Item fm = (FullMultinameAVM2Item) cons.propertyName;
+                                                if ("AccessibilityProperties".equals(fm.resolvedMultinameName)) {
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                        SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) ti;
+                                        
+                                        if (setProp.propertyName instanceof FullMultinameAVM2Item) {
+                                            FullMultinameAVM2Item prop = (FullMultinameAVM2Item) setProp.propertyName;
+                                            if ("tabIndex".equals(prop.resolvedMultinameName)) {
+                                                GetPropertyAVM2Item parentGetProp = (GetPropertyAVM2Item) setProp.object;
+                                                if (parentGetProp.object instanceof ThisAVM2Item) {
+                                                    if (parentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                        if (setProp.value instanceof IntegerValueAVM2Item) {
+                                                            FullMultinameAVM2Item parentProp = (FullMultinameAVM2Item) parentGetProp.propertyName;
+                                                            if (!ret.containsKey(parentProp.resolvedMultinameName)) {
+                                                                ret.put(parentProp.resolvedMultinameName, new HashMap<>());
+                                                            }
+                                                            IntegerValueAVM2Item iv = (IntegerValueAVM2Item) setProp.value;
+                                                            ret.get(parentProp.resolvedMultinameName).put("tabIndex", "" + iv.getResult());
+                                                        }                                                                                                                                                                                                                        
+                                                    }
+                                                }                                                
+                                            }
+                                        }
+                                        
+                                        if (setProp.object instanceof GetPropertyAVM2Item) {
+                                            GetPropertyAVM2Item parentGetProp = (GetPropertyAVM2Item) setProp.object;
+                                            if (parentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                FullMultinameAVM2Item parentProp = (FullMultinameAVM2Item) parentGetProp.propertyName;
+                                                if ("accessibilityProperties".equals(parentProp.resolvedMultinameName)) {
+                                                    if (parentGetProp.object instanceof GetPropertyAVM2Item) {
+                                                        GetPropertyAVM2Item parentParentGetProp = (GetPropertyAVM2Item) parentGetProp.object;
+                                                        if (parentParentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                            FullMultinameAVM2Item parentParentProp = (FullMultinameAVM2Item) parentParentGetProp.propertyName;
+                                                            if (parentParentProp.resolvedMultinameName != null) {
+                                                                if (parentParentGetProp.object instanceof ThisAVM2Item) {
+                                                                    if (setProp.propertyName instanceof FullMultinameAVM2Item) {                                                                        
+                                                                        
+                                                                        FullMultinameAVM2Item prop = (FullMultinameAVM2Item) setProp.propertyName;
+                                                                        if (!ret.containsKey(parentParentProp.resolvedMultinameName)) {
+                                                                            ret.put(parentParentProp.resolvedMultinameName, new HashMap<>());
+                                                                        }
+                                                                        String acProp = prop.resolvedMultinameName;
+                                                                        
+                                                                        if (Arrays.asList("name", "description", "forceSimple", "noAutoLabeling", "shortcut").contains(acProp)) {
+                                                                            boolean invert = false;
+                                                                            if ("noAutoLabeling".equals(acProp)) {
+                                                                                acProp = "autoLabeling";
+                                                                                invert = true;
+                                                                            }
+                                                                            if ("name".equals(acProp)) {
+                                                                                acProp = "accName";
+                                                                            }
+                                                                            String val = "";
+                                                                            if (setProp.value instanceof StringAVM2Item) {
+                                                                                val = (String) ((StringAVM2Item) setProp.value).getResult();
+                                                                            }
+                                                                            if (setProp.value instanceof TrueItem) {                                                                
+                                                                                val = invert ? "false": "true";
+                                                                            }
+                                                                            if (setProp.value instanceof FalseItem) {
+                                                                                val = invert ? "true": "false";
+                                                                            }
+                                                                            ret.get(parentParentProp.resolvedMultinameName).put(acProp, val);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }                        
+                    }
+                }
+            } catch (InterruptedException ex) {
+                //ignore
+            }
+        }
+        return ret;                                
+    }
+    
     private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) {
         
         int swfVersion = -1;
@@ -2922,10 +3162,10 @@ public class XFLConverter {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
         }
 
-        Map<Integer, String> frameToScriptMap = new HashMap<>();
-
+        Map<Integer, String> frameToScriptMap = new HashMap<>();        
+        
         if (scriptPack != null) {
-            frameToScriptMap = getFrameScriptsFromPack(abcIndex, scriptPack);
+            frameToScriptMap = getFrameScriptsFromPack(abcIndex, scriptPack);            
         }
 
         for (Tag t : timeLineTags) {
@@ -3172,6 +3412,7 @@ public class XFLConverter {
     }
 
     private void addExtractedClip(
+            Map<CharacterTag, ScriptPack> characterScriptPacks,
             Reference<Integer> lastItemIdNumber,
             Reference<Integer> lastImportedId,
             Map<CharacterTag, String> characterNameMap,
@@ -3192,7 +3433,7 @@ public class XFLConverter {
     ) throws XMLStreamException {
         XFLXmlWriter symbolStr = new XFLXmlWriter();
 
-        extractMultilevelClips(lastItemIdNumber, lastImportedId, characterNameMap, timelineTags, spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+        extractMultilevelClips(characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, timelineTags, spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
 
         if (nextClipId.getVal() < 0) {
             nextClipId.setVal(swf.getNextCharacterId());
@@ -3210,7 +3451,7 @@ public class XFLConverter {
             "lastModified", Long.toString(getTimestamp(swf))});
         symbolStr.writeAttribute("symbolType", "graphic");
 
-        convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, timelineTags, timelineTags, getMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+        convertTimelines(characterScriptPacks, lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, timelineTags, timelineTags, getMaskedSymbolName(objectId), flaVersion, files, symbolStr, null, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
 
         symbolStr.writeEndElement(); // DOMSymbolItem
         String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3283,6 +3524,7 @@ public class XFLConverter {
     }
 
     private void extractMultiUsageMorphShapes(
+            Map<CharacterTag, ScriptPack> characterScriptPacks,
             Reference<Integer> lastItemIdNumber,
             Reference<Integer> lastImportedId,
             Map<CharacterTag, String> characterNameMap,
@@ -3326,7 +3568,7 @@ public class XFLConverter {
                 }
             }
 
-            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, swf.getTags(), new ReadOnlyTagList(timelineTags), getSymbolName(lastImportedId, characterNameMap, swf, swf.getCharacter(objectId)), flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>(), statusStack, characterImportLinkageURL, characters);
+            convertTimelines(characterScriptPacks, lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, objectId, "", nonLibraryShapes, swf.getTags(), new ReadOnlyTagList(timelineTags), getSymbolName(lastImportedId, characterNameMap, swf, swf.getCharacter(objectId)), flaVersion, files, symbolStr, null, new HashMap<>(), new ArrayList<>(), statusStack, characterImportLinkageURL, characters);
 
             symbolStr.writeEndElement(); // DOMSymbolItem
             String symbolStr2 = prettyFormatXML(symbolStr.toString());
@@ -3347,6 +3589,7 @@ public class XFLConverter {
     }
 
     private void extractMultilevelClips(
+            Map<CharacterTag, ScriptPack> characterScriptPacks,
             Reference<Integer> lastItemIdNumber,
             Reference<Integer> lastImportedId,
             Map<CharacterTag, String> characterNameMap,
@@ -3576,7 +3819,7 @@ public class XFLConverter {
                         //set timelined?
                         delegatedTimeline.add(showFrame);
                     }
-                    addExtractedClip(lastItemIdNumber, lastImportedId, characterNameMap, new ReadOnlyTagList(delegatedTimeline), spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                    addExtractedClip(characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, new ReadOnlyTagList(delegatedTimeline), spriteId, writer, swf, nextClipId, nonLibraryShapes, backgroundColor, flaVersion, files, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
                     placeToMaskedSymbol.put(secondPlace, new MultiLevelClip(secondPlace, nextClipId.getVal(), numFrames));
                 }
             }
@@ -3598,8 +3841,28 @@ public class XFLConverter {
     }
 
     //Note: symbolId argument might be a virtual symbol like MaskedSymbol
-    private void convertTimelines(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {
-
+    private void convertTimelines(Map<CharacterTag, ScriptPack> characterScriptPacks, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {      
+        ScriptPack characterScriptPack = sprite == null ? null : characterScriptPacks.containsKey(sprite) ? characterScriptPacks.get(sprite) : null;
+        
+        if (sprite == null && symbolId == -1) {
+            String documentClass = swf.getDocumentClass();
+            if (documentClass != null) {               
+                try {
+                    List<ScriptPack> sps = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
+                    if (sps != null && !sps.isEmpty()) {
+                        characterScriptPack = sps.get(0);
+                    }
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+        }
+        
+        Map<String, Map<String, String>> accessibility = new HashMap<>();
+        if (characterScriptPack != null) {
+            accessibility = getAccessibilityFromPack(swf.getAbcIndex(), characterScriptPack);
+        }
+        
         String symbolName = getSymbolName(lastImportedId, characterNameMap, swf, sprite);
         List<String> classNames = new ArrayList<>();
         //Searches for Object.registerClass("linkageIdentifier",mypkg.MyClass);        
@@ -3762,7 +4025,7 @@ public class XFLConverter {
             ReadOnlyTagList sceneTimelineTags = scene.timelineSubTags;
             int labelLayerCount = convertLabelsLayers(sceneTimelineTags, writer);
             boolean hasScript = convertActionScriptLayer(scene, initClipScript, abcIndex, sceneTimelineTags, writer, scriptPack);
-
+            
             int index = 0;
 
             index += labelLayerCount;
@@ -3969,7 +4232,7 @@ public class XFLConverter {
                             "color", randomOutlineColor(),
                             "layerType", "mask",
                             "locked", "true"});
-                        convertFrames(symbolName, lastImportedId, characterNameMap, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                        convertFrames(accessibility, symbolName, lastImportedId, characterNameMap, swf, depthToFramesList.get(po.getDepth()), clipFrame, lastFrame, "", "", nonLibraryShapes, sceneTimelineTags, po.getDepth(), flaVersion, writer, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
                         writer.writeEndElement();
 
                         int parentIndex = index;
@@ -3991,7 +4254,7 @@ public class XFLConverter {
                                         handledClips.add(po2);
 
                                         for (int ndx = po.getClipDepth() - 1; ndx > po2.getClipDepth(); ndx--) {
-                                            boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                                            boolean nonEmpty = writeLayer(accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(ndx), ndx, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
                                             for (int i = clipFrame; i <= lastFrame; i++) {
                                                 depthToFramesList.get(ndx).remove((Integer) i);
                                             }
@@ -4070,7 +4333,7 @@ public class XFLConverter {
                         }
 
                         for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
-                            boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                            boolean nonEmpty = writeLayer(accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(nd), nd, clipFrame, lastFrame, parentIndex, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
                             for (int i = clipFrame; i <= lastFrame; i++) {
                                 depthToFramesList.get(nd).remove((Integer) i);
                             }
@@ -4107,7 +4370,7 @@ public class XFLConverter {
                     }
                 }
 
-                boolean nonEmpty = writeLayer(symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+                boolean nonEmpty = writeLayer(accessibility, symbolName, lastImportedId, characterNameMap, swf, index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, sceneTimelineTags, flaVersion, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
                 if (nonEmpty) {
                     index++;
                 }
@@ -4146,7 +4409,7 @@ public class XFLConverter {
         writer.writeEndElement(); //DOMLayer        
     }
 
-    private boolean writeLayer(String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {
+    private boolean writeLayer(Map<String, Map<String, String>> accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, List<Integer> multiUsageMorphShapes, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
@@ -4165,7 +4428,7 @@ public class XFLConverter {
         layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
         String layerAfter = "</DOMLayer>";
         int prevLength = writer.length();
-        convertFrames(symbolName, lastImportedId, characterNameMap, swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, timelineTags, d, flaVersion, writer, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+        convertFrames(accessibility, symbolName, lastImportedId, characterNameMap, swf, onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, timelineTags, d, flaVersion, writer, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
         statusStack.popStatus();
         return writer.length() != prevLength;
     }
@@ -4245,7 +4508,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static void convertText(String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, XFLXmlWriter writer, Map<CharacterTag, String> characterImportLinkageURL, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Set<CharacterTag> characters) throws XMLStreamException {
+    private static void convertText(Map<String, Map<String, String>> accessibility, String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, XFLXmlWriter writer, Map<CharacterTag, String> characterImportLinkageURL, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Set<CharacterTag> characters) throws XMLStreamException {
         MATRIX matrix = new MATRIX(m);
         CSMTextSettingsTag csmts = null;
         XFLXmlWriter filterStr = new XFLXmlWriter();
@@ -4446,6 +4709,13 @@ public class XFLConverter {
             }
             if (instanceName != null) {
                 writer.writeAttribute("name", instanceName);
+                
+                if (accessibility.containsKey(instanceName)) {
+                    writer.writeAttribute("hasAccessibleData", "true");
+                    for (String acKey : accessibility.get(instanceName).keySet()) {
+                        writer.writeAttribute(acKey, accessibility.get(instanceName).get(acKey));
+                    }
+                }
             }
             if (antiAliasSharpness != null) {
                 writer.writeAttribute("antiAliasSharpness", antiAliasSharpness);
@@ -4718,8 +4988,17 @@ public class XFLConverter {
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());
 
+        
         XFLXmlWriter domDocument = new XFLXmlWriter();
         try {
+            
+            ScriptPack documentScriptPack = null;
+            if (documentClass != null) {
+                List<ScriptPack> packs = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
+                documentScriptPack = packs.isEmpty() ? null : packs.get(0);            
+            }
+
+            
             domDocument.writeStartElement("DOMDocument", new String[]{
                 "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance",
                 "xmlns", "http://ns.adobe.com/xfl/2008/",
@@ -4739,6 +5018,16 @@ public class XFLConverter {
                 "frameRate", doubleToString(swf.frameRate)
             });
 
+            if (documentScriptPack != null) {
+                Map<String, String> accessibility = getRootAccessibilityFromPack(swf.getAbcIndex(), documentScriptPack);
+                if (!accessibility.isEmpty()) {
+                    domDocument.writeAttribute("hasAccessibleData", "true");
+                    for (String acKey : accessibility.keySet()) {
+                        domDocument.writeAttribute(acKey, accessibility.get(acKey));
+                    }
+                }
+            }      
+            
             if (Double.compare(width, 550) != 0) {
                 domDocument.writeAttribute("width", doubleToString(width));
 
@@ -4808,15 +5097,10 @@ public class XFLConverter {
 
             convertLibrary(lastItemIdNumber, charactersExportedInFirstFrame, characterImportLinkageURL, characters, lastImportedId, characterNameMap, swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), files, datfiles, flaVersion, domDocument, placeToMaskedSymbol, multiUsageMorphShapes, statusStack);
 
-            //domDocument.writeStartElement("timelines");
-            ScriptPack documentScriptPack = null;
-            if (documentClass != null) {
-                List<ScriptPack> packs = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
-                documentScriptPack = packs.isEmpty() ? null : packs.get(0);
-            }
+            //domDocument.writeStartElement("timelines");            
 
             statusStack.pushStatus("main timeline");
-            convertTimelines(lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, -1, null, nonLibraryShapes, swf.getTags(), swf.getTags(), null, flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
+            convertTimelines(characterScriptPacks, lastImportedId, characterNameMap, swf, swf.getAbcIndex(), null, -1, null, nonLibraryShapes, swf.getTags(), swf.getTags(), null, flaVersion, files, domDocument, documentScriptPack, placeToMaskedSymbol, multiUsageMorphShapes, statusStack, characterImportLinkageURL, characters);
             statusStack.popStatus();
             //domDocument.writeEndElement();
 
@@ -5297,7 +5581,7 @@ public class XFLConverter {
         }
         if (useAS3 && settings.exportScript) {
             try {
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true, false, true, true, "/_assets/", Configuration.linkAllClasses.get());
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true, false, true, true, "/_assets/", Configuration.linkAllClasses.get(), true);
                 swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);

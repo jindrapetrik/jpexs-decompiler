@@ -343,7 +343,7 @@ public class SwfFlashDevelopExporter {
         }
 
         boolean parallel = Configuration.parallelSpeedUp.get();
-        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, false, "/_assets/", Configuration.linkAllClasses.get());
+        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, false, "/_assets/", Configuration.linkAllClasses.get(), false);
         swf.exportActionScript(handler, outFile.toPath().getParent().resolve(srcPath).toFile().getAbsolutePath(), scriptExportSettings, parallel, eventListener);
     }
 }

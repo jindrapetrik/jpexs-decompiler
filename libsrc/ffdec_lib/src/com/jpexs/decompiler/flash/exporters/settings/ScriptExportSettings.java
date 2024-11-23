@@ -50,6 +50,11 @@ public class ScriptExportSettings implements Cloneable {
      * Ignore frame scripts
      */
     public boolean ignoreFrameScripts;
+    
+    /**
+     * Ignore accessibility
+     */
+    public boolean ignoreAccessibility;
 
     /**
      * Export embed
@@ -93,7 +98,7 @@ public class ScriptExportSettings implements Cloneable {
             boolean exportEmbedFlaMode,
             boolean resampleWav
     ) {
-        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/", false);
+        this(mode, singleFile, ignoreFrameScripts, exportEmbed, exportEmbedFlaMode, resampleWav, "/_assets/", false, false);
     }
 
     public ScriptExportSettings(
@@ -104,7 +109,8 @@ public class ScriptExportSettings implements Cloneable {
             boolean exportEmbedFlaMode,
             boolean resampleWav,
             String assetsDir,
-            boolean includeAllClasses
+            boolean includeAllClasses,
+            boolean ignoreAccessibility
     ) {
         this.mode = mode;
         this.singleFile = singleFile;
@@ -114,6 +120,7 @@ public class ScriptExportSettings implements Cloneable {
         this.resampleWav = resampleWav;
         this.assetsDir = assetsDir;
         this.includeAllClasses = includeAllClasses;
+        this.ignoreAccessibility = ignoreAccessibility;
     }
 
     public String getFileExtension() {

@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- FLA export - accessibility for AS3 files
 
 ## [22.0.1] - 2024-11-20
 ### Added
