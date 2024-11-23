@@ -19,10 +19,12 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructPropAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
@@ -79,6 +81,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
      * Frame trait names
      */
     private final List<String> frameTraitNames = new ArrayList<>();
+    
+    /**
+     * Accesibility trait names
+     */
+    private final List<String> accessibilityTraitNames = new ArrayList<>();
 
     /**
      * Deletes this trait.
@@ -316,8 +323,16 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //static methods
         classInfo.static_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
+        List<String> ignoredInstanceTraitNames = new ArrayList<>();
+        if (convertData.ignoreFrameScripts) {
+            ignoredInstanceTraitNames.addAll(frameTraitNames);         
+        }
+        if (convertData.ignoreAccessibility) {
+            ignoredInstanceTraitNames.addAll(accessibilityTraitNames);
+        }
+        
         //instance methods
-        instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
+        instanceInfo.instance_traits.toString(swfVersion, packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, ignoredInstanceTraitNames, isInterface);
 
         if (first.getVal()) {
             writer.newLine();
@@ -429,6 +444,77 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                         }
                                         constructorBody.convertedItems.remove(j);
                                         j--;
+                                    } else if (
+                                            propName.resolvedMultinameName != null
+                                            && (
+                                                propName.resolvedMultinameName.startsWith("__setAcc_")
+                                                || propName.resolvedMultinameName.startsWith("__setTab_")
+                                            )
+                                            && callProp.arguments.isEmpty()
+                                            ) {
+                                        accessibilityTraitNames.add(propName.resolvedMultinameName);
+                                        constructorBody.convertedItems.remove(j);
+                                        j--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (convertData.ignoreAccessibility) {
+                    if (constructorBody.convertedItems != null) {
+                        for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
+                            GraphTargetItem ti = constructorBody.convertedItems.get(j);
+                            if (ti instanceof CallPropertyAVM2Item) {
+                                CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
+                                if (callProp.propertyName instanceof FullMultinameAVM2Item) {
+                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                    if (
+                                        propName.resolvedMultinameName != null
+                                        && (
+                                            propName.resolvedMultinameName.startsWith("__setAcc_")
+                                            || propName.resolvedMultinameName.startsWith("__setTab_")
+                                        )
+                                        && callProp.arguments.isEmpty()
+                                        ) {
+                                        accessibilityTraitNames.add(propName.resolvedMultinameName);
+                                        constructorBody.convertedItems.remove(j);
+                                        j--;
+                                    }
+                                }
+                            }
+                            if (ti instanceof SetPropertyAVM2Item) {
+                                if (ti.value instanceof ConstructPropAVM2Item) {
+                                    ConstructPropAVM2Item cons = (ConstructPropAVM2Item) ti.value;
+                                    if (cons.propertyName instanceof FullMultinameAVM2Item) {
+                                        FullMultinameAVM2Item fm = (FullMultinameAVM2Item) cons.propertyName;
+                                        if ("AccessibilityProperties".equals(fm.resolvedMultinameName)) {
+                                            constructorBody.convertedItems.remove(j);
+                                            j--;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) ti;
+                                if (setProp.object instanceof GetPropertyAVM2Item) {
+                                    GetPropertyAVM2Item parentGetProp = (GetPropertyAVM2Item) setProp.object;
+                                    if (parentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                        FullMultinameAVM2Item parentProp = (FullMultinameAVM2Item) parentGetProp.propertyName;
+                                        if ("accessibilityProperties".equals(parentProp.resolvedMultinameName)) {
+                                            if (parentGetProp.object instanceof GetPropertyAVM2Item) {
+                                                GetPropertyAVM2Item parentParentGetProp = (GetPropertyAVM2Item) parentGetProp.object;
+                                                if (parentParentGetProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                    FullMultinameAVM2Item parentParentProp = (FullMultinameAVM2Item) parentParentGetProp.propertyName;
+                                                    if ("root".equals(parentParentProp.resolvedMultinameName)) {
+                                                        if (parentParentGetProp.object instanceof ThisAVM2Item) {
+                                                            constructorBody.convertedItems.remove(j);
+                                                            j--;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

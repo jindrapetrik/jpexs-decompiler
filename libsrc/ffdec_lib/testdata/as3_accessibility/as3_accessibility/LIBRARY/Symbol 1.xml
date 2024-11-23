@@ -1,0 +1,51 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 1" itemID="6741f93d-000006ed" lastModified="1732384072" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="Symbol 1">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FF00"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal">
+                        <fill>
+                          <SolidColor/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!2460 1860|0 1860!0 1860|0 0!0 0|2460 0!2460 0|2460 1860"/>
+                  </edges>
+                </DOMShape>
+                <DOMSymbolInstance libraryItemName="Symbol 2" name="MovieClip4a" accName="My red circle" description="Red circle description" shortcut="red shortcut" tabIndex="61" hasAccessibleData="true" centerPoint3DX="151.5" centerPoint3DY="119.5">
+                  <matrix>
+                    <Matrix tx="133" ty="98"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="18.5" y="21.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Symbol 2" name="MovieClip4b" accName="My red circle2" description="Red circle description 2" shortcut="red shortcut 2" tabIndex="62" hasAccessibleData="true" centerPoint3DX="54.5" centerPoint3DY="138.45">
+                  <matrix>
+                    <Matrix tx="36" ty="116.95"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="18.5" y="21.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

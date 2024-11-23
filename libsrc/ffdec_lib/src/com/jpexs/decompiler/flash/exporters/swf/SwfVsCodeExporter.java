@@ -411,7 +411,7 @@ public class SwfVsCodeExporter {
         libsDir.mkdirs();
         
         boolean parallel = Configuration.parallelSpeedUp.get();
-        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, false, "/_assets/", Configuration.linkAllClasses.get());
+        ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, false, true, false, false, "/_assets/", Configuration.linkAllClasses.get(), false);
         swf.exportActionScript(handler, srcDir.getAbsolutePath(), scriptExportSettings, parallel, eventListener);
     }
 }

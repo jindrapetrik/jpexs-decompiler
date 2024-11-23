@@ -35,6 +35,8 @@ public class ConvertData {
     public boolean thisHasDefaultToPrimitive;
 
     public boolean ignoreFrameScripts;
+    
+    public boolean ignoreAccessibility;
 
     public boolean exportEmbed;
 
